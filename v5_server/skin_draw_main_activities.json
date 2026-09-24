@@ -1,0 +1,86 @@
+{
+  "182211": {
+    "main_activity_id": 182211,
+    "type": "T0",
+    "pool_list": [],
+    "task_currency": 53029,
+    "stories": []
+  },
+  "272211": {
+    "main_activity_id": 272211,
+    "type": "T0",
+    "pool_list": [],
+    "task_currency": 53111,
+    "stories": []
+  },
+  "292211": {
+    "main_activity_id": 292211,
+    "type": "T0",
+    "pool_list": [],
+    "task_currency": 53122,
+    "stories": []
+  },
+  "312211": {
+    "main_activity_id": 312211,
+    "type": "T0",
+    "pool_list": [],
+    "task_currency": 53142,
+    "stories": []
+  },
+  "332211": {
+    "main_activity_id": 332211,
+    "type": "T0",
+    "pool_list": [],
+    "task_currency": 53158,
+    "stories": []
+  },
+  "3522101": {
+    "main_activity_id": 3522101,
+    "type": "T0",
+    "pool_list": [],
+    "task_currency": 53183,
+    "stories": []
+  },
+  "3722101": {
+    "main_activity_id": 3722101,
+    "type": "T0",
+    "pool_list": [],
+    "task_currency": 53191,
+    "stories": []
+  },
+  "4022101": {
+    "main_activity_id": 4022101,
+    "type": "T0",
+    "pool_list": [],
+    "task_currency": 53200,
+    "stories": []
+  },
+  "4122101": {
+    "main_activity_id": 4122101,
+    "type": "T0",
+    "pool_list": [],
+    "task_currency": 53210,
+    "stories": []
+  },
+  "4322101": {
+    "main_activity_id": 4322101,
+    "type": "T0",
+    "pool_list": [],
+    "task_currency": 53218,
+    "stories": []
+  },
+  "4042301": {
+    "main_activity_id": 4042301,
+    "type": "Wedding",
+    "pool_list": [],
+    "task_currency": 0,
+    "stories": []
+  },
+  "4342301": {
+    "main_activity_id": 4342301,
+    "type": "Wedding",
+    "pool_list": [],
+    "task_currency": 0,
+    "stories": []
+  }
+}

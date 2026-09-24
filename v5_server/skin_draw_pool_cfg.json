@@ -1,0 +1,6537 @@
+{
+  "1001": {
+    "pool_id": 1001,
+    "name": "夜宴之邀",
+    "pool_type": 1,
+    "cost_once": [
+      53030,
+      1
+    ],
+    "cost_ten_times": [
+      53030,
+      10
+    ],
+    "payment": [
+      300000014,
+      300000013,
+      300000012,
+      300000011,
+      300000010,
+      300000009,
+      300000008,
+      300000007
+    ],
+    "payment_free": [
+      300000006
+    ],
+    "activity_id": [
+      182221
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "101": {
+        "drop_id": 101,
+        "pool_id": 1001,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            6
+          ]
+        ]
+      },
+      "102": {
+        "drop_id": 102,
+        "pool_id": 1001,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            4
+          ]
+        ]
+      },
+      "103": {
+        "drop_id": 103,
+        "pool_id": 1001,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            2
+          ]
+        ]
+      },
+      "104": {
+        "drop_id": 104,
+        "pool_id": 1001,
+        "total": 5,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            2
+          ]
+        ]
+      },
+      "105": {
+        "drop_id": 105,
+        "pool_id": 1001,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            12
+          ]
+        ]
+      },
+      "106": {
+        "drop_id": 106,
+        "pool_id": 1001,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            2
+          ]
+        ]
+      },
+      "107": {
+        "drop_id": 107,
+        "pool_id": 1001,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            1
+          ]
+        ]
+      },
+      "108": {
+        "drop_id": 108,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90001,
+            1
+          ]
+        ]
+      },
+      "109": {
+        "drop_id": 109,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90002,
+            1
+          ]
+        ]
+      },
+      "110": {
+        "drop_id": 110,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90003,
+            1
+          ]
+        ]
+      },
+      "111": {
+        "drop_id": 111,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90004,
+            1
+          ]
+        ]
+      },
+      "112": {
+        "drop_id": 112,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90005,
+            1
+          ]
+        ]
+      },
+      "113": {
+        "drop_id": 113,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            2020,
+            1
+          ]
+        ]
+      },
+      "114": {
+        "drop_id": 114,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            40
+          ]
+        ]
+      },
+      "115": {
+        "drop_id": 115,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            96
+          ]
+        ]
+      },
+      "116": {
+        "drop_id": 116,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "117": {
+        "drop_id": 117,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "118": {
+        "drop_id": 118,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "119": {
+        "drop_id": 119,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            10
+          ]
+        ]
+      },
+      "120": {
+        "drop_id": 120,
+        "pool_id": 1001,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            107602,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1002": {
+    "pool_id": 1002,
+    "name": "夜宴之邀",
+    "pool_type": 2,
+    "cost_once": [
+      53031,
+      1
+    ],
+    "cost_ten_times": [
+      53031,
+      10
+    ],
+    "payment": [
+      300000005,
+      300000004,
+      300000003,
+      300000002
+    ],
+    "payment_free": [
+      300000001
+    ],
+    "activity_id": [
+      182222
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "201": {
+        "drop_id": 201,
+        "pool_id": 1002,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "202": {
+        "drop_id": 202,
+        "pool_id": 1002,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40701,
+            2
+          ]
+        ]
+      },
+      "203": {
+        "drop_id": 203,
+        "pool_id": 1002,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "204": {
+        "drop_id": 204,
+        "pool_id": 1002,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "205": {
+        "drop_id": 205,
+        "pool_id": 1002,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40701,
+            20
+          ]
+        ]
+      },
+      "206": {
+        "drop_id": 206,
+        "pool_id": 1002,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "207": {
+        "drop_id": 207,
+        "pool_id": 1002,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            5
+          ]
+        ]
+      },
+      "208": {
+        "drop_id": 208,
+        "pool_id": 1002,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6001,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1003": {
+    "pool_id": 1003,
+    "name": "夜宴之邀",
+    "pool_type": 1,
+    "cost_once": [
+      53109,
+      1
+    ],
+    "cost_ten_times": [
+      53109,
+      10
+    ],
+    "payment": [
+      301000014,
+      301000013,
+      301000012,
+      301000011,
+      301000010,
+      301000009,
+      301000008,
+      301000007
+    ],
+    "payment_free": [
+      301000006
+    ],
+    "activity_id": [
+      272221
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "301": {
+        "drop_id": 301,
+        "pool_id": 1003,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            6
+          ]
+        ]
+      },
+      "302": {
+        "drop_id": 302,
+        "pool_id": 1003,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            4
+          ]
+        ]
+      },
+      "303": {
+        "drop_id": 303,
+        "pool_id": 1003,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            2
+          ]
+        ]
+      },
+      "304": {
+        "drop_id": 304,
+        "pool_id": 1003,
+        "total": 5,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            2
+          ]
+        ]
+      },
+      "305": {
+        "drop_id": 305,
+        "pool_id": 1003,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            12
+          ]
+        ]
+      },
+      "306": {
+        "drop_id": 306,
+        "pool_id": 1003,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            2
+          ]
+        ]
+      },
+      "307": {
+        "drop_id": 307,
+        "pool_id": 1003,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            1
+          ]
+        ]
+      },
+      "308": {
+        "drop_id": 308,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90001,
+            1
+          ]
+        ]
+      },
+      "309": {
+        "drop_id": 309,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90002,
+            1
+          ]
+        ]
+      },
+      "310": {
+        "drop_id": 310,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90003,
+            1
+          ]
+        ]
+      },
+      "311": {
+        "drop_id": 311,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90004,
+            1
+          ]
+        ]
+      },
+      "312": {
+        "drop_id": 312,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90005,
+            1
+          ]
+        ]
+      },
+      "313": {
+        "drop_id": 313,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            2020,
+            1
+          ]
+        ]
+      },
+      "314": {
+        "drop_id": 314,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            40
+          ]
+        ]
+      },
+      "315": {
+        "drop_id": 315,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            96
+          ]
+        ]
+      },
+      "316": {
+        "drop_id": 316,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "317": {
+        "drop_id": 317,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "318": {
+        "drop_id": 318,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "319": {
+        "drop_id": 319,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            10
+          ]
+        ]
+      },
+      "320": {
+        "drop_id": 320,
+        "pool_id": 1003,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            107602,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1004": {
+    "pool_id": 1004,
+    "name": "夜宴之邀",
+    "pool_type": 2,
+    "cost_once": [
+      53110,
+      1
+    ],
+    "cost_ten_times": [
+      53110,
+      10
+    ],
+    "payment": [
+      301000005,
+      301000004,
+      301000003,
+      301000002
+    ],
+    "payment_free": [
+      301000001
+    ],
+    "activity_id": [
+      272222
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "401": {
+        "drop_id": 401,
+        "pool_id": 1004,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "402": {
+        "drop_id": 402,
+        "pool_id": 1004,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40701,
+            2
+          ]
+        ]
+      },
+      "403": {
+        "drop_id": 403,
+        "pool_id": 1004,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "404": {
+        "drop_id": 404,
+        "pool_id": 1004,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "405": {
+        "drop_id": 405,
+        "pool_id": 1004,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40701,
+            20
+          ]
+        ]
+      },
+      "406": {
+        "drop_id": 406,
+        "pool_id": 1004,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "407": {
+        "drop_id": 407,
+        "pool_id": 1004,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            5
+          ]
+        ]
+      },
+      "408": {
+        "drop_id": 408,
+        "pool_id": 1004,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6001,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1005": {
+    "pool_id": 1005,
+    "name": "绘夜之诗",
+    "pool_type": 1,
+    "cost_once": [
+      53120,
+      1
+    ],
+    "cost_ten_times": [
+      53120,
+      10
+    ],
+    "payment": [
+      303000019,
+      303000018,
+      303000017,
+      303000016,
+      303000015,
+      303000014,
+      303000013,
+      303000012
+    ],
+    "payment_free": [
+      303000011
+    ],
+    "activity_id": [
+      292221
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "501": {
+        "drop_id": 501,
+        "pool_id": 1005,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            6
+          ]
+        ]
+      },
+      "502": {
+        "drop_id": 502,
+        "pool_id": 1005,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            4
+          ]
+        ]
+      },
+      "503": {
+        "drop_id": 503,
+        "pool_id": 1005,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            2
+          ]
+        ]
+      },
+      "504": {
+        "drop_id": 504,
+        "pool_id": 1005,
+        "total": 5,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            2
+          ]
+        ]
+      },
+      "505": {
+        "drop_id": 505,
+        "pool_id": 1005,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            60,
+            100
+          ]
+        ]
+      },
+      "506": {
+        "drop_id": 506,
+        "pool_id": 1005,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            2
+          ]
+        ]
+      },
+      "507": {
+        "drop_id": 507,
+        "pool_id": 1005,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            1
+          ]
+        ]
+      },
+      "508": {
+        "drop_id": 508,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90058,
+            1
+          ]
+        ]
+      },
+      "509": {
+        "drop_id": 509,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90059,
+            1
+          ]
+        ]
+      },
+      "510": {
+        "drop_id": 510,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90060,
+            1
+          ]
+        ]
+      },
+      "511": {
+        "drop_id": 511,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90061,
+            1
+          ]
+        ]
+      },
+      "512": {
+        "drop_id": 512,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90062,
+            1
+          ]
+        ]
+      },
+      "513": {
+        "drop_id": 513,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            2917,
+            1
+          ]
+        ]
+      },
+      "514": {
+        "drop_id": 514,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            40
+          ]
+        ]
+      },
+      "515": {
+        "drop_id": 515,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30094,
+            1
+          ]
+        ]
+      },
+      "516": {
+        "drop_id": 516,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "517": {
+        "drop_id": 517,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "518": {
+        "drop_id": 518,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "519": {
+        "drop_id": 519,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            10
+          ]
+        ]
+      },
+      "520": {
+        "drop_id": 520,
+        "pool_id": 1005,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            109502,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1006": {
+    "pool_id": 1006,
+    "name": "思念的归处·晨意",
+    "pool_type": 2,
+    "cost_once": [
+      53121,
+      1
+    ],
+    "cost_ten_times": [
+      53121,
+      10
+    ],
+    "payment": [
+      303000005,
+      303000004,
+      303000003,
+      303000002
+    ],
+    "payment_free": [
+      303000001
+    ],
+    "activity_id": [
+      292222
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "601": {
+        "drop_id": 601,
+        "pool_id": 1006,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "602": {
+        "drop_id": 602,
+        "pool_id": 1006,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            3
+          ]
+        ]
+      },
+      "603": {
+        "drop_id": 603,
+        "pool_id": 1006,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "604": {
+        "drop_id": 604,
+        "pool_id": 1006,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "605": {
+        "drop_id": 605,
+        "pool_id": 1006,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30095,
+            1
+          ]
+        ]
+      },
+      "606": {
+        "drop_id": 606,
+        "pool_id": 1006,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "607": {
+        "drop_id": 607,
+        "pool_id": 1006,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            5
+          ]
+        ]
+      },
+      "608": {
+        "drop_id": 608,
+        "pool_id": 1006,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6017,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1007": {
+    "pool_id": 1007,
+    "name": "思念的归处·夜语",
+    "pool_type": 2,
+    "cost_once": [
+      53124,
+      1
+    ],
+    "cost_ten_times": [
+      53124,
+      10
+    ],
+    "payment": [
+      303000010,
+      303000009,
+      303000008,
+      303000007
+    ],
+    "payment_free": [
+      303000006
+    ],
+    "activity_id": [
+      292223
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "701": {
+        "drop_id": 701,
+        "pool_id": 1007,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "702": {
+        "drop_id": 702,
+        "pool_id": 1007,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            3
+          ]
+        ]
+      },
+      "703": {
+        "drop_id": 703,
+        "pool_id": 1007,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "704": {
+        "drop_id": 704,
+        "pool_id": 1007,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "705": {
+        "drop_id": 705,
+        "pool_id": 1007,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30095,
+            1
+          ]
+        ]
+      },
+      "706": {
+        "drop_id": 706,
+        "pool_id": 1007,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "707": {
+        "drop_id": 707,
+        "pool_id": 1007,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            5
+          ]
+        ]
+      },
+      "708": {
+        "drop_id": 708,
+        "pool_id": 1007,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6018,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1008": {
+    "pool_id": 1008,
+    "name": "夜宴之邀",
+    "pool_type": 1,
+    "cost_once": [
+      53140,
+      1
+    ],
+    "cost_ten_times": [
+      53140,
+      10
+    ],
+    "payment": [
+      306000014,
+      306000013,
+      306000012,
+      306000011,
+      306000010,
+      306000009,
+      306000008,
+      306000007
+    ],
+    "payment_free": [
+      306000006
+    ],
+    "activity_id": [
+      312221
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "801": {
+        "drop_id": 801,
+        "pool_id": 1008,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            6
+          ]
+        ]
+      },
+      "802": {
+        "drop_id": 802,
+        "pool_id": 1008,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            4
+          ]
+        ]
+      },
+      "803": {
+        "drop_id": 803,
+        "pool_id": 1008,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            2
+          ]
+        ]
+      },
+      "804": {
+        "drop_id": 804,
+        "pool_id": 1008,
+        "total": 5,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            2
+          ]
+        ]
+      },
+      "805": {
+        "drop_id": 805,
+        "pool_id": 1008,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            12
+          ]
+        ]
+      },
+      "806": {
+        "drop_id": 806,
+        "pool_id": 1008,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            2
+          ]
+        ]
+      },
+      "807": {
+        "drop_id": 807,
+        "pool_id": 1008,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            1
+          ]
+        ]
+      },
+      "808": {
+        "drop_id": 808,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90001,
+            1
+          ]
+        ]
+      },
+      "809": {
+        "drop_id": 809,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90002,
+            1
+          ]
+        ]
+      },
+      "810": {
+        "drop_id": 810,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90003,
+            1
+          ]
+        ]
+      },
+      "811": {
+        "drop_id": 811,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90004,
+            1
+          ]
+        ]
+      },
+      "812": {
+        "drop_id": 812,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90005,
+            1
+          ]
+        ]
+      },
+      "813": {
+        "drop_id": 813,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            2020,
+            1
+          ]
+        ]
+      },
+      "814": {
+        "drop_id": 814,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            40
+          ]
+        ]
+      },
+      "815": {
+        "drop_id": 815,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            96
+          ]
+        ]
+      },
+      "816": {
+        "drop_id": 816,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "817": {
+        "drop_id": 817,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "818": {
+        "drop_id": 818,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "819": {
+        "drop_id": 819,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            10
+          ]
+        ]
+      },
+      "820": {
+        "drop_id": 820,
+        "pool_id": 1008,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            107602,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1009": {
+    "pool_id": 1009,
+    "name": "夜宴之邀",
+    "pool_type": 2,
+    "cost_once": [
+      53141,
+      1
+    ],
+    "cost_ten_times": [
+      53141,
+      10
+    ],
+    "payment": [
+      306000005,
+      306000004,
+      306000003,
+      306000002
+    ],
+    "payment_free": [
+      306000001
+    ],
+    "activity_id": [
+      312222
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "901": {
+        "drop_id": 901,
+        "pool_id": 1009,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "902": {
+        "drop_id": 902,
+        "pool_id": 1009,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40701,
+            2
+          ]
+        ]
+      },
+      "903": {
+        "drop_id": 903,
+        "pool_id": 1009,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "904": {
+        "drop_id": 904,
+        "pool_id": 1009,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "905": {
+        "drop_id": 905,
+        "pool_id": 1009,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40701,
+            20
+          ]
+        ]
+      },
+      "906": {
+        "drop_id": 906,
+        "pool_id": 1009,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "907": {
+        "drop_id": 907,
+        "pool_id": 1009,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            5
+          ]
+        ]
+      },
+      "908": {
+        "drop_id": 908,
+        "pool_id": 1009,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6001,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1010": {
+    "pool_id": 1010,
+    "name": "无间玩伴",
+    "pool_type": 1,
+    "cost_once": [
+      53156,
+      1
+    ],
+    "cost_ten_times": [
+      53156,
+      10
+    ],
+    "payment": [
+      309000014,
+      309000013,
+      309000012,
+      309000011,
+      309000010,
+      309000009,
+      309000008,
+      309000007
+    ],
+    "payment_free": [
+      309000006
+    ],
+    "activity_id": [
+      332221
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {}
+  },
+  "1011": {
+    "pool_id": 1011,
+    "name": "喧笑的时光",
+    "pool_type": 2,
+    "cost_once": [
+      53157,
+      1
+    ],
+    "cost_ten_times": [
+      53157,
+      10
+    ],
+    "payment": [
+      309000005,
+      309000004,
+      309000003,
+      309000002
+    ],
+    "payment_free": [
+      309000001
+    ],
+    "activity_id": [
+      332222
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "1101": {
+        "drop_id": 1101,
+        "pool_id": 1011,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "1102": {
+        "drop_id": 1102,
+        "pool_id": 1011,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            3
+          ]
+        ]
+      },
+      "1103": {
+        "drop_id": 1103,
+        "pool_id": 1011,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "1104": {
+        "drop_id": 1104,
+        "pool_id": 1011,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "1105": {
+        "drop_id": 1105,
+        "pool_id": 1011,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30097,
+            1
+          ]
+        ]
+      },
+      "1106": {
+        "drop_id": 1106,
+        "pool_id": 1011,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "1107": {
+        "drop_id": 1107,
+        "pool_id": 1011,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            6
+          ]
+        ]
+      },
+      "1108": {
+        "drop_id": 1108,
+        "pool_id": 1011,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6030,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1012": {
+    "pool_id": 1012,
+    "name": "绘夜之诗",
+    "pool_type": 1,
+    "cost_once": [
+      53180,
+      1
+    ],
+    "cost_ten_times": [
+      53180,
+      10
+    ],
+    "payment": [
+      310000019,
+      310000018,
+      310000017,
+      310000016,
+      310000015,
+      310000014,
+      310000013,
+      310000012
+    ],
+    "payment_free": [
+      310000011
+    ],
+    "activity_id": [
+      3522201
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "1201": {
+        "drop_id": 1201,
+        "pool_id": 1012,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            6
+          ]
+        ]
+      },
+      "1202": {
+        "drop_id": 1202,
+        "pool_id": 1012,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            4
+          ]
+        ]
+      },
+      "1203": {
+        "drop_id": 1203,
+        "pool_id": 1012,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            2
+          ]
+        ]
+      },
+      "1204": {
+        "drop_id": 1204,
+        "pool_id": 1012,
+        "total": 5,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            2
+          ]
+        ]
+      },
+      "1205": {
+        "drop_id": 1205,
+        "pool_id": 1012,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            60,
+            100
+          ]
+        ]
+      },
+      "1206": {
+        "drop_id": 1206,
+        "pool_id": 1012,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            2
+          ]
+        ]
+      },
+      "1207": {
+        "drop_id": 1207,
+        "pool_id": 1012,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            1
+          ]
+        ]
+      },
+      "1208": {
+        "drop_id": 1208,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90058,
+            1
+          ]
+        ]
+      },
+      "1209": {
+        "drop_id": 1209,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90059,
+            1
+          ]
+        ]
+      },
+      "1210": {
+        "drop_id": 1210,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90060,
+            1
+          ]
+        ]
+      },
+      "1211": {
+        "drop_id": 1211,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90061,
+            1
+          ]
+        ]
+      },
+      "1212": {
+        "drop_id": 1212,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            90062,
+            1
+          ]
+        ]
+      },
+      "1213": {
+        "drop_id": 1213,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            2917,
+            1
+          ]
+        ]
+      },
+      "1214": {
+        "drop_id": 1214,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            40
+          ]
+        ]
+      },
+      "1215": {
+        "drop_id": 1215,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30094,
+            1
+          ]
+        ]
+      },
+      "1216": {
+        "drop_id": 1216,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "1217": {
+        "drop_id": 1217,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "1218": {
+        "drop_id": 1218,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "1219": {
+        "drop_id": 1219,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            10
+          ]
+        ]
+      },
+      "1220": {
+        "drop_id": 1220,
+        "pool_id": 1012,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            109502,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1013": {
+    "pool_id": 1013,
+    "name": "思念的归处·晨意",
+    "pool_type": 2,
+    "cost_once": [
+      53181,
+      1
+    ],
+    "cost_ten_times": [
+      53181,
+      10
+    ],
+    "payment": [
+      310000005,
+      310000004,
+      310000003,
+      310000002
+    ],
+    "payment_free": [
+      310000001
+    ],
+    "activity_id": [
+      3522202
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "1301": {
+        "drop_id": 1301,
+        "pool_id": 1013,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "1302": {
+        "drop_id": 1302,
+        "pool_id": 1013,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            3
+          ]
+        ]
+      },
+      "1303": {
+        "drop_id": 1303,
+        "pool_id": 1013,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "1304": {
+        "drop_id": 1304,
+        "pool_id": 1013,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "1305": {
+        "drop_id": 1305,
+        "pool_id": 1013,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30095,
+            1
+          ]
+        ]
+      },
+      "1306": {
+        "drop_id": 1306,
+        "pool_id": 1013,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "1307": {
+        "drop_id": 1307,
+        "pool_id": 1013,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            5
+          ]
+        ]
+      },
+      "1308": {
+        "drop_id": 1308,
+        "pool_id": 1013,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6017,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1014": {
+    "pool_id": 1014,
+    "name": "思念的归处·夜语",
+    "pool_type": 2,
+    "cost_once": [
+      53182,
+      1
+    ],
+    "cost_ten_times": [
+      53182,
+      10
+    ],
+    "payment": [
+      310000010,
+      310000009,
+      310000008,
+      310000007
+    ],
+    "payment_free": [
+      310000006
+    ],
+    "activity_id": [
+      3522203
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "1401": {
+        "drop_id": 1401,
+        "pool_id": 1014,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "1402": {
+        "drop_id": 1402,
+        "pool_id": 1014,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            3
+          ]
+        ]
+      },
+      "1403": {
+        "drop_id": 1403,
+        "pool_id": 1014,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "1404": {
+        "drop_id": 1404,
+        "pool_id": 1014,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "1405": {
+        "drop_id": 1405,
+        "pool_id": 1014,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30095,
+            1
+          ]
+        ]
+      },
+      "1406": {
+        "drop_id": 1406,
+        "pool_id": 1014,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "1407": {
+        "drop_id": 1407,
+        "pool_id": 1014,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            5
+          ]
+        ]
+      },
+      "1408": {
+        "drop_id": 1408,
+        "pool_id": 1014,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6018,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1015": {
+    "pool_id": 1015,
+    "name": "永夜眷恋",
+    "pool_type": 1,
+    "cost_once": [
+      53189,
+      1
+    ],
+    "cost_ten_times": [
+      53189,
+      10
+    ],
+    "payment": [
+      311000014,
+      311000013,
+      311000012,
+      311000011,
+      311000010,
+      311000009,
+      311000008,
+      311000007
+    ],
+    "payment_free": [
+      311000006
+    ],
+    "activity_id": [
+      3722201
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "1501": {
+        "drop_id": 1501,
+        "pool_id": 1015,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            6
+          ]
+        ]
+      },
+      "1502": {
+        "drop_id": 1502,
+        "pool_id": 1015,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            4
+          ]
+        ]
+      },
+      "1503": {
+        "drop_id": 1503,
+        "pool_id": 1015,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            2
+          ]
+        ]
+      },
+      "1504": {
+        "drop_id": 1504,
+        "pool_id": 1015,
+        "total": 5,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            2
+          ]
+        ]
+      },
+      "1505": {
+        "drop_id": 1505,
+        "pool_id": 1015,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            60,
+            100
+          ]
+        ]
+      },
+      "1506": {
+        "drop_id": 1506,
+        "pool_id": 1015,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            2
+          ]
+        ]
+      },
+      "1507": {
+        "drop_id": 1507,
+        "pool_id": 1015,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            1
+          ]
+        ]
+      },
+      "1508": {
+        "drop_id": 1508,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91029,
+            1
+          ]
+        ]
+      },
+      "1509": {
+        "drop_id": 1509,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91030,
+            1
+          ]
+        ]
+      },
+      "1510": {
+        "drop_id": 1510,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91031,
+            1
+          ]
+        ]
+      },
+      "1511": {
+        "drop_id": 1511,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91032,
+            1
+          ]
+        ]
+      },
+      "1512": {
+        "drop_id": 1512,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91033,
+            1
+          ]
+        ]
+      },
+      "1513": {
+        "drop_id": 1513,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            2933,
+            1
+          ]
+        ]
+      },
+      "1514": {
+        "drop_id": 1514,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            40
+          ]
+        ]
+      },
+      "1515": {
+        "drop_id": 1515,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30096,
+            1
+          ]
+        ]
+      },
+      "1516": {
+        "drop_id": 1516,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "1517": {
+        "drop_id": 1517,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "1518": {
+        "drop_id": 1518,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "1519": {
+        "drop_id": 1519,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            10
+          ]
+        ]
+      },
+      "1520": {
+        "drop_id": 1520,
+        "pool_id": 1015,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            108502,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1016": {
+    "pool_id": 1016,
+    "name": "暮光的心旅",
+    "pool_type": 2,
+    "cost_once": [
+      53190,
+      1
+    ],
+    "cost_ten_times": [
+      53190,
+      10
+    ],
+    "payment": [
+      311000005,
+      311000004,
+      311000003,
+      311000002
+    ],
+    "payment_free": [
+      311000001
+    ],
+    "activity_id": [
+      3722202
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "1601": {
+        "drop_id": 1601,
+        "pool_id": 1016,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "1602": {
+        "drop_id": 1602,
+        "pool_id": 1016,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            3
+          ]
+        ]
+      },
+      "1603": {
+        "drop_id": 1603,
+        "pool_id": 1016,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "1604": {
+        "drop_id": 1604,
+        "pool_id": 1016,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "1605": {
+        "drop_id": 1605,
+        "pool_id": 1016,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30097,
+            1
+          ]
+        ]
+      },
+      "1606": {
+        "drop_id": 1606,
+        "pool_id": 1016,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "1607": {
+        "drop_id": 1607,
+        "pool_id": 1016,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            6
+          ]
+        ]
+      },
+      "1608": {
+        "drop_id": 1608,
+        "pool_id": 1016,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6042,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1017": {
+    "pool_id": 1017,
+    "name": "无间玩伴",
+    "pool_type": 1,
+    "cost_once": [
+      53198,
+      1
+    ],
+    "cost_ten_times": [
+      53198,
+      10
+    ],
+    "payment": [
+      312000001,
+      312000002,
+      312000003,
+      312000004,
+      312000005,
+      312000006,
+      312000007,
+      312000008
+    ],
+    "payment_free": [
+      312000009
+    ],
+    "activity_id": [
+      4022201
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "1701": {
+        "drop_id": 1701,
+        "pool_id": 1017,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            6
+          ]
+        ]
+      },
+      "1702": {
+        "drop_id": 1702,
+        "pool_id": 1017,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            4
+          ]
+        ]
+      },
+      "1703": {
+        "drop_id": 1703,
+        "pool_id": 1017,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            2
+          ]
+        ]
+      },
+      "1704": {
+        "drop_id": 1704,
+        "pool_id": 1017,
+        "total": 5,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            2
+          ]
+        ]
+      },
+      "1705": {
+        "drop_id": 1705,
+        "pool_id": 1017,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            60,
+            100
+          ]
+        ]
+      },
+      "1706": {
+        "drop_id": 1706,
+        "pool_id": 1017,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            2
+          ]
+        ]
+      },
+      "1707": {
+        "drop_id": 1707,
+        "pool_id": 1017,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            1
+          ]
+        ]
+      },
+      "1708": {
+        "drop_id": 1708,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91014,
+            1
+          ]
+        ]
+      },
+      "1709": {
+        "drop_id": 1709,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91015,
+            1
+          ]
+        ]
+      },
+      "1710": {
+        "drop_id": 1710,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91016,
+            1
+          ]
+        ]
+      },
+      "1711": {
+        "drop_id": 1711,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91017,
+            1
+          ]
+        ]
+      },
+      "1712": {
+        "drop_id": 1712,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91018,
+            1
+          ]
+        ]
+      },
+      "1713": {
+        "drop_id": 1713,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            2927,
+            1
+          ]
+        ]
+      },
+      "1714": {
+        "drop_id": 1714,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            40
+          ]
+        ]
+      },
+      "1715": {
+        "drop_id": 1715,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30096,
+            1
+          ]
+        ]
+      },
+      "1716": {
+        "drop_id": 1716,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "1717": {
+        "drop_id": 1717,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "1718": {
+        "drop_id": 1718,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "1719": {
+        "drop_id": 1719,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            10
+          ]
+        ]
+      },
+      "1720": {
+        "drop_id": 1720,
+        "pool_id": 1017,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            102003,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1018": {
+    "pool_id": 1018,
+    "name": "喧笑的时光",
+    "pool_type": 2,
+    "cost_once": [
+      53199,
+      1
+    ],
+    "cost_ten_times": [
+      53199,
+      10
+    ],
+    "payment": [
+      312000010,
+      312000011,
+      312000012,
+      312000013
+    ],
+    "payment_free": [
+      312000014
+    ],
+    "activity_id": [
+      4022202
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "1801": {
+        "drop_id": 1801,
+        "pool_id": 1018,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "1802": {
+        "drop_id": 1802,
+        "pool_id": 1018,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            3
+          ]
+        ]
+      },
+      "1803": {
+        "drop_id": 1803,
+        "pool_id": 1018,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "1804": {
+        "drop_id": 1804,
+        "pool_id": 1018,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "1805": {
+        "drop_id": 1805,
+        "pool_id": 1018,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30097,
+            1
+          ]
+        ]
+      },
+      "1806": {
+        "drop_id": 1806,
+        "pool_id": 1018,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "1807": {
+        "drop_id": 1807,
+        "pool_id": 1018,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            6
+          ]
+        ]
+      },
+      "1808": {
+        "drop_id": 1808,
+        "pool_id": 1018,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6030,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1019": {
+    "pool_id": 1019,
+    "name": "无垢之华",
+    "pool_type": 1,
+    "cost_once": [
+      53202,
+      1
+    ],
+    "cost_ten_times": [
+      53202,
+      10
+    ],
+    "payment": [
+      313000001,
+      313000002,
+      313000003,
+      313000004,
+      313000005,
+      313000006
+    ],
+    "payment_free": [
+      313000007
+    ],
+    "activity_id": [
+      4042401
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "1901": {
+        "drop_id": 1901,
+        "pool_id": 1019,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30098,
+            1
+          ]
+        ]
+      },
+      "1902": {
+        "drop_id": 1902,
+        "pool_id": 1019,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "1903": {
+        "drop_id": 1903,
+        "pool_id": 1019,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            5
+          ]
+        ]
+      },
+      "1904": {
+        "drop_id": 1904,
+        "pool_id": 1019,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            60,
+            300
+          ]
+        ]
+      },
+      "1905": {
+        "drop_id": 1905,
+        "pool_id": 1019,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            20
+          ]
+        ]
+      },
+      "1906": {
+        "drop_id": 1906,
+        "pool_id": 1019,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            1
+          ]
+        ]
+      },
+      "1907": {
+        "drop_id": 1907,
+        "pool_id": 1019,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            60,
+            10
+          ]
+        ]
+      },
+      "1908": {
+        "drop_id": 1908,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            3
+          ]
+        ]
+      },
+      "1909": {
+        "drop_id": 1909,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            5
+          ]
+        ]
+      },
+      "1910": {
+        "drop_id": 1910,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40104,
+            3
+          ]
+        ]
+      },
+      "1911": {
+        "drop_id": 1911,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40103,
+            5
+          ]
+        ]
+      },
+      "1912": {
+        "drop_id": 1912,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40203,
+            10
+          ]
+        ]
+      },
+      "1913": {
+        "drop_id": 1913,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            15
+          ]
+        ]
+      },
+      "1914": {
+        "drop_id": 1914,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40602,
+            20
+          ]
+        ]
+      },
+      "1915": {
+        "drop_id": 1915,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            10
+          ]
+        ]
+      },
+      "1916": {
+        "drop_id": 1916,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40503,
+            20
+          ]
+        ]
+      },
+      "1917": {
+        "drop_id": 1917,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40414,
+            5
+          ]
+        ]
+      },
+      "1918": {
+        "drop_id": 1918,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41002,
+            20
+          ]
+        ]
+      },
+      "1919": {
+        "drop_id": 1919,
+        "pool_id": 1019,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40301,
+            200
+          ]
+        ]
+      }
+    }
+  },
+  "1020": {
+    "pool_id": 1020,
+    "name": "缘定神前",
+    "pool_type": 2,
+    "cost_once": [
+      53203,
+      1
+    ],
+    "cost_ten_times": [
+      53203,
+      10
+    ],
+    "payment": [
+      313000008,
+      313000009,
+      313000010,
+      313000011
+    ],
+    "payment_free": [
+      313000012
+    ],
+    "activity_id": [
+      4042402
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "2001": {
+        "drop_id": 2001,
+        "pool_id": 1020,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6049,
+            1
+          ]
+        ]
+      },
+      "2002": {
+        "drop_id": 2002,
+        "pool_id": 1020,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            2
+          ]
+        ]
+      },
+      "2003": {
+        "drop_id": 2003,
+        "pool_id": 1020,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            10
+          ]
+        ]
+      },
+      "2004": {
+        "drop_id": 2004,
+        "pool_id": 1020,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            10
+          ]
+        ]
+      },
+      "2005": {
+        "drop_id": 2005,
+        "pool_id": 1020,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "2006": {
+        "drop_id": 2006,
+        "pool_id": 1020,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "2007": {
+        "drop_id": 2007,
+        "pool_id": 1020,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            10
+          ]
+        ]
+      },
+      "2008": {
+        "drop_id": 2008,
+        "pool_id": 1020,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40701,
+            5
+          ]
+        ]
+      },
+      "2009": {
+        "drop_id": 2009,
+        "pool_id": 1020,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40602,
+            10
+          ]
+        ]
+      },
+      "2010": {
+        "drop_id": 2010,
+        "pool_id": 1020,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40503,
+            10
+          ]
+        ]
+      },
+      "2011": {
+        "drop_id": 2011,
+        "pool_id": 1020,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40502,
+            10
+          ]
+        ]
+      },
+      "2012": {
+        "drop_id": 2012,
+        "pool_id": 1020,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40203,
+            5
+          ]
+        ]
+      },
+      "2013": {
+        "drop_id": 2013,
+        "pool_id": 1020,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40202,
+            5
+          ]
+        ]
+      },
+      "2014": {
+        "drop_id": 2014,
+        "pool_id": 1020,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40803,
+            5
+          ]
+        ]
+      },
+      "2015": {
+        "drop_id": 2015,
+        "pool_id": 1020,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40802,
+            5
+          ]
+        ]
+      },
+      "2016": {
+        "drop_id": 2016,
+        "pool_id": 1020,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40103,
+            3
+          ]
+        ]
+      },
+      "2017": {
+        "drop_id": 2017,
+        "pool_id": 1020,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40102,
+            5
+          ]
+        ]
+      },
+      "2018": {
+        "drop_id": 2018,
+        "pool_id": 1020,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            22003,
+            5
+          ]
+        ]
+      },
+      "2019": {
+        "drop_id": 2019,
+        "pool_id": 1020,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40301,
+            100
+          ]
+        ]
+      }
+    }
+  },
+  "1021": {
+    "pool_id": 1021,
+    "name": "完美合奏",
+    "pool_type": 1,
+    "cost_once": [
+      53208,
+      1
+    ],
+    "cost_ten_times": [
+      53208,
+      10
+    ],
+    "payment": [
+      314000001,
+      314000002,
+      314000003,
+      314000004,
+      314000005,
+      314000006,
+      314000007,
+      314000008
+    ],
+    "payment_free": [
+      314000009
+    ],
+    "activity_id": [
+      4122201
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "2101": {
+        "drop_id": 2101,
+        "pool_id": 1021,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            6
+          ]
+        ]
+      },
+      "2102": {
+        "drop_id": 2102,
+        "pool_id": 1021,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            4
+          ]
+        ]
+      },
+      "2103": {
+        "drop_id": 2103,
+        "pool_id": 1021,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            2
+          ]
+        ]
+      },
+      "2104": {
+        "drop_id": 2104,
+        "pool_id": 1021,
+        "total": 5,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            2
+          ]
+        ]
+      },
+      "2105": {
+        "drop_id": 2105,
+        "pool_id": 1021,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            60,
+            100
+          ]
+        ]
+      },
+      "2106": {
+        "drop_id": 2106,
+        "pool_id": 1021,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            2
+          ]
+        ]
+      },
+      "2107": {
+        "drop_id": 2107,
+        "pool_id": 1021,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            1
+          ]
+        ]
+      },
+      "2108": {
+        "drop_id": 2108,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91034,
+            1
+          ]
+        ]
+      },
+      "2109": {
+        "drop_id": 2109,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91035,
+            1
+          ]
+        ]
+      },
+      "2110": {
+        "drop_id": 2110,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91036,
+            1
+          ]
+        ]
+      },
+      "2111": {
+        "drop_id": 2111,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91037,
+            1
+          ]
+        ]
+      },
+      "2112": {
+        "drop_id": 2112,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91038,
+            1
+          ]
+        ]
+      },
+      "2113": {
+        "drop_id": 2113,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            2944,
+            1
+          ]
+        ]
+      },
+      "2114": {
+        "drop_id": 2114,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            40
+          ]
+        ]
+      },
+      "2115": {
+        "drop_id": 2115,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30096,
+            1
+          ]
+        ]
+      },
+      "2116": {
+        "drop_id": 2116,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "2117": {
+        "drop_id": 2117,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "2118": {
+        "drop_id": 2118,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "2119": {
+        "drop_id": 2119,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            10
+          ]
+        ]
+      },
+      "2120": {
+        "drop_id": 2120,
+        "pool_id": 1021,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30099,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1022": {
+    "pool_id": 1022,
+    "name": "少女欢奏之夜",
+    "pool_type": 2,
+    "cost_once": [
+      53209,
+      1
+    ],
+    "cost_ten_times": [
+      53209,
+      10
+    ],
+    "payment": [
+      314000010,
+      314000011,
+      314000012,
+      314000013
+    ],
+    "payment_free": [
+      314000014
+    ],
+    "activity_id": [
+      4122202
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "2201": {
+        "drop_id": 2201,
+        "pool_id": 1022,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "2202": {
+        "drop_id": 2202,
+        "pool_id": 1022,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            3
+          ]
+        ]
+      },
+      "2203": {
+        "drop_id": 2203,
+        "pool_id": 1022,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "2204": {
+        "drop_id": 2204,
+        "pool_id": 1022,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "2205": {
+        "drop_id": 2205,
+        "pool_id": 1022,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30097,
+            1
+          ]
+        ]
+      },
+      "2206": {
+        "drop_id": 2206,
+        "pool_id": 1022,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "2207": {
+        "drop_id": 2207,
+        "pool_id": 1022,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            3
+          ]
+        ]
+      },
+      "2208": {
+        "drop_id": 2208,
+        "pool_id": 1022,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6052,
+            1
+          ]
+        ]
+      },
+      "2209": {
+        "drop_id": 2209,
+        "pool_id": 1022,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 2,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "2210": {
+        "drop_id": 2210,
+        "pool_id": 1022,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 2,
+        "reward": [
+          [
+            40415,
+            3
+          ]
+        ]
+      },
+      "2211": {
+        "drop_id": 2211,
+        "pool_id": 1022,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 2,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "2212": {
+        "drop_id": 2212,
+        "pool_id": 1022,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 2,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "2213": {
+        "drop_id": 2213,
+        "pool_id": 1022,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 2,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "2214": {
+        "drop_id": 2214,
+        "pool_id": 1022,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 2,
+        "reward": [
+          [
+            38,
+            3
+          ]
+        ]
+      },
+      "2215": {
+        "drop_id": 2215,
+        "pool_id": 1022,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 2,
+        "reward": [
+          [
+            13003,
+            1
+          ]
+        ]
+      },
+      "2216": {
+        "drop_id": 2216,
+        "pool_id": 1022,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 2,
+        "reward": [
+          [
+            13004,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1023": {
+    "pool_id": 1023,
+    "name": "永夜眷恋",
+    "pool_type": 1,
+    "cost_once": [
+      53216,
+      1
+    ],
+    "cost_ten_times": [
+      53216,
+      10
+    ],
+    "payment": [
+      315000001,
+      315000002,
+      315000003,
+      315000004,
+      315000005,
+      315000006,
+      315000007,
+      315000008
+    ],
+    "payment_free": [
+      315000009
+    ],
+    "activity_id": [
+      4322201
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "2301": {
+        "drop_id": 2301,
+        "pool_id": 1023,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            6
+          ]
+        ]
+      },
+      "2302": {
+        "drop_id": 2302,
+        "pool_id": 1023,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            4
+          ]
+        ]
+      },
+      "2303": {
+        "drop_id": 2303,
+        "pool_id": 1023,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            2
+          ]
+        ]
+      },
+      "2304": {
+        "drop_id": 2304,
+        "pool_id": 1023,
+        "total": 5,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            2
+          ]
+        ]
+      },
+      "2305": {
+        "drop_id": 2305,
+        "pool_id": 1023,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            60,
+            100
+          ]
+        ]
+      },
+      "2306": {
+        "drop_id": 2306,
+        "pool_id": 1023,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            2
+          ]
+        ]
+      },
+      "2307": {
+        "drop_id": 2307,
+        "pool_id": 1023,
+        "total": 15,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            1
+          ]
+        ]
+      },
+      "2308": {
+        "drop_id": 2308,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91029,
+            1
+          ]
+        ]
+      },
+      "2309": {
+        "drop_id": 2309,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91030,
+            1
+          ]
+        ]
+      },
+      "2310": {
+        "drop_id": 2310,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91031,
+            1
+          ]
+        ]
+      },
+      "2311": {
+        "drop_id": 2311,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91032,
+            1
+          ]
+        ]
+      },
+      "2312": {
+        "drop_id": 2312,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            91033,
+            1
+          ]
+        ]
+      },
+      "2313": {
+        "drop_id": 2313,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            2933,
+            1
+          ]
+        ]
+      },
+      "2314": {
+        "drop_id": 2314,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            40
+          ]
+        ]
+      },
+      "2315": {
+        "drop_id": 2315,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30096,
+            1
+          ]
+        ]
+      },
+      "2316": {
+        "drop_id": 2316,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "2317": {
+        "drop_id": 2317,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "2318": {
+        "drop_id": 2318,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            19,
+            5
+          ]
+        ]
+      },
+      "2319": {
+        "drop_id": 2319,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            10
+          ]
+        ]
+      },
+      "2320": {
+        "drop_id": 2320,
+        "pool_id": 1023,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            108502,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1024": {
+    "pool_id": 1024,
+    "name": "暮光的心旅",
+    "pool_type": 2,
+    "cost_once": [
+      53217,
+      1
+    ],
+    "cost_ten_times": [
+      53217,
+      10
+    ],
+    "payment": [
+      315000010,
+      315000011,
+      315000012,
+      315000013
+    ],
+    "payment_free": [
+      315000014
+    ],
+    "activity_id": [
+      4322202
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "2401": {
+        "drop_id": 2401,
+        "pool_id": 1024,
+        "total": 6,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            5
+          ]
+        ]
+      },
+      "2402": {
+        "drop_id": 2402,
+        "pool_id": 1024,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            3
+          ]
+        ]
+      },
+      "2403": {
+        "drop_id": 2403,
+        "pool_id": 1024,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "2404": {
+        "drop_id": 2404,
+        "pool_id": 1024,
+        "total": 10,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "2405": {
+        "drop_id": 2405,
+        "pool_id": 1024,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30097,
+            1
+          ]
+        ]
+      },
+      "2406": {
+        "drop_id": 2406,
+        "pool_id": 1024,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            24
+          ]
+        ]
+      },
+      "2407": {
+        "drop_id": 2407,
+        "pool_id": 1024,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            6
+          ]
+        ]
+      },
+      "2408": {
+        "drop_id": 2408,
+        "pool_id": 1024,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6042,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "1025": {
+    "pool_id": 1025,
+    "name": "吻抱黎明",
+    "pool_type": 1,
+    "cost_once": [
+      53219,
+      1
+    ],
+    "cost_ten_times": [
+      53219,
+      10
+    ],
+    "payment": [
+      316000001,
+      316000002,
+      316000003,
+      316000004,
+      316000005,
+      316000006
+    ],
+    "payment_free": [
+      316000007
+    ],
+    "activity_id": [
+      4342401
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "2501": {
+        "drop_id": 2501,
+        "pool_id": 1025,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            30124,
+            1
+          ]
+        ]
+      },
+      "2502": {
+        "drop_id": 2502,
+        "pool_id": 1025,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41201,
+            10
+          ]
+        ]
+      },
+      "2503": {
+        "drop_id": 2503,
+        "pool_id": 1025,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            5
+          ]
+        ]
+      },
+      "2504": {
+        "drop_id": 2504,
+        "pool_id": 1025,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            60,
+            300
+          ]
+        ]
+      },
+      "2505": {
+        "drop_id": 2505,
+        "pool_id": 1025,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            20
+          ]
+        ]
+      },
+      "2506": {
+        "drop_id": 2506,
+        "pool_id": 1025,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            1
+          ]
+        ]
+      },
+      "2507": {
+        "drop_id": 2507,
+        "pool_id": 1025,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            60,
+            10
+          ]
+        ]
+      },
+      "2508": {
+        "drop_id": 2508,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41302,
+            3
+          ]
+        ]
+      },
+      "2509": {
+        "drop_id": 2509,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41301,
+            5
+          ]
+        ]
+      },
+      "2510": {
+        "drop_id": 2510,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40104,
+            3
+          ]
+        ]
+      },
+      "2511": {
+        "drop_id": 2511,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40103,
+            5
+          ]
+        ]
+      },
+      "2512": {
+        "drop_id": 2512,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40203,
+            10
+          ]
+        ]
+      },
+      "2513": {
+        "drop_id": 2513,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            15
+          ]
+        ]
+      },
+      "2514": {
+        "drop_id": 2514,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40602,
+            20
+          ]
+        ]
+      },
+      "2515": {
+        "drop_id": 2515,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40504,
+            10
+          ]
+        ]
+      },
+      "2516": {
+        "drop_id": 2516,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40503,
+            20
+          ]
+        ]
+      },
+      "2517": {
+        "drop_id": 2517,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40414,
+            5
+          ]
+        ]
+      },
+      "2518": {
+        "drop_id": 2518,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41002,
+            20
+          ]
+        ]
+      },
+      "2519": {
+        "drop_id": 2519,
+        "pool_id": 1025,
+        "total": 4,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40301,
+            200
+          ]
+        ]
+      }
+    }
+  },
+  "1026": {
+    "pool_id": 1026,
+    "name": "羽落归处",
+    "pool_type": 2,
+    "cost_once": [
+      53220,
+      1
+    ],
+    "cost_ten_times": [
+      53220,
+      10
+    ],
+    "payment": [
+      316000008,
+      316000009,
+      316000010,
+      316000011
+    ],
+    "payment_free": [
+      316000012
+    ],
+    "activity_id": [
+      4342402
+    ],
+    "stage_list": [
+      1
+    ],
+    "drops": {
+      "2601": {
+        "drop_id": 2601,
+        "pool_id": 1026,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            6057,
+            1
+          ]
+        ]
+      },
+      "2602": {
+        "drop_id": 2602,
+        "pool_id": 1026,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            38,
+            2
+          ]
+        ]
+      },
+      "2603": {
+        "drop_id": 2603,
+        "pool_id": 1026,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            41303,
+            10
+          ]
+        ]
+      },
+      "2604": {
+        "drop_id": 2604,
+        "pool_id": 1026,
+        "total": 1,
+        "weight": 100,
+        "minimum_guarantee": 2,
+        "is_core": 1,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40415,
+            10
+          ]
+        ]
+      },
+      "2605": {
+        "drop_id": 2605,
+        "pool_id": 1026,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20003,
+            1
+          ]
+        ]
+      },
+      "2606": {
+        "drop_id": 2606,
+        "pool_id": 1026,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            20002,
+            1
+          ]
+        ]
+      },
+      "2607": {
+        "drop_id": 2607,
+        "pool_id": 1026,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40603,
+            10
+          ]
+        ]
+      },
+      "2608": {
+        "drop_id": 2608,
+        "pool_id": 1026,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40701,
+            5
+          ]
+        ]
+      },
+      "2609": {
+        "drop_id": 2609,
+        "pool_id": 1026,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40602,
+            10
+          ]
+        ]
+      },
+      "2610": {
+        "drop_id": 2610,
+        "pool_id": 1026,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40503,
+            10
+          ]
+        ]
+      },
+      "2611": {
+        "drop_id": 2611,
+        "pool_id": 1026,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40502,
+            10
+          ]
+        ]
+      },
+      "2612": {
+        "drop_id": 2612,
+        "pool_id": 1026,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40203,
+            5
+          ]
+        ]
+      },
+      "2613": {
+        "drop_id": 2613,
+        "pool_id": 1026,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40202,
+            5
+          ]
+        ]
+      },
+      "2614": {
+        "drop_id": 2614,
+        "pool_id": 1026,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40803,
+            5
+          ]
+        ]
+      },
+      "2615": {
+        "drop_id": 2615,
+        "pool_id": 1026,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40802,
+            5
+          ]
+        ]
+      },
+      "2616": {
+        "drop_id": 2616,
+        "pool_id": 1026,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40103,
+            3
+          ]
+        ]
+      },
+      "2617": {
+        "drop_id": 2617,
+        "pool_id": 1026,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40102,
+            5
+          ]
+        ]
+      },
+      "2618": {
+        "drop_id": 2618,
+        "pool_id": 1026,
+        "total": 2,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            22003,
+            5
+          ]
+        ]
+      },
+      "2619": {
+        "drop_id": 2619,
+        "pool_id": 1026,
+        "total": 3,
+        "weight": 100,
+        "minimum_guarantee": 1,
+        "is_core": 0,
+        "pool_stage": 1,
+        "reward": [
+          [
+            40301,
+            100
+          ]
+        ]
+      }
+    }
+  },
+  "4342402": {
+    "pool_id": 4342402,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "4342401": {
+    "pool_id": 4342401,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "4322202": {
+    "pool_id": 4322202,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "4322201": {
+    "pool_id": 4322201,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "4122202": {
+    "pool_id": 4122202,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "4122201": {
+    "pool_id": 4122201,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "4042402": {
+    "pool_id": 4042402,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "4042401": {
+    "pool_id": 4042401,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "4022202": {
+    "pool_id": 4022202,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "4022201": {
+    "pool_id": 4022201,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "3722202": {
+    "pool_id": 3722202,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "3722201": {
+    "pool_id": 3722201,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "3522203": {
+    "pool_id": 3522203,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "3522202": {
+    "pool_id": 3522202,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "3522201": {
+    "pool_id": 3522201,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "332222": {
+    "pool_id": 332222,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "332221": {
+    "pool_id": 332221,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "312222": {
+    "pool_id": 312222,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "312221": {
+    "pool_id": 312221,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "292223": {
+    "pool_id": 292223,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "292222": {
+    "pool_id": 292222,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "292221": {
+    "pool_id": 292221,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "272222": {
+    "pool_id": 272222,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "272221": {
+    "pool_id": 272221,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "182222": {
+    "pool_id": 182222,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  },
+  "182221": {
+    "pool_id": 182221,
+    "name": "",
+    "pool_type": 0,
+    "cost_once": [],
+    "cost_ten_times": [],
+    "payment": [],
+    "payment_free": [],
+    "activity_id": [],
+    "stage_list": [],
+    "drops": {}
+  }
+}

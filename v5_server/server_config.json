@@ -1,0 +1,21 @@
+{
+  "storage": {
+    "cdn_cache_dir": "./cdn_cache",
+    "notes": "CDN资源落包根目录（支持相对路径如 ./cdn_cache 或自定义绝对路径）"
+  },
+  "client": {
+    "game_install_dir": "",
+    "notes": "客户端安装目录（留空则自动探测常见路径）"
+  },
+  "network": {
+    "capture_cdn": true,
+    "default_res_version": "auto"
+  },
+  "lifecycle": {
+    "on_close_action": "ask"
+  },
+  "presentation": {
+    "has_completed_initial_splash": true,
+    "always_play_splash": true
+  }
+}

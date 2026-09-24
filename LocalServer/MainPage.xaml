@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="LocalServer.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:LocalServer"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid>
+        <NavigationView x:Name="NavView"
+                        PaneDisplayMode="Left"
+                        IsBackButtonVisible="Collapsed"
+                        IsSettingsVisible="False"
+                        SelectionChanged="OnNavSelectionChanged">
+            <NavigationView.MenuItems>
+                <NavigationViewItem x:Name="NavItemDashboard" Content="仪表盘 (Dashboard)" Tag="Dashboard" IsSelected="True">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE80F;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem x:Name="NavItemConsole" Content="管理控制台 (Console)" Tag="Console">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE7FC;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem x:Name="NavItemTerminal" Content="运行日志 (Logs)" Tag="Terminal">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE756;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem x:Name="NavItemSettings" Content="环境配置 (Config)" Tag="Settings">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE713;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <NavigationView.Content>
+                <Grid Margin="24,16,24,24">
+                    <!-- ================= 视图 1：仪表盘 (Dashboard) ================= -->
+                    <Grid x:Name="DashboardView" Visibility="Visible">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Spacing="20">
+                                <!-- 状态总览大卡片 (流式垂直分层，永不重叠碰撞) -->
+                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1" CornerRadius="12" Padding="24,20">
+                                    <StackPanel Spacing="18">
+                                        <!-- 第一层：服务标题与运行状态徽标 -->
+                                        <Grid ColumnDefinitions="Auto, Auto, *">
+                                            <TextBlock Text="本地服务端运行时 (Local Server Runtime)" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Border Grid.Column="1" x:Name="StatusBadge" CornerRadius="12" Padding="12,3" Margin="14,0,0,0" Background="#26EF4444" VerticalAlignment="Center">
+                                                <TextBlock x:Name="StatusText" Text="守护进程未运行" FontSize="12" Foreground="#EF4444" FontWeight="SemiBold"/>
+                                            </Border>
+                                        </Grid>
+                                        <TextBlock x:Name="ServerDetailText" Text="守护状态: 闲置 (IDLE) | 端口监听: 闲置 | 托管拓扑: 待命"
+                                                   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,-6,0,0"/>
+
+                                        <!-- 第二层：核心运维操作按钮栏 -->
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <Button x:Name="BtnToggleServer" Click="OnToggleServerClick" Style="{StaticResource AccentButtonStyle}" Padding="20,10">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <FontIcon x:Name="BtnServerIcon" Glyph="&#xE768;" FontSize="15" />
+                                                    <TextBlock x:Name="BtnServerText" Text="初始化并启动 (Initialize)" FontWeight="SemiBold" FontSize="14"/>
+                                                </StackPanel>
+                                            </Button>
+                                            <Button x:Name="BtnKillPorts" Click="OnKillPortsClick" Padding="14,10"
+                                                    ToolTipService.ToolTip="仲裁并强制回收占用 8102/8105/443/80/6105 服务端口的冲突进程">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="#EF4444"/>
+                                                    <TextBlock Text="端口冲突回收" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button x:Name="BtnOpenBrowser" Click="OnOpenBrowserClick" Padding="14,10"
+                                                    ToolTipService.ToolTip="在默认系统浏览器中打开 Web 运维控制台">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <FontIcon Glyph="&#xE774;" FontSize="14" />
+                                                    <TextBlock Text="外部浏览器访问" />
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+
+                                        <!-- 第三层：服务组件状态矩阵卡片 -->
+                                        <Grid ColumnDefinitions="*, *, *, *, *">
+                                            <Border Grid.Column="0" Margin="0,0,8,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="14,10">
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock Text="8102 网关代理 (Gateway)" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                                                    <TextBlock x:Name="TxtGwPortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Grid.Column="1" Margin="4,0,4,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="14,10">
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock Text="8105 业务逻辑 (Core)" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                                                    <TextBlock x:Name="TxtGamePortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Grid.Column="2" Margin="4,0,4,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="14,10">
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock Text="443 鉴权分发 (Auth/HTTPS)" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                                                    <TextBlock x:Name="TxtHttpsPortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Grid.Column="3" Margin="4,0,4,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="14,10">
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock Text="80 运维控制端 (Admin/HTTP)" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                                                    <TextBlock x:Name="TxtWebPortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Grid.Column="4" Margin="8,0,0,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="14,10">
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock Text="CDN 缓存代理 (Storage Proxy)" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                                                    <TextBlock x:Name="TxtCdnStateStatus" Text="待命" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 运行环境与安全基线简报 (流式均分两列) -->
+                                <Grid ColumnDefinitions="*, *">
+                                    <!-- 客户端环境与协议基线 -->
+                                    <Border Grid.Column="0" Margin="0,0,10,0"
+                                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                            BorderThickness="1" CornerRadius="12" Padding="20">
+                                        <StackPanel Spacing="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE7FC;" FontSize="16" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"/>
+                                                <TextBlock Text="客户端运行环境与协议基线 (Client Runtime &amp; Protocol)" FontWeight="SemiBold" FontSize="14"/>
+                                            </StackPanel>
+                                            <TextBlock x:Name="TxtDashClientDir" Text="客户端基准路径: 自动嗅探中..." FontSize="12" TextWrapping="Wrap"
+                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            <TextBlock x:Name="TxtDashResVersion" Text="协议对齐基线: Build 229 (v5.2.1 兼容协议)" FontSize="12"
+                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            <Button Click="OnGoSettingsClick" Content="配置环境参数 (Environment Settings)" HorizontalAlignment="Left" Style="{StaticResource DefaultButtonStyle}"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- 根证书与安全状态 -->
+                                    <Border Grid.Column="1" Margin="10,0,0,0"
+                                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                            BorderThickness="1" CornerRadius="12" Padding="20">
+                                        <StackPanel Spacing="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE72E;" FontSize="16" Foreground="#10B981"/>
+                                                <TextBlock Text="本地自签名 CA 根证书 (Local CA Certificate Chain)" FontWeight="SemiBold" FontSize="14"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <Button x:Name="BtnQuickInstallCert" Click="OnInstallCertClick" Content="安装 CA 根证书至系统存储区 (Install Root CA)"/>
+                                                <Button x:Name="BtnQuickRegenerateCert" Click="OnRegenerateCertClick" Content="重新生成证书 (Regenerate Cert)"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <!-- ================= 视图 2：管理控制台 (WebView2) ================= -->
+                    <Grid x:Name="ConsoleView" Visibility="Collapsed" RowDefinitions="Auto, *">
+                        <!-- 顶部工具栏 -->
+                        <Border Grid.Row="0" Margin="0,0,0,12" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="12,8">
+                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE774;" FontSize="14" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"/>
+                                    <TextBlock x:Name="TxtWebUrl" Text="http://127.0.0.1/web/gm_console.html" FontSize="12" FontFamily="Consolas" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                                    <Button Click="OnReloadWebClick" ToolTipService.ToolTip="重新加载页面 (Reload Context)">
+                                        <FontIcon Glyph="&#xE72C;" FontSize="13" />
+                                    </Button>
+                                    <Button Click="OnOpenBrowserClick" ToolTipService.ToolTip="在默认系统浏览器中打开 (Open in External Browser)">
+                                        <FontIcon Glyph="&#xE8A7;" FontSize="13" />
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- WebView2 宿主容器 -->
+                        <Border Grid.Row="1" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                            <WebView2 x:Name="ConsoleWebView" />
+                        </Border>
+                    </Grid>
+
+                    <!-- ================= 视图 3：诊断日志监视器 (Diagnostics & Logs) ================= -->
+                    <Grid x:Name="TerminalView" Visibility="Collapsed" RowDefinitions="Auto, *">
+                        <!-- 终端控制条 -->
+                        <Border Grid.Row="0" Margin="0,0,0,10" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="12,8">
+                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                                    <ToggleSwitch x:Name="ToggleAutoScroll" Header="" OffContent="暂停滚屏" OnContent="自动滚屏" IsOn="True"
+                                                  Toggled="OnToggleAutoScrollChanged" Margin="0,-6,0,-6"/>
+                                    <TextBlock x:Name="TxtLogStats" Text="缓冲队列: 0 项 | 采集状态: 捕获中 (STREAMING)" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                                    <TextBox x:Name="TxtFilterKeyword" PlaceholderText="过滤流式输出 (关键词/日志级别，如 ERROR, INFO)..."
+                                             Width="260" TextChanged="OnFilterKeywordChanged" FontSize="12"/>
+                                    <Button Click="OnClearLogsClick" ToolTipService.ToolTip="清空日志缓冲区 (Clear Buffer)">
+                                        <FontIcon Glyph="&#xE74D;" FontSize="13"/>
+                                    </Button>
+                                    <Button Click="OnCopyLogsClick" ToolTipService.ToolTip="导出日志文本至剪贴板 (Copy to Clipboard)">
+                                        <FontIcon Glyph="&#xE8C8;" FontSize="13"/>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- 抗高频洪流的极速终端文本框 (暗色独立主题 + 全方位覆盖背景态，彻底消除悬停点击闪烁) -->
+                        <Border Grid.Row="1" CornerRadius="8" Background="#0B0F19" BorderBrush="#1E293B" BorderThickness="1"
+                                RequestedTheme="Dark" Padding="8">
+                            <TextBox x:Name="LogTextBox"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     FontFamily="Consolas, Cascadia Code, Courier New"
+                                     FontSize="12"
+                                     Background="#0B0F19"
+                                     BorderThickness="0"
+                                     Foreground="#38BDF8">
+                                <TextBox.Resources>
+                                    <SolidColorBrush x:Key="TextControlBackground" Color="#0B0F19" />
+                                    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#0B0F19" />
+                                    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#0B0F19" />
+                                    <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#0B0F19" />
+                                    <SolidColorBrush x:Key="TextControlBorderBrush" Color="Transparent" />
+                                    <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="Transparent" />
+                                    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="Transparent" />
+                                    <SolidColorBrush x:Key="TextControlForeground" Color="#38BDF8" />
+                                    <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#38BDF8" />
+                                    <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#38BDF8" />
+                                </TextBox.Resources>
+                            </TextBox>
+                        </Border>
+                    </Grid>
+
+                    <!-- ================= 视图 4：系统设置 (Settings) ================= -->
+                    <Grid x:Name="SettingsView" Visibility="Collapsed">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="运行环境配置与网络拓扑参数 (Runtime Environment &amp; Network Topology)" FontSize="18" FontWeight="Bold" Margin="0,0,0,4"/>
+
+                                <!-- 客户端部署基准路径配置 -->
+                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1" CornerRadius="10" Padding="18">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock Text="🎮 客户端安装基准路径 (Client Deployment Directory)" FontWeight="SemiBold" FontSize="14"/>
+                                        <TextBlock Text="服务端只读比对客户端 StreamingAssets 下的 AssetHash 校验清单以自动协商协议版本 (Build 229 / 311)，不修改客户端任何文件。"
+                                                   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        <Grid ColumnDefinitions="*, Auto, Auto">
+                                            <TextBox x:Name="TxtClientPath" Margin="0,0,8,0" PlaceholderText="例如: D:\AtherGazer\AetherGazerLauncher\AetherGazer"/>
+                                            <Button Grid.Column="1" Click="OnAutoDetectClientClick" Content="自动检测 (Auto Detect)" Margin="0,0,8,0"/>
+                                            <Button Grid.Column="2" Click="OnBrowseClientClick" Content="浏览定位 (Browse...)"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtClientDetectionResult" Text="未检测" FontSize="11" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 静态资源缓存挂载路径配置 -->
+                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1" CornerRadius="10" Padding="18">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock Text="📦 静态资源缓存挂载目录 (CDN Storage Cache Directory)" FontWeight="SemiBold" FontSize="14"/>
+                                        <TextBlock Text="穿透代理所拉取的远端静态资源包持久化落盘存储路径（全量资源建议分配 20GB+ 存储空间）。"
+                                                   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        <Grid ColumnDefinitions="*, Auto, Auto">
+                                            <TextBox x:Name="TxtCdnDir" Margin="0,0,8,0" PlaceholderText="留空则回退至服务端相对路径 server/cdn_cache/"/>
+                                            <Button Grid.Column="1" Click="OnRecommendCdnDriveClick" Content="分析最大可用卷 (Analyze Storage)" Margin="0,0,8,0"/>
+                                            <Button Grid.Column="2" Click="OnBrowseCdnClick" Content="浏览定位 (Browse...)"/>
+                                        </Grid>
+                                        <TextBlock x:Name="TxtCdnDriveResult" Text="就绪" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 资产清单协商策略 -->
+                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1" CornerRadius="10" Padding="18">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock Text="🏷️ 资产清单协商策略 (Asset Manifest Alignment Policy)" FontWeight="SemiBold" FontSize="14"/>
+                                        <TextBlock Text="指定服务端对外分发的资源哈希基线版本。建议选择 auto 模式以自动与客户端探测版本保持一致。"
+                                                   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        <ComboBox x:Name="CmbResVersion" SelectedIndex="0" Width="340">
+                                            <ComboBoxItem Content="auto (自动按客户端清单协商 · 推荐)" Tag="auto"/>
+                                            <ComboBoxItem Content="Build 229 (v5.2.1 协议基线)" Tag="229"/>
+                                            <ComboBoxItem Content="Build 311 (v5.3.0 协议基线)" Tag="311"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 本地 CA 根证书 -->
+                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1" CornerRadius="10" Padding="18">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock Text="🛡️ 本地自签名 CA 根证书 (Local CA Certificate Chain)" FontWeight="SemiBold" FontSize="14"/>
+                                        <TextBlock Text="将服务端颁发的自签名根证书 (sdk_ca.crt) 导入 Windows 受信任根证书颁发机构存储区，确立 SSL/TLS 安全通信信任链。"
+                                                   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <Button Click="OnInstallCertClick" Content="安装 CA 根证书至系统存储区 (certutil)" Style="{StaticResource AccentButtonStyle}"/>
+                                            <Button Click="OnRegenerateCertClick" Content="重新生成证书 (Windows / iPhone)"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- DNS 本地解析覆盖策略 (HOSTS) -->
+                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1" CornerRadius="10" Padding="18">
+                                    <StackPanel Spacing="12">
+                                        <Grid ColumnDefinitions="Auto, *">
+                                            <TextBlock Text="🌐 DNS 本地解析覆盖策略 (Local DNS / HOSTS Mapping)" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center"/>
+                                            <Border Grid.Column="1" x:Name="BadgeHostsStatus" CornerRadius="10" Padding="10,2" Margin="12,0,0,0"
+                                                    Background="{ThemeResource LayerFillColorDefaultBrush}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtHostsBadge" Text="状态: 未检测" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            </Border>
+                                        </Grid>
+                                        <TextBlock Text="将客户端请求的目标域名覆盖解析至环回地址 (127.0.0.1)。支持带有独立边界标识的规则注入、自动备份及 DNS 缓存刷新。"
+                                                   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        
+                                        <Border Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="6" Padding="12,8">
+                                            <TextBlock x:Name="TxtHostsDetail" Text="目标路由域名 (10项): open.ys4fun.com, prod-api-activity.ys4fun.com, account.ys4fun.com 等"
+                                                       FontSize="11" FontFamily="Consolas, Cascadia Code" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextWrapping="Wrap"/>
+                                        </Border>
+
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <Button x:Name="BtnCheckHosts" Click="OnCheckHostsClick" Content="校验解析状态 (Verify)" />
+                                            <Button x:Name="BtnApplyHosts" Click="OnApplyHostsClick" Content="注入解析规则 (Apply Mapping)" Style="{StaticResource AccentButtonStyle}"
+                                                    ToolTipService.ToolTip="备份系统原始 hosts 并注入 127.0.0.1 覆盖解析规则"/>
+                                            <Button x:Name="BtnRemoveHosts" Click="OnRemoveHostsClick" Content="还原解析规则 (Clear Mapping)"
+                                                    ToolTipService.ToolTip="清除 Local Server 注入的解析配置块并刷新系统 DNS 缓存"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="TxtHostsOpResult" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 宿主生命周期与进程托管策略 -->
+                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1" CornerRadius="10" Padding="18">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock Text="🚪 宿主生命周期与进程托管策略 (Host Lifecycle &amp; Process Management)" FontWeight="SemiBold" FontSize="14"/>
+                                        <TextBlock Text="配置点击 Local Server 桌面窗口右上角关闭按钮时，对底层活动的 Python 服务端守护进程的处理动作。"
+                                                   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        <Grid ColumnDefinitions="Auto, Auto">
+                                            <ComboBox x:Name="CmbCloseAction" SelectedIndex="0" Width="360" SelectionChanged="OnCloseActionSelectionChanged">
+                                                <ComboBoxItem Content="每次关闭时弹出策略确认对话框 (交互式确认)" Tag="ask"/>
+                                                <ComboBoxItem Content="随宿主一同终止：销毁进程树并释放端口 (Host-Bound)" Tag="kill"/>
+                                                <ComboBoxItem Content="后台保留运行：解除托管并转为独立守护进程 (Detached Daemon)" Tag="keep"/>
+                                            </ComboBox>
+                                        </Grid>
+                                        <TextBlock Text="提示：若配置为后台保留运行，下次启动 Local Server 将自动感知并重新接管该服务进程。"
+                                                   FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 视觉与品牌启动动效配置 (Startup Presentation & Splash Screen) -->
+                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1" CornerRadius="12" Padding="20">
+                                    <StackPanel Spacing="14">
+                                        <Grid ColumnDefinitions="Auto, *">
+                                            <FontIcon Glyph="&#xE790;" FontSize="18" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <TextBlock Grid.Column="1" Text="视觉与品牌启动动效 (Startup Presentation &amp; Splash Screen)" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock Text="配置宿主桌面程序启动时的视觉呈现策略。首次运行已自动播放一次品牌动效，日常启动默认跳过以提升效率。"
+                                                   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                        <ToggleSwitch x:Name="ToggleAlwaysPlaySplash"
+                                                      Header="每次启动播放品牌动效 (Play Splash Screen on Every Startup)"
+                                                      OffContent="关闭 (仅首次启动播放，推荐)"
+                                                      OnContent="开启 (每次启动均播放)"
+                                                      IsOn="False"
+                                                      Toggled="OnToggleAlwaysPlaySplashChanged"/>
+
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <Button x:Name="BtnPreviewSplash" Click="OnPreviewSplashClick">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <FontIcon Glyph="&#xE768;" FontSize="14"/>
+                                                    <TextBlock Text="预览启动动效 (Preview Splash)"/>
+                                                </StackPanel>
+                                            </Button>
+                                            <TextBlock x:Name="TxtSplashStatus" Text="首次启动后默认关闭，避免干扰日常高频运维调试。"
+                                                       FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 保存配置按钮 -->
+                                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,24">
+                                    <Button Click="OnSaveConfigClick" Content="保存并持久化配置 (Save &amp; Persist)" Style="{StaticResource AccentButtonStyle}" Padding="20,8"/>
+                                    <TextBlock x:Name="TxtSaveResult" FontSize="12" VerticalAlignment="Center" Foreground="#10B981"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+            </NavigationView.Content>
+        </NavigationView>
+
+        <!-- 品牌启动屏全屏遮罩层 (Brand Splash Screen Overlay) -->
+        <Grid x:Name="SplashOverlay"
+              Visibility="Collapsed"
+              Background="#030712"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <WebView2 x:Name="SplashWebView"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch" />
+        </Grid>
+    </Grid>
+</Page>

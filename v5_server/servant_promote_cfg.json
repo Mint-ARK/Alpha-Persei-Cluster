@@ -1,0 +1,1152 @@
+{
+  "2310001": {
+    "id": 2310001,
+    "starlevel": 3,
+    "race": 1,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 0
+  },
+  "2320001": {
+    "id": 2320001,
+    "starlevel": 3,
+    "race": 2,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 0
+  },
+  "2330001": {
+    "id": 2330001,
+    "starlevel": 3,
+    "race": 3,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 0
+  },
+  "2340001": {
+    "id": 2340001,
+    "starlevel": 3,
+    "race": 4,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 0
+  },
+  "2350001": {
+    "id": 2350001,
+    "starlevel": 3,
+    "race": 5,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 0
+  },
+  "2390001": {
+    "id": 2390001,
+    "starlevel": 3,
+    "race": 9,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 0
+  },
+  "2410001": {
+    "id": 2410001,
+    "starlevel": 4,
+    "race": 1,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2410002": {
+    "id": 2410002,
+    "starlevel": 4,
+    "race": 1,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2420001": {
+    "id": 2420001,
+    "starlevel": 4,
+    "race": 2,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2420002": {
+    "id": 2420002,
+    "starlevel": 4,
+    "race": 2,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2430001": {
+    "id": 2430001,
+    "starlevel": 4,
+    "race": 3,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2430002": {
+    "id": 2430002,
+    "starlevel": 4,
+    "race": 3,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2440001": {
+    "id": 2440001,
+    "starlevel": 4,
+    "race": 4,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2440002": {
+    "id": 2440002,
+    "starlevel": 4,
+    "race": 4,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2450001": {
+    "id": 2450001,
+    "starlevel": 4,
+    "race": 5,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2450002": {
+    "id": 2450002,
+    "starlevel": 4,
+    "race": 5,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2490001": {
+    "id": 2490001,
+    "starlevel": 4,
+    "race": 9,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2490002": {
+    "id": 2490002,
+    "starlevel": 4,
+    "race": 9,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 1
+  },
+  "2510000": {
+    "id": 2510000,
+    "starlevel": 5,
+    "race": 1,
+    "type": 3,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2510001": {
+    "id": 2510001,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1038,
+    "mat_cost": 30
+  },
+  "2510002": {
+    "id": 2510002,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1039,
+    "mat_cost": 30
+  },
+  "2510003": {
+    "id": 2510003,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1059,
+    "mat_cost": 30
+  },
+  "2510004": {
+    "id": 2510004,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1041,
+    "mat_cost": 30
+  },
+  "2510005": {
+    "id": 2510005,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1042,
+    "mat_cost": 30
+  },
+  "2510006": {
+    "id": 2510006,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1067,
+    "mat_cost": 30
+  },
+  "2510007": {
+    "id": 2510007,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1097,
+    "mat_cost": 30
+  },
+  "2510008": {
+    "id": 2510008,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1096,
+    "mat_cost": 30
+  },
+  "2510009": {
+    "id": 2510009,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1138,
+    "mat_cost": 30
+  },
+  "2510010": {
+    "id": 2510010,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1139,
+    "mat_cost": 30
+  },
+  "2510012": {
+    "id": 2510012,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1197,
+    "mat_cost": 30
+  },
+  "2510013": {
+    "id": 2510013,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1022,
+    "mat_cost": 30
+  },
+  "2510014": {
+    "id": 2510014,
+    "starlevel": 5,
+    "race": 1,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1021,
+    "mat_cost": 30
+  },
+  "2510999": {
+    "id": 2510999,
+    "starlevel": 5,
+    "race": 1,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2520000": {
+    "id": 2520000,
+    "starlevel": 5,
+    "race": 2,
+    "type": 3,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2520001": {
+    "id": 2520001,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1019,
+    "mat_cost": 30
+  },
+  "2520002": {
+    "id": 2520002,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1011,
+    "mat_cost": 30
+  },
+  "2520003": {
+    "id": 2520003,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1024,
+    "mat_cost": 30
+  },
+  "2520004": {
+    "id": 2520004,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1035,
+    "mat_cost": 30
+  },
+  "2520005": {
+    "id": 2520005,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1111,
+    "mat_cost": 30
+  },
+  "2520006": {
+    "id": 2520006,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1119,
+    "mat_cost": 30
+  },
+  "2520007": {
+    "id": 2520007,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1017,
+    "mat_cost": 30
+  },
+  "2520008": {
+    "id": 2520008,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1015,
+    "mat_cost": 30
+  },
+  "2520009": {
+    "id": 2520009,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1095,
+    "mat_cost": 30
+  },
+  "2520010": {
+    "id": 2520010,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1034,
+    "mat_cost": 30
+  },
+  "2520011": {
+    "id": 2520011,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1211,
+    "mat_cost": 30
+  },
+  "2520012": {
+    "id": 2520012,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1047,
+    "mat_cost": 30
+  },
+  "2520013": {
+    "id": 2520013,
+    "starlevel": 5,
+    "race": 2,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1044,
+    "mat_cost": 30
+  },
+  "2520999": {
+    "id": 2520999,
+    "starlevel": 5,
+    "race": 2,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2530000": {
+    "id": 2530000,
+    "starlevel": 5,
+    "race": 3,
+    "type": 3,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2530001": {
+    "id": 2530001,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1099,
+    "mat_cost": 30
+  },
+  "2530002": {
+    "id": 2530002,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1048,
+    "mat_cost": 30
+  },
+  "2530003": {
+    "id": 2530003,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1066,
+    "mat_cost": 30
+  },
+  "2530004": {
+    "id": 2530004,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1093,
+    "mat_cost": 30
+  },
+  "2530005": {
+    "id": 2530005,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1148,
+    "mat_cost": 30
+  },
+  "2530006": {
+    "id": 2530006,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1050,
+    "mat_cost": 30
+  },
+  "2530007": {
+    "id": 2530007,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1199,
+    "mat_cost": 30
+  },
+  "2530008": {
+    "id": 2530008,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1058,
+    "mat_cost": 30
+  },
+  "2530009": {
+    "id": 2530009,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1055,
+    "mat_cost": 30
+  },
+  "2530010": {
+    "id": 2530010,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1158,
+    "mat_cost": 30
+  },
+  "2530011": {
+    "id": 2530011,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1049,
+    "mat_cost": 30
+  },
+  "2530012": {
+    "id": 2530012,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1150,
+    "mat_cost": 30
+  },
+  "2530013": {
+    "id": 2530013,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1248,
+    "mat_cost": 30
+  },
+  "2530014": {
+    "id": 2530014,
+    "starlevel": 5,
+    "race": 3,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1166,
+    "mat_cost": 30
+  },
+  "2530999": {
+    "id": 2530999,
+    "starlevel": 5,
+    "race": 3,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2540000": {
+    "id": 2540000,
+    "starlevel": 5,
+    "race": 4,
+    "type": 3,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2540001": {
+    "id": 2540001,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1080,
+    "mat_cost": 30
+  },
+  "2540002": {
+    "id": 2540002,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1084,
+    "mat_cost": 30
+  },
+  "2540003": {
+    "id": 2540003,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1094,
+    "mat_cost": 30
+  },
+  "2540004": {
+    "id": 2540004,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1037,
+    "mat_cost": 30
+  },
+  "2540005": {
+    "id": 2540005,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1184,
+    "mat_cost": 30
+  },
+  "2540006": {
+    "id": 2540006,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1028,
+    "mat_cost": 30
+  },
+  "2540008": {
+    "id": 2540008,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1032,
+    "mat_cost": 30
+  },
+  "2540009": {
+    "id": 2540009,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1033,
+    "mat_cost": 30
+  },
+  "2540010": {
+    "id": 2540010,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1081,
+    "mat_cost": 30
+  },
+  "2540011": {
+    "id": 2540011,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1132,
+    "mat_cost": 30
+  },
+  "2540012": {
+    "id": 2540012,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1284,
+    "mat_cost": 30
+  },
+  "2540013": {
+    "id": 2540013,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1133,
+    "mat_cost": 30
+  },
+  "2540014": {
+    "id": 2540014,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1085,
+    "mat_cost": 30
+  },
+  "2540015": {
+    "id": 2540015,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1194,
+    "mat_cost": 30
+  },
+  "2540016": {
+    "id": 2540016,
+    "starlevel": 5,
+    "race": 4,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1137,
+    "mat_cost": 30
+  },
+  "2540999": {
+    "id": 2540999,
+    "starlevel": 5,
+    "race": 4,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2550000": {
+    "id": 2550000,
+    "starlevel": 5,
+    "race": 5,
+    "type": 3,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2550001": {
+    "id": 2550001,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1027,
+    "mat_cost": 30
+  },
+  "2550002": {
+    "id": 2550002,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1013,
+    "mat_cost": 30
+  },
+  "2550004": {
+    "id": 2550004,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1026,
+    "mat_cost": 30
+  },
+  "2550005": {
+    "id": 2550005,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1056,
+    "mat_cost": 30
+  },
+  "2550006": {
+    "id": 2550006,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1068,
+    "mat_cost": 30
+  },
+  "2550007": {
+    "id": 2550007,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1016,
+    "mat_cost": 30
+  },
+  "2550008": {
+    "id": 2550008,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1127,
+    "mat_cost": 30
+  },
+  "2550009": {
+    "id": 2550009,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1052,
+    "mat_cost": 30
+  },
+  "2550010": {
+    "id": 2550010,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1020,
+    "mat_cost": 30
+  },
+  "2550011": {
+    "id": 2550011,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1156,
+    "mat_cost": 30
+  },
+  "2550012": {
+    "id": 2550012,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1089,
+    "mat_cost": 30
+  },
+  "2550013": {
+    "id": 2550013,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1083,
+    "mat_cost": 30
+  },
+  "2550014": {
+    "id": 2550014,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1043,
+    "mat_cost": 30
+  },
+  "2550996": {
+    "id": 2550996,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1046,
+    "mat_cost": 30
+  },
+  "2550997": {
+    "id": 2550997,
+    "starlevel": 5,
+    "race": 5,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1045,
+    "mat_cost": 30
+  },
+  "2550998": {
+    "id": 2550998,
+    "starlevel": 5,
+    "race": 5,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2550999": {
+    "id": 2550999,
+    "starlevel": 5,
+    "race": 5,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2590000": {
+    "id": 2590000,
+    "starlevel": 5,
+    "race": 9,
+    "type": 3,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  },
+  "2590001": {
+    "id": 2590001,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1070,
+    "mat_cost": 30
+  },
+  "2590003": {
+    "id": 2590003,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1075,
+    "mat_cost": 30
+  },
+  "2590004": {
+    "id": 2590004,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1071,
+    "mat_cost": 30
+  },
+  "2590005": {
+    "id": 2590005,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1072,
+    "mat_cost": 30
+  },
+  "2590006": {
+    "id": 2590006,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1076,
+    "mat_cost": 30
+  },
+  "2590007": {
+    "id": 2590007,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1074,
+    "mat_cost": 30
+  },
+  "2590008": {
+    "id": 2590008,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1060,
+    "mat_cost": 30
+  },
+  "2590009": {
+    "id": 2590009,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1061,
+    "mat_cost": 30
+  },
+  "2590010": {
+    "id": 2590010,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1012,
+    "mat_cost": 30
+  },
+  "2590011": {
+    "id": 2590011,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1073,
+    "mat_cost": 30
+  },
+  "2590012": {
+    "id": 2590012,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1053,
+    "mat_cost": 30
+  },
+  "2590013": {
+    "id": 2590013,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1170,
+    "mat_cost": 30
+  },
+  "2590014": {
+    "id": 2590014,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1054,
+    "mat_cost": 30
+  },
+  "2590015": {
+    "id": 2590015,
+    "starlevel": 5,
+    "race": 9,
+    "type": 2,
+    "name": "",
+    "is_exclusive": true,
+    "spec_hero": 1077,
+    "mat_cost": 30
+  },
+  "2590999": {
+    "id": 2590999,
+    "starlevel": 5,
+    "race": 9,
+    "type": 1,
+    "name": "",
+    "is_exclusive": false,
+    "spec_hero": 0,
+    "mat_cost": 10
+  }
+}

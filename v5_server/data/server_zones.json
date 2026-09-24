@@ -1,0 +1,21 @@
+{
+  "default_zone_id": "1",
+  "zones": [
+    {
+      "serverId": "1",
+      "serverName": "艾因索菲",
+      "env": "prod",
+      "newServerFlag": 1,
+      "maintain": false,
+      "maintainReason": ""
+    },
+    {
+      "serverId": "2",
+      "serverName": "蒂卡拉",
+      "env": "prod",
+      "newServerFlag": 0,
+      "maintain": false,
+      "maintainReason": ""
+    }
+  ]
+}

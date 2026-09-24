@@ -1,0 +1,673 @@
+{
+  "2020": {
+    "id": 2020,
+    "name": "真言妄语",
+    "type": 12,
+    "sub_type": 1201,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        50
+      ]
+    ]
+  },
+  "2917": {
+    "id": 2917,
+    "name": "最后的期限",
+    "type": 12,
+    "sub_type": 1201,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        50
+      ]
+    ]
+  },
+  "2927": {
+    "id": 2927,
+    "name": "丰羽",
+    "type": 12,
+    "sub_type": 1201,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        50
+      ]
+    ]
+  },
+  "2933": {
+    "id": 2933,
+    "name": "协同出击",
+    "type": 12,
+    "sub_type": 1201,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        50
+      ]
+    ]
+  },
+  "3027": {
+    "id": 3027,
+    "name": "难得闲暇",
+    "type": 13,
+    "sub_type": 1301,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        2,
+        20000
+      ]
+    ]
+  },
+  "3043": {
+    "id": 3043,
+    "name": "秘密的约定",
+    "type": 13,
+    "sub_type": 1301,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        2,
+        20000
+      ]
+    ]
+  },
+  "3056": {
+    "id": 3056,
+    "name": "熟悉的味道",
+    "type": 13,
+    "sub_type": 1301,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        2,
+        20000
+      ]
+    ]
+  },
+  "3062": {
+    "id": 3062,
+    "name": "我的梦想",
+    "type": 13,
+    "sub_type": 1301,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        2,
+        20000
+      ]
+    ]
+  },
+  "3067": {
+    "id": 3067,
+    "name": "闪耀之星",
+    "type": 13,
+    "sub_type": 1301,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        2,
+        20000
+      ]
+    ]
+  },
+  "6001": {
+    "id": 6001,
+    "name": "暮色珍珠（1天）",
+    "type": 21,
+    "sub_type": 2102,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        500
+      ]
+    ]
+  },
+  "6017": {
+    "id": 6017,
+    "name": "思念的归处·夜语",
+    "type": 21,
+    "sub_type": 2101,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        500
+      ]
+    ]
+  },
+  "6018": {
+    "id": 6018,
+    "name": "思念的归处·晨意（1天）",
+    "type": 21,
+    "sub_type": 2102,
+    "limit": 0,
+    "num_exchange_item": [
+      [
+        1,
+        500
+      ]
+    ]
+  },
+  "6030": {
+    "id": 6030,
+    "name": "不思量",
+    "type": 21,
+    "sub_type": 2101,
+    "limit": 0,
+    "num_exchange_item": [
+      [
+        1,
+        500
+      ]
+    ]
+  },
+  "6042": {
+    "id": 6042,
+    "name": "摸摸许可证",
+    "type": 21,
+    "sub_type": 2101,
+    "limit": 0,
+    "num_exchange_item": [
+      [
+        1,
+        500
+      ]
+    ]
+  },
+  "6049": {
+    "id": 6049,
+    "name": "天际线之上",
+    "type": 21,
+    "sub_type": 2101,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        500
+      ]
+    ]
+  },
+  "6051": {
+    "id": 6051,
+    "name": "少女欢奏之夜",
+    "type": 21,
+    "sub_type": 2101,
+    "limit": 1,
+    "num_exchange_item": []
+  },
+  "6052": {
+    "id": 6052,
+    "name": "心动烘焙日记",
+    "type": 21,
+    "sub_type": 2101,
+    "limit": 0,
+    "num_exchange_item": [
+      [
+        1,
+        500
+      ]
+    ]
+  },
+  "6057": {
+    "id": 6057,
+    "name": "仅予你的魔法",
+    "type": 21,
+    "sub_type": 2101,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        500
+      ]
+    ]
+  },
+  "90001": {
+    "id": 90001,
+    "name": "「庚辰·叹气」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "90002": {
+    "id": 90002,
+    "name": "「庚辰·喝茶」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "90003": {
+    "id": 90003,
+    "name": "「庚辰·疑惑」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "90004": {
+    "id": 90004,
+    "name": "「庚辰·点赞」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "90005": {
+    "id": 90005,
+    "name": "「庚辰·敲打」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "90058": {
+    "id": 90058,
+    "name": "「托特·可爱」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "90059": {
+    "id": 90059,
+    "name": "「托特·比心」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "90060": {
+    "id": 90060,
+    "name": "「托特·尴尬」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "90061": {
+    "id": 90061,
+    "name": "「托特·怀疑」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "90062": {
+    "id": 90062,
+    "name": "「托特·困倦」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91014": {
+    "id": 91014,
+    "name": "「梵天·得意」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91015": {
+    "id": 91015,
+    "name": "「梵天·比心」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91016": {
+    "id": 91016,
+    "name": "「梵天·摸鱼」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91017": {
+    "id": 91017,
+    "name": "「梵天·指指点点」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91018": {
+    "id": 91018,
+    "name": "「梵天·大哭」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91029": {
+    "id": 91029,
+    "name": "「诗蔻蒂·送花花」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91030": {
+    "id": 91030,
+    "name": "「诗蔻蒂·气鼓鼓」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91031": {
+    "id": 91031,
+    "name": "「诗蔻蒂·委屈」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91032": {
+    "id": 91032,
+    "name": "「诗蔻蒂·思考」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91033": {
+    "id": 91033,
+    "name": "「诗蔻蒂·嘬嘬」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91034": {
+    "id": 91034,
+    "name": "「荷鲁斯·傲娇」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91035": {
+    "id": 91035,
+    "name": "「荷鲁斯·抓狂」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91036": {
+    "id": 91036,
+    "name": "「荷鲁斯·nice」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91037": {
+    "id": 91037,
+    "name": "「荷鲁斯·哎呀呀」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "91038": {
+    "id": 91038,
+    "name": "「荷鲁斯·嘲笑」",
+    "type": 20,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        20
+      ]
+    ]
+  },
+  "3009002": {
+    "id": 3009002,
+    "name": "不负春韶-大厅图纸",
+    "type": 24,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        2,
+        8000
+      ]
+    ]
+  },
+  "107602": {
+    "id": 107602,
+    "name": "",
+    "type": 8,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        1000
+      ]
+    ]
+  },
+  "109502": {
+    "id": 109502,
+    "name": "",
+    "type": 8,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        1000
+      ]
+    ]
+  },
+  "107002": {
+    "id": 107002,
+    "name": "",
+    "type": 8,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        2,
+        5000
+      ]
+    ]
+  },
+  "102003": {
+    "id": 102003,
+    "name": "",
+    "type": 8,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        1000
+      ]
+    ]
+  },
+  "108502": {
+    "id": 108502,
+    "name": "",
+    "type": 8,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        1000
+      ]
+    ]
+  },
+  "104903": {
+    "id": 104903,
+    "name": "",
+    "type": 8,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        1000
+      ]
+    ]
+  },
+  "104402": {
+    "id": 104402,
+    "name": "",
+    "type": 8,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        1000
+      ]
+    ]
+  },
+  "109503": {
+    "id": 109503,
+    "name": "",
+    "type": 8,
+    "sub_type": 0,
+    "limit": 1,
+    "num_exchange_item": [
+      [
+        1,
+        1000
+      ]
+    ]
+  }
+}

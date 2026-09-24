@@ -1,0 +1,30 @@
+{
+  "name": "v5-control-panel-ui",
+  "private": true,
+  "version": "1.0.0",
+  "description": "V5 控制面板前端视觉稿 (HeroUI v3 + React 19 + Tailwind v4) — 纯前端，无数据库接入",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/inline.mjs",
+    "shot": "node scripts/shot.mjs",
+    "preview": "vite preview",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@heroui/react": "3.2.4",
+    "@heroui/styles": "3.2.4",
+    "lucide-react": "^0.454.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.10"
+  }
+}

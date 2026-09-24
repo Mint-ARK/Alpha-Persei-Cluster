@@ -1,0 +1,4862 @@
+{
+  "5030701": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5030702": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5030703": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5030704": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5030705": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5030706": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5040201": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5040202": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5040203": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5040204": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050811": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050812": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050813": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050814": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5060811": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5060812": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5060813": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5060814": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5060815": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5070201": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5070202": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5070203": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5070204": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5080601": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5080602": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5080603": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5080604": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5080605": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5090201": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5090202": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5090203": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5100201": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5100202": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5100203": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5110401": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5110402": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5110403": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5120301": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5120302": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5120303": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5120401": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5120402": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5120403": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5130501": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5130502": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5130503": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5140501": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5140502": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5140503": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5140601": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5140602": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5140603": {
+    "cost": 0,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050201": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050202": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050203": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050204": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050205": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050207": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050208": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050209": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050210": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050211": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050213": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050214": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050215": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050216": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050217": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050219": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050220": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050221": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050222": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050223": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050225": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050226": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050227": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050228": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5050229": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "5010102": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010109": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010110": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010111": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010112": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010113": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010114": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010116": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010117": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010118": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010119": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5010121": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5020103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5020104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5020105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5030101": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5030102": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5030103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5030105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 0
+  },
+  "5030106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 0
+  },
+  "5030107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 0
+  },
+  "5030110": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5030111": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5030112": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5030113": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 0
+  },
+  "5030114": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 0
+  },
+  "5030115": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 0
+  },
+  "5030116": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 0
+  },
+  "5030117": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5050101": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5050102": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5050103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5050105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5050106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5050107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5050108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5050109": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060102": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060109": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060110": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060112": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060114": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060115": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060116": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060117": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060118": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060119": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060121": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060122": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060123": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060702": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060704": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060706": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060708": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060710": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5060712": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5080102": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5080103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5080105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5080106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5080107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5080109": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5080110": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5080111": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5080112": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5110102": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5110104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5110105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5110107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5110108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210109": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210110": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210111": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210112": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210113": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210114": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210115": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5210116": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180101": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180102": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180109": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180110": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180111": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5180112": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220102": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220109": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220111": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220113": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220114": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220115": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220116": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220117": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220118": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220120": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220121": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5220123": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140101": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140102": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140110": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140111": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140112": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140113": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140114": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140115": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140117": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140118": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140120": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140121": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140122": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140123": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140124": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5140125": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191001": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191002": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191004": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191006": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191007": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191008": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191010": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191011": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191012": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191013": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5191015": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230101": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230111": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230112": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230114": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230117": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230118": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230120": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230121": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230123": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5230124": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5250101": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5250102": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5250103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5250105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5250106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5250107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5250108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5250109": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270105": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270106": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270109": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270110": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5280101": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5280104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5280107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5280108": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5280110": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5280113": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5280116": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5280117": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5280119": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5280120": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5310101": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5310103": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5310104": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5310107": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5310110": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5310112": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5310113": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1030001": {
+    "cost": 10,
+    "user_exp": 20,
+    "hero_exp": 20
+  },
+  "1030002": {
+    "cost": 10,
+    "user_exp": 20,
+    "hero_exp": 20
+  },
+  "1030003": {
+    "cost": 10,
+    "user_exp": 20,
+    "hero_exp": 20
+  },
+  "1030004": {
+    "cost": 10,
+    "user_exp": 20,
+    "hero_exp": 20
+  },
+  "1030005": {
+    "cost": 10,
+    "user_exp": 20,
+    "hero_exp": 20
+  },
+  "1030006": {
+    "cost": 10,
+    "user_exp": 20,
+    "hero_exp": 20
+  },
+  "1030007": {
+    "cost": 10,
+    "user_exp": 20,
+    "hero_exp": 20
+  },
+  "1030108": {
+    "cost": 15,
+    "user_exp": 40,
+    "hero_exp": 40
+  },
+  "1030109": {
+    "cost": 15,
+    "user_exp": 40,
+    "hero_exp": 40
+  },
+  "1030203": {
+    "cost": 20,
+    "user_exp": 60,
+    "hero_exp": 60
+  },
+  "1030206": {
+    "cost": 20,
+    "user_exp": 60,
+    "hero_exp": 60
+  },
+  "1030303": {
+    "cost": 30,
+    "user_exp": 80,
+    "hero_exp": 80
+  },
+  "1030304": {
+    "cost": 30,
+    "user_exp": 80,
+    "hero_exp": 80
+  },
+  "1030305": {
+    "cost": 30,
+    "user_exp": 80,
+    "hero_exp": 80
+  },
+  "1030401": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1030402": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1030404": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1030405": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1030408": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1030409": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1030410": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1030411": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1030412": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1030501": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1030503": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1030504": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1030505": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1030506": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1030507": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010001": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1010002": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1010003": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1010004": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1010005": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1010101": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 0
+  },
+  "1010102": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "1010103": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "1010104": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "1010105": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "1010106": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "1010108": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 0
+  },
+  "1010109": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "1010110": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "1010111": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "1010113": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "1010201": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "1010202": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "1010203": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "1010204": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "1010205": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "1010206": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 0
+  },
+  "1010207": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "1010208": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "1010209": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "1010210": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "1010211": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "1010301": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010302": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010303": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010304": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010305": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010306": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010307": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010308": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010309": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 0
+  },
+  "1010310": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010401": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010402": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 0
+  },
+  "1010403": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010404": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010405": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010406": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010407": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010408": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010409": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010410": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 0
+  },
+  "1010411": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010412": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "1010501": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010502": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010504": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010505": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010506": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010507": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010508": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010509": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010511": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010602": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010603": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010604": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010605": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010606": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010608": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010609": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010610": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010611": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010612": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010613": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010701": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010702": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010703": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010704": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010705": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010706": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010707": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010708": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010709": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010710": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010801": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010802": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010803": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010804": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010805": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010806": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010807": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010808": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010809": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010810": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010901": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010902": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010903": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010904": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010905": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010906": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010907": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010908": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1010909": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1010910": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011002": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011003": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011004": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011005": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011006": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011007": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011008": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011009": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011010": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011011": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011012": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011013": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011014": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011015": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011016": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011017": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011102": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011103": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011104": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011105": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011106": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011107": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011108": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011109": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011110": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011111": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011112": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011113": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011114": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011116": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011117": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011118": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011202": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011203": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011204": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011206": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011208": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011209": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011210": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011212": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011213": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011214": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011215": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011216": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011217": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011218": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011220": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011221": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011222": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011223": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011224": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011225": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011227": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011228": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011229": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011230": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011231": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011232": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011233": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011235": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011236": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011237": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011239": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011240": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011303": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011304": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011305": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011306": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011307": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011308": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011309": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011310": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011311": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011312": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011313": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011314": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011317": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011319": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011321": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011323": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011324": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011326": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011327": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011328": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011329": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011330": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011402": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011403": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011405": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011406": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011408": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011410": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011411": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011412": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011413": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011414": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011415": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 0
+  },
+  "1011501": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011502": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011503": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011504": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011505": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011506": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011508": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011509": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011510": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011512": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011513": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011514": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011515": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011516": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011517": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011518": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011519": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011520": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011521": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011523": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011524": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011525": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011526": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011527": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011602": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011603": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011604": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011605": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011606": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011607": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011608": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011609": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011610": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011611": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011612": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011613": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011614": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011615": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011616": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011617": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011619": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011620": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011621": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011622": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1011623": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031701": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031703": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031704": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031705": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031706": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031708": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031709": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031710": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031711": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031712": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031713": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031714": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031715": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031717": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031718": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031719": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031720": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031721": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031722": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031723": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031724": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031725": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031726": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031728": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031729": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031730": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031731": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031802": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031803": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031805": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031806": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031807": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031808": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031809": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031810": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031811": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031812": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031813": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031814": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031815": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031816": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031818": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031819": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031820": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031821": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031822": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031823": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031824": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031826": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031827": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031828": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031829": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1031901": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031902": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031903": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031904": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031905": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031906": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031907": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031908": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031909": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031910": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031911": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031912": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031913": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031914": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031915": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031916": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031917": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031918": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031919": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031920": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031921": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031922": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031923": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031924": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031925": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031926": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1031927": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "1032001": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032002": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032003": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032004": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032007": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032008": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032009": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032010": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032012": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032013": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032014": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032016": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032018": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032020": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032022": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032023": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032024": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032025": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032028": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032029": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032030": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032031": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032101": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032102": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032107": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032110": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032111": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032112": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032113": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032115": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032116": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032118": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032119": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032120": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032121": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032123": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032125": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032126": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032129": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032130": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032132": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032133": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032134": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032138": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032201": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032204": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032205": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032206": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032207": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032208": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032209": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032210": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032211": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032212": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032213": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032214": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032217": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032218": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032219": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032220": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032224": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032308": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032309": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032310": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032311": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032316": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032318": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032319": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032320": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032322": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032350": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032351": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032357": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032361": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032372": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032373": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032376": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032378": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032382": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032402": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032405": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032406": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032407": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032410": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032411": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032414": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032416": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032450": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032452": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032456": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032457": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032461": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032472": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032477": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032550": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032502": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032506": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032508": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032509": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032510": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032511": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032513": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032552": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032554": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032555": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032556": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032558": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032559": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032560": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032580": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032581": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032582": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1032587": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1132554": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020101": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020102": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020103": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020104": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020105": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020106": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020201": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020202": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020203": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020204": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020205": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020206": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020301": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020302": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020303": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020304": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020305": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020306": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020401": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020402": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020403": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020404": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020405": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020406": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020501": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020502": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020503": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020504": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020505": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020506": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020601": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020602": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020603": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020604": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020605": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020606": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020701": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020702": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020703": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020704": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020705": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020706": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020801": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020802": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020803": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020804": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020805": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020806": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020901": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020902": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020903": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020904": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020905": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1020906": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021001": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021002": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021003": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021004": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021005": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021006": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021101": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021102": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021103": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021104": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021105": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "1021106": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2010101": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "2010102": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2010103": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2010104": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2010105": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2010201": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "2010202": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2010203": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2010204": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2010205": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2010206": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2010301": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "2010302": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2010303": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2010304": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2010305": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2010401": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "2010402": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2010403": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2010404": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2010405": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2010501": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "2010502": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2010503": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2010504": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2010505": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2010601": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "2010602": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2010603": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2010604": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2010605": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2010606": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2010701": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "2010702": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2010703": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2010704": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2010705": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030011": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030012": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030013": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030021": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030022": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030023": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030031": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030032": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030033": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030041": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030042": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030043": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030051": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030052": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030053": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030061": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030062": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030063": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030071": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030072": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030073": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030081": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2030082": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030083": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030091": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2030092": {
+    "cost": 35,
+    "user_exp": 35,
+    "hero_exp": 70
+  },
+  "2030093": {
+    "cost": 45,
+    "user_exp": 45,
+    "hero_exp": 90
+  },
+  "2030101": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2030102": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030103": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030111": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2030112": {
+    "cost": 35,
+    "user_exp": 35,
+    "hero_exp": 70
+  },
+  "2030113": {
+    "cost": 45,
+    "user_exp": 45,
+    "hero_exp": 90
+  },
+  "2030121": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2030122": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030123": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030131": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2030132": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030133": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030141": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2030142": {
+    "cost": 35,
+    "user_exp": 35,
+    "hero_exp": 70
+  },
+  "2030143": {
+    "cost": 45,
+    "user_exp": 45,
+    "hero_exp": 90
+  },
+  "2030151": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2030152": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030153": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030161": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030162": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030163": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030171": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2030172": {
+    "cost": 35,
+    "user_exp": 35,
+    "hero_exp": 70
+  },
+  "2030173": {
+    "cost": 45,
+    "user_exp": 45,
+    "hero_exp": 90
+  },
+  "2030181": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030182": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030183": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030191": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030192": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030193": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030201": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2030202": {
+    "cost": 35,
+    "user_exp": 35,
+    "hero_exp": 70
+  },
+  "2030203": {
+    "cost": 45,
+    "user_exp": 45,
+    "hero_exp": 90
+  },
+  "2030211": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2030212": {
+    "cost": 35,
+    "user_exp": 35,
+    "hero_exp": 70
+  },
+  "2030213": {
+    "cost": 45,
+    "user_exp": 45,
+    "hero_exp": 90
+  },
+  "2030221": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2030222": {
+    "cost": 35,
+    "user_exp": 35,
+    "hero_exp": 70
+  },
+  "2030223": {
+    "cost": 45,
+    "user_exp": 45,
+    "hero_exp": 90
+  },
+  "2030231": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030232": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030233": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030241": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030242": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030243": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030251": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2030252": {
+    "cost": 35,
+    "user_exp": 35,
+    "hero_exp": 70
+  },
+  "2030253": {
+    "cost": 45,
+    "user_exp": 45,
+    "hero_exp": 90
+  },
+  "2030261": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2030262": {
+    "cost": 35,
+    "user_exp": 35,
+    "hero_exp": 70
+  },
+  "2030263": {
+    "cost": 45,
+    "user_exp": 45,
+    "hero_exp": 90
+  },
+  "2030271": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030272": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030273": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030281": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030282": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030283": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030291": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2030292": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2030293": {
+    "cost": 50,
+    "user_exp": 50,
+    "hero_exp": 100
+  },
+  "2030301": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2030302": {
+    "cost": 35,
+    "user_exp": 35,
+    "hero_exp": 70
+  },
+  "2030303": {
+    "cost": 45,
+    "user_exp": 45,
+    "hero_exp": 90
+  },
+  "2020011": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2020012": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2020013": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2020014": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2020015": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2020021": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2020022": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2020023": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2020024": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2020025": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2020031": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2020032": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2020033": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2020034": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2020035": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2020041": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2020042": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2020043": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2020044": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2020045": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2020051": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2020052": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2020053": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2020054": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2020055": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2020061": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2020062": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2020063": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2020064": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2020065": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "2020071": {
+    "cost": 15,
+    "user_exp": 15,
+    "hero_exp": 30
+  },
+  "2020072": {
+    "cost": 20,
+    "user_exp": 20,
+    "hero_exp": 40
+  },
+  "2020073": {
+    "cost": 25,
+    "user_exp": 25,
+    "hero_exp": 50
+  },
+  "2020074": {
+    "cost": 30,
+    "user_exp": 30,
+    "hero_exp": 60
+  },
+  "2020075": {
+    "cost": 40,
+    "user_exp": 40,
+    "hero_exp": 80
+  },
+  "5270201": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270205": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270206": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  },
+  "5270207": {
+    "cost": 10,
+    "user_exp": 10,
+    "hero_exp": 20
+  }
+}

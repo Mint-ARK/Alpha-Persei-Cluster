@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1790233139000,
+    "mail_id": 1001,
+    "uid": 10001,
+    "sender": "隐科组总务部",
+    "title": "【隐科组】常规物资调配",
+    "content": "亲爱的管理员，战备物资已全额送达，请注意查收！",
+    "attachments": [
+      {
+        "id": 1,
+        "name": "",
+        "number": 500
+      },
+      {
+        "id": 2,
+        "name": "",
+        "number": 10
+      }
+    ],
+    "attachments_count": 2,
+    "sent_at": 1790233139,
+    "sent_at_str": "2026-09-24 14:58:59",
+    "status": "已入库"
+  },
+  {
+    "id": 1790231413000,
+    "mail_id": 1001,
+    "uid": 10001,
+    "sender": "隐科组总务部",
+    "title": "【隐科组】常规物资调配",
+    "content": "亲爱的管理员，战备物资已全额送达，请注意查收！",
+    "attachments": [
+      {
+        "id": 1,
+        "name": "",
+        "number": 500
+      },
+      {
+        "id": 2,
+        "name": "",
+        "number": 10
+      }
+    ],
+    "attachments_count": 2,
+    "sent_at": 1790231413,
+    "sent_at_str": "2026-09-24 14:30:13",
+    "status": "已入库"
+  },
+  {
+    "id": 1790222378000,
+    "mail_id": 1001,
+    "uid": 10001,
+    "sender": "隐科组总务部",
+    "title": "【隐科组】常规物资调配",
+    "content": "亲爱的管理员，战备物资已全额送达，请注意查收！",
+    "attachments": [
+      {
+        "id": 1,
+        "name": "",
+        "number": 500
+      },
+      {
+        "id": 2,
+        "name": "",
+        "number": 10
+      }
+    ],
+    "attachments_count": 2,
+    "sent_at": 1790222378,
+    "sent_at_str": "2026-09-24 11:59:38",
+    "status": "已入库"
+  }
+]

@@ -1,0 +1,66 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+/* ------------------------------------------------------------------------------------------------
+ * 字体
+ *
+ * HeroUI v3 自身不覆写字体：组件直接继承 Tailwind v4 的 --font-sans（系统字体栈），
+ * 这也是 heroui.com 组件展示区的观感来源。这里沿用同一条链路，只补齐中文字形：
+ *   iOS / macOS → SF Pro + 苹方(PingFang SC)
+ *   Windows     → Segoe UI + 微软雅黑
+ * 关键点：中文字形必须在 generic `sans-serif` 之前命中一款黑体，
+ * 否则 Windows 上的 sans-serif 会回退到宋体(SimSun)。
+ * ---------------------------------------------------------------------------------------------- */
+@theme {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI Variable Text",
+    "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "PingFang TC", "HarmonyOS Sans SC",
+    "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC",
+    "Hiragino Sans GB", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+
+  --font-mono:
+    "SF Mono", ui-monospace, SFMono-Regular, "JetBrains Mono", "Cascadia Mono", Consolas, Menlo,
+    "PingFang SC", "Microsoft YaHei UI", monospace;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /*
+   * 细滚动条：只作用于显式标注的滚动容器，
+   * 不做全局 `*` 覆盖——HeroUI 已说明全局滚动条样式会干扰 modal / overlay 的点击关闭。
+   */
+  .cp-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar) transparent;
+  }
+
+  .cp-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .cp-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .cp-scroll::-webkit-scrollbar-thumb {
+    background: var(--scrollbar);
+    border-radius: 999px;
+  }
+}

@@ -1,0 +1,2120 @@
+{
+  "1": {
+    "id": 1,
+    "activity_id": 91491,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 39200,
+    "name": "Promise (Short Ver.)",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        11033,
+        5
+      ],
+      [
+        2,
+        2000
+      ]
+    ]
+  },
+  "2": {
+    "id": 2,
+    "activity_id": 91491,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 47100,
+    "name": "Promise (Short Ver.)",
+    "rewards": [
+      [
+        40203,
+        3
+      ],
+      [
+        40301,
+        200
+      ],
+      [
+        2,
+        4000
+      ]
+    ]
+  },
+  "3": {
+    "id": 3,
+    "activity_id": 91492,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 31000,
+    "name": "Fighting in Sasanami 1",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        11033,
+        5
+      ],
+      [
+        2,
+        2000
+      ]
+    ]
+  },
+  "4": {
+    "id": 4,
+    "activity_id": 91492,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 48700,
+    "name": "Fighting in Sasanami 1",
+    "rewards": [
+      [
+        40203,
+        3
+      ],
+      [
+        40301,
+        200
+      ],
+      [
+        2,
+        4000
+      ]
+    ]
+  },
+  "5": {
+    "id": 5,
+    "activity_id": 91493,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 33300,
+    "name": "Go Ahead",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        11033,
+        5
+      ],
+      [
+        2,
+        2000
+      ]
+    ]
+  },
+  "6": {
+    "id": 6,
+    "activity_id": 91493,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 39500,
+    "name": "Go Ahead",
+    "rewards": [
+      [
+        40203,
+        3
+      ],
+      [
+        40301,
+        200
+      ],
+      [
+        2,
+        4000
+      ]
+    ]
+  },
+  "7": {
+    "id": 7,
+    "activity_id": 91494,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 29700,
+    "name": "Athena Sonatina",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        11033,
+        5
+      ],
+      [
+        2,
+        2000
+      ]
+    ]
+  },
+  "8": {
+    "id": 8,
+    "activity_id": 91494,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 58300,
+    "name": "Athena Sonatina",
+    "rewards": [
+      [
+        40203,
+        3
+      ],
+      [
+        40301,
+        200
+      ],
+      [
+        2,
+        4000
+      ]
+    ]
+  },
+  "9": {
+    "id": 9,
+    "activity_id": 91495,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 41100,
+    "name": "Fight For Me",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        11033,
+        5
+      ],
+      [
+        2,
+        2000
+      ]
+    ]
+  },
+  "10": {
+    "id": 10,
+    "activity_id": 91495,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 51500,
+    "name": "Fight For Me",
+    "rewards": [
+      [
+        40203,
+        3
+      ],
+      [
+        40301,
+        200
+      ],
+      [
+        2,
+        4000
+      ]
+    ]
+  },
+  "11": {
+    "id": 11,
+    "activity_id": 91496,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 18600,
+    "name": "Red Light",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        11033,
+        5
+      ],
+      [
+        2,
+        2000
+      ]
+    ]
+  },
+  "12": {
+    "id": 12,
+    "activity_id": 91496,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 42800,
+    "name": "Red Light",
+    "rewards": [
+      [
+        40203,
+        3
+      ],
+      [
+        40301,
+        200
+      ],
+      [
+        2,
+        4000
+      ]
+    ]
+  },
+  "13": {
+    "id": 13,
+    "activity_id": 91497,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 30000,
+    "name": "Halphas (Phase 2)",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        11033,
+        5
+      ],
+      [
+        2,
+        2000
+      ]
+    ]
+  },
+  "14": {
+    "id": 14,
+    "activity_id": 91497,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 69800,
+    "name": "Halphas (Phase 2)",
+    "rewards": [
+      [
+        40203,
+        3
+      ],
+      [
+        40301,
+        200
+      ],
+      [
+        2,
+        4000
+      ]
+    ]
+  },
+  "15": {
+    "id": 15,
+    "activity_id": 91498,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 22500,
+    "name": "Siren: Remotum Punctum",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        11033,
+        5
+      ],
+      [
+        2,
+        2000
+      ]
+    ]
+  },
+  "16": {
+    "id": 16,
+    "activity_id": 91498,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 62800,
+    "name": "Siren: Remotum Punctum",
+    "rewards": [
+      [
+        40203,
+        3
+      ],
+      [
+        40301,
+        200
+      ],
+      [
+        2,
+        4000
+      ]
+    ]
+  },
+  "17": {
+    "id": 17,
+    "activity_id": 91491,
+    "difficult": 3,
+    "track": 4,
+    "total_score": 74800,
+    "name": "Promise (Short Ver.)",
+    "rewards": []
+  },
+  "18": {
+    "id": 18,
+    "activity_id": 91498,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 98800,
+    "name": "Siren: Remotum Punctum",
+    "rewards": []
+  },
+  "19": {
+    "id": 19,
+    "activity_id": 141921,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 26100,
+    "name": "再起尘嚣",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40412,
+        20
+      ],
+      [
+        22002,
+        3
+      ]
+    ]
+  },
+  "20": {
+    "id": 20,
+    "activity_id": 141921,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 36600,
+    "name": "再起尘嚣",
+    "rewards": [
+      [
+        40301,
+        100
+      ],
+      [
+        2,
+        2000
+      ],
+      [
+        40102,
+        10
+      ]
+    ]
+  },
+  "21": {
+    "id": 21,
+    "activity_id": 141922,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 46600,
+    "name": "Theatre Flame",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40414,
+        10
+      ],
+      [
+        40802,
+        6
+      ]
+    ]
+  },
+  "22": {
+    "id": 22,
+    "activity_id": 141922,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 61700,
+    "name": "Theatre Flame",
+    "rewards": [
+      [
+        40301,
+        100
+      ],
+      [
+        2,
+        2000
+      ],
+      [
+        40102,
+        10
+      ]
+    ]
+  },
+  "23": {
+    "id": 23,
+    "activity_id": 141923,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 17600,
+    "name": "Beach Party",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40413,
+        15
+      ],
+      [
+        40102,
+        5
+      ]
+    ]
+  },
+  "24": {
+    "id": 24,
+    "activity_id": 141923,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 44700,
+    "name": "Beach Party",
+    "rewards": [
+      [
+        40301,
+        100
+      ],
+      [
+        2,
+        2000
+      ],
+      [
+        40802,
+        20
+      ]
+    ]
+  },
+  "25": {
+    "id": 25,
+    "activity_id": 141924,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 19900,
+    "name": "Avant un rêve",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40701,
+        10
+      ],
+      [
+        40802,
+        6
+      ]
+    ]
+  },
+  "26": {
+    "id": 26,
+    "activity_id": 141924,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 43200,
+    "name": "Avant un rêve",
+    "rewards": [
+      [
+        40301,
+        100
+      ],
+      [
+        2,
+        2000
+      ],
+      [
+        40102,
+        10
+      ]
+    ]
+  },
+  "27": {
+    "id": 27,
+    "activity_id": 141925,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 28400,
+    "name": "Après mille rêves",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        41301,
+        20
+      ],
+      [
+        22002,
+        3
+      ]
+    ]
+  },
+  "28": {
+    "id": 28,
+    "activity_id": 141925,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 49300,
+    "name": "Après mille rêves",
+    "rewards": [
+      [
+        40301,
+        100
+      ],
+      [
+        2,
+        2000
+      ],
+      [
+        40102,
+        10
+      ]
+    ]
+  },
+  "29": {
+    "id": 29,
+    "activity_id": 141926,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 33900,
+    "name": "且笑桑田 (Ver. 2)",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        41302,
+        10
+      ],
+      [
+        40102,
+        5
+      ]
+    ]
+  },
+  "30": {
+    "id": 30,
+    "activity_id": 141926,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 48500,
+    "name": "且笑桑田 (Ver. 2)",
+    "rewards": [
+      [
+        40301,
+        100
+      ],
+      [
+        2,
+        2000
+      ],
+      [
+        40802,
+        20
+      ]
+    ]
+  },
+  "31": {
+    "id": 31,
+    "activity_id": 141927,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 29400,
+    "name": "Modern shuffle slayer",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40603,
+        5
+      ],
+      [
+        40202,
+        5
+      ]
+    ]
+  },
+  "32": {
+    "id": 32,
+    "activity_id": 141927,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 47600,
+    "name": "Modern shuffle slayer",
+    "rewards": [
+      [
+        40301,
+        100
+      ],
+      [
+        2,
+        2000
+      ],
+      [
+        40802,
+        20
+      ]
+    ]
+  },
+  "33": {
+    "id": 33,
+    "activity_id": 141928,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 29800,
+    "name": "云歌行",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        41303,
+        5
+      ],
+      [
+        40202,
+        5
+      ]
+    ]
+  },
+  "34": {
+    "id": 34,
+    "activity_id": 141928,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 51500,
+    "name": "云歌行",
+    "rewards": [
+      [
+        3021,
+        1
+      ],
+      [
+        40301,
+        100
+      ],
+      [
+        2,
+        2000
+      ]
+    ]
+  },
+  "35": {
+    "id": 35,
+    "activity_id": 141921,
+    "difficult": 3,
+    "track": 4,
+    "total_score": 50300,
+    "name": "再起尘嚣",
+    "rewards": []
+  },
+  "36": {
+    "id": 36,
+    "activity_id": 141924,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 76300,
+    "name": "Avant un rêve",
+    "rewards": []
+  },
+  "37": {
+    "id": 37,
+    "activity_id": 141925,
+    "difficult": 3,
+    "track": 4,
+    "total_score": 79000,
+    "name": "Après mille rêves",
+    "rewards": []
+  },
+  "38": {
+    "id": 38,
+    "activity_id": 141926,
+    "difficult": 3,
+    "track": 4,
+    "total_score": 75000,
+    "name": "且笑桑田 (Ver. 2)",
+    "rewards": []
+  },
+  "39": {
+    "id": 39,
+    "activity_id": 141927,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 102200,
+    "name": "Modern shuffle slayer",
+    "rewards": []
+  },
+  "40": {
+    "id": 40,
+    "activity_id": 141928,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 209400,
+    "name": "云歌行",
+    "rewards": []
+  },
+  "41": {
+    "id": 41,
+    "activity_id": 231491,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 24400,
+    "name": "Spring",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40413,
+        20
+      ],
+      [
+        22003,
+        4
+      ]
+    ]
+  },
+  "42": {
+    "id": 42,
+    "activity_id": 231491,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 39800,
+    "name": "Spring",
+    "rewards": []
+  },
+  "43": {
+    "id": 43,
+    "activity_id": 231492,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 20800,
+    "name": "Through the Crowd",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40414,
+        10
+      ],
+      [
+        22003,
+        4
+      ]
+    ]
+  },
+  "44": {
+    "id": 44,
+    "activity_id": 231492,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 41100,
+    "name": "Through the Crowd",
+    "rewards": []
+  },
+  "45": {
+    "id": 45,
+    "activity_id": 231493,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 28500,
+    "name": "Deranged Circuit",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40503,
+        20
+      ],
+      [
+        22003,
+        4
+      ]
+    ]
+  },
+  "46": {
+    "id": 46,
+    "activity_id": 231493,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 52200,
+    "name": "Deranged Circuit",
+    "rewards": []
+  },
+  "47": {
+    "id": 47,
+    "activity_id": 231494,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 29200,
+    "name": "Unfading Mirage",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40504,
+        20
+      ],
+      [
+        22003,
+        4
+      ]
+    ]
+  },
+  "48": {
+    "id": 48,
+    "activity_id": 231494,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 43600,
+    "name": "Unfading Mirage",
+    "rewards": []
+  },
+  "49": {
+    "id": 49,
+    "activity_id": 231495,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 21700,
+    "name": "Sakura no Saisei",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40701,
+        10
+      ],
+      [
+        22003,
+        4
+      ]
+    ]
+  },
+  "50": {
+    "id": 50,
+    "activity_id": 231495,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 41800,
+    "name": "Sakura no Saisei",
+    "rewards": []
+  },
+  "51": {
+    "id": 51,
+    "activity_id": 231496,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 28500,
+    "name": "Drifting Without Wind",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        41302,
+        10
+      ],
+      [
+        22003,
+        4
+      ]
+    ]
+  },
+  "52": {
+    "id": 52,
+    "activity_id": 231496,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 47300,
+    "name": "Drifting Without Wind",
+    "rewards": []
+  },
+  "53": {
+    "id": 53,
+    "activity_id": 231497,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 38500,
+    "name": "Mutated Heaven",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        41303,
+        5
+      ],
+      [
+        22003,
+        4
+      ]
+    ]
+  },
+  "54": {
+    "id": 54,
+    "activity_id": 231497,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 62000,
+    "name": "Mutated Heaven",
+    "rewards": []
+  },
+  "55": {
+    "id": 55,
+    "activity_id": 231498,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 22800,
+    "name": "Sakura Fubuki",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        40603,
+        20
+      ],
+      [
+        22003,
+        4
+      ]
+    ]
+  },
+  "56": {
+    "id": 56,
+    "activity_id": 231498,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 41600,
+    "name": "Sakura Fubuki",
+    "rewards": []
+  },
+  "57": {
+    "id": 57,
+    "activity_id": 231498,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 89900,
+    "name": "Sakura Fubuki",
+    "rewards": []
+  },
+  "58": {
+    "id": 58,
+    "activity_id": 231491,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 56000,
+    "name": "Spring",
+    "rewards": []
+  },
+  "59": {
+    "id": 59,
+    "activity_id": 231494,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 81300,
+    "name": "Unfading Mirage",
+    "rewards": []
+  },
+  "60": {
+    "id": 60,
+    "activity_id": 231496,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 72800,
+    "name": "Drifting Without Wind",
+    "rewards": []
+  },
+  "61": {
+    "id": 61,
+    "activity_id": 231497,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 119500,
+    "name": "Mutated Heaven",
+    "rewards": []
+  },
+  "62": {
+    "id": 62,
+    "activity_id": 311491,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 34600,
+    "name": "Wordless Song for a Starry Night",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        54116,
+        7500
+      ],
+      [
+        3048,
+        1
+      ]
+    ]
+  },
+  "63": {
+    "id": 63,
+    "activity_id": 311491,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 57300,
+    "name": "Wordless Song for a Starry Night",
+    "rewards": []
+  },
+  "64": {
+    "id": 64,
+    "activity_id": 311491,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 77000,
+    "name": "Wordless Song for a Starry Night",
+    "rewards": []
+  },
+  "65": {
+    "id": 65,
+    "activity_id": 311491,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 100200,
+    "name": "Wordless Song for a Starry Night",
+    "rewards": []
+  },
+  "66": {
+    "id": 66,
+    "activity_id": 311492,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 27300,
+    "name": "MUSEDASH!!!!",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        54116,
+        7500
+      ],
+      [
+        22003,
+        2
+      ]
+    ]
+  },
+  "67": {
+    "id": 67,
+    "activity_id": 311492,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 45500,
+    "name": "MUSEDASH!!!!",
+    "rewards": []
+  },
+  "68": {
+    "id": 68,
+    "activity_id": 311492,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 77000,
+    "name": "MUSEDASH!!!!",
+    "rewards": []
+  },
+  "69": {
+    "id": 69,
+    "activity_id": 311492,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 109900,
+    "name": "MUSEDASH!!!!",
+    "rewards": []
+  },
+  "70": {
+    "id": 70,
+    "activity_id": 311493,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 34900,
+    "name": "Sarvaloka",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        54116,
+        7500
+      ],
+      [
+        22003,
+        2
+      ]
+    ]
+  },
+  "71": {
+    "id": 71,
+    "activity_id": 311493,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 37000,
+    "name": "Sarvaloka",
+    "rewards": []
+  },
+  "72": {
+    "id": 72,
+    "activity_id": 311493,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 67900,
+    "name": "Sarvaloka",
+    "rewards": []
+  },
+  "73": {
+    "id": 73,
+    "activity_id": 311494,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 39300,
+    "name": "Comet Coaster",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        54116,
+        7500
+      ],
+      [
+        22003,
+        2
+      ]
+    ]
+  },
+  "74": {
+    "id": 74,
+    "activity_id": 311494,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 70100,
+    "name": "Comet Coaster",
+    "rewards": []
+  },
+  "75": {
+    "id": 75,
+    "activity_id": 311494,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 121900,
+    "name": "Comet Coaster",
+    "rewards": []
+  },
+  "76": {
+    "id": 76,
+    "activity_id": 311494,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 146600,
+    "name": "Comet Coaster",
+    "rewards": []
+  },
+  "77": {
+    "id": 77,
+    "activity_id": 311495,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 36700,
+    "name": "Transcend the Abyss",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        54116,
+        7500
+      ],
+      [
+        22003,
+        2
+      ]
+    ]
+  },
+  "78": {
+    "id": 78,
+    "activity_id": 311495,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 41900,
+    "name": "Transcend the Abyss",
+    "rewards": []
+  },
+  "79": {
+    "id": 79,
+    "activity_id": 311495,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 91600,
+    "name": "Transcend the Abyss",
+    "rewards": []
+  },
+  "80": {
+    "id": 80,
+    "activity_id": 311496,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 32200,
+    "name": "Tanuki Step",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        54116,
+        7500
+      ],
+      [
+        22003,
+        2
+      ]
+    ]
+  },
+  "81": {
+    "id": 81,
+    "activity_id": 311496,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 53400,
+    "name": "Tanuki Step",
+    "rewards": []
+  },
+  "82": {
+    "id": 82,
+    "activity_id": 311496,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 105500,
+    "name": "Tanuki Step",
+    "rewards": []
+  },
+  "83": {
+    "id": 83,
+    "activity_id": 311496,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 130400,
+    "name": "Tanuki Step",
+    "rewards": []
+  },
+  "84": {
+    "id": 84,
+    "activity_id": 311497,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 54100,
+    "name": "Reverie on World Strings",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        54116,
+        7500
+      ],
+      [
+        22003,
+        2
+      ]
+    ]
+  },
+  "85": {
+    "id": 85,
+    "activity_id": 311497,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 69500,
+    "name": "Reverie on World Strings",
+    "rewards": []
+  },
+  "86": {
+    "id": 86,
+    "activity_id": 311497,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 149500,
+    "name": "Reverie on World Strings",
+    "rewards": []
+  },
+  "87": {
+    "id": 87,
+    "activity_id": 311497,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 205400,
+    "name": "Reverie on World Strings",
+    "rewards": []
+  },
+  "88": {
+    "id": 88,
+    "activity_id": 311498,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 39400,
+    "name": "; ne m",
+    "rewards": [
+      [
+        1,
+        50
+      ],
+      [
+        54116,
+        7500
+      ],
+      [
+        22003,
+        2
+      ]
+    ]
+  },
+  "89": {
+    "id": 89,
+    "activity_id": 311498,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 46200,
+    "name": "; ne m",
+    "rewards": []
+  },
+  "90": {
+    "id": 90,
+    "activity_id": 311498,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 100100,
+    "name": "; ne m",
+    "rewards": []
+  },
+  "91": {
+    "id": 91,
+    "activity_id": 311498,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 130600,
+    "name": "; ne m",
+    "rewards": []
+  },
+  "92": {
+    "id": 92,
+    "activity_id": 3814901,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 43600,
+    "name": "Redemption",
+    "rewards": []
+  },
+  "93": {
+    "id": 93,
+    "activity_id": 3814901,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 58000,
+    "name": "Redemption",
+    "rewards": []
+  },
+  "94": {
+    "id": 94,
+    "activity_id": 3814901,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 81100,
+    "name": "Redemption",
+    "rewards": []
+  },
+  "95": {
+    "id": 95,
+    "activity_id": 3814901,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 130000,
+    "name": "Redemption",
+    "rewards": []
+  },
+  "96": {
+    "id": 96,
+    "activity_id": 3814901,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 141900,
+    "name": "Redemption",
+    "rewards": []
+  },
+  "97": {
+    "id": 97,
+    "activity_id": 3814901,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 141800,
+    "name": "Redemption",
+    "rewards": []
+  },
+  "98": {
+    "id": 98,
+    "activity_id": 3814902,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 29100,
+    "name": "Toss All the Chips",
+    "rewards": []
+  },
+  "99": {
+    "id": 99,
+    "activity_id": 3814902,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 42600,
+    "name": "Toss All the Chips",
+    "rewards": []
+  },
+  "100": {
+    "id": 100,
+    "activity_id": 3814902,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 68400,
+    "name": "Toss All the Chips",
+    "rewards": []
+  },
+  "101": {
+    "id": 101,
+    "activity_id": 3814902,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 94400,
+    "name": "Toss All the Chips",
+    "rewards": []
+  },
+  "102": {
+    "id": 102,
+    "activity_id": 3814902,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 94100,
+    "name": "Toss All the Chips",
+    "rewards": []
+  },
+  "103": {
+    "id": 103,
+    "activity_id": 3814902,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 106000,
+    "name": "Toss All the Chips",
+    "rewards": []
+  },
+  "104": {
+    "id": 104,
+    "activity_id": 3814903,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 44000,
+    "name": "双重间谍",
+    "rewards": []
+  },
+  "105": {
+    "id": 105,
+    "activity_id": 3814903,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 71200,
+    "name": "双重间谍",
+    "rewards": []
+  },
+  "106": {
+    "id": 106,
+    "activity_id": 3814903,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 108600,
+    "name": "双重间谍",
+    "rewards": []
+  },
+  "107": {
+    "id": 107,
+    "activity_id": 3814903,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 152100,
+    "name": "双重间谍",
+    "rewards": []
+  },
+  "108": {
+    "id": 108,
+    "activity_id": 3814903,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 155500,
+    "name": "双重间谍",
+    "rewards": []
+  },
+  "109": {
+    "id": 109,
+    "activity_id": 3814903,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 167400,
+    "name": "双重间谍",
+    "rewards": []
+  },
+  "110": {
+    "id": 110,
+    "activity_id": 3814904,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 48900,
+    "name": "神圣之光",
+    "rewards": []
+  },
+  "111": {
+    "id": 111,
+    "activity_id": 3814904,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 68000,
+    "name": "神圣之光",
+    "rewards": []
+  },
+  "112": {
+    "id": 112,
+    "activity_id": 3814904,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 109900,
+    "name": "神圣之光",
+    "rewards": []
+  },
+  "113": {
+    "id": 113,
+    "activity_id": 3814904,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 153300,
+    "name": "神圣之光",
+    "rewards": []
+  },
+  "114": {
+    "id": 114,
+    "activity_id": 3814904,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 150600,
+    "name": "神圣之光",
+    "rewards": []
+  },
+  "115": {
+    "id": 115,
+    "activity_id": 3814904,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 165900,
+    "name": "神圣之光",
+    "rewards": []
+  },
+  "116": {
+    "id": 116,
+    "activity_id": 3814905,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 35400,
+    "name": "龙阕谣",
+    "rewards": []
+  },
+  "117": {
+    "id": 117,
+    "activity_id": 3814905,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 57700,
+    "name": "龙阕谣",
+    "rewards": []
+  },
+  "118": {
+    "id": 118,
+    "activity_id": 3814905,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 88000,
+    "name": "龙阕谣",
+    "rewards": []
+  },
+  "119": {
+    "id": 119,
+    "activity_id": 3814905,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 129500,
+    "name": "龙阕谣",
+    "rewards": []
+  },
+  "120": {
+    "id": 120,
+    "activity_id": 3814905,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 129500,
+    "name": "龙阕谣",
+    "rewards": []
+  },
+  "121": {
+    "id": 121,
+    "activity_id": 3814905,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 134400,
+    "name": "龙阕谣",
+    "rewards": []
+  },
+  "122": {
+    "id": 122,
+    "activity_id": 3814906,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 44600,
+    "name": "永夜城",
+    "rewards": []
+  },
+  "123": {
+    "id": 123,
+    "activity_id": 3814906,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 62200,
+    "name": "永夜城",
+    "rewards": []
+  },
+  "124": {
+    "id": 124,
+    "activity_id": 3814906,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 99700,
+    "name": "永夜城",
+    "rewards": []
+  },
+  "125": {
+    "id": 125,
+    "activity_id": 3814906,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 126600,
+    "name": "永夜城",
+    "rewards": []
+  },
+  "126": {
+    "id": 126,
+    "activity_id": 3814906,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 137800,
+    "name": "永夜城",
+    "rewards": []
+  },
+  "127": {
+    "id": 127,
+    "activity_id": 3814906,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 139600,
+    "name": "永夜城",
+    "rewards": []
+  },
+  "128": {
+    "id": 128,
+    "activity_id": 3814907,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 48700,
+    "name": "天河激流",
+    "rewards": []
+  },
+  "129": {
+    "id": 129,
+    "activity_id": 3814907,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 77200,
+    "name": "天河激流",
+    "rewards": []
+  },
+  "130": {
+    "id": 130,
+    "activity_id": 3814907,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 118600,
+    "name": "天河激流",
+    "rewards": []
+  },
+  "131": {
+    "id": 131,
+    "activity_id": 3814907,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 167600,
+    "name": "天河激流",
+    "rewards": []
+  },
+  "132": {
+    "id": 132,
+    "activity_id": 3814907,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 170600,
+    "name": "天河激流",
+    "rewards": []
+  },
+  "133": {
+    "id": 133,
+    "activity_id": 3814907,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 176300,
+    "name": "天河激流",
+    "rewards": []
+  },
+  "134": {
+    "id": 134,
+    "activity_id": 3814908,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 54000,
+    "name": "狄拉克之海",
+    "rewards": []
+  },
+  "135": {
+    "id": 135,
+    "activity_id": 3814908,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 69500,
+    "name": "狄拉克之海",
+    "rewards": []
+  },
+  "136": {
+    "id": 136,
+    "activity_id": 3814908,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 121300,
+    "name": "狄拉克之海",
+    "rewards": []
+  },
+  "137": {
+    "id": 137,
+    "activity_id": 3814908,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 158700,
+    "name": "狄拉克之海",
+    "rewards": []
+  },
+  "138": {
+    "id": 138,
+    "activity_id": 3814908,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 163300,
+    "name": "狄拉克之海",
+    "rewards": []
+  },
+  "139": {
+    "id": 139,
+    "activity_id": 3814908,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 179300,
+    "name": "狄拉克之海",
+    "rewards": []
+  },
+  "140": {
+    "id": 140,
+    "activity_id": 311497,
+    "difficult": 9,
+    "track": 5,
+    "total_score": 216900,
+    "name": "Reverie on World Strings",
+    "rewards": []
+  },
+  "141": {
+    "id": 141,
+    "activity_id": 311497,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 225100,
+    "name": "Reverie on World Strings",
+    "rewards": []
+  },
+  "142": {
+    "id": 142,
+    "activity_id": 4214901,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 50800,
+    "name": "Parting at Future",
+    "rewards": []
+  },
+  "143": {
+    "id": 143,
+    "activity_id": 4214901,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 56300,
+    "name": "Parting at Future",
+    "rewards": []
+  },
+  "144": {
+    "id": 144,
+    "activity_id": 4214901,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 75000,
+    "name": "Parting at Future",
+    "rewards": []
+  },
+  "145": {
+    "id": 145,
+    "activity_id": 4214901,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 98700,
+    "name": "Parting at Future",
+    "rewards": []
+  },
+  "146": {
+    "id": 146,
+    "activity_id": 4214901,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 111800,
+    "name": "Parting at Future",
+    "rewards": []
+  },
+  "147": {
+    "id": 147,
+    "activity_id": 4214902,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 33800,
+    "name": "Dazzling! Fierce! Duel King Now!",
+    "rewards": []
+  },
+  "148": {
+    "id": 148,
+    "activity_id": 4214902,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 59000,
+    "name": "Dazzling! Fierce! Duel King Now!",
+    "rewards": []
+  },
+  "149": {
+    "id": 149,
+    "activity_id": 4214902,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 97500,
+    "name": "Dazzling! Fierce! Duel King Now!",
+    "rewards": []
+  },
+  "150": {
+    "id": 150,
+    "activity_id": 4214902,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 125600,
+    "name": "Dazzling! Fierce! Duel King Now!",
+    "rewards": []
+  },
+  "151": {
+    "id": 151,
+    "activity_id": 4214902,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 129300,
+    "name": "Dazzling! Fierce! Duel King Now!",
+    "rewards": []
+  },
+  "152": {
+    "id": 152,
+    "activity_id": 4214903,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 32300,
+    "name": "Whisper of the Underworld",
+    "rewards": []
+  },
+  "153": {
+    "id": 153,
+    "activity_id": 4214903,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 49000,
+    "name": "Whisper of the Underworld",
+    "rewards": []
+  },
+  "154": {
+    "id": 154,
+    "activity_id": 4214903,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 87700,
+    "name": "Whisper of the Underworld",
+    "rewards": []
+  },
+  "155": {
+    "id": 155,
+    "activity_id": 4214903,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 132000,
+    "name": "Whisper of the Underworld",
+    "rewards": []
+  },
+  "156": {
+    "id": 156,
+    "activity_id": 4214903,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 142200,
+    "name": "Whisper of the Underworld",
+    "rewards": []
+  },
+  "157": {
+    "id": 157,
+    "activity_id": 4214904,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 27300,
+    "name": "One Step（中文版）",
+    "rewards": []
+  },
+  "158": {
+    "id": 158,
+    "activity_id": 4214904,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 40300,
+    "name": "One Step（中文版）",
+    "rewards": []
+  },
+  "159": {
+    "id": 159,
+    "activity_id": 4214904,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 59700,
+    "name": "One Step（中文版）",
+    "rewards": []
+  },
+  "160": {
+    "id": 160,
+    "activity_id": 4214904,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 88500,
+    "name": "One Step（中文版）",
+    "rewards": []
+  },
+  "161": {
+    "id": 161,
+    "activity_id": 4214904,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 87200,
+    "name": "One Step（中文版）",
+    "rewards": []
+  },
+  "162": {
+    "id": 162,
+    "activity_id": 4214905,
+    "difficult": 1,
+    "track": 0,
+    "total_score": 27300,
+    "name": "One Step（日文版）",
+    "rewards": []
+  },
+  "163": {
+    "id": 163,
+    "activity_id": 4214905,
+    "difficult": 2,
+    "track": 0,
+    "total_score": 40300,
+    "name": "One Step（日文版）",
+    "rewards": []
+  },
+  "164": {
+    "id": 164,
+    "activity_id": 4214905,
+    "difficult": 3,
+    "track": 0,
+    "total_score": 59700,
+    "name": "One Step（日文版）",
+    "rewards": []
+  },
+  "165": {
+    "id": 165,
+    "activity_id": 4214905,
+    "difficult": 9,
+    "track": 4,
+    "total_score": 88500,
+    "name": "One Step（日文版）",
+    "rewards": []
+  },
+  "166": {
+    "id": 166,
+    "activity_id": 4214905,
+    "difficult": 9,
+    "track": 6,
+    "total_score": 87200,
+    "name": "One Step（日文版）",
+    "rewards": []
+  }
+}

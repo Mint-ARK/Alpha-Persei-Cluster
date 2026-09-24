@@ -1,0 +1,6 @@
+node_modules/
+dist/
+*.local
+.vite/
+scratch_shots/
+archive/

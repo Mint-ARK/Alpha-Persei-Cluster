@@ -1,0 +1,458 @@
+{
+  "101": {
+    "id": 101,
+    "name": "明炉烤肉",
+    "sell": 36,
+    "cost_time": 1080,
+    "cook_time": 2,
+    "cook_type": 5,
+    "unlock": 81502,
+    "ingredient_list": [
+      [
+        51013,
+        4
+      ],
+      [
+        51022,
+        1
+      ]
+    ]
+  },
+  "102": {
+    "id": 102,
+    "name": "脆皮烤鸭",
+    "sell": 23,
+    "cost_time": 840,
+    "cook_time": 2,
+    "cook_type": 5,
+    "unlock": 0,
+    "ingredient_list": [
+      [
+        51022,
+        1
+      ],
+      [
+        51015,
+        2
+      ]
+    ]
+  },
+  "103": {
+    "id": 103,
+    "name": "雪花肉酥",
+    "sell": 39,
+    "cost_time": 1200,
+    "cook_time": 2,
+    "cook_type": 5,
+    "unlock": 81503,
+    "ingredient_list": [
+      [
+        51013,
+        2
+      ],
+      [
+        51019,
+        3
+      ]
+    ]
+  },
+  "104": {
+    "id": 104,
+    "name": "辣子鸡",
+    "sell": 35,
+    "cost_time": 960,
+    "cook_time": 2,
+    "cook_type": 3,
+    "unlock": 81302,
+    "ingredient_list": [
+      [
+        51024,
+        1
+      ],
+      [
+        51015,
+        3
+      ]
+    ]
+  },
+  "105": {
+    "id": 105,
+    "name": "干煸肥肠",
+    "sell": 35,
+    "cost_time": 1200,
+    "cook_time": 2,
+    "cook_type": 3,
+    "unlock": 81302,
+    "ingredient_list": [
+      [
+        51011,
+        3
+      ]
+    ]
+  },
+  "106": {
+    "id": 106,
+    "name": "番茄炒蛋",
+    "sell": 26,
+    "cost_time": 720,
+    "cook_time": 2,
+    "cook_type": 3,
+    "unlock": 0,
+    "ingredient_list": [
+      [
+        51019,
+        1
+      ],
+      [
+        51025,
+        4
+      ]
+    ]
+  },
+  "107": {
+    "id": 107,
+    "name": "广椒土豆片",
+    "sell": 25,
+    "cost_time": 720,
+    "cook_time": 2,
+    "cook_type": 3,
+    "unlock": 0,
+    "ingredient_list": [
+      [
+        51022,
+        1
+      ],
+      [
+        51024,
+        1
+      ],
+      [
+        51032,
+        4
+      ]
+    ]
+  },
+  "108": {
+    "id": 108,
+    "name": "腰果虾仁",
+    "sell": 41,
+    "cost_time": 1200,
+    "cook_time": 2,
+    "cook_type": 3,
+    "unlock": 81303,
+    "ingredient_list": [
+      [
+        51017,
+        2
+      ],
+      [
+        51028,
+        1
+      ]
+    ]
+  },
+  "109": {
+    "id": 109,
+    "name": "剁椒鱼头",
+    "sell": 23,
+    "cost_time": 840,
+    "cook_time": 2,
+    "cook_type": 4,
+    "unlock": 0,
+    "ingredient_list": [
+      [
+        51024,
+        2
+      ],
+      [
+        51012,
+        2
+      ]
+    ]
+  },
+  "110": {
+    "id": 110,
+    "name": "饺子",
+    "sell": 35,
+    "cost_time": 960,
+    "cook_time": 2,
+    "cook_type": 4,
+    "unlock": 81402,
+    "ingredient_list": [
+      [
+        51013,
+        1
+      ],
+      [
+        51031,
+        4
+      ]
+    ]
+  },
+  "111": {
+    "id": 111,
+    "name": "芙蓉蛋",
+    "sell": 25,
+    "cost_time": 720,
+    "cook_time": 2,
+    "cook_type": 4,
+    "unlock": 0,
+    "ingredient_list": [
+      [
+        51019,
+        4
+      ]
+    ]
+  },
+  "112": {
+    "id": 112,
+    "name": "西湖醋鱼",
+    "sell": 44,
+    "cost_time": 1200,
+    "cook_time": 2,
+    "cook_type": 4,
+    "unlock": 81403,
+    "ingredient_list": [
+      [
+        51022,
+        1
+      ],
+      [
+        51012,
+        4
+      ]
+    ]
+  },
+  "113": {
+    "id": 113,
+    "name": "梅菜扣肉",
+    "sell": 33,
+    "cost_time": 720,
+    "cook_time": 2,
+    "cook_type": 4,
+    "unlock": 81402,
+    "ingredient_list": [
+      [
+        51013,
+        3
+      ],
+      [
+        51023,
+        2
+      ]
+    ]
+  },
+  "114": {
+    "id": 114,
+    "name": "泡椒牛蛙",
+    "sell": 38,
+    "cost_time": 1200,
+    "cook_time": 2,
+    "cook_type": 6,
+    "unlock": 81602,
+    "ingredient_list": [
+      [
+        51024,
+        1
+      ],
+      [
+        51014,
+        2
+      ]
+    ]
+  },
+  "115": {
+    "id": 115,
+    "name": "水煮肉片",
+    "sell": 26,
+    "cost_time": 840,
+    "cook_time": 2,
+    "cook_type": 6,
+    "unlock": 0,
+    "ingredient_list": [
+      [
+        51013,
+        2
+      ],
+      [
+        51023,
+        2
+      ]
+    ]
+  },
+  "116": {
+    "id": 116,
+    "name": "麻婆豆腐",
+    "sell": 38,
+    "cost_time": 1080,
+    "cook_time": 2,
+    "cook_type": 6,
+    "unlock": 81602,
+    "ingredient_list": [
+      [
+        51013,
+        1
+      ],
+      [
+        51030,
+        3
+      ]
+    ]
+  },
+  "117": {
+    "id": 117,
+    "name": "毛血旺",
+    "sell": 42,
+    "cost_time": 1200,
+    "cook_time": 2,
+    "cook_type": 6,
+    "unlock": 81603,
+    "ingredient_list": [
+      [
+        51009,
+        3
+      ],
+      [
+        51010,
+        1
+      ],
+      [
+        51016,
+        1
+      ]
+    ]
+  },
+  "118": {
+    "id": 118,
+    "name": "红烧狮子头",
+    "sell": 23,
+    "cost_time": 720,
+    "cook_time": 2,
+    "cook_type": 6,
+    "unlock": 0,
+    "ingredient_list": [
+      [
+        51013,
+        3
+      ]
+    ]
+  },
+  "119": {
+    "id": 119,
+    "name": "烤鱼",
+    "sell": 36,
+    "cost_time": 960,
+    "cook_time": 2,
+    "cook_type": 5,
+    "unlock": 81502,
+    "ingredient_list": [
+      [
+        51022,
+        1
+      ],
+      [
+        51024,
+        2
+      ],
+      [
+        51012,
+        3
+      ]
+    ]
+  },
+  "120": {
+    "id": 120,
+    "name": "烤肉串",
+    "sell": 28,
+    "cost_time": 720,
+    "cook_time": 2,
+    "cook_type": 5,
+    "unlock": 0,
+    "ingredient_list": [
+      [
+        51013,
+        1
+      ],
+      [
+        51015,
+        2
+      ]
+    ]
+  },
+  "121": {
+    "id": 121,
+    "name": "炸醋肉",
+    "sell": 32,
+    "cost_time": 720,
+    "cook_time": 2,
+    "cook_type": 3,
+    "unlock": 81303,
+    "ingredient_list": [
+      [
+        51013,
+        3
+      ],
+      [
+        51035,
+        2
+      ]
+    ]
+  },
+  "122": {
+    "id": 122,
+    "name": "虎咬猪",
+    "sell": 40,
+    "cost_time": 840,
+    "cook_time": 2,
+    "cook_type": 4,
+    "unlock": 81403,
+    "ingredient_list": [
+      [
+        51013,
+        4
+      ],
+      [
+        51035,
+        1
+      ]
+    ]
+  },
+  "123": {
+    "id": 123,
+    "name": "烧肉粽",
+    "sell": 38,
+    "cost_time": 960,
+    "cook_time": 2,
+    "cook_type": 4,
+    "unlock": 81403,
+    "ingredient_list": [
+      [
+        51036,
+        1
+      ],
+      [
+        51037,
+        2
+      ],
+      [
+        51038,
+        1
+      ]
+    ]
+  },
+  "124": {
+    "id": 124,
+    "name": "土笋冻",
+    "sell": 44,
+    "cost_time": 1080,
+    "cook_time": 2,
+    "cook_type": 6,
+    "unlock": 81603,
+    "ingredient_list": [
+      [
+        51039,
+        3
+      ]
+    ]
+  }
+}

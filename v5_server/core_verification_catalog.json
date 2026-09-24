@@ -1,0 +1,9409 @@
+{
+  "rewards": {
+    "1001": {
+      "cycle": 0,
+      "id": 1001,
+      "reward_type": 3,
+      "condition": 130021
+    },
+    "1002": {
+      "cycle": 0,
+      "id": 1002,
+      "reward_type": 3,
+      "condition": 130022
+    },
+    "1003": {
+      "cycle": 0,
+      "id": 1003,
+      "reward_type": 3,
+      "condition": 130023
+    },
+    "1004": {
+      "cycle": 0,
+      "id": 1004,
+      "reward_type": 3,
+      "condition": 130024
+    },
+    "1005": {
+      "cycle": 0,
+      "id": 1005,
+      "reward_type": 3,
+      "condition": 130025
+    },
+    "1006": {
+      "cycle": 0,
+      "id": 1006,
+      "reward_type": 3,
+      "condition": 130026
+    },
+    "1007": {
+      "cycle": 0,
+      "id": 1007,
+      "reward_type": 3,
+      "condition": 130027
+    },
+    "1008": {
+      "cycle": 0,
+      "id": 1008,
+      "reward_type": 3,
+      "condition": 130028
+    },
+    "2001": {
+      "cycle": 0,
+      "id": 2001,
+      "reward_type": 4,
+      "condition": 130011
+    },
+    "2002": {
+      "cycle": 0,
+      "id": 2002,
+      "reward_type": 4,
+      "condition": 130012
+    },
+    "2003": {
+      "cycle": 0,
+      "id": 2003,
+      "reward_type": 4,
+      "condition": 130013
+    },
+    "2004": {
+      "cycle": 0,
+      "id": 2004,
+      "reward_type": 4,
+      "condition": 130014
+    },
+    "2005": {
+      "cycle": 0,
+      "id": 2005,
+      "reward_type": 4,
+      "condition": 130015
+    },
+    "2006": {
+      "cycle": 0,
+      "id": 2006,
+      "reward_type": 4,
+      "condition": 130016
+    },
+    "2007": {
+      "cycle": 0,
+      "id": 2007,
+      "reward_type": 4,
+      "condition": 130017
+    },
+    "2008": {
+      "cycle": 0,
+      "id": 2008,
+      "reward_type": 4,
+      "condition": 130018
+    },
+    "2011": {
+      "cycle": 0,
+      "id": 2011,
+      "reward_type": 4,
+      "condition": 130301
+    },
+    "2012": {
+      "cycle": 0,
+      "id": 2012,
+      "reward_type": 4,
+      "condition": 130302
+    },
+    "2013": {
+      "cycle": 0,
+      "id": 2013,
+      "reward_type": 4,
+      "condition": 130303
+    },
+    "2014": {
+      "cycle": 0,
+      "id": 2014,
+      "reward_type": 4,
+      "condition": 130304
+    },
+    "2015": {
+      "cycle": 0,
+      "id": 2015,
+      "reward_type": 4,
+      "condition": 130305
+    },
+    "2016": {
+      "cycle": 0,
+      "id": 2016,
+      "reward_type": 4,
+      "condition": 130306
+    },
+    "2017": {
+      "cycle": 0,
+      "id": 2017,
+      "reward_type": 4,
+      "condition": 130307
+    },
+    "2018": {
+      "cycle": 0,
+      "id": 2018,
+      "reward_type": 4,
+      "condition": 130308
+    },
+    "2021": {
+      "cycle": 0,
+      "id": 2021,
+      "reward_type": 4,
+      "condition": 130311
+    },
+    "2022": {
+      "cycle": 0,
+      "id": 2022,
+      "reward_type": 4,
+      "condition": 130312
+    },
+    "2023": {
+      "cycle": 0,
+      "id": 2023,
+      "reward_type": 4,
+      "condition": 130313
+    },
+    "2024": {
+      "cycle": 0,
+      "id": 2024,
+      "reward_type": 4,
+      "condition": 130314
+    },
+    "2025": {
+      "cycle": 0,
+      "id": 2025,
+      "reward_type": 4,
+      "condition": 130315
+    },
+    "2026": {
+      "cycle": 0,
+      "id": 2026,
+      "reward_type": 4,
+      "condition": 130316
+    },
+    "2027": {
+      "cycle": 0,
+      "id": 2027,
+      "reward_type": 4,
+      "condition": 130317
+    },
+    "2028": {
+      "cycle": 0,
+      "id": 2028,
+      "reward_type": 4,
+      "condition": 130318
+    },
+    "11001": {
+      "cycle": 1,
+      "id": 11001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "11002": {
+      "cycle": 1,
+      "id": 11002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "11003": {
+      "cycle": 1,
+      "id": 11003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "11004": {
+      "cycle": 1,
+      "id": 11004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "11005": {
+      "cycle": 1,
+      "id": 11005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "11006": {
+      "cycle": 1,
+      "id": 11006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "11007": {
+      "cycle": 1,
+      "id": 11007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "11008": {
+      "cycle": 1,
+      "id": 11008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "12001": {
+      "cycle": 1,
+      "id": 12001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "12002": {
+      "cycle": 1,
+      "id": 12002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "12003": {
+      "cycle": 1,
+      "id": 12003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "12004": {
+      "cycle": 1,
+      "id": 12004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "12005": {
+      "cycle": 1,
+      "id": 12005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "12006": {
+      "cycle": 1,
+      "id": 12006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "12007": {
+      "cycle": 1,
+      "id": 12007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "12008": {
+      "cycle": 1,
+      "id": 12008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "21001": {
+      "cycle": 2,
+      "id": 21001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "21002": {
+      "cycle": 2,
+      "id": 21002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "21003": {
+      "cycle": 2,
+      "id": 21003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "21004": {
+      "cycle": 2,
+      "id": 21004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "21005": {
+      "cycle": 2,
+      "id": 21005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "21006": {
+      "cycle": 2,
+      "id": 21006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "21007": {
+      "cycle": 2,
+      "id": 21007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "21008": {
+      "cycle": 2,
+      "id": 21008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "22001": {
+      "cycle": 2,
+      "id": 22001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "22002": {
+      "cycle": 2,
+      "id": 22002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "22003": {
+      "cycle": 2,
+      "id": 22003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "22004": {
+      "cycle": 2,
+      "id": 22004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "22005": {
+      "cycle": 2,
+      "id": 22005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "22006": {
+      "cycle": 2,
+      "id": 22006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "22007": {
+      "cycle": 2,
+      "id": 22007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "22008": {
+      "cycle": 2,
+      "id": 22008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "31001": {
+      "cycle": 3,
+      "id": 31001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "31002": {
+      "cycle": 3,
+      "id": 31002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "31003": {
+      "cycle": 3,
+      "id": 31003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "31004": {
+      "cycle": 3,
+      "id": 31004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "31005": {
+      "cycle": 3,
+      "id": 31005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "31006": {
+      "cycle": 3,
+      "id": 31006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "31007": {
+      "cycle": 3,
+      "id": 31007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "31008": {
+      "cycle": 3,
+      "id": 31008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "32001": {
+      "cycle": 3,
+      "id": 32001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "32002": {
+      "cycle": 3,
+      "id": 32002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "32003": {
+      "cycle": 3,
+      "id": 32003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "32004": {
+      "cycle": 3,
+      "id": 32004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "32005": {
+      "cycle": 3,
+      "id": 32005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "32006": {
+      "cycle": 3,
+      "id": 32006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "32007": {
+      "cycle": 3,
+      "id": 32007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "32008": {
+      "cycle": 3,
+      "id": 32008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "41001": {
+      "cycle": 4,
+      "id": 41001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "41002": {
+      "cycle": 4,
+      "id": 41002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "41003": {
+      "cycle": 4,
+      "id": 41003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "41004": {
+      "cycle": 4,
+      "id": 41004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "41005": {
+      "cycle": 4,
+      "id": 41005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "41006": {
+      "cycle": 4,
+      "id": 41006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "41007": {
+      "cycle": 4,
+      "id": 41007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "41008": {
+      "cycle": 4,
+      "id": 41008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "42001": {
+      "cycle": 4,
+      "id": 42001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "42002": {
+      "cycle": 4,
+      "id": 42002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "42003": {
+      "cycle": 4,
+      "id": 42003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "42004": {
+      "cycle": 4,
+      "id": 42004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "42005": {
+      "cycle": 4,
+      "id": 42005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "42006": {
+      "cycle": 4,
+      "id": 42006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "42007": {
+      "cycle": 4,
+      "id": 42007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "42008": {
+      "cycle": 4,
+      "id": 42008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "51001": {
+      "cycle": 5,
+      "id": 51001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "51002": {
+      "cycle": 5,
+      "id": 51002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "51003": {
+      "cycle": 5,
+      "id": 51003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "51004": {
+      "cycle": 5,
+      "id": 51004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "51005": {
+      "cycle": 5,
+      "id": 51005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "51006": {
+      "cycle": 5,
+      "id": 51006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "51007": {
+      "cycle": 5,
+      "id": 51007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "51008": {
+      "cycle": 5,
+      "id": 51008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "52001": {
+      "cycle": 5,
+      "id": 52001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "52002": {
+      "cycle": 5,
+      "id": 52002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "52003": {
+      "cycle": 5,
+      "id": 52003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "52004": {
+      "cycle": 5,
+      "id": 52004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "52005": {
+      "cycle": 5,
+      "id": 52005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "52006": {
+      "cycle": 5,
+      "id": 52006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "52007": {
+      "cycle": 5,
+      "id": 52007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "52008": {
+      "cycle": 5,
+      "id": 52008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "61001": {
+      "cycle": 6,
+      "id": 61001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "61002": {
+      "cycle": 6,
+      "id": 61002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "61003": {
+      "cycle": 6,
+      "id": 61003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "61004": {
+      "cycle": 6,
+      "id": 61004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "61005": {
+      "cycle": 6,
+      "id": 61005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "61006": {
+      "cycle": 6,
+      "id": 61006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "61007": {
+      "cycle": 6,
+      "id": 61007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "61008": {
+      "cycle": 6,
+      "id": 61008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "62001": {
+      "cycle": 6,
+      "id": 62001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "62002": {
+      "cycle": 6,
+      "id": 62002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "62003": {
+      "cycle": 6,
+      "id": 62003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "62004": {
+      "cycle": 6,
+      "id": 62004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "62005": {
+      "cycle": 6,
+      "id": 62005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "62006": {
+      "cycle": 6,
+      "id": 62006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "62007": {
+      "cycle": 6,
+      "id": 62007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "62008": {
+      "cycle": 6,
+      "id": 62008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "71001": {
+      "cycle": 7,
+      "id": 71001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "71002": {
+      "cycle": 7,
+      "id": 71002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "71003": {
+      "cycle": 7,
+      "id": 71003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "71004": {
+      "cycle": 7,
+      "id": 71004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "71005": {
+      "cycle": 7,
+      "id": 71005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "71006": {
+      "cycle": 7,
+      "id": 71006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "71007": {
+      "cycle": 7,
+      "id": 71007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "71008": {
+      "cycle": 7,
+      "id": 71008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "72001": {
+      "cycle": 7,
+      "id": 72001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "72002": {
+      "cycle": 7,
+      "id": 72002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "72003": {
+      "cycle": 7,
+      "id": 72003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "72004": {
+      "cycle": 7,
+      "id": 72004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "72005": {
+      "cycle": 7,
+      "id": 72005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "72006": {
+      "cycle": 7,
+      "id": 72006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "72007": {
+      "cycle": 7,
+      "id": 72007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "72008": {
+      "cycle": 7,
+      "id": 72008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "81001": {
+      "cycle": 8,
+      "id": 81001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "81002": {
+      "cycle": 8,
+      "id": 81002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "81003": {
+      "cycle": 8,
+      "id": 81003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "81004": {
+      "cycle": 8,
+      "id": 81004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "81005": {
+      "cycle": 8,
+      "id": 81005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "81006": {
+      "cycle": 8,
+      "id": 81006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "81007": {
+      "cycle": 8,
+      "id": 81007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "81008": {
+      "cycle": 8,
+      "id": 81008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "82001": {
+      "cycle": 8,
+      "id": 82001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "82002": {
+      "cycle": 8,
+      "id": 82002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "82003": {
+      "cycle": 8,
+      "id": 82003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "82004": {
+      "cycle": 8,
+      "id": 82004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "82005": {
+      "cycle": 8,
+      "id": 82005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "82006": {
+      "cycle": 8,
+      "id": 82006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "82007": {
+      "cycle": 8,
+      "id": 82007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "82008": {
+      "cycle": 8,
+      "id": 82008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "91001": {
+      "cycle": 9,
+      "id": 91001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "91002": {
+      "cycle": 9,
+      "id": 91002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "91003": {
+      "cycle": 9,
+      "id": 91003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "91004": {
+      "cycle": 9,
+      "id": 91004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "91005": {
+      "cycle": 9,
+      "id": 91005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "91006": {
+      "cycle": 9,
+      "id": 91006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "91007": {
+      "cycle": 9,
+      "id": 91007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "91008": {
+      "cycle": 9,
+      "id": 91008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "92001": {
+      "cycle": 9,
+      "id": 92001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "92002": {
+      "cycle": 9,
+      "id": 92002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "92003": {
+      "cycle": 9,
+      "id": 92003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "92004": {
+      "cycle": 9,
+      "id": 92004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "92005": {
+      "cycle": 9,
+      "id": 92005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "92006": {
+      "cycle": 9,
+      "id": 92006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "92007": {
+      "cycle": 9,
+      "id": 92007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "92008": {
+      "cycle": 9,
+      "id": 92008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "101001": {
+      "cycle": 10,
+      "id": 101001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "101002": {
+      "cycle": 10,
+      "id": 101002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "101003": {
+      "cycle": 10,
+      "id": 101003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "101004": {
+      "cycle": 10,
+      "id": 101004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "101005": {
+      "cycle": 10,
+      "id": 101005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "101006": {
+      "cycle": 10,
+      "id": 101006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "101007": {
+      "cycle": 10,
+      "id": 101007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "101008": {
+      "cycle": 10,
+      "id": 101008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "102001": {
+      "cycle": 10,
+      "id": 102001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "102002": {
+      "cycle": 10,
+      "id": 102002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "102003": {
+      "cycle": 10,
+      "id": 102003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "102004": {
+      "cycle": 10,
+      "id": 102004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "102005": {
+      "cycle": 10,
+      "id": 102005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "102006": {
+      "cycle": 10,
+      "id": 102006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "102007": {
+      "cycle": 10,
+      "id": 102007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "102008": {
+      "cycle": 10,
+      "id": 102008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "111001": {
+      "cycle": 11,
+      "id": 111001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "111002": {
+      "cycle": 11,
+      "id": 111002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "111003": {
+      "cycle": 11,
+      "id": 111003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "111004": {
+      "cycle": 11,
+      "id": 111004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "111005": {
+      "cycle": 11,
+      "id": 111005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "111006": {
+      "cycle": 11,
+      "id": 111006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "111007": {
+      "cycle": 11,
+      "id": 111007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "111008": {
+      "cycle": 11,
+      "id": 111008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "112001": {
+      "cycle": 11,
+      "id": 112001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "112002": {
+      "cycle": 11,
+      "id": 112002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "112003": {
+      "cycle": 11,
+      "id": 112003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "112004": {
+      "cycle": 11,
+      "id": 112004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "112005": {
+      "cycle": 11,
+      "id": 112005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "112006": {
+      "cycle": 11,
+      "id": 112006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "112007": {
+      "cycle": 11,
+      "id": 112007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "112008": {
+      "cycle": 11,
+      "id": 112008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "121001": {
+      "cycle": 12,
+      "id": 121001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "121002": {
+      "cycle": 12,
+      "id": 121002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "121003": {
+      "cycle": 12,
+      "id": 121003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "121004": {
+      "cycle": 12,
+      "id": 121004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "121005": {
+      "cycle": 12,
+      "id": 121005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "121006": {
+      "cycle": 12,
+      "id": 121006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "121007": {
+      "cycle": 12,
+      "id": 121007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "121008": {
+      "cycle": 12,
+      "id": 121008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "122001": {
+      "cycle": 12,
+      "id": 122001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "122002": {
+      "cycle": 12,
+      "id": 122002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "122003": {
+      "cycle": 12,
+      "id": 122003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "122004": {
+      "cycle": 12,
+      "id": 122004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "122005": {
+      "cycle": 12,
+      "id": 122005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "122006": {
+      "cycle": 12,
+      "id": 122006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "122007": {
+      "cycle": 12,
+      "id": 122007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "122008": {
+      "cycle": 12,
+      "id": 122008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "131001": {
+      "cycle": 13,
+      "id": 131001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "131002": {
+      "cycle": 13,
+      "id": 131002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "131003": {
+      "cycle": 13,
+      "id": 131003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "131004": {
+      "cycle": 13,
+      "id": 131004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "131005": {
+      "cycle": 13,
+      "id": 131005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "131006": {
+      "cycle": 13,
+      "id": 131006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "131007": {
+      "cycle": 13,
+      "id": 131007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "131008": {
+      "cycle": 13,
+      "id": 131008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "132001": {
+      "cycle": 13,
+      "id": 132001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "132002": {
+      "cycle": 13,
+      "id": 132002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "132003": {
+      "cycle": 13,
+      "id": 132003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "132004": {
+      "cycle": 13,
+      "id": 132004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "132005": {
+      "cycle": 13,
+      "id": 132005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "132006": {
+      "cycle": 13,
+      "id": 132006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "132007": {
+      "cycle": 13,
+      "id": 132007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "132008": {
+      "cycle": 13,
+      "id": 132008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "141001": {
+      "cycle": 14,
+      "id": 141001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "141002": {
+      "cycle": 14,
+      "id": 141002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "141003": {
+      "cycle": 14,
+      "id": 141003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "141004": {
+      "cycle": 14,
+      "id": 141004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "141005": {
+      "cycle": 14,
+      "id": 141005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "141006": {
+      "cycle": 14,
+      "id": 141006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "141007": {
+      "cycle": 14,
+      "id": 141007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "141008": {
+      "cycle": 14,
+      "id": 141008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "142001": {
+      "cycle": 14,
+      "id": 142001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "142002": {
+      "cycle": 14,
+      "id": 142002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "142003": {
+      "cycle": 14,
+      "id": 142003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "142004": {
+      "cycle": 14,
+      "id": 142004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "142005": {
+      "cycle": 14,
+      "id": 142005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "142006": {
+      "cycle": 14,
+      "id": 142006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "142007": {
+      "cycle": 14,
+      "id": 142007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "142008": {
+      "cycle": 14,
+      "id": 142008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "151001": {
+      "cycle": 15,
+      "id": 151001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "151002": {
+      "cycle": 15,
+      "id": 151002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "151003": {
+      "cycle": 15,
+      "id": 151003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "151004": {
+      "cycle": 15,
+      "id": 151004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "151005": {
+      "cycle": 15,
+      "id": 151005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "151006": {
+      "cycle": 15,
+      "id": 151006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "151007": {
+      "cycle": 15,
+      "id": 151007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "151008": {
+      "cycle": 15,
+      "id": 151008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "152001": {
+      "cycle": 15,
+      "id": 152001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "152002": {
+      "cycle": 15,
+      "id": 152002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "152003": {
+      "cycle": 15,
+      "id": 152003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "152004": {
+      "cycle": 15,
+      "id": 152004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "152005": {
+      "cycle": 15,
+      "id": 152005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "152006": {
+      "cycle": 15,
+      "id": 152006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "152007": {
+      "cycle": 15,
+      "id": 152007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "152008": {
+      "cycle": 15,
+      "id": 152008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "161001": {
+      "cycle": 16,
+      "id": 161001,
+      "reward_type": 1,
+      "condition": 113001
+    },
+    "161002": {
+      "cycle": 16,
+      "id": 161002,
+      "reward_type": 1,
+      "condition": 113002
+    },
+    "161003": {
+      "cycle": 16,
+      "id": 161003,
+      "reward_type": 1,
+      "condition": 113003
+    },
+    "161004": {
+      "cycle": 16,
+      "id": 161004,
+      "reward_type": 1,
+      "condition": 113004
+    },
+    "161005": {
+      "cycle": 16,
+      "id": 161005,
+      "reward_type": 1,
+      "condition": 113005
+    },
+    "161006": {
+      "cycle": 16,
+      "id": 161006,
+      "reward_type": 1,
+      "condition": 113006
+    },
+    "161007": {
+      "cycle": 16,
+      "id": 161007,
+      "reward_type": 1,
+      "condition": 113007
+    },
+    "161008": {
+      "cycle": 16,
+      "id": 161008,
+      "reward_type": 1,
+      "condition": 113008
+    },
+    "162001": {
+      "cycle": 16,
+      "id": 162001,
+      "reward_type": 2,
+      "condition": 113011
+    },
+    "162002": {
+      "cycle": 16,
+      "id": 162002,
+      "reward_type": 2,
+      "condition": 113012
+    },
+    "162003": {
+      "cycle": 16,
+      "id": 162003,
+      "reward_type": 2,
+      "condition": 113013
+    },
+    "162004": {
+      "cycle": 16,
+      "id": 162004,
+      "reward_type": 2,
+      "condition": 113014
+    },
+    "162005": {
+      "cycle": 16,
+      "id": 162005,
+      "reward_type": 2,
+      "condition": 113015
+    },
+    "162006": {
+      "cycle": 16,
+      "id": 162006,
+      "reward_type": 2,
+      "condition": 113016
+    },
+    "162007": {
+      "cycle": 16,
+      "id": 162007,
+      "reward_type": 2,
+      "condition": 113017
+    },
+    "162008": {
+      "cycle": 16,
+      "id": 162008,
+      "reward_type": 2,
+      "condition": 113018
+    },
+    "all": {}
+  },
+  "cycle_info": {
+    "1101": {
+      "cycle": 1,
+      "stage_id": 3090008,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 1101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "1102": {
+      "cycle": 1,
+      "stage_id": 3090008,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 1102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "1103": {
+      "cycle": 1,
+      "stage_id": 3090008,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 1103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "1104": {
+      "cycle": 1,
+      "stage_id": 3090008,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 1104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "1105": {
+      "cycle": 1,
+      "stage_id": 3090008,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 1105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "1106": {
+      "cycle": 1,
+      "stage_id": 3090008,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 1106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "1107": {
+      "cycle": 1,
+      "stage_id": 3090008,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 1107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "1108": {
+      "cycle": 1,
+      "stage_id": 3090008,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 1108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "1201": {
+      "cycle": 1,
+      "stage_id": 3091014,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 1201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "1202": {
+      "cycle": 1,
+      "stage_id": 3091014,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 1202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "1203": {
+      "cycle": 1,
+      "stage_id": 3091014,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 1203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "1204": {
+      "cycle": 1,
+      "stage_id": 3091014,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 1204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "1205": {
+      "cycle": 1,
+      "stage_id": 3091014,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 1205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "1206": {
+      "cycle": 1,
+      "stage_id": 3091014,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 1206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "1207": {
+      "cycle": 1,
+      "stage_id": 3091014,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 1207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "1208": {
+      "cycle": 1,
+      "stage_id": 3091014,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 1208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "2101": {
+      "cycle": 2,
+      "stage_id": 3090001,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 2101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "2102": {
+      "cycle": 2,
+      "stage_id": 3090001,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 2102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "2103": {
+      "cycle": 2,
+      "stage_id": 3090001,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 2103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "2104": {
+      "cycle": 2,
+      "stage_id": 3090001,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 2104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "2105": {
+      "cycle": 2,
+      "stage_id": 3090001,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 2105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "2106": {
+      "cycle": 2,
+      "stage_id": 3090001,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 2106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "2107": {
+      "cycle": 2,
+      "stage_id": 3090001,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 2107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "2108": {
+      "cycle": 2,
+      "stage_id": 3090001,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 2108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "2201": {
+      "cycle": 2,
+      "stage_id": 3091005,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 2201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "2202": {
+      "cycle": 2,
+      "stage_id": 3091005,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 2202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "2203": {
+      "cycle": 2,
+      "stage_id": 3091005,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 2203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "2204": {
+      "cycle": 2,
+      "stage_id": 3091005,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 2204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "2205": {
+      "cycle": 2,
+      "stage_id": 3091005,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 2205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "2206": {
+      "cycle": 2,
+      "stage_id": 3091005,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 2206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "2207": {
+      "cycle": 2,
+      "stage_id": 3091005,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 2207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "2208": {
+      "cycle": 2,
+      "stage_id": 3091005,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 2208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "3101": {
+      "cycle": 3,
+      "stage_id": 3090002,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 3101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "3102": {
+      "cycle": 3,
+      "stage_id": 3090002,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 3102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "3103": {
+      "cycle": 3,
+      "stage_id": 3090002,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 3103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "3104": {
+      "cycle": 3,
+      "stage_id": 3090002,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 3104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "3105": {
+      "cycle": 3,
+      "stage_id": 3090002,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 3105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "3106": {
+      "cycle": 3,
+      "stage_id": 3090002,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 3106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "3107": {
+      "cycle": 3,
+      "stage_id": 3090002,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 3107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "3108": {
+      "cycle": 3,
+      "stage_id": 3090002,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 3108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "3201": {
+      "cycle": 3,
+      "stage_id": 3091015,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 3201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "3202": {
+      "cycle": 3,
+      "stage_id": 3091015,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 3202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "3203": {
+      "cycle": 3,
+      "stage_id": 3091015,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 3203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "3204": {
+      "cycle": 3,
+      "stage_id": 3091015,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 3204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "3205": {
+      "cycle": 3,
+      "stage_id": 3091015,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 3205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "3206": {
+      "cycle": 3,
+      "stage_id": 3091015,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 3206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "3207": {
+      "cycle": 3,
+      "stage_id": 3091015,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 3207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "3208": {
+      "cycle": 3,
+      "stage_id": 3091015,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 3208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "4101": {
+      "cycle": 4,
+      "stage_id": 3090003,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 4101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "4102": {
+      "cycle": 4,
+      "stage_id": 3090003,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 4102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "4103": {
+      "cycle": 4,
+      "stage_id": 3090003,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 4103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "4104": {
+      "cycle": 4,
+      "stage_id": 3090003,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 4104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "4105": {
+      "cycle": 4,
+      "stage_id": 3090003,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 4105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "4106": {
+      "cycle": 4,
+      "stage_id": 3090003,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 4106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "4107": {
+      "cycle": 4,
+      "stage_id": 3090003,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 4107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "4108": {
+      "cycle": 4,
+      "stage_id": 3090003,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 4108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "4201": {
+      "cycle": 4,
+      "stage_id": 3091007,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 4201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "4202": {
+      "cycle": 4,
+      "stage_id": 3091007,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 4202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "4203": {
+      "cycle": 4,
+      "stage_id": 3091007,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 4203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "4204": {
+      "cycle": 4,
+      "stage_id": 3091007,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 4204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "4205": {
+      "cycle": 4,
+      "stage_id": 3091007,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 4205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "4206": {
+      "cycle": 4,
+      "stage_id": 3091007,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 4206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "4207": {
+      "cycle": 4,
+      "stage_id": 3091007,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 4207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "4208": {
+      "cycle": 4,
+      "stage_id": 3091007,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 4208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "5101": {
+      "cycle": 5,
+      "stage_id": 3090004,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 5101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "5102": {
+      "cycle": 5,
+      "stage_id": 3090004,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 5102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "5103": {
+      "cycle": 5,
+      "stage_id": 3090004,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 5103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "5104": {
+      "cycle": 5,
+      "stage_id": 3090004,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 5104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "5105": {
+      "cycle": 5,
+      "stage_id": 3090004,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 5105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "5106": {
+      "cycle": 5,
+      "stage_id": 3090004,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 5106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "5107": {
+      "cycle": 5,
+      "stage_id": 3090004,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 5107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "5108": {
+      "cycle": 5,
+      "stage_id": 3090004,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 5108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "5201": {
+      "cycle": 5,
+      "stage_id": 3091008,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 5201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "5202": {
+      "cycle": 5,
+      "stage_id": 3091008,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 5202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "5203": {
+      "cycle": 5,
+      "stage_id": 3091008,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 5203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "5204": {
+      "cycle": 5,
+      "stage_id": 3091008,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 5204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "5205": {
+      "cycle": 5,
+      "stage_id": 3091008,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 5205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "5206": {
+      "cycle": 5,
+      "stage_id": 3091008,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 5206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "5207": {
+      "cycle": 5,
+      "stage_id": 3091008,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 5207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "5208": {
+      "cycle": 5,
+      "stage_id": 3091008,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 5208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "recommend": [
+        8,
+        4
+      ],
+      "recommend_team": [
+        2,
+        3
+      ]
+    },
+    "6101": {
+      "cycle": 6,
+      "stage_id": 3090005,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 6101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "6102": {
+      "cycle": 6,
+      "stage_id": 3090005,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 6102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "6103": {
+      "cycle": 6,
+      "stage_id": 3090005,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 6103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "6104": {
+      "cycle": 6,
+      "stage_id": 3090005,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 6104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "6105": {
+      "cycle": 6,
+      "stage_id": 3090005,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 6105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "6106": {
+      "cycle": 6,
+      "stage_id": 3090005,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 6106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "6107": {
+      "cycle": 6,
+      "stage_id": 3090005,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 6107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "6108": {
+      "cycle": 6,
+      "stage_id": 3090005,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 6108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "6201": {
+      "cycle": 6,
+      "stage_id": 3091009,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 6201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "6202": {
+      "cycle": 6,
+      "stage_id": 3091009,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 6202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "6203": {
+      "cycle": 6,
+      "stage_id": 3091009,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 6203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "6204": {
+      "cycle": 6,
+      "stage_id": 3091009,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 6204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "6205": {
+      "cycle": 6,
+      "stage_id": 3091009,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 6205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "6206": {
+      "cycle": 6,
+      "stage_id": 3091009,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 6206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "6207": {
+      "cycle": 6,
+      "stage_id": 3091009,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 6207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "6208": {
+      "cycle": 6,
+      "stage_id": 3091009,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 6208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "7101": {
+      "cycle": 7,
+      "stage_id": 3090011,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 7101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "7102": {
+      "cycle": 7,
+      "stage_id": 3090011,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 7102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "7103": {
+      "cycle": 7,
+      "stage_id": 3090011,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 7103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "7104": {
+      "cycle": 7,
+      "stage_id": 3090011,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 7104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "7105": {
+      "cycle": 7,
+      "stage_id": 3090011,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 7105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "7106": {
+      "cycle": 7,
+      "stage_id": 3090011,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 7106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "7107": {
+      "cycle": 7,
+      "stage_id": 3090011,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 7107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "7108": {
+      "cycle": 7,
+      "stage_id": 3090011,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 7108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "7201": {
+      "cycle": 7,
+      "stage_id": 3091010,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 7201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "7202": {
+      "cycle": 7,
+      "stage_id": 3091010,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 7202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "7203": {
+      "cycle": 7,
+      "stage_id": 3091010,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 7203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "7204": {
+      "cycle": 7,
+      "stage_id": 3091010,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 7204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "7205": {
+      "cycle": 7,
+      "stage_id": 3091010,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 7205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "7206": {
+      "cycle": 7,
+      "stage_id": 3091010,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 7206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "7207": {
+      "cycle": 7,
+      "stage_id": 3091010,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 7207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "7208": {
+      "cycle": 7,
+      "stage_id": 3091010,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 7208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "recommend": [
+        0,
+        10
+      ],
+      "recommend_team": [
+        1,
+        8
+      ]
+    },
+    "8101": {
+      "cycle": 8,
+      "stage_id": 3090007,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 8101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "8102": {
+      "cycle": 8,
+      "stage_id": 3090007,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 8102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "8103": {
+      "cycle": 8,
+      "stage_id": 3090007,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 8103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "8104": {
+      "cycle": 8,
+      "stage_id": 3090007,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 8104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "8105": {
+      "cycle": 8,
+      "stage_id": 3090007,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 8105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "8106": {
+      "cycle": 8,
+      "stage_id": 3090007,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 8106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "8107": {
+      "cycle": 8,
+      "stage_id": 3090007,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 8107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "8108": {
+      "cycle": 8,
+      "stage_id": 3090007,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 8108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "8201": {
+      "cycle": 8,
+      "stage_id": 3091011,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 8201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "8202": {
+      "cycle": 8,
+      "stage_id": 3091011,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 8202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "8203": {
+      "cycle": 8,
+      "stage_id": 3091011,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 8203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "8204": {
+      "cycle": 8,
+      "stage_id": 3091011,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 8204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "8205": {
+      "cycle": 8,
+      "stage_id": 3091011,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 8205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "8206": {
+      "cycle": 8,
+      "stage_id": 3091011,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 8206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "8207": {
+      "cycle": 8,
+      "stage_id": 3091011,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 8207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "8208": {
+      "cycle": 8,
+      "stage_id": 3091011,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 8208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "recommend": [
+        14,
+        2
+      ],
+      "recommend_team": [
+        5,
+        6
+      ]
+    },
+    "9101": {
+      "cycle": 9,
+      "stage_id": 3090008,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 9101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "9102": {
+      "cycle": 9,
+      "stage_id": 3090008,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 9102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "9103": {
+      "cycle": 9,
+      "stage_id": 3090008,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 9103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "9104": {
+      "cycle": 9,
+      "stage_id": 3090008,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 9104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "9105": {
+      "cycle": 9,
+      "stage_id": 3090008,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 9105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "9106": {
+      "cycle": 9,
+      "stage_id": 3090008,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 9106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "9107": {
+      "cycle": 9,
+      "stage_id": 3090008,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 9107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "9108": {
+      "cycle": 9,
+      "stage_id": 3090008,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 9108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        0
+      ],
+      "recommend_team": [
+        1
+      ]
+    },
+    "9201": {
+      "cycle": 9,
+      "stage_id": 3091012,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 9201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "9202": {
+      "cycle": 9,
+      "stage_id": 3091012,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 9202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "9203": {
+      "cycle": 9,
+      "stage_id": 3091012,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 9203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "9204": {
+      "cycle": 9,
+      "stage_id": 3091012,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 9204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "9205": {
+      "cycle": 9,
+      "stage_id": 3091012,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 9205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "9206": {
+      "cycle": 9,
+      "stage_id": 3091012,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 9206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "9207": {
+      "cycle": 9,
+      "stage_id": 3091012,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 9207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "9208": {
+      "cycle": 9,
+      "stage_id": 3091012,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 9208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "10101": {
+      "cycle": 10,
+      "stage_id": 3090009,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 10101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "10102": {
+      "cycle": 10,
+      "stage_id": 3090009,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 10102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "10103": {
+      "cycle": 10,
+      "stage_id": 3090009,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 10103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "10104": {
+      "cycle": 10,
+      "stage_id": 3090009,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 10104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "10105": {
+      "cycle": 10,
+      "stage_id": 3090009,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 10105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "10106": {
+      "cycle": 10,
+      "stage_id": 3090009,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 10106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "10107": {
+      "cycle": 10,
+      "stage_id": 3090009,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 10107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "10108": {
+      "cycle": 10,
+      "stage_id": 3090009,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 10108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        4
+      ],
+      "recommend_team": [
+        2
+      ]
+    },
+    "10201": {
+      "cycle": 10,
+      "stage_id": 3091013,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 10201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "10202": {
+      "cycle": 10,
+      "stage_id": 3091013,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 10202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "10203": {
+      "cycle": 10,
+      "stage_id": 3091013,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 10203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "10204": {
+      "cycle": 10,
+      "stage_id": 3091013,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 10204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "10205": {
+      "cycle": 10,
+      "stage_id": 3091013,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 10205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "10206": {
+      "cycle": 10,
+      "stage_id": 3091013,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 10206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "10207": {
+      "cycle": 10,
+      "stage_id": 3091013,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 10207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "10208": {
+      "cycle": 10,
+      "stage_id": 3091013,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 10208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "recommend": [
+        6,
+        12
+      ],
+      "recommend_team": [
+        4,
+        7
+      ]
+    },
+    "11101": {
+      "cycle": 11,
+      "stage_id": 3090001,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 11101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "11102": {
+      "cycle": 11,
+      "stage_id": 3090001,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 11102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "11103": {
+      "cycle": 11,
+      "stage_id": 3090001,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 11103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "11104": {
+      "cycle": 11,
+      "stage_id": 3090001,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 11104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "11105": {
+      "cycle": 11,
+      "stage_id": 3090001,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 11105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "11106": {
+      "cycle": 11,
+      "stage_id": 3090001,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 11106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "11107": {
+      "cycle": 11,
+      "stage_id": 3090001,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 11107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "11108": {
+      "cycle": 11,
+      "stage_id": 3090001,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 11108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        8
+      ],
+      "recommend_team": [
+        3
+      ]
+    },
+    "11201": {
+      "cycle": 11,
+      "stage_id": 3091001,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 11201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "11202": {
+      "cycle": 11,
+      "stage_id": 3091001,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 11202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "11203": {
+      "cycle": 11,
+      "stage_id": 3091001,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 11203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "11204": {
+      "cycle": 11,
+      "stage_id": 3091001,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 11204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "11205": {
+      "cycle": 11,
+      "stage_id": 3091001,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 11205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "11206": {
+      "cycle": 11,
+      "stage_id": 3091001,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 11206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "11207": {
+      "cycle": 11,
+      "stage_id": 3091001,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 11207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "11208": {
+      "cycle": 11,
+      "stage_id": 3091001,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 11208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "12101": {
+      "cycle": 12,
+      "stage_id": 3090002,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 12101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "12102": {
+      "cycle": 12,
+      "stage_id": 3090002,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 12102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "12103": {
+      "cycle": 12,
+      "stage_id": 3090002,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 12103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "12104": {
+      "cycle": 12,
+      "stage_id": 3090002,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 12104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "12105": {
+      "cycle": 12,
+      "stage_id": 3090002,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 12105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "12106": {
+      "cycle": 12,
+      "stage_id": 3090002,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 12106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "12107": {
+      "cycle": 12,
+      "stage_id": 3090002,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 12107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "12108": {
+      "cycle": 12,
+      "stage_id": 3090002,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 12108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        6
+      ],
+      "recommend_team": [
+        4
+      ]
+    },
+    "12201": {
+      "cycle": 12,
+      "stage_id": 3091002,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 12201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "12202": {
+      "cycle": 12,
+      "stage_id": 3091002,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 12202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "12203": {
+      "cycle": 12,
+      "stage_id": 3091002,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 12203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "12204": {
+      "cycle": 12,
+      "stage_id": 3091002,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 12204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "12205": {
+      "cycle": 12,
+      "stage_id": 3091002,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 12205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "12206": {
+      "cycle": 12,
+      "stage_id": 3091002,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 12206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "12207": {
+      "cycle": 12,
+      "stage_id": 3091002,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 12207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "12208": {
+      "cycle": 12,
+      "stage_id": 3091002,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 12208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "13101": {
+      "cycle": 13,
+      "stage_id": 3090003,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 13101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "13102": {
+      "cycle": 13,
+      "stage_id": 3090003,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 13102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "13103": {
+      "cycle": 13,
+      "stage_id": 3090003,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 13103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "13104": {
+      "cycle": 13,
+      "stage_id": 3090003,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 13104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "13105": {
+      "cycle": 13,
+      "stage_id": 3090003,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 13105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "13106": {
+      "cycle": 13,
+      "stage_id": 3090003,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 13106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "13107": {
+      "cycle": 13,
+      "stage_id": 3090003,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 13107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "13108": {
+      "cycle": 13,
+      "stage_id": 3090003,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 13108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        14
+      ],
+      "recommend_team": [
+        5
+      ]
+    },
+    "13201": {
+      "cycle": 13,
+      "stage_id": 3091003,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 13201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "13202": {
+      "cycle": 13,
+      "stage_id": 3091003,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 13202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "13203": {
+      "cycle": 13,
+      "stage_id": 3091003,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 13203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "13204": {
+      "cycle": 13,
+      "stage_id": 3091003,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 13204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "13205": {
+      "cycle": 13,
+      "stage_id": 3091003,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 13205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "13206": {
+      "cycle": 13,
+      "stage_id": 3091003,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 13206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "13207": {
+      "cycle": 13,
+      "stage_id": 3091003,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 13207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "13208": {
+      "cycle": 13,
+      "stage_id": 3091003,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 13208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "14101": {
+      "cycle": 14,
+      "stage_id": 3090004,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 14101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "14102": {
+      "cycle": 14,
+      "stage_id": 3090004,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 14102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "14103": {
+      "cycle": 14,
+      "stage_id": 3090004,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 14103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "14104": {
+      "cycle": 14,
+      "stage_id": 3090004,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 14104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "14105": {
+      "cycle": 14,
+      "stage_id": 3090004,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 14105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "14106": {
+      "cycle": 14,
+      "stage_id": 3090004,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 14106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "14107": {
+      "cycle": 14,
+      "stage_id": 3090004,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 14107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "14108": {
+      "cycle": 14,
+      "stage_id": 3090004,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 14108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        2
+      ],
+      "recommend_team": [
+        6
+      ]
+    },
+    "14201": {
+      "cycle": 14,
+      "stage_id": 3091004,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 14201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "14202": {
+      "cycle": 14,
+      "stage_id": 3091004,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 14202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "14203": {
+      "cycle": 14,
+      "stage_id": 3091004,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 14203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "14204": {
+      "cycle": 14,
+      "stage_id": 3091004,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 14204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "14205": {
+      "cycle": 14,
+      "stage_id": 3091004,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 14205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "14206": {
+      "cycle": 14,
+      "stage_id": 3091004,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 14206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "14207": {
+      "cycle": 14,
+      "stage_id": 3091004,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 14207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "14208": {
+      "cycle": 14,
+      "stage_id": 3091004,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 14208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "15101": {
+      "cycle": 15,
+      "stage_id": 3090011,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 15101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "15102": {
+      "cycle": 15,
+      "stage_id": 3090011,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 15102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "15103": {
+      "cycle": 15,
+      "stage_id": 3090011,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 15103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "15104": {
+      "cycle": 15,
+      "stage_id": 3090011,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 15104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "15105": {
+      "cycle": 15,
+      "stage_id": 3090011,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 15105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "15106": {
+      "cycle": 15,
+      "stage_id": 3090011,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 15106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "15107": {
+      "cycle": 15,
+      "stage_id": 3090011,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 15107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "15108": {
+      "cycle": 15,
+      "stage_id": 3090011,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 15108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        12
+      ],
+      "recommend_team": [
+        7
+      ]
+    },
+    "15201": {
+      "cycle": 15,
+      "stage_id": 3091005,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 15201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "15202": {
+      "cycle": 15,
+      "stage_id": 3091005,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 15202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "15203": {
+      "cycle": 15,
+      "stage_id": 3091005,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 15203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "15204": {
+      "cycle": 15,
+      "stage_id": 3091005,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 15204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "15205": {
+      "cycle": 15,
+      "stage_id": 3091005,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 15205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "15206": {
+      "cycle": 15,
+      "stage_id": 3091005,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 15206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "15207": {
+      "cycle": 15,
+      "stage_id": 3091005,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 15207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "15208": {
+      "cycle": 15,
+      "stage_id": 3091005,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 15208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "16101": {
+      "cycle": 16,
+      "stage_id": 3090006,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 16101,
+      "attribute_factor": [
+        1000,
+        1000,
+        22452
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "16102": {
+      "cycle": 16,
+      "stage_id": 3090006,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 16102,
+      "attribute_factor": [
+        1000,
+        1000,
+        32390
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "16103": {
+      "cycle": 16,
+      "stage_id": 3090006,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 16103,
+      "attribute_factor": [
+        1000,
+        1000,
+        52747
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "16104": {
+      "cycle": 16,
+      "stage_id": 3090006,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 16104,
+      "attribute_factor": [
+        1000,
+        1000,
+        84580
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "16105": {
+      "cycle": 16,
+      "stage_id": 3090006,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 16105,
+      "attribute_factor": [
+        1000,
+        1000,
+        176158
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "16106": {
+      "cycle": 16,
+      "stage_id": 3090006,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 16106,
+      "attribute_factor": [
+        1000,
+        1000,
+        379541
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "16107": {
+      "cycle": 16,
+      "stage_id": 3090006,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 16107,
+      "attribute_factor": [
+        1000,
+        1000,
+        481138
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "16108": {
+      "cycle": 16,
+      "stage_id": 3090006,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 1,
+      "stage_type": 0,
+      "id": 16108,
+      "attribute_factor": [
+        1000,
+        1000,
+        615374
+      ],
+      "recommend": [
+        10
+      ],
+      "recommend_team": [
+        8
+      ]
+    },
+    "16201": {
+      "cycle": 16,
+      "stage_id": 3091006,
+      "difficult": 1,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 16201,
+      "attribute_factor": [
+        1000,
+        3250,
+        6586
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "16202": {
+      "cycle": 16,
+      "stage_id": 3091006,
+      "difficult": 2,
+      "unlock_level": 60,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 16202,
+      "attribute_factor": [
+        1000,
+        3250,
+        9501
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "16203": {
+      "cycle": 16,
+      "stage_id": 3091006,
+      "difficult": 3,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 16203,
+      "attribute_factor": [
+        1000,
+        3250,
+        15472
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "16204": {
+      "cycle": 16,
+      "stage_id": 3091006,
+      "difficult": 4,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 16204,
+      "attribute_factor": [
+        1000,
+        3250,
+        20790
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "16205": {
+      "cycle": 16,
+      "stage_id": 3091006,
+      "difficult": 5,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 16205,
+      "attribute_factor": [
+        1000,
+        3250,
+        33107
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "16206": {
+      "cycle": 16,
+      "stage_id": 3091006,
+      "difficult": 6,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 16206,
+      "attribute_factor": [
+        1000,
+        3250,
+        82399
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "16207": {
+      "cycle": 16,
+      "stage_id": 3091006,
+      "difficult": 7,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 16207,
+      "attribute_factor": [
+        1000,
+        3250,
+        141133
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "16208": {
+      "cycle": 16,
+      "stage_id": 3091006,
+      "difficult": 8,
+      "unlock_level": 80,
+      "affix_pool": "",
+      "boss_type": 2,
+      "stage_type": 0,
+      "id": 16208,
+      "attribute_factor": [
+        1000,
+        3250,
+        180509
+      ],
+      "affix_type": [],
+      "recommend": [],
+      "recommend_team": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "get_id_list_by_cycle": {},
+    "all": {}
+  },
+  "badges": {
+    "40302": {
+      "sort": 0,
+      "name": "斩蛇焚影·邃密",
+      "type": 2,
+      "unlock_condition": 1440308,
+      "desc": "你还记得那日的大火，失落的家族，残忍的黑蛇，以及……那对师徒眼中迸发的决意。",
+      "activity_id": 3539301,
+      "set_id": 403,
+      "id": 40302,
+      "set_id_sort": 1,
+      "level": 1
+    },
+    "40303": {
+      "sort": 0,
+      "name": "斩蛇焚影·洞悉",
+      "type": 2,
+      "unlock_condition": 1440313,
+      "desc": "你还记得那日的大火，失落的家族，残忍的黑蛇，以及……那对师徒眼中迸发的决意。",
+      "activity_id": 3539301,
+      "set_id": 403,
+      "id": 40303,
+      "set_id_sort": 1,
+      "level": 2
+    },
+    "40304": {
+      "sort": 1,
+      "name": "蛇渊",
+      "type": 1,
+      "unlock_condition": 1440304,
+      "desc": "您已踏入恶意的深渊，很庆幸能看见您的归还。",
+      "activity_id": 3539301,
+      "set_id": 403,
+      "id": 40304,
+      "set_id_sort": 1,
+      "level": 0
+    },
+    "40305": {
+      "sort": 2,
+      "name": "真剑",
+      "type": 1,
+      "unlock_condition": 1440305,
+      "desc": "您见证过那位少女的决意，而您的目光亦变得与之相同。",
+      "activity_id": 3539301,
+      "set_id": 403,
+      "id": 40305,
+      "set_id_sort": 1,
+      "level": 0
+    },
+    "40306": {
+      "sort": 3,
+      "name": "悲剧的余声",
+      "type": 1,
+      "unlock_condition": 1440307,
+      "desc": "您为一场大火后的悲剧画上了句点。",
+      "activity_id": 3539301,
+      "set_id": 403,
+      "id": 40306,
+      "set_id_sort": 1,
+      "level": 0
+    },
+    "40401": {
+      "sort": 0,
+      "name": "钢铁轰鸣·点燃",
+      "type": 2,
+      "unlock_condition": 1440406,
+      "desc": "巨大机械的轰鸣和爆炸声成为了战场上唯一的声音，在这种情况下最好让这场战斗尽快落下帷幕。",
+      "activity_id": 3640301,
+      "set_id": 404,
+      "id": 40401,
+      "set_id_sort": 2,
+      "level": 1
+    },
+    "40402": {
+      "sort": 0,
+      "name": "钢铁轰鸣·炽烈",
+      "type": 2,
+      "unlock_condition": 1440407,
+      "desc": "巨大机械的轰鸣和爆炸声成为了战场上唯一的声音，在这种情况下最好让这场战斗尽快落下帷幕。",
+      "activity_id": 3640301,
+      "set_id": 404,
+      "id": 40402,
+      "set_id_sort": 2,
+      "level": 2
+    },
+    "40403": {
+      "sort": 1,
+      "name": "全金属外壳",
+      "type": 1,
+      "unlock_condition": 1440401,
+      "desc": "钢铁是诺伊汉萨区工业的骄傲，却也成为了视骸的外壳。",
+      "activity_id": 3640301,
+      "set_id": 404,
+      "id": 40403,
+      "set_id_sort": 2,
+      "level": 0
+    },
+    "40404": {
+      "sort": 2,
+      "name": "爆裂炽炎",
+      "type": 1,
+      "unlock_condition": 1440402,
+      "desc": "炽炎所过之处，只留下焦土和灰烬。",
+      "activity_id": 3640301,
+      "set_id": 404,
+      "id": 40404,
+      "set_id_sort": 2,
+      "level": 0
+    },
+    "40405": {
+      "sort": 3,
+      "name": "幕后主使",
+      "type": 1,
+      "unlock_condition": 1440403,
+      "desc": "在有人察觉到异常之前，斯皮尔特工厂事件的制造者就完成了它的布局。",
+      "activity_id": 3640301,
+      "set_id": 404,
+      "id": 40405,
+      "set_id_sort": 2,
+      "level": 0
+    },
+    "40501": {
+      "sort": 0,
+      "name": "破坏本能·震响",
+      "type": 2,
+      "unlock_condition": 1440506,
+      "desc": "巨大的身躯，强壮的双臂，纯粹的破坏意志……它是我们遇到的第一道难关。",
+      "activity_id": 3739301,
+      "set_id": 405,
+      "id": 40501,
+      "set_id_sort": 3,
+      "level": 1
+    },
+    "40502": {
+      "sort": 0,
+      "name": "破坏本能·轰鸣",
+      "type": 2,
+      "unlock_condition": 1440507,
+      "desc": "巨大的身躯，强壮的双臂，纯粹的破坏意志……它是我们遇到的第一道难关。",
+      "activity_id": 3739301,
+      "set_id": 405,
+      "id": 40502,
+      "set_id_sort": 3,
+      "level": 2
+    },
+    "40503": {
+      "sort": 1,
+      "name": "撼地",
+      "type": 1,
+      "unlock_condition": 1440501,
+      "desc": "其坚实的手臂可以划开空间，震撼大地。",
+      "activity_id": 3739301,
+      "set_id": 405,
+      "id": 40503,
+      "set_id_sort": 3,
+      "level": 0
+    },
+    "40504": {
+      "sort": 2,
+      "name": "一场事故",
+      "type": 1,
+      "unlock_condition": 1440502,
+      "desc": "这里是故事的起点。",
+      "activity_id": 3739301,
+      "set_id": 405,
+      "id": 40504,
+      "set_id_sort": 3,
+      "level": 0
+    },
+    "40505": {
+      "sort": 3,
+      "name": "初次任务",
+      "type": 1,
+      "unlock_condition": 1440503,
+      "desc": "有惊无险，至少我们顺利完成了任务。",
+      "activity_id": 3739301,
+      "set_id": 405,
+      "id": 40505,
+      "set_id_sort": 3,
+      "level": 0
+    },
+    "40601": {
+      "sort": 0,
+      "name": "擂台霸主·铁拳",
+      "type": 2,
+      "unlock_condition": 1440606,
+      "desc": "在弱肉强食的贫民窟中，用拳头说话永远比用嘴巴更有说服力。",
+      "activity_id": 3840301,
+      "set_id": 406,
+      "id": 40601,
+      "set_id_sort": 4,
+      "level": 1
+    },
+    "40602": {
+      "sort": 0,
+      "name": "擂台霸主·碎骨",
+      "type": 2,
+      "unlock_condition": 1440607,
+      "desc": "在弱肉强食的贫民窟中，用拳头说话永远比用嘴巴更有说服力。",
+      "activity_id": 3840301,
+      "set_id": 406,
+      "id": 40602,
+      "set_id_sort": 4,
+      "level": 2
+    },
+    "40603": {
+      "sort": 1,
+      "name": "八角笼内",
+      "type": 1,
+      "unlock_condition": 1440601,
+      "desc": "在鱼龙混杂的地下格斗比赛参赛者之间，唯一的规则就是站到最后。",
+      "activity_id": 3840301,
+      "set_id": 406,
+      "id": 40603,
+      "set_id_sort": 4,
+      "level": 0
+    },
+    "40604": {
+      "sort": 2,
+      "name": "地下冠军",
+      "type": 1,
+      "unlock_condition": 1440602,
+      "desc": "贫民窟中打黑拳的人大多都是为了钱，但也有人为了这廉价的冠军腰带而争得头破血流。",
+      "activity_id": 3840301,
+      "set_id": 406,
+      "id": 40604,
+      "set_id_sort": 4,
+      "level": 0
+    },
+    "40605": {
+      "sort": 3,
+      "name": "猎豹之首",
+      "type": 1,
+      "unlock_condition": 1440603,
+      "desc": "靠着拳头和一路巧取豪夺，一个称为「猎豹帮」的小帮派开始不断扩张地盘，在帮派中站稳了脚跟。",
+      "activity_id": 3840301,
+      "set_id": 406,
+      "id": 40605,
+      "set_id_sort": 4,
+      "level": 0
+    },
+    "40701": {
+      "sort": 0,
+      "name": "黑武神·化身",
+      "type": 2,
+      "unlock_condition": 1440705,
+      "desc": "操纵记忆之人，最终被记忆吞噬。",
+      "activity_id": 3941701,
+      "set_id": 407,
+      "id": 40701,
+      "set_id_sort": 5,
+      "level": 1
+    },
+    "40702": {
+      "sort": 0,
+      "name": "黑武神·溃灭",
+      "type": 2,
+      "unlock_condition": 1440706,
+      "desc": "操纵记忆之人，最终被记忆吞噬。",
+      "activity_id": 3941701,
+      "set_id": 407,
+      "id": 40702,
+      "set_id_sort": 5,
+      "level": 2
+    },
+    "40703": {
+      "sort": 1,
+      "name": "从无中来",
+      "type": 1,
+      "unlock_condition": 1440701,
+      "desc": "本为虚造之物，却妄想掌管他人的真实。",
+      "activity_id": 3941701,
+      "set_id": 407,
+      "id": 40703,
+      "set_id_sort": 5,
+      "level": 0
+    },
+    "40704": {
+      "sort": 2,
+      "name": "虚假记忆",
+      "type": 1,
+      "unlock_condition": 1440702,
+      "desc": "将过去的记忆改写，留下伪作与诡计。",
+      "activity_id": 3941701,
+      "set_id": 407,
+      "id": 40704,
+      "set_id_sort": 5,
+      "level": 0
+    },
+    "40705": {
+      "sort": 3,
+      "name": "谎言之冠",
+      "type": 1,
+      "unlock_condition": 1440703,
+      "desc": "头戴虚假的王冠，坐在谎言之座上。",
+      "activity_id": 3941701,
+      "set_id": 407,
+      "id": 40705,
+      "set_id_sort": 5,
+      "level": 0
+    },
+    "40801": {
+      "sort": 0,
+      "name": "醒岁除夕·辞岁",
+      "type": 2,
+      "unlock_condition": 1440806,
+      "desc": "燃爆竹，点朱砂，封印醒岁之兽。",
+      "activity_id": 4039301,
+      "set_id": 408,
+      "id": 40801,
+      "set_id_sort": 6,
+      "level": 1
+    },
+    "40802": {
+      "sort": 0,
+      "name": "醒岁除夕·新禧",
+      "type": 2,
+      "unlock_condition": 1440807,
+      "desc": "燃爆竹，点朱砂，封印醒岁之兽。",
+      "activity_id": 4039301,
+      "set_id": 408,
+      "id": 40802,
+      "set_id_sort": 6,
+      "level": 2
+    },
+    "40803": {
+      "sort": 1,
+      "name": "炮竹齐鸣",
+      "type": 1,
+      "unlock_condition": 1440801,
+      "desc": "燃竹驱怪，守岁迎新。",
+      "activity_id": 4039301,
+      "set_id": 408,
+      "id": 40803,
+      "set_id_sort": 6,
+      "level": 0
+    },
+    "40804": {
+      "sort": 2,
+      "name": "朱砂封印",
+      "type": 1,
+      "unlock_condition": 1440802,
+      "desc": "朱砂一点，作乱夕兽化为小巧玩偶。",
+      "activity_id": 4039301,
+      "set_id": 408,
+      "id": 40804,
+      "set_id_sort": 6,
+      "level": 0
+    },
+    "40805": {
+      "sort": 3,
+      "name": "挥笔画符",
+      "type": 1,
+      "unlock_condition": 1440803,
+      "desc": "醒岁节的平安，都落笔在了一抹朱红中。",
+      "activity_id": 4039301,
+      "set_id": 408,
+      "id": 40805,
+      "set_id_sort": 6,
+      "level": 0
+    },
+    "40901": {
+      "sort": 0,
+      "name": "极致兵器",
+      "type": 2,
+      "unlock_condition": 1440906,
+      "desc": "倾尽斯皮尔特工业的全部资源，只为铸就这毁天灭地的兵器。",
+      "activity_id": 4139301,
+      "set_id": 409,
+      "id": 40901,
+      "set_id_sort": 7,
+      "level": 1
+    },
+    "40902": {
+      "sort": 0,
+      "name": "极致兵器",
+      "type": 2,
+      "unlock_condition": 1440907,
+      "desc": "倾尽斯皮尔特工业的全部资源，只为铸就这毁天灭地的兵器。",
+      "activity_id": 4139301,
+      "set_id": 409,
+      "id": 40902,
+      "set_id_sort": 7,
+      "level": 2
+    },
+    "40903": {
+      "sort": 1,
+      "name": "执矛者",
+      "type": 1,
+      "unlock_condition": 1440901,
+      "desc": "那杆长矛刺出的轨迹致命而精准，但最终我们还是用胜利终结了这篇章。",
+      "activity_id": 4139301,
+      "set_id": 409,
+      "id": 40903,
+      "set_id_sort": 7,
+      "level": 0
+    },
+    "40904": {
+      "sort": 2,
+      "name": "千钧之坠",
+      "type": 1,
+      "unlock_condition": 1440902,
+      "desc": "千钧之力从天而降，震碎地面，撕裂空气。",
+      "activity_id": 4139301,
+      "set_id": 409,
+      "id": 40904,
+      "set_id_sort": 7,
+      "level": 0
+    },
+    "40905": {
+      "sort": 3,
+      "name": "独当千军",
+      "type": 1,
+      "unlock_condition": 1440903,
+      "desc": "不需要战友，不需要支援，它本身就能媲美一支军队。",
+      "activity_id": 4139301,
+      "set_id": 409,
+      "id": 40905,
+      "set_id_sort": 7,
+      "level": 0
+    },
+    "41001": {
+      "sort": 0,
+      "name": "执念之影",
+      "type": 2,
+      "unlock_condition": 1441006,
+      "desc": "虚恒生与灭的轮回成为了格莫瑞永恒的执念。",
+      "activity_id": 4140301,
+      "set_id": 410,
+      "id": 41001,
+      "set_id_sort": 8,
+      "level": 1
+    },
+    "41002": {
+      "sort": 0,
+      "name": "执念之影",
+      "type": 2,
+      "unlock_condition": 1441007,
+      "desc": "虚恒生与灭的轮回成为了格莫瑞永恒的执念。",
+      "activity_id": 4140301,
+      "set_id": 410,
+      "id": 41002,
+      "set_id_sort": 8,
+      "level": 2
+    },
+    "41003": {
+      "sort": 1,
+      "name": "彼岸花影",
+      "type": 1,
+      "unlock_condition": 1441001,
+      "desc": "彼岸花在她的衣上绽放，如同业火般燃烧。",
+      "activity_id": 4140301,
+      "set_id": 410,
+      "id": 41003,
+      "set_id_sort": 8,
+      "level": 0
+    },
+    "41004": {
+      "sort": 2,
+      "name": "雾中之人",
+      "type": 1,
+      "unlock_condition": 1441002,
+      "desc": "她优雅的外表下潜藏着致命的杀意。",
+      "activity_id": 4140301,
+      "set_id": 410,
+      "id": 41004,
+      "set_id_sort": 8,
+      "level": 0
+    },
+    "41005": {
+      "sort": 3,
+      "name": "收割镰舞",
+      "type": 1,
+      "unlock_condition": 1441003,
+      "desc": "她试图收割世间万物，再重塑新生。",
+      "activity_id": 4140301,
+      "set_id": 410,
+      "id": 41005,
+      "set_id_sort": 8,
+      "level": 0
+    },
+    "50101": {
+      "sort": 0,
+      "name": "拟造之躯·构造",
+      "type": 2,
+      "unlock_condition": 1441105,
+      "desc": "空有外表的拟造之躯，内里只有无思维的吞噬本能。",
+      "activity_id": 4241701,
+      "set_id": 511,
+      "id": 50101,
+      "set_id_sort": 9,
+      "level": 1
+    },
+    "50102": {
+      "sort": 0,
+      "name": "拟造之躯·吞噬",
+      "type": 2,
+      "unlock_condition": 1441106,
+      "desc": "空有外表的拟造之躯，内里只有无思维的吞噬本能。",
+      "activity_id": 4241701,
+      "set_id": 511,
+      "id": 50102,
+      "set_id_sort": 9,
+      "level": 2
+    },
+    "50103": {
+      "sort": 1,
+      "name": "荒芜心脉",
+      "type": 1,
+      "unlock_condition": 1441101,
+      "desc": "认知被扭曲的领域中，那颗心脏正贪婪地追求进化。",
+      "activity_id": 4241701,
+      "set_id": 511,
+      "id": 50103,
+      "set_id_sort": 9,
+      "level": 0
+    },
+    "50104": {
+      "sort": 2,
+      "name": "生命之符",
+      "type": 1,
+      "unlock_condition": 1441102,
+      "desc": "生命之符被缠绕扭曲，将生命力转化为破坏与侵蚀。",
+      "activity_id": 4241701,
+      "set_id": 511,
+      "id": 50104,
+      "set_id_sort": 9,
+      "level": 0
+    },
+    "50105": {
+      "sort": 3,
+      "name": "侵蚀之镰",
+      "type": 1,
+      "unlock_condition": 1441103,
+      "desc": "镰刀划过之处，留下了被侵蚀的痕迹。",
+      "activity_id": 4241701,
+      "set_id": 511,
+      "id": 50105,
+      "set_id_sort": 9,
+      "level": 0
+    },
+    "50106": {
+      "sort": 0,
+      "name": "三首之龙·镜影",
+      "type": 2,
+      "unlock_condition": 1441205,
+      "desc": "三首同体，轮流编制谎言，永不疲倦。",
+      "activity_id": 4243301,
+      "set_id": 512,
+      "id": 50106,
+      "set_id_sort": 10,
+      "level": 1
+    },
+    "50107": {
+      "sort": 0,
+      "name": "三首之龙·欺世",
+      "type": 2,
+      "unlock_condition": 1441206,
+      "desc": "三首同体，轮流编制谎言，永不疲倦。",
+      "activity_id": 4243301,
+      "set_id": 512,
+      "id": 50107,
+      "set_id_sort": 10,
+      "level": 2
+    },
+    "50108": {
+      "sort": 1,
+      "name": "欺骗者的枷锁",
+      "type": 1,
+      "unlock_condition": 1441201,
+      "desc": "铁链锁住身躯，但难以锁住那颗恶意之心。",
+      "activity_id": 4243301,
+      "set_id": 512,
+      "id": 50108,
+      "set_id_sort": 10,
+      "level": 0
+    },
+    "50109": {
+      "sort": 2,
+      "name": "镜中囚徒",
+      "type": 1,
+      "unlock_condition": 1441202,
+      "desc": "被困于镜子中的囚徒还在等待着下一个目标。",
+      "activity_id": 4243301,
+      "set_id": 512,
+      "id": 50109,
+      "set_id_sort": 10,
+      "level": 0
+    },
+    "50110": {
+      "sort": 3,
+      "name": "谎言盛宴",
+      "type": 1,
+      "unlock_condition": 1441203,
+      "desc": "以诡计离间友人，以蛊惑拆散伙伴。",
+      "activity_id": 4243301,
+      "set_id": 512,
+      "id": 50110,
+      "set_id_sort": 10,
+      "level": 0
+    },
+    "50201": {
+      "sort": 0,
+      "name": "天灾之形·重现",
+      "type": 2,
+      "unlock_condition": 1441306,
+      "desc": "蛇身蜿蜒，双翼遮天，类人的头颅中燃烧着足以吞噬一切的骸能核心。",
+      "activity_id": 4339301,
+      "set_id": 513,
+      "id": 50201,
+      "set_id_sort": 11,
+      "level": 1
+    },
+    "50202": {
+      "sort": 0,
+      "name": "天灾之形·浩劫",
+      "type": 2,
+      "unlock_condition": 1441307,
+      "desc": "蛇身蜿蜒，双翼遮天，类人的头颅中燃烧着足以吞噬一切的骸能核心。",
+      "activity_id": 4339301,
+      "set_id": 513,
+      "id": 50202,
+      "set_id_sort": 11,
+      "level": 2
+    },
+    "50203": {
+      "sort": 1,
+      "name": "众星陨落",
+      "type": 1,
+      "unlock_condition": 1441301,
+      "desc": "八颗星体在它的意志下偏离轨道，化为坠向大地的灾厄。",
+      "activity_id": 4339301,
+      "set_id": 513,
+      "id": 50203,
+      "set_id_sort": 11,
+      "level": 0
+    },
+    "50204": {
+      "sort": 2,
+      "name": "封印之下",
+      "type": 1,
+      "unlock_condition": 1441302,
+      "desc": "封印装置锁住了它的躯体，它的挣扎让大地都在颤抖。",
+      "activity_id": 4339301,
+      "set_id": 513,
+      "id": 50204,
+      "set_id_sort": 11,
+      "level": 0
+    },
+    "50205": {
+      "sort": 3,
+      "name": "黯日之兆",
+      "type": 1,
+      "unlock_condition": 1441303,
+      "desc": "恒星的光芒被吞没，只剩下一圈微弱的光晕。",
+      "activity_id": 4339301,
+      "set_id": 513,
+      "id": 50205,
+      "set_id_sort": 11,
+      "level": 0
+    },
+    "50206": {
+      "sort": 0,
+      "name": "骸化兵装·蚀铁",
+      "type": 2,
+      "unlock_condition": 1450205,
+      "desc": "骸能替代了燃料，让这台钢铁巨物获得了近乎无穷的续战能力。",
+      "activity_id": 4343301,
+      "set_id": 514,
+      "id": 50206,
+      "set_id_sort": 12,
+      "level": 1
+    },
+    "50207": {
+      "sort": 0,
+      "name": "骸化兵装·失控",
+      "type": 2,
+      "unlock_condition": 1450206,
+      "desc": "骸能替代了燃料，让这台钢铁巨物获得了近乎无穷的续战能力。",
+      "activity_id": 4343301,
+      "set_id": 514,
+      "id": 50207,
+      "set_id_sort": 12,
+      "level": 2
+    },
+    "50208": {
+      "sort": 1,
+      "name": "骸能暴走",
+      "type": 1,
+      "unlock_condition": 1450201,
+      "desc": "驱动核心被骸能彻底侵蚀，战术程序让位于不可遏制的狂暴。",
+      "activity_id": 4343301,
+      "set_id": 514,
+      "id": 50208,
+      "set_id_sort": 12,
+      "level": 0
+    },
+    "50209": {
+      "sort": 2,
+      "name": "飞弹齐射",
+      "type": 1,
+      "unlock_condition": 1450202,
+      "desc": "引擎轰鸣着将钢铁巨躯推上半空，让整个战场落入射程之中。",
+      "activity_id": 4343301,
+      "set_id": 514,
+      "id": 50209,
+      "set_id_sort": 12,
+      "level": 0
+    },
+    "50210": {
+      "sort": 3,
+      "name": "黑铁之翼",
+      "type": 1,
+      "unlock_condition": 1450203,
+      "desc": "骸能沿着盾牌的裂缝蔓延，将冰冷的装甲重塑为一对不祥之翼。",
+      "activity_id": 4343301,
+      "set_id": 514,
+      "id": 50210,
+      "set_id_sort": 12,
+      "level": 0
+    },
+    "get_id_list_by_set_id": {},
+    "get_id_list_by_activity_id": {},
+    "get_id_list_by_set_id_sort": {},
+    "all": {}
+  },
+  "modes": {
+    "mode1": {
+      "3092001": {
+        "stage_img": "Bgbc3007",
+        "stage_id": 3092001,
+        "stage_buff_unlock": 1440301,
+        "stage_type": 1,
+        "stage_name": "原点试验区·I",
+        "activity_id": 3539501,
+        "recommend": [
+          2
+        ],
+        "stage_com_affix": [
+          720010
+        ],
+        "stage_affix": [
+          720510
+        ],
+        "stage_buff_upgrade": [
+          "初始等级1级，<color=#F48800>敌人每次被附加破甲状态时</color>提升1级，最多可提升至10级",
+          "初始等级1级，<color=#F48800>每次施放连携奥义时</color>提升3级，最多可提升至10级"
+        ],
+        "recommend_team": [
+          1061,
+          1133,
+          1076
+        ]
+      },
+      "3092002": {
+        "stage_img": "Bgbc3019",
+        "stage_id": 3092002,
+        "stage_buff_unlock": 1440302,
+        "stage_type": 1,
+        "stage_name": "原点试验区·II",
+        "activity_id": 3539501,
+        "recommend": [
+          4
+        ],
+        "stage_com_affix": [
+          720010
+        ],
+        "stage_affix": [
+          720520
+        ],
+        "stage_buff_upgrade": [
+          "初始等级1级，<color=#F48800>敌人每次被附加虚弱状态时</color>提升2级，最多可提升至10级",
+          "初始等级1级，<color=#F48800>敌人每次被附加属性控制状态时</color>提升2级，最多可提升至10级"
+        ],
+        "recommend_team": [
+          1284,
+          1211,
+          1085
+        ]
+      },
+      "3093001": {
+        "stage_img": "Bgbc4014",
+        "stage_id": 3093001,
+        "stage_buff_upgrade": "",
+        "stage_buff_unlock": 0,
+        "stage_type": 2,
+        "stage_name": "奇点递归·隐蛇之祸",
+        "activity_id": 3539501,
+        "recommend": [
+          10
+        ],
+        "stage_com_affix": [
+          720010
+        ],
+        "stage_affix": [
+          720530
+        ],
+        "recommend_team": [
+          1022,
+          1047,
+          1197
+        ]
+      },
+      "3092021": {
+        "stage_img": "Bgbc3046",
+        "stage_id": 3092021,
+        "stage_buff_unlock": 1440501,
+        "stage_type": 1,
+        "stage_name": "原点试验区·I",
+        "activity_id": 3739501,
+        "recommend": [
+          4
+        ],
+        "stage_com_affix": [
+          720030
+        ],
+        "stage_affix": [
+          720570
+        ],
+        "stage_buff_upgrade": [
+          "初始等级1级，<color=#F48800>每次施放连携奥义时</color>提升3层，最多可提升至10级",
+          "初始等级1级，<color=#F48800>敌人每降低10%生命值</color>提升1层，最多可提升至10级"
+        ],
+        "recommend_team": [
+          1070,
+          1075,
+          1083
+        ]
+      },
+      "3092022": {
+        "stage_img": "Bgbc3041",
+        "stage_id": 3092022,
+        "stage_buff_unlock": 1440502,
+        "stage_type": 1,
+        "stage_name": "原点试验区·II",
+        "activity_id": 3739501,
+        "recommend": [
+          6
+        ],
+        "stage_com_affix": [
+          720030
+        ],
+        "stage_affix": [
+          720580
+        ],
+        "stage_buff_upgrade": [
+          "初始等级1级，<color=#F48800>每次对敌人施放属性控制状态时</color>提升2层，最多可提升至10级",
+          "初始等级1级，<color=#F48800>敌人每降低10%生命值</color>提升1层，最多可提升至10级"
+        ],
+        "recommend_team": [
+          1049,
+          1055,
+          1043
+        ]
+      },
+      "3093021": {
+        "stage_img": "Bgbc4020",
+        "stage_id": 3093021,
+        "stage_buff_upgrade": "",
+        "stage_buff_unlock": 0,
+        "stage_type": 2,
+        "stage_name": "奇点递归·巨化威胁",
+        "activity_id": 3739501,
+        "recommend": [
+          12
+        ],
+        "stage_com_affix": [
+          720030
+        ],
+        "stage_affix": [
+          720590
+        ],
+        "recommend_team": [
+          1044,
+          1211,
+          1085
+        ]
+      },
+      "3092051": {
+        "stage_img": "Bgbc3039",
+        "stage_id": 3092051,
+        "stage_buff_unlock": 1440801,
+        "stage_type": 1,
+        "stage_name": "原点试验区·I",
+        "activity_id": 4039501,
+        "recommend": [
+          8
+        ],
+        "stage_com_affix": [
+          720060
+        ],
+        "stage_affix": [
+          720670
+        ],
+        "stage_buff_upgrade": [
+          "初始等级1级，<color=#F48800>每次对敌人施放属性控制状态时</color>提升3层，最多可提升至10级",
+          "初始等级1级，<color=#F48800>敌人每降低10%生命值</color>提升1层，最多可提升至10级"
+        ],
+        "recommend_team": [
+          1194,
+          1133,
+          1085
+        ]
+      },
+      "3092052": {
+        "stage_img": "Bgbc3036",
+        "stage_id": 3092052,
+        "stage_buff_unlock": 1440802,
+        "stage_type": 1,
+        "stage_name": "原点试验区·II",
+        "activity_id": 4039501,
+        "recommend": [
+          14
+        ],
+        "stage_com_affix": [
+          720060
+        ],
+        "stage_affix": [
+          720680
+        ],
+        "stage_buff_upgrade": [
+          "初始等级1级，<color=#F48800>每次施放连携奥义时</color>提升5层，最多可提升至10级",
+          "初始等级1级，<color=#F48800>敌人每降低10%生命值</color>提升1层，最多可提升至10级"
+        ],
+        "recommend_team": [
+          1137,
+          1248,
+          1156
+        ]
+      },
+      "3093051": {
+        "stage_img": "Bgbc4034",
+        "stage_id": 3093051,
+        "stage_buff_upgrade": "",
+        "stage_buff_unlock": 0,
+        "stage_type": 2,
+        "stage_name": "奇点演算·岁兽之夕",
+        "activity_id": 4039501,
+        "recommend": [
+          4
+        ],
+        "stage_com_affix": [
+          720060
+        ],
+        "stage_affix": [
+          720690
+        ],
+        "recommend_team": [
+          1053,
+          1075,
+          1083
+        ]
+      },
+      "3092061": {
+        "stage_img": "Bgbc300501",
+        "stage_id": 3092061,
+        "stage_buff_unlock": 1440901,
+        "stage_type": 1,
+        "stage_name": "原点试验区·I",
+        "activity_id": 4139501,
+        "recommend": [
+          8
+        ],
+        "stage_com_affix": [
+          730000
+        ],
+        "stage_affix": [
+          735140
+        ],
+        "stage_buff_upgrade": [
+          "初始等级1级，<color=#F48800>每次对敌人附加持续伤害状态时</color>提升3层，最多可提升至10级",
+          "初始等级1级，<color=#F48800>敌人每降低10%生命值</color>提升1层，最多可提升至10级"
+        ],
+        "recommend_team": [
+          1137,
+          1248,
+          1156
+        ]
+      },
+      "3092062": {
+        "stage_img": "Bgbc3036",
+        "stage_id": 3092062,
+        "stage_buff_unlock": 1440902,
+        "stage_type": 1,
+        "stage_name": "原点试验区·II",
+        "activity_id": 4139501,
+        "recommend": [
+          14
+        ],
+        "stage_com_affix": [
+          730000
+        ],
+        "stage_affix": [
+          735100
+        ],
+        "stage_buff_upgrade": [
+          "初始等级1级，<color=#F48800>每次施放单人奥义时</color>提升3层，最多可提升至10级",
+          "初始等级1级，<color=#F48800>敌人每降低10%生命值</color>提升1层，最多可提升至10级"
+        ],
+        "recommend_team": [
+          1054,
+          1197,
+          1085
+        ]
+      },
+      "3093061": {
+        "stage_img": "Bgbc4012",
+        "stage_id": 3093061,
+        "stage_buff_upgrade": "",
+        "stage_buff_unlock": 0,
+        "stage_type": 2,
+        "stage_name": "奇点演算·铁蹄踏阵",
+        "activity_id": 4139501,
+        "recommend": [
+          4
+        ],
+        "stage_com_affix": [
+          730000
+        ],
+        "stage_affix": [
+          740120
+        ],
+        "recommend_team": [
+          1053,
+          1170,
+          1075
+        ]
+      },
+      "3092101": {
+        "stage_img": "Bgbc3055",
+        "stage_id": 3092101,
+        "stage_buff_unlock": 1441301,
+        "stage_type": 1,
+        "stage_name": "原点试验区·I",
+        "activity_id": 4339501,
+        "recommend": [
+          10
+        ],
+        "stage_com_affix": [
+          730040
+        ],
+        "stage_affix": [
+          735100
+        ],
+        "stage_buff_upgrade": [
+          "初始等级1级，<color=#F48800>每次施放连携奥义时</color>提升5级，最多可提升至10级",
+          "初始等级1级，<color=#F48800>敌人每降低10%生命值</color>提升1级，最多可提升至10级"
+        ],
+        "recommend_team": [
+          1054,
+          1077,
+          1075
+        ]
+      },
+      "3092102": {
+        "stage_img": "Bgbc3046",
+        "stage_id": 3092102,
+        "stage_buff_unlock": 1441302,
+        "stage_type": 1,
+        "stage_name": "原点试验区·II",
+        "activity_id": 4339501,
+        "recommend": [
+          4
+        ],
+        "stage_com_affix": [
+          730040
+        ],
+        "stage_affix": [
+          735040
+        ],
+        "stage_buff_upgrade": [
+          "初始等级1级，<color=#F48800>每次对敌人附加持续伤害状态时</color>提升1级，最多可提升至10级",
+          "初始等级1级，<color=#F48800>敌人每降低10%生命值</color>提升1级，最多可提升至10级"
+        ],
+        "recommend_team": [
+          1053,
+          1170,
+          1083
+        ]
+      },
+      "3093101": {
+        "stage_img": "Bgbc4052",
+        "stage_id": 3093101,
+        "stage_buff_upgrade": "",
+        "stage_buff_unlock": 0,
+        "stage_type": 2,
+        "stage_name": "奇点演算·黯日焚空",
+        "activity_id": 4339501,
+        "recommend": [
+          12
+        ],
+        "stage_com_affix": [
+          730040
+        ],
+        "stage_affix": [
+          735120
+        ],
+        "recommend_team": [
+          1044,
+          1211,
+          1166
+        ]
+      },
+      "get_id_list_by_activity_id": {},
+      "get_id_list_by_stage_type": {},
+      "all": {}
+    },
+    "mode2": {
+      "3092011": {
+        "stage_id": 3092011,
+        "stage_img": "Bgbc3035",
+        "cost_limit_up": 3,
+        "stage_affix_debuff": "",
+        "stage_type": 1,
+        "stage_name": "感官校准I",
+        "activity_id": 3640501,
+        "stage_affix_buff": "",
+        "recommend": "",
+        "stage_com_affix": [
+          720020
+        ],
+        "stage_affix": [
+          720540
+        ],
+        "stage_buff": [
+          721560
+        ],
+        "recommend_team": [
+          1020,
+          1089,
+          1073
+        ]
+      },
+      "3092012": {
+        "stage_id": 3092012,
+        "stage_img": "Bgbc3040",
+        "cost_limit_up": 3,
+        "stage_affix_debuff": "",
+        "stage_type": 1,
+        "stage_name": "感官校准II",
+        "activity_id": 3640501,
+        "stage_affix_buff": "",
+        "recommend": "",
+        "stage_com_affix": [
+          720020
+        ],
+        "stage_affix": [
+          720550
+        ],
+        "stage_buff": [
+          721570
+        ],
+        "recommend_team": [
+          1095,
+          1034,
+          1015
+        ]
+      },
+      "3093011": {
+        "stage_id": 3093011,
+        "stage_img": "Bgbc4013",
+        "cost_limit_up": 0,
+        "stage_type": 2,
+        "stage_name": "认知负载·热核反应",
+        "stage_buff": "",
+        "activity_id": 3640501,
+        "recommend": [
+          4
+        ],
+        "stage_com_affix": [
+          720020
+        ],
+        "stage_affix": [
+          720560
+        ],
+        "stage_affix_buff": [
+          721580,
+          721590,
+          721600,
+          721610,
+          721620
+        ],
+        "stage_affix_debuff": [
+          723050,
+          723060,
+          723070,
+          723080,
+          723090
+        ],
+        "recommend_team": [
+          1083,
+          1070,
+          1075
+        ]
+      },
+      "3092031": {
+        "stage_id": 3092031,
+        "stage_img": "Bgbc3046",
+        "cost_limit_up": 3,
+        "stage_affix_debuff": "",
+        "stage_type": 1,
+        "stage_name": "擂台对决I",
+        "activity_id": 3840501,
+        "stage_affix_buff": "",
+        "recommend": "",
+        "stage_com_affix": [
+          720040
+        ],
+        "stage_affix": [
+          720600
+        ],
+        "stage_buff": [
+          721670
+        ],
+        "recommend_team": [
+          1049,
+          1055,
+          1043
+        ]
+      },
+      "3092032": {
+        "stage_id": 3092032,
+        "stage_img": "Bgbc3032",
+        "cost_limit_up": 3,
+        "stage_affix_debuff": "",
+        "stage_type": 1,
+        "stage_name": "擂台对决II",
+        "activity_id": 3840501,
+        "stage_affix_buff": "",
+        "recommend": "",
+        "stage_com_affix": [
+          720040
+        ],
+        "stage_affix": [
+          720610
+        ],
+        "stage_buff": [
+          721680
+        ],
+        "recommend_team": [
+          1044,
+          1211,
+          1138
+        ]
+      },
+      "3093031": {
+        "stage_id": 3093031,
+        "stage_img": "Bgbc4032",
+        "cost_limit_up": 0,
+        "stage_type": 2,
+        "stage_name": "认知负载·无规则格斗",
+        "stage_buff": "",
+        "activity_id": 3840501,
+        "recommend": [
+          8
+        ],
+        "stage_com_affix": [
+          720040
+        ],
+        "stage_affix": [
+          720620
+        ],
+        "stage_affix_buff": [
+          721690,
+          721700,
+          721710,
+          721720,
+          721730
+        ],
+        "stage_affix_debuff": [
+          723140,
+          723150,
+          723160,
+          723170,
+          723180
+        ],
+        "recommend_team": [
+          1194,
+          1133,
+          1085
+        ]
+      },
+      "3092071": {
+        "stage_id": 3092071,
+        "stage_img": "Bgbc3057",
+        "cost_limit_up": 3,
+        "stage_affix_debuff": "",
+        "stage_type": 1,
+        "stage_name": "影中杀机I",
+        "activity_id": 4140501,
+        "stage_affix_buff": "",
+        "recommend": "",
+        "stage_com_affix": [
+          730010
+        ],
+        "stage_affix": [
+          735080
+        ],
+        "stage_buff": [
+          740050
+        ],
+        "recommend_team": [
+          1194,
+          1133,
+          1085
+        ]
+      },
+      "3092072": {
+        "stage_id": 3092072,
+        "stage_img": "Bgbc3056",
+        "cost_limit_up": 3,
+        "stage_affix_debuff": "",
+        "stage_type": 1,
+        "stage_name": "影中杀机II",
+        "activity_id": 4140501,
+        "stage_affix_buff": "",
+        "recommend": "",
+        "stage_com_affix": [
+          730010
+        ],
+        "stage_affix": [
+          735040
+        ],
+        "stage_buff": [
+          740060
+        ],
+        "recommend_team": [
+          1053,
+          1170,
+          1083
+        ]
+      },
+      "3093071": {
+        "stage_id": 3093071,
+        "stage_img": "Bgbc4036",
+        "cost_limit_up": 0,
+        "stage_type": 2,
+        "stage_name": "认知负载·坠入源层",
+        "stage_buff": "",
+        "activity_id": 4140501,
+        "recommend": [
+          10
+        ],
+        "stage_com_affix": [
+          730010
+        ],
+        "stage_affix": [
+          735100
+        ],
+        "stage_affix_buff": [
+          740070,
+          740080,
+          740090,
+          740100,
+          740110
+        ],
+        "stage_affix_debuff": [
+          750050,
+          750060,
+          750090,
+          750070,
+          750080
+        ],
+        "recommend_team": [
+          1054,
+          1197,
+          1075
+        ]
+      },
+      "get_id_list_by_activity_id": {},
+      "get_id_list_by_stage_type": {},
+      "all": {}
+    },
+    "mode3": {
+      "3092041": {
+        "stage_id": 3092041,
+        "stage_img": "Bgbc3035",
+        "stage_name": "振幅叠乘I",
+        "stage_type": 1,
+        "activity_id": 3941901,
+        "recommend": [
+          0,
+          2,
+          12
+        ],
+        "stage_com_affix": [
+          720050
+        ],
+        "stage_affix": [
+          721740
+        ],
+        "type_affix": [
+          720630
+        ],
+        "recommend_team": [
+          1044,
+          1211,
+          1138
+        ]
+      },
+      "3092042": {
+        "stage_id": 3092042,
+        "stage_img": "Bgbc3020",
+        "stage_name": "振幅叠乘II",
+        "stage_type": 1,
+        "activity_id": 3941901,
+        "recommend": [
+          6,
+          2,
+          10
+        ],
+        "stage_com_affix": [
+          720050
+        ],
+        "stage_affix": [
+          721750
+        ],
+        "type_affix": [
+          720640
+        ],
+        "recommend_team": [
+          1049,
+          1055,
+          1043
+        ]
+      },
+      "3092043": {
+        "stage_id": 3092043,
+        "stage_img": "Bgbc3070",
+        "stage_name": "振幅叠乘III",
+        "stage_type": 1,
+        "activity_id": 3941901,
+        "recommend": [
+          0,
+          4,
+          8
+        ],
+        "stage_com_affix": [
+          720050
+        ],
+        "stage_affix": [
+          721760
+        ],
+        "type_affix": [
+          720650
+        ],
+        "recommend_team": [
+          1194,
+          1133,
+          1085
+        ]
+      },
+      "3093041": {
+        "stage_id": 3093041,
+        "stage_img": "Bgbc4031",
+        "stage_name": "共振激发·记忆编码",
+        "stage_type": 2,
+        "activity_id": 3941901,
+        "recommend": [
+          14
+        ],
+        "stage_com_affix": [
+          720050
+        ],
+        "stage_affix": [
+          721770
+        ],
+        "type_affix": [
+          720660
+        ],
+        "recommend_team": [
+          1137,
+          1248,
+          1156
+        ]
+      },
+      "3092081": {
+        "stage_id": 3092081,
+        "stage_img": "Bgbc3025",
+        "stage_name": "振幅叠乘I",
+        "stage_type": 1,
+        "activity_id": 4241901,
+        "recommend": [
+          0,
+          8,
+          6
+        ],
+        "stage_com_affix": [
+          730020
+        ],
+        "stage_affix": [
+          744010
+        ],
+        "type_affix": [
+          744050
+        ],
+        "recommend_team": [
+          1061,
+          1075,
+          1076
+        ]
+      },
+      "3092082": {
+        "stage_id": 3092082,
+        "stage_img": "Bgbc3026",
+        "stage_name": "振幅叠乘II",
+        "stage_type": 1,
+        "activity_id": 4241901,
+        "recommend": [
+          4,
+          14,
+          2
+        ],
+        "stage_com_affix": [
+          730020
+        ],
+        "stage_affix": [
+          744020
+        ],
+        "type_affix": [
+          744060
+        ],
+        "recommend_team": [
+          1074,
+          1073,
+          1072
+        ]
+      },
+      "3092083": {
+        "stage_id": 3092083,
+        "stage_img": "Bgbc3027",
+        "stage_name": "振幅叠乘III",
+        "stage_type": 1,
+        "activity_id": 4241901,
+        "recommend": [
+          0,
+          4,
+          12
+        ],
+        "stage_com_affix": [
+          730020
+        ],
+        "stage_affix": [
+          744030
+        ],
+        "type_affix": [
+          744070
+        ],
+        "recommend_team": [
+          1053,
+          1170,
+          1083
+        ]
+      },
+      "3093081": {
+        "stage_id": 3093081,
+        "stage_img": "Bgbc4047",
+        "stage_name": "共振激发·记忆编码",
+        "stage_type": 2,
+        "activity_id": 4241901,
+        "recommend": [
+          10
+        ],
+        "stage_com_affix": [
+          730020
+        ],
+        "stage_affix": [
+          744040
+        ],
+        "type_affix": [
+          744080
+        ],
+        "recommend_team": [
+          1054,
+          1077,
+          1085
+        ]
+      },
+      "get_id_list_by_activity_id": {},
+      "get_id_list_by_stage_type": {},
+      "all": {}
+    },
+    "mode4": {
+      "3092091": {
+        "stage_img": "Bgbc3031",
+        "stage_id": 3092091,
+        "stage_type": 1,
+        "stage_name": "稳态定轨I",
+        "activity_id": 4243501,
+        "stage_team": 1,
+        "recommend": [
+          0,
+          12
+        ],
+        "stage_com_affix": [
+          730030
+        ],
+        "stage_affix": [],
+        "type_affix": [
+          746010
+        ],
+        "recommend_team": [
+          1044,
+          1211,
+          1138
+        ]
+      },
+      "3092092": {
+        "stage_img": "Bgbc3035",
+        "stage_id": 3092092,
+        "stage_type": 1,
+        "stage_name": "稳态定轨II",
+        "activity_id": 4243501,
+        "stage_team": 1,
+        "recommend": [
+          6,
+          2
+        ],
+        "stage_com_affix": [
+          730030
+        ],
+        "stage_affix": [],
+        "type_affix": [
+          746020
+        ],
+        "recommend_team": [
+          1020,
+          1089,
+          1073
+        ]
+      },
+      "3092093": {
+        "stage_img": "Bgbc3020",
+        "stage_id": 3092093,
+        "stage_type": 1,
+        "stage_name": "稳态定轨III",
+        "activity_id": 4243501,
+        "stage_team": 1,
+        "recommend": [
+          0,
+          8
+        ],
+        "stage_com_affix": [
+          730030
+        ],
+        "stage_affix": [],
+        "type_affix": [
+          746030
+        ],
+        "recommend_team": [
+          1095,
+          1034,
+          1015
+        ]
+      },
+      "3093091": {
+        "stage_img": "Bgbc4025",
+        "stage_id": 3093091,
+        "stage_type": 2,
+        "stage_name": "峰值激发",
+        "activity_id": 4243501,
+        "stage_team": 3,
+        "recommend": [
+          4,
+          14,
+          10
+        ],
+        "stage_com_affix": [
+          730030
+        ],
+        "stage_affix": [],
+        "type_affix": [
+          746040
+        ],
+        "recommend_team": [
+          1054,
+          1077,
+          1075
+        ]
+      },
+      "3092111": {
+        "stage_img": "Bgbc3006",
+        "stage_id": 3092111,
+        "stage_type": 1,
+        "stage_name": "稳态定轨I",
+        "activity_id": 4343501,
+        "stage_team": 1,
+        "recommend": [
+          8,
+          6
+        ],
+        "stage_com_affix": [
+          730030
+        ],
+        "stage_affix": [],
+        "type_affix": [
+          746050
+        ],
+        "recommend_team": [
+          1194,
+          1133,
+          1085
+        ]
+      },
+      "3092112": {
+        "stage_img": "Bgbc3032",
+        "stage_id": 3092112,
+        "stage_type": 1,
+        "stage_name": "稳态定轨II",
+        "activity_id": 4343501,
+        "stage_team": 1,
+        "recommend": [
+          14,
+          12
+        ],
+        "stage_com_affix": [
+          730030
+        ],
+        "stage_affix": [],
+        "type_affix": [
+          746060
+        ],
+        "recommend_team": [
+          1137,
+          1248,
+          1156
+        ]
+      },
+      "3092113": {
+        "stage_img": "Bgbc3033",
+        "stage_id": 3092113,
+        "stage_type": 1,
+        "stage_name": "稳态定轨III",
+        "activity_id": 4343501,
+        "stage_team": 1,
+        "recommend": [
+          2,
+          10
+        ],
+        "stage_com_affix": [
+          730030
+        ],
+        "stage_affix": [],
+        "type_affix": [
+          746070
+        ],
+        "recommend_team": [
+          1020,
+          1089,
+          1073
+        ]
+      },
+      "3093111": {
+        "stage_img": "Bgbc4028",
+        "stage_id": 3093111,
+        "stage_type": 2,
+        "stage_name": "峰值激发",
+        "activity_id": 4343501,
+        "stage_team": 5,
+        "recommend": [
+          0,
+          4,
+          6,
+          12,
+          10
+        ],
+        "stage_com_affix": [
+          730030
+        ],
+        "stage_affix": [],
+        "type_affix": [
+          746080
+        ],
+        "recommend_team": [
+          1054,
+          1077,
+          1075
+        ]
+      },
+      "get_id_list_by_activity_id": {},
+      "get_id_list_by_stage_type": {},
+      "all": {}
+    }
+  }
+}

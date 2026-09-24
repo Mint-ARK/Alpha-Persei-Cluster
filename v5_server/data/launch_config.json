@@ -1,0 +1,11 @@
+{
+  "log_level": "INFO",
+  "replay_enabled": false,
+  "replay_path": "",
+  "host_ip": "",
+  "https_port": 443,
+  "gw_port": 8102,
+  "game_port": 8105,
+  "db_path": "account.db",
+  "client_assets_dir": ""
+}

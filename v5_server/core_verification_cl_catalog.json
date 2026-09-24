@@ -1,0 +1,2692 @@
+{
+  "mode1": {
+    "3092001": {
+      "stage_id": 3092001,
+      "stage_name": "原点试验区·I",
+      "stage_type": 1,
+      "activity_id": 3539501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 1440301,
+      "stage_team": 1,
+      "stage_buff": [
+        721510,
+        0
+      ],
+      "stage_debuff": [
+        723010,
+        20
+      ]
+    },
+    "3092002": {
+      "stage_id": 3092002,
+      "stage_name": "原点试验区·II",
+      "stage_type": 1,
+      "activity_id": 3539501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 1440302,
+      "stage_team": 1,
+      "stage_buff": [
+        721530,
+        0
+      ],
+      "stage_debuff": [
+        723030,
+        20
+      ]
+    },
+    "3093001": {
+      "stage_id": 3093001,
+      "stage_name": "奇点递归·隐蛇之祸",
+      "stage_type": 2,
+      "activity_id": 3539501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        721510,
+        0
+      ],
+      "stage_debuff": [
+        723010,
+        20
+      ]
+    },
+    "3092021": {
+      "stage_id": 3092021,
+      "stage_name": "原点试验区·I",
+      "stage_type": 1,
+      "activity_id": 3739501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 1440501,
+      "stage_team": 1,
+      "stage_buff": [
+        721630,
+        0
+      ],
+      "stage_debuff": [
+        723100,
+        20
+      ]
+    },
+    "3092022": {
+      "stage_id": 3092022,
+      "stage_name": "原点试验区·II",
+      "stage_type": 1,
+      "activity_id": 3739501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 1440502,
+      "stage_team": 1,
+      "stage_buff": [
+        721650,
+        0
+      ],
+      "stage_debuff": [
+        723120,
+        20
+      ]
+    },
+    "3093021": {
+      "stage_id": 3093021,
+      "stage_name": "奇点递归·巨化威胁",
+      "stage_type": 2,
+      "activity_id": 3739501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        721630,
+        0
+      ],
+      "stage_debuff": [
+        723100,
+        20
+      ]
+    },
+    "3092051": {
+      "stage_id": 3092051,
+      "stage_name": "原点试验区·I",
+      "stage_type": 1,
+      "activity_id": 4039501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 1440801,
+      "stage_team": 1,
+      "stage_buff": [
+        721780,
+        0
+      ],
+      "stage_debuff": [
+        723190,
+        20
+      ]
+    },
+    "3092052": {
+      "stage_id": 3092052,
+      "stage_name": "原点试验区·II",
+      "stage_type": 1,
+      "activity_id": 4039501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 1440802,
+      "stage_team": 1,
+      "stage_buff": [
+        721800,
+        0
+      ],
+      "stage_debuff": [
+        723210,
+        20
+      ]
+    },
+    "3093051": {
+      "stage_id": 3093051,
+      "stage_name": "奇点演算·岁兽之夕",
+      "stage_type": 2,
+      "activity_id": 4039501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        721780,
+        0
+      ],
+      "stage_debuff": [
+        723190,
+        20
+      ]
+    },
+    "3092061": {
+      "stage_id": 3092061,
+      "stage_name": "原点试验区·I",
+      "stage_type": 1,
+      "activity_id": 4139501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 1440901,
+      "stage_team": 1,
+      "stage_buff": [
+        740010,
+        0
+      ],
+      "stage_debuff": [
+        750010,
+        20
+      ]
+    },
+    "3092062": {
+      "stage_id": 3092062,
+      "stage_name": "原点试验区·II",
+      "stage_type": 1,
+      "activity_id": 4139501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 1440902,
+      "stage_team": 1,
+      "stage_buff": [
+        740030,
+        0
+      ],
+      "stage_debuff": [
+        750030,
+        20
+      ]
+    },
+    "3093061": {
+      "stage_id": 3093061,
+      "stage_name": "奇点演算·铁蹄踏阵",
+      "stage_type": 2,
+      "activity_id": 4139501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        740010,
+        0
+      ],
+      "stage_debuff": [
+        750010,
+        20
+      ]
+    },
+    "3092101": {
+      "stage_id": 3092101,
+      "stage_name": "原点试验区·I",
+      "stage_type": 1,
+      "activity_id": 4339501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 1441301,
+      "stage_team": 1,
+      "stage_buff": [
+        740010,
+        0
+      ],
+      "stage_debuff": [
+        750010,
+        20
+      ]
+    },
+    "3092102": {
+      "stage_id": 3092102,
+      "stage_name": "原点试验区·II",
+      "stage_type": 1,
+      "activity_id": 4339501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 1441302,
+      "stage_team": 1,
+      "stage_buff": [
+        740030,
+        0
+      ],
+      "stage_debuff": [
+        750030,
+        20
+      ]
+    },
+    "3093101": {
+      "stage_id": 3093101,
+      "stage_name": "奇点演算·黯日焚空",
+      "stage_type": 2,
+      "activity_id": 4339501,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        740010,
+        0
+      ],
+      "stage_debuff": [
+        750010,
+        20
+      ]
+    },
+    "4339501": {
+      "stage_id": 4339501,
+      "stage_name": "",
+      "stage_type": 0,
+      "activity_id": 0,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "2": {
+      "stage_id": 2,
+      "stage_name": "",
+      "stage_type": 0,
+      "activity_id": 0,
+      "mode": 1,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    }
+  },
+  "mode2": {
+    "3092011": {
+      "stage_id": 3092011,
+      "stage_name": "感官校准I",
+      "stage_type": 1,
+      "activity_id": 3640501,
+      "mode": 2,
+      "cost_limit_up": 3,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        721560
+      ],
+      "stage_debuff": []
+    },
+    "3092012": {
+      "stage_id": 3092012,
+      "stage_name": "感官校准II",
+      "stage_type": 1,
+      "activity_id": 3640501,
+      "mode": 2,
+      "cost_limit_up": 3,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        721570
+      ],
+      "stage_debuff": []
+    },
+    "3093011": {
+      "stage_id": 3093011,
+      "stage_name": "认知负载·热核反应",
+      "stage_type": 2,
+      "activity_id": 3640501,
+      "mode": 2,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        721580,
+        721590,
+        721600,
+        721610,
+        721620
+      ],
+      "stage_debuff": [
+        723050,
+        723060,
+        723070,
+        723080,
+        723090
+      ]
+    },
+    "3092031": {
+      "stage_id": 3092031,
+      "stage_name": "擂台对决I",
+      "stage_type": 1,
+      "activity_id": 3840501,
+      "mode": 2,
+      "cost_limit_up": 3,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        721670
+      ],
+      "stage_debuff": []
+    },
+    "3092032": {
+      "stage_id": 3092032,
+      "stage_name": "擂台对决II",
+      "stage_type": 1,
+      "activity_id": 3840501,
+      "mode": 2,
+      "cost_limit_up": 3,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        721680
+      ],
+      "stage_debuff": []
+    },
+    "3093031": {
+      "stage_id": 3093031,
+      "stage_name": "认知负载·无规则格斗",
+      "stage_type": 2,
+      "activity_id": 3840501,
+      "mode": 2,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        721690,
+        721700,
+        721710,
+        721720,
+        721730
+      ],
+      "stage_debuff": [
+        723140,
+        723150,
+        723160,
+        723170,
+        723180
+      ]
+    },
+    "3092071": {
+      "stage_id": 3092071,
+      "stage_name": "影中杀机I",
+      "stage_type": 1,
+      "activity_id": 4140501,
+      "mode": 2,
+      "cost_limit_up": 3,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        740050
+      ],
+      "stage_debuff": []
+    },
+    "3092072": {
+      "stage_id": 3092072,
+      "stage_name": "影中杀机II",
+      "stage_type": 1,
+      "activity_id": 4140501,
+      "mode": 2,
+      "cost_limit_up": 3,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        740060
+      ],
+      "stage_debuff": []
+    },
+    "3093071": {
+      "stage_id": 3093071,
+      "stage_name": "认知负载·坠入源层",
+      "stage_type": 2,
+      "activity_id": 4140501,
+      "mode": 2,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [
+        740070,
+        740080,
+        740090,
+        740100,
+        740110
+      ],
+      "stage_debuff": [
+        750050,
+        750060,
+        750090,
+        750070,
+        750080
+      ]
+    },
+    "4140501": {
+      "stage_id": 4140501,
+      "stage_name": "",
+      "stage_type": 0,
+      "activity_id": 0,
+      "mode": 2,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "2": {
+      "stage_id": 2,
+      "stage_name": "",
+      "stage_type": 0,
+      "activity_id": 0,
+      "mode": 2,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    }
+  },
+  "mode3": {
+    "3092041": {
+      "stage_id": 3092041,
+      "stage_name": "振幅叠乘I",
+      "stage_type": 1,
+      "activity_id": 3941901,
+      "mode": 3,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092042": {
+      "stage_id": 3092042,
+      "stage_name": "振幅叠乘II",
+      "stage_type": 1,
+      "activity_id": 3941901,
+      "mode": 3,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092043": {
+      "stage_id": 3092043,
+      "stage_name": "振幅叠乘III",
+      "stage_type": 1,
+      "activity_id": 3941901,
+      "mode": 3,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3093041": {
+      "stage_id": 3093041,
+      "stage_name": "共振激发·记忆编码",
+      "stage_type": 2,
+      "activity_id": 3941901,
+      "mode": 3,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092081": {
+      "stage_id": 3092081,
+      "stage_name": "振幅叠乘I",
+      "stage_type": 1,
+      "activity_id": 4241901,
+      "mode": 3,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092082": {
+      "stage_id": 3092082,
+      "stage_name": "振幅叠乘II",
+      "stage_type": 1,
+      "activity_id": 4241901,
+      "mode": 3,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092083": {
+      "stage_id": 3092083,
+      "stage_name": "振幅叠乘III",
+      "stage_type": 1,
+      "activity_id": 4241901,
+      "mode": 3,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3093081": {
+      "stage_id": 3093081,
+      "stage_name": "共振激发·记忆编码",
+      "stage_type": 2,
+      "activity_id": 4241901,
+      "mode": 3,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "4241901": {
+      "stage_id": 4241901,
+      "stage_name": "",
+      "stage_type": 0,
+      "activity_id": 0,
+      "mode": 3,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "2": {
+      "stage_id": 2,
+      "stage_name": "",
+      "stage_type": 0,
+      "activity_id": 0,
+      "mode": 3,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    }
+  },
+  "mode4": {
+    "3092091": {
+      "stage_id": 3092091,
+      "stage_name": "稳态定轨I",
+      "stage_type": 1,
+      "activity_id": 4243501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092092": {
+      "stage_id": 3092092,
+      "stage_name": "稳态定轨II",
+      "stage_type": 1,
+      "activity_id": 4243501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092093": {
+      "stage_id": 3092093,
+      "stage_name": "稳态定轨III",
+      "stage_type": 1,
+      "activity_id": 4243501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3093091": {
+      "stage_id": 3093091,
+      "stage_name": "峰值激发",
+      "stage_type": 2,
+      "activity_id": 4243501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 3,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092111": {
+      "stage_id": 3092111,
+      "stage_name": "稳态定轨I",
+      "stage_type": 1,
+      "activity_id": 4343501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092112": {
+      "stage_id": 3092112,
+      "stage_name": "稳态定轨II",
+      "stage_type": 1,
+      "activity_id": 4343501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092113": {
+      "stage_id": 3092113,
+      "stage_name": "稳态定轨III",
+      "stage_type": 1,
+      "activity_id": 4343501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3093111": {
+      "stage_id": 3093111,
+      "stage_name": "峰值激发",
+      "stage_type": 2,
+      "activity_id": 4343501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 5,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "4343501": {
+      "stage_id": 4343501,
+      "stage_name": "",
+      "stage_type": 0,
+      "activity_id": 0,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "2": {
+      "stage_id": 2,
+      "stage_name": "",
+      "stage_type": 0,
+      "activity_id": 0,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_buff_unlock": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092121": {
+      "stage_id": 3092121,
+      "stage_name": "稳态定轨I",
+      "stage_type": 1,
+      "activity_id": 4443501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092122": {
+      "stage_id": 3092122,
+      "stage_name": "稳态定轨II",
+      "stage_type": 1,
+      "activity_id": 4443501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092123": {
+      "stage_id": 3092123,
+      "stage_name": "稳态定轨III",
+      "stage_type": 1,
+      "activity_id": 4443501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3093121": {
+      "stage_id": 3093121,
+      "stage_name": "峰值激发",
+      "stage_type": 2,
+      "activity_id": 4443501,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 5,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092131": {
+      "stage_id": 3092131,
+      "stage_name": "稳态定轨I",
+      "stage_type": 1,
+      "activity_id": 4443502,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092132": {
+      "stage_id": 3092132,
+      "stage_name": "稳态定轨II",
+      "stage_type": 1,
+      "activity_id": 4443502,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092133": {
+      "stage_id": 3092133,
+      "stage_name": "稳态定轨III",
+      "stage_type": 1,
+      "activity_id": 4443502,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3093131": {
+      "stage_id": 3093131,
+      "stage_name": "峰值激发",
+      "stage_type": 2,
+      "activity_id": 4443502,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 5,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092141": {
+      "stage_id": 3092141,
+      "stage_name": "稳态定轨I",
+      "stage_type": 1,
+      "activity_id": 4443503,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092142": {
+      "stage_id": 3092142,
+      "stage_name": "稳态定轨II",
+      "stage_type": 1,
+      "activity_id": 4443503,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092143": {
+      "stage_id": 3092143,
+      "stage_name": "稳态定轨III",
+      "stage_type": 1,
+      "activity_id": 4443503,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3093141": {
+      "stage_id": 3093141,
+      "stage_name": "峰值激发",
+      "stage_type": 2,
+      "activity_id": 4443503,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 5,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092151": {
+      "stage_id": 3092151,
+      "stage_name": "稳态定轨I",
+      "stage_type": 1,
+      "activity_id": 4443504,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092152": {
+      "stage_id": 3092152,
+      "stage_name": "稳态定轨II",
+      "stage_type": 1,
+      "activity_id": 4443504,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3092153": {
+      "stage_id": 3092153,
+      "stage_name": "稳态定轨III",
+      "stage_type": 1,
+      "activity_id": 4443504,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 1,
+      "stage_buff": [],
+      "stage_debuff": []
+    },
+    "3093151": {
+      "stage_id": 3093151,
+      "stage_name": "峰值激发",
+      "stage_type": 2,
+      "activity_id": 4443504,
+      "mode": 4,
+      "cost_limit_up": 0,
+      "stage_team": 5,
+      "stage_buff": [],
+      "stage_debuff": []
+    }
+  },
+  "rewards": {
+    "40301": {
+      "id": 40301,
+      "task_id": 40301,
+      "activity_id": 3539501,
+      "reward_type": 1,
+      "condition": 1440304,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40302": {
+      "id": 40302,
+      "task_id": 40302,
+      "activity_id": 3539501,
+      "reward_type": 1,
+      "condition": 1440305,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40303": {
+      "id": 40303,
+      "task_id": 40303,
+      "activity_id": 3539501,
+      "reward_type": 1,
+      "condition": 1440307,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40306": {
+      "id": 40306,
+      "task_id": 40306,
+      "activity_id": 3539501,
+      "reward_type": 1,
+      "condition": 1440310,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 40000
+        }
+      ]
+    },
+    "40307": {
+      "id": 40307,
+      "task_id": 40307,
+      "activity_id": 3539501,
+      "reward_type": 1,
+      "condition": 1440311,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 20000
+        }
+      ]
+    },
+    "40309": {
+      "id": 40309,
+      "task_id": 40309,
+      "activity_id": 3539501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200008,
+          "num": 1
+        }
+      ]
+    },
+    "40310": {
+      "id": 40310,
+      "task_id": 40310,
+      "activity_id": 3539501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200009,
+          "num": 1
+        }
+      ]
+    },
+    "40311": {
+      "id": 40311,
+      "task_id": 40311,
+      "activity_id": 3539501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200010,
+          "num": 1
+        }
+      ]
+    },
+    "40401": {
+      "id": 40401,
+      "task_id": 40401,
+      "activity_id": 3640501,
+      "reward_type": 1,
+      "condition": 1440401,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40402": {
+      "id": 40402,
+      "task_id": 40402,
+      "activity_id": 3640501,
+      "reward_type": 1,
+      "condition": 1440402,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40403": {
+      "id": 40403,
+      "task_id": 40403,
+      "activity_id": 3640501,
+      "reward_type": 1,
+      "condition": 1440403,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40404": {
+      "id": 40404,
+      "task_id": 40404,
+      "activity_id": 3640501,
+      "reward_type": 1,
+      "condition": 1440404,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 40000
+        }
+      ]
+    },
+    "40405": {
+      "id": 40405,
+      "task_id": 40405,
+      "activity_id": 3640501,
+      "reward_type": 1,
+      "condition": 1440405,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 20000
+        }
+      ]
+    },
+    "40406": {
+      "id": 40406,
+      "task_id": 40406,
+      "activity_id": 3640501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200008,
+          "num": 1
+        }
+      ]
+    },
+    "40407": {
+      "id": 40407,
+      "task_id": 40407,
+      "activity_id": 3640501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200009,
+          "num": 1
+        }
+      ]
+    },
+    "40408": {
+      "id": 40408,
+      "task_id": 40408,
+      "activity_id": 3640501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200010,
+          "num": 1
+        }
+      ]
+    },
+    "40501": {
+      "id": 40501,
+      "task_id": 40501,
+      "activity_id": 3739501,
+      "reward_type": 1,
+      "condition": 1440501,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40502": {
+      "id": 40502,
+      "task_id": 40502,
+      "activity_id": 3739501,
+      "reward_type": 1,
+      "condition": 1440502,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40503": {
+      "id": 40503,
+      "task_id": 40503,
+      "activity_id": 3739501,
+      "reward_type": 1,
+      "condition": 1440503,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40504": {
+      "id": 40504,
+      "task_id": 40504,
+      "activity_id": 3739501,
+      "reward_type": 1,
+      "condition": 1440504,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 40000
+        }
+      ]
+    },
+    "40505": {
+      "id": 40505,
+      "task_id": 40505,
+      "activity_id": 3739501,
+      "reward_type": 1,
+      "condition": 1440505,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 20000
+        }
+      ]
+    },
+    "40506": {
+      "id": 40506,
+      "task_id": 40506,
+      "activity_id": 3739501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200008,
+          "num": 1
+        }
+      ]
+    },
+    "40507": {
+      "id": 40507,
+      "task_id": 40507,
+      "activity_id": 3739501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200009,
+          "num": 1
+        }
+      ]
+    },
+    "40508": {
+      "id": 40508,
+      "task_id": 40508,
+      "activity_id": 3739501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200010,
+          "num": 1
+        }
+      ]
+    },
+    "40601": {
+      "id": 40601,
+      "task_id": 40601,
+      "activity_id": 3840501,
+      "reward_type": 1,
+      "condition": 1440601,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40602": {
+      "id": 40602,
+      "task_id": 40602,
+      "activity_id": 3840501,
+      "reward_type": 1,
+      "condition": 1440602,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40603": {
+      "id": 40603,
+      "task_id": 40603,
+      "activity_id": 3840501,
+      "reward_type": 1,
+      "condition": 1440603,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40604": {
+      "id": 40604,
+      "task_id": 40604,
+      "activity_id": 3840501,
+      "reward_type": 1,
+      "condition": 1440604,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 40000
+        }
+      ]
+    },
+    "40605": {
+      "id": 40605,
+      "task_id": 40605,
+      "activity_id": 3840501,
+      "reward_type": 1,
+      "condition": 1440605,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 20000
+        }
+      ]
+    },
+    "40606": {
+      "id": 40606,
+      "task_id": 40606,
+      "activity_id": 3840501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200008,
+          "num": 1
+        }
+      ]
+    },
+    "40607": {
+      "id": 40607,
+      "task_id": 40607,
+      "activity_id": 3840501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200009,
+          "num": 1
+        }
+      ]
+    },
+    "40608": {
+      "id": 40608,
+      "task_id": 40608,
+      "activity_id": 3840501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200010,
+          "num": 1
+        }
+      ]
+    },
+    "40701": {
+      "id": 40701,
+      "task_id": 40701,
+      "activity_id": 3941901,
+      "reward_type": 1,
+      "condition": 1440701,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "40702": {
+      "id": 40702,
+      "task_id": 40702,
+      "activity_id": 3941901,
+      "reward_type": 1,
+      "condition": 1440702,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "40703": {
+      "id": 40703,
+      "task_id": 40703,
+      "activity_id": 3941901,
+      "reward_type": 1,
+      "condition": 1440703,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "40704": {
+      "id": 40704,
+      "task_id": 40704,
+      "activity_id": 3941901,
+      "reward_type": 1,
+      "condition": 1440704,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 60
+        }
+      ]
+    },
+    "40705": {
+      "id": 40705,
+      "task_id": 40705,
+      "activity_id": 3941901,
+      "reward_type": 1,
+      "condition": 1440705,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 30000
+        }
+      ]
+    },
+    "40706": {
+      "id": 40706,
+      "task_id": 40706,
+      "activity_id": 3941901,
+      "reward_type": 1,
+      "condition": 1440706,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 30000
+        }
+      ]
+    },
+    "40707": {
+      "id": 40707,
+      "task_id": 40707,
+      "activity_id": 3941901,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200008,
+          "num": 1
+        }
+      ]
+    },
+    "40708": {
+      "id": 40708,
+      "task_id": 40708,
+      "activity_id": 3941901,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200009,
+          "num": 1
+        }
+      ]
+    },
+    "40709": {
+      "id": 40709,
+      "task_id": 40709,
+      "activity_id": 3941901,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200010,
+          "num": 1
+        }
+      ]
+    },
+    "40801": {
+      "id": 40801,
+      "task_id": 40801,
+      "activity_id": 4039501,
+      "reward_type": 1,
+      "condition": 1440801,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40802": {
+      "id": 40802,
+      "task_id": 40802,
+      "activity_id": 4039501,
+      "reward_type": 1,
+      "condition": 1440802,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40803": {
+      "id": 40803,
+      "task_id": 40803,
+      "activity_id": 4039501,
+      "reward_type": 1,
+      "condition": 1440803,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40804": {
+      "id": 40804,
+      "task_id": 40804,
+      "activity_id": 4039501,
+      "reward_type": 1,
+      "condition": 1440804,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 40000
+        }
+      ]
+    },
+    "40805": {
+      "id": 40805,
+      "task_id": 40805,
+      "activity_id": 4039501,
+      "reward_type": 1,
+      "condition": 1440805,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 20000
+        }
+      ]
+    },
+    "40806": {
+      "id": 40806,
+      "task_id": 40806,
+      "activity_id": 4039501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200008,
+          "num": 1
+        }
+      ]
+    },
+    "40807": {
+      "id": 40807,
+      "task_id": 40807,
+      "activity_id": 4039501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200009,
+          "num": 1
+        }
+      ]
+    },
+    "40808": {
+      "id": 40808,
+      "task_id": 40808,
+      "activity_id": 4039501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200010,
+          "num": 1
+        }
+      ]
+    },
+    "40901": {
+      "id": 40901,
+      "task_id": 40901,
+      "activity_id": 4139501,
+      "reward_type": 1,
+      "condition": 1440901,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40902": {
+      "id": 40902,
+      "task_id": 40902,
+      "activity_id": 4139501,
+      "reward_type": 1,
+      "condition": 1440902,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40903": {
+      "id": 40903,
+      "task_id": 40903,
+      "activity_id": 4139501,
+      "reward_type": 1,
+      "condition": 1440903,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "40904": {
+      "id": 40904,
+      "task_id": 40904,
+      "activity_id": 4139501,
+      "reward_type": 1,
+      "condition": 1440904,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 40000
+        }
+      ]
+    },
+    "40905": {
+      "id": 40905,
+      "task_id": 40905,
+      "activity_id": 4139501,
+      "reward_type": 1,
+      "condition": 1440905,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 20000
+        }
+      ]
+    },
+    "40906": {
+      "id": 40906,
+      "task_id": 40906,
+      "activity_id": 4139501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200008,
+          "num": 1
+        }
+      ]
+    },
+    "40907": {
+      "id": 40907,
+      "task_id": 40907,
+      "activity_id": 4139501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200009,
+          "num": 1
+        }
+      ]
+    },
+    "40908": {
+      "id": 40908,
+      "task_id": 40908,
+      "activity_id": 4139501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200010,
+          "num": 1
+        }
+      ]
+    },
+    "41001": {
+      "id": 41001,
+      "task_id": 41001,
+      "activity_id": 4140501,
+      "reward_type": 1,
+      "condition": 1441001,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "41002": {
+      "id": 41002,
+      "task_id": 41002,
+      "activity_id": 4140501,
+      "reward_type": 1,
+      "condition": 1441002,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "41003": {
+      "id": 41003,
+      "task_id": 41003,
+      "activity_id": 4140501,
+      "reward_type": 1,
+      "condition": 1441003,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "41004": {
+      "id": 41004,
+      "task_id": 41004,
+      "activity_id": 4140501,
+      "reward_type": 1,
+      "condition": 1441004,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 40000
+        }
+      ]
+    },
+    "41005": {
+      "id": 41005,
+      "task_id": 41005,
+      "activity_id": 4140501,
+      "reward_type": 1,
+      "condition": 1441005,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 20000
+        }
+      ]
+    },
+    "41006": {
+      "id": 41006,
+      "task_id": 41006,
+      "activity_id": 4140501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2946,
+          "num": 1
+        }
+      ]
+    },
+    "41007": {
+      "id": 41007,
+      "task_id": 41007,
+      "activity_id": 4140501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2947,
+          "num": 1
+        }
+      ]
+    },
+    "41008": {
+      "id": 41008,
+      "task_id": 41008,
+      "activity_id": 4140501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2948,
+          "num": 1
+        }
+      ]
+    },
+    "50101": {
+      "id": 50101,
+      "task_id": 50101,
+      "activity_id": 4241901,
+      "reward_type": 1,
+      "condition": 1441101,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "50102": {
+      "id": 50102,
+      "task_id": 50102,
+      "activity_id": 4241901,
+      "reward_type": 1,
+      "condition": 1441102,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "50103": {
+      "id": 50103,
+      "task_id": 50103,
+      "activity_id": 4241901,
+      "reward_type": 1,
+      "condition": 1441103,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "50104": {
+      "id": 50104,
+      "task_id": 50104,
+      "activity_id": 4241901,
+      "reward_type": 1,
+      "condition": 1441104,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 60
+        }
+      ]
+    },
+    "50105": {
+      "id": 50105,
+      "task_id": 50105,
+      "activity_id": 4241901,
+      "reward_type": 1,
+      "condition": 1441105,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 30000
+        }
+      ]
+    },
+    "50106": {
+      "id": 50106,
+      "task_id": 50106,
+      "activity_id": 4241901,
+      "reward_type": 1,
+      "condition": 1441106,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 30000
+        }
+      ]
+    },
+    "50107": {
+      "id": 50107,
+      "task_id": 50107,
+      "activity_id": 4241901,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200008,
+          "num": 1
+        }
+      ]
+    },
+    "50108": {
+      "id": 50108,
+      "task_id": 50108,
+      "activity_id": 4241901,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200009,
+          "num": 1
+        }
+      ]
+    },
+    "50109": {
+      "id": 50109,
+      "task_id": 50109,
+      "activity_id": 4241901,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200010,
+          "num": 1
+        }
+      ]
+    },
+    "50110": {
+      "id": 50110,
+      "task_id": 50110,
+      "activity_id": 4243501,
+      "reward_type": 1,
+      "condition": 1441201,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "50111": {
+      "id": 50111,
+      "task_id": 50111,
+      "activity_id": 4243501,
+      "reward_type": 1,
+      "condition": 1441202,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "50112": {
+      "id": 50112,
+      "task_id": 50112,
+      "activity_id": 4243501,
+      "reward_type": 1,
+      "condition": 1441203,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "50113": {
+      "id": 50113,
+      "task_id": 50113,
+      "activity_id": 4243501,
+      "reward_type": 1,
+      "condition": 1441204,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 60
+        }
+      ]
+    },
+    "50114": {
+      "id": 50114,
+      "task_id": 50114,
+      "activity_id": 4243501,
+      "reward_type": 1,
+      "condition": 1441205,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 30000
+        }
+      ]
+    },
+    "50115": {
+      "id": 50115,
+      "task_id": 50115,
+      "activity_id": 4243501,
+      "reward_type": 1,
+      "condition": 1441206,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 30000
+        }
+      ]
+    },
+    "50116": {
+      "id": 50116,
+      "task_id": 50116,
+      "activity_id": 4243501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2946,
+          "num": 1
+        }
+      ]
+    },
+    "50117": {
+      "id": 50117,
+      "task_id": 50117,
+      "activity_id": 4243501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2947,
+          "num": 1
+        }
+      ]
+    },
+    "50118": {
+      "id": 50118,
+      "task_id": 50118,
+      "activity_id": 4243501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2948,
+          "num": 1
+        }
+      ]
+    },
+    "50201": {
+      "id": 50201,
+      "task_id": 50201,
+      "activity_id": 4339501,
+      "reward_type": 1,
+      "condition": 1441301,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "50202": {
+      "id": 50202,
+      "task_id": 50202,
+      "activity_id": 4339501,
+      "reward_type": 1,
+      "condition": 1441302,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "50203": {
+      "id": 50203,
+      "task_id": 50203,
+      "activity_id": 4339501,
+      "reward_type": 1,
+      "condition": 1441303,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 100
+        }
+      ]
+    },
+    "50204": {
+      "id": 50204,
+      "task_id": 50204,
+      "activity_id": 4339501,
+      "reward_type": 1,
+      "condition": 1441304,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 40000
+        }
+      ]
+    },
+    "50205": {
+      "id": 50205,
+      "task_id": 50205,
+      "activity_id": 4339501,
+      "reward_type": 1,
+      "condition": 1441305,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 20000
+        }
+      ]
+    },
+    "50206": {
+      "id": 50206,
+      "task_id": 50206,
+      "activity_id": 4339501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200116,
+          "num": 1
+        }
+      ]
+    },
+    "50207": {
+      "id": 50207,
+      "task_id": 50207,
+      "activity_id": 4339501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200117,
+          "num": 1
+        }
+      ]
+    },
+    "50208": {
+      "id": 50208,
+      "task_id": 50208,
+      "activity_id": 4339501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2200118,
+          "num": 1
+        }
+      ]
+    },
+    "50209": {
+      "id": 50209,
+      "task_id": 50209,
+      "activity_id": 4343501,
+      "reward_type": 1,
+      "condition": 1450201,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "50210": {
+      "id": 50210,
+      "task_id": 50210,
+      "activity_id": 4343501,
+      "reward_type": 1,
+      "condition": 1450202,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "50211": {
+      "id": 50211,
+      "task_id": 50211,
+      "activity_id": 4343501,
+      "reward_type": 1,
+      "condition": 1450203,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 80
+        }
+      ]
+    },
+    "50212": {
+      "id": 50212,
+      "task_id": 50212,
+      "activity_id": 4343501,
+      "reward_type": 1,
+      "condition": 1450204,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 60
+        }
+      ]
+    },
+    "50213": {
+      "id": 50213,
+      "task_id": 50213,
+      "activity_id": 4343501,
+      "reward_type": 1,
+      "condition": 1450205,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 60
+        },
+        {
+          "id": 2,
+          "num": 30000
+        }
+      ]
+    },
+    "50214": {
+      "id": 50214,
+      "task_id": 50214,
+      "activity_id": 4343501,
+      "reward_type": 1,
+      "condition": 1450206,
+      "rewards": [
+        {
+          "id": 40603,
+          "num": 40
+        },
+        {
+          "id": 2,
+          "num": 30000
+        }
+      ]
+    },
+    "50215": {
+      "id": 50215,
+      "task_id": 50215,
+      "activity_id": 4343501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2951,
+          "num": 1
+        }
+      ]
+    },
+    "50216": {
+      "id": 50216,
+      "task_id": 50216,
+      "activity_id": 4343501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2952,
+          "num": 1
+        }
+      ]
+    },
+    "50217": {
+      "id": 50217,
+      "task_id": 50217,
+      "activity_id": 4343501,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": [
+        {
+          "id": 2953,
+          "num": 1
+        }
+      ]
+    },
+    "4343501": {
+      "id": 4343501,
+      "task_id": 4343501,
+      "activity_id": 0,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": []
+    },
+    "0": {
+      "id": 0,
+      "task_id": 0,
+      "activity_id": 0,
+      "reward_type": 0,
+      "condition": 0,
+      "rewards": []
+    }
+  },
+  "badges": {
+    "40302": {
+      "id": 40302,
+      "activity_id": 3539301,
+      "set_id": 403,
+      "condition": 1440308
+    },
+    "40303": {
+      "id": 40303,
+      "activity_id": 3539301,
+      "set_id": 403,
+      "condition": 1440313
+    },
+    "40304": {
+      "id": 40304,
+      "activity_id": 3539301,
+      "set_id": 403,
+      "condition": 1440304
+    },
+    "40305": {
+      "id": 40305,
+      "activity_id": 3539301,
+      "set_id": 403,
+      "condition": 1440305
+    },
+    "40306": {
+      "id": 40306,
+      "activity_id": 3539301,
+      "set_id": 403,
+      "condition": 1440307
+    },
+    "40401": {
+      "id": 40401,
+      "activity_id": 3640301,
+      "set_id": 404,
+      "condition": 1440406
+    },
+    "40402": {
+      "id": 40402,
+      "activity_id": 3640301,
+      "set_id": 404,
+      "condition": 1440407
+    },
+    "40403": {
+      "id": 40403,
+      "activity_id": 3640301,
+      "set_id": 404,
+      "condition": 1440401
+    },
+    "40404": {
+      "id": 40404,
+      "activity_id": 3640301,
+      "set_id": 404,
+      "condition": 1440402
+    },
+    "40405": {
+      "id": 40405,
+      "activity_id": 3640301,
+      "set_id": 404,
+      "condition": 1440403
+    },
+    "40501": {
+      "id": 40501,
+      "activity_id": 3739301,
+      "set_id": 405,
+      "condition": 1440506
+    },
+    "40502": {
+      "id": 40502,
+      "activity_id": 3739301,
+      "set_id": 405,
+      "condition": 1440507
+    },
+    "40503": {
+      "id": 40503,
+      "activity_id": 3739301,
+      "set_id": 405,
+      "condition": 1440501
+    },
+    "40504": {
+      "id": 40504,
+      "activity_id": 3739301,
+      "set_id": 405,
+      "condition": 1440502
+    },
+    "40505": {
+      "id": 40505,
+      "activity_id": 3739301,
+      "set_id": 405,
+      "condition": 1440503
+    },
+    "40601": {
+      "id": 40601,
+      "activity_id": 3840301,
+      "set_id": 406,
+      "condition": 1440606
+    },
+    "40602": {
+      "id": 40602,
+      "activity_id": 3840301,
+      "set_id": 406,
+      "condition": 1440607
+    },
+    "40603": {
+      "id": 40603,
+      "activity_id": 3840301,
+      "set_id": 406,
+      "condition": 1440601
+    },
+    "40604": {
+      "id": 40604,
+      "activity_id": 3840301,
+      "set_id": 406,
+      "condition": 1440602
+    },
+    "40605": {
+      "id": 40605,
+      "activity_id": 3840301,
+      "set_id": 406,
+      "condition": 1440603
+    },
+    "40701": {
+      "id": 40701,
+      "activity_id": 3941701,
+      "set_id": 407,
+      "condition": 1440705
+    },
+    "40702": {
+      "id": 40702,
+      "activity_id": 3941701,
+      "set_id": 407,
+      "condition": 1440706
+    },
+    "40703": {
+      "id": 40703,
+      "activity_id": 3941701,
+      "set_id": 407,
+      "condition": 1440701
+    },
+    "40704": {
+      "id": 40704,
+      "activity_id": 3941701,
+      "set_id": 407,
+      "condition": 1440702
+    },
+    "40705": {
+      "id": 40705,
+      "activity_id": 3941701,
+      "set_id": 407,
+      "condition": 1440703
+    },
+    "40801": {
+      "id": 40801,
+      "activity_id": 4039301,
+      "set_id": 408,
+      "condition": 1440806
+    },
+    "40802": {
+      "id": 40802,
+      "activity_id": 4039301,
+      "set_id": 408,
+      "condition": 1440807
+    },
+    "40803": {
+      "id": 40803,
+      "activity_id": 4039301,
+      "set_id": 408,
+      "condition": 1440801
+    },
+    "40804": {
+      "id": 40804,
+      "activity_id": 4039301,
+      "set_id": 408,
+      "condition": 1440802
+    },
+    "40805": {
+      "id": 40805,
+      "activity_id": 4039301,
+      "set_id": 408,
+      "condition": 1440803
+    },
+    "40901": {
+      "id": 40901,
+      "activity_id": 4139301,
+      "set_id": 409,
+      "condition": 1440906
+    },
+    "40902": {
+      "id": 40902,
+      "activity_id": 4139301,
+      "set_id": 409,
+      "condition": 1440907
+    },
+    "40903": {
+      "id": 40903,
+      "activity_id": 4139301,
+      "set_id": 409,
+      "condition": 1440901
+    },
+    "40904": {
+      "id": 40904,
+      "activity_id": 4139301,
+      "set_id": 409,
+      "condition": 1440902
+    },
+    "40905": {
+      "id": 40905,
+      "activity_id": 4139301,
+      "set_id": 409,
+      "condition": 1440903
+    },
+    "41001": {
+      "id": 41001,
+      "activity_id": 4140301,
+      "set_id": 410,
+      "condition": 1441006
+    },
+    "41002": {
+      "id": 41002,
+      "activity_id": 4140301,
+      "set_id": 410,
+      "condition": 1441007
+    },
+    "41003": {
+      "id": 41003,
+      "activity_id": 4140301,
+      "set_id": 410,
+      "condition": 1441001
+    },
+    "41004": {
+      "id": 41004,
+      "activity_id": 4140301,
+      "set_id": 410,
+      "condition": 1441002
+    },
+    "41005": {
+      "id": 41005,
+      "activity_id": 4140301,
+      "set_id": 410,
+      "condition": 1441003
+    },
+    "50101": {
+      "id": 50101,
+      "activity_id": 4241701,
+      "set_id": 511,
+      "condition": 1441105
+    },
+    "50102": {
+      "id": 50102,
+      "activity_id": 4241701,
+      "set_id": 511,
+      "condition": 1441106
+    },
+    "50103": {
+      "id": 50103,
+      "activity_id": 4241701,
+      "set_id": 511,
+      "condition": 1441101
+    },
+    "50104": {
+      "id": 50104,
+      "activity_id": 4241701,
+      "set_id": 511,
+      "condition": 1441102
+    },
+    "50105": {
+      "id": 50105,
+      "activity_id": 4241701,
+      "set_id": 511,
+      "condition": 1441103
+    },
+    "50106": {
+      "id": 50106,
+      "activity_id": 4243301,
+      "set_id": 512,
+      "condition": 1441205
+    },
+    "50107": {
+      "id": 50107,
+      "activity_id": 4243301,
+      "set_id": 512,
+      "condition": 1441206
+    },
+    "50108": {
+      "id": 50108,
+      "activity_id": 4243301,
+      "set_id": 512,
+      "condition": 1441201
+    },
+    "50109": {
+      "id": 50109,
+      "activity_id": 4243301,
+      "set_id": 512,
+      "condition": 1441202
+    },
+    "50110": {
+      "id": 50110,
+      "activity_id": 4243301,
+      "set_id": 512,
+      "condition": 1441203
+    },
+    "50201": {
+      "id": 50201,
+      "activity_id": 4339301,
+      "set_id": 513,
+      "condition": 1441306
+    },
+    "50202": {
+      "id": 50202,
+      "activity_id": 4339301,
+      "set_id": 513,
+      "condition": 1441307
+    },
+    "50203": {
+      "id": 50203,
+      "activity_id": 4339301,
+      "set_id": 513,
+      "condition": 1441301
+    },
+    "50204": {
+      "id": 50204,
+      "activity_id": 4339301,
+      "set_id": 513,
+      "condition": 1441302
+    },
+    "50205": {
+      "id": 50205,
+      "activity_id": 4339301,
+      "set_id": 513,
+      "condition": 1441303
+    },
+    "50206": {
+      "id": 50206,
+      "activity_id": 4343301,
+      "set_id": 514,
+      "condition": 1450205
+    },
+    "50207": {
+      "id": 50207,
+      "activity_id": 4343301,
+      "set_id": 514,
+      "condition": 1450206
+    },
+    "50208": {
+      "id": 50208,
+      "activity_id": 4343301,
+      "set_id": 514,
+      "condition": 1450201
+    },
+    "50209": {
+      "id": 50209,
+      "activity_id": 4343301,
+      "set_id": 514,
+      "condition": 1450202
+    },
+    "50210": {
+      "id": 50210,
+      "activity_id": 4343301,
+      "set_id": 514,
+      "condition": 1450203
+    },
+    "514": {
+      "id": 514,
+      "activity_id": 0,
+      "set_id": 0,
+      "condition": 0
+    },
+    "4343301": {
+      "id": 4343301,
+      "activity_id": 0,
+      "set_id": 0,
+      "condition": 0
+    },
+    "12": {
+      "id": 12,
+      "activity_id": 0,
+      "set_id": 0,
+      "condition": 0
+    },
+    "3539301": {
+      "id": 3539301,
+      "activity_id": 0,
+      "set_id": 0,
+      "condition": 0
+    }
+  }
+}

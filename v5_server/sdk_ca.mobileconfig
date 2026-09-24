@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadCertificateFileName</key>
+			<string>AetherGazer_CA.crt</string>
+			<key>PayloadContent</key>
+			<data>
+				MIIDqDCCApCgAwIBAgIUUGzROUXKcqYMShbFXywDZ1y0/P4wDQYJKoZIhvcNAQEL
+				BQAwbDELMAkGA1UEBhMCQ04xKjAoBgNVBAoMIVlvbmdTaGkgQWV0aGVyR2F6ZXIg
+				VjUgUHJpdmF0ZSBDQTExMC8GA1UEAwwoQWV0aGVyR2F6ZXIgVjUgUm9vdCBDQSAo
+				b3Blbi55czRmdW4uY29tKTAeFw0yNjA5MjMwMTExMjNaFw0zNjA5MjEwMTExMjNa
+				MGwxCzAJBgNVBAYTAkNOMSowKAYDVQQKDCFZb25nU2hpIEFldGhlckdhemVyIFY1
+				IFByaXZhdGUgQ0ExMTAvBgNVBAMMKEFldGhlckdhemVyIFY1IFJvb3QgQ0EgKG9w
+				ZW4ueXM0ZnVuLmNvbSkwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC6
+				YOV7jWL+pheUAECCsWN9COQJPUnZe+jAAN57gd4kyrsAjui7nDOUWTp9SdiLNq88
+				Z+kOJuJ78bXSj+79pUwJV5VH4I5bNHVHTx8y9Vl5LvwcQyf8qvAwoyxy9yNVMNXD
+				qbhuEWFM8uN6qINgWDwLs9wvV2528WA1/8lIZq1W08pqgRZ2ihgu13TO7gX+aeoG
+				vXgy28gCXbxCfbT6U8gAfJ72k7QLKl4MDdW1VjqlWCAfpb/nw1g6bA++QiwLC2Of
+				cLaxIAC10U58uOybZYXqH67raBKU0np5m49OKauIGOIO4kCBQYcyWfMH5oAPg4w6
+				mJw6T2bjkg8u/XXnsluJAgMBAAGjQjBAMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0P
+				AQH/BAQDAgGGMB0GA1UdDgQWBBSfd7RrsnePqz4FCOvFAtfja4PNszANBgkqhkiG
+				9w0BAQsFAAOCAQEAsLl4Ujl57C1BjsZbkJcOZIsEcFKglL0tZEP3QETOb3EJJvCX
+				jHBmJ98fmE8bRlOLfSV05BjZWcIKiz7eLcRbXkVeVhKBKzSzPMTgUPJolPBNdK23
+				NNYvEYFMjmLT0gJ7kd/j2AuKEpjCh7Gnx9GdPtHK4Nb5/boTLuennKmdoC/HB1uR
+				T52JHg/4z71/eSLx33/CO7MWB7psIWuS62mRUoePpJ39iASUwpI7KqrrypTdbAzx
+				aBug2M8KcKIuky6UFDmGnH7Q2EVGW1ijYTFrP6DiUuXf98I9Uokmjx9C5dBzV2eY
+				Y6MoYwO4HTNFaBgjnSO34puEf//YVVhHn0b5Hg==
+			</data>
+			<key>PayloadDescription</key>
+			<string>配置受信任的深空之眼 V5 本地根证书 (Root CA)</string>
+			<key>PayloadDisplayName</key>
+			<string>AetherGazer V5 Root CA</string>
+			<key>PayloadIdentifier</key>
+			<string>com.ys4fun.aethergazer.ca.credential</string>
+			<key>PayloadType</key>
+			<string>com.apple.security.root</string>
+			<key>PayloadUUID</key>
+			<string>93ED5D14-65CE-40CF-8D59-2F30F0189B67</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>安装此描述文件以信任深空之眼单机仿真的本地 TLS 根证书</string>
+	<key>PayloadDisplayName</key>
+	<string>深空之眼 V5 本地根证书描述文件</string>
+	<key>PayloadIdentifier</key>
+	<string>com.ys4fun.aethergazer.ca.profile</string>
+	<key>PayloadOrganization</key>
+	<string>YongShi AetherGazer V5 Server</string>
+	<key>PayloadRemovalDisallowed</key>
+	<false/>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>27690344-A910-4674-B92B-1D11C0DF641F</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

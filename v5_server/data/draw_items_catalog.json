@@ -1,0 +1,2416 @@
+{
+  "1066": {
+    "id": 1066,
+    "name": "早樱·大国主",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1066.png"
+  },
+  "1093": {
+    "id": 1093,
+    "name": "觅影·国常立",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1093.png"
+  },
+  "1058": {
+    "id": 1058,
+    "name": "龙切·迦具土",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1058.png"
+  },
+  "1139": {
+    "id": 1139,
+    "name": "冰渊·波塞冬",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1139.png"
+  },
+  "1013": {
+    "id": 1013,
+    "name": "障月·阿修罗",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1013.png"
+  },
+  "1032": {
+    "id": 1032,
+    "name": "熯天·提尔",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1032.png"
+  },
+  "1119": {
+    "id": 1119,
+    "name": "流萤岚雾·休",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1119.png"
+  },
+  "1067": {
+    "id": 1067,
+    "name": "流转之洋·欧申纳斯",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1067.png"
+  },
+  "1024": {
+    "id": 1024,
+    "name": "胡狼·阿努比斯",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1024.png"
+  },
+  "1127": {
+    "id": 1127,
+    "name": "逆潮·利维坦",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1127.png"
+  },
+  "1071": {
+    "id": 1071,
+    "name": "青君·孟章",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1071.png"
+  },
+  "1072": {
+    "id": 1072,
+    "name": "百解·禄良",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1072.png"
+  },
+  "1070": {
+    "id": 1070,
+    "name": "十曜·金乌",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1070.png"
+  },
+  "1199": {
+    "id": 1199,
+    "name": "震离·月读",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1199.png"
+  },
+  "1111": {
+    "id": 1111,
+    "name": "生魂·奥西里斯",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1111.png"
+  },
+  "1094": {
+    "id": 1094,
+    "name": "暗星·海拉",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1094.png"
+  },
+  "1138": {
+    "id": 1138,
+    "name": "黎幻·赫拉",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1138.png"
+  },
+  "1081": {
+    "id": 1081,
+    "name": "斩浪·丝卡蒂",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1081.png"
+  },
+  "1042": {
+    "id": 1042,
+    "name": "操偶师·哈迪斯",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1042.png"
+  },
+  "1041": {
+    "id": 1041,
+    "name": "铃兰之弦·雅典娜",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1041.png"
+  },
+  "1052": {
+    "id": 1052,
+    "name": "怒蛇·马尔杜克",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1052.png"
+  },
+  "1028": {
+    "id": 1028,
+    "name": "轰雷·托尔",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1028.png"
+  },
+  "1132": {
+    "id": 1132,
+    "name": "烙焰·提尔",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1132.png"
+  },
+  "1075": {
+    "id": 1075,
+    "name": "澄心·陵光",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1075.png"
+  },
+  "1076": {
+    "id": 1076,
+    "name": "太一·庚辰",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1076.png"
+  },
+  "1074": {
+    "id": 1074,
+    "name": "巡天·英招",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1074.png"
+  },
+  "1055": {
+    "id": 1055,
+    "name": "霜影·暗御津羽",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1055.png"
+  },
+  "1049": {
+    "id": 1049,
+    "name": "镜花黄泉·伊邪那美",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1049.png"
+  },
+  "1158": {
+    "id": 1158,
+    "name": "惑火灼心·迦具土",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1158.png"
+  },
+  "1060": {
+    "id": 1060,
+    "name": "九司·陆吾",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1060.png"
+  },
+  "1061": {
+    "id": 1061,
+    "name": "玄机·执明",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1061.png"
+  },
+  "1150": {
+    "id": 1150,
+    "name": "绯染·丰前坊天狗",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1150.png"
+  },
+  "1015": {
+    "id": 1015,
+    "name": "狂狮·塞赫麦特",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1015.png"
+  },
+  "1012": {
+    "id": 1012,
+    "name": "天诫·白泽",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1012.png"
+  },
+  "1020": {
+    "id": 1020,
+    "name": "三相·梵天",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1020.png"
+  },
+  "1021": {
+    "id": 1021,
+    "name": "曦光·阿尔忒弥斯",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1021.png"
+  },
+  "1022": {
+    "id": 1022,
+    "name": "幽月·塞勒涅",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1022.png"
+  },
+  "1034": {
+    "id": 1034,
+    "name": "潜蛇·瓦吉特",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1034.png"
+  },
+  "1043": {
+    "id": 1043,
+    "name": "隐夜·伊里伽尔",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1043.png"
+  },
+  "1044": {
+    "id": 1044,
+    "name": "不灭王权·荷鲁斯",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1044.png"
+  },
+  "1047": {
+    "id": 1047,
+    "name": "裁暗之锋·塞尔凯特",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1047.png"
+  },
+  "1053": {
+    "id": 1053,
+    "name": "怀阳·羲和",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1053.png"
+  },
+  "1054": {
+    "id": 1054,
+    "name": "双司镇命·无常",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1054.png"
+  },
+  "1073": {
+    "id": 1073,
+    "name": "巧构·麟钰",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1073.png"
+  },
+  "1077": {
+    "id": 1077,
+    "name": "锻玉·武罗",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1077.png"
+  },
+  "1083": {
+    "id": 1083,
+    "name": "硝芒·埃克什瓦",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1083.png"
+  },
+  "1085": {
+    "id": 1085,
+    "name": "绮望·诗蔻蒂",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1085.png"
+  },
+  "1089": {
+    "id": 1089,
+    "name": "焚轮·帕尔瓦蒂",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1089.png"
+  },
+  "1095": {
+    "id": 1095,
+    "name": "苍鹭·托特",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1095.png"
+  },
+  "1133": {
+    "id": 1133,
+    "name": "天卫·海姆达尔",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1133.png"
+  },
+  "1137": {
+    "id": 1137,
+    "name": "谧光之刻·霍德尔",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1137.png"
+  },
+  "1156": {
+    "id": 1156,
+    "name": "伐灭·伽梨",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1156.png"
+  },
+  "1166": {
+    "id": 1166,
+    "name": "星仪·大国主",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1166.png"
+  },
+  "1170": {
+    "id": 1170,
+    "name": "昭阳·金乌",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1170.png"
+  },
+  "1194": {
+    "id": 1194,
+    "name": "悼亡之蝶·海拉",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1194.png"
+  },
+  "1197": {
+    "id": 1197,
+    "name": "梦影·俄尼里伊",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1197.png"
+  },
+  "1211": {
+    "id": 1211,
+    "name": "魂羽·奥西里斯",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1211.png"
+  },
+  "1248": {
+    "id": 1248,
+    "name": "神威·前鬼坊天狗",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1248.png"
+  },
+  "1284": {
+    "id": 1284,
+    "name": "黯耀·薇儿丹蒂",
+    "rare": "SSR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1284.png"
+  },
+  "1011": {
+    "id": 1011,
+    "name": "雏心·奥西里斯",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1011.png"
+  },
+  "1016": {
+    "id": 1016,
+    "name": "荒獠·金固",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1016.png"
+  },
+  "1017": {
+    "id": 1017,
+    "name": "灵猫·芭丝特",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1017.png"
+  },
+  "1019": {
+    "id": 1019,
+    "name": "疾风之枪·休",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1019.png"
+  },
+  "1026": {
+    "id": 1026,
+    "name": "银臂·努阿达",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1026.png"
+  },
+  "1027": {
+    "id": 1027,
+    "name": "低吹雪·利维坦",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1027.png"
+  },
+  "1033": {
+    "id": 1033,
+    "name": "启明·海姆达尔",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1033.png"
+  },
+  "1035": {
+    "id": 1035,
+    "name": "狂鳄·索贝克",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1035.png"
+  },
+  "1037": {
+    "id": 1037,
+    "name": "夜之寄生·霍德尔",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1037.png"
+  },
+  "1038": {
+    "id": 1038,
+    "name": "羽灼·赫拉",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1038.png"
+  },
+  "1039": {
+    "id": 1039,
+    "name": "潮音·波塞冬",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1039.png"
+  },
+  "1048": {
+    "id": 1048,
+    "name": "彗光·前鬼坊天狗",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1048.png"
+  },
+  "1050": {
+    "id": 1050,
+    "name": "真红·丰前坊天狗",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1050.png"
+  },
+  "1056": {
+    "id": 1056,
+    "name": "雷獠·伽梨",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1056.png"
+  },
+  "1059": {
+    "id": 1059,
+    "name": "光煌·阿波罗",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1059.png"
+  },
+  "1068": {
+    "id": 1068,
+    "name": "沐风·恩利尔",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1068.png"
+  },
+  "1080": {
+    "id": 1080,
+    "name": "寒霜之牙·维达尔",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1080.png"
+  },
+  "1096": {
+    "id": 1096,
+    "name": "风行·赫尔墨斯",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1096.png"
+  },
+  "1097": {
+    "id": 1097,
+    "name": "小困·俄尼里伊",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1097.png"
+  },
+  "1099": {
+    "id": 1099,
+    "name": "朔望·月读",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1099.png"
+  },
+  "1184": {
+    "id": 1184,
+    "name": "旧誓·薇儿丹蒂",
+    "rare": "SR",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1184.png"
+  },
+  "1084": {
+    "id": 1084,
+    "name": "朝约·薇儿丹蒂",
+    "rare": "R",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1084.png"
+  },
+  "1148": {
+    "id": 1148,
+    "name": "追炎·前鬼坊天狗",
+    "rare": "R",
+    "type": "hero",
+    "img": "extracted_assets/avatars/1148.png"
+  },
+  "2510000": {
+    "id": 2510000,
+    "name": "星使·沉睡之子",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510000.png"
+  },
+  "2520000": {
+    "id": 2520000,
+    "name": "列王·沉睡之子",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520000.png"
+  },
+  "2530000": {
+    "id": 2530000,
+    "name": "式神·沉睡之子",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530000.png"
+  },
+  "2540000": {
+    "id": 2540000,
+    "name": "妖精·沉睡之子",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540000.png"
+  },
+  "2550000": {
+    "id": 2550000,
+    "name": "命者·沉睡之子",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550000.png"
+  },
+  "2590000": {
+    "id": 2590000,
+    "name": "方异·沉睡之子",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590000.png"
+  },
+  "2410001": {
+    "id": 2410001,
+    "name": "星使·莱拉普斯",
+    "rare": "SR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2410001.png"
+  },
+  "2410002": {
+    "id": 2410002,
+    "name": "星使·墨兰普斯",
+    "rare": "SR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2410002.png"
+  },
+  "2420001": {
+    "id": 2420001,
+    "name": "列王·图特摩斯",
+    "rare": "SR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2420001.png"
+  },
+  "2420002": {
+    "id": 2420002,
+    "name": "列王·伊涅特夫一世",
+    "rare": "SR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2420002.png"
+  },
+  "2430001": {
+    "id": 2430001,
+    "name": "式神·稻妻雷兽",
+    "rare": "SR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2430001.png"
+  },
+  "2430002": {
+    "id": 2430002,
+    "name": "式神·夕立幽谷响",
+    "rare": "SR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2430002.png"
+  },
+  "2440001": {
+    "id": 2440001,
+    "name": "妖精·玫菲尔",
+    "rare": "SR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2440001.png"
+  },
+  "2440002": {
+    "id": 2440002,
+    "name": "妖精·蒂雅姆",
+    "rare": "SR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2440002.png"
+  },
+  "2450001": {
+    "id": 2450001,
+    "name": "命者·只遮尼俱",
+    "rare": "SR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2450001.png"
+  },
+  "2450002": {
+    "id": 2450002,
+    "name": "命者·伽阇那俱",
+    "rare": "SR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2450002.png"
+  },
+  "2490001": {
+    "id": 2490001,
+    "name": "方异·鹿蜀",
+    "rare": "SR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2490001.png"
+  },
+  "2490002": {
+    "id": 2490002,
+    "name": "方异·孰湖",
+    "rare": "SR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2490002.png"
+  },
+  "2310001": {
+    "id": 2310001,
+    "name": "星使·希波",
+    "rare": "R",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2310001.png"
+  },
+  "2320001": {
+    "id": 2320001,
+    "name": "列王·阿肯纳顿",
+    "rare": "R",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2320001.png"
+  },
+  "2330001": {
+    "id": 2330001,
+    "name": "式神·胧月倩兮",
+    "rare": "R",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2330001.png"
+  },
+  "2340001": {
+    "id": 2340001,
+    "name": "妖精·玛尔琳妮",
+    "rare": "R",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2340001.png"
+  },
+  "2350001": {
+    "id": 2350001,
+    "name": "命者·冰伽娄",
+    "rare": "R",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2350001.png"
+  },
+  "2390001": {
+    "id": 2390001,
+    "name": "方异·驳",
+    "rare": "R",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2390001.png"
+  },
+  "2520005": {
+    "id": 2520005,
+    "name": "列王·奈杰里赫特",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520005.png"
+  },
+  "2530002": {
+    "id": 2530002,
+    "name": "式神·若夏黑童子",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530002.png"
+  },
+  "2540010": {
+    "id": 2540010,
+    "name": "妖精·格蕾",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540010.png"
+  },
+  "2590011": {
+    "id": 2590011,
+    "name": "方异·夫诸",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590011.png"
+  },
+  "2530003": {
+    "id": 2530003,
+    "name": "式神·弥生缘结",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530003.png"
+  },
+  "2520012": {
+    "id": 2520012,
+    "name": "列王·乌纳斯",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520012.png"
+  },
+  "2590005": {
+    "id": 2590005,
+    "name": "方异·虎蛟",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590005.png"
+  },
+  "2550004": {
+    "id": 2550004,
+    "name": "命者·奎矢崎",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550004.png"
+  },
+  "2550997": {
+    "id": 2550997,
+    "name": "命者·竹田云雀",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550997.png"
+  },
+  "2590001": {
+    "id": 2590001,
+    "name": "方异·毕方",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590001.png"
+  },
+  "2590012": {
+    "id": 2590012,
+    "name": "方异·三骓",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590012.png"
+  },
+  "2530004": {
+    "id": 2530004,
+    "name": "式神·白夜玉藻前",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530004.png"
+  },
+  "2540014": {
+    "id": 2540014,
+    "name": "妖精·瑞吉蕾芙",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540014.png"
+  },
+  "2530011": {
+    "id": 2530011,
+    "name": "式神·彼岸大神实命",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530011.png"
+  },
+  "2510006": {
+    "id": 2510006,
+    "name": "星使·摩洛克洛斯",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510006.png"
+  },
+  "2520009": {
+    "id": 2520009,
+    "name": "列王·内弗尔卡塔",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520009.png"
+  },
+  "2550011": {
+    "id": 2550011,
+    "name": "命者·摩那斯",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550011.png"
+  },
+  "2550008": {
+    "id": 2550008,
+    "name": "命者·赛珮",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550008.png"
+  },
+  "2540012": {
+    "id": 2540012,
+    "name": "妖精·洁萝露尔",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540012.png"
+  },
+  "2590003": {
+    "id": 2590003,
+    "name": "方异·凰",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590003.png"
+  },
+  "2510001": {
+    "id": 2510001,
+    "name": "星使·美提斯",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510001.png"
+  },
+  "2530001": {
+    "id": 2530001,
+    "name": "式神·朝凪以津真天",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530001.png"
+  },
+  "2530012": {
+    "id": 2530012,
+    "name": "式神·青岚姑获鸟",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530012.png"
+  },
+  "2550001": {
+    "id": 2550001,
+    "name": "命者·贝鲁塞巴布",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550001.png"
+  },
+  "2540008": {
+    "id": 2540008,
+    "name": "妖精·艾尔威",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540008.png"
+  },
+  "2510010": {
+    "id": 2510010,
+    "name": "星使·安菲特里忒",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510010.png"
+  },
+  "2540016": {
+    "id": 2540016,
+    "name": "妖精·格恩达尔",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540016.png"
+  },
+  "2590013": {
+    "id": 2590013,
+    "name": "方异·兆吉毕方",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590013.png"
+  },
+  "2590009": {
+    "id": 2590009,
+    "name": "方异·玄龟",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590009.png"
+  },
+  "2550010": {
+    "id": 2550010,
+    "name": "命者·修吉",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550010.png"
+  },
+  "2590014": {
+    "id": 2590014,
+    "name": "方异·蛮蛮",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590014.png"
+  },
+  "2510003": {
+    "id": 2510003,
+    "name": "星使·托勒弥",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510003.png"
+  },
+  "2540009": {
+    "id": 2540009,
+    "name": "妖精·埃雅温",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540009.png"
+  },
+  "2520006": {
+    "id": 2520006,
+    "name": "列王·门卡拉",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520006.png"
+  },
+  "2530013": {
+    "id": 2530013,
+    "name": "式神·春雷猫又",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530013.png"
+  },
+  "2520004": {
+    "id": 2520004,
+    "name": "列王·萨胡拉",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520004.png"
+  },
+  "2590010": {
+    "id": 2590010,
+    "name": "方异·敏牛",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590010.png"
+  },
+  "2550007": {
+    "id": 2550007,
+    "name": "命者·库萨里库",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550007.png"
+  },
+  "2590008": {
+    "id": 2590008,
+    "name": "方异·土蝼",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590008.png"
+  },
+  "2530008": {
+    "id": 2530008,
+    "name": "式神·炎天丛原火",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530008.png"
+  },
+  "2530010": {
+    "id": 2530010,
+    "name": "式神·阳炎不知火",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530010.png"
+  },
+  "2510004": {
+    "id": 2510004,
+    "name": "星使·珀尔修丝",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510004.png"
+  },
+  "2550009": {
+    "id": 2550009,
+    "name": "命者·乌修穆伽尔",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550009.png"
+  },
+  "2550012": {
+    "id": 2550012,
+    "name": "命者·阿那婆达多",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550012.png"
+  },
+  "2550013": {
+    "id": 2550013,
+    "name": "命者·卡泽耐尔",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550013.png"
+  },
+  "2550002": {
+    "id": 2550002,
+    "name": "命者·娑加罗",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550002.png"
+  },
+  "2510009": {
+    "id": 2510009,
+    "name": "星使·米里亚姆",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510009.png"
+  },
+  "2510005": {
+    "id": 2510005,
+    "name": "星使·刻耳柏洛斯",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510005.png"
+  },
+  "2510012": {
+    "id": 2510012,
+    "name": "星使·阿里翁",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510012.png"
+  },
+  "2540005": {
+    "id": 2540005,
+    "name": "妖精·艾丝特尔",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540005.png"
+  },
+  "2550996": {
+    "id": 2550996,
+    "name": "命者·法兰",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550996.png"
+  },
+  "2550006": {
+    "id": 2550006,
+    "name": "命者·木施胡舒",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550006.png"
+  },
+  "2530006": {
+    "id": 2530006,
+    "name": "式神·雁渡红叶狩",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530006.png"
+  },
+  "2530009": {
+    "id": 2530009,
+    "name": "式神·夜引天邪",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530009.png"
+  },
+  "2530007": {
+    "id": 2530007,
+    "name": "式神·旱星狂骨",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530007.png"
+  },
+  "2520013": {
+    "id": 2520013,
+    "name": "列王·荷尔阿哈",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520013.png"
+  },
+  "2540003": {
+    "id": 2540003,
+    "name": "妖精·穆丽儿",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540003.png"
+  },
+  "2520001": {
+    "id": 2520001,
+    "name": "列王·胡夫",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520001.png"
+  },
+  "2540001": {
+    "id": 2540001,
+    "name": "妖精·蒂姆希拉克",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540001.png"
+  },
+  "2590006": {
+    "id": 2590006,
+    "name": "方异·神鲤",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590006.png"
+  },
+  "2540011": {
+    "id": 2540011,
+    "name": "妖精·亚伦格林",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540011.png"
+  },
+  "2520008": {
+    "id": 2520008,
+    "name": "列王·瑟莫赫特",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520008.png"
+  },
+  "2540002": {
+    "id": 2540002,
+    "name": "妖精·碧洛迪丝",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540002.png"
+  },
+  "2520010": {
+    "id": 2520010,
+    "name": "列王·洁特",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520010.png"
+  },
+  "2520007": {
+    "id": 2520007,
+    "name": "列王·伊比",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520007.png"
+  },
+  "2510007": {
+    "id": 2510007,
+    "name": "星使·克律索马罗斯",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510007.png"
+  },
+  "2590007": {
+    "id": 2590007,
+    "name": "方异·鸾鸟",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590007.png"
+  },
+  "2510002": {
+    "id": 2510002,
+    "name": "星使·笛奈",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510002.png"
+  },
+  "2530005": {
+    "id": 2530005,
+    "name": "式神·雪见白童子",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530005.png"
+  },
+  "2540015": {
+    "id": 2540015,
+    "name": "妖精·密丝特",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540015.png"
+  },
+  "2520011": {
+    "id": 2520011,
+    "name": "列王·美尼斯",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520011.png"
+  },
+  "2540004": {
+    "id": 2540004,
+    "name": "妖精·爱尔文",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540004.png"
+  },
+  "2510014": {
+    "id": 2510014,
+    "name": "星使·凯莉丝特",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510014.png"
+  },
+  "2590004": {
+    "id": 2590004,
+    "name": "方异·夔龙",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590004.png"
+  },
+  "2590015": {
+    "id": 2590015,
+    "name": "方异·孟极",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 9,
+    "img": "extracted_assets/servants/icons/2590015.png"
+  },
+  "2530014": {
+    "id": 2530014,
+    "name": "式神·霜夜天探女",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 3,
+    "img": "extracted_assets/servants/icons/2530014.png"
+  },
+  "2540013": {
+    "id": 2540013,
+    "name": "妖精·奥尔露恩",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540013.png"
+  },
+  "2550014": {
+    "id": 2550014,
+    "name": "命者·纳姆塔拉",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550014.png"
+  },
+  "2520003": {
+    "id": 2520003,
+    "name": "列王·赫肯涅迈",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520003.png"
+  },
+  "2510013": {
+    "id": 2510013,
+    "name": "星使·恩狄明",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510013.png"
+  },
+  "2520002": {
+    "id": 2520002,
+    "name": "列王·巴卡",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 2,
+    "img": "extracted_assets/servants/icons/2520002.png"
+  },
+  "2550005": {
+    "id": 2550005,
+    "name": "命者·德叉伽",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 5,
+    "img": "extracted_assets/servants/icons/2550005.png"
+  },
+  "2540006": {
+    "id": 2540006,
+    "name": "妖精·凯莱布丽安",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 4,
+    "img": "extracted_assets/servants/icons/2540006.png"
+  },
+  "2510008": {
+    "id": 2510008,
+    "name": "星使·佩加索斯",
+    "rare": "SSR",
+    "type": "servant",
+    "race": 1,
+    "img": "extracted_assets/servants/icons/2510008.png"
+  },
+  "2510999": {
+    "id": 2510999,
+    "name": "星使·许德拉",
+    "rare": "SSR",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/2510999.png",
+    "race": 1
+  },
+  "2520999": {
+    "id": 2520999,
+    "name": "列王·乌瑟卡夫",
+    "rare": "SSR",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/2520999.png",
+    "race": 2
+  },
+  "2530999": {
+    "id": 2530999,
+    "name": "式神·萤狩青鹭火",
+    "rare": "SSR",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/2530999.png",
+    "race": 3
+  },
+  "2540999": {
+    "id": 2540999,
+    "name": "妖精·盖拉德丽尔",
+    "rare": "SSR",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/2540999.png",
+    "race": 4
+  },
+  "2550998": {
+    "id": 2550998,
+    "name": "命者·雅",
+    "rare": "SSR",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/2550998.png",
+    "race": 5
+  },
+  "2550999": {
+    "id": 2550999,
+    "name": "命者·苏枳",
+    "rare": "SSR",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/2550999.png",
+    "race": 5
+  },
+  "2590999": {
+    "id": 2590999,
+    "name": "方异·狰",
+    "rare": "SSR",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/2590999.png",
+    "race": 9
+  },
+  "9": {
+    "id": 9,
+    "name": "钥从 9",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/9.png",
+    "race": 1
+  },
+  "5": {
+    "id": 5,
+    "name": "钥从 5",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/5.png",
+    "race": 1
+  },
+  "4": {
+    "id": 4,
+    "name": "钥从 4",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/4.png",
+    "race": 1
+  },
+  "3": {
+    "id": 3,
+    "name": "钥从 3",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/3.png",
+    "race": 1
+  },
+  "2": {
+    "id": 2,
+    "name": "钥从 2",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/2.png",
+    "race": 1
+  },
+  "0": {
+    "id": 0,
+    "name": "钥从 0",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/0.png",
+    "race": 1
+  },
+  "425": {
+    "id": 425,
+    "name": "钥从 425",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/425.png",
+    "race": 1
+  },
+  "107701": {
+    "id": 107701,
+    "name": "钥从 107701",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/107701.png",
+    "race": 1
+  },
+  "105401": {
+    "id": 105401,
+    "name": "钥从 105401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/105401.png",
+    "race": 1
+  },
+  "117001": {
+    "id": 117001,
+    "name": "钥从 117001",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/117001.png",
+    "race": 1
+  },
+  "105301": {
+    "id": 105301,
+    "name": "钥从 105301",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/105301.png",
+    "race": 1
+  },
+  "107301": {
+    "id": 107301,
+    "name": "钥从 107301",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/107301.png",
+    "race": 1
+  },
+  "101201": {
+    "id": 101201,
+    "name": "钥从 101201",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/101201.png",
+    "race": 1
+  },
+  "106101": {
+    "id": 106101,
+    "name": "钥从 106101",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/106101.png",
+    "race": 1
+  },
+  "106001": {
+    "id": 106001,
+    "name": "钥从 106001",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/106001.png",
+    "race": 1
+  },
+  "107401": {
+    "id": 107401,
+    "name": "钥从 107401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/107401.png",
+    "race": 1
+  },
+  "107601": {
+    "id": 107601,
+    "name": "钥从 107601",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/107601.png",
+    "race": 1
+  },
+  "107201": {
+    "id": 107201,
+    "name": "钥从 107201",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/107201.png",
+    "race": 1
+  },
+  "107101": {
+    "id": 107101,
+    "name": "钥从 107101",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/107101.png",
+    "race": 1
+  },
+  "107501": {
+    "id": 107501,
+    "name": "钥从 107501",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/107501.png",
+    "race": 1
+  },
+  "107001": {
+    "id": 107001,
+    "name": "钥从 107001",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/107001.png",
+    "race": 1
+  },
+  "420": {
+    "id": 420,
+    "name": "钥从 420",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/420.png",
+    "race": 1
+  },
+  "421": {
+    "id": 421,
+    "name": "钥从 421",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/421.png",
+    "race": 1
+  },
+  "104501": {
+    "id": 104501,
+    "name": "钥从 104501",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/104501.png",
+    "race": 1
+  },
+  "104601": {
+    "id": 104601,
+    "name": "钥从 104601",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/104601.png",
+    "race": 1
+  },
+  "104301": {
+    "id": 104301,
+    "name": "钥从 104301",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/104301.png",
+    "race": 1
+  },
+  "108301": {
+    "id": 108301,
+    "name": "钥从 108301",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/108301.png",
+    "race": 1
+  },
+  "108901": {
+    "id": 108901,
+    "name": "钥从 108901",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/108901.png",
+    "race": 1
+  },
+  "115601": {
+    "id": 115601,
+    "name": "钥从 115601",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/115601.png",
+    "race": 1
+  },
+  "102001": {
+    "id": 102001,
+    "name": "钥从 102001",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/102001.png",
+    "race": 1
+  },
+  "105201": {
+    "id": 105201,
+    "name": "钥从 105201",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/105201.png",
+    "race": 1
+  },
+  "112701": {
+    "id": 112701,
+    "name": "钥从 112701",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/112701.png",
+    "race": 1
+  },
+  "101601": {
+    "id": 101601,
+    "name": "钥从 101601",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/101601.png",
+    "race": 1
+  },
+  "106801": {
+    "id": 106801,
+    "name": "钥从 106801",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/106801.png",
+    "race": 1
+  },
+  "105601": {
+    "id": 105601,
+    "name": "钥从 105601",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/105601.png",
+    "race": 1
+  },
+  "102601": {
+    "id": 102601,
+    "name": "钥从 102601",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/102601.png",
+    "race": 1
+  },
+  "101301": {
+    "id": 101301,
+    "name": "钥从 101301",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/101301.png",
+    "race": 1
+  },
+  "102701": {
+    "id": 102701,
+    "name": "钥从 102701",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/102701.png",
+    "race": 1
+  },
+  "419": {
+    "id": 419,
+    "name": "钥从 419",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/419.png",
+    "race": 1
+  },
+  "113701": {
+    "id": 113701,
+    "name": "钥从 113701",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/113701.png",
+    "race": 1
+  },
+  "119401": {
+    "id": 119401,
+    "name": "钥从 119401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/119401.png",
+    "race": 1
+  },
+  "108501": {
+    "id": 108501,
+    "name": "钥从 108501",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/108501.png",
+    "race": 1
+  },
+  "113301": {
+    "id": 113301,
+    "name": "钥从 113301",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/113301.png",
+    "race": 1
+  },
+  "128401": {
+    "id": 128401,
+    "name": "钥从 128401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/128401.png",
+    "race": 1
+  },
+  "113201": {
+    "id": 113201,
+    "name": "钥从 113201",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/113201.png",
+    "race": 1
+  },
+  "108101": {
+    "id": 108101,
+    "name": "钥从 108101",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/108101.png",
+    "race": 1
+  },
+  "103301": {
+    "id": 103301,
+    "name": "钥从 103301",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/103301.png",
+    "race": 1
+  },
+  "103201": {
+    "id": 103201,
+    "name": "钥从 103201",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/103201.png",
+    "race": 1
+  },
+  "102801": {
+    "id": 102801,
+    "name": "钥从 102801",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/102801.png",
+    "race": 1
+  },
+  "118401": {
+    "id": 118401,
+    "name": "钥从 118401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/118401.png",
+    "race": 1
+  },
+  "103701": {
+    "id": 103701,
+    "name": "钥从 103701",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/103701.png",
+    "race": 1
+  },
+  "109401": {
+    "id": 109401,
+    "name": "钥从 109401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/109401.png",
+    "race": 1
+  },
+  "108401": {
+    "id": 108401,
+    "name": "钥从 108401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/108401.png",
+    "race": 1
+  },
+  "108001": {
+    "id": 108001,
+    "name": "钥从 108001",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/108001.png",
+    "race": 1
+  },
+  "418": {
+    "id": 418,
+    "name": "钥从 418",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/418.png",
+    "race": 1
+  },
+  "116601": {
+    "id": 116601,
+    "name": "钥从 116601",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/116601.png",
+    "race": 1
+  },
+  "124801": {
+    "id": 124801,
+    "name": "钥从 124801",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/124801.png",
+    "race": 1
+  },
+  "115001": {
+    "id": 115001,
+    "name": "钥从 115001",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/115001.png",
+    "race": 1
+  },
+  "104901": {
+    "id": 104901,
+    "name": "钥从 104901",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/104901.png",
+    "race": 1
+  },
+  "115801": {
+    "id": 115801,
+    "name": "钥从 115801",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/115801.png",
+    "race": 1
+  },
+  "105501": {
+    "id": 105501,
+    "name": "钥从 105501",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/105501.png",
+    "race": 1
+  },
+  "105801": {
+    "id": 105801,
+    "name": "钥从 105801",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/105801.png",
+    "race": 1
+  },
+  "119901": {
+    "id": 119901,
+    "name": "钥从 119901",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/119901.png",
+    "race": 1
+  },
+  "105001": {
+    "id": 105001,
+    "name": "钥从 105001",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/105001.png",
+    "race": 1
+  },
+  "114801": {
+    "id": 114801,
+    "name": "钥从 114801",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/114801.png",
+    "race": 1
+  },
+  "109301": {
+    "id": 109301,
+    "name": "钥从 109301",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/109301.png",
+    "race": 1
+  },
+  "106601": {
+    "id": 106601,
+    "name": "钥从 106601",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/106601.png",
+    "race": 1
+  },
+  "104802": {
+    "id": 104802,
+    "name": "钥从 104802",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/104802.png",
+    "race": 1
+  },
+  "109901": {
+    "id": 109901,
+    "name": "钥从 109901",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/109901.png",
+    "race": 1
+  },
+  "417": {
+    "id": 417,
+    "name": "钥从 417",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/417.png",
+    "race": 1
+  },
+  "104401": {
+    "id": 104401,
+    "name": "钥从 104401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/104401.png",
+    "race": 1
+  },
+  "104701": {
+    "id": 104701,
+    "name": "钥从 104701",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/104701.png",
+    "race": 1
+  },
+  "121101": {
+    "id": 121101,
+    "name": "钥从 121101",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/121101.png",
+    "race": 1
+  },
+  "103401": {
+    "id": 103401,
+    "name": "钥从 103401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/103401.png",
+    "race": 1
+  },
+  "109501": {
+    "id": 109501,
+    "name": "钥从 109501",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/109501.png",
+    "race": 1
+  },
+  "101501": {
+    "id": 101501,
+    "name": "钥从 101501",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/101501.png",
+    "race": 1
+  },
+  "101701": {
+    "id": 101701,
+    "name": "钥从 101701",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/101701.png",
+    "race": 1
+  },
+  "111901": {
+    "id": 111901,
+    "name": "钥从 111901",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/111901.png",
+    "race": 1
+  },
+  "111101": {
+    "id": 111101,
+    "name": "钥从 111101",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/111101.png",
+    "race": 1
+  },
+  "103501": {
+    "id": 103501,
+    "name": "钥从 103501",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/103501.png",
+    "race": 1
+  },
+  "102401": {
+    "id": 102401,
+    "name": "钥从 102401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/102401.png",
+    "race": 1
+  },
+  "101101": {
+    "id": 101101,
+    "name": "钥从 101101",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/101101.png",
+    "race": 1
+  },
+  "101901": {
+    "id": 101901,
+    "name": "钥从 101901",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/101901.png",
+    "race": 1
+  },
+  "416": {
+    "id": 416,
+    "name": "钥从 416",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/416.png",
+    "race": 1
+  },
+  "102101": {
+    "id": 102101,
+    "name": "钥从 102101",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/102101.png",
+    "race": 1
+  },
+  "102201": {
+    "id": 102201,
+    "name": "钥从 102201",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/102201.png",
+    "race": 1
+  },
+  "119701": {
+    "id": 119701,
+    "name": "钥从 119701",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/119701.png",
+    "race": 1
+  },
+  "113901": {
+    "id": 113901,
+    "name": "钥从 113901",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/113901.png",
+    "race": 1
+  },
+  "113801": {
+    "id": 113801,
+    "name": "钥从 113801",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/113801.png",
+    "race": 1
+  },
+  "109601": {
+    "id": 109601,
+    "name": "钥从 109601",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/109601.png",
+    "race": 1
+  },
+  "109701": {
+    "id": 109701,
+    "name": "钥从 109701",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/109701.png",
+    "race": 1
+  },
+  "106701": {
+    "id": 106701,
+    "name": "钥从 106701",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/106701.png",
+    "race": 1
+  },
+  "104201": {
+    "id": 104201,
+    "name": "钥从 104201",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/104201.png",
+    "race": 1
+  },
+  "104101": {
+    "id": 104101,
+    "name": "钥从 104101",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/104101.png",
+    "race": 1
+  },
+  "105901": {
+    "id": 105901,
+    "name": "钥从 105901",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/105901.png",
+    "race": 1
+  },
+  "103901": {
+    "id": 103901,
+    "name": "钥从 103901",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/103901.png",
+    "race": 1
+  },
+  "103801": {
+    "id": 103801,
+    "name": "钥从 103801",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/103801.png",
+    "race": 1
+  },
+  "424": {
+    "id": 424,
+    "name": "钥从 424",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/424.png",
+    "race": 1
+  },
+  "423": {
+    "id": 423,
+    "name": "钥从 423",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/423.png",
+    "race": 1
+  },
+  "415": {
+    "id": 415,
+    "name": "钥从 415",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/415.png",
+    "race": 1
+  },
+  "414": {
+    "id": 414,
+    "name": "钥从 414",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/414.png",
+    "race": 1
+  },
+  "413": {
+    "id": 413,
+    "name": "钥从 413",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/413.png",
+    "race": 1
+  },
+  "412": {
+    "id": 412,
+    "name": "钥从 412",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/412.png",
+    "race": 1
+  },
+  "411": {
+    "id": 411,
+    "name": "钥从 411",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/411.png",
+    "race": 1
+  },
+  "410": {
+    "id": 410,
+    "name": "钥从 410",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/410.png",
+    "race": 1
+  },
+  "409": {
+    "id": 409,
+    "name": "钥从 409",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/409.png",
+    "race": 1
+  },
+  "408": {
+    "id": 408,
+    "name": "钥从 408",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/408.png",
+    "race": 1
+  },
+  "407": {
+    "id": 407,
+    "name": "钥从 407",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/407.png",
+    "race": 1
+  },
+  "406": {
+    "id": 406,
+    "name": "钥从 406",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/406.png",
+    "race": 1
+  },
+  "422": {
+    "id": 422,
+    "name": "钥从 422",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/422.png",
+    "race": 1
+  },
+  "405": {
+    "id": 405,
+    "name": "钥从 405",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/405.png",
+    "race": 1
+  },
+  "404": {
+    "id": 404,
+    "name": "钥从 404",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/404.png",
+    "race": 1
+  },
+  "403": {
+    "id": 403,
+    "name": "钥从 403",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/403.png",
+    "race": 1
+  },
+  "402": {
+    "id": 402,
+    "name": "钥从 402",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/402.png",
+    "race": 1
+  },
+  "401": {
+    "id": 401,
+    "name": "钥从 401",
+    "rare": "R",
+    "type": "servant",
+    "img": "extracted_assets/servants/icons/401.png",
+    "race": 1
+  }
+}
