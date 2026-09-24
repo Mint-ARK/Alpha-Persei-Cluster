@@ -133,7 +133,7 @@
 
 适合无界面调试环境或直接运行 Python 核心：
 
-1. **安装 Python 核心依赖**：
+1. **安装 Python 核心依赖**（*源码调试需要；若使用 Release 便携包或安装包，环境已内置封装，开箱即用，无需执行本步*）：
    ```powershell
    cd v5_server
    pip install -r requirements.txt

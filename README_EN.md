@@ -133,7 +133,7 @@ This project is an experimental local simulation environment for offline study a
 
 Ideal for headless environments or direct Python debugging:
 
-1. **Install Python Dependencies**:
+1. **Install Python Dependencies** (*Required for source code debugging; pre-bundled in Portable & Setup distributions, skip if using Release builds*):
    ```powershell
    cd v5_server
    pip install -r requirements.txt
