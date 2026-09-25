@@ -1,0 +1,5860 @@
+{
+ "supported_heroes": [
+  1011,
+  1019,
+  1022,
+  1028,
+  1033,
+  1039,
+  1041,
+  1048,
+  1049,
+  1050,
+  1066,
+  1075,
+  1081,
+  1084,
+  1093,
+  1095,
+  1099,
+  1111,
+  1119,
+  1127,
+  1133,
+  1139,
+  1148,
+  1150,
+  1184,
+  1199,
+  1284
+ ],
+ "trust_level_caps": {
+  "1": 1500,
+  "2": 1700,
+  "3": 2300,
+  "4": 2500,
+  "5": 0
+ },
+ "mood_rates": {
+  "1": 1.0,
+  "2": 1.1,
+  "3": 1.3
+ },
+ "gift_exp": {
+  "30012": 40,
+  "30013": 80,
+  "30014": 160,
+  "30015": 320,
+  "50001": 20,
+  "50002": 20,
+  "50003": 20,
+  "50004": 20,
+  "50005": 20,
+  "50006": 20,
+  "50007": 20,
+  "50008": 20,
+  "50009": 20,
+  "50010": 20,
+  "50011": 20,
+  "50012": 20,
+  "50013": 20,
+  "50014": 20,
+  "50015": 20,
+  "50016": 20,
+  "50017": 20,
+  "50018": 20,
+  "50019": 20,
+  "50020": 20,
+  "50021": 20,
+  "50022": 20,
+  "50023": 20,
+  "50024": 20,
+  "50025": 20,
+  "50026": 20,
+  "50027": 20,
+  "50028": 20,
+  "50029": 20,
+  "50030": 20,
+  "50031": 20,
+  "50032": 20,
+  "50033": 20,
+  "50034": 20,
+  "50035": 20,
+  "50036": 20,
+  "50039": 20,
+  "50040": 20,
+  "50041": 20,
+  "50042": 20,
+  "50043": 20,
+  "50044": 20,
+  "50045": 20,
+  "50046": 20,
+  "50047": 20,
+  "50048": 20,
+  "50049": 20,
+  "50050": 20,
+  "50051": 20,
+  "50052": 20,
+  "50053": 20,
+  "50054": 20,
+  "50055": 20,
+  "50056": 20,
+  "50057": 20,
+  "50058": 20,
+  "50059": 20,
+  "50060": 20,
+  "50061": 20,
+  "50062": 20,
+  "50063": 20,
+  "50064": 20,
+  "50065": 20,
+  "50066": 20
+ },
+ "hero_trust_cfg": {
+  "1199": {
+   "1": {
+    "id": 1199,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1199,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1199,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1199,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950007,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1199,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1011": {
+   "1": {
+    "id": 1011,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1011,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1011,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1011,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950016,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1011,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1028": {
+   "1": {
+    "id": 1028,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1028,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1028,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1028,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950018,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1028,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1041": {
+   "1": {
+    "id": 1041,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1041,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1041,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1041,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950017,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1041,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1048": {
+   "1": {
+    "id": 1048,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1048,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1048,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1048,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950009,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1048,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1066": {
+   "1": {
+    "id": 1066,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1066,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1066,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1066,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950010,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1066,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1099": {
+   "1": {
+    "id": 1099,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1099,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1099,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1099,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950013,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1099,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1111": {
+   "1": {
+    "id": 1111,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1111,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1111,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1111,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950015,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1111,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1127": {
+   "1": {
+    "id": 1127,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1127,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1127,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1127,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950019,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1127,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1148": {
+   "1": {
+    "id": 1148,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1148,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1148,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1148,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950014,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1148,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1039": {
+   "1": {
+    "id": 1039,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1039,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1039,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1039,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950020,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1039,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1139": {
+   "1": {
+    "id": 1139,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1139,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1139,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1139,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950021,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1139,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1019": {
+   "1": {
+    "id": 1019,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1019,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1019,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1019,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950023,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1019,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1119": {
+   "1": {
+    "id": 1119,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1119,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1119,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1119,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950022,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1119,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1081": {
+   "1": {
+    "id": 1081,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1081,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1081,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1081,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950025,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1081,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1093": {
+   "1": {
+    "id": 1093,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1093,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1093,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1093,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950026,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1093,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1050": {
+   "1": {
+    "id": 1050,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1050,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1050,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1050,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950027,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1050,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1150": {
+   "1": {
+    "id": 1150,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1150,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1150,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1150,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950028,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1150,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1133": {
+   "1": {
+    "id": 1133,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1133,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1133,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1133,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950029,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1133,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1075": {
+   "1": {
+    "id": 1075,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1075,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1075,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1075,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950030,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1075,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1049": {
+   "1": {
+    "id": 1049,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1049,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1049,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1049,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950036,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1049,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1033": {
+   "1": {
+    "id": 1033,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1033,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1033,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1033,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950034,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1033,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1095": {
+   "1": {
+    "id": 1095,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1095,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1095,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1095,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950037,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1095,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1022": {
+   "1": {
+    "id": 1022,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1022,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1022,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1022,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950039,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1022,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1084": {
+   "1": {
+    "id": 1084,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1084,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1084,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1084,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 950043,
+      "num": 1
+     }
+    ]
+   },
+   "5": {
+    "id": 1084,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1184": {
+   "1": {
+    "id": 1184,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1184,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1184,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1184,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 800
+     }
+    ]
+   },
+   "5": {
+    "id": 1184,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  },
+  "1284": {
+   "1": {
+    "id": 1284,
+    "condition_list": [
+     2101,
+     5108
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 50
+     }
+    ]
+   },
+   "2": {
+    "id": 1284,
+    "condition_list": [
+     5101,
+     5109
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 80
+     }
+    ]
+   },
+   "3": {
+    "id": 1284,
+    "condition_list": [
+     5102,
+     5110
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 100
+     }
+    ]
+   },
+   "4": {
+    "id": 1284,
+    "condition_list": [
+     5103,
+     5111
+    ],
+    "reward_item_list": [
+     {
+      "id": 1,
+      "num": 800
+     }
+    ]
+   },
+   "5": {
+    "id": 1284,
+    "condition_list": [],
+    "reward_item_list": []
+   }
+  }
+ },
+ "relation_net_cfg": {
+  "101101": {
+   "id": 101101,
+   "hero_id": 1011,
+   "index": 1,
+   "intimate": [
+    1028
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "101102": {
+   "id": 101102,
+   "hero_id": 1011,
+   "index": 2,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "101103": {
+   "id": 101103,
+   "hero_id": 1011,
+   "index": 3,
+   "intimate": [
+    1048
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "101104": {
+   "id": 101104,
+   "hero_id": 1011,
+   "index": 4,
+   "intimate": [
+    1111
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "101105": {
+   "id": 101105,
+   "hero_id": 1011,
+   "index": 5,
+   "intimate": [
+    1084
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "102801": {
+   "id": 102801,
+   "hero_id": 1028,
+   "index": 1,
+   "intimate": [
+    1119
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "102802": {
+   "id": 102802,
+   "hero_id": 1028,
+   "index": 2,
+   "intimate": [
+    1111
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "102803": {
+   "id": 102803,
+   "hero_id": 1028,
+   "index": 3,
+   "intimate": [
+    1080
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "102804": {
+   "id": 102804,
+   "hero_id": 1028,
+   "index": 4,
+   "intimate": [
+    1066
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "102805": {
+   "id": 102805,
+   "hero_id": 1028,
+   "index": 5,
+   "intimate": [
+    1048
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "104101": {
+   "id": 104101,
+   "hero_id": 1041,
+   "index": 1,
+   "intimate": [
+    1097
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "104102": {
+   "id": 104102,
+   "hero_id": 1041,
+   "index": 2,
+   "intimate": [
+    1184
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "104103": {
+   "id": 104103,
+   "hero_id": 1041,
+   "index": 3,
+   "intimate": [
+    1042
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "104104": {
+   "id": 104104,
+   "hero_id": 1041,
+   "index": 4,
+   "intimate": [
+    1067
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "104105": {
+   "id": 104105,
+   "hero_id": 1041,
+   "index": 5,
+   "intimate": [
+    1038
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "104801": {
+   "id": 104801,
+   "hero_id": 1048,
+   "index": 1,
+   "intimate": [
+    1094,
+    1013
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "104802": {
+   "id": 104802,
+   "hero_id": 1048,
+   "index": 2,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "104803": {
+   "id": 104803,
+   "hero_id": 1048,
+   "index": 3,
+   "intimate": [
+    1084,
+    1039
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "104804": {
+   "id": 104804,
+   "hero_id": 1048,
+   "index": 4,
+   "intimate": [
+    1059
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "104805": {
+   "id": 104805,
+   "hero_id": 1048,
+   "index": 5,
+   "intimate": [
+    1028,
+    1027
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "106601": {
+   "id": 106601,
+   "hero_id": 1066,
+   "index": 1,
+   "intimate": [
+    1037
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "106602": {
+   "id": 106602,
+   "hero_id": 1066,
+   "index": 2,
+   "intimate": [
+    1080
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "106603": {
+   "id": 106603,
+   "hero_id": 1066,
+   "index": 3,
+   "intimate": [
+    1096
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "106604": {
+   "id": 106604,
+   "hero_id": 1066,
+   "index": 4,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "106605": {
+   "id": 106605,
+   "hero_id": 1066,
+   "index": 5,
+   "intimate": [
+    1033
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "109901": {
+   "id": 109901,
+   "hero_id": 1099,
+   "index": 1,
+   "intimate": [
+    1055,
+    1026
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "109902": {
+   "id": 109902,
+   "hero_id": 1099,
+   "index": 2,
+   "intimate": [
+    1184
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "109903": {
+   "id": 109903,
+   "hero_id": 1099,
+   "index": 3,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "109904": {
+   "id": 109904,
+   "hero_id": 1099,
+   "index": 4,
+   "intimate": [
+    1093
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "109905": {
+   "id": 109905,
+   "hero_id": 1099,
+   "index": 5,
+   "intimate": [
+    1050
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "111101": {
+   "id": 111101,
+   "hero_id": 1111,
+   "index": 1,
+   "intimate": [
+    1028
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "111102": {
+   "id": 111102,
+   "hero_id": 1111,
+   "index": 2,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "111103": {
+   "id": 111103,
+   "hero_id": 1111,
+   "index": 3,
+   "intimate": [
+    1048
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "111104": {
+   "id": 111104,
+   "hero_id": 1111,
+   "index": 4,
+   "intimate": [
+    1011
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "111105": {
+   "id": 111105,
+   "hero_id": 1111,
+   "index": 5,
+   "intimate": [
+    1084
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "112701": {
+   "id": 112701,
+   "hero_id": 1127,
+   "index": 1,
+   "intimate": [
+    1081
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "112702": {
+   "id": 112702,
+   "hero_id": 1127,
+   "index": 2,
+   "intimate": [
+    1056
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "112703": {
+   "id": 112703,
+   "hero_id": 1127,
+   "index": 3,
+   "intimate": [
+    1148
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "112704": {
+   "id": 112704,
+   "hero_id": 1127,
+   "index": 4,
+   "intimate": [
+    1139
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "112705": {
+   "id": 112705,
+   "hero_id": 1127,
+   "index": 5,
+   "intimate": [
+    1080
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "114801": {
+   "id": 114801,
+   "hero_id": 1148,
+   "index": 1,
+   "intimate": [
+    1094,
+    1013
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "114802": {
+   "id": 114802,
+   "hero_id": 1148,
+   "index": 2,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "114803": {
+   "id": 114803,
+   "hero_id": 1148,
+   "index": 3,
+   "intimate": [
+    1084,
+    1039
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "114804": {
+   "id": 114804,
+   "hero_id": 1148,
+   "index": 4,
+   "intimate": [
+    1059
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "114805": {
+   "id": 114805,
+   "hero_id": 1148,
+   "index": 5,
+   "intimate": [
+    1028,
+    1027
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "103901": {
+   "id": 103901,
+   "hero_id": 1039,
+   "index": 1,
+   "intimate": [
+    1038
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "103902": {
+   "id": 103902,
+   "hero_id": 1039,
+   "index": 2,
+   "intimate": [
+    1084
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "103903": {
+   "id": 103903,
+   "hero_id": 1039,
+   "index": 3,
+   "intimate": [
+    1148
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "103904": {
+   "id": 103904,
+   "hero_id": 1039,
+   "index": 4,
+   "intimate": [
+    1027
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "103905": {
+   "id": 103905,
+   "hero_id": 1039,
+   "index": 5,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "113901": {
+   "id": 113901,
+   "hero_id": 1139,
+   "index": 1,
+   "intimate": [
+    1038
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "113902": {
+   "id": 113902,
+   "hero_id": 1139,
+   "index": 2,
+   "intimate": [
+    1084
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "113903": {
+   "id": 113903,
+   "hero_id": 1139,
+   "index": 3,
+   "intimate": [
+    1148
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "113904": {
+   "id": 113904,
+   "hero_id": 1139,
+   "index": 4,
+   "intimate": [
+    1027
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "113905": {
+   "id": 113905,
+   "hero_id": 1139,
+   "index": 5,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "101901": {
+   "id": 101901,
+   "hero_id": 1019,
+   "index": 1,
+   "intimate": [
+    1111
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "101902": {
+   "id": 101902,
+   "hero_id": 1019,
+   "index": 2,
+   "intimate": [
+    1184,
+    1015
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "101903": {
+   "id": 101903,
+   "hero_id": 1019,
+   "index": 3,
+   "intimate": [
+    1028
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "101904": {
+   "id": 101904,
+   "hero_id": 1019,
+   "index": 4,
+   "intimate": [
+    1066
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "101905": {
+   "id": 101905,
+   "hero_id": 1019,
+   "index": 5,
+   "intimate": [
+    1039
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "111901": {
+   "id": 111901,
+   "hero_id": 1119,
+   "index": 1,
+   "intimate": [
+    1111
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "111902": {
+   "id": 111902,
+   "hero_id": 1119,
+   "index": 2,
+   "intimate": [
+    1184,
+    1015
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "111903": {
+   "id": 111903,
+   "hero_id": 1119,
+   "index": 3,
+   "intimate": [
+    1028
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "111904": {
+   "id": 111904,
+   "hero_id": 1119,
+   "index": 4,
+   "intimate": [
+    1066
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "111905": {
+   "id": 111905,
+   "hero_id": 1119,
+   "index": 5,
+   "intimate": [
+    1039
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "108101": {
+   "id": 108101,
+   "hero_id": 1081,
+   "index": 1,
+   "intimate": [
+    1055
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "108102": {
+   "id": 108102,
+   "hero_id": 1081,
+   "index": 2,
+   "intimate": [
+    1056
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "108103": {
+   "id": 108103,
+   "hero_id": 1081,
+   "index": 3,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "108104": {
+   "id": 108104,
+   "hero_id": 1081,
+   "index": 4,
+   "intimate": [
+    1039
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "108105": {
+   "id": 108105,
+   "hero_id": 1081,
+   "index": 5,
+   "intimate": [
+    1027
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  },
+  "109301": {
+   "id": 109301,
+   "hero_id": 1093,
+   "index": 1,
+   "intimate": [
+    1199
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "109302": {
+   "id": 109302,
+   "hero_id": 1093,
+   "index": 2,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "109303": {
+   "id": 109303,
+   "hero_id": 1093,
+   "index": 3,
+   "intimate": [
+    1055
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "109304": {
+   "id": 109304,
+   "hero_id": 1093,
+   "index": 4,
+   "intimate": [
+    1084
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "109305": {
+   "id": 109305,
+   "hero_id": 1093,
+   "index": 5,
+   "intimate": [
+    1150
+   ],
+   "relation_upgrade_group": [
+    8,
+    19,
+    16
+   ]
+  },
+  "105001": {
+   "id": 105001,
+   "hero_id": 1050,
+   "index": 1,
+   "intimate": [
+    1099
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "105002": {
+   "id": 105002,
+   "hero_id": 1050,
+   "index": 2,
+   "intimate": [
+    1284
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "105003": {
+   "id": 105003,
+   "hero_id": 1050,
+   "index": 3,
+   "intimate": [
+    1055
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "105004": {
+   "id": 105004,
+   "hero_id": 1050,
+   "index": 4,
+   "intimate": [
+    1049
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "105005": {
+   "id": 105005,
+   "hero_id": 1050,
+   "index": 5,
+   "intimate": [
+    1093
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "115001": {
+   "id": 115001,
+   "hero_id": 1150,
+   "index": 1,
+   "intimate": [
+    1099
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "115002": {
+   "id": 115002,
+   "hero_id": 1150,
+   "index": 2,
+   "intimate": [
+    1284
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "115003": {
+   "id": 115003,
+   "hero_id": 1150,
+   "index": 3,
+   "intimate": [
+    1055
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "115004": {
+   "id": 115004,
+   "hero_id": 1150,
+   "index": 4,
+   "intimate": [
+    1049
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "115005": {
+   "id": 115005,
+   "hero_id": 1150,
+   "index": 5,
+   "intimate": [
+    1093
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "113301": {
+   "id": 113301,
+   "hero_id": 1133,
+   "index": 1,
+   "intimate": [
+    1061
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "113302": {
+   "id": 113302,
+   "hero_id": 1133,
+   "index": 2,
+   "intimate": [
+    1028
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "113303": {
+   "id": 113303,
+   "hero_id": 1133,
+   "index": 3,
+   "intimate": [
+    1248
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "113304": {
+   "id": 113304,
+   "hero_id": 1133,
+   "index": 4,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "113305": {
+   "id": 113305,
+   "hero_id": 1133,
+   "index": 5,
+   "intimate": [
+    1066
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "107501": {
+   "id": 107501,
+   "hero_id": 1075,
+   "index": 1,
+   "intimate": [
+    1084
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "107502": {
+   "id": 107502,
+   "hero_id": 1075,
+   "index": 2,
+   "intimate": [
+    1072
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "107503": {
+   "id": 107503,
+   "hero_id": 1075,
+   "index": 3,
+   "intimate": [
+    1074
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "107504": {
+   "id": 107504,
+   "hero_id": 1075,
+   "index": 4,
+   "intimate": [
+    1061
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "107505": {
+   "id": 107505,
+   "hero_id": 1075,
+   "index": 5,
+   "intimate": [
+    1076
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "104901": {
+   "id": 104901,
+   "hero_id": 1049,
+   "index": 1,
+   "intimate": [
+    1150
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "104902": {
+   "id": 104902,
+   "hero_id": 1049,
+   "index": 2,
+   "intimate": [
+    1055
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "104903": {
+   "id": 104903,
+   "hero_id": 1049,
+   "index": 3,
+   "intimate": [
+    1093
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "104904": {
+   "id": 104904,
+   "hero_id": 1049,
+   "index": 4,
+   "intimate": [
+    1099
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "104905": {
+   "id": 104905,
+   "hero_id": 1049,
+   "index": 5,
+   "intimate": [
+    1015
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "103301": {
+   "id": 103301,
+   "hero_id": 1033,
+   "index": 1,
+   "intimate": [
+    1061
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "103302": {
+   "id": 103302,
+   "hero_id": 1033,
+   "index": 2,
+   "intimate": [
+    1028
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "103303": {
+   "id": 103303,
+   "hero_id": 1033,
+   "index": 3,
+   "intimate": [
+    1248
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "103304": {
+   "id": 103304,
+   "hero_id": 1033,
+   "index": 4,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "103305": {
+   "id": 103305,
+   "hero_id": 1033,
+   "index": 5,
+   "intimate": [
+    1066
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "109501": {
+   "id": 109501,
+   "hero_id": 1095,
+   "index": 1,
+   "intimate": [
+    1084
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "109502": {
+   "id": 109502,
+   "hero_id": 1095,
+   "index": 2,
+   "intimate": [
+    1020
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "109503": {
+   "id": 109503,
+   "hero_id": 1095,
+   "index": 3,
+   "intimate": [
+    1012
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "109504": {
+   "id": 109504,
+   "hero_id": 1095,
+   "index": 4,
+   "intimate": [
+    1034
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "109505": {
+   "id": 109505,
+   "hero_id": 1095,
+   "index": 5,
+   "intimate": [
+    1015
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "102201": {
+   "id": 102201,
+   "hero_id": 1022,
+   "index": 1,
+   "intimate": [
+    1038
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "102202": {
+   "id": 102202,
+   "hero_id": 1022,
+   "index": 2,
+   "intimate": [
+    1041
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "102203": {
+   "id": 102203,
+   "hero_id": 1022,
+   "index": 3,
+   "intimate": [
+    1097
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "102204": {
+   "id": 102204,
+   "hero_id": 1022,
+   "index": 4,
+   "intimate": [
+    1042
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "102205": {
+   "id": 102205,
+   "hero_id": 1022,
+   "index": 5,
+   "intimate": [
+    1021
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "108401": {
+   "id": 108401,
+   "hero_id": 1084,
+   "index": 1,
+   "intimate": [
+    1027
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "108402": {
+   "id": 108402,
+   "hero_id": 1084,
+   "index": 2,
+   "intimate": [
+    1248
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "108403": {
+   "id": 108403,
+   "hero_id": 1084,
+   "index": 3,
+   "intimate": [
+    1039
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "108404": {
+   "id": 108404,
+   "hero_id": 1084,
+   "index": 4,
+   "intimate": [
+    1047
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "108405": {
+   "id": 108405,
+   "hero_id": 1084,
+   "index": 5,
+   "intimate": [
+    1211
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "118401": {
+   "id": 118401,
+   "hero_id": 1184,
+   "index": 1,
+   "intimate": [
+    1027
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "118402": {
+   "id": 118402,
+   "hero_id": 1184,
+   "index": 2,
+   "intimate": [
+    1248
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "118403": {
+   "id": 118403,
+   "hero_id": 1184,
+   "index": 3,
+   "intimate": [
+    1039
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "118404": {
+   "id": 118404,
+   "hero_id": 1184,
+   "index": 4,
+   "intimate": [
+    1047
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "118405": {
+   "id": 118405,
+   "hero_id": 1184,
+   "index": 5,
+   "intimate": [
+    1211
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "128401": {
+   "id": 128401,
+   "hero_id": 1284,
+   "index": 1,
+   "intimate": [
+    1027
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "128402": {
+   "id": 128402,
+   "hero_id": 1284,
+   "index": 2,
+   "intimate": [
+    1248
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "128403": {
+   "id": 128403,
+   "hero_id": 1284,
+   "index": 3,
+   "intimate": [
+    1039
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "128404": {
+   "id": 128404,
+   "hero_id": 1284,
+   "index": 4,
+   "intimate": [
+    1047
+   ],
+   "relation_upgrade_group": [
+    4,
+    18,
+    15
+   ]
+  },
+  "128405": {
+   "id": 128405,
+   "hero_id": 1284,
+   "index": 5,
+   "intimate": [
+    1211
+   ],
+   "relation_upgrade_group": [
+    8,
+    18,
+    16
+   ]
+  },
+  "1": {
+   "id": 1,
+   "hero_id": 1199,
+   "index": 1,
+   "intimate": [
+    1055,
+    1026
+   ],
+   "relation_upgrade_group": [
+    1,
+    13,
+    9
+   ]
+  },
+  "2": {
+   "id": 2,
+   "hero_id": 1199,
+   "index": 2,
+   "intimate": [
+    1184
+   ],
+   "relation_upgrade_group": [
+    2,
+    6,
+    10
+   ]
+  },
+  "3": {
+   "id": 3,
+   "hero_id": 1199,
+   "index": 3,
+   "intimate": [
+    1019
+   ],
+   "relation_upgrade_group": [
+    3,
+    7,
+    14
+   ]
+  },
+  "4": {
+   "id": 4,
+   "hero_id": 1199,
+   "index": 4,
+   "intimate": [
+    1093
+   ],
+   "relation_upgrade_group": [
+    4,
+    11,
+    15
+   ]
+  },
+  "5": {
+   "id": 5,
+   "hero_id": 1199,
+   "index": 5,
+   "intimate": [
+    1050
+   ],
+   "relation_upgrade_group": [
+    8,
+    12,
+    16
+   ]
+  }
+ },
+ "relation_upgrade_cfg": {
+  "1": {
+   "id": 1,
+   "condition_id": 1001
+  },
+  "2": {
+   "id": 2,
+   "condition_id": 1002
+  },
+  "3": {
+   "id": 3,
+   "condition_id": 1003
+  },
+  "4": {
+   "id": 4,
+   "condition_id": 1004
+  },
+  "5": {
+   "id": 5,
+   "condition_id": 2001
+  },
+  "6": {
+   "id": 6,
+   "condition_id": 2002
+  },
+  "7": {
+   "id": 7,
+   "condition_id": 2003
+  },
+  "8": {
+   "id": 8,
+   "condition_id": 2004
+  },
+  "9": {
+   "id": 9,
+   "condition_id": 3001
+  },
+  "10": {
+   "id": 10,
+   "condition_id": 3002
+  },
+  "11": {
+   "id": 11,
+   "condition_id": 4001
+  },
+  "12": {
+   "id": 12,
+   "condition_id": 4002
+  },
+  "13": {
+   "id": 13,
+   "condition_id": 5001
+  },
+  "14": {
+   "id": 14,
+   "condition_id": 5002
+  },
+  "15": {
+   "id": 15,
+   "condition_id": 6001
+  },
+  "16": {
+   "id": 16,
+   "condition_id": 6002
+  },
+  "17": {
+   "id": 17,
+   "condition_id": 6003
+  },
+  "18": {
+   "id": 18,
+   "condition_id": 4003
+  },
+  "19": {
+   "id": 19,
+   "condition_id": 4004
+  }
+ },
+ "relation_upgrade_condition_cfg": {
+  "1001": {
+   "id": 1001,
+   "type": 1,
+   "arg": [
+    20
+   ]
+  },
+  "1002": {
+   "id": 1002,
+   "type": 1,
+   "arg": [
+    40
+   ]
+  },
+  "1003": {
+   "id": 1003,
+   "type": 1,
+   "arg": [
+    60
+   ]
+  },
+  "1004": {
+   "id": 1004,
+   "type": 1,
+   "arg": [
+    80
+   ]
+  },
+  "2001": {
+   "id": 2001,
+   "type": 2,
+   "arg": [
+    25
+   ]
+  },
+  "2002": {
+   "id": 2002,
+   "type": 2,
+   "arg": [
+    50
+   ]
+  },
+  "2003": {
+   "id": 2003,
+   "type": 2,
+   "arg": [
+    100
+   ]
+  },
+  "2004": {
+   "id": 2004,
+   "type": 2,
+   "arg": [
+    150
+   ]
+  },
+  "3001": {
+   "id": 3001,
+   "type": 3,
+   "arg": [
+    40
+   ]
+  },
+  "3002": {
+   "id": 3002,
+   "type": 3,
+   "arg": [
+    60
+   ]
+  },
+  "4001": {
+   "id": 4001,
+   "type": 4,
+   "arg": [
+    500
+   ]
+  },
+  "4002": {
+   "id": 4002,
+   "type": 4,
+   "arg": [
+    600
+   ]
+  },
+  "4003": {
+   "id": 4003,
+   "type": 4,
+   "arg": [
+    400
+   ]
+  },
+  "4004": {
+   "id": 4004,
+   "type": 4,
+   "arg": [
+    300
+   ]
+  },
+  "5001": {
+   "id": 5001,
+   "type": 5,
+   "arg": [
+    50
+   ]
+  },
+  "5002": {
+   "id": 5002,
+   "type": 5,
+   "arg": [
+    100
+   ]
+  },
+  "6001": {
+   "id": 6001,
+   "type": 6,
+   "arg": [
+    6
+   ]
+  },
+  "6002": {
+   "id": 6002,
+   "type": 6,
+   "arg": [
+    18
+   ]
+  },
+  "6003": {
+   "id": 6003,
+   "type": 6,
+   "arg": [
+    12
+   ]
+  }
+ },
+ "relation_story_cfg": {
+  "101101": {
+   "id": 101101,
+   "story_id": 710110101,
+   "main_hero_id": 1011,
+   "relate_hero_id": 1084,
+   "story_reward": []
+  },
+  "101102": {
+   "id": 101102,
+   "story_id": 710110102,
+   "main_hero_id": 1011,
+   "relate_hero_id": 1111,
+   "story_reward": []
+  },
+  "101103": {
+   "id": 101103,
+   "story_id": 0,
+   "main_hero_id": 1011,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "101104": {
+   "id": 101104,
+   "story_id": 710110103,
+   "main_hero_id": 1011,
+   "relate_hero_id": 1048,
+   "story_reward": []
+  },
+  "101105": {
+   "id": 101105,
+   "story_id": 0,
+   "main_hero_id": 1011,
+   "relate_hero_id": 1028,
+   "story_reward": []
+  },
+  "102801": {
+   "id": 102801,
+   "story_id": 710280101,
+   "main_hero_id": 1028,
+   "relate_hero_id": 1119,
+   "story_reward": []
+  },
+  "102802": {
+   "id": 102802,
+   "story_id": 0,
+   "main_hero_id": 1028,
+   "relate_hero_id": 1111,
+   "story_reward": []
+  },
+  "102803": {
+   "id": 102803,
+   "story_id": 710280102,
+   "main_hero_id": 1028,
+   "relate_hero_id": 1080,
+   "story_reward": []
+  },
+  "102804": {
+   "id": 102804,
+   "story_id": 710280103,
+   "main_hero_id": 1028,
+   "relate_hero_id": 1066,
+   "story_reward": []
+  },
+  "102805": {
+   "id": 102805,
+   "story_id": 0,
+   "main_hero_id": 1028,
+   "relate_hero_id": 1048,
+   "story_reward": []
+  },
+  "104101": {
+   "id": 104101,
+   "story_id": 710410101,
+   "main_hero_id": 1041,
+   "relate_hero_id": 1038,
+   "story_reward": []
+  },
+  "104102": {
+   "id": 104102,
+   "story_id": 0,
+   "main_hero_id": 1041,
+   "relate_hero_id": 1067,
+   "story_reward": []
+  },
+  "104103": {
+   "id": 104103,
+   "story_id": 710410102,
+   "main_hero_id": 1041,
+   "relate_hero_id": 1042,
+   "story_reward": []
+  },
+  "104104": {
+   "id": 104104,
+   "story_id": 710410103,
+   "main_hero_id": 1041,
+   "relate_hero_id": 1097,
+   "story_reward": []
+  },
+  "104105": {
+   "id": 104105,
+   "story_id": 0,
+   "main_hero_id": 1041,
+   "relate_hero_id": 1184,
+   "story_reward": []
+  },
+  "104801": {
+   "id": 104801,
+   "story_id": 710480103,
+   "main_hero_id": 1048,
+   "relate_hero_id": 1094,
+   "story_reward": []
+  },
+  "104802": {
+   "id": 104802,
+   "story_id": 0,
+   "main_hero_id": 1048,
+   "relate_hero_id": 1013,
+   "story_reward": []
+  },
+  "104803": {
+   "id": 104803,
+   "story_id": 0,
+   "main_hero_id": 1048,
+   "relate_hero_id": 1084,
+   "story_reward": []
+  },
+  "104804": {
+   "id": 104804,
+   "story_id": 0,
+   "main_hero_id": 1048,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "104805": {
+   "id": 104805,
+   "story_id": 710480102,
+   "main_hero_id": 1048,
+   "relate_hero_id": 1028,
+   "story_reward": []
+  },
+  "104806": {
+   "id": 104806,
+   "story_id": 710480101,
+   "main_hero_id": 1048,
+   "relate_hero_id": 1059,
+   "story_reward": []
+  },
+  "104807": {
+   "id": 104807,
+   "story_id": 0,
+   "main_hero_id": 1048,
+   "relate_hero_id": 1039,
+   "story_reward": []
+  },
+  "104808": {
+   "id": 104808,
+   "story_id": 0,
+   "main_hero_id": 1048,
+   "relate_hero_id": 1027,
+   "story_reward": []
+  },
+  "106601": {
+   "id": 106601,
+   "story_id": 710660101,
+   "main_hero_id": 1066,
+   "relate_hero_id": 1037,
+   "story_reward": []
+  },
+  "106602": {
+   "id": 106602,
+   "story_id": 0,
+   "main_hero_id": 1066,
+   "relate_hero_id": 1080,
+   "story_reward": []
+  },
+  "106603": {
+   "id": 106603,
+   "story_id": 710660104,
+   "main_hero_id": 1066,
+   "relate_hero_id": 1096,
+   "story_reward": []
+  },
+  "106604": {
+   "id": 106604,
+   "story_id": 710660103,
+   "main_hero_id": 1066,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "106605": {
+   "id": 106605,
+   "story_id": 0,
+   "main_hero_id": 1066,
+   "relate_hero_id": 1033,
+   "story_reward": []
+  },
+  "109901": {
+   "id": 109901,
+   "story_id": 710990101,
+   "main_hero_id": 1099,
+   "relate_hero_id": 1093,
+   "story_reward": []
+  },
+  "109902": {
+   "id": 109902,
+   "story_id": 0,
+   "main_hero_id": 1099,
+   "relate_hero_id": 1050,
+   "story_reward": []
+  },
+  "109903": {
+   "id": 109903,
+   "story_id": 710990102,
+   "main_hero_id": 1099,
+   "relate_hero_id": 1184,
+   "story_reward": []
+  },
+  "109904": {
+   "id": 109904,
+   "story_id": 0,
+   "main_hero_id": 1099,
+   "relate_hero_id": 1026,
+   "story_reward": []
+  },
+  "109905": {
+   "id": 109905,
+   "story_id": 0,
+   "main_hero_id": 1099,
+   "relate_hero_id": 1055,
+   "story_reward": []
+  },
+  "109906": {
+   "id": 109906,
+   "story_id": 710990103,
+   "main_hero_id": 1099,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "111101": {
+   "id": 111101,
+   "story_id": 0,
+   "main_hero_id": 1111,
+   "relate_hero_id": 1084,
+   "story_reward": []
+  },
+  "111102": {
+   "id": 111102,
+   "story_id": 0,
+   "main_hero_id": 1111,
+   "relate_hero_id": 1011,
+   "story_reward": []
+  },
+  "111103": {
+   "id": 111103,
+   "story_id": 711110101,
+   "main_hero_id": 1111,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "111104": {
+   "id": 111104,
+   "story_id": 0,
+   "main_hero_id": 1111,
+   "relate_hero_id": 1048,
+   "story_reward": []
+  },
+  "111105": {
+   "id": 111105,
+   "story_id": 711110102,
+   "main_hero_id": 1111,
+   "relate_hero_id": 1028,
+   "story_reward": []
+  },
+  "121701": {
+   "id": 121701,
+   "story_id": 710270105,
+   "main_hero_id": 1127,
+   "relate_hero_id": 1081,
+   "story_reward": []
+  },
+  "121702": {
+   "id": 121702,
+   "story_id": 710270104,
+   "main_hero_id": 1127,
+   "relate_hero_id": 1056,
+   "story_reward": []
+  },
+  "121703": {
+   "id": 121703,
+   "story_id": 0,
+   "main_hero_id": 1127,
+   "relate_hero_id": 1148,
+   "story_reward": []
+  },
+  "121704": {
+   "id": 121704,
+   "story_id": 0,
+   "main_hero_id": 1127,
+   "relate_hero_id": 1139,
+   "story_reward": []
+  },
+  "121705": {
+   "id": 121705,
+   "story_id": 710270101,
+   "main_hero_id": 1127,
+   "relate_hero_id": 1080,
+   "story_reward": []
+  },
+  "114801": {
+   "id": 114801,
+   "story_id": 0,
+   "main_hero_id": 1148,
+   "relate_hero_id": 1094,
+   "story_reward": []
+  },
+  "114802": {
+   "id": 114802,
+   "story_id": 711480104,
+   "main_hero_id": 1148,
+   "relate_hero_id": 1013,
+   "story_reward": []
+  },
+  "114803": {
+   "id": 114803,
+   "story_id": 711480101,
+   "main_hero_id": 1148,
+   "relate_hero_id": 1084,
+   "story_reward": []
+  },
+  "114804": {
+   "id": 114804,
+   "story_id": 711480103,
+   "main_hero_id": 1148,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "114805": {
+   "id": 114805,
+   "story_id": 0,
+   "main_hero_id": 1148,
+   "relate_hero_id": 1028,
+   "story_reward": []
+  },
+  "114806": {
+   "id": 114806,
+   "story_id": 0,
+   "main_hero_id": 1148,
+   "relate_hero_id": 1059,
+   "story_reward": []
+  },
+  "114807": {
+   "id": 114807,
+   "story_id": 711480102,
+   "main_hero_id": 1148,
+   "relate_hero_id": 1039,
+   "story_reward": []
+  },
+  "114808": {
+   "id": 114808,
+   "story_id": 0,
+   "main_hero_id": 1148,
+   "relate_hero_id": 1027,
+   "story_reward": []
+  },
+  "103901": {
+   "id": 103901,
+   "story_id": 0,
+   "main_hero_id": 1039,
+   "relate_hero_id": 1038,
+   "story_reward": []
+  },
+  "103902": {
+   "id": 103902,
+   "story_id": 710390102,
+   "main_hero_id": 1039,
+   "relate_hero_id": 1084,
+   "story_reward": []
+  },
+  "103903": {
+   "id": 103903,
+   "story_id": 710390101,
+   "main_hero_id": 1039,
+   "relate_hero_id": 1148,
+   "story_reward": []
+  },
+  "103904": {
+   "id": 103904,
+   "story_id": 0,
+   "main_hero_id": 1039,
+   "relate_hero_id": 1027,
+   "story_reward": []
+  },
+  "103905": {
+   "id": 103905,
+   "story_id": 710390103,
+   "main_hero_id": 1039,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "113901": {
+   "id": 113901,
+   "story_id": 711390101,
+   "main_hero_id": 1139,
+   "relate_hero_id": 1038,
+   "story_reward": []
+  },
+  "113902": {
+   "id": 113902,
+   "story_id": 0,
+   "main_hero_id": 1139,
+   "relate_hero_id": 1084,
+   "story_reward": []
+  },
+  "113903": {
+   "id": 113903,
+   "story_id": 0,
+   "main_hero_id": 1139,
+   "relate_hero_id": 1148,
+   "story_reward": []
+  },
+  "113904": {
+   "id": 113904,
+   "story_id": 711390102,
+   "main_hero_id": 1139,
+   "relate_hero_id": 1027,
+   "story_reward": []
+  },
+  "113905": {
+   "id": 113905,
+   "story_id": 0,
+   "main_hero_id": 1139,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "101901": {
+   "id": 101901,
+   "story_id": 0,
+   "main_hero_id": 1019,
+   "relate_hero_id": 1111,
+   "story_reward": []
+  },
+  "101902": {
+   "id": 101902,
+   "story_id": 0,
+   "main_hero_id": 1019,
+   "relate_hero_id": 1184,
+   "story_reward": []
+  },
+  "101903": {
+   "id": 101903,
+   "story_id": 0,
+   "main_hero_id": 1019,
+   "relate_hero_id": 1015,
+   "story_reward": []
+  },
+  "101904": {
+   "id": 101904,
+   "story_id": 0,
+   "main_hero_id": 1019,
+   "relate_hero_id": 1028,
+   "story_reward": []
+  },
+  "101905": {
+   "id": 101905,
+   "story_id": 710190102,
+   "main_hero_id": 1019,
+   "relate_hero_id": 1066,
+   "story_reward": []
+  },
+  "101906": {
+   "id": 101906,
+   "story_id": 710190101,
+   "main_hero_id": 1019,
+   "relate_hero_id": 1039,
+   "story_reward": []
+  },
+  "111901": {
+   "id": 111901,
+   "story_id": 0,
+   "main_hero_id": 1119,
+   "relate_hero_id": 1111,
+   "story_reward": []
+  },
+  "111902": {
+   "id": 111902,
+   "story_id": 711190103,
+   "main_hero_id": 1119,
+   "relate_hero_id": 1184,
+   "story_reward": []
+  },
+  "111903": {
+   "id": 111903,
+   "story_id": 711190101,
+   "main_hero_id": 1119,
+   "relate_hero_id": 1015,
+   "story_reward": []
+  },
+  "111904": {
+   "id": 111904,
+   "story_id": 711190102,
+   "main_hero_id": 1119,
+   "relate_hero_id": 1028,
+   "story_reward": []
+  },
+  "111905": {
+   "id": 111905,
+   "story_id": 0,
+   "main_hero_id": 1119,
+   "relate_hero_id": 1066,
+   "story_reward": []
+  },
+  "111906": {
+   "id": 111906,
+   "story_id": 0,
+   "main_hero_id": 1119,
+   "relate_hero_id": 1039,
+   "story_reward": []
+  },
+  "108101": {
+   "id": 108101,
+   "story_id": 0,
+   "main_hero_id": 1081,
+   "relate_hero_id": 1055,
+   "story_reward": []
+  },
+  "108102": {
+   "id": 108102,
+   "story_id": 0,
+   "main_hero_id": 1081,
+   "relate_hero_id": 1056,
+   "story_reward": []
+  },
+  "108103": {
+   "id": 108103,
+   "story_id": 710810101,
+   "main_hero_id": 1081,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "108104": {
+   "id": 108104,
+   "story_id": 710810102,
+   "main_hero_id": 1081,
+   "relate_hero_id": 1039,
+   "story_reward": []
+  },
+  "108105": {
+   "id": 108105,
+   "story_id": 710810103,
+   "main_hero_id": 1081,
+   "relate_hero_id": 1027,
+   "story_reward": []
+  },
+  "109301": {
+   "id": 109301,
+   "story_id": 710930103,
+   "main_hero_id": 1093,
+   "relate_hero_id": 1199,
+   "story_reward": []
+  },
+  "109302": {
+   "id": 109302,
+   "story_id": 0,
+   "main_hero_id": 1093,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "109303": {
+   "id": 109303,
+   "story_id": 710930101,
+   "main_hero_id": 1093,
+   "relate_hero_id": 1055,
+   "story_reward": []
+  },
+  "109304": {
+   "id": 109304,
+   "story_id": 0,
+   "main_hero_id": 1093,
+   "relate_hero_id": 1084,
+   "story_reward": []
+  },
+  "109305": {
+   "id": 109305,
+   "story_id": 710930102,
+   "main_hero_id": 1093,
+   "relate_hero_id": 1150,
+   "story_reward": []
+  },
+  "105001": {
+   "id": 105001,
+   "story_id": 710500102,
+   "main_hero_id": 1050,
+   "relate_hero_id": 1099,
+   "story_reward": []
+  },
+  "105002": {
+   "id": 105002,
+   "story_id": 0,
+   "main_hero_id": 1050,
+   "relate_hero_id": 1284,
+   "story_reward": []
+  },
+  "105003": {
+   "id": 105003,
+   "story_id": 0,
+   "main_hero_id": 1050,
+   "relate_hero_id": 1055,
+   "story_reward": []
+  },
+  "105004": {
+   "id": 105004,
+   "story_id": 0,
+   "main_hero_id": 1050,
+   "relate_hero_id": 1049,
+   "story_reward": []
+  },
+  "105005": {
+   "id": 105005,
+   "story_id": 710500101,
+   "main_hero_id": 1050,
+   "relate_hero_id": 1093,
+   "story_reward": []
+  },
+  "115001": {
+   "id": 115001,
+   "story_id": 0,
+   "main_hero_id": 1150,
+   "relate_hero_id": 1099,
+   "story_reward": []
+  },
+  "115002": {
+   "id": 115002,
+   "story_id": 711500103,
+   "main_hero_id": 1150,
+   "relate_hero_id": 1284,
+   "story_reward": []
+  },
+  "115003": {
+   "id": 115003,
+   "story_id": 711500101,
+   "main_hero_id": 1150,
+   "relate_hero_id": 1055,
+   "story_reward": []
+  },
+  "115004": {
+   "id": 115004,
+   "story_id": 711500102,
+   "main_hero_id": 1150,
+   "relate_hero_id": 1049,
+   "story_reward": []
+  },
+  "115005": {
+   "id": 115005,
+   "story_id": 0,
+   "main_hero_id": 1150,
+   "relate_hero_id": 1093,
+   "story_reward": []
+  },
+  "113301": {
+   "id": 113301,
+   "story_id": 711330103,
+   "main_hero_id": 1133,
+   "relate_hero_id": 1061,
+   "story_reward": []
+  },
+  "113302": {
+   "id": 113302,
+   "story_id": 711330101,
+   "main_hero_id": 1133,
+   "relate_hero_id": 1028,
+   "story_reward": []
+  },
+  "113303": {
+   "id": 113303,
+   "story_id": 711330102,
+   "main_hero_id": 1133,
+   "relate_hero_id": 1248,
+   "story_reward": []
+  },
+  "113304": {
+   "id": 113304,
+   "story_id": 0,
+   "main_hero_id": 1133,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "113305": {
+   "id": 113305,
+   "story_id": 0,
+   "main_hero_id": 1133,
+   "relate_hero_id": 1066,
+   "story_reward": []
+  },
+  "107501": {
+   "id": 107501,
+   "story_id": 0,
+   "main_hero_id": 1075,
+   "relate_hero_id": 1084,
+   "story_reward": []
+  },
+  "107502": {
+   "id": 107502,
+   "story_id": 0,
+   "main_hero_id": 1075,
+   "relate_hero_id": 1072,
+   "story_reward": []
+  },
+  "107503": {
+   "id": 107503,
+   "story_id": 710750103,
+   "main_hero_id": 1075,
+   "relate_hero_id": 1074,
+   "story_reward": []
+  },
+  "107504": {
+   "id": 107504,
+   "story_id": 710750102,
+   "main_hero_id": 1075,
+   "relate_hero_id": 1061,
+   "story_reward": []
+  },
+  "107505": {
+   "id": 107505,
+   "story_id": 710750101,
+   "main_hero_id": 1075,
+   "relate_hero_id": 1076,
+   "story_reward": []
+  },
+  "104901": {
+   "id": 104901,
+   "story_id": 710490103,
+   "main_hero_id": 1049,
+   "relate_hero_id": 1150,
+   "story_reward": []
+  },
+  "104902": {
+   "id": 104902,
+   "story_id": 0,
+   "main_hero_id": 1049,
+   "relate_hero_id": 1055,
+   "story_reward": []
+  },
+  "104903": {
+   "id": 104903,
+   "story_id": 710490102,
+   "main_hero_id": 1049,
+   "relate_hero_id": 1093,
+   "story_reward": []
+  },
+  "104904": {
+   "id": 104904,
+   "story_id": 0,
+   "main_hero_id": 1049,
+   "relate_hero_id": 1099,
+   "story_reward": []
+  },
+  "104905": {
+   "id": 104905,
+   "story_id": 710490101,
+   "main_hero_id": 1049,
+   "relate_hero_id": 1015,
+   "story_reward": []
+  },
+  "103301": {
+   "id": 103301,
+   "story_id": 0,
+   "main_hero_id": 1033,
+   "relate_hero_id": 1061,
+   "story_reward": []
+  },
+  "103302": {
+   "id": 103302,
+   "story_id": 0,
+   "main_hero_id": 1033,
+   "relate_hero_id": 1028,
+   "story_reward": []
+  },
+  "103303": {
+   "id": 103303,
+   "story_id": 0,
+   "main_hero_id": 1033,
+   "relate_hero_id": 1248,
+   "story_reward": []
+  },
+  "103304": {
+   "id": 103304,
+   "story_id": 710330102,
+   "main_hero_id": 1033,
+   "relate_hero_id": 1019,
+   "story_reward": []
+  },
+  "103305": {
+   "id": 103305,
+   "story_id": 710330101,
+   "main_hero_id": 1033,
+   "relate_hero_id": 1066,
+   "story_reward": []
+  },
+  "109501": {
+   "id": 109501,
+   "story_id": 0,
+   "main_hero_id": 1095,
+   "relate_hero_id": 1084,
+   "story_reward": []
+  },
+  "109502": {
+   "id": 109502,
+   "story_id": 710950103,
+   "main_hero_id": 1095,
+   "relate_hero_id": 1020,
+   "story_reward": []
+  },
+  "109503": {
+   "id": 109503,
+   "story_id": 710950102,
+   "main_hero_id": 1095,
+   "relate_hero_id": 1012,
+   "story_reward": []
+  },
+  "109504": {
+   "id": 109504,
+   "story_id": 0,
+   "main_hero_id": 1095,
+   "relate_hero_id": 1034,
+   "story_reward": []
+  },
+  "109505": {
+   "id": 109505,
+   "story_id": 710950101,
+   "main_hero_id": 1095,
+   "relate_hero_id": 1015,
+   "story_reward": []
+  },
+  "102201": {
+   "id": 102201,
+   "story_id": 710220103,
+   "main_hero_id": 1022,
+   "relate_hero_id": 1038,
+   "story_reward": []
+  },
+  "102202": {
+   "id": 102202,
+   "story_id": 0,
+   "main_hero_id": 1022,
+   "relate_hero_id": 1041,
+   "story_reward": []
+  },
+  "102203": {
+   "id": 102203,
+   "story_id": 0,
+   "main_hero_id": 1022,
+   "relate_hero_id": 1097,
+   "story_reward": []
+  },
+  "102204": {
+   "id": 102204,
+   "story_id": 710220102,
+   "main_hero_id": 1022,
+   "relate_hero_id": 1042,
+   "story_reward": []
+  },
+  "102205": {
+   "id": 102205,
+   "story_id": 710220101,
+   "main_hero_id": 1022,
+   "relate_hero_id": 1021,
+   "story_reward": []
+  },
+  "108401": {
+   "id": 108401,
+   "story_id": 0,
+   "main_hero_id": 1084,
+   "relate_hero_id": 1027,
+   "story_reward": []
+  },
+  "108402": {
+   "id": 108402,
+   "story_id": 0,
+   "main_hero_id": 1084,
+   "relate_hero_id": 1248,
+   "story_reward": []
+  },
+  "108403": {
+   "id": 108403,
+   "story_id": 710840101,
+   "main_hero_id": 1084,
+   "relate_hero_id": 1039,
+   "story_reward": []
+  },
+  "108404": {
+   "id": 108404,
+   "story_id": 0,
+   "main_hero_id": 1084,
+   "relate_hero_id": 1047,
+   "story_reward": []
+  },
+  "108405": {
+   "id": 108405,
+   "story_id": 0,
+   "main_hero_id": 1084,
+   "relate_hero_id": 1211,
+   "story_reward": []
+  },
+  "118401": {
+   "id": 118401,
+   "story_id": 710840103,
+   "main_hero_id": 1184,
+   "relate_hero_id": 1027,
+   "story_reward": []
+  },
+  "118402": {
+   "id": 118402,
+   "story_id": 710840102,
+   "main_hero_id": 1184,
+   "relate_hero_id": 1248,
+   "story_reward": []
+  },
+  "118403": {
+   "id": 118403,
+   "story_id": 0,
+   "main_hero_id": 1184,
+   "relate_hero_id": 1039,
+   "story_reward": []
+  },
+  "118404": {
+   "id": 118404,
+   "story_id": 0,
+   "main_hero_id": 1184,
+   "relate_hero_id": 1047,
+   "story_reward": []
+  },
+  "118405": {
+   "id": 118405,
+   "story_id": 0,
+   "main_hero_id": 1184,
+   "relate_hero_id": 1211,
+   "story_reward": []
+  },
+  "128401": {
+   "id": 128401,
+   "story_id": 0,
+   "main_hero_id": 1284,
+   "relate_hero_id": 1027,
+   "story_reward": []
+  },
+  "128402": {
+   "id": 128402,
+   "story_id": 0,
+   "main_hero_id": 1284,
+   "relate_hero_id": 1248,
+   "story_reward": []
+  },
+  "128403": {
+   "id": 128403,
+   "story_id": 0,
+   "main_hero_id": 1284,
+   "relate_hero_id": 1039,
+   "story_reward": []
+  },
+  "128404": {
+   "id": 128404,
+   "story_id": 710840104,
+   "main_hero_id": 1284,
+   "relate_hero_id": 1047,
+   "story_reward": []
+  },
+  "128405": {
+   "id": 128405,
+   "story_id": 710840105,
+   "main_hero_id": 1284,
+   "relate_hero_id": 1211,
+   "story_reward": []
+  },
+  "1284": {
+   "id": 1284,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1184": {
+   "id": 1184,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1084": {
+   "id": 1084,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1022": {
+   "id": 1022,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1095": {
+   "id": 1095,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1033": {
+   "id": 1033,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1049": {
+   "id": 1049,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1075": {
+   "id": 1075,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1133": {
+   "id": 1133,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1150": {
+   "id": 1150,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1050": {
+   "id": 1050,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1093": {
+   "id": 1093,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1081": {
+   "id": 1081,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1119": {
+   "id": 1119,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1019": {
+   "id": 1019,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1139": {
+   "id": 1139,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1039": {
+   "id": 1039,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1148": {
+   "id": 1148,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1127": {
+   "id": 1127,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1111": {
+   "id": 1111,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1099": {
+   "id": 1099,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1066": {
+   "id": 1066,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1048": {
+   "id": 1048,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1041": {
+   "id": 1041,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1028": {
+   "id": 1028,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1011": {
+   "id": 1011,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  },
+  "1199": {
+   "id": 1199,
+   "story_id": 0,
+   "main_hero_id": 0,
+   "relate_hero_id": 0,
+   "story_reward": []
+  }
+ },
+ "weapon_exp_cfg": {
+  "1": 0,
+  "2": 200,
+  "3": 400,
+  "4": 600,
+  "5": 800,
+  "6": 1000,
+  "7": 1200,
+  "8": 1400,
+  "9": 1600,
+  "10": 1800,
+  "11": 2100,
+  "12": 2400,
+  "13": 2700,
+  "14": 3000,
+  "15": 3300,
+  "16": 3600,
+  "17": 3900,
+  "18": 4200,
+  "19": 4500,
+  "20": 4800,
+  "21": 5300,
+  "22": 5800,
+  "23": 6300,
+  "24": 6800,
+  "25": 7300,
+  "26": 7800,
+  "27": 8300,
+  "28": 8800,
+  "29": 9300,
+  "30": 9800,
+  "31": 10800,
+  "32": 11800,
+  "33": 12800,
+  "34": 13800,
+  "35": 14800,
+  "36": 15800,
+  "37": 16800,
+  "38": 17800,
+  "39": 18800,
+  "40": 19800,
+  "41": 22800,
+  "42": 25800,
+  "43": 28800,
+  "44": 31800,
+  "45": 34800,
+  "46": 37800,
+  "47": 40800,
+  "48": 43800,
+  "49": 46800,
+  "50": 49800,
+  "51": 54800,
+  "52": 59800,
+  "53": 64800,
+  "54": 69800,
+  "55": 74800,
+  "56": 79800,
+  "57": 84800,
+  "58": 89800,
+  "59": 94800,
+  "60": 99800,
+  "61": 104800,
+  "62": 109800,
+  "63": 114800,
+  "64": 119800,
+  "65": 124800,
+  "66": 129800,
+  "67": 134800,
+  "68": 139800,
+  "69": 144800,
+  "70": 149800,
+  "71": 154800,
+  "72": 159800,
+  "73": 164800,
+  "74": 169800,
+  "75": 174800,
+  "76": 179800,
+  "77": 184800,
+  "78": 189800,
+  "79": 194800,
+  "80": 199800
+ },
+ "combo_skill_cfg": {
+  "1": {
+   "id": 1,
+   "skill_id": 1027208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1027,
+    1080
+   ]
+  },
+  "2": {
+   "id": 2,
+   "skill_id": 1011208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1084,
+    1011
+   ]
+  },
+  "3": {
+   "id": 3,
+   "skill_id": 1037208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1066,
+    1037
+   ]
+  },
+  "4": {
+   "id": 4,
+   "skill_id": 1093208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1099,
+    1093
+   ]
+  },
+  "5": {
+   "id": 5,
+   "skill_id": 1039208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1084,
+    1148,
+    1039
+   ]
+  },
+  "6": {
+   "id": 6,
+   "skill_id": 1050208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1199,
+    1050
+   ]
+  },
+  "7": {
+   "id": 7,
+   "skill_id": 1032208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1059,
+    1032
+   ]
+  },
+  "8": {
+   "id": 8,
+   "skill_id": 1026208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1035,
+    1026
+   ]
+  },
+  "9": {
+   "id": 9,
+   "skill_id": 1019208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1039,
+    1019
+   ]
+  },
+  "10": {
+   "id": 10,
+   "skill_id": 1011281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1011,
+    1111
+   ]
+  },
+  "11": {
+   "id": 11,
+   "skill_id": 1026281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1058,
+    1026
+   ]
+  },
+  "12": {
+   "id": 12,
+   "skill_id": 1038208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1038,
+    1139
+   ]
+  },
+  "13": {
+   "id": 13,
+   "skill_id": 1013208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1148,
+    1013
+   ]
+  },
+  "14": {
+   "id": 14,
+   "skill_id": 1050281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1093,
+    1050
+   ]
+  },
+  "15": {
+   "id": 15,
+   "skill_id": 1019281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1019,
+    1066
+   ]
+  },
+  "16": {
+   "id": 16,
+   "skill_id": 1019282,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1019,
+    1111
+   ]
+  },
+  "17": {
+   "id": 17,
+   "skill_id": 1035208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1058,
+    1035
+   ]
+  },
+  "18": {
+   "id": 18,
+   "skill_id": 1184208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1199,
+    1184
+   ]
+  },
+  "19": {
+   "id": 19,
+   "skill_id": 1096208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1138,
+    1096
+   ]
+  },
+  "20": {
+   "id": 20,
+   "skill_id": 1048208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1094,
+    1048
+   ]
+  },
+  "21": {
+   "id": 21,
+   "skill_id": 1027281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1081,
+    1027
+   ]
+  },
+  "22": {
+   "id": 22,
+   "skill_id": 1080208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1080,
+    1127
+   ]
+  },
+  "23": {
+   "id": 23,
+   "skill_id": 1056208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1056,
+    1081
+   ]
+  },
+  "24": {
+   "id": 24,
+   "skill_id": 1119208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1119,
+    1184
+   ]
+  },
+  "25": {
+   "id": 25,
+   "skill_id": 1042208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1042,
+    1097
+   ]
+  },
+  "26": {
+   "id": 26,
+   "skill_id": 1067208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1067,
+    1068
+   ]
+  },
+  "27": {
+   "id": 27,
+   "skill_id": 1038281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1038,
+    1041
+   ]
+  },
+  "28": {
+   "id": 28,
+   "skill_id": 1033208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1033,
+    1066
+   ]
+  },
+  "29": {
+   "id": 29,
+   "skill_id": 1017208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1093,
+    1017
+   ]
+  },
+  "30": {
+   "id": 30,
+   "skill_id": 1016208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1016,
+    1058
+   ]
+  },
+  "31": {
+   "id": 31,
+   "skill_id": 1016281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1016,
+    1052
+   ]
+  },
+  "32": {
+   "id": 32,
+   "skill_id": 1024208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1024,
+    1035
+   ]
+  },
+  "33": {
+   "id": 33,
+   "skill_id": 1028208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1048,
+    1028
+   ]
+  },
+  "34": {
+   "id": 34,
+   "skill_id": 1028281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1028,
+    1111
+   ]
+  },
+  "35": {
+   "id": 35,
+   "skill_id": 1058208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1132,
+    1058
+   ]
+  },
+  "36": {
+   "id": 36,
+   "skill_id": 1068208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1071,
+    1068
+   ]
+  },
+  "37": {
+   "id": 37,
+   "skill_id": 1070208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1070,
+    1075
+   ]
+  },
+  "38": {
+   "id": 38,
+   "skill_id": 1075208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1075,
+    1076
+   ]
+  },
+  "39": {
+   "id": 39,
+   "skill_id": 1072208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1076,
+    1072
+   ]
+  },
+  "40": {
+   "id": 40,
+   "skill_id": 1072281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1072,
+    1074
+   ]
+  },
+  "41": {
+   "id": 41,
+   "skill_id": 1055208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1055,
+    1199
+   ]
+  },
+  "42": {
+   "id": 42,
+   "skill_id": 1049208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1055,
+    1049
+   ]
+  },
+  "43": {
+   "id": 43,
+   "skill_id": 1132208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1158,
+    1132
+   ]
+  },
+  "44": {
+   "id": 44,
+   "skill_id": 1060208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1074,
+    1060
+   ]
+  },
+  "45": {
+   "id": 45,
+   "skill_id": 1061208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1076,
+    1061
+   ]
+  },
+  "46": {
+   "id": 46,
+   "skill_id": 1150281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1199,
+    1150,
+    1093
+   ]
+  },
+  "47": {
+   "id": 47,
+   "skill_id": 1150208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1150,
+    1199
+   ]
+  },
+  "48": {
+   "id": 48,
+   "skill_id": 1015208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1119,
+    1015
+   ]
+  },
+  "49": {
+   "id": 49,
+   "skill_id": 1095208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1015,
+    1095
+   ]
+  },
+  "50": {
+   "id": 50,
+   "skill_id": 1028282,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1119,
+    1028
+   ]
+  },
+  "51": {
+   "id": 51,
+   "skill_id": 1284208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1284,
+    1138
+   ]
+  },
+  "52": {
+   "id": 52,
+   "skill_id": 1055281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1081,
+    1055
+   ]
+  },
+  "53": {
+   "id": 53,
+   "skill_id": 1197208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1042,
+    1197
+   ]
+  },
+  "54": {
+   "id": 54,
+   "skill_id": 1033282,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1033,
+    1094
+   ]
+  },
+  "55": {
+   "id": 55,
+   "skill_id": 1150282,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1049,
+    1150
+   ]
+  },
+  "56": {
+   "id": 56,
+   "skill_id": 1022208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1022,
+    1042
+   ]
+  },
+  "57": {
+   "id": 57,
+   "skill_id": 1021208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1021,
+    1041
+   ]
+  },
+  "58": {
+   "id": 58,
+   "skill_id": 1020208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1020,
+    1156
+   ]
+  },
+  "59": {
+   "id": 59,
+   "skill_id": 1024281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1052,
+    1024
+   ]
+  },
+  "60": {
+   "id": 60,
+   "skill_id": 1095281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1095,
+    1111
+   ]
+  },
+  "61": {
+   "id": 61,
+   "skill_id": 1089208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1089,
+    1020
+   ]
+  },
+  "62": {
+   "id": 62,
+   "skill_id": 1248208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1248,
+    1028
+   ]
+  },
+  "63": {
+   "id": 63,
+   "skill_id": 1133208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1061,
+    1133
+   ]
+  },
+  "64": {
+   "id": 64,
+   "skill_id": 1059208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1059,
+    1067
+   ]
+  },
+  "65": {
+   "id": 65,
+   "skill_id": 1034208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1034,
+    1015
+   ]
+  },
+  "66": {
+   "id": 66,
+   "skill_id": 1012208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1012,
+    1060
+   ]
+  },
+  "67": {
+   "id": 67,
+   "skill_id": 1073208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1073,
+    1074
+   ]
+  },
+  "68": {
+   "id": 68,
+   "skill_id": 1248281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1248,
+    1150
+   ]
+  },
+  "69": {
+   "id": 69,
+   "skill_id": 1211208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1211,
+    1284
+   ]
+  },
+  "70": {
+   "id": 70,
+   "skill_id": 1045208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1045,
+    1046
+   ]
+  },
+  "71": {
+   "id": 71,
+   "skill_id": 1089281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1111,
+    1089
+   ]
+  },
+  "72": {
+   "id": 72,
+   "skill_id": 1047208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1022,
+    1047
+   ]
+  },
+  "73": {
+   "id": 73,
+   "skill_id": 1083208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1013,
+    1083
+   ]
+  },
+  "74": {
+   "id": 74,
+   "skill_id": 1043208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1043,
+    1055
+   ]
+  },
+  "75": {
+   "id": 75,
+   "skill_id": 1044208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1044,
+    1211
+   ]
+  },
+  "76": {
+   "id": 76,
+   "skill_id": 1211281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1111,
+    1211
+   ]
+  },
+  "77": {
+   "id": 77,
+   "skill_id": 1194208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1133,
+    1194
+   ]
+  },
+  "78": {
+   "id": 78,
+   "skill_id": 1137208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1137,
+    1248
+   ]
+  },
+  "79": {
+   "id": 79,
+   "skill_id": 1053208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1053,
+    1070
+   ]
+  },
+  "80": {
+   "id": 80,
+   "skill_id": 1075281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1061,
+    1075
+   ]
+  },
+  "81": {
+   "id": 81,
+   "skill_id": 1170208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1053,
+    1170
+   ]
+  },
+  "82": {
+   "id": 82,
+   "skill_id": 1054208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1054,
+    1170
+   ]
+  },
+  "83": {
+   "id": 83,
+   "skill_id": 1077208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1054,
+    1077
+   ]
+  },
+  "84": {
+   "id": 84,
+   "skill_id": 1166208,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1166,
+    1211
+   ]
+  },
+  "85": {
+   "id": 85,
+   "skill_id": 1034281,
+   "max_level": 3,
+   "cooperate_role_ids": [
+    1034,
+    1095
+   ]
+  }
+ },
+ "combo_skill_level_cfg": {
+  "1": {
+   "id": 1,
+   "des": "连携修正者的奥义等级均达到20级(不包含跃迁技能提升)",
+   "condition_type": 1,
+   "index": 1,
+   "target": 20,
+   "level": 0
+  },
+  "2": {
+   "id": 2,
+   "des": "选择「%s」通关任意关卡15次",
+   "condition_type": 2,
+   "index": 2,
+   "target": 15,
+   "level": 0
+  },
+  "3": {
+   "id": 3,
+   "des": "选择「%s」通关梦境再构玩法 异相层 及以上任意魇渊难度的Boss 4 次",
+   "condition_type": 3,
+   "index": 1,
+   "target": 4,
+   "level": 1
+  },
+  "4": {
+   "id": 4,
+   "des": "选择「%s」通关黑区净化玩法 难度 Ⅶ 以上 5 次 （推荐等级70-80级）",
+   "condition_type": 4,
+   "index": 2,
+   "target": 5,
+   "level": 1
+  },
+  "5": {
+   "id": 5,
+   "des": "连携修正者的奥义等级均达到35级(不包含跃迁技能提升)",
+   "condition_type": 1,
+   "index": 3,
+   "target": 35,
+   "level": 1
+  },
+  "6": {
+   "id": 6,
+   "des": "选择「%s」通关梦境再构玩法 扭曲梦境II及以上任意难度四的Boss 4 次",
+   "condition_type": 3,
+   "index": 1,
+   "target": 4,
+   "level": 2
+  },
+  "7": {
+   "id": 7,
+   "des": "选择「%s」通关黑区净化玩法 Ω难度怨念等级10及以上 10 次 （推荐等级70-80级）",
+   "condition_type": 4,
+   "index": 2,
+   "target": 10,
+   "level": 2
+  },
+  "8": {
+   "id": 8,
+   "des": "累计使用连携奥义50次",
+   "condition_type": 5,
+   "index": 3,
+   "target": 50,
+   "level": 2
+  }
+ },
+ "hero_ultimate_skill": {
+  "1011": 1011209,
+  "1012": 1012209,
+  "1013": 1013209,
+  "1015": 1015209,
+  "1016": 1016209,
+  "1017": 1017209,
+  "1019": 1019209,
+  "1020": 1020209,
+  "1021": 1021209,
+  "1022": 1022209,
+  "1024": 1024209,
+  "1026": 1026209,
+  "1027": 1027209,
+  "1028": 1028209,
+  "1032": 1032209,
+  "1033": 1033209,
+  "1034": 1034209,
+  "1035": 1035209,
+  "1037": 1037209,
+  "1038": 1038209,
+  "1039": 1039209,
+  "1041": 1041209,
+  "1042": 1042209,
+  "1043": 1043209,
+  "1044": 1044209,
+  "1045": 1045209,
+  "1046": 1046209,
+  "1047": 1047209,
+  "1048": 1048209,
+  "1049": 1049209,
+  "1050": 1050209,
+  "1052": 1052209,
+  "1053": 1053209,
+  "1054": 1054209,
+  "1055": 1055209,
+  "1056": 1056209,
+  "1058": 1058209,
+  "1059": 1059209,
+  "1060": 1060209,
+  "1061": 1061209,
+  "1066": 1066209,
+  "1067": 1067209,
+  "1068": 1068209,
+  "1070": 1070209,
+  "1071": 1071209,
+  "1072": 1072209,
+  "1073": 1073209,
+  "1074": 1074209,
+  "1075": 1075209,
+  "1076": 1076209,
+  "1077": 1077209,
+  "1080": 1080209,
+  "1081": 1081209,
+  "1083": 1083209,
+  "1084": 1084209,
+  "1089": 1089209,
+  "1093": 1093236,
+  "1094": 1094209,
+  "1095": 1095209,
+  "1096": 1096209,
+  "1097": 1097209,
+  "1099": 1099209,
+  "1111": 1111209,
+  "1119": 1119209,
+  "1127": 1127209,
+  "1132": 1132209,
+  "1133": 1133209,
+  "1137": 1137209,
+  "1138": 1138209,
+  "1139": 1139209,
+  "1148": 1148209,
+  "1150": 1150209,
+  "1156": 1156209,
+  "1158": 1158209,
+  "1166": 1166209,
+  "1170": 1170209,
+  "1184": 1184209,
+  "1194": 1194209,
+  "1197": 1197209,
+  "1199": 1199209,
+  "1211": 1211209,
+  "1248": 1248209,
+  "1284": 1284209
+ },
+ "trust_displace_limit": {
+  "30012": 30,
+  "30013": 20,
+  "30014": 15,
+  "30015": 10
+ }
+}

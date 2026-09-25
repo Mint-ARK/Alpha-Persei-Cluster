@@ -1,0 +1,52 @@
+{
+  "provider": "deepseek",
+  "temperature": 0.7,
+  "max_tokens": 1000,
+  "max_history_turns": 10,
+  "timeout_seconds": 30,
+  "system_prefix": "你正在与《深空之眼》的管理员进行游戏内私聊。请保持游戏沉浸感，严禁输出任何代码块、markdown 标题或 AI 身份声明，直接像真正的游戏角色一样回复简短自然的对话（1~3句话为佳）。\n\n",
+  "providers": {
+    "opencode": {
+      "type": "openai",
+      "base_url": "https://opencode.ai/zen/go/v1",
+      "model": "deepseek-v4-flash",
+      "api_key_env": "OPENCODE_GO_API_KEY",
+      "api_key": ""
+    },
+    "deepseek": {
+      "type": "openai",
+      "base_url": "https://api.deepseek.com/v1",
+      "model": "deepseek-flash",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "api_key": ""
+    },
+    "gemini": {
+      "type": "gemini",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "model": "gemini-3.8-flash",
+      "api_key_env": "GEMINI_API_KEY",
+      "api_key": ""
+    },
+    "openai": {
+      "type": "openai",
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-5.6",
+      "api_key_env": "OPENAI_API_KEY",
+      "api_key": ""
+    },
+    "anthropic": {
+      "type": "anthropic",
+      "base_url": "https://api.anthropic.com/v1",
+      "model": "claude-sonnet-5",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "api_key": ""
+    },
+    "ollama": {
+      "type": "openai",
+      "base_url": "http://localhost:11434/v1",
+      "model": "llama3.3:70b",
+      "api_key_env": "OLLAMA_API_KEY",
+      "api_key": ""
+    }
+  }
+}

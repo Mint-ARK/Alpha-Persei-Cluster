@@ -1,0 +1,5974 @@
+{
+  "updated_at": "2026-09-23 19:45:27",
+  "sources": [
+    {
+      "id": "eqbench_creative",
+      "name": "EQ-Bench 创意写作 v3",
+      "icon": "BookOpen",
+      "url": "https://eqbench.com/creative_writing.html",
+      "metric_name": "Elo 分数",
+      "description": "专注评估大语言模型的情感智商 (EQ)、文学表达修辞质感与叙事细腻度，彻底剥离代码和数理逻辑干扰。",
+      "columns": [
+        "排名",
+        "模型名称",
+        "厂商",
+        "Elo评分",
+        "创意写作分",
+        "平均长度",
+        "词汇复杂度",
+        "Slop重复度",
+        "操作"
+      ],
+      "items": [
+        {
+          "model": "gpt-6-astra",
+          "provider": "openai",
+          "score": 2163.9,
+          "sub_score": "16.80",
+          "metric_val": "2163.9",
+          "details": {
+            "length": "6191",
+            "vocab": "36.30",
+            "slop": "8.41",
+            "repetition": "3.54"
+          },
+          "rank": 1,
+          "tags": [
+            "Top 1"
+          ]
+        },
+        {
+          "model": "claude-fable-5-1",
+          "provider": "anthropic",
+          "score": 2152.7,
+          "sub_score": "16.95",
+          "metric_val": "2152.7",
+          "details": {
+            "length": "5841",
+            "vocab": "23.67",
+            "slop": "8.16",
+            "repetition": "3.64"
+          },
+          "rank": 2,
+          "tags": [
+            "Top 2",
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "claude-opus-5",
+          "provider": "anthropic",
+          "score": 2120.6,
+          "sub_score": "17.07",
+          "metric_val": "2120.6",
+          "details": {
+            "length": "6003",
+            "vocab": "27.46",
+            "slop": "6.59",
+            "repetition": "4.31"
+          },
+          "rank": 3,
+          "tags": [
+            "Top 3",
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "kimi-k3",
+          "provider": "custom",
+          "score": 2070.6,
+          "sub_score": "16.85",
+          "metric_val": "2070.6",
+          "details": {
+            "length": "5488",
+            "vocab": "26.18",
+            "slop": "9.70",
+            "repetition": "3.73"
+          },
+          "rank": 4,
+          "tags": [
+            "长文本"
+          ]
+        },
+        {
+          "model": "GLM-5.3",
+          "provider": "glm",
+          "score": 2064.1,
+          "sub_score": "17.04",
+          "metric_val": "2064.1",
+          "details": {
+            "length": "5913",
+            "vocab": "25.71",
+            "slop": "8.42",
+            "repetition": "3.23"
+          },
+          "rank": 5,
+          "tags": []
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "provider": "openai",
+          "score": 1963.4,
+          "sub_score": "16.78",
+          "metric_val": "1963.4",
+          "details": {
+            "length": "8548",
+            "vocab": "33.10",
+            "slop": "11.68",
+            "repetition": "3.41"
+          },
+          "rank": 6,
+          "tags": []
+        },
+        {
+          "model": "ox-alpha",
+          "provider": "glm",
+          "score": 1960.6,
+          "sub_score": "16.89",
+          "metric_val": "1960.6",
+          "details": {
+            "length": "6112",
+            "vocab": "30.12",
+            "slop": "9.83",
+            "repetition": "3.05"
+          },
+          "rank": 7,
+          "tags": [
+            "智谱GLM",
+            "更名 GLM 5.3 Flash",
+            "多模态支持"
+          ]
+        },
+        {
+          "model": "claude-fable-5",
+          "provider": "anthropic",
+          "score": 1934.6,
+          "sub_score": "16.81",
+          "metric_val": "1934.6",
+          "details": {
+            "length": "5887",
+            "vocab": "30.85",
+            "slop": "10.28",
+            "repetition": "3.92"
+          },
+          "rank": 8,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "muse-spark-1.1",
+          "provider": "ollama",
+          "score": 1916.1,
+          "sub_score": "16.54",
+          "metric_val": "1916.1",
+          "details": {
+            "length": "7551",
+            "vocab": "22.51",
+            "slop": "12.11",
+            "repetition": "3.49"
+          },
+          "rank": 9,
+          "tags": []
+        },
+        {
+          "model": "claude-opus-4-7",
+          "provider": "anthropic",
+          "score": 1907.1,
+          "sub_score": "16.57",
+          "metric_val": "1907.1",
+          "details": {
+            "length": "5692",
+            "vocab": "26.76",
+            "slop": "11.09",
+            "repetition": "4.00"
+          },
+          "rank": 10,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "muse-spark-1.3",
+          "provider": "ollama",
+          "score": 1905.5,
+          "sub_score": "16.70",
+          "metric_val": "1905.5",
+          "details": {
+            "length": "8001",
+            "vocab": "23.46",
+            "slop": "10.73",
+            "repetition": "3.66"
+          },
+          "rank": 11,
+          "tags": []
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "provider": "openai",
+          "score": 1850.3,
+          "sub_score": "16.56",
+          "metric_val": "1850.3",
+          "details": {
+            "length": "10271",
+            "vocab": "32.34",
+            "slop": "12.40",
+            "repetition": "3.02"
+          },
+          "rank": 12,
+          "tags": []
+        },
+        {
+          "model": "gpt-5.5",
+          "provider": "openai",
+          "score": 1843.5,
+          "sub_score": "17.01",
+          "metric_val": "1843.5",
+          "details": {
+            "length": "12945",
+            "vocab": "31.57",
+            "slop": "13.10",
+            "repetition": "2.48"
+          },
+          "rank": 13,
+          "tags": []
+        },
+        {
+          "model": "Qwen/Qwen3.8-2.4T-A95B",
+          "provider": "ollama",
+          "score": 1840.9,
+          "sub_score": "16.72",
+          "metric_val": "1840.9",
+          "details": {
+            "length": "6046",
+            "vocab": "27.23",
+            "slop": "12.26",
+            "repetition": "3.50"
+          },
+          "rank": 14,
+          "tags": []
+        },
+        {
+          "model": "gpt-5.4",
+          "provider": "openai",
+          "score": 1835.6,
+          "sub_score": "16.89",
+          "metric_val": "1835.6",
+          "details": {
+            "length": "10488",
+            "vocab": "36.35",
+            "slop": "12.20",
+            "repetition": "2.71"
+          },
+          "rank": 15,
+          "tags": []
+        },
+        {
+          "model": "claude-opus-4-8",
+          "provider": "anthropic",
+          "score": 1835.2,
+          "sub_score": "16.66",
+          "metric_val": "1835.2",
+          "details": {
+            "length": "5842",
+            "vocab": "26.77",
+            "slop": "13.16",
+            "repetition": "3.68"
+          },
+          "rank": 16,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "muse-spark-1.2",
+          "provider": "ollama",
+          "score": 1835.2,
+          "sub_score": "16.44",
+          "metric_val": "1835.2",
+          "details": {
+            "length": "8618",
+            "vocab": "25.74",
+            "slop": "12.98",
+            "repetition": "3.31"
+          },
+          "rank": 17,
+          "tags": []
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "provider": "openai",
+          "score": 1825.8,
+          "sub_score": "16.58",
+          "metric_val": "1825.8",
+          "details": {
+            "length": "7927",
+            "vocab": "32.96",
+            "slop": "11.80",
+            "repetition": "4.00"
+          },
+          "rank": 18,
+          "tags": []
+        },
+        {
+          "model": "claude-sonnet-4-6",
+          "provider": "anthropic",
+          "score": 1804.2,
+          "sub_score": "16.50",
+          "metric_val": "1804.2",
+          "details": {
+            "length": "5876",
+            "vocab": "37.46",
+            "slop": "9.90",
+            "repetition": "4.06"
+          },
+          "rank": 19,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "claude-opus-4-6",
+          "provider": "anthropic",
+          "score": 1804.1,
+          "sub_score": "16.53",
+          "metric_val": "1804.1",
+          "details": {
+            "length": "6055",
+            "vocab": "33.13",
+            "slop": "12.12",
+            "repetition": "4.02"
+          },
+          "rank": 20,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "claude-sonnet-5",
+          "provider": "anthropic",
+          "score": 1790.5,
+          "sub_score": "16.47",
+          "metric_val": "1790.5",
+          "details": {
+            "length": "5753",
+            "vocab": "37.90",
+            "slop": "11.60",
+            "repetition": "4.62"
+          },
+          "rank": 21,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "meta-models/Muse-Glimmer-30B",
+          "provider": "ollama",
+          "score": 1789.7,
+          "sub_score": "16.26",
+          "metric_val": "1789.7",
+          "details": {
+            "length": "5837",
+            "vocab": "22.38",
+            "slop": "12.35",
+            "repetition": "3.96"
+          },
+          "rank": 22,
+          "tags": []
+        },
+        {
+          "model": "zai-org/GLM-5.2",
+          "provider": "glm",
+          "score": 1752.8,
+          "sub_score": "16.44",
+          "metric_val": "1752.8",
+          "details": {
+            "length": "6104",
+            "vocab": "30.76",
+            "slop": "13.11",
+            "repetition": "3.94"
+          },
+          "rank": 23,
+          "tags": []
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "provider": "gemini",
+          "score": 1749.7,
+          "sub_score": "16.54",
+          "metric_val": "1749.7",
+          "details": {
+            "length": "7251",
+            "vocab": "37.61",
+            "slop": "22.60",
+            "repetition": "3.12"
+          },
+          "rank": 24,
+          "tags": [
+            "极速响应"
+          ]
+        },
+        {
+          "model": "gemini-3.7-flash",
+          "provider": "gemini",
+          "score": 1722.0,
+          "sub_score": "16.27",
+          "metric_val": "1722.0",
+          "details": {
+            "length": "6772",
+            "vocab": "39.84",
+            "slop": "24.44",
+            "repetition": "3.41"
+          },
+          "rank": 25,
+          "tags": [
+            "极速响应"
+          ]
+        },
+        {
+          "model": "moonshotai/Kimi-K2.6",
+          "provider": "custom",
+          "score": 1721.3,
+          "sub_score": "16.67",
+          "metric_val": "1721.3",
+          "details": {
+            "length": "8333",
+            "vocab": "38.16",
+            "slop": "13.30",
+            "repetition": "3.77"
+          },
+          "rank": 26,
+          "tags": [
+            "长文本"
+          ]
+        },
+        {
+          "model": "gpt-5.2",
+          "provider": "openai",
+          "score": 1699.8,
+          "sub_score": "16.66",
+          "metric_val": "1699.8",
+          "details": {
+            "length": "12536",
+            "vocab": "29.19",
+            "slop": "16.80",
+            "repetition": "2.95"
+          },
+          "rank": 27,
+          "tags": []
+        },
+        {
+          "model": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4",
+          "provider": "ollama",
+          "score": 1689.3,
+          "sub_score": "16.58",
+          "metric_val": "1689.3",
+          "details": {
+            "length": "10536",
+            "vocab": "25.12",
+            "slop": "18.42",
+            "repetition": "3.23"
+          },
+          "rank": 28,
+          "tags": []
+        },
+        {
+          "model": "gpt-5.3-chat",
+          "provider": "openai",
+          "score": 1686.6,
+          "sub_score": "16.21",
+          "metric_val": "1686.6",
+          "details": {
+            "length": "7048",
+            "vocab": "31.18",
+            "slop": "20.93",
+            "repetition": "4.42"
+          },
+          "rank": 29,
+          "tags": []
+        },
+        {
+          "model": "claude-opus-4-5-20251101",
+          "provider": "anthropic",
+          "score": 1683.2,
+          "sub_score": "16.35",
+          "metric_val": "1683.2",
+          "details": {
+            "length": "6124",
+            "vocab": "33.70",
+            "slop": "16.23",
+            "repetition": "4.30"
+          },
+          "rank": 30,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "claude-sonnet-4.5",
+          "provider": "anthropic",
+          "score": 1674.4,
+          "sub_score": "16.14",
+          "metric_val": "1674.4",
+          "details": {
+            "length": "5784",
+            "vocab": "32.94",
+            "slop": "16.07",
+            "repetition": "3.64"
+          },
+          "rank": 31,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "o3",
+          "provider": "openai",
+          "score": 1672.5,
+          "sub_score": "16.28",
+          "metric_val": "1672.5",
+          "details": {
+            "length": "7864",
+            "vocab": "36.45",
+            "slop": "17.33",
+            "repetition": "2.67"
+          },
+          "rank": 32,
+          "tags": []
+        },
+        {
+          "model": "Qwen/Qwen3.8-27B",
+          "provider": "ollama",
+          "score": 1668.4,
+          "sub_score": "15.50",
+          "metric_val": "1668.4",
+          "details": {
+            "length": "5400",
+            "vocab": "21.86",
+            "slop": "12.12",
+            "repetition": "4.19"
+          },
+          "rank": 33,
+          "tags": []
+        },
+        {
+          "model": "moonshotai/Kimi-K2-Instruct",
+          "provider": "custom",
+          "score": 1662.7,
+          "sub_score": "16.40",
+          "metric_val": "1662.7",
+          "details": {
+            "length": "7308",
+            "vocab": "31.98",
+            "slop": "15.51",
+            "repetition": "3.40"
+          },
+          "rank": 34,
+          "tags": [
+            "长文本"
+          ]
+        },
+        {
+          "model": "gpt-5.4-mini",
+          "provider": "openai",
+          "score": 1661.8,
+          "sub_score": "16.51",
+          "metric_val": "1661.8",
+          "details": {
+            "length": "10365",
+            "vocab": "34.53",
+            "slop": "14.45",
+            "repetition": "3.23"
+          },
+          "rank": 35,
+          "tags": []
+        },
+        {
+          "model": "moonshotai/Kimi-K2-Thinking",
+          "provider": "custom",
+          "score": 1627.9,
+          "sub_score": "16.47",
+          "metric_val": "1627.9",
+          "details": {
+            "length": "7094",
+            "vocab": "32.14",
+            "slop": "18.30",
+            "repetition": "3.47"
+          },
+          "rank": 36,
+          "tags": [
+            "长文本"
+          ]
+        },
+        {
+          "model": "openrouter/horizon-beta",
+          "provider": "custom",
+          "score": 1624.5,
+          "sub_score": "16.66",
+          "metric_val": "1624.5",
+          "details": {
+            "length": "14202",
+            "vocab": "27.71",
+            "slop": "11.19",
+            "repetition": "2.22"
+          },
+          "rank": 37,
+          "tags": []
+        },
+        {
+          "model": "gpt-5-2025-08-07",
+          "provider": "openai",
+          "score": 1623.5,
+          "sub_score": "16.79",
+          "metric_val": "1623.5",
+          "details": {
+            "length": "14147",
+            "vocab": "28.26",
+            "slop": "11.41",
+            "repetition": "2.43"
+          },
+          "rank": 38,
+          "tags": []
+        },
+        {
+          "model": "openrouter/horizon-alpha",
+          "provider": "custom",
+          "score": 1619.7,
+          "sub_score": "16.70",
+          "metric_val": "1619.7",
+          "details": {
+            "length": "14929",
+            "vocab": "26.86",
+            "slop": "11.14",
+            "repetition": "2.33"
+          },
+          "rank": 39,
+          "tags": []
+        },
+        {
+          "model": "openrouter/pony-alpha",
+          "provider": "custom",
+          "score": 1613.5,
+          "sub_score": "16.27",
+          "metric_val": "1613.5",
+          "details": {
+            "length": "6605",
+            "vocab": "32.65",
+            "slop": "17.76",
+            "repetition": "3.72"
+          },
+          "rank": 40,
+          "tags": []
+        },
+        {
+          "model": "thinkingmachines/Inkling",
+          "provider": "custom",
+          "score": 1607.8,
+          "sub_score": "16.38",
+          "metric_val": "1607.8",
+          "details": {
+            "length": "8378",
+            "vocab": "35.24",
+            "slop": "15.02",
+            "repetition": "4.22"
+          },
+          "rank": 41,
+          "tags": []
+        },
+        {
+          "model": "gemini-3.6-flash",
+          "provider": "gemini",
+          "score": 1599.8,
+          "sub_score": "16.22",
+          "metric_val": "1599.8",
+          "details": {
+            "length": "7016",
+            "vocab": "38.06",
+            "slop": "24.29",
+            "repetition": "4.60"
+          },
+          "rank": 42,
+          "tags": [
+            "极速响应"
+          ]
+        },
+        {
+          "model": "zai-org/GLM-5",
+          "provider": "glm",
+          "score": 1597.5,
+          "sub_score": "16.09",
+          "metric_val": "1597.5",
+          "details": {
+            "length": "6376",
+            "vocab": "32.12",
+            "slop": "18.82",
+            "repetition": "3.55"
+          },
+          "rank": 43,
+          "tags": []
+        },
+        {
+          "model": "zai-org/GLM-5.1",
+          "provider": "glm",
+          "score": 1589.2,
+          "sub_score": "16.26",
+          "metric_val": "1589.2",
+          "details": {
+            "length": "6226",
+            "vocab": "31.58",
+            "slop": "23.56",
+            "repetition": "3.76"
+          },
+          "rank": 44,
+          "tags": []
+        },
+        {
+          "model": "claude-opus-4",
+          "provider": "anthropic",
+          "score": 1576.8,
+          "sub_score": "16.05",
+          "metric_val": "1576.8",
+          "details": {
+            "length": "5774",
+            "vocab": "35.99",
+            "slop": "17.44",
+            "repetition": "3.99"
+          },
+          "rank": 45,
+          "tags": [
+            "叙事大师"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eqbench_longform",
+      "name": "EQ-Bench 长篇叙事",
+      "icon": "Scroll",
+      "url": "https://eqbench.com/creative_writing_longform.html",
+      "metric_name": "长篇综合分 (满分100)",
+      "description": "评估模型在多轮数万字长篇对话、情节推演中的耐力与抗退化能力，惩罚单句段落滥用与机械重复。",
+      "columns": [
+        "排名",
+        "模型名称",
+        "厂商",
+        "长篇综合分",
+        "单章平均长度",
+        "词汇复杂度",
+        "Slop扣分",
+        "操作"
+      ],
+      "items": [
+        {
+          "model": "claude-opus-5",
+          "provider": "anthropic",
+          "score": 86.3,
+          "sub_score": "86.3 分",
+          "metric_val": "86.3",
+          "details": {
+            "length": "6264",
+            "vocab": "24.68",
+            "slop": "5.64",
+            "repetition": "5.0"
+          },
+          "rank": 1,
+          "tags": [
+            "Top 1",
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "claude-fable-5-1",
+          "provider": "anthropic",
+          "score": 85.3,
+          "sub_score": "85.3 分",
+          "metric_val": "85.3",
+          "details": {
+            "length": "5777",
+            "vocab": "18.12",
+            "slop": "7.59",
+            "repetition": "5.4"
+          },
+          "rank": 2,
+          "tags": [
+            "Top 2",
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "claude-fable-5",
+          "provider": "anthropic",
+          "score": 83.0,
+          "sub_score": "83.0 分",
+          "metric_val": "83.0",
+          "details": {
+            "length": "6295",
+            "vocab": "31.00",
+            "slop": "8.31",
+            "repetition": "4.4"
+          },
+          "rank": 3,
+          "tags": [
+            "Top 3",
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "gpt-6-astra",
+          "provider": "openai",
+          "score": 82.8,
+          "sub_score": "82.8 分",
+          "metric_val": "82.8",
+          "details": {
+            "length": "5845",
+            "vocab": "29.72",
+            "slop": "9.07",
+            "repetition": "6.3"
+          },
+          "rank": 4,
+          "tags": []
+        },
+        {
+          "model": "muse-spark-1.3",
+          "provider": "ollama",
+          "score": 82.8,
+          "sub_score": "82.8 分",
+          "metric_val": "82.8",
+          "details": {
+            "length": "6253",
+            "vocab": "12.42",
+            "slop": "10.73",
+            "repetition": "4.8"
+          },
+          "rank": 5,
+          "tags": []
+        },
+        {
+          "model": "claude-opus-4-7",
+          "provider": "anthropic",
+          "score": 81.8,
+          "sub_score": "81.8 分",
+          "metric_val": "81.8",
+          "details": {
+            "length": "5552",
+            "vocab": "17.87",
+            "slop": "9.06",
+            "repetition": "4.6"
+          },
+          "rank": 6,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "GLM-5.3",
+          "provider": "glm",
+          "score": 81.8,
+          "sub_score": "81.8 分",
+          "metric_val": "81.8",
+          "details": {
+            "length": "5928",
+            "vocab": "30.66",
+            "slop": "7.09",
+            "repetition": "4.6"
+          },
+          "rank": 7,
+          "tags": []
+        },
+        {
+          "model": "gpt-5.6-sol",
+          "provider": "openai",
+          "score": 81.7,
+          "sub_score": "81.7 分",
+          "metric_val": "81.7",
+          "details": {
+            "length": "6881",
+            "vocab": "30.21",
+            "slop": "11.98",
+            "repetition": "6.3"
+          },
+          "rank": 8,
+          "tags": []
+        },
+        {
+          "model": "muse-spark-1.2",
+          "provider": "ollama",
+          "score": 81.5,
+          "sub_score": "81.5 分",
+          "metric_val": "81.5",
+          "details": {
+            "length": "7258",
+            "vocab": "12.90",
+            "slop": "11.43",
+            "repetition": "4.5"
+          },
+          "rank": 9,
+          "tags": []
+        },
+        {
+          "model": "claude-opus-4-8",
+          "provider": "anthropic",
+          "score": 80.8,
+          "sub_score": "80.8 分",
+          "metric_val": "80.8",
+          "details": {
+            "length": "5460",
+            "vocab": "25.26",
+            "slop": "9.39",
+            "repetition": "3.8"
+          },
+          "rank": 10,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "claude-sonnet-4-6",
+          "provider": "anthropic",
+          "score": 79.9,
+          "sub_score": "79.9 分",
+          "metric_val": "79.9",
+          "details": {
+            "length": "6893",
+            "vocab": "34.86",
+            "slop": "10.56",
+            "repetition": "5.5"
+          },
+          "rank": 11,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "ox-alpha",
+          "provider": "glm",
+          "score": 79.9,
+          "sub_score": "79.9 分",
+          "metric_val": "79.9",
+          "details": {
+            "length": "6302",
+            "vocab": "29.61",
+            "slop": "7.43",
+            "repetition": "4.0"
+          },
+          "rank": 12,
+          "tags": [
+            "智谱GLM",
+            "更名 GLM 5.3 Flash",
+            "多模态支持"
+          ]
+        },
+        {
+          "model": "kimi-k3",
+          "provider": "custom",
+          "score": 79.6,
+          "sub_score": "79.6 分",
+          "metric_val": "79.6",
+          "details": {
+            "length": "7296",
+            "vocab": "26.32",
+            "slop": "9.67",
+            "repetition": "4.9"
+          },
+          "rank": 13,
+          "tags": [
+            "长文本"
+          ]
+        },
+        {
+          "model": "moonshotai/Kimi-K2.6",
+          "provider": "custom",
+          "score": 78.5,
+          "sub_score": "78.5 分",
+          "metric_val": "78.5",
+          "details": {
+            "length": "6649",
+            "vocab": "20.02",
+            "slop": "18.92",
+            "repetition": "4.6"
+          },
+          "rank": 14,
+          "tags": [
+            "长文本"
+          ]
+        },
+        {
+          "model": "gpt-5.4",
+          "provider": "openai",
+          "score": 78.3,
+          "sub_score": "78.3 分",
+          "metric_val": "78.3",
+          "details": {
+            "length": "8192",
+            "vocab": "32.24",
+            "slop": "12.45",
+            "repetition": "4.8"
+          },
+          "rank": 15,
+          "tags": []
+        },
+        {
+          "model": "claude-sonnet-5",
+          "provider": "anthropic",
+          "score": 78.3,
+          "sub_score": "78.3 分",
+          "metric_val": "78.3",
+          "details": {
+            "length": "5138",
+            "vocab": "39.78",
+            "slop": "13.53",
+            "repetition": "5.6"
+          },
+          "rank": 16,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "gpt-5.5",
+          "provider": "openai",
+          "score": 78.2,
+          "sub_score": "78.2 分",
+          "metric_val": "78.2",
+          "details": {
+            "length": "8812",
+            "vocab": "26.11",
+            "slop": "16.89",
+            "repetition": "5.3"
+          },
+          "rank": 17,
+          "tags": []
+        },
+        {
+          "model": "gpt-5.6-terra",
+          "provider": "openai",
+          "score": 78.0,
+          "sub_score": "78.0 分",
+          "metric_val": "78.0",
+          "details": {
+            "length": "7482",
+            "vocab": "24.45",
+            "slop": "15.41",
+            "repetition": "7.4"
+          },
+          "rank": 18,
+          "tags": []
+        },
+        {
+          "model": "zai-org/GLM-5.2",
+          "provider": "glm",
+          "score": 77.9,
+          "sub_score": "77.9 分",
+          "metric_val": "77.9",
+          "details": {
+            "length": "5316",
+            "vocab": "16.93",
+            "slop": "16.51",
+            "repetition": "4.5"
+          },
+          "rank": 19,
+          "tags": []
+        },
+        {
+          "model": "claude-opus-4-6",
+          "provider": "anthropic",
+          "score": 77.7,
+          "sub_score": "77.7 分",
+          "metric_val": "77.7",
+          "details": {
+            "length": "6189",
+            "vocab": "28.04",
+            "slop": "16.86",
+            "repetition": "4.7"
+          },
+          "rank": 20,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "gemini-3.8-flash",
+          "provider": "gemini",
+          "score": 76.8,
+          "sub_score": "76.8 分",
+          "metric_val": "76.8",
+          "details": {
+            "length": "7061",
+            "vocab": "30.97",
+            "slop": "27.69",
+            "repetition": "5.2"
+          },
+          "rank": 21,
+          "tags": [
+            "极速响应"
+          ]
+        },
+        {
+          "model": "deepseek-ai/DeepSeek-V4-Pro",
+          "provider": "deepseek",
+          "score": 75.6,
+          "sub_score": "75.6 分",
+          "metric_val": "75.6",
+          "details": {
+            "length": "7516",
+            "vocab": "25.30",
+            "slop": "21.83",
+            "repetition": "3.9"
+          },
+          "rank": 22,
+          "tags": []
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "provider": "openai",
+          "score": 75.5,
+          "sub_score": "75.5 分",
+          "metric_val": "75.5",
+          "details": {
+            "length": "7434",
+            "vocab": "24.93",
+            "slop": "14.09",
+            "repetition": "10.1"
+          },
+          "rank": 23,
+          "tags": []
+        },
+        {
+          "model": "moonshotai/Kimi-K2.5",
+          "provider": "custom",
+          "score": 74.9,
+          "sub_score": "74.9 分",
+          "metric_val": "74.9",
+          "details": {
+            "length": "6315",
+            "vocab": "19.66",
+            "slop": "17.28",
+            "repetition": "4.8"
+          },
+          "rank": 24,
+          "tags": [
+            "长文本"
+          ]
+        },
+        {
+          "model": "XiaomiMiMo/MiMo-V2.5-Pro",
+          "provider": "custom",
+          "score": 73.7,
+          "sub_score": "73.7 分",
+          "metric_val": "73.7",
+          "details": {
+            "length": "9566",
+            "vocab": "23.02",
+            "slop": "24.35",
+            "repetition": "4.4"
+          },
+          "rank": 25,
+          "tags": []
+        },
+        {
+          "model": "zai-org/GLM-5.1",
+          "provider": "glm",
+          "score": 73.5,
+          "sub_score": "73.5 分",
+          "metric_val": "73.5",
+          "details": {
+            "length": "6271",
+            "vocab": "22.68",
+            "slop": "24.94",
+            "repetition": "4.4"
+          },
+          "rank": 26,
+          "tags": []
+        },
+        {
+          "model": "claude-opus-4-5-20251101",
+          "provider": "anthropic",
+          "score": 73.1,
+          "sub_score": "73.1 分",
+          "metric_val": "73.1",
+          "details": {
+            "length": "5856",
+            "vocab": "23.66",
+            "slop": "20.22",
+            "repetition": "4.6"
+          },
+          "rank": 27,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "gpt-5-2025-08-07-high-reasoning-high-reasoning",
+          "provider": "openai",
+          "score": 73.1,
+          "sub_score": "73.1 分",
+          "metric_val": "73.1",
+          "details": {
+            "length": "10225",
+            "vocab": "23.88",
+            "slop": "10.76",
+            "repetition": "3.3"
+          },
+          "rank": 28,
+          "tags": []
+        },
+        {
+          "model": "gpt-5.4-mini",
+          "provider": "openai",
+          "score": 73.0,
+          "sub_score": "73.0 分",
+          "metric_val": "73.0",
+          "details": {
+            "length": "9508",
+            "vocab": "29.54",
+            "slop": "23.56",
+            "repetition": "6.4"
+          },
+          "rank": 29,
+          "tags": []
+        },
+        {
+          "model": "gpt-5-2025-08-07",
+          "provider": "openai",
+          "score": 72.8,
+          "sub_score": "72.8 分",
+          "metric_val": "72.8",
+          "details": {
+            "length": "13497",
+            "vocab": "25.12",
+            "slop": "15.48",
+            "repetition": "5.1"
+          },
+          "rank": 30,
+          "tags": []
+        },
+        {
+          "model": "thinkingmachines/Inkling",
+          "provider": "custom",
+          "score": 72.5,
+          "sub_score": "72.5 分",
+          "metric_val": "72.5",
+          "details": {
+            "length": "6478",
+            "vocab": "29.07",
+            "slop": "21.46",
+            "repetition": "5.2"
+          },
+          "rank": 31,
+          "tags": []
+        },
+        {
+          "model": "gemini-3.5-flash",
+          "provider": "gemini",
+          "score": 71.8,
+          "sub_score": "71.8 分",
+          "metric_val": "71.8",
+          "details": {
+            "length": "6598",
+            "vocab": "29.80",
+            "slop": "29.01",
+            "repetition": "6.1"
+          },
+          "rank": 32,
+          "tags": [
+            "极速响应"
+          ]
+        },
+        {
+          "model": "gpt-5.2",
+          "provider": "openai",
+          "score": 71.6,
+          "sub_score": "71.6 分",
+          "metric_val": "71.6",
+          "details": {
+            "length": "11746",
+            "vocab": "22.84",
+            "slop": "41.76",
+            "repetition": "7.6"
+          },
+          "rank": 33,
+          "tags": []
+        },
+        {
+          "model": "claude-sonnet-4.5",
+          "provider": "anthropic",
+          "score": 71.4,
+          "sub_score": "71.4 分",
+          "metric_val": "71.4",
+          "details": {
+            "length": "6803",
+            "vocab": "22.64",
+            "slop": "12.99",
+            "repetition": "4.4"
+          },
+          "rank": 34,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "horizon-alpha",
+          "provider": "custom",
+          "score": 71.2,
+          "sub_score": "71.2 分",
+          "metric_val": "71.2",
+          "details": {
+            "length": "14072",
+            "vocab": "27.48",
+            "slop": "15.32",
+            "repetition": "3.1"
+          },
+          "rank": 35,
+          "tags": []
+        },
+        {
+          "model": "zai-org/GLM-5",
+          "provider": "glm",
+          "score": 70.9,
+          "sub_score": "70.9 分",
+          "metric_val": "70.9",
+          "details": {
+            "length": "8065",
+            "vocab": "23.43",
+            "slop": "24.04",
+            "repetition": "4.4"
+          },
+          "rank": 36,
+          "tags": []
+        },
+        {
+          "model": "mimo-v2-pro",
+          "provider": "custom",
+          "score": 70.9,
+          "sub_score": "70.9 分",
+          "metric_val": "70.9",
+          "details": {
+            "length": "9467",
+            "vocab": "21.12",
+            "slop": "27.66",
+            "repetition": "4.8"
+          },
+          "rank": 37,
+          "tags": []
+        },
+        {
+          "model": "muse-spark-1.1",
+          "provider": "ollama",
+          "score": 70.6,
+          "sub_score": "70.6 分",
+          "metric_val": "70.6",
+          "details": {
+            "length": "7216",
+            "vocab": "22.56",
+            "slop": "12.30",
+            "repetition": "6.2"
+          },
+          "rank": 38,
+          "tags": []
+        },
+        {
+          "model": "claude-opus-4.1",
+          "provider": "anthropic",
+          "score": 70.5,
+          "sub_score": "70.5 分",
+          "metric_val": "70.5",
+          "details": {
+            "length": "6190",
+            "vocab": "21.49",
+            "slop": "11.69",
+            "repetition": "4.5"
+          },
+          "rank": 39,
+          "tags": [
+            "叙事大师"
+          ]
+        },
+        {
+          "model": "moonshotai/Kimi-K2-Thinking",
+          "provider": "custom",
+          "score": 69.0,
+          "sub_score": "69.0 分",
+          "metric_val": "69.0",
+          "details": {
+            "length": "6290",
+            "vocab": "15.07",
+            "slop": "13.08",
+            "repetition": "5.1"
+          },
+          "rank": 40,
+          "tags": [
+            "长文本"
+          ]
+        },
+        {
+          "model": "gemini-3-pro-preview",
+          "provider": "gemini",
+          "score": 68.8,
+          "sub_score": "68.8 分",
+          "metric_val": "68.8",
+          "details": {
+            "length": "7720",
+            "vocab": "23.90",
+            "slop": "38.54",
+            "repetition": "3.6"
+          },
+          "rank": 41,
+          "tags": []
+        },
+        {
+          "model": "grok-4.20-beta",
+          "provider": "custom",
+          "score": 68.5,
+          "sub_score": "68.5 分",
+          "metric_val": "68.5",
+          "details": {
+            "length": "8370",
+            "vocab": "25.00",
+            "slop": "27.41",
+            "repetition": "5.2"
+          },
+          "rank": 42,
+          "tags": []
+        },
+        {
+          "model": "Qwen/Qwen3.5-397B-A17B",
+          "provider": "ollama",
+          "score": 68.3,
+          "sub_score": "68.3 分",
+          "metric_val": "68.3",
+          "details": {
+            "length": "5652",
+            "vocab": "13.76",
+            "slop": "41.55",
+            "repetition": "5.3"
+          },
+          "rank": 43,
+          "tags": []
+        },
+        {
+          "model": "gemini-3.1-pro-preview",
+          "provider": "gemini",
+          "score": 68.2,
+          "sub_score": "68.2 分",
+          "metric_val": "68.2",
+          "details": {
+            "length": "7433",
+            "vocab": "44.46",
+            "slop": "38.12",
+            "repetition": "4.9"
+          },
+          "rank": 44,
+          "tags": []
+        },
+        {
+          "model": "moonshotai/Kimi-K2-Instruct",
+          "provider": "custom",
+          "score": 68.1,
+          "sub_score": "68.1 分",
+          "metric_val": "68.1",
+          "details": {
+            "length": "5124",
+            "vocab": "21.98",
+            "slop": "16.63",
+            "repetition": "5.2"
+          },
+          "rank": 45,
+          "tags": [
+            "长文本"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lmsys_arena",
+      "name": "LMSYS Arena 写作天梯",
+      "icon": "Swords",
+      "url": "https://arena.ai/leaderboard/text/creative-writing",
+      "metric_name": "Arena 双盲胜率 Elo",
+      "description": "全网真实人类双盲盲测投票胜率榜，纯靠玩家两两对决盲打投票，最公认的众口难调终极试金石。",
+      "columns": [
+        "排名",
+        "模型名称",
+        "厂商",
+        "Arena Elo",
+        "置信区间",
+        "对战胜率",
+        "总对局数",
+        "操作"
+      ],
+      "items": [
+        {
+          "rank": 1,
+          "model": "claude-fable-5-high",
+          "provider": "anthropic",
+          "score": 1506.0,
+          "sub_score": "±5",
+          "metric_val": "1506",
+          "details": {
+            "ci": "±5",
+            "votes": "30,057",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "Top 1",
+            "实测投票",
+            "旗舰推理",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 2,
+          "model": "claude-opus-4-6-high",
+          "provider": "anthropic",
+          "score": 1505.0,
+          "sub_score": "±4",
+          "metric_val": "1505",
+          "details": {
+            "ci": "±4",
+            "votes": "71,993",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "Top 2",
+            "实测投票",
+            "旗舰推理",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 3,
+          "model": "claude-opus-4-7-high",
+          "provider": "anthropic",
+          "score": 1502.0,
+          "sub_score": "±4",
+          "metric_val": "1502",
+          "details": {
+            "ci": "±4",
+            "votes": "60,002",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "Top 3",
+            "实测投票",
+            "旗舰推理",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 4,
+          "model": "muse-spark-1.2 (xHigh)",
+          "provider": "ollama",
+          "score": 1500.0,
+          "sub_score": "±11",
+          "metric_val": "1500",
+          "details": {
+            "ci": "±11",
+            "votes": "3,227",
+            "vendor": "Meta",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理"
+          ]
+        },
+        {
+          "rank": 5,
+          "model": "claude-fable-5.1-max",
+          "provider": "anthropic",
+          "score": 1498.0,
+          "sub_score": "±8",
+          "metric_val": "1498",
+          "details": {
+            "ci": "±8",
+            "votes": "5,783",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 6,
+          "model": "claude-opus-4-6",
+          "provider": "anthropic",
+          "score": 1497.0,
+          "sub_score": "±3",
+          "metric_val": "1497",
+          "details": {
+            "ci": "±3",
+            "votes": "75,878",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 7,
+          "model": "claude-opus-4-7",
+          "provider": "anthropic",
+          "score": 1494.0,
+          "sub_score": "±4",
+          "metric_val": "1494",
+          "details": {
+            "ci": "±4",
+            "votes": "61,128",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 8,
+          "model": "muse-spark-1.3-max",
+          "provider": "ollama",
+          "score": 1493.0,
+          "sub_score": "±9",
+          "metric_val": "1493",
+          "details": {
+            "ci": "±9",
+            "votes": "4,723",
+            "vendor": "Meta",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理"
+          ]
+        },
+        {
+          "rank": 9,
+          "model": "gemini-3.8-flash-high",
+          "provider": "gemini",
+          "score": 1493.0,
+          "sub_score": "±9",
+          "metric_val": "1493",
+          "details": {
+            "ci": "±9",
+            "votes": "5,076",
+            "vendor": "Google",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理",
+            "极速响应"
+          ]
+        },
+        {
+          "rank": 10,
+          "model": "claude-opus-5-high",
+          "provider": "anthropic",
+          "score": 1493.0,
+          "sub_score": "±4",
+          "metric_val": "1493",
+          "details": {
+            "ci": "±4",
+            "votes": "42,617",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 11,
+          "model": "muse-spark-1.1",
+          "provider": "ollama",
+          "score": 1493.0,
+          "sub_score": "±5",
+          "metric_val": "1493",
+          "details": {
+            "ci": "±5",
+            "votes": "27,615",
+            "vendor": "Meta",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 12,
+          "model": "gemini-3.7-flash-high",
+          "provider": "gemini",
+          "score": 1490.0,
+          "sub_score": "±8",
+          "metric_val": "1490",
+          "details": {
+            "ci": "±8",
+            "votes": "5,640",
+            "vendor": "Google",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理",
+            "极速响应"
+          ]
+        },
+        {
+          "rank": 13,
+          "model": "muse-spark",
+          "provider": "ollama",
+          "score": 1488.0,
+          "sub_score": "±6",
+          "metric_val": "1488",
+          "details": {
+            "ci": "±6",
+            "votes": "13,565",
+            "vendor": "Meta",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 14,
+          "model": "claude-opus-5-max",
+          "provider": "anthropic",
+          "score": 1487.0,
+          "sub_score": "±5",
+          "metric_val": "1487",
+          "details": {
+            "ci": "±5",
+            "votes": "20,706",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 15,
+          "model": "gemini-3.1-pro-preview",
+          "provider": "gemini",
+          "score": 1487.0,
+          "sub_score": "±3",
+          "metric_val": "1487",
+          "details": {
+            "ci": "±3",
+            "votes": "106,951",
+            "vendor": "Google",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 16,
+          "model": "gemini-3-pro",
+          "provider": "gemini",
+          "score": 1485.0,
+          "sub_score": "±4",
+          "metric_val": "1485",
+          "details": {
+            "ci": "±4",
+            "votes": "40,654",
+            "vendor": "Google",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 17,
+          "model": "gpt-5.6-sol-xhigh",
+          "provider": "openai",
+          "score": 1483.0,
+          "sub_score": "±5",
+          "metric_val": "1483",
+          "details": {
+            "ci": "±5",
+            "votes": "27,069",
+            "vendor": "OpenAI",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理"
+          ]
+        },
+        {
+          "rank": 18,
+          "model": "glm-5.3-max",
+          "provider": "glm",
+          "score": 1483.0,
+          "sub_score": "±6",
+          "metric_val": "1483",
+          "details": {
+            "ci": "±6",
+            "votes": "10,960",
+            "vendor": "Z.ai",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理"
+          ]
+        },
+        {
+          "rank": 19,
+          "model": "gpt-5.5-high",
+          "provider": "openai",
+          "score": 1482.0,
+          "sub_score": "±4",
+          "metric_val": "1482",
+          "details": {
+            "ci": "±4",
+            "votes": "64,924",
+            "vendor": "OpenAI",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理"
+          ]
+        },
+        {
+          "rank": 20,
+          "model": "claude-opus-4-8-high",
+          "provider": "anthropic",
+          "score": 1481.0,
+          "sub_score": "±4",
+          "metric_val": "1481",
+          "details": {
+            "ci": "±4",
+            "votes": "52,535",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 21,
+          "model": "qwen3.8-max",
+          "provider": "ollama",
+          "score": 1481.0,
+          "sub_score": "±6",
+          "metric_val": "1481",
+          "details": {
+            "ci": "±6",
+            "votes": "16,670",
+            "vendor": "Alibaba",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理"
+          ]
+        },
+        {
+          "rank": 22,
+          "model": "gemini-3.6-flash-high",
+          "provider": "gemini",
+          "score": 1480.0,
+          "sub_score": "±5",
+          "metric_val": "1480",
+          "details": {
+            "ci": "±5",
+            "votes": "26,445",
+            "vendor": "Google",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理",
+            "极速响应"
+          ]
+        },
+        {
+          "rank": 23,
+          "model": "gpt-6-astra-max",
+          "provider": "openai",
+          "score": 1480.0,
+          "sub_score": "±12",
+          "metric_val": "1480",
+          "details": {
+            "ci": "±12",
+            "votes": "2,693",
+            "vendor": "OpenAI",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理"
+          ]
+        },
+        {
+          "rank": 24,
+          "model": "gemini-3.5-flash-high",
+          "provider": "gemini",
+          "score": 1478.0,
+          "sub_score": "±4",
+          "metric_val": "1478",
+          "details": {
+            "ci": "±4",
+            "votes": "38,257",
+            "vendor": "Google",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理",
+            "极速响应"
+          ]
+        },
+        {
+          "rank": 25,
+          "model": "gpt-5.4-high",
+          "provider": "openai",
+          "score": 1476.0,
+          "sub_score": "±4",
+          "metric_val": "1476",
+          "details": {
+            "ci": "±4",
+            "votes": "60,537",
+            "vendor": "OpenAI",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理"
+          ]
+        },
+        {
+          "rank": 26,
+          "model": "gpt-5.2-chat-latest-20260210",
+          "provider": "openai",
+          "score": 1476.0,
+          "sub_score": "±4",
+          "metric_val": "1476",
+          "details": {
+            "ci": "±4",
+            "votes": "34,176",
+            "vendor": "OpenAI",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 27,
+          "model": "gpt-5.5",
+          "provider": "openai",
+          "score": 1476.0,
+          "sub_score": "±4",
+          "metric_val": "1476",
+          "details": {
+            "ci": "±4",
+            "votes": "66,317",
+            "vendor": "OpenAI",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 28,
+          "model": "glm-5.3-flash",
+          "provider": "glm",
+          "score": 1475.0,
+          "sub_score": "±7",
+          "metric_val": "1475",
+          "details": {
+            "ci": "±7",
+            "votes": "10,038",
+            "vendor": "Z.ai",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "极速响应"
+          ]
+        },
+        {
+          "rank": 29,
+          "model": "grok-4.20-beta1",
+          "provider": "custom",
+          "score": 1475.0,
+          "sub_score": "±5",
+          "metric_val": "1475",
+          "details": {
+            "ci": "±5",
+            "votes": "26,599",
+            "vendor": "SpaceXAI",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 30,
+          "model": "gemini-3.5-flash-medium",
+          "provider": "gemini",
+          "score": 1474.0,
+          "sub_score": "±4",
+          "metric_val": "1474",
+          "details": {
+            "ci": "±4",
+            "votes": "36,627",
+            "vendor": "Google",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "极速响应"
+          ]
+        },
+        {
+          "rank": 31,
+          "model": "gpt-5.5-instant",
+          "provider": "openai",
+          "score": 1474.0,
+          "sub_score": "±5",
+          "metric_val": "1474",
+          "details": {
+            "ci": "±5",
+            "votes": "25,850",
+            "vendor": "OpenAI",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 32,
+          "model": "gemini-3-flash",
+          "provider": "gemini",
+          "score": 1474.0,
+          "sub_score": "±4",
+          "metric_val": "1474",
+          "details": {
+            "ci": "±4",
+            "votes": "30,225",
+            "vendor": "Google",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "极速响应"
+          ]
+        },
+        {
+          "rank": 33,
+          "model": "qwen3.7-max-preview",
+          "provider": "ollama",
+          "score": 1473.0,
+          "sub_score": "±10",
+          "metric_val": "1473",
+          "details": {
+            "ci": "±10",
+            "votes": "3,705",
+            "vendor": "Alibaba",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理"
+          ]
+        },
+        {
+          "rank": 34,
+          "model": "claude-opus-4-8",
+          "provider": "anthropic",
+          "score": 1473.0,
+          "sub_score": "±4",
+          "metric_val": "1473",
+          "details": {
+            "ci": "±4",
+            "votes": "53,446",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 35,
+          "model": "claude-opus-4-5-20251101-high-32k",
+          "provider": "anthropic",
+          "score": 1473.0,
+          "sub_score": "±4",
+          "metric_val": "1473",
+          "details": {
+            "ci": "±4",
+            "votes": "36,239",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理",
+            "前沿拟真"
+          ]
+        },
+        {
+          "rank": 36,
+          "model": "claude-sonnet-4-6",
+          "provider": "anthropic",
+          "score": 1473.0,
+          "sub_score": "±4",
+          "metric_val": "1473",
+          "details": {
+            "ci": "±4",
+            "votes": "66,208",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 37,
+          "model": "glm-5.2-max",
+          "provider": "glm",
+          "score": 1472.0,
+          "sub_score": "±5",
+          "metric_val": "1472",
+          "details": {
+            "ci": "±5",
+            "votes": "36,798",
+            "vendor": "Z.ai",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "旗舰推理"
+          ]
+        },
+        {
+          "rank": 38,
+          "model": "grok-4.20-beta-0309-reasoning",
+          "provider": "custom",
+          "score": 1471.0,
+          "sub_score": "±4",
+          "metric_val": "1471",
+          "details": {
+            "ci": "±4",
+            "votes": "62,168",
+            "vendor": "SpaceXAI",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 39,
+          "model": "grok-4.20-multi-agent-beta-0309",
+          "provider": "custom",
+          "score": 1470.0,
+          "sub_score": "±4",
+          "metric_val": "1470",
+          "details": {
+            "ci": "±4",
+            "votes": "60,777",
+            "vendor": "SpaceXAI",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票"
+          ]
+        },
+        {
+          "rank": 40,
+          "model": "claude-opus-4-5-20251101",
+          "provider": "anthropic",
+          "score": 1469.0,
+          "sub_score": "±3",
+          "metric_val": "1469",
+          "details": {
+            "ci": "±3",
+            "votes": "70,013",
+            "vendor": "Anthropic",
+            "license": "proprietary"
+          },
+          "tags": [
+            "实测投票",
+            "前沿拟真"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "artificial_analysis",
+      "name": "Artificial Analysis 质速指数",
+      "icon": "Zap",
+      "url": "https://artificialanalysis.ai",
+      "metric_name": "综合质量指数 (0-100)",
+      "description": "兼测模型‘智力质量’与‘真实首字握手延迟 (TTFT) / 生成吞吐 (TPS)’，直观呈现谁是真正的即时秒回之王。",
+      "columns": [
+        "排名",
+        "模型名称",
+        "厂商",
+        "质量指数",
+        "首字延迟 (TTFT)",
+        "生成速度 (TPS)",
+        "百万Token价格",
+        "操作"
+      ],
+      "items": [
+        {
+          "rank": 1,
+          "model": "gpt-6-astra",
+          "provider": "openai",
+          "score": 99.0,
+          "sub_score": "99.0",
+          "metric_val": "99.0 分",
+          "details": {
+            "ttft": "0.95s",
+            "tps": "65 t/s",
+            "price": "$10.00"
+          },
+          "tags": [
+            "终极智力",
+            "旗舰排面",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 2,
+          "model": "claude-opus-5",
+          "provider": "anthropic",
+          "score": 98.4,
+          "sub_score": "98.4",
+          "metric_val": "98.4 分",
+          "details": {
+            "ttft": "1.10s",
+            "tps": "52 t/s",
+            "price": "$15.00"
+          },
+          "tags": [
+            "大师文笔",
+            "尊享品质",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 3,
+          "model": "claude-sonnet-5",
+          "provider": "anthropic",
+          "score": 96.2,
+          "sub_score": "96.2",
+          "metric_val": "96.2 分",
+          "details": {
+            "ttft": "0.55s",
+            "tps": "88 t/s",
+            "price": "$3.00"
+          },
+          "tags": [
+            "质感无敌",
+            "流畅顺滑",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 4,
+          "model": "gpt-5.6",
+          "provider": "openai",
+          "score": 95.8,
+          "sub_score": "95.8",
+          "metric_val": "95.8 分",
+          "details": {
+            "ttft": "0.48s",
+            "tps": "94 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "均衡强劲",
+            "黄金手感",
+            "多模态支持",
+            "指向 sol"
+          ]
+        },
+        {
+          "rank": 5,
+          "model": "gpt-5.6-sol",
+          "provider": "openai",
+          "score": 95.5,
+          "sub_score": "95.5",
+          "metric_val": "95.5 分",
+          "details": {
+            "ttft": "0.50s",
+            "tps": "92 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "sol核心",
+            "私聊专属",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 6,
+          "model": "claude-fable-5-1",
+          "provider": "anthropic",
+          "score": 95.0,
+          "sub_score": "95.0",
+          "metric_val": "95.0 分",
+          "details": {
+            "ttft": "0.62s",
+            "tps": "82 t/s",
+            "price": "$4.00"
+          },
+          "tags": [
+            "叙事神选",
+            "情绪饱满",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 7,
+          "model": "gpt-5.5-pro",
+          "provider": "openai",
+          "score": 94.6,
+          "sub_score": "94.6",
+          "metric_val": "94.6 分",
+          "details": {
+            "ttft": "0.72s",
+            "tps": "75 t/s",
+            "price": "$5.00"
+          },
+          "tags": [
+            "深层推演",
+            "高智商",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 8,
+          "model": "gpt-5.5",
+          "provider": "openai",
+          "score": 94.0,
+          "sub_score": "94.0",
+          "metric_val": "94.0 分",
+          "details": {
+            "ttft": "0.58s",
+            "tps": "86 t/s",
+            "price": "$3.50"
+          },
+          "tags": [
+            "大文笔",
+            "篇幅宏伟",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 9,
+          "model": "gemini-3.8-flash",
+          "provider": "gemini",
+          "score": 93.5,
+          "sub_score": "93.5",
+          "metric_val": "93.5 分",
+          "details": {
+            "ttft": "0.28s",
+            "tps": "145 t/s",
+            "price": "$0.075"
+          },
+          "tags": [
+            "0.28s闪击",
+            "性价比绝杀",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 10,
+          "model": "gpt-5.4",
+          "provider": "openai",
+          "score": 93.0,
+          "sub_score": "93.0",
+          "metric_val": "93.0 分",
+          "details": {
+            "ttft": "0.45s",
+            "tps": "102 t/s",
+            "price": "$2.00"
+          },
+          "tags": [
+            "敏捷快语",
+            "词采精妙",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 11,
+          "model": "claude-opus-4-8",
+          "provider": "anthropic",
+          "score": 92.5,
+          "sub_score": "92.5",
+          "metric_val": "92.5 分",
+          "details": {
+            "ttft": "0.85s",
+            "tps": "64 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "雍容华贵",
+            "沉稳文风",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 12,
+          "model": "deepseek-flash",
+          "provider": "deepseek",
+          "score": 91.8,
+          "sub_score": "91.8",
+          "metric_val": "91.8 分",
+          "details": {
+            "ttft": "0.32s",
+            "tps": "118 t/s",
+            "price": "$0.14"
+          },
+          "tags": [
+            "极速秒回",
+            "国内直连"
+          ]
+        },
+        {
+          "rank": 13,
+          "model": "o3-pro",
+          "provider": "openai",
+          "score": 91.5,
+          "sub_score": "91.5",
+          "metric_val": "91.5 分",
+          "details": {
+            "ttft": "1.20s",
+            "tps": "48 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "超强逻辑",
+            "长链思考"
+          ]
+        },
+        {
+          "rank": 14,
+          "model": "o3",
+          "provider": "openai",
+          "score": 91.0,
+          "sub_score": "91.0",
+          "metric_val": "91.0 分",
+          "details": {
+            "ttft": "0.80s",
+            "tps": "70 t/s",
+            "price": "$4.00"
+          },
+          "tags": [
+            "推理极准",
+            "不犯错"
+          ]
+        },
+        {
+          "rank": 15,
+          "model": "kimi-k3",
+          "provider": "custom",
+          "score": 90.5,
+          "sub_score": "90.5",
+          "metric_val": "90.5 分",
+          "details": {
+            "ttft": "0.65s",
+            "tps": "78 t/s",
+            "price": "$1.50"
+          },
+          "tags": [
+            "中文长流",
+            "交互亲和",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 16,
+          "model": "GLM-5.3",
+          "provider": "custom",
+          "score": 90.0,
+          "sub_score": "90.0",
+          "metric_val": "90.0 分",
+          "details": {
+            "ttft": "0.60s",
+            "tps": "82 t/s",
+            "price": "$1.20"
+          },
+          "tags": [
+            "国产力作",
+            "神采飞扬",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 17,
+          "model": "gpt-5.4-mini",
+          "provider": "openai",
+          "score": 89.8,
+          "sub_score": "89.8",
+          "metric_val": "89.8 分",
+          "details": {
+            "ttft": "0.25s",
+            "tps": "150 t/s",
+            "price": "$0.15"
+          },
+          "tags": [
+            "速答利器",
+            "极其跟手",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 18,
+          "model": "gpt-5.4-nano",
+          "provider": "openai",
+          "score": 89.2,
+          "sub_score": "89.2",
+          "metric_val": "89.2 分",
+          "details": {
+            "ttft": "0.22s",
+            "tps": "162 t/s",
+            "price": "$0.05"
+          },
+          "tags": [
+            "微秒级打字",
+            "轻量王者",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 19,
+          "model": "gemini-3.7-flash",
+          "provider": "gemini",
+          "score": 89.0,
+          "sub_score": "89.0",
+          "metric_val": "89.0 分",
+          "details": {
+            "ttft": "0.30s",
+            "tps": "138 t/s",
+            "price": "$0.075"
+          },
+          "tags": [
+            "清爽敏捷",
+            "毫无卡顿",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 20,
+          "model": "claude-sonnet-4-6",
+          "provider": "anthropic",
+          "score": 88.5,
+          "sub_score": "88.5",
+          "metric_val": "88.5 分",
+          "details": {
+            "ttft": "0.60s",
+            "tps": "85 t/s",
+            "price": "$3.00"
+          },
+          "tags": [
+            "用词考究",
+            "高质回复",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 21,
+          "model": "deepseek-v4-pro",
+          "provider": "deepseek",
+          "score": 88.0,
+          "sub_score": "88.0",
+          "metric_val": "88.0 分",
+          "details": {
+            "ttft": "0.40s",
+            "tps": "98 t/s",
+            "price": "$0.50"
+          },
+          "tags": [
+            "性价比旗舰",
+            "扎实耐看"
+          ]
+        },
+        {
+          "rank": 22,
+          "model": "gpt-5.6-terra",
+          "provider": "openai",
+          "score": 87.8,
+          "sub_score": "87.8",
+          "metric_val": "87.8 分",
+          "details": {
+            "ttft": "0.52s",
+            "tps": "90 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "厚重大气",
+            "设定严谨",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 23,
+          "model": "gpt-5.6-luna",
+          "provider": "openai",
+          "score": 87.5,
+          "sub_score": "87.5",
+          "metric_val": "87.5 分",
+          "details": {
+            "ttft": "0.49s",
+            "tps": "93 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "温存细腻",
+            "情绪在线",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 24,
+          "model": "gemini-3.1-pro",
+          "provider": "gemini",
+          "score": 87.2,
+          "sub_score": "87.2",
+          "metric_val": "87.2 分",
+          "details": {
+            "ttft": "0.68s",
+            "tps": "76 t/s",
+            "price": "$1.25"
+          },
+          "tags": [
+            "长记忆库",
+            "百万上下文",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 25,
+          "model": "llama3.3:70b",
+          "provider": "ollama",
+          "score": 87.0,
+          "sub_score": "87.0",
+          "metric_val": "87.0 分",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "本地断网",
+            "零成本"
+          ]
+        },
+        {
+          "rank": 26,
+          "model": "claude-opus-4-7",
+          "provider": "anthropic",
+          "score": 86.8,
+          "sub_score": "86.8",
+          "metric_val": "86.8 分",
+          "details": {
+            "ttft": "0.90s",
+            "tps": "60 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "古典韵味",
+            "情绪沉浸",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 27,
+          "model": "deepseek-r1:32b",
+          "provider": "ollama",
+          "score": 86.5,
+          "sub_score": "86.5",
+          "metric_val": "86.5 分",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "本地推理",
+            "无删减"
+          ]
+        },
+        {
+          "rank": 28,
+          "model": "qwen3.8-95b",
+          "provider": "ollama",
+          "score": 86.0,
+          "sub_score": "86.0",
+          "metric_val": "86.0 分",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "大尺寸开源",
+            "文风浓郁"
+          ]
+        },
+        {
+          "rank": 29,
+          "model": "claude-haiku-4-5-20251001",
+          "provider": "anthropic",
+          "score": 85.5,
+          "sub_score": "85.5",
+          "metric_val": "85.5 分",
+          "details": {
+            "ttft": "0.26s",
+            "tps": "142 t/s",
+            "price": "$0.25"
+          },
+          "tags": [
+            "小快灵",
+            "角色拟人",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 30,
+          "model": "gpt-5.2",
+          "provider": "openai",
+          "score": 85.0,
+          "sub_score": "85.0",
+          "metric_val": "85.0 分",
+          "details": {
+            "ttft": "0.55s",
+            "tps": "85 t/s",
+            "price": "$1.80"
+          },
+          "tags": [
+            "老练稳重",
+            "规规矩矩",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 31,
+          "model": "gemini-3.6-flash",
+          "provider": "gemini",
+          "score": 84.5,
+          "sub_score": "84.5",
+          "metric_val": "84.5 分",
+          "details": {
+            "ttft": "0.34s",
+            "tps": "125 t/s",
+            "price": "$0.05"
+          },
+          "tags": [
+            "学生党首选",
+            "量大管饱",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 32,
+          "model": "gpt-5.3-codex",
+          "provider": "openai",
+          "score": 84.0,
+          "sub_score": "84.0",
+          "metric_val": "84.0 分",
+          "details": {
+            "ttft": "0.48s",
+            "tps": "95 t/s",
+            "price": "$1.50"
+          },
+          "tags": [
+            "严整回复",
+            "一丝不苟",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 33,
+          "model": "gpt-5.1",
+          "provider": "openai",
+          "score": 83.5,
+          "sub_score": "83.5",
+          "metric_val": "83.5 分",
+          "details": {
+            "ttft": "0.52s",
+            "tps": "88 t/s",
+            "price": "$1.50"
+          },
+          "tags": [
+            "前代中坚",
+            "稳定可靠",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 34,
+          "model": "gpt-5",
+          "provider": "openai",
+          "score": 83.0,
+          "sub_score": "83.0",
+          "metric_val": "83.0 分",
+          "details": {
+            "ttft": "0.55s",
+            "tps": "82 t/s",
+            "price": "$1.20"
+          },
+          "tags": [
+            "标准跑分",
+            "均衡路线",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 35,
+          "model": "gpt-4.1",
+          "provider": "openai",
+          "score": 82.5,
+          "sub_score": "82.5",
+          "metric_val": "82.5 分",
+          "details": {
+            "ttft": "0.42s",
+            "tps": "105 t/s",
+            "price": "$1.00"
+          },
+          "tags": [
+            "响应迅捷",
+            "结构清晰",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 36,
+          "model": "gpt-4.1-mini",
+          "provider": "openai",
+          "score": 82.0,
+          "sub_score": "82.0",
+          "metric_val": "82.0 分",
+          "details": {
+            "ttft": "0.24s",
+            "tps": "155 t/s",
+            "price": "$0.10"
+          },
+          "tags": [
+            "白菜价",
+            "超快响应",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 37,
+          "model": "gpt-4o",
+          "provider": "openai",
+          "score": 81.5,
+          "sub_score": "81.5",
+          "metric_val": "81.5 分",
+          "details": {
+            "ttft": "0.45s",
+            "tps": "96 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "多模态元老",
+            "手感熟悉",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 38,
+          "model": "gpt-4o-mini",
+          "provider": "openai",
+          "score": 81.0,
+          "sub_score": "81.0",
+          "metric_val": "81.0 分",
+          "details": {
+            "ttft": "0.26s",
+            "tps": "148 t/s",
+            "price": "$0.15"
+          },
+          "tags": [
+            "低延迟日常",
+            "极省资源",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 39,
+          "model": "qwen2.5:72b",
+          "provider": "ollama",
+          "score": 80.5,
+          "sub_score": "80.5",
+          "metric_val": "80.5 分",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "中文开源中流",
+            "稳"
+          ]
+        },
+        {
+          "rank": 40,
+          "model": "claude-opus-4-6",
+          "provider": "anthropic",
+          "score": 80.0,
+          "sub_score": "80.0",
+          "metric_val": "80.0 分",
+          "details": {
+            "ttft": "0.95s",
+            "tps": "58 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "慢条斯理",
+            "有条不紊",
+            "多模态支持"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aa_quality",
+      "name": "AA 智能质量榜",
+      "icon": "Brain",
+      "url": "https://artificialanalysis.ai/leaderboards/models",
+      "metric_name": "综合质量指数 (Quality Index)",
+      "description": "由 Artificial Analysis 独立评估的大模型综合智能与推理质量指数，涵盖 MMLU-Pro、GPQA、HumanEval 等多维基准。",
+      "columns": [
+        "排名",
+        "模型名称",
+        "厂商",
+        "综合质量指数",
+        "首字延迟 (TTFT)",
+        "输出速度 (TPS)",
+        "百万Token价格",
+        "操作"
+      ],
+      "items": [
+        {
+          "rank": 1,
+          "model": "gpt-6-astra",
+          "provider": "openai",
+          "score": 99.0,
+          "sub_score": "99.0 质量分",
+          "metric_val": "99.0 分",
+          "details": {
+            "ttft": "0.95s",
+            "tps": "65 t/s",
+            "price": "$10.00"
+          },
+          "tags": [
+            "Top 1",
+            "终极智力",
+            "旗舰排面",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 2,
+          "model": "claude-opus-5",
+          "provider": "anthropic",
+          "score": 98.4,
+          "sub_score": "98.4 质量分",
+          "metric_val": "98.4 分",
+          "details": {
+            "ttft": "1.10s",
+            "tps": "52 t/s",
+            "price": "$15.00"
+          },
+          "tags": [
+            "Top 2",
+            "大师文笔",
+            "尊享品质",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 3,
+          "model": "claude-sonnet-5",
+          "provider": "anthropic",
+          "score": 96.2,
+          "sub_score": "96.2 质量分",
+          "metric_val": "96.2 分",
+          "details": {
+            "ttft": "0.55s",
+            "tps": "88 t/s",
+            "price": "$3.00"
+          },
+          "tags": [
+            "Top 3",
+            "质感无敌",
+            "流畅顺滑",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 4,
+          "model": "gpt-5.6",
+          "provider": "openai",
+          "score": 95.8,
+          "sub_score": "95.8 质量分",
+          "metric_val": "95.8 分",
+          "details": {
+            "ttft": "0.48s",
+            "tps": "94 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "均衡强劲",
+            "黄金手感",
+            "多模态支持",
+            "指向 sol"
+          ]
+        },
+        {
+          "rank": 5,
+          "model": "gpt-5.6-sol",
+          "provider": "openai",
+          "score": 95.5,
+          "sub_score": "95.5 质量分",
+          "metric_val": "95.5 分",
+          "details": {
+            "ttft": "0.50s",
+            "tps": "92 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "sol核心",
+            "私聊专属",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 6,
+          "model": "claude-fable-5-1",
+          "provider": "anthropic",
+          "score": 95.0,
+          "sub_score": "95.0 质量分",
+          "metric_val": "95.0 分",
+          "details": {
+            "ttft": "0.62s",
+            "tps": "82 t/s",
+            "price": "$4.00"
+          },
+          "tags": [
+            "叙事神选",
+            "情绪饱满",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 7,
+          "model": "gpt-5.5-pro",
+          "provider": "openai",
+          "score": 94.6,
+          "sub_score": "94.6 质量分",
+          "metric_val": "94.6 分",
+          "details": {
+            "ttft": "0.72s",
+            "tps": "75 t/s",
+            "price": "$5.00"
+          },
+          "tags": [
+            "深层推演",
+            "高智商",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 8,
+          "model": "gpt-5.5",
+          "provider": "openai",
+          "score": 94.0,
+          "sub_score": "94.0 质量分",
+          "metric_val": "94.0 分",
+          "details": {
+            "ttft": "0.58s",
+            "tps": "86 t/s",
+            "price": "$3.50"
+          },
+          "tags": [
+            "大文笔",
+            "篇幅宏伟",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 9,
+          "model": "gemini-3.8-flash",
+          "provider": "gemini",
+          "score": 93.5,
+          "sub_score": "93.5 质量分",
+          "metric_val": "93.5 分",
+          "details": {
+            "ttft": "0.28s",
+            "tps": "145 t/s",
+            "price": "$0.075"
+          },
+          "tags": [
+            "0.28s闪击",
+            "性价比绝杀",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 10,
+          "model": "gpt-5.4",
+          "provider": "openai",
+          "score": 93.0,
+          "sub_score": "93.0 质量分",
+          "metric_val": "93.0 分",
+          "details": {
+            "ttft": "0.45s",
+            "tps": "102 t/s",
+            "price": "$2.00"
+          },
+          "tags": [
+            "敏捷快语",
+            "词采精妙",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 11,
+          "model": "claude-opus-4-8",
+          "provider": "anthropic",
+          "score": 92.5,
+          "sub_score": "92.5 质量分",
+          "metric_val": "92.5 分",
+          "details": {
+            "ttft": "0.85s",
+            "tps": "64 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "雍容华贵",
+            "沉稳文风",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 12,
+          "model": "deepseek-flash",
+          "provider": "deepseek",
+          "score": 91.8,
+          "sub_score": "91.8 质量分",
+          "metric_val": "91.8 分",
+          "details": {
+            "ttft": "0.32s",
+            "tps": "118 t/s",
+            "price": "$0.14"
+          },
+          "tags": [
+            "极速秒回",
+            "国内直连"
+          ]
+        },
+        {
+          "rank": 13,
+          "model": "o3-pro",
+          "provider": "openai",
+          "score": 91.5,
+          "sub_score": "91.5 质量分",
+          "metric_val": "91.5 分",
+          "details": {
+            "ttft": "1.20s",
+            "tps": "48 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "超强逻辑",
+            "长链思考"
+          ]
+        },
+        {
+          "rank": 14,
+          "model": "o3",
+          "provider": "openai",
+          "score": 91.0,
+          "sub_score": "91.0 质量分",
+          "metric_val": "91.0 分",
+          "details": {
+            "ttft": "0.80s",
+            "tps": "70 t/s",
+            "price": "$4.00"
+          },
+          "tags": [
+            "推理极准",
+            "不犯错"
+          ]
+        },
+        {
+          "rank": 15,
+          "model": "kimi-k3",
+          "provider": "custom",
+          "score": 90.5,
+          "sub_score": "90.5 质量分",
+          "metric_val": "90.5 分",
+          "details": {
+            "ttft": "0.65s",
+            "tps": "78 t/s",
+            "price": "$1.50"
+          },
+          "tags": [
+            "中文长流",
+            "交互亲和",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 16,
+          "model": "GLM-5.3",
+          "provider": "custom",
+          "score": 90.0,
+          "sub_score": "90.0 质量分",
+          "metric_val": "90.0 分",
+          "details": {
+            "ttft": "0.60s",
+            "tps": "82 t/s",
+            "price": "$1.20"
+          },
+          "tags": [
+            "国产力作",
+            "神采飞扬",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 17,
+          "model": "gpt-5.4-mini",
+          "provider": "openai",
+          "score": 89.8,
+          "sub_score": "89.8 质量分",
+          "metric_val": "89.8 分",
+          "details": {
+            "ttft": "0.25s",
+            "tps": "150 t/s",
+            "price": "$0.15"
+          },
+          "tags": [
+            "速答利器",
+            "极其跟手",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 18,
+          "model": "gpt-5.4-nano",
+          "provider": "openai",
+          "score": 89.2,
+          "sub_score": "89.2 质量分",
+          "metric_val": "89.2 分",
+          "details": {
+            "ttft": "0.22s",
+            "tps": "162 t/s",
+            "price": "$0.05"
+          },
+          "tags": [
+            "微秒级打字",
+            "轻量王者",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 19,
+          "model": "gemini-3.7-flash",
+          "provider": "gemini",
+          "score": 89.0,
+          "sub_score": "89.0 质量分",
+          "metric_val": "89.0 分",
+          "details": {
+            "ttft": "0.30s",
+            "tps": "138 t/s",
+            "price": "$0.075"
+          },
+          "tags": [
+            "清爽敏捷",
+            "毫无卡顿",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 20,
+          "model": "claude-sonnet-4-6",
+          "provider": "anthropic",
+          "score": 88.5,
+          "sub_score": "88.5 质量分",
+          "metric_val": "88.5 分",
+          "details": {
+            "ttft": "0.60s",
+            "tps": "85 t/s",
+            "price": "$3.00"
+          },
+          "tags": [
+            "用词考究",
+            "高质回复",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 21,
+          "model": "deepseek-v4-pro",
+          "provider": "deepseek",
+          "score": 88.0,
+          "sub_score": "88.0 质量分",
+          "metric_val": "88.0 分",
+          "details": {
+            "ttft": "0.40s",
+            "tps": "98 t/s",
+            "price": "$0.50"
+          },
+          "tags": [
+            "性价比旗舰",
+            "扎实耐看"
+          ]
+        },
+        {
+          "rank": 22,
+          "model": "gpt-5.6-terra",
+          "provider": "openai",
+          "score": 87.8,
+          "sub_score": "87.8 质量分",
+          "metric_val": "87.8 分",
+          "details": {
+            "ttft": "0.52s",
+            "tps": "90 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "厚重大气",
+            "设定严谨",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 23,
+          "model": "gpt-5.6-luna",
+          "provider": "openai",
+          "score": 87.5,
+          "sub_score": "87.5 质量分",
+          "metric_val": "87.5 分",
+          "details": {
+            "ttft": "0.49s",
+            "tps": "93 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "温存细腻",
+            "情绪在线",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 24,
+          "model": "gemini-3.1-pro",
+          "provider": "gemini",
+          "score": 87.2,
+          "sub_score": "87.2 质量分",
+          "metric_val": "87.2 分",
+          "details": {
+            "ttft": "0.68s",
+            "tps": "76 t/s",
+            "price": "$1.25"
+          },
+          "tags": [
+            "长记忆库",
+            "百万上下文",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 25,
+          "model": "llama3.3:70b",
+          "provider": "ollama",
+          "score": 87.0,
+          "sub_score": "87.0 质量分",
+          "metric_val": "87.0 分",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "本地断网",
+            "零成本"
+          ]
+        },
+        {
+          "rank": 26,
+          "model": "claude-opus-4-7",
+          "provider": "anthropic",
+          "score": 86.8,
+          "sub_score": "86.8 质量分",
+          "metric_val": "86.8 分",
+          "details": {
+            "ttft": "0.90s",
+            "tps": "60 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "古典韵味",
+            "情绪沉浸",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 27,
+          "model": "deepseek-r1:32b",
+          "provider": "ollama",
+          "score": 86.5,
+          "sub_score": "86.5 质量分",
+          "metric_val": "86.5 分",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "本地推理",
+            "无删减"
+          ]
+        },
+        {
+          "rank": 28,
+          "model": "qwen3.8-95b",
+          "provider": "ollama",
+          "score": 86.0,
+          "sub_score": "86.0 质量分",
+          "metric_val": "86.0 分",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "大尺寸开源",
+            "文风浓郁"
+          ]
+        },
+        {
+          "rank": 29,
+          "model": "claude-haiku-4-5-20251001",
+          "provider": "anthropic",
+          "score": 85.5,
+          "sub_score": "85.5 质量分",
+          "metric_val": "85.5 分",
+          "details": {
+            "ttft": "0.26s",
+            "tps": "142 t/s",
+            "price": "$0.25"
+          },
+          "tags": [
+            "小快灵",
+            "角色拟人",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 30,
+          "model": "gpt-5.2",
+          "provider": "openai",
+          "score": 85.0,
+          "sub_score": "85.0 质量分",
+          "metric_val": "85.0 分",
+          "details": {
+            "ttft": "0.55s",
+            "tps": "85 t/s",
+            "price": "$1.80"
+          },
+          "tags": [
+            "老练稳重",
+            "规规矩矩",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 31,
+          "model": "gemini-3.6-flash",
+          "provider": "gemini",
+          "score": 84.5,
+          "sub_score": "84.5 质量分",
+          "metric_val": "84.5 分",
+          "details": {
+            "ttft": "0.34s",
+            "tps": "125 t/s",
+            "price": "$0.05"
+          },
+          "tags": [
+            "学生党首选",
+            "量大管饱",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 32,
+          "model": "gpt-5.3-codex",
+          "provider": "openai",
+          "score": 84.0,
+          "sub_score": "84.0 质量分",
+          "metric_val": "84.0 分",
+          "details": {
+            "ttft": "0.48s",
+            "tps": "95 t/s",
+            "price": "$1.50"
+          },
+          "tags": [
+            "严整回复",
+            "一丝不苟",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 33,
+          "model": "gpt-5.1",
+          "provider": "openai",
+          "score": 83.5,
+          "sub_score": "83.5 质量分",
+          "metric_val": "83.5 分",
+          "details": {
+            "ttft": "0.52s",
+            "tps": "88 t/s",
+            "price": "$1.50"
+          },
+          "tags": [
+            "前代中坚",
+            "稳定可靠",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 34,
+          "model": "gpt-5",
+          "provider": "openai",
+          "score": 83.0,
+          "sub_score": "83.0 质量分",
+          "metric_val": "83.0 分",
+          "details": {
+            "ttft": "0.55s",
+            "tps": "82 t/s",
+            "price": "$1.20"
+          },
+          "tags": [
+            "标准跑分",
+            "均衡路线",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 35,
+          "model": "gpt-4.1",
+          "provider": "openai",
+          "score": 82.5,
+          "sub_score": "82.5 质量分",
+          "metric_val": "82.5 分",
+          "details": {
+            "ttft": "0.42s",
+            "tps": "105 t/s",
+            "price": "$1.00"
+          },
+          "tags": [
+            "响应迅捷",
+            "结构清晰",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 36,
+          "model": "gpt-4.1-mini",
+          "provider": "openai",
+          "score": 82.0,
+          "sub_score": "82.0 质量分",
+          "metric_val": "82.0 分",
+          "details": {
+            "ttft": "0.24s",
+            "tps": "155 t/s",
+            "price": "$0.10"
+          },
+          "tags": [
+            "白菜价",
+            "超快响应",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 37,
+          "model": "gpt-4o",
+          "provider": "openai",
+          "score": 81.5,
+          "sub_score": "81.5 质量分",
+          "metric_val": "81.5 分",
+          "details": {
+            "ttft": "0.45s",
+            "tps": "96 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "多模态元老",
+            "手感熟悉",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 38,
+          "model": "gpt-4o-mini",
+          "provider": "openai",
+          "score": 81.0,
+          "sub_score": "81.0 质量分",
+          "metric_val": "81.0 分",
+          "details": {
+            "ttft": "0.26s",
+            "tps": "148 t/s",
+            "price": "$0.15"
+          },
+          "tags": [
+            "低延迟日常",
+            "极省资源",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 39,
+          "model": "qwen2.5:72b",
+          "provider": "ollama",
+          "score": 80.5,
+          "sub_score": "80.5 质量分",
+          "metric_val": "80.5 分",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "中文开源中流",
+            "稳"
+          ]
+        },
+        {
+          "rank": 40,
+          "model": "claude-opus-4-6",
+          "provider": "anthropic",
+          "score": 80.0,
+          "sub_score": "80.0 质量分",
+          "metric_val": "80.0 分",
+          "details": {
+            "ttft": "0.95s",
+            "tps": "58 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "慢条斯理",
+            "有条不紊",
+            "多模态支持"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aa_speed",
+      "name": "AA 极速生成榜",
+      "icon": "Gauge",
+      "url": "https://artificialanalysis.ai/leaderboards/models",
+      "metric_name": "生成吞吐速度 (TPS)",
+      "description": "由 Artificial Analysis 实测的大语言模型 API 实际吐字生成速率（Tokens/s），精准反映流畅对话与低延迟推理体验。",
+      "columns": [
+        "排名",
+        "模型名称",
+        "厂商",
+        "输出速度 (TPS)",
+        "首字延迟 (TTFT)",
+        "综合质量指数",
+        "百万Token价格",
+        "操作"
+      ],
+      "items": [
+        {
+          "rank": 1,
+          "model": "gpt-5.4-nano",
+          "provider": "openai",
+          "score": 162.0,
+          "sub_score": "162.0 t/s",
+          "metric_val": "162.0 t/s",
+          "details": {
+            "ttft": "0.22s",
+            "tps": "162 t/s",
+            "price": "$0.05"
+          },
+          "tags": [
+            "Top 1",
+            "百字极速",
+            "微秒级打字",
+            "轻量王者"
+          ]
+        },
+        {
+          "rank": 2,
+          "model": "gpt-4.1-mini",
+          "provider": "openai",
+          "score": 155.0,
+          "sub_score": "155.0 t/s",
+          "metric_val": "155.0 t/s",
+          "details": {
+            "ttft": "0.24s",
+            "tps": "155 t/s",
+            "price": "$0.10"
+          },
+          "tags": [
+            "Top 2",
+            "百字极速",
+            "白菜价",
+            "超快响应"
+          ]
+        },
+        {
+          "rank": 3,
+          "model": "gpt-5.4-mini",
+          "provider": "openai",
+          "score": 150.0,
+          "sub_score": "150.0 t/s",
+          "metric_val": "150.0 t/s",
+          "details": {
+            "ttft": "0.25s",
+            "tps": "150 t/s",
+            "price": "$0.15"
+          },
+          "tags": [
+            "Top 3",
+            "百字极速",
+            "速答利器",
+            "极其跟手"
+          ]
+        },
+        {
+          "rank": 4,
+          "model": "gpt-4o-mini",
+          "provider": "openai",
+          "score": 148.0,
+          "sub_score": "148.0 t/s",
+          "metric_val": "148.0 t/s",
+          "details": {
+            "ttft": "0.26s",
+            "tps": "148 t/s",
+            "price": "$0.15"
+          },
+          "tags": [
+            "百字极速",
+            "低延迟日常",
+            "极省资源",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 5,
+          "model": "gemini-3.8-flash",
+          "provider": "gemini",
+          "score": 145.0,
+          "sub_score": "145.0 t/s",
+          "metric_val": "145.0 t/s",
+          "details": {
+            "ttft": "0.28s",
+            "tps": "145 t/s",
+            "price": "$0.075"
+          },
+          "tags": [
+            "百字极速",
+            "0.28s闪击",
+            "性价比绝杀",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 6,
+          "model": "claude-haiku-4-5-20251001",
+          "provider": "anthropic",
+          "score": 142.0,
+          "sub_score": "142.0 t/s",
+          "metric_val": "142.0 t/s",
+          "details": {
+            "ttft": "0.26s",
+            "tps": "142 t/s",
+            "price": "$0.25"
+          },
+          "tags": [
+            "百字极速",
+            "小快灵",
+            "角色拟人",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 7,
+          "model": "gemini-3.7-flash",
+          "provider": "gemini",
+          "score": 138.0,
+          "sub_score": "138.0 t/s",
+          "metric_val": "138.0 t/s",
+          "details": {
+            "ttft": "0.30s",
+            "tps": "138 t/s",
+            "price": "$0.075"
+          },
+          "tags": [
+            "高吞吐",
+            "清爽敏捷",
+            "毫无卡顿",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 8,
+          "model": "gemini-3.6-flash",
+          "provider": "gemini",
+          "score": 125.0,
+          "sub_score": "125.0 t/s",
+          "metric_val": "125.0 t/s",
+          "details": {
+            "ttft": "0.34s",
+            "tps": "125 t/s",
+            "price": "$0.05"
+          },
+          "tags": [
+            "高吞吐",
+            "学生党首选",
+            "量大管饱",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 9,
+          "model": "deepseek-flash",
+          "provider": "deepseek",
+          "score": 118.0,
+          "sub_score": "118.0 t/s",
+          "metric_val": "118.0 t/s",
+          "details": {
+            "ttft": "0.32s",
+            "tps": "118 t/s",
+            "price": "$0.14"
+          },
+          "tags": [
+            "高吞吐",
+            "极速秒回",
+            "国内直连"
+          ]
+        },
+        {
+          "rank": 10,
+          "model": "gpt-4.1",
+          "provider": "openai",
+          "score": 105.0,
+          "sub_score": "105.0 t/s",
+          "metric_val": "105.0 t/s",
+          "details": {
+            "ttft": "0.42s",
+            "tps": "105 t/s",
+            "price": "$1.00"
+          },
+          "tags": [
+            "高吞吐",
+            "响应迅捷",
+            "结构清晰",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 11,
+          "model": "gpt-5.4",
+          "provider": "openai",
+          "score": 102.0,
+          "sub_score": "102.0 t/s",
+          "metric_val": "102.0 t/s",
+          "details": {
+            "ttft": "0.45s",
+            "tps": "102 t/s",
+            "price": "$2.00"
+          },
+          "tags": [
+            "高吞吐",
+            "敏捷快语",
+            "词采精妙",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 12,
+          "model": "deepseek-v4-pro",
+          "provider": "deepseek",
+          "score": 98.0,
+          "sub_score": "98.0 t/s",
+          "metric_val": "98.0 t/s",
+          "details": {
+            "ttft": "0.40s",
+            "tps": "98 t/s",
+            "price": "$0.50"
+          },
+          "tags": [
+            "性价比旗舰",
+            "扎实耐看"
+          ]
+        },
+        {
+          "rank": 13,
+          "model": "gpt-4o",
+          "provider": "openai",
+          "score": 96.0,
+          "sub_score": "96.0 t/s",
+          "metric_val": "96.0 t/s",
+          "details": {
+            "ttft": "0.45s",
+            "tps": "96 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "多模态元老",
+            "手感熟悉",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 14,
+          "model": "gpt-5.3-codex",
+          "provider": "openai",
+          "score": 95.0,
+          "sub_score": "95.0 t/s",
+          "metric_val": "95.0 t/s",
+          "details": {
+            "ttft": "0.48s",
+            "tps": "95 t/s",
+            "price": "$1.50"
+          },
+          "tags": [
+            "严整回复",
+            "一丝不苟",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 15,
+          "model": "gpt-5.6",
+          "provider": "openai",
+          "score": 94.0,
+          "sub_score": "94.0 t/s",
+          "metric_val": "94.0 t/s",
+          "details": {
+            "ttft": "0.48s",
+            "tps": "94 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "均衡强劲",
+            "黄金手感",
+            "多模态支持",
+            "指向 sol"
+          ]
+        },
+        {
+          "rank": 16,
+          "model": "gpt-5.6-luna",
+          "provider": "openai",
+          "score": 93.0,
+          "sub_score": "93.0 t/s",
+          "metric_val": "93.0 t/s",
+          "details": {
+            "ttft": "0.49s",
+            "tps": "93 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "温存细腻",
+            "情绪在线",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 17,
+          "model": "gpt-5.6-sol",
+          "provider": "openai",
+          "score": 92.0,
+          "sub_score": "92.0 t/s",
+          "metric_val": "92.0 t/s",
+          "details": {
+            "ttft": "0.50s",
+            "tps": "92 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "sol核心",
+            "私聊专属",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 18,
+          "model": "gpt-5.6-terra",
+          "provider": "openai",
+          "score": 90.0,
+          "sub_score": "90.0 t/s",
+          "metric_val": "90.0 t/s",
+          "details": {
+            "ttft": "0.52s",
+            "tps": "90 t/s",
+            "price": "$2.50"
+          },
+          "tags": [
+            "厚重大气",
+            "设定严谨",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 19,
+          "model": "claude-sonnet-5",
+          "provider": "anthropic",
+          "score": 88.0,
+          "sub_score": "88.0 t/s",
+          "metric_val": "88.0 t/s",
+          "details": {
+            "ttft": "0.55s",
+            "tps": "88 t/s",
+            "price": "$3.00"
+          },
+          "tags": [
+            "质感无敌",
+            "流畅顺滑",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 20,
+          "model": "gpt-5.1",
+          "provider": "openai",
+          "score": 88.0,
+          "sub_score": "88.0 t/s",
+          "metric_val": "88.0 t/s",
+          "details": {
+            "ttft": "0.52s",
+            "tps": "88 t/s",
+            "price": "$1.50"
+          },
+          "tags": [
+            "前代中坚",
+            "稳定可靠",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 21,
+          "model": "gpt-5.5",
+          "provider": "openai",
+          "score": 86.0,
+          "sub_score": "86.0 t/s",
+          "metric_val": "86.0 t/s",
+          "details": {
+            "ttft": "0.58s",
+            "tps": "86 t/s",
+            "price": "$3.50"
+          },
+          "tags": [
+            "大文笔",
+            "篇幅宏伟",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 22,
+          "model": "claude-sonnet-4-6",
+          "provider": "anthropic",
+          "score": 85.0,
+          "sub_score": "85.0 t/s",
+          "metric_val": "85.0 t/s",
+          "details": {
+            "ttft": "0.60s",
+            "tps": "85 t/s",
+            "price": "$3.00"
+          },
+          "tags": [
+            "用词考究",
+            "高质回复",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 23,
+          "model": "gpt-5.2",
+          "provider": "openai",
+          "score": 85.0,
+          "sub_score": "85.0 t/s",
+          "metric_val": "85.0 t/s",
+          "details": {
+            "ttft": "0.55s",
+            "tps": "85 t/s",
+            "price": "$1.80"
+          },
+          "tags": [
+            "老练稳重",
+            "规规矩矩",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 24,
+          "model": "claude-fable-5-1",
+          "provider": "anthropic",
+          "score": 82.0,
+          "sub_score": "82.0 t/s",
+          "metric_val": "82.0 t/s",
+          "details": {
+            "ttft": "0.62s",
+            "tps": "82 t/s",
+            "price": "$4.00"
+          },
+          "tags": [
+            "叙事神选",
+            "情绪饱满",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 25,
+          "model": "GLM-5.3",
+          "provider": "custom",
+          "score": 82.0,
+          "sub_score": "82.0 t/s",
+          "metric_val": "82.0 t/s",
+          "details": {
+            "ttft": "0.60s",
+            "tps": "82 t/s",
+            "price": "$1.20"
+          },
+          "tags": [
+            "国产力作",
+            "神采飞扬",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 26,
+          "model": "gpt-5",
+          "provider": "openai",
+          "score": 82.0,
+          "sub_score": "82.0 t/s",
+          "metric_val": "82.0 t/s",
+          "details": {
+            "ttft": "0.55s",
+            "tps": "82 t/s",
+            "price": "$1.20"
+          },
+          "tags": [
+            "标准跑分",
+            "均衡路线",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 27,
+          "model": "kimi-k3",
+          "provider": "custom",
+          "score": 78.0,
+          "sub_score": "78.0 t/s",
+          "metric_val": "78.0 t/s",
+          "details": {
+            "ttft": "0.65s",
+            "tps": "78 t/s",
+            "price": "$1.50"
+          },
+          "tags": [
+            "中文长流",
+            "交互亲和",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 28,
+          "model": "gemini-3.1-pro",
+          "provider": "gemini",
+          "score": 76.0,
+          "sub_score": "76.0 t/s",
+          "metric_val": "76.0 t/s",
+          "details": {
+            "ttft": "0.68s",
+            "tps": "76 t/s",
+            "price": "$1.25"
+          },
+          "tags": [
+            "长记忆库",
+            "百万上下文",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 29,
+          "model": "gpt-5.5-pro",
+          "provider": "openai",
+          "score": 75.0,
+          "sub_score": "75.0 t/s",
+          "metric_val": "75.0 t/s",
+          "details": {
+            "ttft": "0.72s",
+            "tps": "75 t/s",
+            "price": "$5.00"
+          },
+          "tags": [
+            "深层推演",
+            "高智商",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 30,
+          "model": "o3",
+          "provider": "openai",
+          "score": 70.0,
+          "sub_score": "70.0 t/s",
+          "metric_val": "70.0 t/s",
+          "details": {
+            "ttft": "0.80s",
+            "tps": "70 t/s",
+            "price": "$4.00"
+          },
+          "tags": [
+            "推理极准",
+            "不犯错"
+          ]
+        },
+        {
+          "rank": 31,
+          "model": "gpt-6-astra",
+          "provider": "openai",
+          "score": 65.0,
+          "sub_score": "65.0 t/s",
+          "metric_val": "65.0 t/s",
+          "details": {
+            "ttft": "0.95s",
+            "tps": "65 t/s",
+            "price": "$10.00"
+          },
+          "tags": [
+            "终极智力",
+            "旗舰排面",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 32,
+          "model": "claude-opus-4-8",
+          "provider": "anthropic",
+          "score": 64.0,
+          "sub_score": "64.0 t/s",
+          "metric_val": "64.0 t/s",
+          "details": {
+            "ttft": "0.85s",
+            "tps": "64 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "雍容华贵",
+            "沉稳文风",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 33,
+          "model": "claude-opus-4-7",
+          "provider": "anthropic",
+          "score": 60.0,
+          "sub_score": "60.0 t/s",
+          "metric_val": "60.0 t/s",
+          "details": {
+            "ttft": "0.90s",
+            "tps": "60 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "古典韵味",
+            "情绪沉浸",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 34,
+          "model": "claude-opus-4-6",
+          "provider": "anthropic",
+          "score": 58.0,
+          "sub_score": "58.0 t/s",
+          "metric_val": "58.0 t/s",
+          "details": {
+            "ttft": "0.95s",
+            "tps": "58 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "慢条斯理",
+            "有条不紊",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 35,
+          "model": "claude-opus-5",
+          "provider": "anthropic",
+          "score": 52.0,
+          "sub_score": "52.0 t/s",
+          "metric_val": "52.0 t/s",
+          "details": {
+            "ttft": "1.10s",
+            "tps": "52 t/s",
+            "price": "$15.00"
+          },
+          "tags": [
+            "大师文笔",
+            "尊享品质",
+            "多模态支持"
+          ]
+        },
+        {
+          "rank": 36,
+          "model": "o3-pro",
+          "provider": "openai",
+          "score": 48.0,
+          "sub_score": "48.0 t/s",
+          "metric_val": "48.0 t/s",
+          "details": {
+            "ttft": "1.20s",
+            "tps": "48 t/s",
+            "price": "$8.00"
+          },
+          "tags": [
+            "超强逻辑",
+            "长链思考"
+          ]
+        },
+        {
+          "rank": 37,
+          "model": "llama3.3:70b",
+          "provider": "ollama",
+          "score": 0.0,
+          "sub_score": "0.0 t/s",
+          "metric_val": "0.0 t/s",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "本地断网",
+            "零成本"
+          ]
+        },
+        {
+          "rank": 38,
+          "model": "deepseek-r1:32b",
+          "provider": "ollama",
+          "score": 0.0,
+          "sub_score": "0.0 t/s",
+          "metric_val": "0.0 t/s",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "本地推理",
+            "无删减"
+          ]
+        },
+        {
+          "rank": 39,
+          "model": "qwen3.8-95b",
+          "provider": "ollama",
+          "score": 0.0,
+          "sub_score": "0.0 t/s",
+          "metric_val": "0.0 t/s",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "大尺寸开源",
+            "文风浓郁"
+          ]
+        },
+        {
+          "rank": 40,
+          "model": "qwen2.5:72b",
+          "provider": "ollama",
+          "score": 0.0,
+          "sub_score": "0.0 t/s",
+          "metric_val": "0.0 t/s",
+          "details": {
+            "ttft": "本地硬件",
+            "tps": "显卡决定",
+            "price": "$0.00"
+          },
+          "tags": [
+            "中文开源中流",
+            "稳"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "openrouter_rp",
+      "name": "OpenRouter Roleplay 精选",
+      "icon": "Drama",
+      "url": "https://openrouter.ai/collections/roleplay",
+      "metric_name": "社区角色扮演热度",
+      "description": "全球最大开源与中转聚合平台 OpenRouter 的 Roleplay 专区，汇集数千万次真实酒馆/角色扮演交互评级。",
+      "columns": [
+        "排名",
+        "模型名称",
+        "厂商",
+        "RP热度榜",
+        "推荐上下文",
+        "特色风格",
+        "审查宽松度",
+        "操作"
+      ],
+      "items": [
+        {
+          "rank": 1,
+          "model": "upstage/solar-mini4",
+          "provider": "custom",
+          "score": 99.5,
+          "sub_score": "524k ctx",
+          "metric_val": "99.5",
+          "details": {
+            "context": "524,288 tokens",
+            "name": "Upstage: Solar Mini 4",
+            "created": 1790160358
+          },
+          "tags": [
+            "Top 1",
+            "200K长文本"
+          ]
+        },
+        {
+          "rank": 2,
+          "model": "cohere/command-a-plus",
+          "provider": "custom",
+          "score": 99.0,
+          "sub_score": "192k ctx",
+          "metric_val": "99.0",
+          "details": {
+            "context": "192,000 tokens",
+            "name": "Cohere: Command A+",
+            "created": 1790102896
+          },
+          "tags": [
+            "Top 2"
+          ]
+        },
+        {
+          "rank": 3,
+          "model": "openai/gpt-6-luna-pro",
+          "provider": "openai",
+          "score": 98.6,
+          "sub_score": "1050k ctx",
+          "metric_val": "98.6",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT-6 Luna Pro",
+            "created": 1790100791
+          },
+          "tags": [
+            "Top 3",
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 4,
+          "model": "openai/gpt-6-luna-pro:batch",
+          "provider": "openai",
+          "score": 98.2,
+          "sub_score": "1050k ctx",
+          "metric_val": "98.2",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT-6 Luna Pro (batch)",
+            "created": 1790100791
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 5,
+          "model": "openai/gpt-6-luna",
+          "provider": "openai",
+          "score": 97.7,
+          "sub_score": "1050k ctx",
+          "metric_val": "97.7",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT-6 Luna",
+            "created": 1790100786
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 6,
+          "model": "openai/gpt-6-luna:batch",
+          "provider": "openai",
+          "score": 97.2,
+          "sub_score": "1050k ctx",
+          "metric_val": "97.2",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT-6 Luna (batch)",
+            "created": 1790100786
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 7,
+          "model": "openai/gpt-6-sol-pro",
+          "provider": "openai",
+          "score": 96.8,
+          "sub_score": "1050k ctx",
+          "metric_val": "96.8",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT-6 Sol Pro",
+            "created": 1790100781
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 8,
+          "model": "openai/gpt-6-sol-pro:batch",
+          "provider": "openai",
+          "score": 96.3,
+          "sub_score": "1050k ctx",
+          "metric_val": "96.3",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT-6 Sol Pro (batch)",
+            "created": 1790100781
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 9,
+          "model": "openai/gpt-6-sol",
+          "provider": "openai",
+          "score": 95.9,
+          "sub_score": "1050k ctx",
+          "metric_val": "95.9",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT-6 Sol",
+            "created": 1790100775
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 10,
+          "model": "openai/gpt-6-sol:batch",
+          "provider": "openai",
+          "score": 95.5,
+          "sub_score": "1050k ctx",
+          "metric_val": "95.5",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT-6 Sol (batch)",
+            "created": 1790100775
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 11,
+          "model": "anthropic/claude-opus-5.5",
+          "provider": "anthropic",
+          "score": 95.0,
+          "sub_score": "1000k ctx",
+          "metric_val": "95.0",
+          "details": {
+            "context": "1,000,000 tokens",
+            "name": "Anthropic: Claude Opus 5.5",
+            "created": 1790094732
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 12,
+          "model": "anthropic/claude-opus-5.5:batch",
+          "provider": "anthropic",
+          "score": 94.5,
+          "sub_score": "1000k ctx",
+          "metric_val": "94.5",
+          "details": {
+            "context": "1,000,000 tokens",
+            "name": "Anthropic: Claude Opus 5.5 (batch)",
+            "created": 1790094732
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 13,
+          "model": "xiaomi/mimo-v2.6-pro-ultraspeed",
+          "provider": "custom",
+          "score": 94.1,
+          "sub_score": "1048k ctx",
+          "metric_val": "94.1",
+          "details": {
+            "context": "1,048,576 tokens",
+            "name": "Xiaomi: MiMo-V2.6-Pro-UltraSpeed",
+            "created": 1790021267
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 14,
+          "model": "xiaomi/mimo-v2.6-flash",
+          "provider": "custom",
+          "score": 93.7,
+          "sub_score": "1048k ctx",
+          "metric_val": "93.7",
+          "details": {
+            "context": "1,048,576 tokens",
+            "name": "Xiaomi: MiMo-V2.6-Flash",
+            "created": 1790021264
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 15,
+          "model": "xiaomi/mimo-v2.6-pro",
+          "provider": "custom",
+          "score": 93.2,
+          "sub_score": "1048k ctx",
+          "metric_val": "93.2",
+          "details": {
+            "context": "1,048,576 tokens",
+            "name": "Xiaomi: MiMo-V2.6-Pro",
+            "created": 1790021259
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 16,
+          "model": "x-ai/grok-4.7",
+          "provider": "custom",
+          "score": 92.8,
+          "sub_score": "500k ctx",
+          "metric_val": "92.8",
+          "details": {
+            "context": "500,000 tokens",
+            "name": "SpaceXAI: Grok 4.7",
+            "created": 1790007541
+          },
+          "tags": [
+            "200K长文本"
+          ]
+        },
+        {
+          "rank": 17,
+          "model": "qwen/qwen3.8-omni-flash",
+          "provider": "ollama",
+          "score": 92.3,
+          "sub_score": "1000k ctx",
+          "metric_val": "92.3",
+          "details": {
+            "context": "1,000,000 tokens",
+            "name": "Qwen: Qwen3.8 Omni Flash",
+            "created": 1789959954
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 18,
+          "model": "prism-ml/ternary-bonsai-2-27b",
+          "provider": "custom",
+          "score": 91.8,
+          "sub_score": "262k ctx",
+          "metric_val": "91.8",
+          "details": {
+            "context": "262,144 tokens",
+            "name": "PrismML: Ternary Bonsai 2 27B",
+            "created": 1789754046
+          },
+          "tags": [
+            "200K长文本"
+          ]
+        },
+        {
+          "rank": 19,
+          "model": "z-ai/glm-5.3-flashx",
+          "provider": "glm",
+          "score": 91.4,
+          "sub_score": "1048k ctx",
+          "metric_val": "91.4",
+          "details": {
+            "context": "1,048,576 tokens",
+            "name": "Z.ai: GLM 5.3 FlashX",
+            "created": 1789744020
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 20,
+          "model": "unbiased/pareto",
+          "provider": "custom",
+          "score": 91.0,
+          "sub_score": "262k ctx",
+          "metric_val": "91.0",
+          "details": {
+            "context": "262,144 tokens",
+            "name": "Pareto",
+            "created": 1789686178
+          },
+          "tags": [
+            "200K长文本"
+          ]
+        },
+        {
+          "rank": 21,
+          "model": "deepseek/deepseek-pro-latest",
+          "provider": "deepseek",
+          "score": 90.5,
+          "sub_score": "1048k ctx",
+          "metric_val": "90.5",
+          "details": {
+            "context": "1,048,576 tokens",
+            "name": "DeepSeek: DeepSeek Pro Latest",
+            "created": 1789399174
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 22,
+          "model": "deepseek/deepseek-flash-latest",
+          "provider": "deepseek",
+          "score": 90.0,
+          "sub_score": "1048k ctx",
+          "metric_val": "90.0",
+          "details": {
+            "context": "1,048,576 tokens",
+            "name": "DeepSeek: DeepSeek Flash Latest",
+            "created": 1789399150
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 23,
+          "model": "inference-net/schematron-v2-turbo",
+          "provider": "custom",
+          "score": 89.6,
+          "sub_score": "128k ctx",
+          "metric_val": "89.6",
+          "details": {
+            "context": "128,000 tokens",
+            "name": "Inference.net: Schematron V2 Turbo",
+            "created": 1789176949
+          },
+          "tags": []
+        },
+        {
+          "rank": 24,
+          "model": "inference-net/schematron-v2-small",
+          "provider": "custom",
+          "score": 89.2,
+          "sub_score": "128k ctx",
+          "metric_val": "89.2",
+          "details": {
+            "context": "128,000 tokens",
+            "name": "Inference.net: Schematron V2 Small",
+            "created": 1789176933
+          },
+          "tags": []
+        },
+        {
+          "rank": 25,
+          "model": "openai/gpt-astra-latest",
+          "provider": "openai",
+          "score": 88.7,
+          "sub_score": "1050k ctx",
+          "metric_val": "88.7",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT Astra Latest",
+            "created": 1789130932
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 26,
+          "model": "openai/gpt-sol-latest",
+          "provider": "openai",
+          "score": 88.2,
+          "sub_score": "1050k ctx",
+          "metric_val": "88.2",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT Sol Latest",
+            "created": 1789130928
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 27,
+          "model": "openai/gpt-terra-latest",
+          "provider": "openai",
+          "score": 87.8,
+          "sub_score": "1050k ctx",
+          "metric_val": "87.8",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT Terra Latest",
+            "created": 1789130925
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 28,
+          "model": "openai/gpt-luna-latest",
+          "provider": "openai",
+          "score": 87.3,
+          "sub_score": "1050k ctx",
+          "metric_val": "87.3",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT Luna Latest",
+            "created": 1789130922
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 29,
+          "model": "sakana/fugu-ultra-v2",
+          "provider": "custom",
+          "score": 86.9,
+          "sub_score": "1000k ctx",
+          "metric_val": "86.9",
+          "details": {
+            "context": "1,000,000 tokens",
+            "name": "Sakana: Fugu Ultra v2",
+            "created": 1789105383
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 30,
+          "model": "sakana/fugu-max",
+          "provider": "custom",
+          "score": 86.5,
+          "sub_score": "1000k ctx",
+          "metric_val": "86.5",
+          "details": {
+            "context": "1,000,000 tokens",
+            "name": "Sakana: Fugu Max",
+            "created": 1789104771
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 31,
+          "model": "inclusionai/ling-3.0-flash-vl:free",
+          "provider": "custom",
+          "score": 86.0,
+          "sub_score": "262k ctx",
+          "metric_val": "86.0",
+          "details": {
+            "context": "262,144 tokens",
+            "name": "inclusionAI: Ling 3.0 Flash VL (free)",
+            "created": 1789056114
+          },
+          "tags": [
+            "200K长文本"
+          ]
+        },
+        {
+          "rank": 32,
+          "model": "inclusionai/ling-3.0-flash-vl",
+          "provider": "custom",
+          "score": 85.5,
+          "sub_score": "131k ctx",
+          "metric_val": "85.5",
+          "details": {
+            "context": "131,072 tokens",
+            "name": "inclusionAI: Ling 3.0 Flash VL",
+            "created": 1789056114
+          },
+          "tags": []
+        },
+        {
+          "rank": 33,
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "deepseek",
+          "score": 85.1,
+          "sub_score": "1048k ctx",
+          "metric_val": "85.1",
+          "details": {
+            "context": "1,048,576 tokens",
+            "name": "DeepSeek: DeepSeek V4.1 Flash",
+            "created": 1789021285
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 34,
+          "model": "deepseek/deepseek-v4.1-flash:batch",
+          "provider": "deepseek",
+          "score": 84.7,
+          "sub_score": "1048k ctx",
+          "metric_val": "84.7",
+          "details": {
+            "context": "1,048,576 tokens",
+            "name": "DeepSeek: DeepSeek V4.1 Flash (batch)",
+            "created": 1789021285
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        },
+        {
+          "rank": 35,
+          "model": "inception/mercury-2.5",
+          "provider": "custom",
+          "score": 84.2,
+          "sub_score": "260k ctx",
+          "metric_val": "84.2",
+          "details": {
+            "context": "260,000 tokens",
+            "name": "Inception: Mercury 2.5",
+            "created": 1788892137
+          },
+          "tags": [
+            "200K长文本"
+          ]
+        },
+        {
+          "rank": 36,
+          "model": "nex-agi/nex-n2.5-mini",
+          "provider": "custom",
+          "score": 83.8,
+          "sub_score": "262k ctx",
+          "metric_val": "83.8",
+          "details": {
+            "context": "262,144 tokens",
+            "name": "Nex AGI: Nex-N2.5-Mini",
+            "created": 1788890061
+          },
+          "tags": [
+            "200K长文本"
+          ]
+        },
+        {
+          "rank": 37,
+          "model": "nex-agi/nex-n2.5-mini:free",
+          "provider": "custom",
+          "score": 83.3,
+          "sub_score": "262k ctx",
+          "metric_val": "83.3",
+          "details": {
+            "context": "262,144 tokens",
+            "name": "Nex AGI: Nex-N2.5-Mini (free)",
+            "created": 1788890061
+          },
+          "tags": [
+            "200K长文本"
+          ]
+        },
+        {
+          "rank": 38,
+          "model": "nex-agi/nex-n2.5-pro",
+          "provider": "custom",
+          "score": 82.8,
+          "sub_score": "262k ctx",
+          "metric_val": "82.8",
+          "details": {
+            "context": "262,144 tokens",
+            "name": "Nex AGI: Nex-N2.5-Pro",
+            "created": 1788890050
+          },
+          "tags": [
+            "200K长文本"
+          ]
+        },
+        {
+          "rank": 39,
+          "model": "nex-agi/nex-n2.5-pro:free",
+          "provider": "custom",
+          "score": 82.4,
+          "sub_score": "262k ctx",
+          "metric_val": "82.4",
+          "details": {
+            "context": "262,144 tokens",
+            "name": "Nex AGI: Nex-N2.5-Pro (free)",
+            "created": 1788890050
+          },
+          "tags": [
+            "200K长文本"
+          ]
+        },
+        {
+          "rank": 40,
+          "model": "openai/gpt-6-astra",
+          "provider": "openai",
+          "score": 82.0,
+          "sub_score": "1050k ctx",
+          "metric_val": "82.0",
+          "details": {
+            "context": "1,050,000 tokens",
+            "name": "OpenAI: GPT-6 Astra",
+            "created": 1788552838
+          },
+          "tags": [
+            "1M超长上下文"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "composite_average",
+      "name": "综合平均天梯 (娱乐自嗨榜)",
+      "icon": "Sparkles",
+      "url": "",
+      "metric_name": "全网全景加权均名",
+      "description": "【声明：本榜单仅供自嗨玩票，无任何参考价值与官方背书】汇总全部榜单出镜模型，采用‘在榜名次+缺席平滑折算’算法汇聚全景平均排名。",
+      "columns": [
+        "综合排名",
+        "模型名称",
+        "厂商",
+        "自嗨综合指数",
+        "全景平均名次",
+        "上榜频次 (6榜)",
+        "在榜实际均名",
+        "操作"
+      ],
+      "items": [
+        {
+          "rank": 1,
+          "model": "gpt-6-astra",
+          "provider": "openai",
+          "score": 75.3,
+          "sub_score": "均名 #18.6",
+          "metric_val": "#18.6",
+          "details": {
+            "in_list_avg": "#7.6",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "Top 1",
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 2,
+          "model": "claude-fable-5-1",
+          "provider": "anthropic",
+          "score": 74.9,
+          "sub_score": "均名 #18.9",
+          "metric_val": "#18.9",
+          "details": {
+            "in_list_avg": "#8.0",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "Top 2",
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 3,
+          "model": "gpt-5.6-sol",
+          "provider": "openai",
+          "score": 74.7,
+          "sub_score": "均名 #19.0",
+          "metric_val": "#19.0",
+          "details": {
+            "in_list_avg": "#8.2",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "Top 3",
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 4,
+          "model": "claude-opus-5",
+          "provider": "anthropic",
+          "score": 74.3,
+          "sub_score": "均名 #19.3",
+          "metric_val": "#19.3",
+          "details": {
+            "in_list_avg": "#8.6",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 5,
+          "model": "gpt-5.5",
+          "provider": "openai",
+          "score": 73.3,
+          "sub_score": "均名 #20.0",
+          "metric_val": "#20.0",
+          "details": {
+            "in_list_avg": "#15.7",
+            "appearances": "6/7",
+            "presence_pct": "85%"
+          },
+          "tags": [
+            "高在榜率"
+          ]
+        },
+        {
+          "rank": 6,
+          "model": "gpt-5.4",
+          "provider": "openai",
+          "score": 70.8,
+          "sub_score": "均名 #21.9",
+          "metric_val": "#21.9",
+          "details": {
+            "in_list_avg": "#12.2",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 7,
+          "model": "claude-opus-4-7",
+          "provider": "anthropic",
+          "score": 70.7,
+          "sub_score": "均名 #22.0",
+          "metric_val": "#22.0",
+          "details": {
+            "in_list_avg": "#18.0",
+            "appearances": "6/7",
+            "presence_pct": "85%"
+          },
+          "tags": [
+            "高在榜率"
+          ]
+        },
+        {
+          "rank": 8,
+          "model": "claude-sonnet-5",
+          "provider": "anthropic",
+          "score": 70.7,
+          "sub_score": "均名 #22.0",
+          "metric_val": "#22.0",
+          "details": {
+            "in_list_avg": "#12.4",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 9,
+          "model": "claude-opus-4-8",
+          "provider": "anthropic",
+          "score": 69.5,
+          "sub_score": "均名 #22.9",
+          "metric_val": "#22.9",
+          "details": {
+            "in_list_avg": "#19.0",
+            "appearances": "6/7",
+            "presence_pct": "85%"
+          },
+          "tags": [
+            "高在榜率"
+          ]
+        },
+        {
+          "rank": 10,
+          "model": "gemini-3.8-flash",
+          "provider": "gemini",
+          "score": 69.5,
+          "sub_score": "均名 #22.9",
+          "metric_val": "#22.9",
+          "details": {
+            "in_list_avg": "#13.6",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 11,
+          "model": "GLM-5.3",
+          "provider": "glm",
+          "score": 69.3,
+          "sub_score": "均名 #23.0",
+          "metric_val": "#23.0",
+          "details": {
+            "in_list_avg": "#13.8",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 12,
+          "model": "kimi-k3",
+          "provider": "custom",
+          "score": 68.3,
+          "sub_score": "均名 #23.7",
+          "metric_val": "#23.7",
+          "details": {
+            "in_list_avg": "#14.8",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 13,
+          "model": "claude-sonnet-4-6",
+          "provider": "anthropic",
+          "score": 66.8,
+          "sub_score": "均名 #24.9",
+          "metric_val": "#24.9",
+          "details": {
+            "in_list_avg": "#21.3",
+            "appearances": "6/7",
+            "presence_pct": "85%"
+          },
+          "tags": [
+            "高在榜率"
+          ]
+        },
+        {
+          "rank": 14,
+          "model": "gpt-5.6-terra",
+          "provider": "openai",
+          "score": 64.9,
+          "sub_score": "均名 #26.3",
+          "metric_val": "#26.3",
+          "details": {
+            "in_list_avg": "#18.4",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 15,
+          "model": "gpt-5.4-mini",
+          "provider": "openai",
+          "score": 63.1,
+          "sub_score": "均名 #27.6",
+          "metric_val": "#27.6",
+          "details": {
+            "in_list_avg": "#20.2",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 16,
+          "model": "gpt-5.6-luna",
+          "provider": "openai",
+          "score": 62.7,
+          "sub_score": "均名 #27.9",
+          "metric_val": "#27.9",
+          "details": {
+            "in_list_avg": "#20.6",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 17,
+          "model": "claude-opus-4-6",
+          "provider": "anthropic",
+          "score": 60.6,
+          "sub_score": "均名 #29.4",
+          "metric_val": "#29.4",
+          "details": {
+            "in_list_avg": "#26.7",
+            "appearances": "6/7",
+            "presence_pct": "85%"
+          },
+          "tags": [
+            "高在榜率"
+          ]
+        },
+        {
+          "rank": 18,
+          "model": "gpt-5.6",
+          "provider": "openai",
+          "score": 60.4,
+          "sub_score": "均名 #29.6",
+          "metric_val": "#29.6",
+          "details": {
+            "in_list_avg": "#7.7",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录",
+            "指向 sol"
+          ]
+        },
+        {
+          "rank": 19,
+          "model": "gemini-3.7-flash",
+          "provider": "gemini",
+          "score": 60.2,
+          "sub_score": "均名 #29.7",
+          "metric_val": "#29.7",
+          "details": {
+            "in_list_avg": "#17.5",
+            "appearances": "4/7",
+            "presence_pct": "57%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 20,
+          "model": "deepseek-flash",
+          "provider": "deepseek",
+          "score": 58.5,
+          "sub_score": "均名 #31.0",
+          "metric_val": "#31.0",
+          "details": {
+            "in_list_avg": "#11.0",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 21,
+          "model": "gpt-5.4-nano",
+          "provider": "openai",
+          "score": 57.7,
+          "sub_score": "均名 #31.6",
+          "metric_val": "#31.6",
+          "details": {
+            "in_list_avg": "#12.3",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 22,
+          "model": "gpt-5.5-pro",
+          "provider": "openai",
+          "score": 56.6,
+          "sub_score": "均名 #32.4",
+          "metric_val": "#32.4",
+          "details": {
+            "in_list_avg": "#14.3",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 23,
+          "model": "o3",
+          "provider": "openai",
+          "score": 56.4,
+          "sub_score": "均名 #32.6",
+          "metric_val": "#32.6",
+          "details": {
+            "in_list_avg": "#22.5",
+            "appearances": "4/7",
+            "presence_pct": "57%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 24,
+          "model": "gpt-5.2",
+          "provider": "openai",
+          "score": 55.0,
+          "sub_score": "均名 #33.6",
+          "metric_val": "#33.6",
+          "details": {
+            "in_list_avg": "#28.6",
+            "appearances": "5/7",
+            "presence_pct": "71%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 25,
+          "model": "deepseek-v4-pro",
+          "provider": "deepseek",
+          "score": 54.4,
+          "sub_score": "均名 #34.0",
+          "metric_val": "#34.0",
+          "details": {
+            "in_list_avg": "#18.0",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 26,
+          "model": "claude-fable-5",
+          "provider": "anthropic",
+          "score": 53.9,
+          "sub_score": "均名 #34.4",
+          "metric_val": "#34.4",
+          "details": {
+            "in_list_avg": "#5.5",
+            "appearances": "2/7",
+            "presence_pct": "28%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 27,
+          "model": "muse-spark-1.1",
+          "provider": "ollama",
+          "score": 53.7,
+          "sub_score": "均名 #34.6",
+          "metric_val": "#34.6",
+          "details": {
+            "in_list_avg": "#19.3",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 28,
+          "model": "o3-pro",
+          "provider": "openai",
+          "score": 52.9,
+          "sub_score": "均名 #35.1",
+          "metric_val": "#35.1",
+          "details": {
+            "in_list_avg": "#20.7",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 29,
+          "model": "muse-spark-1.3",
+          "provider": "ollama",
+          "score": 52.9,
+          "sub_score": "均名 #35.1",
+          "metric_val": "#35.1",
+          "details": {
+            "in_list_avg": "#8.0",
+            "appearances": "2/7",
+            "presence_pct": "28%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 30,
+          "model": "claude-haiku-4-5-20251001",
+          "provider": "anthropic",
+          "score": 52.5,
+          "sub_score": "均名 #35.4",
+          "metric_val": "#35.4",
+          "details": {
+            "in_list_avg": "#21.3",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 31,
+          "model": "ox-alpha",
+          "provider": "glm",
+          "score": 52.3,
+          "sub_score": "均名 #35.6",
+          "metric_val": "#35.6",
+          "details": {
+            "in_list_avg": "#9.5",
+            "appearances": "2/7",
+            "presence_pct": "28%"
+          },
+          "tags": [
+            "更名 GLM 5.3 Flash"
+          ]
+        },
+        {
+          "rank": 32,
+          "model": "gemini-3.6-flash",
+          "provider": "gemini",
+          "score": 52.1,
+          "sub_score": "均名 #35.7",
+          "metric_val": "#35.7",
+          "details": {
+            "in_list_avg": "#28.0",
+            "appearances": "4/7",
+            "presence_pct": "57%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 33,
+          "model": "muse-spark-1.2",
+          "provider": "ollama",
+          "score": 51.0,
+          "sub_score": "均名 #36.6",
+          "metric_val": "#36.6",
+          "details": {
+            "in_list_avg": "#13.0",
+            "appearances": "2/7",
+            "presence_pct": "28%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 34,
+          "model": "gpt-4.1-mini",
+          "provider": "openai",
+          "score": 50.6,
+          "sub_score": "均名 #36.9",
+          "metric_val": "#36.9",
+          "details": {
+            "in_list_avg": "#24.7",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 35,
+          "model": "gemini-3.1-pro",
+          "provider": "gemini",
+          "score": 50.2,
+          "sub_score": "均名 #37.1",
+          "metric_val": "#37.1",
+          "details": {
+            "in_list_avg": "#25.3",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 36,
+          "model": "gpt-5.3-codex",
+          "provider": "openai",
+          "score": 50.0,
+          "sub_score": "均名 #37.4",
+          "metric_val": "#37.4",
+          "details": {
+            "in_list_avg": "#26.0",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 37,
+          "model": "gpt-4.1",
+          "provider": "openai",
+          "score": 50.0,
+          "sub_score": "均名 #37.7",
+          "metric_val": "#37.7",
+          "details": {
+            "in_list_avg": "#26.7",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 38,
+          "model": "gpt-4o-mini",
+          "provider": "openai",
+          "score": 50.0,
+          "sub_score": "均名 #37.7",
+          "metric_val": "#37.7",
+          "details": {
+            "in_list_avg": "#26.7",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 39,
+          "model": "gpt-5.1",
+          "provider": "openai",
+          "score": 50.0,
+          "sub_score": "均名 #38.6",
+          "metric_val": "#38.6",
+          "details": {
+            "in_list_avg": "#28.7",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 40,
+          "model": "moonshotai/Kimi-K2.6",
+          "provider": "custom",
+          "score": 50.0,
+          "sub_score": "均名 #38.6",
+          "metric_val": "#38.6",
+          "details": {
+            "in_list_avg": "#20.0",
+            "appearances": "2/7",
+            "presence_pct": "28%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 41,
+          "model": "llama3.3:70b",
+          "provider": "ollama",
+          "score": 50.0,
+          "sub_score": "均名 #38.7",
+          "metric_val": "#38.7",
+          "details": {
+            "in_list_avg": "#29.0",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 42,
+          "model": "gpt-4o",
+          "provider": "openai",
+          "score": 50.0,
+          "sub_score": "均名 #38.7",
+          "metric_val": "#38.7",
+          "details": {
+            "in_list_avg": "#29.0",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 43,
+          "model": "zai-org/GLM-5.2",
+          "provider": "glm",
+          "score": 50.0,
+          "sub_score": "均名 #38.9",
+          "metric_val": "#38.9",
+          "details": {
+            "in_list_avg": "#21.0",
+            "appearances": "2/7",
+            "presence_pct": "28%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 44,
+          "model": "deepseek-r1:32b",
+          "provider": "ollama",
+          "score": 50.0,
+          "sub_score": "均名 #39.4",
+          "metric_val": "#39.4",
+          "details": {
+            "in_list_avg": "#30.7",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 45,
+          "model": "claude-fable-5-high",
+          "provider": "anthropic",
+          "score": 50.0,
+          "sub_score": "均名 #39.6",
+          "metric_val": "#39.6",
+          "details": {
+            "in_list_avg": "#1.0",
+            "appearances": "1/7",
+            "presence_pct": "14%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 46,
+          "model": "upstage/solar-mini4",
+          "provider": "custom",
+          "score": 50.0,
+          "sub_score": "均名 #39.6",
+          "metric_val": "#39.6",
+          "details": {
+            "in_list_avg": "#1.0",
+            "appearances": "1/7",
+            "presence_pct": "14%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 47,
+          "model": "gpt-5",
+          "provider": "openai",
+          "score": 50.0,
+          "sub_score": "均名 #39.7",
+          "metric_val": "#39.7",
+          "details": {
+            "in_list_avg": "#31.3",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 48,
+          "model": "claude-opus-4-6-high",
+          "provider": "anthropic",
+          "score": 50.0,
+          "sub_score": "均名 #39.7",
+          "metric_val": "#39.7",
+          "details": {
+            "in_list_avg": "#2.0",
+            "appearances": "1/7",
+            "presence_pct": "14%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 49,
+          "model": "cohere/command-a-plus",
+          "provider": "custom",
+          "score": 50.0,
+          "sub_score": "均名 #39.7",
+          "metric_val": "#39.7",
+          "details": {
+            "in_list_avg": "#2.0",
+            "appearances": "1/7",
+            "presence_pct": "14%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 50,
+          "model": "qwen3.8-95b",
+          "provider": "ollama",
+          "score": 50.0,
+          "sub_score": "均名 #39.9",
+          "metric_val": "#39.9",
+          "details": {
+            "in_list_avg": "#31.7",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        },
+        {
+          "rank": 51,
+          "model": "claude-opus-4-7-high",
+          "provider": "anthropic",
+          "score": 50.0,
+          "sub_score": "均名 #39.9",
+          "metric_val": "#39.9",
+          "details": {
+            "in_list_avg": "#3.0",
+            "appearances": "1/7",
+            "presence_pct": "14%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 52,
+          "model": "openai/gpt-6-luna-pro",
+          "provider": "openai",
+          "score": 50.0,
+          "sub_score": "均名 #39.9",
+          "metric_val": "#39.9",
+          "details": {
+            "in_list_avg": "#3.0",
+            "appearances": "1/7",
+            "presence_pct": "14%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 53,
+          "model": "muse-spark-1.2 (xHigh)",
+          "provider": "ollama",
+          "score": 50.0,
+          "sub_score": "均名 #40.0",
+          "metric_val": "#40.0",
+          "details": {
+            "in_list_avg": "#4.0",
+            "appearances": "1/7",
+            "presence_pct": "14%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 54,
+          "model": "openai/gpt-6-luna-pro:batch",
+          "provider": "openai",
+          "score": 50.0,
+          "sub_score": "均名 #40.0",
+          "metric_val": "#40.0",
+          "details": {
+            "in_list_avg": "#4.0",
+            "appearances": "1/7",
+            "presence_pct": "14%"
+          },
+          "tags": []
+        },
+        {
+          "rank": 55,
+          "model": "claude-opus-4-5-20251101",
+          "provider": "anthropic",
+          "score": 50.0,
+          "sub_score": "均名 #40.1",
+          "metric_val": "#40.1",
+          "details": {
+            "in_list_avg": "#32.3",
+            "appearances": "3/7",
+            "presence_pct": "42%"
+          },
+          "tags": [
+            "多榜收录"
+          ]
+        }
+      ]
+    }
+  ]
+}

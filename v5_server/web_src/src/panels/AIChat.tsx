@@ -1,0 +1,2722 @@
+import { useState, useEffect, useRef } from 'react'
+import {
+  Trophy,
+  ExternalLink,
+  BookOpen,
+  Scroll,
+  Swords,
+  Zap,
+  Drama,
+  Brain,
+  Gauge,
+  Activity,
+  AlertTriangle,
+  Bot,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Cpu,
+  Edit3,
+  Eye,
+  EyeOff,
+  Mail,
+  RefreshCw,
+  Send,
+  ShieldCheck,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  Trash2,
+  X,
+  MessageSquare,
+} from 'lucide-react'
+import {
+  Avatar,
+  Button,
+  Card,
+  Chip,
+  Modal,
+  ScrollShadow,
+  TextField,
+  Input,
+  Label,
+  Description,
+  Select,
+  ListBox,
+  cn,
+} from '@heroui/react'
+import { PageHeader, StatCard } from '../components/kit'
+import { useServer } from '../lib/serverContext'
+import {
+  fetchAIChatLeaderboards,
+  refreshAIChatLeaderboards,
+  type LeaderboardItem,
+  type LeaderboardsData,
+  fetchAIChatCharacters,
+  fetchAIChatCalendar,
+  fetchAIChatConfig,
+  saveAIChatConfig,
+  testAIChatConnection,
+  fetchAIChatHistory,
+  sendAIChatMessage,
+  clearAIChatHistory,
+  updateAIChatPersona,
+  updateAIChatGreetingSettings,
+  triggerAIChatGreeting,
+  resolveAssetUrl,
+  type CharacterItem,
+  type CalendarData,
+  type AIChatConfigData,
+  type ChatHistoryMessage,
+} from '../lib/api'
+
+// 离线静态回退修正者名册
+const OFFLINE_CHARACTERS: CharacterItem[] = [
+  {
+    char_id: 90001001,
+    id: 90001001,
+    char_name: '悼亡之蝶·海拉',
+    name: '悼亡之蝶·海拉',
+    hero_id: 1194,
+    avatar: 'extracted_assets/avatars/1194.png',
+    level: 80,
+    sign: '生与死的界线，由我来执掌。',
+    ip_location: '欧林匹斯',
+    location: '欧林匹斯',
+    greeting_msg: '管理员，今天有什么要处理的事务吗？',
+    system_prompt: '你是悼亡之蝶·海拉，外表沉静淡漠、内心珍视同伴与管理员的修正者。',
+    is_active: true,
+    message_count: 12,
+    last_message: '若感到疲惫，不必勉强前行。',
+    last_time: Math.floor(Date.now() / 1000) - 300,
+    birthday: '10-24',
+    greeting_mode: 'all',
+  },
+  {
+    char_id: 90001002,
+    id: 90001002,
+    char_name: '朝约·薇儿丹蒂',
+    name: '朝约·薇儿丹蒂',
+    hero_id: 1084,
+    avatar: 'extracted_assets/avatars/1084.png',
+    level: 80,
+    sign: '不管前路如何，我都会守护在您身旁！',
+    ip_location: '隐科组',
+    location: '隐科组',
+    greeting_msg: '管理员！今天也要一起元气满满地出击哦！',
+    system_prompt: '你是朝约·薇儿丹蒂，性格元气阳光、温柔勇敢、信任管理员。',
+    is_active: true,
+    message_count: 28,
+    last_message: '放心交给我吧，今天的训练完全没问题！',
+    last_time: Math.floor(Date.now() / 1000) - 1200,
+    birthday: '05-04',
+    greeting_mode: 'all',
+  },
+  {
+    char_id: 90001003,
+    id: 90001003,
+    char_name: '早樱·大国主',
+    name: '早樱·大国主',
+    hero_id: 1066,
+    avatar: 'extracted_assets/avatars/1066.png',
+    level: 80,
+    sign: '来占卜一下今天的运势吧？',
+    ip_location: '笹波',
+    location: '笹波',
+    greeting_msg: '哼哼，今天的运势是大吉呢，管理员有什么想问的吗？',
+    system_prompt: '你是早樱·大国主，外表可爱、性格聪慧狡黠的小发明家。',
+    is_active: true,
+    message_count: 8,
+    last_message: '命运的指引往往就在不经意的细节中哦。',
+    last_time: Math.floor(Date.now() / 1000) - 4500,
+    birthday: '09-02',
+    greeting_mode: 'holiday',
+  },
+  {
+    char_id: 90001004,
+    id: 90001004,
+    char_name: '太一·庚辰',
+    name: '太一·庚辰',
+    hero_id: 1076,
+    avatar: 'extracted_assets/avatars/1076.png',
+    level: 80,
+    sign: '清流所至，万象澄明。',
+    ip_location: '虚恒',
+    location: '虚恒',
+    greeting_msg: '管理员，虚恒的山风尚好，愿清宁与你同在。',
+    system_prompt: '你是太一·庚辰，虚恒守护者，沉稳优雅、神性淡然。',
+    is_active: true,
+    message_count: 15,
+    last_message: '若有所思，不妨直言。',
+    last_time: Math.floor(Date.now() / 1000) - 8600,
+    birthday: '01-15',
+    greeting_mode: 'birthday',
+  },
+  {
+    char_id: 90001005,
+    id: 90001005,
+    char_name: '澄心·陵光',
+    name: '澄心·陵光',
+    hero_id: 1075,
+    avatar: 'extracted_assets/avatars/1075.png',
+    level: 80,
+    sign: '医者仁心，保重身体乃第一要务。',
+    ip_location: '虚恒',
+    location: '虚恒',
+    greeting_msg: '今日脉象平稳，不过切记不可熬夜过度。',
+    system_prompt: '你是澄心·陵光，虚恒神医，医者仁心、注重养生。',
+    is_active: true,
+    message_count: 6,
+    last_message: '按时饮用这盅参茶，对心神大有裨益。',
+    last_time: Math.floor(Date.now() / 1000) - 18000,
+    birthday: '07-23',
+    greeting_mode: 'none',
+  },
+  {
+    char_id: 90001006,
+    id: 90001006,
+    char_name: '雏心·奥西里斯',
+    name: '雏心·奥西里斯',
+    hero_id: 1011,
+    avatar: 'extracted_assets/avatars/1011.png',
+    level: 80,
+    sign: '只要能帮上管理员的忙……',
+    ip_location: '尼罗',
+    location: '尼罗',
+    greeting_msg: '那个……管理员，我、我今天也努力整理了资料！',
+    system_prompt: '你是雏心·奥西里斯，内向柔弱、善良坚韧。',
+    is_active: true,
+    message_count: 10,
+    last_message: '我会加倍努力的！',
+    last_time: Math.floor(Date.now() / 1000) - 24000,
+    birthday: '11-18',
+    greeting_mode: 'birthday',
+  },
+]
+
+// 离线静态日历与节气数据
+const OFFLINE_CALENDAR: CalendarData = {
+  today: {
+    solar_date: '2026-09-15',
+    solar_term: '白露',
+    lunar_date: '八月初五',
+    holidays: ['中秋节前奏'],
+    hero_birthdays: [],
+    is_player_birthday: false,
+    holiday_greeting_heroes: [90001002, 90001003],
+  },
+  current_month: 9,
+  month_heroes: [
+    { record_id: 1066, hero_name: '早樱·大国主', birthday: '09-02', day: 2, organization: '笹波', is_today: false },
+    { record_id: 1013, hero_name: '冰渊·波塞冬', birthday: '09-19', day: 19, organization: '欧林匹斯', is_today: false },
+    { record_id: 1014, hero_name: '潮音·波塞冬', birthday: '09-28', day: 28, organization: '欧林匹斯', is_today: false },
+  ],
+  total_month_birthdays: 3,
+}
+
+const OFFLINE_CONFIG: AIChatConfigData = {
+  provider: 'gemini',
+  model: 'gemini-3.8-flash',
+  base_url: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+  api_key_masked: 'AQ.***Lug',
+  has_api_key: true,
+  fallback_model: 'gemini-1.5-flash',
+  timeout_seconds: 30,
+  max_tokens: 1024,
+  temperature: 0.7,
+  max_history_turns: 10,
+  system_prefix: '你正在与《深空之眼》的管理员进行游戏内私聊。请保持游戏沉浸感，严禁输出任何代码块、markdown 标题或 AI 身份声明，直接像真正的游戏角色一样回复简短自然的对话（1~3句话为佳）。\n\n',
+}
+
+// 主流服务商厂商预设矩阵
+interface ProviderPreset {
+  id: string
+  name: string
+  badge: string
+  type: string
+  defaultBaseUrl: string
+  defaultModel: string
+  candidateModels: string[]
+  apiKeyEnv: string
+  hint: string
+}
+
+const PROVIDER_PRESETS: ProviderPreset[] = [
+  {
+    id: 'gemini',
+    name: 'Google Gemini',
+    badge: '官方原生/极速',
+    type: 'gemini',
+    defaultBaseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+    defaultModel: 'gemini-3.8-flash',
+    candidateModels: [
+      'gemini-3.8-flash',
+      'gemini-3.7-flash',
+      'gemini-3.6-flash',
+      'gemini-3.1-pro',
+    ],
+    apiKeyEnv: 'GEMINI_API_KEY',
+    hint: 'Google 原生端点，支持高并发免费额度与极速首字输出。',
+  },
+  {
+    id: 'deepseek',
+    name: 'DeepSeek',
+    badge: '深度求索/高性价比',
+    type: 'openai',
+    defaultBaseUrl: 'https://api.deepseek.com/v1',
+    defaultModel: 'deepseek-flash',
+    candidateModels: [
+      'deepseek-flash',
+      'deepseek-v4-pro',
+    ],
+    apiKeyEnv: 'DEEPSEEK_API_KEY',
+    hint: '国内直连，高性价比与强逻辑，文学角色拟真表现极佳。',
+  },
+  {
+    id: 'ollama',
+    name: '本地 Ollama / LMStudio',
+    badge: '局域网离线/免Key',
+    type: 'openai',
+    defaultBaseUrl: 'http://localhost:11434/v1',
+    defaultModel: 'llama3.3:70b',
+    candidateModels: [
+      'deepseek-r1:32b',
+      'qwen2.5:72b',
+      'llama3.3:70b',
+      'qwen2.5:14b',
+      'llama3.1:8b',
+    ],
+    apiKeyEnv: '免配置 (本地免鉴权)',
+    hint: '本地硬件离线推理，零外网依赖、免梯子、免 API Key，私密安全。',
+  },
+  {
+    id: 'openai',
+    name: 'OpenAI 官方',
+    badge: '标准端点/前沿矩阵',
+    type: 'openai',
+    defaultBaseUrl: 'https://api.openai.com/v1',
+    defaultModel: 'gpt-5.6',
+    candidateModels: [
+      'gpt-6-astra',
+      'gpt-5.6',
+      'gpt-5.6-sol',
+      'gpt-5.6-terra',
+      'gpt-5.6-luna',
+      'gpt-5.5',
+      'gpt-5.5-pro',
+      'gpt-5.4',
+      'gpt-5.4-pro',
+      'gpt-5.4-mini',
+      'gpt-5.4-nano',
+      'gpt-5.3-codex',
+      'gpt-5.2',
+      'gpt-5.2-pro',
+      'gpt-5.1',
+      'gpt-5',
+      'gpt-5-pro',
+      'gpt-5-mini',
+      'gpt-5-nano',
+      'o3',
+      'o3-pro',
+      'gpt-4.1',
+      'gpt-4.1-mini',
+      'gpt-4o',
+      'gpt-4o-mini',
+    ],
+    apiKeyEnv: 'OPENAI_API_KEY',
+    hint: 'OpenAI 官方国际 API 端点，强大前沿矩阵（GPT-6 / GPT-5.x / o3 / 4.x）。',
+  },
+  {
+    id: 'anthropic',
+    name: 'Anthropic Claude',
+    badge: '高级拟真/情感叙事',
+    type: 'anthropic',
+    defaultBaseUrl: 'https://api.anthropic.com/v1',
+    defaultModel: 'claude-sonnet-5',
+    candidateModels: [
+      'claude-fable-5',
+      'claude-opus-5',
+      'claude-opus-4-8',
+      'claude-opus-4-7',
+      'claude-opus-4-6',
+      'claude-opus-4-5-20251101',
+      'claude-sonnet-5',
+      'claude-sonnet-4-6',
+      'claude-sonnet-4-5-20250929',
+      'claude-haiku-4-5-20251001',
+    ],
+    apiKeyEnv: 'ANTHROPIC_API_KEY',
+    hint: 'Claude 官方 API 端点，细腻自然的角色情感拟真与文风塑造能力。',
+  },
+  {
+    id: 'custom',
+    name: '自定义 OpenAI 兼容 / OneAPI',
+    badge: '聚合代理',
+    type: 'openai',
+    defaultBaseUrl: '',
+    defaultModel: '',
+    candidateModels: [],
+    apiKeyEnv: 'CUSTOM_API_KEY',
+    hint: '兼容所有第三方反代、聚合中转站（NewAPI / OneAPI）或自建网关。',
+  },
+]
+
+// =========================================================================
+// 原厂原装官方 AI 品牌徽标微组件 (纯净无杂质、标准尺寸、毫秒级渲染)
+// =========================================================================
+const BRAND_OPENAI_DATA_URI = "data:image/png;base64,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"
+export const BRAND_GEMINI_DATA_URI = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBpZD0iTGF5ZXJfMSIgdmlld0JveD0iMCAwIDE5MiAxOTIiPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcHBhdGgiPjxwYXRoIGQ9Ik0xNjQuOTMgODYuNjhjLTEzLjU2LTUuODQtMjUuNDItMTMuODQtMzUuNi0yNC4wMS0xMC4xNy0xMC4xNy0xOC4xOC0yMi4wNC0yNC4wMS0zNS42LTIuMjMtNS4xOS00LjA0LTEwLjU0LTUuNDItMTYuMDJDOTkuNDUgOS4yNiA5Ny44NSA4IDk2IDhzLTMuNDUgMS4yNi0zLjkgMy4wNWMtMS4zOCA1LjQ4LTMuMTggMTAuODEtNS40MiAxNi4wMi01Ljg0IDEzLjU2LTEzLjg0IDI1LjQzLTI0LjAxIDM1LjYtMTAuMTcgMTAuMTYtMjIuMDQgMTguMTctMzUuNiAyNC4wMS01LjE5IDIuMjMtMTAuNTQgNC4wNC0xNi4wMiA1LjQyQzkuMjYgOTIuNTUgOCA5NC4xNSA4IDk2czEuMjYgMy40NSAzLjA1IDMuOWM1LjQ4IDEuMzggMTAuODEgMy4xOCAxNi4wMiA1LjQyIDEzLjU2IDUuODQgMjUuNDIgMTMuODQgMzUuNiAyNC4wMSAxMC4xNyAxMC4xNyAxOC4xOCAyMi4wNCAyNC4wMSAzNS42IDIuMjQgNS4yIDQuMDQgMTAuNTQgNS40MiAxNi4wMkE0LjAzIDQuMDMgMCAwIDAgOTYgMTg0YzEuODUgMCAzLjQ1LTEuMjYgMy45LTMuMDUgMS4zOC01LjQ4IDMuMTgtMTAuODEgNS40Mi0xNi4wMiA1Ljg0LTEzLjU2IDEzLjg0LTI1LjQyIDI0LjAxLTM1LjYgMTAuMTctMTAuMTcgMjIuMDQtMTguMTggMzUuNi0yNC4wMSA1LjItMi4yNCAxMC41NC00LjA0IDE2LjAyLTUuNDJBNC4wMyA0LjAzIDAgMCAwIDE4NCA5NmMwLTEuODUtMS4yNi0zLjQ1LTMuMDUtMy45LTUuNDgtMS4zOC0xMC44MS0zLjE4LTE2LjAyLTUuNDIiIGNsYXNzPSJzdDAiLz48L2NsaXBQYXRoPjxjbGlwUGF0aCBpZD0iY2xpcHBhdGgtMSI+PHBhdGggZD0iTTE2NC45MyA4Ni42OGMtMTMuNTYtNS44NC0yNS40Mi0xMy44NC0zNS42LTI0LjAxLTEwLjE3LTEwLjE3LTE4LjE4LTIyLjA0LTI0LjAxLTM1LjYtMi4yMy01LjE5LTQuMDQtMTAuNTQtNS40Mi0xNi4wMkM5OS40NSA5LjI2IDk3Ljg1IDggOTYgOHMtMy40NSAxLjI2LTMuOSAzLjA1Yy0xLjM4IDUuNDgtMy4xOCAxMC44MS01LjQyIDE2LjAyLTUuODQgMTMuNTYtMTMuODQgMjUuNDMtMjQuMDEgMzUuNi0xMC4xNyAxMC4xNi0yMi4wNCAxOC4xNy0zNS42IDI0LjAxLTUuMTkgMi4yMy0xMC41NCA0LjA0LTE2LjAyIDUuNDJDOS4yNiA5Mi41NSA4IDk0LjE1IDggOTZzMS4yNiAzLjQ1IDMuMDUgMy45YzUuNDggMS4zOCAxMC44MSAzLjE4IDE2LjAyIDUuNDIgMTMuNTYgNS44NCAyNS40MiAxMy44NCAzNS42IDI0LjAxIDEwLjE3IDEwLjE3IDE4LjE4IDIyLjA0IDI0LjAxIDM1LjYgMi4yNCA1LjIgNC4wNCAxMC41NCA1LjQyIDE2LjAyQTQuMDMgNC4wMyAwIDAgMCA5NiAxODRjMS44NSAwIDMuNDUtMS4yNiAzLjktMy4wNSAxLjM4LTUuNDggMy4xOC0xMC44MSA1LjQyLTE2LjAyIDUuODQtMTMuNTYgMTMuODQtMjUuNDIgMjQuMDEtMzUuNiAxMC4xNy0xMC4xNyAyMi4wNC0xOC4xOCAzNS42LTI0LjAxIDUuMi0yLjI0IDEwLjU0LTQuMDQgMTYuMDItNS40MkE0LjAzIDQuMDMgMCAwIDAgMTg0IDk2YzAtMS44NS0xLjI2LTMuNDUtMy4wNS0zLjktNS40OC0xLjM4LTEwLjgxLTMuMTgtMTYuMDItNS40MiIgY2xhc3M9InN0MCIvPjwvY2xpcFBhdGg+PHJhZGlhbEdyYWRpZW50IGlkPSJyYWRpYWwtZ3JhZGllbnQiIGN4PSItMTIyLjQ5IiBjeT0iLTIyMy41MyIgcj0iMTEwLjk4IiBmeD0iLTEyMi40OSIgZnk9Ii0yMjMuNTMiIGdyYWRpZW50VHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgLS41NCAwIC0uOTMpIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIuMzEiIHN0b3AtY29sb3I9IiMzMTg2ZmYiLz48c3RvcCBvZmZzZXQ9Ii40MiIgc3RvcC1jb2xvcj0iIzQ0OTFmZiIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNGM5NmZmIi8+PHN0b3Agb2Zmc2V0PSIuODEiIHN0b3AtY29sb3I9IiNlN2YxZmYiLz48c3RvcCBvZmZzZXQ9Ii44OSIgc3RvcC1jb2xvcj0iI2ZmZiIvPjwvcmFkaWFsR3JhZGllbnQ+PHN0eWxlPi5zdDB7ZmlsbDpub25lfTwvc3R5bGU+PC9kZWZzPjxnIHN0eWxlPSJjbGlwLXBhdGg6dXJsKCNjbGlwcGF0aCkiPjxpbWFnZSB4bGluazpocmVmPSJkYXRhOmltYWdlL2pwZWc7YmFzZTY0LC85ai80UzUrYUhSMGNEb3ZMMjV6TG1Ga2IySmxMbU52YlM5NFlYQXZNUzR3THdBOFAzaHdZV05yWlhRZ1ltVm5hVzQ5SXUrN3Z5SWdhV1E5SWxjMVRUQk5jRU5sYUdsSWVuSmxVM3BPVkdONmEyTTVaQ0kvUGdvOGVEcDRiWEJ0WlhSaElIaHRiRzV6T25nOUltRmtiMkpsT201ek9tMWxkR0V2SWlCNE9uaHRjSFJyUFNKQlpHOWlaU0JZVFZBZ1EyOXlaU0E1TGpFdFl6QXdNeUF4TGpBd01EQXdNQ3dnTURBd01DOHdNQzh3TUMwd01Eb3dNRG93TUNBZ0lDQWdJQ0FnSWo0S0lDQWdQSEprWmpwU1JFWWdlRzFzYm5NNmNtUm1QU0pvZEhSd09pOHZkM2QzTG5jekxtOXlaeTh4T1RrNUx6QXlMekl5TFhKa1ppMXplVzUwWVhndGJuTWpJajRLSUNBZ0lDQWdQSEprWmpwRVpYTmpjbWx3ZEdsdmJpQnlaR1k2WVdKdmRYUTlJaUlLSUNBZ0lDQWdJQ0FnSUNBZ2VHMXNibk02ZUcxd1BTSm9kSFJ3T2k4dmJuTXVZV1J2WW1VdVkyOXRMM2hoY0M4eExqQXZJZ29nSUNBZ0lDQWdJQ0FnSUNCNGJXeHVjenA0YlhCSFNXMW5QU0pvZEhSd09pOHZibk11WVdSdlltVXVZMjl0TDNoaGNDOHhMakF2Wnk5cGJXY3ZJZ29nSUNBZ0lDQWdJQ0FnSUNCNGJXeHVjenBwYkd4MWMzUnlZWFJ2Y2owaWFIUjBjRG92TDI1ekxtRmtiMkpsTG1OdmJTOXBiR3gxYzNSeVlYUnZjaTh4TGpBdklnb2dJQ0FnSUNBZ0lDQWdJQ0I0Yld4dWN6cGtZejBpYUhSMGNEb3ZMM0IxY213dWIzSm5MMlJqTDJWc1pXMWxiblJ6THpFdU1TOGlDaUFnSUNBZ0lDQWdJQ0FnSUhodGJHNXpPbmh0Y0UxTlBTSm9kSFJ3T2k4dmJuTXVZV1J2WW1VdVkyOXRMM2hoY0M4eExqQXZiVzB2SWdvZ0lDQWdJQ0FnSUNBZ0lDQjRiV3h1Y3pwemRFVjJkRDBpYUhSMGNEb3ZMMjV6TG1Ga2IySmxMbU52YlM5NFlYQXZNUzR3TDNOVWVYQmxMMUpsYzI5MWNtTmxSWFpsYm5RaklqNEtJQ0FnSUNBZ0lDQWdQSGh0Y0RwRGNtVmhkRzl5Vkc5dmJENUJaRzlpWlNCSmJHeDFjM1J5WVhSdmNpQXlPUzQySUNoTllXTnBiblJ2YzJncFBDOTRiWEE2UTNKbFlYUnZjbFJ2YjJ3K0NpQWdJQ0FnSUNBZ0lEeDRiWEE2UTNKbFlYUmxSR0YwWlQ0eU1ESTFMVEEyTFRJMVZERXhPakU0T2pJeExUQTNPakF3UEM5NGJYQTZRM0psWVhSbFJHRjBaVDRLSUNBZ0lDQWdJQ0FnUEhodGNEcFVhSFZ0WW01aGFXeHpQZ29nSUNBZ0lDQWdJQ0FnSUNBOGNtUm1Pa0ZzZEQ0S0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnUEhKa1pqcHNhU0J5WkdZNmNHRnljMlZVZVhCbFBTSlNaWE52ZFhKalpTSStDaUFnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJRHg0YlhCSFNXMW5PbmRwWkhSb1BqSTFOand2ZUcxd1IwbHRaenAzYVdSMGFENEtJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdQSGh0Y0VkSmJXYzZhR1ZwWjJoMFBqSTFNand2ZUcxd1IwbHRaenBvWldsbmFIUStDaUFnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJRHg0YlhCSFNXMW5PbVp2Y20xaGRENUtVRVZIUEM5NGJYQkhTVzFuT21admNtMWhkRDRLSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnUEhodGNFZEpiV2M2YVcxaFoyVStMemxxTHpSQlFWRlRhMXBLVW1kQlFrRm5SVUZCUVVGQlFVRkVMemRSUVhOVlIyaDJaRWM1ZW1GSE9YZEpSRTExVFVGQk5GRnJiRTVCS3pCQlFVRkJRVUZDUVVGQlFVRkJRVUZGUVNZamVFRTdRVkZCUVVGQlFVRkJVVUZDTHlzMFFVUnJSbXRpTWtwc1FVZFVRVUZCUVVGQlppOWlRVWxSUVVKblVVVkNRVlZGUW1kVlJrSm5hMGRDVVZsS1EzZG5SMEpuWjB4RVFXOUxRM2R2U3lZamVFRTdSRUpCVFVSQmQwMUVRWGRSUkVFMFVFVkJPRTlFUWsxVVJrSlJWRVY0ZDJKSGVITmpTSGc0WmtoNE9HWkllRGhtU0hkRlNFSjNZMDVFUVRCWlJVSkJXVWRvVlZKR1VtOW1TSGc0WmlZamVFRTdTSGc0WmtoNE9HWkllRGhtU0hnNFpraDRPR1pJZURobVNIZzRaa2g0T0daSWVEaG1TSGc0WmtoNE9HWkllRGhtU0hnNFpraDRPR1pJZURobUx6aEJRVVZSWjBFdlFVVkJRWGRGVWlZamVFRTdRVUZKVWtGUlRWSkJaaTlGUVdGSlFVRkJRVWhCVVVWQ1FWRkZRVUZCUVVGQlFVRkJRVUZSUmtGM1NVZEJVVUZJUTBGclMwTjNSVUZCWjBsRVFWRkZRa0ZSUlVGQlFVRkJRVUZCUVNZamVFRTdRVkZCUTBGM1VVWkNaMk5KUTFGdlRFVkJRVU5CVVUxRVFXZFJRMEpuWTBSQ1FVbEhRVzVOUWtGblRWSkNRVUZHU1ZKSmVGRldSVWRGTWtWcFkxbEZWVTF3UjJoQ2VGZDRVV2xRUWlZamVFRTdWWFJJYUUxNFdtazRRMUo1WjNaRmJGRjZVbFJyY1V0NVdUTlFRMDVWVVc1ck5rOTZUbWhrVlZwSVZFUXdkVWxKU205TlNrTm9aMXBvU2xKR1VuRlRNRlowVGxaTFFuSjVOQzlRUlNZamVFRTdNVTlVTUZwWVYwWnNZVmN4ZUdSWWJEbFhXakpvY0dGdGRITmlWelYyV1ROU01XUnVaRFJsV0hBM1prZ3hLMll6VDBWb1dXRklhVWx0UzJrMGVVNXFieXREYXpWVFZteHdaVmx0V2lZamVFRTdjV0p1U2pKbGJqVkxhbkJMVjIxd05tbHdjWEYxYzNKaE5uWnZVa0ZCU1VOQlVVbEVRbEZWUlVKUldVVkRRVTFFWWxGRlFVRm9SVVJDUTBWVFRWVkZSbFZTVG1oSloxcDRaMXBGZVNZamVFRTdiMkpJZDBaTlNGSTBVMDVEUmxaS2FXTjJSWHBLUkZKRVoyaGhVMVY1VjJsWk4weERRak5RVTA1bFNrVm5lR1JWYTNkblNrTm9aMXBLYWxwR1IybGthMlJHVlRNNGNVOTZkM2xuY0NZamVFRTdNQ3RRZW1oS1UydDBUVlJWTlZCU2JHUlpWMVp3WWxoR01XVllNVkpzV20xa2IyRlhjSEppUnpGMVlqSlNNV1J1WkRSbFdIQTNaa2d4SzJZelQwVm9XV0ZJYVVsdFMyazBlVTVxYnlZamVFRTdLMFJzU2xkWGJEVnBXbTF3ZFdOdVdqWm1hM0ZQYTNCaFlXNXhTMjF4Y1RaNWRISnhLM1l2WVVGQmQwUkJVVUZEUlZGTlVrRkVPRUU1VlRSeE4wWllXWEUzUmxoWmNUZEdXRmx4TnlZamVFRTdSbGhaY1RkR1dGbHhOMFpZV1hFMmRVdDBWbmhUTVZoQmNsSmlSa3hZVEVaaFlUVTBjSEIyYkdscGJrSnpWbkJrV0VaRVpHTkxkWGhXZGtaRWMxWmthWEp6Vm1ScGNuTldaR2x5Y3lZamVFRTdWbVJwY25OV1pHbHljMVprYVhKelZtUnBjbk5XWkdseWMxWmthWEp6Vm1GNFV6UTBjWE5NV1VWeVIyWkJhMEpaTUhWRE1sRnBjSFJPYW1KSlVsY3JkVTFHY0RSWVEyTlpNblpEY1NZamVFRTdURTVvZEdsWmNXbDVXV0paYTB0bllrTjRXRUUwYjJKM2NUTnBhREpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVlBTM1JGTkNZamVFRTdjRmRHYzBOV1NqVkxXVXhhWjBsbFUyTkVkbXRUVjNsTlZVaE1aWEZQSzFGTmJUWlBUa0o1Tm10dk56VkZlbUp2TkZWUFpGWlllSGxRUnpKbFFYVlVWa1pLTmpRNFlVUm5VbU5QYnlZamVFRTdRVGs0YlVwT1RYTlRUMmgxVVRObVNtZDBSVzlKZFU5VGRWTjBjVWxXYkdKS1RVTkdORTlNUm5aRGNtVkxTRmx4TjBaWVdYRTNSbGhaY1RkR1dGbHhOMFpZV1hFM1JsaFpjVGRHV0NZamVFRTdXWEUzUmxoWmNUZEdWM05WY2xkUFFrdHBOemRaUTNwQlVWWjRUMFpDTTNsQ1RHUkRRMVpZWkN0eE1UTjVjVlZ1VEhnMGEydDFPVlZCU2l0TVMxcFVZek5JWjFOdE5ERmpZaTlHYkNZamVFRTdVbTAxWTA1UFp6SXhhbVkzVjFFNFVuWkhibGhTWVhoMk9YSkRTbk5hWVdST1RGQldVVk5RYVhsNVRUTkhlVmxGTDNOeU9FMUNkbTFTUjFSeU9HMUtUM0poTkVSQllqVmpRelJOTkNZamVFRTdielpPT0cxSFoyaFlWbk5NUW1WRWFGRXlUVlZQZUZZeVMzVjRWakpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0Vm5oNFZtODBjRlZhUjI5TmFWZFpRME4xU2lZamVFRTdkMjlQSzFGS1ltOVNVMHhWVGxGRFp6YzFWRXRVYmpSelZFZGtVakZYYkdacGVrZHVUakpsU0VGNE1qZ3hVV3R1Wmt0S1ZHUnFhbmRLVms1eFJFVTVZM0ZOYmt4cWFWRjRkbGR5TVNZamVFRTdlVkJGTWtSSGRtcDJiVUkyTkZKS1JYTlRXakpYYjA1NVJ5dFhlR3MwYlZoRmVXcFVUbEV5Unl0YVZVTTJjbEJxV2xSWldHeFJUamg1TkU5d2VYaFViVWRqUjIxWVFVOUdTa2RLU3lZamVFRTdUVTVPVWxac1prUlVSbVZFYVdoa1dFRnljMVprYVhKelZtUnBjbk5XWkdseWMxWmthWEp6Vm1ScGNuTldaR2x5YzFaa2FYSlNlRk56WkhGYVJXeEpRMFYxU21kdlQxRk5iVFpGVlNZamVFRTdhVEZETDBOb2MzQnNUbnB6VjA1cFQzRTJjakY2UjI1T01pdEVRM2hoTHpGSmMxUnRUa3RVZEdOWFJrbzFjbTl6WTNCS1kzbE5SVTB3Y0U5U2RIUkZWbTVOTkVVd2RWWjZhRU5EUlNZamVFRTdXR0pVYTAxTmRHYzBLMUZOYWpCNU4wbHdiV1JwYVRabVZVSnNaVzB6ZFhkNldWazBUMnA2YkZBM1lUbEhNaXRhUVhoMWRXNUtUVWx5YzJWUFNHZGhWRXBHZUROSmQwZE1SekJUYXlZamVFRTdiMDlTVFZaMFYwUm5OVWRyY21kalExYzRRM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll4WTBOeVIyRnRVa3BhUVVsWFlXRnNaRGh3YkU1emFrWktkRkYyVHlZamVFRTdTMjVtVFZkbFducE5WMDVwVjNFMloyWnBNM3BJYkd4a2RHZDRUVkF4U3psWmF6YzFWVnAxTlhjME1HdHViVXBQVm10MVpFTkxSMXB4TlVaMVFWYzBjR1JuVm5OYVNVMVRjbmR1TkNZamVFRTdjM2xOWTFoR2VYbFViWGhyU1hCdE1YZFpNMUkyY2tsNVEzaDFhVUZPT0RKMVRFVTRMM0ZOYVdOUldEVklaazF2V1ZoWVUzbEtha1J4VUhacFkweFRXbThyUkZWUVprdDZhVko0Y0NZamVFRTdha0psVmpjMVZFeEhlVVZyWmtaalZuQjJiRXBwTWtOVFMxTlRkVlpyVFdkV1VVaEpjRmhaUlhWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa0pXYWs1VVNWTk1TVUpEZWlZamVFRTdWRlZIV1N0VVNsUmlSMHRXV0d3MVVVaG1UbVpzZW5WV2FuaHpXakZVVlU1cWRtMTJiSEZJV2xsTlZFVk9VM1pUVXpJclFWcE1aSFpvZUUxa2RYQnBla2hNUVZoYU5EUnZTakp5YXlZamVFRTdiVGhDV21sNVpHbHljMHRHZDNsNVNXRTFlVlp2YUhadGQzZFpjbVJpY1UxMFFrMXlXbkZFVGpkd2MwUjZaWEo2Y0d4Q1l6aGhZalYxVFZkQ01FZG1UV2xyZG1sUEsxcEpkM1ZFVENZamVFRTdTMmx2ZEZOUWFtbGpURlZqYVU5ME9WVTVPSEpzYUZWYVJUTjBUbFJ5VkdaTllXVkdjMnByVkcweGRuZGhZalZwVkhoT09GcHdjbUl6VVVrMk5XbDVaek5EVTA5cWJFSjVhMmh6UWlZamVFRTdWbWRqWjJ4a1oxTTNSbGhaY1RkR1dGbHhOMFpZV1hFM1JsaFpjWFJaTlVWc1NWRXdNR3hDYlU1cmJUSjRRMVl6WkhoVGRTdGhlazVzWTIxRlJXaDJOM0p5ZG0xd2VscHVVSGhSV1NZamVFRTdkbkZrZVZSWVRVdFBVek5oV1ZsTldYWmFVMU5qZVRoYVpIQnBhV3hOY2xaUFdtdFlUV2xHUVRWT2JUZEdUSE5MUjNkTmEwRjRTbGhMVGpoNU9FOVBNMFI2V2t0U1JWTTFkVGxNWnlZamVFRTdaRUp4T1ZGcE5IcFJXakJQYm5kMlRXRnlUM0pEVjIxaVUwZE9NVWRVU1RjMmVEYzFZMDFpYVhsdE1uUXhWSFpyZGtSaGVrNUZkek14VHl0V2VYaHllSEJ1WVdGb01ETjZTRzVwWWlZamVFRTdTWHBVSzNreFJHTmlOV2hhVFZScmVHMTVRM2wyVVZGT09IZE5iVTU1V1ZSVWNURjFRVkZPT0hjMWVHSTBiRTFKTTNKc1FrUmhRM0pCTlVKTVpVSk1jMVprYVhKelZtUnBjbk5XWkNZamVFRTdhWEpxWjFaVGEySmlTelZzYlVWMWRUVmhRVFZ5Y3pnelNXaEdTVGN5WXpjMWNFNVNiR016U0VaSmNqSlZiWFZoY2twcll5OUlSbXAxYjBWdGRWRjRiREpQU21veE0xZHdlbGswYVNZamVFRTdOMGhIYkRCbk0zcE9hVmhMYVhCVmVXSktNMGhEZEhKbmRWTkJXVWRUTkVsamVYTmxUek5HZVRWaFdIRnRZbXBVWVdRd2RYRXhWa3Q1YVcxa1JIQjBUemg2Y1RsVmNXTnpNMWRNUmlZamVFRTdWRzlqTW1FeGNHdDZUR3BDZDFwVVYwNUtiR2RwTVVkVE16RlVhM1ZHYUhoTWEyNXdaMDFXTkd0YVFtUnJSV0kxVkV4SGVVVnJOWE0zTkRGSEsxbHRWRWMxUlZwemF6QTJMM2REYlNZamVFRTdLMkV2VEdwamNVVXlVelptWkRGQk0zcFhOVmxQV0VOVFpUSTRkR0ZhYUZOcE5VVlRhbFZoYjNscmRHZFdUV2xzTWt0MWVGWXlTM1Y0VmpKTGRYaFdielJEYkVSNlNGazFhalZEZWlZamVFRTdhV3hHTmk5WVRsSnhXazlhYWtOU1dHdG9NM3BTV2pWUFpHcERWRE5LU25KdGRHeEtla2xLVUdWU2F6RjVWVU0xYlUxd1JtUlJiWEI2VDNoNll5OUlTa3hhV1ZSWVRUSk5NMHRxU2lZamVFRTdVemxKTldGS2MzVktjMUZ1U21sVVExZFNaVWxVYlZacGFtSnBOV00wUXpjd2NWcDFUazVuZERGSGNERlJaRk50WkVod1pFMDRNM0U1VnpCWGNHMDNkelJoWkVSdWVqSjBURFZ1VWlZamVFRTdaellyWXpGb1preFJSMnQ1VjBaemJsUkJiR0o1ZUZKaVp6SkxSbEphUTAxQ1EySlVUekoxUTBOT09IaHdkMkp2ZVZwQ2NERXlaSFE0ZDJOelNFcG9TbXhYYkROV1lXSTFjVGd3U0NZamVFRTdUWGg1V2xCYVZGWndiWFI1VW1OMVNsUmhSbkZxVFZkUlluZHBUWEphVDNoV01rdDFlRll5UzNWNFZqSkxkRWh3WjB0VlRsQXdUMWt5VW5OcGEzUTVNM3BUTm14NlkxTlJNMlZoVENZamVFRTdUelV5VGt4YVVsaE9aRXA1YjI5SFpVdHZkMUpNWmtkVFYxUXliR0UzV210M2JUVk5UV2xCYkhOMEsyMWFUV055WlUxeGFXSklNbmt3V2xWdVRURTVWWEJ0Vm1sc1ltcGFUbEpVYWlZamVFRTdRVUp0T1RCdFR6TlZZVzVYUzAxcFFWb3hSMnQzVDJjeFQzTjBSRTlSVFRaTVFtbGtTRzE2TW05Tk1tSkRSVWhCYms4eGFHSk1aMGR2YkdGVWFGa3lNVmhEYUhKR1dGbHZZbkpwY1NZamVFRTdUR2hsYUVkV1UwUlpRMjVXYUV0a2MzYzRjMWNyUWxwV2NGVXpWR1pPV201cE5XMU5jM1F3SzFOMFRURlhWVTlrUVhBNVluUnpUWGRhVDFKR1J6VlRNazk0VmpKTGRYaFdNa3QxZUNZamVFRTdWakpMZEVoQlZXOWxXV0pJVFdaSlIyTlZiM1pWTmpWeFRsUkdlazFhVTBjM2FqWTFiM000V0U5NGJFeEtWak42VjFSRWJGSkxTRnBMTlZSaVdVTndUbUpuTlUxVFdrTmhhVEZyUkNZamVFRTdNbmxaYlc1NFZrWTNTVVIwYkRCS2RHTTROa1Z0WjBNeE1ucGFObGwxZEhvMmJFRlVRMjFrV205Qk5raFZObTl2UzFrMU1USnJhVWhVTldONFMwTnNZbVpPTjJsRWFIbHVZV2Q0ZWlZamVFRTdURUZoVTFad1QxTlJNV2x5YzFWUGVGWXlTM1Y0VmtWU1NHTmFRWE4zYlRGcFpIaHRUR3RpYjAxeE1HdHRiM3BYV2pOTmVITjNNREE1VFRGSFZucHZUV2gwWldkNlFXMDFWVlZtYkNZamVFRTdSRmszUmxoWmNUZEdXRmx4TjBaWVdYRTBORVpWY0VZeWVYRlpXbWR3WW1SNFZrSjZXRm8wVDFKRFUxTXphMEo2VXpacVJUVjFUMU5WZW5kRlNFNVViSGgxV0VkVFJrMWxXVXBFV2lZamVFRTdlRTlEUkVKVVJYcGlUV1ZUUVdGd1drWkhWMHhpY0d3d1FUUjFWRXRzYkRGRlpEZ3lkVzFNY1RnclVrcHliRk5EWXpaeVVUVkxaRXh0YTJ3d01XUTROamRTTlVoWWVrdEZhMGRpTHlZamVFRTdRVUY1WVdsdlRtMWFSWE5HZFZSUk1XbHljMVprYVhKelZtUnBjVWxwUnpSNVJXMVpWR1Y0V0dOYWFWcERNMUZhVm5CTE9VMHhiV04xWW1wYWFuQjVPVTB4VDFWMVpFSnJSbk5PYUNZamVFRTdiVUpPZVZsdk4wdEhlREpMZFhoV01rdDFlRll5UzNWNFZqSkxjbGRIVWtsVFJVNU9TRlZhYWxwSlRuTlRiSFI2WWtFMWNtTXlSbmxKVkZOeE5IUmxkV0Z1VUdkamNVOVNURnBaU3lZamVFRTdXbkZhTkZjemVFWkJjbFJMYW1waGNGcElSRVZTWVVwYVNGQkhRMDF6YVVkcFkydENaRkZpU0UxNlJFdHVRbmx3U21WWE9VTmpNekpyZVRBMmRreEdTamR0VDJoUFpGWnZjemRuZWlZamVFRTdRMEpyV0U5dE1DdFdjRXRuZVRWMFkyTXlRMjFTYkRSTFIzRlpWbVIyYVdoeVJsaFpjVGRHVlZwRGRuaEVTM0JHYzBGVWJsUTBPWGh0U0d4TVprRk5kREJ0VUhCdGNucHNlbU5aV2lZamVFRTdaSEEyWkUweFYxVjFZa0ZLTjJKcVdWcG5lV05yU1haTGJXSnpWbVJwY25OV1pHbHljMVprYVhKelZtUm5WbGw1TVhsRmIzTm5WVkJNUTBOTmIyNXFkRzFLU1VNMGRHUnFkRzFFYkNZamVFRTdkMDUzZVVwUVpWY3ZSM1V5WVhaS2NHdHVTMnM0TDNkck5XaFVkMVV3VTNwTFNXeEdZM2cxV1RKMmVGWmtXRUpIVmpoTVRHcDBWRzFXVTAxeloxZDFZVlF6YTFFemVscFpTakEyTHlZamVFRTdTMFZwZGtrMlJUVXdWMnA2VDNWNVFrczFWak42Y1dSTWJtTlpjVUpUY0hwbFdXTjZRbTkzYmsweVQxSmhZVTFDZVRCVVYyeHdhRTlUTkd0Vk1UWk1aVWRRUlhSUE9VWjJSRWhwVnlZamVFRTdia05GTkRoVE1HMU5SblZoYW1KTlpWVXlNRkpVZWxRM1l6ZGlXbWhhV25WU1EweExkRXRuY0ZSaVRscHRhelZ0VFUxeWMxazJRVnB4T0doak1rRlVhVVZpV21sVFluZHBUWEphVHlZamVFRTdlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1YzUzNSYVkwSkRZbEU0TUdVeVZsTm5ka1ZyZFc5dlFVUnRTR3Q0VGxVMWMxZDJiVFJyTldkYVkweG9lWGx3VlRGNVFUTllUVVJLYVNZamVFRTdXVVJOYVVseWMyVlBXV3R6WW1aSVRYRkhOVUpJV0VscFJFMDFWVVJrVTJjeGVrdDRRbmhqYXpCcmRrZENjbTAwTURCeFpHWnJTMVo1T1dNMlJGUmFia2RLVlRGWGNIcGxXV00zUmlZamVFRTdSWGgzVmtoVVRtaEVUM3BCVWtOWFVtSjBiVkZOZWsxU1dDOXZNRzUwYkdkNlNqUkhkakJaWmtSRU5Ia3JSekVyYVhvMFdTdE5kbWh5YkRCekswZEJOV3NyUjJvMFRsQmhieko1YlNZamVFRTdWMVp6UlVVMWMySkZhVzB5V1dWVVNUVkZTVTFxTURZeVNYQjBiWFo1ZW1OeFJWZFJNbk5rUzFwblZFeHJlRU5hVW1waVRXTjBiMVpqWjNsa2FYSnpWbVJwY25OV1pHbHljMVprYVNZamVFRTdjbk5XWkdseWMxWlZjRkowYTFORlJrcGtWRWgzYmt0d1VtTllTMWRIWVc5VFF6SlpiVk5FY21OcmJVOVlSWGhFU0daTlJFcHFZMk0xUm5GWWFFaG1UVmRYU201SVRYRnBLekkyTlNZamVFRTdXRFJVV2pSNWFreGtNVGMxV2tkRVExZFdRVlI1TVhwTmVHSlBVRXRUUTJNeFQySk1SbXR3Y0VwaWFWaG1UbTVwZW05VVYzcG5OVlY2V1ZrNVVUTlJWSFV4YzA5UlJ6SmFWV00zYkNZamVFRTdVV2xxYXpCeGJ6WmFXVTAzWTAxaEx6bEZaalZQVXpoa2JEUmlkakJTTjFrclQzWm9jbXd3YWpKM1NFOXVkekJXUm5CV1JEQjVkVmRhYlUxaFdUSXlibFUzV21wNmVYUnJXVXAwWVNZamVFRTdNblpIYlRKWmN6VjBPRmx3YmtSR1ZFMWhVbUpSUlZOdmVXOXpNU3RDVEhOV1pHbHljMVprYVhKelZtUnBjbk5XWkdseWMxWmthWEY1VkhCblVWVnVNVVpMY1dObldFWjVhR2hsY2lZamVFRTdlRzF5V21wNlJIRTRiMWxzWlRGRVNFMVRZMWhEYTFWRFdsTk5lSEJSVW5oUEszTkllSGxJUVc1cFYyMWpia05KYnpSc1NqTnliSE5YU2t0dFpEaDJha3BEZEVGMmVGcHNVWGxMYmlZamVFRTdLMjVSTVhCMGJXSkVTek0wZDNsMlZISk5SVVJpVFhGUFZqSkhTMHRrVVRabFMyUk5jMGRXZWtKQ1YwZHVSSGQzSzB0NU5FY3ZNR05RUkVRMGNUaEVXVEEwWlVkRWVGVTRRM0ZzWnlZamVFRTdRako1U25sd05FVlNTR0ZCWkhOeVRUSlphV2x2TkVGTmNrMXRVVU5KVm1GYVYxTjZXR2RaUlhRMFJtUnBjbk5XWkdseWMxWmthWEp6Vm1ScGNuTldaR2x5YzFaWGRVNXpWVXBrWmlZamVFRTdVakZWTlVWMFIxRk5VekZsTXlzeGJFMW5Oak5PUm1obGNGRXdXVFZxVkVSeVdtaEtjRlpKVDFrNFp6RnhTa3A1ZFd4WGF6UXdjbkUwVm1KVlZrOVVRMjk1TVdweGQzazJRMmhzUnlZamVFRTdhekk1WVZwc1VVeHNOR2Q2VUZNM1kyTldNbnBKYVZoYU5HOXdPVVJCUzJSTmN6UnVUV2xHWWpCR09FMVFSWHB3TTI5cVNHbFhiUzlTU0docWVFeFVXV2xIUkdsVVV6UlNha0poTUNZamVFRTdka00wVEZNeVFtZFRNMmx5YzFaa2FYSnpWbVJwY25OV1pHbHljMVprYVhKelZtUnBjbk5XWVVsNFZrUllSV1pKU0VGWGRWRlRSRlZ5U1hOSGVYRlVhRFZOVm5OUE1XSlVWek5QV1NZamVFRTdPRE5ZV2sxQ1dYcGtNbFJMWTNnMVQweE1SbE5ZVUVWUlkzSk1XSGR4V2tKM1NYQnpTMVJwZEVzNFRVSlpOVWxOYUVNd05EQXZWREphYUd3d1Z6WkhSV3hzSzJ4aFkzZEJObHByZUNZamVFRTdZemRHWjFwYVdWZDRWbEpzTkdSb2FtaFRZWGh3VVZwT2VVRkdVMjFMV0ZWM2NHUlVSbGhWZDBzelZFWllXWEUzUmxoWmNUZEdXRmx4TjBaWVdYRTNSbGhaY1RkR1dGbHhOMFpZV1NZamVFRTdjVGRHV0ZseGMyUmhha0ZuY0daa1VWWkNNbmxLUkZaSlRXSXhUM2x4UkhSc1JXOTFTbXRuZUZoVllrRTNOMXBxZVdrMFQxTkRVVE5HYjFGbGJWWkZUMDVMUzBWaE0yRjJWRWt3TVNZamVFRTdPRXMxVEZwcFpXMU9Ta1ZWZVhNM1NtbFNkR3huYVROUlozbFVWRXhCTVVjeVdGSnBOV1ZQUkVzNVVIUmhTMDV6ZVVsb2VtOVNWSGt6YW05Q2JHOUVhMUpEUzBGNVZFNTJSa3h6VmlZamVFRTdaR2x5YzFaa2FYSnpWbVJwY25OV1pHbHljMVprYVhKelZtUnBjbk5XWkdseWMxWmthWEp6Vm1ScGNuTldZVWw0VmxOcmFuRk5RbGxyU2xwbFYyZFpTR0pMZVVkdFZWVm5kamxPY2lZamVFRTdXR0pMY0ZKalYyVk9TVXgyVTNSNmRHeEtaelJ6YzFOWWRuQktjakI1U0VFeGJrVnhVVFpUWVdwaVEwbEtSMHBPTjB4VGNVVmlXbHBIUkdaRVIzbERlREF2YWxSaVRHOTRZM0ZGUlNZamVFRTdPSFJ5WTB0UGJWZG5UMVJIUzA1U1lVUktUbWRZTkZWMWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmlZamVFRTdiMnBHUTJwTVJVUm5jRUpEUVhWTVRVMVBiVkZKWVhCUlV6Sm1WRUZVTUhsQ2FUQnVSMmN5TUdkV05scElaMWxsUlhGU05sTkJaVzFKWjJ0WmEyWmlObU5HY0hScmVFWjBha0pOYnlZamVFRTdURmxNTW5sWlJHRkpiM1JGYjAxck1rRkxaMGRHVEhOV1pHbHljMVprYVhKelZtUnBjbk5XWkdseWMxWmthWEp6Vm1ScGNuTldaR2x5YzFaa2FYSnpWbVJwY25OV1pHbHljMVprYVNZamVFRTdjbk5XWVVsNFZsbDVRVFJGVlhCT1FVUXlkMVY0Y0ZST2NYWm9hbE5QUm5SaVdtWkVSMncwVmxaSlVVOHlSMjFXUzI5VlJFWkxObTFHVEhOV1pHbHljMVprYVhKelZtUnBjbk5XWkNZamVFRTdhWEp6Vm1ScGNuTldaR2x5YzFaa2FYSnpWbVJwY25OV1pHbHljMVprYVhKelZtUnBjbk5XWkdseWMxWmtWRVpYY1ZseE4ybE5WbVI0ZUZaMWJVdDFlRll5UzNWNFZqSkxkWGhXTWlZamVFRTdTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5U3lZamVFRTdkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFNZamVFRTdlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUNZamVFRTdWakpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmlZamVFRTdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWlZamVFRTdTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5UzNWNFZqSkxkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5U3lZamVFRTdkWGhXTWt0MWVGWXlTM1Y0VmpKTGRYaFdNa3QxZUZZeVMzVjRWakpMZFhoV01rdDFlRll5UzNZdkwxbzhMM2h0Y0VkSmJXYzZhVzFoWjJVK0NpQWdJQ0FnSUNBZ0lDQWdJQ0FnSUR3dmNtUm1PbXhwUGdvZ0lDQWdJQ0FnSUNBZ0lDQThMM0prWmpwQmJIUStDaUFnSUNBZ0lDQWdJRHd2ZUcxd09sUm9kVzFpYm1GcGJITStDaUFnSUNBZ0lDQWdJRHg0YlhBNlRXVjBZV1JoZEdGRVlYUmxQakl3TWpVdE1EWXRNalZVTVRFNk1UZzZNakV0TURjNk1EQThMM2h0Y0RwTlpYUmhaR0YwWVVSaGRHVStDaUFnSUNBZ0lDQWdJRHg0YlhBNlRXOWthV1o1UkdGMFpUNHlNREkxTFRBMkxUSTFWREU0T2pFNE9qSXhXand2ZUcxd09rMXZaR2xtZVVSaGRHVStDaUFnSUNBZ0lDQWdJRHhwYkd4MWMzUnlZWFJ2Y2pwSmMwWnBiR1ZUWVhabFpGWnBZVWx1YzNSaGJuUlRZWFpsUGtaaGJITmxQQzlwYkd4MWMzUnlZWFJ2Y2pwSmMwWnBiR1ZUWVhabFpGWnBZVWx1YzNSaGJuUlRZWFpsUGdvZ0lDQWdJQ0FnSUNBOFpHTTZabTl5YldGMFBrcFFSVWNnWm1sc1pTQm1iM0p0WVhROEwyUmpPbVp2Y20xaGRENEtJQ0FnSUNBZ0lDQWdQSGh0Y0UxTk9rUmxjbWwyWldSR2NtOXRJSEprWmpwd1lYSnpaVlI1Y0dVOUlsSmxjMjkxY21ObElpOCtDaUFnSUNBZ0lDQWdJRHg0YlhCTlRUcEViMk4xYldWdWRFbEVQbmh0Y0M1a2FXUTZaR0l3T0dNNE1XRXRNMlExTXkwME0yVmlMVGczTnpVdFpEWTBOMkl4TWpVek1HTTFQQzk0YlhCTlRUcEViMk4xYldWdWRFbEVQZ29nSUNBZ0lDQWdJQ0E4ZUcxd1RVMDZTVzV6ZEdGdVkyVkpSRDU0YlhBdWFXbGtPbVJpTURoak9ERmhMVE5rTlRNdE5ETmxZaTA0TnpjMUxXUTJORGRpTVRJMU16QmpOVHd2ZUcxd1RVMDZTVzV6ZEdGdVkyVkpSRDRLSUNBZ0lDQWdJQ0FnUEhodGNFMU5Pazl5YVdkcGJtRnNSRzlqZFcxbGJuUkpSRDU0YlhBdVpHbGtPbVJpTURoak9ERmhMVE5rTlRNdE5ETmxZaTA0TnpjMUxXUTJORGRpTVRJMU16QmpOVHd2ZUcxd1RVMDZUM0pwWjJsdVlXeEViMk4xYldWdWRFbEVQZ29nSUNBZ0lDQWdJQ0E4ZUcxd1RVMDZTR2x6ZEc5eWVUNEtJQ0FnSUNBZ0lDQWdJQ0FnUEhKa1pqcFRaWEUrQ2lBZ0lDQWdJQ0FnSUNBZ0lDQWdJRHh5WkdZNmJHa2djbVJtT25CaGNuTmxWSGx3WlQwaVVtVnpiM1Z5WTJVaVBnb2dJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQThjM1JGZG5RNllXTjBhVzl1UG5OaGRtVmtQQzl6ZEVWMmREcGhZM1JwYjI0K0NpQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lEeHpkRVYyZERwcGJuTjBZVzVqWlVsRVBuaHRjQzVwYVdRNlpHSXdPR000TVdFdE0yUTFNeTAwTTJWaUxUZzNOelV0WkRZME4ySXhNalV6TUdNMVBDOXpkRVYyZERwcGJuTjBZVzVqWlVsRVBnb2dJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQThjM1JGZG5RNmQyaGxiajR5TURJMUxUQTJMVEkxVkRFeE9qRTRPakl4TFRBM09qQXdQQzl6ZEVWMmREcDNhR1Z1UGdvZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBOGMzUkZkblE2YzI5bWRIZGhjbVZCWjJWdWRENUJaRzlpWlNCSmJHeDFjM1J5WVhSdmNpQXlPUzQySUNoTllXTnBiblJ2YzJncFBDOXpkRVYyZERwemIyWjBkMkZ5WlVGblpXNTBQZ29nSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0E4YzNSRmRuUTZZMmhoYm1kbFpENHZQQzl6ZEVWMmREcGphR0Z1WjJWa1Bnb2dJQ0FnSUNBZ0lDQWdJQ0FnSUNBOEwzSmtaanBzYVQ0S0lDQWdJQ0FnSUNBZ0lDQWdQQzl5WkdZNlUyVnhQZ29nSUNBZ0lDQWdJQ0E4TDNodGNFMU5Pa2hwYzNSdmNuaytDaUFnSUNBZ0lEd3ZjbVJtT2tSbGMyTnlhWEIwYVc5dVBnb2dJQ0E4TDNKa1pqcFNSRVkrQ2p3dmVEcDRiWEJ0WlhSaFBnb2dJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdDaUFnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FLSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUFvZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0NpQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQUtJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQW9nSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnQ2lBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBS0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lBb2dJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdDaUFnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FLSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUFvZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0NpQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQUtJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQW9nSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnQ2lBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBS0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lBb2dJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdDaUFnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FLSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnSUNBZ0lDQWdJQ0FnQ2p3L2VIQmhZMnRsZENCbGJtUTlJbmNpUHo3LzRBQVFTa1pKUmdBQkFnRUFTQUJJQUFELzdRQXNVR2h2ZEc5emFHOXdJRE11TUFBNFFrbE5BKzBBQUFBQUFCQUFTQUFBQUFFQUFRQklBQUFBQVFBQi85c0FoQUFLQndjSENBY0tDQWdLRHdvSUNnOFNEUW9LRFJJVUVCQVNFQkFVRkE4UkVSRVJEeFFVRnhnYUdCY1VIeDhoSVI4ZkxTd3NMQzB5TWpJeU1qSXlNakl5QVFzS0Nnc01DdzRNREE0U0RnNE9FaFFPRGc0T0ZCa1JFUklSRVJrZ0Z4UVVGQlFYSUJ3ZUdob2FIaHdqSXlBZ0l5TXJLeWtyS3pJeU1qSXlNakl5TWpMLzNRQUVBQjcvN2dBT1FXUnZZbVVBWk1BQUFBQUIvOEFBRVFnQnpRSFlBd0FpQUFFUkFRSVJBZi9FQWFJQUFRQUJCUUVBQXdFQUFBQUFBQUFBQUFBSEFRSURCQVlGQ0FrS0N3RUJBQUVGQVFBREFRQUFBQUFBQUFBQUFBVUJBZ1FHQndNSUNRb0xFQUVBQVFJQUFRSUNQbHNBQUFBQUFBQUFBZ0VERVJJeEJCTUZCZ2NJQ1FvVUZSWVhHQmthSVNJakpDVW1KeWdwS2pJek5EVTJOemc1T2tGQ1EwUkZSa2RJU1VwUlVsTlVWVlpYV0ZsYVlXSmpaR1ZtWjJocGFuRnljM1IxZG5kNGVYcUJnb09FaFlhSGlJbUtrWktUbEpXV2w1aVptcUdpbzZTbHBxZW9xYXF4c3JPMHRiYTN1TG02d2NMRHhNWEd4OGpKeXRIUzA5VFYxdGZZMmRyaDR1UGs1ZWJuNk9ucThQSHk4L1QxOXZmNCtmb1JBUUFBQXdBQkFRT0NGd0FBQUFBQUFBQUJBZ01SSVFReFlRVUdCd2dKQ2hJVEZCVVdGeGdaR2lJakpDVW1KeWdwS2pJek5EVTJOemc1T2tGQ1EwUkZSa2RJU1VwUlVsTlVWVlpYV0ZsYVltTmtaV1puYUdscWNYSnpkSFYyZDNoNWVvR0NnNFNGaG9lSWlZcVJrcE9VbFphWG1KbWFvYUtqcEtXbXA2aXBxckd5czdTMXRyZTR1YnJCd3NQRXhjYkh5TW5LMGRMVDFOWFcxOWpaMnVIaTQrVGw1dWZvNmVydzhmTHo5UFgyOS9qNSt2L2FBQXdEQUFBQkVRSVJBRDhBbVlBQUFBQUFBQUFBQUFBQUFBQUFBQUFBRkFBQUFVd2lxcW1GVENZUXNLNFZNS21Fd3FLMkZjSmhXNFRDRmhjWVZ1RXdoWVhZVmNLekNyaEN3dXdpbUVWVXNMaFRDQXFBS0tpZ0NvQUFBQUFBQUFBQUFBQVAvOUNaZ0FBQUFBQUFBQUFBQUFBQUFBQUFBVUFBQVVGQlZWVENwaFVyVlJXd3JoVXdyYTFXMWtMb1FYMWt0eFN5c2x0WnFXVjBKV1RGR0tZSzNGTW1LV1YxNEdmRks0cHJaTlZ5WVdTOERZeFM3Rk5hbHhmU2F0bFNNalBTcXRLc05KTDZTTEsyTXJKaFZXVXF1cFZWWkdDNVZhcXFvcUFBcW9xS0FBQUFBQUFBQUFBQVAvL1JtWUFBQUFBQUFBQUFBQUFBQUFBQUFCUUFGRlZLaXFpbGFsYXJhMVVWaEFyVmJXU2xaTWNwcVdYcENWZFdUSEtiSE80d3p1cll4ZXNzak5LNHhTdXRlZDVnbmY1RmJHWjd5MFc1VzhzcmZhTXNpT1JZNjVFY2l0dkU5WVVMZzlISjZ0TDd5ODFISXEweUk1RlM4YTY4aTRQVnBlWkkzWGxSeUk1Rm1oZjVGV0V6em1vdlVqY1pZemVkQzgySVhGOElzZWVuWWJ0Skw2VmEwSnMwWkw0UmVNMHJMU3E1anBWZlNxcnpqQmNxdFZWV3FnQ2lvQUFBQUFBQUFBQUFQLy9TbVlBQUFBQUFBQUFBQUFBQUFBQUFGQUFVRlNxbFNxMnRWRllLVnFzbFZXVldHY2xJeGVrc0NVMkNkeFM1Y2F0MjZzakZrU1U3SzY1ZGExeTh4WGJ6VHUzK1JlYzB6TXAwV2U1ZjVGcnp5STVGcTNML0FDTFduZmVVWjJiSlFia3NpT1JZNjVFY2kwWlgyT3Q1Wkdka1MwSG9acU9SVnBrUnlMek1uSzB2S1hpWFhrUFdoa1J5TFp0NUVQRmhlYkZ1OHZoTThaNkQzTFY3a1czYXU4aThTemViOW02OVpabURWcFdIcjI3alloSjV0cTQzTGMzckNMQXFTV0c1R3ErbFd2R1RMR1MrREhtZ3pVcXJSanBWZlNxNTV4WEtyYVZWRkZWVkFVVkFBQUFBQUFBQUIvL1RtWUFBQUFBQUFBQUFBQUFBQUFBQlJWUUJTcXEydFJWU3RWa3FycFZZcHlXeGl2bGd0bkpyWEpycmx4cDNycXlNekpweVdWTHQxbzNyeGZ2UFB2WDNqTk1rS05GZGV2dEs3ZjVGWmR2Tk81ZWVNMHlTcFVXVzVlYTg3ckZPNHgxbTg0ek11V215U3VMSzNHT3NsdUtXMlhyQ1JteFpTYkRpakNXVmJ3dHFOeHNXN3JRakptaE5kQ0x5bmtlclp1dCt4ZHhualdwdCt4Y2U4a1VmWGtlMVp1TjIxTjVGbTQzN1Z4a3l3Uk5hRDBvVFpveWFOdWJZak42d2d3WjIzU1Mra210R2JKU2E2dzhveFo2VlhZV0drbDFKRmhiWlpjS3JIU3E2bFZMQXVGTUtxZ3FLQUtnQUFBQUEvOVNaZ0FBQUFBQUFBQUFBQUFBQUFVQUNxbGFxV1ZUQ3NyVld0V09VbHNabDBJS1NrMTdrMTA1dFM3ZGVVMVI3MDVMS3k5ZGFGKzh2djNYblg3enhtcUpHalNXWDcyTzgrOWRYWHJ1TzBydHg1Um5TbEdrcGN1TmFjeWMyS1Vsa1lzNlNRbEpiV3FsYXFMWHJDQmhNS2dMbFJSVUYxS3NzS3NWRjhWMHJ5bnR6YnRTYjFtVHo3ZFczYXF5cWNxT3RvamIzcVdadDYxY2VWYW0yN2R4bTA1RUxYbXQ3MUxkeG5qY2ViQzZ6eHVzaUZOSFR6UFJqY1pJM0hueHVzc2JxdDVieGpNOUNOeGZHYlJqZFpZM1ZzWkZMeE4yazE5Sk5TTnhrak5aR1ZXeTJhVlhVcXcwa3VwSlpHQ3NJc2lxMmxWY0tpcXFxZ29xcUFBQUQvOVdaZ0FBQUFBQUFBQUFBQUFBVUFCU3RWSXhDdFZsYWtxc2NwUEthZXd2aEJXVW1HY3ljMnRjdU1hZXJZZTBraWwyNDBiMTNIWDNyclF2M2NkaXpWbWRScE1kKzY4Ni9kWkw5MW9YcmkyOHl5bEtOSmp1M0dwT2ErNU5yeXFyQ0tRcHlXRkpWV1ZxcldxMWM5NFFGQUZ3QUFxb3JRZ3BGZFJmRlpSa2pSNnlTMlhoVm1zUVo3Ylp0MWEwR3hDcVFvMDBSYlRWdDdidHliTUp0S01tV00wbFNwSUt2VnRXOUc0eTB1dENseGZTNnlZVW1CUFVlakc4eVJ2UE5wZFh4dkt4cFBLTlI2a2J6TkM4OHFON2tXYUY3a1ZrMUpTOGIxbzNXYU54NWNMelloZGVFMU5mQ2Q2VWJqTEdiUWhkWjRYSGpOSTlJVE55a2w5S3RhTTJXTW5sR1ZmQ0xOU3FxeWxWMUtyTEM1VlZRVVZWQUIvL1dtWUFBQUFBQUFBQUFBQUFCUUZCU3EydFZhMVk1VmVjODFoZENDa3BNRTVycHlhMDVzS3RWc1BlU1V1VGFsMjR1dVRhZDI0amF0ZGwwNUZsNjQ4KzljeDJhOU5vM3A0N3d2TnN4U0ZHUmd2VGFWMmJOZGsxTGxYdkpHeWtxVXJIT1RGV3E2VldPckpsWmNzRktxS3FMbDRBcUFxQUswS1VYVW91bGhaZWMwMWdwUmxqUmJHakpHak1vMDdLUHRvcTJJUlpJc3NXT0srbFV2UW8yNUEyMVY3ZXpVcXVwSmh3cTRwSlU2U0ZyVmJNV2ZGbVRHdldaaTJSQ214SnAyMVM2dXBkYWVURmFYRmJ5M2xHZHZ4dk0wTDNJdk1wZFpZWFZrMU12RzlhRjVzMjd6eDRYV3pidlBDZWt2bG5leGJ1OGkycmQxNDl1OXlMYnQzV05QVGU4czcxWVhHZUUzblc3amF0ellzOGoybG1ic1pNbEt0YUVtV05YaE5CNndpelVWV1VxdVdMbFZWQlJWLy9YbVlBQUFBQUFBQUFBQUFGQUZLcXJhcll4Vmd0bFZobkpmS3JCT1RGcXoySVBTV0RIY2sxYmsyVzVKcTNKSW0yaXJiMlhUbFlyazJwZGt5M0pOVzVWRjFLbHF6S2NyQmRrMHJ0VzFkcTA3cXRPYXpGbjBvTlM3VnJUcTJialZtejZVV2ZUWXBNZFdTU3lyTGxaRUZvcUxseWlwZ1Z3Q2xsVEFyU2l1QmRTaTZFTEt5YWF3cFNpNmxGYVVYVW95cVZPeXc2MWFFSUZLTWxLS1VvdW9sTFo2TnV0RUpiVmJSYjdWZFJkaFdHRkwwYVZoQlcwVjdNWXI4S21LV1lWS3lac3NpTm5xV1YxWktWa3NySmJpbnJDVjR4bVpNV1l0aXhSaWxid3ZPTXpQU2ErTnhxMGt1cE5TTXFsNG05QzQyTGQxNTBiak5DNDhwcEY4Sm5xMjdyYnRYWGtXN2pidFhXTlVwdmFTZDdOcTYzTFZ4NDltNjNyVnhoVktiSmttZXBibTJJU2VmYW0yN2NtSlBLeUpZdHVOVjlLc01hc2xLdkNNSHJDTElLVUZpNS8vOUNaZ0FBQUFBQUFBQUFBRkZWQVVxdGt1cXNrODU0cm9NVTZ0ZTVWbm5WcTNLc0N2TmFQZVNEQmNrMUxrbWU1VnEzS29TMmllM3N5bkJoblZyVFo1MVlKbzJhYTFaY2tHdGNhdHlqYm5ScjNJdlduTXk2Y1dqY28xcDBidHlMWG5CSVVwMmJUbWFzcUxLMFo1UldWaXk1WjN2Q1ppd0dCa3hCaVY5NGwxNGxtQldrV1NrRjFJTG9Sc3ZPYXBDREhTSzZrV1NrRmNTeXFVbGxpVmE4SVpPc3BGV2xGK0pNQ1Z0bm9XNUVXMDIxVysxVUNxMnRVeFFvMkVEYlJiUlpzMnF1RlRDdHJWU3RVaEpKWVJkU3JaWFZrdHJWYldxbGF2YUVySGpNdXJWYldxbUZUQ3VzTEl4VndxWVZNSXJZVzJWY0t0SkxNS3BZVXNzbEpNc0o2RzFzSytNdERvcEdWV0VXL2JtMnJWeDUwSk5pM05qenlQV1daNnRtNDM3TnpHZVBhdU42emN4bUhWa1pNa3oyTE0yN2FtOHF6TnZXWnNDcEt5cEpub3drelJxMWJjbXhDckVtZ3lKWXMxRlZ0S3F2SmUvL1JtWUFBQUFBQUFBQUFBQlJWUUZLc2NtU3JISjVUcm9NTTJyY2JNMnJjUnR0R1RzaW0xYmxXcmNiTnhxM0VIYlJrN05wc0UyR1ZHYVRIS2lPbWphc21WZ2xSZ25GdFNveFNpdWttc1BlV1pwVGd3VGczNVFZcFcyWFRxc2lTZG9TdHJLMjI5VzBzcmFaTXRaN1FxdFBKWmt0dDVLTWx2V0ZXeXBHczFxVzExSU0rU3pFTXVqR3pGaTFiYUxHVHNPSU1TeTFvc3JSTTJ5MDdOaEUyMFcxMisxWTYwV1ZYeVk1VlQxczlHM0lXMmkybXpadFZ0YXJLMVZsVlpXcVRweVdFWlVxMlN0Vk1LbGFxWVh2Q0RIak1yV3FtRlRDTHJDeXlZVkFWVXNnQW9BQUt4cm9haFRIQm5qVm50eWEwYXMwS3ZLYUQwaEZ2V3BONnpMR2ViYXEzYk1zWmkxSVBlU0wxYkVub1daUEtzU2VqWXFqNnNHWFRpOUsxVnN3cTA3VlczYnF3WjRNcVdMWWlxdGl1ZUVYby85S1pnQUFBQUFBQUFBQUFGRlZBVXFza3ZxdGs4NTRMb05lZEd0Y28yNTBhMXlpUHRvbHRIdkpGcFhLTlc1UnUzSXRXNUZDVzBTMjltVTR0U1ZHT3RHZWRHS3RFWlBMYXNtV0xGV2kyc1dXdEZ1QjVQU0VXR3NWbFlOakVtSWVrc3k2RTdWcmJXMXROdkVLVmc5Wlo0cTNtMkdwa3BiVzIyNndXU2d5S2M4Ykx4cVY3RUxlMWF3V1ZvMkpVWUpwZTJXMWpCR1cwVzAyKzFZcE1VcXNrNnNNcXRsdGpsaGFJYXZiUkdPVHJKVllwVlh5cXhTcW5xRUlXSU1DZXJHS3l0VmxhcnFyS3M2V0R3akVGQjZMYklBS0FBQUFBQUJUSENnTWxHV0RGUmtnc21YUWJWcXJkczF4bWpiYnRuYUdOVWU4ajBiRlhvMks0enpyRDBiRzBJK3F5NmIwTExjdHRPeTI3YVBxTXVSc1JYTFlybmhGNndmL1RtWUFBQUFBQUFBQUFBQlJVQlJiVmNwVmJOQldEREtqQk9MWmxSaW5GaVZaTEwxbGkwYmtXdGNpMzdrV3RjZ2liYUtWdlpWT1pvVGl4U2kzSndZSlFSVldreVpabXRXSmdaYXhXNGxpUmtlbDRsbUpNU3Z3R0JTOEsyTTYzRXFZbGt3R0JmTEs4cHFqREtMRktMWnJGaW5GazA0V3JGcTFXcE9qV3VVYmx5TFd1UlM5c3NiRVlJdTJpZU5xMUpzRW14Y28xNTBiSmJIVXR5S3FUUnNzVW1PVEpKanFucUU5cEI0UmlzcXNxdnF0cWtKSXFMUlZSNndVQUFBQUFBQUFDbU9GTWNHU2pMQmlpelFXVEw0TmkwM2JOTVpwMnFONnpUR1l0U0wya2I5aWowYkZNWm9XS1BSc1V4a2ZWaXpLYmRzMGJsdHEycU51M1JnVkdWSXpSWHJZcm1QRjZ3Zi9VbVlBQUFBQUFBQUFBQUFBRkNvS0N5dEdPVVdhdEZ0YVBPZVd5dWhGcXppd1RnM1pSWVpRWVZXbFplMHN6Um5iWUpXMi9PRERLMmphdHM5d1pFdFJveWd4MWkyNXdZWlJZTTlCZmVZd1Zvb3ZsUlpWNHhwV0huTlZWTUNtRmRSUzhGaDR4cVdWdGFNY29zMkJTdEhwTGFQR2VObHFUaTFia0cvT0xYdVFadEdleEZoVm9QT3VSYTA0dCs1QnEzSXB1Mld0YmtkVmxhY3FNVXFOaWRHR1ZHdzJ6VmJjeG9zVlZ0YU1sYUxhMFMxS2V6QmF4aTZ0Rk1ESmhGVmFLNERBdnNxS0N1QlRBQUdBd0FCZ01BQlRITUNzYWFIUUdTTkdhRkZrYU0xdWp5bWk5SVFiRnFqZXMwYWxxTGZzUnhtSlZpOTVJTjJ4UjZObWpSc1J4bm8yYUkrckZtVTROdTFSdHdvMXJWRzFDakJuaXlaV1dLNVNLcnhpOVgvL1ZtWUFBQUFBQUFBQUFBQUFCUlVCUlN0RlJTTUZWbGFNY29zMkJiV2p6bWtzcXdpMTVRWVp3YmxZc1Vvc2FlalpYd25hTTROYTVGdjNJdFM3UmlWTFoxSnFyVG13MXF6WFdyT1REbm9QQ2FzdXhTNmttdmkxMUpzYWFuWVd3ck5tbFJpak5kU1R6dkRZWDNqaEVsUmd1VVpxMVlwMWVzbHBGNVZJd2kxTGtXbmRpM3JqVXVwSzJlZU1MREFyUWFWeWpCS2padU5hYWR0bHEyNWd6eFk2cmNDNnFpYW8xYlI1MlZNQmlWOUtMcVJaMGxWZkJoeEttSmJPSU1sdmFGUmRZYTJKcXBpYXRySlNtU3FycnhsNFd0aVRFdGpKVlRKVlZieHdMd3RiRW1KYkdTcW1TcWw0NEY0V0RFMVhRam9xak5rcXErRnJSVkZJemtKVkl3WjdjRjBiYlBidHZHYWQ2eXlxMm9OK3pIR1liVnR1MllNU3BPOTVKV3pZaTM3TVd0WmczclVXQlZtWmNrR3hibzJJVVliZEd4R2pEbml5SllMNkxsS0t2SmUvLzFwbUFBQUFBQUFBQUFBQUFBQUFVVkFVVXdLaWd0clJqbFJscXNrdGpLUmkxYmxHbGVvMzdsR2pmZVUwandxVFBQdmJTMHJrbTVmMmw1MTZyRXFVMkZVcVdGdFpsTGpYblBRMXVUR0pQU2VVSzFxM28zRjlMalFqZFpLWFdOTlNlMHRkdVZ1TEpUWU1tclpYRklVMTBheXR5VFZ1Vlh6dU5lNU5sMG9XR0pWcU1WeXJYblZsbkpyeXFsS0UxaXd3cDUxdFNpbGFsRXJTcXZLRXpMR2pMR0xIQnNXNHMyU3M5cElxeGd2cGJaSVFiRWJUM2hXWk1zTExWcFo1QlhKRGRwWlgwc0w0VlhyQ1I1MlNESkhJUFJ5UVpJNUJXODVXOHQ1MlNPUU0wL0lQUnlSeUJrZ3ZPTHkzbjB5SDVCZEd3MzhrTHFXT1FValdJVTJuR3l6UXRObU5qa0dhRm5rSG5OVlh3a1lyZHB1V3JhdHUwMmJkdGp6MUh0TEl1dFFiZHVLeTNCc3dpeEo1bVJMQmZDak5HaXlOR1dsR1BORjZ3Z3VvQ3F4Yy8vOWVaZ0FBQUFBQUFBQUFBQUFBQUFBRkZRRktySkw2ckpDa1d2Y2FOL2FXL2NhVitpeU1HTlVlVmtSdEx6YjlYcVpFVXgzbDVFVXgzalBLamEwV2pja3hWbXV1dGFVbU5OSXdwcDdFV2VseGZTNjA4V3JTNDhacWFzS3pjeWFWdXRUSmhreGJlV3V2UFo1WEdHYzJPdHhaS2IwbGtzUEtlclpWbkpobFZXVW1PdFdWSmFNZWFkWEN1aXg0VjhXVkpQWVd3bVo3YmJ0VWExcWpkczBaTWxWbFVvdG0xQnQyN1RIWmhqTisxYmU4dFZJVW9XVmtiTEpTdzJZV21hTmw2UXFzdVdSbzVJNUJYSkhJTitsbFhKS3Q1cSs4dDUyU09RVnlROURKSmtrdk5MeTJoa2hXbGprRzlrbGRTeXBlYVhsdEtsbmtHU05sdDB0THFXbHNhcTZFakJDMHp3dHNrYmJMR0R5bW5Yd2xXd2d6UmlSaXlVaThacG5wQ0JHaStsQ2xGVmtZcjRLMEFXcXYvMEptQUFBQUFBQUFBQUFBQUFBQUFBQUJSYkpjdHFLUllMbEduZW8zcDBhdDZLMkx3cVFlVGtSSEhlVmtSRjdXUkVjZDVXUk1NZDV6UVJ0ZVY1RjZtTzA1dlF2eHgyaGRvOG93UmRXMFlLeVV4YWtsbGFySXlzZU16Sml6RnNPS01VdHZDWGpaS3pVckpqeFNtRldFcTJNNjZ0Vk1LM0NMNExieExxTWtHT2pOQ2owaEZkSzJMVkhvV0l0T3pGNk9ROGNaNlN6TXlqQnZXSVl6MGJNR3BrUERHZWxaZzlvVEpXakt5MjdiUEcycmJob1RZakJmQ2RueVNzTkxaa3RzVWdyaUZieHI3d3RmSlprdHNZZ3hCZU5XOExYeVdya3RueEN1Skx4bDRXQ2x0ZFNETGlWY1NwZUpXOExIU0M2a1YrSlhZRnNabGJDMmtWMUtLNEJiWlZGUVVWRlFCLzlHWmdBQUFBQUFBQUFBQUFBQUFBQUFBVVVxcVZCaWxScjNZdHFWR0c1UlNMeW5nOHkvREhlWmtSYngzdFhvWTd6c2lMYXlNR0RXa2VGa1JieDNuWG9QYXlJdDQ3emI5dkhlY1lJcXRJOHU1RmhrM0xzR3RPS3lNR0JQQ3d3MVV3cnEwV3FXSGxFVUFVRmFGS0xxVVZWZ3VqUm50eFk0UmJkcUdNckI3U1NzOWlEMDhoNE5TeGJlcGtQYmVrRWhRa2JtUThNWjZObURWc1F4bm9Xb3ZTQ1dveXMxdUxQR0t5RkdXbEYxbG1Td01DdUJYQXFyWlhyY0JnWEJaRnVBd0xnc2kzQXJnVkFVd0tnb3FBcUNpb0FBQS85S1pnQUFBQUFBQUFBQUFBQUFBQUFBQUZGVkFVclJpblJtcXNsUVd4ZzA3c0dsZnR2VG5GcTNZTFlzZXBKWmVKa1JheDNtWDdPTzkrL2FlZGZzckl3UnRhazhHOWFhZHkyOW0vWmFOMjBzakJHMWFielpRWTZ4Yms3YkRLMnRZczBqQmdNRExpQ2tGRnQ0VmxJc2tZTG8yMmVGcFZmTElwYnR0MnphVXRXbTlZczR5NkVHVlNwc21ROW5HZW5rUGFZYkZsNk5tMnZoQkowYWJOWnQ0emR0eFlyVUcxQ0srQ1JweTJGOGFMNlVVcFJjdVpFSUFxQ3FncUFvS2dBQUFBQUFBQUFBUC85T1pnQUFBQUFBQUFBQUFBQUFBQUFBQUFBVVVyUlVCaWxSZ3VRYlZhTWNvcVBPYUR6N3R0b1hyTDJMa0dwZHRMWXdZdFNuWmVIZXNOQzdZZS9kc3RLN1k1QmJHREFxMFhoWExEWGxaZXpjeUg1QnJ6eUg1QlpZWVU5RjVkYkpTeTlHdVEvSUZNaCtRTER6dkphVUxMWnQyR3pESWZrR3pieUg1QldFSHJKUlliTmprRy9aczR5KzFZNUJ1V3JQSUxvUVp0S2lXYlRldFcxdHEwMm9RWHdnejZkT3d1aEZtalJTTVY5S0tzcVdDdEZSVlZlQUFBQUFBQUFBQUFBQUFBQS8vMUptQUFBQUFBQUFBQUFBQUFBQUFBQUFBQVVWQVVxdHJSY3BVVVlaUllaMjIzV2pIS0tpeWFXeTgrNWFhdHl3OVdVR0dkcFNNR1BQVHN2SG5rUHlEQkxJZmtIc1Nzc1VySElMYkRIbW9QSXJrTnlDdE1odVFlcFhJZmtDbGprQ3c4N3lHaERJZmtHZTNrUHlEY2pZNUJsalpMRDFsb3NGdXp5RFp0Mm1TRnBtakJkQ0RJa3AyRnNJTTBZcXhpdnBSVjd5eWxLTGdWWGlvQ29BQUFBQUFBQUFBQUFBQUFELy8xWm1BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFVVkFVVzFvdUJSanJGWldETmdVclFVaksxcTIxbGJUYXJGVEVLV0ZrWkdya29wYWJXSU1RV0ZMd05lbHBmUzJ6WWxXa1N3ckNSWlNDK2tWYVVWd0tyNFFLVVZBWENvQUFBQUFBQUFBQUFBQUFBQUFBQS85YVpnQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUZGUUZCVUJUQXBnVkFVd0dCVUZGTUN1QUJVRlFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBSC8vWG1ZQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFILy8wSm1BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUIvLzlHWmdBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQWYvL1NtWUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBSC8vMDVtQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCLy85az0iIHdpZHRoPSI0NzIiIGhlaWdodD0iNDYxIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMTg3LjIgLTk1LjgxKSIvPjxnIHN0eWxlPSJjbGlwLXBhdGg6dXJsKCNjbGlwcGF0aC0xKSI+PHBhdGggZD0iTS0zMjEuOTggOGgyMjEuOTZ2MjIxLjk2aC0yMjEuOTZ6IiBzdHlsZT0iZmlsbDp1cmwoI3JhZGlhbC1ncmFkaWVudCkiLz48L2c+PHBhdGggZD0iTTE2NC45MyA4Ni42OGMtMTMuNTYtNS44NC0yNS40Mi0xMy44NC0zNS42LTI0LjAxLTEwLjE3LTEwLjE3LTE4LjE4LTIyLjA0LTI0LjAxLTM1LjYtMi4yMy01LjE5LTQuMDQtMTAuNTQtNS40Mi0xNi4wMkM5OS40NSA5LjI2IDk3Ljg1IDggOTYgOHMtMy40NSAxLjI2LTMuOSAzLjA1Yy0xLjM4IDUuNDgtMy4xOCAxMC44MS01LjQyIDE2LjAyLTUuODQgMTMuNTYtMTMuODQgMjUuNDMtMjQuMDEgMzUuNi0xMC4xNyAxMC4xNi0yMi4wNCAxOC4xNy0zNS42IDI0LjAxLTUuMTkgMi4yMy0xMC41NCA0LjA0LTE2LjAyIDUuNDJDOS4yNiA5Mi41NSA4IDk0LjE1IDggOTZzMS4yNiAzLjQ1IDMuMDUgMy45YzUuNDggMS4zOCAxMC44MSAzLjE4IDE2LjAyIDUuNDIgMTMuNTYgNS44NCAyNS40MiAxMy44NCAzNS42IDI0LjAxIDEwLjE3IDEwLjE3IDE4LjE4IDIyLjA0IDI0LjAxIDM1LjYgMi4yNCA1LjIgNC4wNCAxMC41NCA1LjQyIDE2LjAyQTQuMDMgNC4wMyAwIDAgMCA5NiAxODRjMS44NSAwIDMuNDUtMS4yNiAzLjktMy4wNSAxLjM4LTUuNDggMy4xOC0xMC44MSA1LjQyLTE2LjAyIDUuODQtMTMuNTYgMTMuODQtMjUuNDIgMjQuMDEtMzUuNiAxMC4xNy0xMC4xNyAyMi4wNC0xOC4xOCAzNS42LTI0LjAxIDUuMi0yLjI0IDEwLjU0LTQuMDQgMTYuMDItNS40MkE0LjAzIDQuMDMgMCAwIDAgMTg0IDk2YzAtMS44NS0xLjI2LTMuNDUtMy4wNS0zLjktNS40OC0xLjM4LTEwLjgxLTMuMTgtMTYuMDItNS40MiIgY2xhc3M9InN0MCIvPjwvZz48L3N2Zz4="
+const BRAND_QWEN_DATA_URI = "data:image/png;base64,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"
+const BRAND_KIMI_DATA_URI = "data:image/webp;base64,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"
+const BRAND_GLM_DATA_URI = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHkAAABoCAMAAADirq9FAAAAPFBMVEVHcEz///////////////////////////////////////////////////////////////////////////+PybD1AAAAE3RSTlMA70Bvn2B/3yCAEJBwv6+PUDDPS578hAAAATtJREFUaN7t2t1ugkAURWH5c4ACauf937VJ06moV2dtOonpPveHJZBPSPR0+p8zZT5tOciWYnMTy1MJn9EiL6cSHtkiLjfjT3hObBGXl3LKF7hIy30JD3QRllO51mOCi7R8LfsrlQjLIiheVkHxsgoKl2VQtPwhg4Ll3zAH9T1L7CmzTvd1DkocAZQ2CihtEpQojwRKGQ2UcpM1UMJs9NFmUAZlUAZlUAb1p6D64CkPR4U7+npsUO/z5XUNhjeDMiiDMiiDMqgqoNpgeDWoNwTVBK/1bFAGZVAGZVAGZVAGZVAGZVAGZVBxUPMS/OfjchCoLviRn0lgUNHF5zIG1WatjEFFF1/KGFSftTL+za/LWhmDGhuxjEGlrJVrgno4wC2496mA2pfrgtqX64LalTGoIWvl2qCOfYlC8wVuwdhr5LAzqAAAAABJRU5ErkJggg=="
+
+export function ProviderLogo({
+  provider,
+  model,
+  className = '',
+}: {
+  provider?: string
+  model?: string
+  className?: string
+}) {
+  const m = (model || '').toLowerCase()
+  const p = (provider || '').toLowerCase()
+
+  // 1. Kimi (月之暗面官方原版 WebP)
+  if (m.includes('kimi') || p === 'moonshot') {
+    return (
+      <img
+        src={BRAND_KIMI_DATA_URI}
+        alt="Kimi"
+        className={cn('size-4 shrink-0 object-contain inline-block align-middle select-none', className)}
+      />
+    )
+  }
+
+  // 2. 通义千问 Qwen (阿里官方原版多棱花标)
+  if (m.includes('qwen') || p === 'qwen' || p === 'alibaba') {
+    return (
+      <img
+        src={BRAND_QWEN_DATA_URI}
+        alt="Qwen"
+        className={cn('size-4 shrink-0 object-contain inline-block align-middle select-none', className)}
+      />
+    )
+  }
+
+  // 3. 智谱 GLM (官方原版 "Z" 标原装微图，自适应暗色反相，支持 OX-ALPHA 别名)
+  if (m.includes('glm') || m.includes('ox-alpha') || p === 'glm' || p === 'zhipu') {
+    return (
+      <img
+        src={BRAND_GLM_DATA_URI}
+        alt="GLM"
+        className={cn('size-4 shrink-0 object-contain inline-block align-middle select-none invert dark:invert-0', className)}
+      />
+    )
+  }
+
+  // 4. Anthropic Claude (官方原版代码与原装陶土色)
+  if (p === 'anthropic' || m.includes('claude')) {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-label="Claude"
+        className={cn('size-4 shrink-0 inline-block align-middle select-none', className)}
+      >
+        <path
+          d="M11.376 24L10.776 23.544L10.44 22.8L10.776 21.312L11.16 19.392L11.472 17.856L11.76 15.96L11.928 15.336L11.904 15.288L11.784 15.312L10.344 17.28L8.16 20.232L6.432 22.056L6.024 22.224L5.304 21.864L5.376 21.192L5.784 20.616L8.16 17.568L9.6 15.672L10.536 14.592L10.512 14.448H10.464L4.128 18.576L3 18.72L2.496 18.264L2.568 17.52L2.808 17.28L4.704 15.96L9.432 13.32L9.504 13.08L9.432 12.96H9.192L8.4 12.912L5.712 12.84L3.384 12.744L1.104 12.624L0.528 12.504L0 11.784L0.048 11.424L0.528 11.112L1.224 11.16L2.736 11.28L5.016 11.424L6.672 11.52L9.12 11.784H9.504L9.552 11.616L9.432 11.52L9.336 11.424L6.96 9.84L4.416 8.16L3.072 7.176L2.352 6.672L1.992 6.216L1.848 5.208L2.496 4.488L3.384 4.56L3.6 4.608L4.488 5.304L6.384 6.768L8.88 8.616L9.24 8.904L9.408 8.808V8.736L9.24 8.472L7.896 6.024L6.456 3.528L5.808 2.496L5.64 1.872C5.576 1.656 5.544 1.416 5.544 1.152L6.288 0.144001L6.696 0L7.704 0.144001L8.112 0.504001L8.736 1.92L9.72 4.152L11.28 7.176L11.736 8.088L11.976 8.904L12.072 9.168H12.24V9.024L12.36 7.296L12.6 5.208L12.84 2.52L12.912 1.752L13.296 0.840001L14.04 0.360001L14.616 0.624001L15.096 1.32L15.024 1.752L14.76 3.6L14.184 6.504L13.824 8.472H14.04L14.28 8.208L15.264 6.912L16.92 4.848L17.64 4.032L18.504 3.12L19.056 2.688H20.088L20.832 3.816L20.496 4.992L19.44 6.336L18.552 7.464L17.28 9.168L16.512 10.536L16.584 10.632H16.752L19.608 10.008L21.168 9.744L22.992 9.432L23.832 9.816L23.928 10.2L23.592 11.016L21.624 11.496L19.32 11.952L15.888 12.768L15.84 12.792L15.888 12.864L17.424 13.008L18.096 13.056H19.728L22.752 13.272L23.544 13.8L24 14.424L23.928 14.928L22.704 15.528L21.072 15.144L17.232 14.232L15.936 13.92H15.744V14.016L16.848 15.096L18.84 16.896L21.36 19.224L21.48 19.8L21.168 20.28L20.832 20.232L18.624 18.552L17.76 17.808L15.84 16.2H15.72V16.368L16.152 17.016L18.504 20.544L18.624 21.624L18.456 21.96L17.832 22.176L17.184 22.056L15.792 20.136L14.376 17.952L13.224 16.008L13.104 16.104L12.408 23.352L12.096 23.712L11.376 24Z"
+          fill="#d97757"
+        />
+      </svg>
+    )
+  }
+
+  // 5. Google / Gemini (官方 4 色 G 或极光 Sparkle)
+  if (p === 'google' || p === 'gemini' || m.includes('gemini')) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-label="Google"
+        className={cn('size-4 shrink-0 inline-block align-middle select-none', className)}
+      >
+        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
+        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z" />
+        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z" />
+        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
+      </svg>
+    )
+  }
+
+  // 6. DeepSeek (官方原版代码与原装科技蓝)
+  if (p === 'deepseek' || m.includes('deepseek')) {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 27 24"
+        fill="none"
+        aria-label="DeepSeek"
+        className={cn('size-4 shrink-0 inline-block align-middle select-none', className)}
+      >
+        <path
+          d="M26.5174 3.39471C26.235 3.2567 26.1137 3.52006 25.9487 3.65346C25.8923 3.69659 25.8446 3.75294 25.7969 3.80469C25.3846 4.24516 24.9027 4.53439 24.2737 4.49989C23.3536 4.44814 22.5682 4.73737 21.8735 5.44119C21.7258 4.57349 21.2353 4.0554 20.4889 3.72304C20.0985 3.55054 19.7034 3.37746 19.4297 3.00197C19.2388 2.73459 19.1865 2.43673 19.091 2.14289C19.0301 1.96579 18.9697 1.78466 18.7656 1.75418C18.5442 1.71968 18.4574 1.90541 18.3705 2.06067C18.0232 2.69549 17.8887 3.39471 17.9019 4.10313C17.9324 5.6965 18.6051 6.96556 19.9421 7.86834C20.0939 7.97184 20.133 8.07535 20.0852 8.22658C19.9938 8.53766 19.8857 8.83955 19.7903 9.15063C19.7293 9.34901 19.6384 9.39271 19.4257 9.30588C18.692 8.9994 18.0583 8.54571 17.4982 7.99772C16.5477 7.07827 15.6881 6.06336 14.6162 5.26869C14.3644 5.08296 14.1125 4.91045 13.8521 4.746C12.7584 3.68394 13.9952 2.81164 14.2816 2.70814C14.5812 2.60003 14.3857 2.22857 13.4179 2.23317C12.4502 2.2372 11.5646 2.56151 10.4359 2.99335C10.2708 3.05832 10.0972 3.10547 9.91951 3.14457C8.8954 2.95022 7.83162 2.90709 6.72069 3.03245C4.62877 3.26533 2.95777 4.25436 1.72954 5.94261C0.254043 7.97184 -0.0932678 10.2777 0.33167 12.6824C0.778458 15.2171 2.07225 17.3153 4.06008 18.9558C6.12152 20.6567 8.49577 21.4905 11.2047 21.3306C12.8498 21.2358 14.6812 21.0155 16.7473 19.2669C17.2682 19.5262 17.8151 19.6297 18.7219 19.7074C19.4205 19.7723 20.0933 19.6729 20.6143 19.5648C21.4302 19.3923 21.3739 18.6367 21.0789 18.4981C18.6874 17.3843 19.2124 17.8374 18.7351 17.4706C19.9501 16.033 21.8063 13.4776 22.379 9.99821C22.4353 9.61409 22.5072 9.073 22.4986 8.76192C22.494 8.57216 22.5377 8.49856 22.7545 8.47671C23.3536 8.40771 23.935 8.24383 24.4692 7.94999C26.0188 7.10357 26.6439 5.71318 26.7911 4.04678C26.8129 3.79204 26.7865 3.52869 26.5174 3.39471ZM13.0143 18.3946C10.6964 16.5724 9.5722 15.9726 9.10816 15.9985C8.67402 16.0244 8.75222 16.5212 8.84768 16.8449C8.94773 17.1646 9.07768 17.3849 9.25996 17.6655C9.38589 17.8512 9.47272 18.1272 9.13404 18.3348C8.38766 18.7965 7.08985 18.1796 7.0289 18.1491C5.51833 17.2595 4.25559 16.0853 3.36546 14.4793C2.50581 12.9337 2.0067 11.2753 1.92447 9.50542C1.90262 9.07818 2.02855 8.92695 2.45406 8.84932C3.01413 8.74582 3.59144 8.72397 4.15093 8.80619C6.51656 9.15178 8.53027 10.2092 10.2185 11.8848C11.1822 12.8388 11.9114 13.979 12.6623 15.0929C13.461 16.2757 14.3201 17.4027 15.4144 18.3268C15.8008 18.6505 16.109 18.8966 16.404 19.0783C15.5144 19.1778 14.0297 19.1991 13.0143 18.3958V18.3946ZM14.1252 11.2489C14.1252 11.0591 14.277 10.9079 14.4679 10.9079C14.511 10.9079 14.5501 10.9165 14.5852 10.9292C14.6329 10.9464 14.6766 10.9723 14.7111 11.0114C14.7721 11.0718 14.8066 11.158 14.8066 11.2489C14.8066 11.4386 14.6548 11.5899 14.4639 11.5899C14.273 11.5899 14.1252 11.4386 14.1252 11.2489ZM17.5759 13.0188C17.3545 13.1096 17.1331 13.1873 16.9203 13.1959C16.5903 13.2131 16.2303 13.0791 16.0348 12.9153C15.7312 12.6605 15.5139 12.5179 15.423 12.0734C15.3839 11.8837 15.4057 11.5899 15.4402 11.4214C15.5185 11.0585 15.4316 10.8257 15.1757 10.614C14.9676 10.4415 14.7025 10.3938 14.4115 10.3938C14.3029 10.3938 14.2034 10.3461 14.1292 10.3076C14.0079 10.2472 13.9078 10.096 14.0033 9.91023C14.0338 9.84985 14.1815 9.70322 14.216 9.67734C14.6111 9.45251 15.0665 9.52612 15.488 9.6946C15.8784 9.85445 16.174 10.1477 16.5989 10.5623C17.033 11.0631 17.1112 11.2011 17.3585 11.5772C17.554 11.871 17.7317 12.1729 17.8536 12.5185C17.9272 12.7341 17.8317 12.9107 17.5759 13.0188Z"
+          fill="#0066FF"
+        />
+      </svg>
+    )
+  }
+
+  // 7. OpenAI (官方原版裁剪图形 + 智能暗色反相)
+  if (p === 'openai' || m.includes('gpt') || m.includes('o3') || m.includes('o1')) {
+    return (
+      <img
+        src={BRAND_OPENAI_DATA_URI}
+        alt="OpenAI"
+        className={cn('size-4 shrink-0 object-contain inline-block align-middle select-none dark:invert', className)}
+      />
+    )
+  }
+
+  // 8. 腾讯混元 (双环极光标)
+  if (p === 'tencent' || m.includes('hy') || m.includes('hunyuan')) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-label="Tencent"
+        className={cn('size-4 shrink-0 inline-block align-middle select-none', className)}
+      >
+        <circle cx="8.5" cy="12" r="5" stroke="#0052D9" strokeWidth="2.5" />
+        <circle cx="15.5" cy="12" r="5" stroke="#4F46E5" strokeWidth="2.5" />
+        <path d="M12 9a4.98 4.98 0 0 1 1.8 3A4.98 4.98 0 0 1 12 15a4.98 4.98 0 0 1-1.8-3A4.98 4.98 0 0 1 12 9z" fill="#0052D9" />
+      </svg>
+    )
+  }
+
+  // 9. 其他模型（统一单色机器人图标，无杂乱色块）
+  return (
+    <span className={cn('inline-flex items-center justify-center size-4 shrink-0 text-muted/70 select-none', className)}>
+      <Bot className="size-3.5" />
+    </span>
+  )
+}
+
+
+// 专用纯净圆形修正者头像组件（彻底规避任何方角阴影）
+function CharacterAvatar({
+  src,
+  name,
+  size = 'md',
+  className = '',
+}: {
+  src?: string
+  name: string
+  size?: 'xs' | 'sm' | 'md' | 'lg'
+  className?: string
+}) {
+  const sizeClasses = {
+    xs: 'size-6',
+    sm: 'size-8',
+    md: 'size-10',
+    lg: 'size-12',
+  }[size]
+
+  const resolvedSrc = src ? resolveAssetUrl(src) : undefined
+
+  return (
+    <Avatar
+      size={size === 'xs' || size === 'sm' ? 'sm' : 'md'}
+      color="accent"
+      className={`rounded-full shrink-0 border border-separator/80 bg-surface shadow-xs select-none ${sizeClasses} ${className}`}
+    >
+      {resolvedSrc && (
+        <Avatar.Image
+          src={resolvedSrc}
+          alt={name}
+          className="size-full object-cover rounded-full"
+        />
+      )}
+      <Avatar.Fallback className="rounded-full bg-accent-soft text-accent font-semibold text-xs">
+        {name ? name.slice(0, 1) : '修'}
+      </Avatar.Fallback>
+    </Avatar>
+  )
+}
+
+// 专用管理员头像组件
+function AdminAvatar({ size = 'sm', className = '' }: { size?: 'xs' | 'sm' | 'md'; className?: string }) {
+  const sizeClasses = {
+    xs: 'size-6 text-[10px]',
+    sm: 'size-8 text-xs',
+    md: 'size-10 text-sm',
+  }[size]
+
+  return (
+    <Avatar
+      size="sm"
+      color="accent"
+      className={`rounded-full shrink-0 border border-accent/40 bg-accent text-accent-foreground font-semibold shadow-xs select-none ${sizeClasses} ${className}`}
+    >
+      <Avatar.Fallback className="rounded-full bg-accent text-accent-foreground font-bold">
+        管
+      </Avatar.Fallback>
+    </Avatar>
+  )
+}
+
+export default function AIChatPanel() {
+  const { activeUid } = useServer()
+
+  // 顶层分段工作台 Tab 状态 ('chat' | 'config')
+  const [activeTab, setActiveTab] = useState<'chat' | 'config'>(() => {
+    if (typeof window !== 'undefined') {
+      if (
+        new URLSearchParams(window.location.search).get('openConfig') === '1' ||
+        new URLSearchParams(window.location.search).get('tab') === 'config' ||
+        window.location.hash.includes('openConfig=1') ||
+        window.location.hash.includes('tab=config')
+      ) {
+        return 'config'
+      }
+    }
+    return 'chat'
+  })
+
+  // 数据状态
+  const [characters, setCharacters] = useState<CharacterItem[]>(OFFLINE_CHARACTERS)
+  const [selectedChar, setSelectedChar] = useState<CharacterItem>(OFFLINE_CHARACTERS[0])
+  const [calendar, setCalendar] = useState<CalendarData>(OFFLINE_CALENDAR)
+  const [modelConfig, setModelConfig] = useState<AIChatConfigData>(OFFLINE_CONFIG)
+  const [messages, setMessages] = useState<ChatHistoryMessage[]>([])
+  const [inputText, setInputText] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isTriggeringGreeting, setIsTriggeringGreeting] = useState(false)
+  const [toastMsg, setToastMsg] = useState<{ text: string; type?: 'success' | 'warning' } | null>(null)
+
+  // 模态弹窗状态（保留人设调优弹窗，配置弹窗已全面升级为原生 Tab）
+  const [isPersonaModalOpen, setIsPersonaModalOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return (
+        new URLSearchParams(window.location.search).get('openPersona') === '1' ||
+        window.location.hash.includes('openPersona=1')
+      )
+    }
+    return false
+  })
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false)
+  const [isClearing, setIsClearing] = useState(false)
+
+  // 连通性测试与诊断状态
+  const [isTestingConn, setIsTestingConn] = useState(false)
+  const [connResult, setConnResult] = useState<{
+    success?: boolean
+    latency_ms?: number
+    msg?: string
+    error?: string | null
+    provider?: string
+    model?: string
+  } | null>(null)
+
+  // 极速试聊测试小沙盒状态
+  const [testChatInput, setTestChatInput] = useState('')
+  const [isTestChatSending, setIsTestChatSending] = useState(false)
+  const [testChatReply, setTestChatReply] = useState<{ query: string; reply: string; latency_ms?: number } | null>(null)
+
+  // 模型配置表单状态
+  const [editProvider, setEditProvider] = useState(OFFLINE_CONFIG.provider)
+  const [editModel, setEditModel] = useState(OFFLINE_CONFIG.model)
+    const [modelSearch, setModelSearch] = useState('')
+
+  // 第三方客观大模型能力排行榜状态
+  const [leaderboardsData, setLeaderboardsData] = useState<LeaderboardsData | null>(null)
+  const [activeLeaderboardSourceId, setActiveLeaderboardSourceId] = useState<string>(() => {
+    try {
+      const searchStr = window.location.hash.includes('?') ? window.location.hash.split('?')[1] : window.location.search
+      const params = new URLSearchParams(searchStr)
+      return params.get('source') || 'eqbench_creative'
+    } catch {
+      return 'eqbench_creative'
+    }
+  })
+  const [leaderboardProviderFilter, setLeaderboardProviderFilter] = useState<string>('all')
+  const [leaderboardSearch, setLeaderboardSearch] = useState<string>('')
+  const [isRefreshingLeaderboard, setIsRefreshingLeaderboard] = useState<boolean>(false)
+  const [editBaseUrl, setEditBaseUrl] = useState(OFFLINE_CONFIG.base_url)
+  const [editApiKey, setEditApiKey] = useState('')
+  const [showApiKey, setShowApiKey] = useState(false)
+  const [editTimeout, setEditTimeout] = useState(String(OFFLINE_CONFIG.timeout_seconds))
+  const [editMaxTokens, setEditMaxTokens] = useState(String(OFFLINE_CONFIG.max_tokens))
+  const [editTemp, setEditTemp] = useState(String(OFFLINE_CONFIG.temperature))
+  const [editMaxHistoryTurns, setEditMaxHistoryTurns] = useState(String(OFFLINE_CONFIG.max_history_turns || 10))
+  const [editSystemPrefix, setEditSystemPrefix] = useState(OFFLINE_CONFIG.system_prefix || '')
+
+  // 人设编辑表单
+  const [editingChar, setEditingChar] = useState<CharacterItem | null>(null)
+  const [editCharName, setEditCharName] = useState(() => OFFLINE_CHARACTERS[0].char_name || '')
+  const [editSign, setEditSign] = useState(() => OFFLINE_CHARACTERS[0].sign || '')
+  const [editLocation, setEditLocation] = useState(() => OFFLINE_CHARACTERS[0].ip_location || '')
+  const [editGreetingMsg, setEditGreetingMsg] = useState(() => OFFLINE_CHARACTERS[0].greeting_msg || '')
+  const [editSystemPrompt, setEditSystemPrompt] = useState(() => OFFLINE_CHARACTERS[0].system_prompt || '')
+
+  const chatScrollRef = useRef<HTMLDivElement>(null)
+
+  const showToast = (text: string, type: 'success' | 'warning' = 'success') => {
+    setToastMsg({ text, type })
+    window.setTimeout(() => setToastMsg(null), 3500)
+  }
+
+  const scrollToBottom = () => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight
+    }
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, isSending])
+
+  // 数据加载
+  const loadAllData = async () => {
+    setIsRefreshing(true)
+    try {
+      // 加载排行榜数据
+      fetchAIChatLeaderboards().then((lbRes) => {
+        if (lbRes.code === 0 && lbRes.data) setLeaderboardsData(lbRes.data)
+      })
+
+      const [charRes, calRes, cfgRes] = await Promise.allSettled([
+        fetchAIChatCharacters(activeUid),
+        fetchAIChatCalendar(activeUid),
+        fetchAIChatConfig(),
+      ])
+
+      if (charRes.status === 'fulfilled' && charRes.value.code === 0 && charRes.value.data?.characters) {
+        setCharacters(charRes.value.data.characters)
+        const current = charRes.value.data.characters.find((c) => c.char_id === selectedChar.char_id) || charRes.value.data.characters[0]
+        setSelectedChar(current)
+      }
+
+      if (calRes.status === 'fulfilled' && calRes.value.code === 0 && calRes.value.data) {
+        setCalendar(calRes.value.data)
+      }
+
+      if (cfgRes.status === 'fulfilled' && cfgRes.value.code === 0 && cfgRes.value.data) {
+        const d = cfgRes.value.data
+        setModelConfig(d)
+        let targetProvider = d.provider || 'gemini'
+        if (typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search)
+          const hash = window.location.hash
+          for (const p of ['openai', 'claude', 'anthropic', 'deepseek', 'gemini', 'ollama', 'custom']) {
+            if (params.get('provider') === p || hash.includes(`provider=${p}`)) {
+              targetProvider = p === 'claude' ? 'anthropic' : p
+              break
+            }
+          }
+        }
+        setEditProvider(targetProvider)
+        const targetPreset = PROVIDER_PRESETS.find((p) => p.id === targetProvider)
+        if (targetProvider !== d.provider && targetPreset) {
+          setEditModel(targetPreset.defaultModel)
+          setEditBaseUrl(targetPreset.defaultBaseUrl)
+        } else {
+          setEditModel(d.model || targetPreset?.defaultModel || 'gemini-3.8-flash')
+          setEditBaseUrl(d.base_url || targetPreset?.defaultBaseUrl || '')
+        }
+        setEditTimeout(String(d.timeout_seconds || 30))
+        setEditMaxTokens(String(d.max_tokens || 1024))
+        setEditTemp(String(d.temperature || 0.7))
+        setEditMaxHistoryTurns(String(d.max_history_turns || 10))
+        setEditSystemPrefix(d.system_prefix || '')
+      }
+
+      loadHistory(selectedChar.char_id)
+    } catch {
+      // 容错回退
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
+
+  useEffect(() => {
+    loadAllData()
+  }, [activeUid])
+
+  const loadHistory = async (charId: number) => {
+    try {
+      const res = await fetchAIChatHistory(charId, 50, activeUid)
+      const list = res?.data?.messages || (res as any)?.data?.history
+      if (res.code === 0 && Array.isArray(list)) {
+        setMessages(list)
+      }
+    } catch (error: any) {
+      setMessages([])
+      showToast(error?.message || '读取服务端会话历史失败', 'warning')
+    }
+  }
+
+  const handleSelectChar = (char: CharacterItem) => {
+    setSelectedChar(char)
+    loadHistory(char.char_id)
+  }
+
+  const handleSend = async (customContent?: string) => {
+    const textToSend = customContent || inputText.trim()
+    if (!textToSend || isSending) return
+
+    const tempUserMsg: ChatHistoryMessage = {
+      id: Date.now(),
+      char_id: selectedChar.char_id,
+      role: 'user',
+      content: textToSend,
+      timestamp: Math.floor(Date.now() / 1000),
+    }
+
+    setMessages((prev) => [...prev, tempUserMsg])
+    if (!customContent) setInputText('')
+    setIsSending(true)
+
+    try {
+      const res = await sendAIChatMessage(selectedChar.char_id, textToSend, activeUid)
+      if (res.code === 0 && res.data) {
+        const assistantMsg: ChatHistoryMessage = {
+          id: Date.now() + 1,
+          char_id: selectedChar.char_id,
+          role: 'assistant',
+          content: res.data.reply || res.data.content,
+          timestamp: Math.floor(Date.now() / 1000),
+          model: res.data.model || modelConfig.model,
+          latency_ms: res.data.latency_ms,
+          is_fallback: Boolean(res.data.is_fallback),
+        }
+        setMessages((prev) => [...prev, assistantMsg])
+      } else {
+        showToast(res.msg || '大模型回复生成失败，请检查端点配置', 'warning')
+      }
+    } catch (error: any) {
+      showToast(error?.message || '网络连接超时，大模型未响应', 'warning')
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  const handleConfirmClear = async () => {
+    setIsClearing(true)
+    try {
+      const res = await clearAIChatHistory(selectedChar.char_id, activeUid)
+      if (res.code === 0) {
+        setMessages([])
+        setIsClearModalOpen(false)
+        showToast(`已成功清空与【${selectedChar.char_name}】的服务端会话记忆`)
+        loadAllData()
+      } else {
+        showToast(res.msg || '清空历史失败', 'warning')
+      }
+    } catch (error: any) {
+      showToast(error?.message || '清空历史失败', 'warning')
+    } finally {
+      setIsClearing(false)
+    }
+  }
+
+  const handleUpdateGreeting = async (charId: number, mode: 'all' | 'holiday' | 'birthday' | 'none') => {
+    try {
+      const res = await updateAIChatGreetingSettings(charId, mode, activeUid)
+      if (res.code === 0) {
+        setCharacters((prev) =>
+          prev.map((c) => (c.char_id === charId ? { ...c, greeting_mode: mode } : c))
+        )
+        showToast('问候触发策略已更新')
+      }
+    } catch (error: any) {
+      showToast(error?.message || '更新问候策略失败', 'warning')
+    }
+  }
+
+  const handleOpenPersona = (char: CharacterItem) => {
+    setEditingChar(char)
+    setEditCharName(char.char_name)
+    setEditSign(char.sign || '')
+    setEditLocation(char.ip_location || char.location || '')
+    setEditGreetingMsg(char.greeting_msg || '')
+    setEditSystemPrompt(char.system_prompt || '')
+    setIsPersonaModalOpen(true)
+  }
+
+  const handleSavePersona = async () => {
+    if (!editingChar) return
+    try {
+      const res = await updateAIChatPersona({
+        char_id: editingChar.char_id,
+        char_name: editCharName,
+        sign: editSign,
+        ip_location: editLocation,
+        greeting_msg: editGreetingMsg,
+        system_prompt: editSystemPrompt,
+      })
+      if (res.code === 0) {
+        setCharacters((prev) =>
+          prev.map((c) =>
+            c.char_id === editingChar.char_id
+              ? {
+                  ...c,
+                  char_name: editCharName,
+                  name: editCharName,
+                  sign: editSign,
+                  ip_location: editLocation,
+                  location: editLocation,
+                  greeting_msg: editGreetingMsg,
+                  system_prompt: editSystemPrompt,
+                }
+              : c
+          )
+        )
+        if (selectedChar.char_id === editingChar.char_id) {
+          setSelectedChar((prev) => ({
+            ...prev,
+            char_name: editCharName,
+            name: editCharName,
+            sign: editSign,
+            ip_location: editLocation,
+            location: editLocation,
+            greeting_msg: editGreetingMsg,
+            system_prompt: editSystemPrompt,
+          }))
+        }
+        setIsPersonaModalOpen(false)
+        showToast(`修正者「${editCharName}」人设已更新`)
+      }
+    } catch (error: any) {
+      showToast(error?.message || '保存修正者人设失败', 'warning')
+    }
+  }
+
+  const handleTriggerGreetingAction = async () => {
+    setIsTriggeringGreeting(true)
+    try {
+      const res = await triggerAIChatGreeting(activeUid)
+      if (res.code === 0 && res.data) {
+        showToast(
+          `全服问候派发成功！生成 ${res.data.generated_mails_count} 封专属节日/生日信件并送达收件箱`,
+          'success'
+        )
+      } else {
+        showToast(res.msg || '问候触发未产生新邮件（可能今日已下发或无符合条件角色）', 'warning')
+      }
+    } catch (error: any) {
+      showToast(error?.message || '触发节日问候调度异常', 'warning')
+    } finally {
+      setIsTriggeringGreeting(false)
+    }
+  }
+
+  // 服务商预设切换
+  const handleSelectPreset = (preset: ProviderPreset) => {
+    setModelSearch('')
+    setEditProvider(preset.id)
+    if (preset.defaultBaseUrl) {
+      setEditBaseUrl(preset.defaultBaseUrl)
+    }
+    if (preset.defaultModel) {
+      setEditModel(preset.defaultModel)
+    }
+  }
+
+  // 连通性测试探针
+  const handleTestConnAction = async () => {
+    setIsTestingConn(true)
+    setConnResult(null)
+    try {
+      const res = await testAIChatConnection(editProvider)
+      if (res.code === 0 && res.data) {
+        setConnResult({
+          success: res.data.success,
+          latency_ms: res.data.latency_ms,
+          msg: res.data.reply ? `端点握手成功 · Echo 回显: "${res.data.reply}"` : '连接探测成功 (HTTP 200 OK)',
+          error: res.data.error,
+          model: res.data.model,
+          provider: res.data.provider,
+        })
+        if (res.data.success) {
+          showToast(`端点探测成功，响应耗时 ${res.data.latency_ms} ms`)
+        } else {
+          showToast(`端点诊断未通过: ${res.data.error || '无法连通'}`, 'warning')
+        }
+      } else {
+        setConnResult({ success: false, msg: res.msg || '连通性测试未响应' })
+        showToast(res.msg || '连通性测试未响应', 'warning')
+      }
+    } catch (error: any) {
+      setConnResult({ success: false, msg: error?.message || '网络请求失败' })
+      showToast('网络请求异常，无法完成诊断', 'warning')
+    } finally {
+      setIsTestingConn(false)
+    }
+  }
+
+  // 诊断控制台内的原地极速试聊
+  // 刷新排行榜实时网络数据
+  const handleRefreshLeaderboards = async () => {
+    setIsRefreshingLeaderboard(true)
+    try {
+      const res = await refreshAIChatLeaderboards()
+      if (res.code === 0 && res.data?.data) {
+        setLeaderboardsData(res.data.data)
+        showToast('已完成第三方权威评测数据抓取与同步', 'success')
+      } else {
+        showToast(res.msg || '排行榜数据刷新完成', 'success')
+      }
+    } catch {
+      showToast('网络受限，已使用本地高精缓存快照', 'warning')
+    } finally {
+      setIsRefreshingLeaderboard(false)
+    }
+  }
+
+  // 从排行榜装配选中的大模型
+  const handleApplyLeaderboardModel = (item: LeaderboardItem) => {
+    let prov = item.provider || 'custom'
+    if (prov === 'ollama') prov = 'ollama'
+    else if (prov === 'openai') prov = 'openai'
+    else if (prov === 'anthropic') prov = 'anthropic'
+    else if (prov === 'gemini') prov = 'gemini'
+    else if (prov === 'deepseek') prov = 'deepseek'
+    else prov = 'custom'
+
+    setEditProvider(prov)
+    const targetPreset = PROVIDER_PRESETS.find((p) => p.id === prov)
+    if (targetPreset?.defaultBaseUrl) {
+      setEditBaseUrl(targetPreset.defaultBaseUrl)
+    }
+    const targetModel = item.model.toLowerCase() === 'ox-alpha' ? 'glm-5.3-flash' : item.model
+    setEditModel(targetModel)
+
+    // 锚点平滑滚动至上方推理引擎工作台
+    const anchor = document.getElementById('llm-config-section')
+    if (anchor) {
+      anchor.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+    showToast(`已装配 [${item.model}]，厂商与端点已自动对齐！`, 'success')
+  }
+
+
+  // =========================================================================
+  // 底部统一排行榜渲染函数 (支持 6大客观源 + 娱乐自嗨榜)
+  // =========================================================================
+  const renderLeaderboardsSection = () => {
+    return (
+      <Card className="flex flex-col overflow-hidden rounded-2xl border border-separator bg-surface p-6 shadow-none space-y-5">
+        {/* 顶栏信息与动作 */}
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between border-b border-separator/60 pb-4">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="grid size-8 place-items-center rounded-xl bg-amber-500/15 text-amber-500">
+                <Trophy className="size-4" />
+              </div>
+              <h3 className="text-base font-bold tracking-tight text-foreground">
+                全网大模型 Chat & 拟真写作能力排行榜
+              </h3>
+              <Chip size="sm" variant="secondary" className="text-[11px] bg-muted/20 text-muted font-normal">
+                客观数据搬运工 · 不吃压力不担责任
+              </Chip>
+            </div>
+            <p className="text-xs text-muted leading-relaxed">
+              汇集独立评测在情商对话、拟真修辞、长篇耐力与即时响应速率的客观跑分，包含 6 大评测源与全网全景平滑平均天梯。
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            {leaderboardsData?.updated_at && (
+              <span className="text-[11px] font-mono text-muted">
+                更新时间：{leaderboardsData.updated_at}
+              </span>
+            )}
+            {(() => {
+              const currSrc = (leaderboardsData?.sources || []).find((s) => s.id === activeLeaderboardSourceId)
+              if (!currSrc?.url) return null
+              return (
+                <a
+                  href={currSrc.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-accent hover:underline px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 transition-colors"
+                >
+                  <ExternalLink className="size-3" />
+                  评测官网
+                </a>
+              )
+            })()}
+            <Button
+              size="sm"
+              variant="secondary"
+              className="text-xs rounded-xl cursor-pointer"
+              onPress={handleRefreshLeaderboards}
+              isDisabled={isRefreshingLeaderboard}
+            >
+              <RefreshCw className={cn('size-3.5 mr-1', isRefreshingLeaderboard && 'animate-spin')} />
+              {isRefreshingLeaderboard ? '拉取中...' : '重新同步数据'}
+            </Button>
+          </div>
+        </div>
+
+        {/* 数据源切换 Tab 胶囊 */}
+        {leaderboardsData && leaderboardsData.sources && leaderboardsData.sources.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-1.5 p-1 bg-surface-secondary/50 rounded-xl border border-separator/70">
+              {leaderboardsData.sources.map((src) => {
+                const isSelected = activeLeaderboardSourceId === src.id
+                const isComposite = src.id === 'composite_average'
+                return (
+                  <button
+                    key={src.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveLeaderboardSourceId(src.id)
+                      setLeaderboardSearch('')
+                    }}
+                    className={cn(
+                      'px-3 py-1.5 text-xs rounded-lg font-medium transition-all cursor-pointer flex items-center gap-1.5',
+                      isSelected
+                        ? isComposite
+                          ? 'bg-amber-600 text-white shadow-xs font-semibold'
+                          : 'bg-accent text-accent-foreground shadow-xs font-semibold'
+                        : isComposite
+                          ? 'text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 font-semibold'
+                          : 'text-muted hover:text-foreground hover:bg-surface/80',
+                    )}
+                  >
+                    {src.id === 'eqbench_creative' && <BookOpen className="size-3.5" />}
+                    {src.id === 'eqbench_longform' && <Scroll className="size-3.5" />}
+                    {src.id === 'lmsys_arena' && <Swords className="size-3.5" />}
+                    {src.id === 'artificial_analysis' && <Zap className="size-3.5" />}
+                    {src.id === 'aa_quality' && <Brain className="size-3.5" />}
+                    {src.id === 'aa_speed' && <Gauge className="size-3.5" />}
+                    {src.id === 'openrouter_rp' && <Drama className="size-3.5" />}
+                    {src.id === 'composite_average' && <Sparkles className="size-3.5" />}
+                    <span>{src.name}</span>
+                    <span
+                      className={cn(
+                        'text-[10px] px-1 rounded-full',
+                        isSelected
+                          ? 'bg-white/20 text-white'
+                          : 'bg-muted/20 text-muted',
+                      )}
+                    >
+                      {src.items?.length || 0}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* 当前数据源说明栏 / 娱乐自嗨榜免责声明横幅 */}
+            {(() => {
+              const currSrc = leaderboardsData.sources.find((s) => s.id === activeLeaderboardSourceId)
+              if (!currSrc) return null
+
+              // 如果是自嗨平均榜单，展示大字免责警示条
+              if (currSrc.id === 'composite_average') {
+                return (
+                  <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs leading-relaxed">
+                    <AlertTriangle className="size-5 shrink-0 text-amber-500 mt-0.5" />
+                    <div className="space-y-1">
+                      <div className="font-bold text-sm flex items-center gap-2">
+                        <span>🎲 综合平均天梯 · 娱乐自嗨算法声明</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 uppercase tracking-wider font-mono font-semibold">
+                          无任何官方参考价值
+                        </span>
+                      </div>
+                      <p className="text-amber-800/90 dark:text-amber-300/90">
+                        【郑重声明：该榜单纯属开发团队自嗨算法，<strong>无任何权威机构背书与参考价值，咱们只是数据搬运工，不吃压力、不担责任！</strong>】
+                        本榜单汇聚所有出现在其他 6 大榜单中的模型（当前共 {currSrc.items?.length || 0} 款）。
+                        对于未在某榜单出现的模型，算法采用<strong>平滑惩罚位（#46）</strong>折算全景平均名次。各模型实际会话手感千人千面，请以实际体验为准！
+                      </p>
+                    </div>
+                  </div>
+                )
+              }
+
+              // 客观榜单常规说明
+              return (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-surface-secondary/40 border border-separator/50 text-xs">
+                  <div className="space-y-0.5">
+                    <span className="font-semibold text-foreground mr-2">【{currSrc.name}】</span>
+                    <span className="text-muted">{currSrc.description}</span>
+                  </div>
+                  <span className="font-mono text-[11px] text-accent shrink-0 font-medium">
+                    核心指标：{currSrc.metric_name}
+                  </span>
+                </div>
+              )
+            })()}
+
+            {/* 过滤工具条：厂商过滤与搜索 */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
+              {/* 厂商过滤器 */}
+              <div className="flex flex-wrap items-center gap-1">
+                <span className="text-xs text-muted mr-1 font-medium">厂商筛选:</span>
+                {[
+                  { id: 'all', label: '全部' },
+                  { id: 'openai', label: 'OpenAI' },
+                  { id: 'anthropic', label: 'Claude' },
+                  { id: 'gemini', label: 'Gemini' },
+                  { id: 'deepseek', label: 'DeepSeek' },
+                  { id: 'glm', label: '智谱/GLM' },
+                  { id: 'ollama', label: '开源/本地' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setLeaderboardProviderFilter(f.id)}
+                    className={cn(
+                      'px-2 py-0.5 rounded-md text-xs font-medium border transition-all cursor-pointer',
+                      leaderboardProviderFilter === f.id
+                        ? 'bg-accent/15 border-accent text-accent font-semibold'
+                        : 'bg-surface-secondary/40 border-separator/60 text-muted hover:text-foreground',
+                    )}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* 关键字搜索框 */}
+              <div className="relative flex items-center">
+                <Search className="w-3.5 h-3.5 text-muted absolute left-2.5 pointer-events-none" />
+                <input
+                  type="text"
+                  value={leaderboardSearch}
+                  onChange={(e) => setLeaderboardSearch(e.target.value)}
+                  placeholder="搜索模型名称 / 特色标签..."
+                  className="pl-8 pr-3 py-1 text-xs font-mono bg-surface-secondary/60 border border-separator/80 rounded-xl text-foreground placeholder:text-muted/70 focus:outline-hidden focus:border-accent w-56 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* 榜单表格展示 */}
+            {(() => {
+              const currSrc = leaderboardsData.sources.find((s) => s.id === activeLeaderboardSourceId)
+              if (!currSrc || !currSrc.items) return null
+
+              const isComposite = currSrc.id === 'composite_average'
+
+              const filteredItems = currSrc.items.filter((it) => {
+                if (leaderboardProviderFilter !== 'all') {
+                  if (leaderboardProviderFilter === 'glm') {
+                    const isGlm = it.provider === 'glm' || it.model.toLowerCase().includes('glm') || it.model.toLowerCase().includes('ox-alpha')
+                    if (!isGlm) return false
+                  } else if (it.provider !== leaderboardProviderFilter) {
+                    return false
+                  }
+                }
+                if (leaderboardSearch.trim()) {
+                  const q = leaderboardSearch.trim().toLowerCase()
+                  const matchName = it.model.toLowerCase().includes(q)
+                  const matchTag = (it.tags || []).some((t) => t.toLowerCase().includes(q))
+                  const matchOxAlphaAlias = it.model.toLowerCase().includes('ox-alpha') && ('glm 5.3 flash'.includes(q) || '智谱'.includes(q) || 'glm'.includes(q))
+                  if (!matchName && !matchTag && !matchOxAlphaAlias) return false
+                }
+                return true
+              })
+
+              // 计算分数条比例基准
+              const maxScore = Math.max(...currSrc.items.map((i) => i.score || 0), 100)
+
+              return (
+                <div className="border border-separator/80 rounded-xl overflow-hidden bg-background/50">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-separator/80 bg-surface-secondary/70 text-muted font-medium text-[11px]">
+                          <th className="py-2.5 px-3 w-14 text-center">{isComposite ? '综合' : '排名'}</th>
+                          <th className="py-2.5 px-3">模型名称</th>
+                          <th className="py-2.5 px-3 w-24">服务厂商</th>
+                          <th className="py-2.5 px-3 w-40">
+                            {isComposite ? '全景加权均名' : `核心跑分 (${currSrc.metric_name})`}
+                          </th>
+                          <th className="py-2.5 px-3">
+                            {isComposite ? '上榜频次 / 真实在榜均名 / 特色标签' : '专项指标 / 特色标签'}
+                          </th>
+                          <th className="py-2.5 px-3 w-28 text-right">快捷操作</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-separator/40 font-sans">
+                        {filteredItems.map((item) => {
+                          const isTop1 = item.rank === 1
+                          const isTop2 = item.rank === 2
+                          const isTop3 = item.rank === 3
+                          const isCurrentConfigModel =
+                            editModel.toLowerCase() === item.model.toLowerCase() ||
+                            (editModel.toLowerCase() === 'glm-5.3-flash' && item.model.toLowerCase() === 'ox-alpha')
+
+                          return (
+                            <tr
+                              key={item.model}
+                              className={cn(
+                                'transition-colors hover:bg-surface-secondary/40',
+                                isCurrentConfigModel && 'bg-accent/5 font-medium',
+                              )}
+                            >
+                              {/* 排名徽章 */}
+                              <td className="py-2.5 px-3 text-center">
+                                {isTop1 ? (
+                                  <span className="inline-grid size-6 place-items-center rounded-full bg-amber-500/20 text-amber-500 font-bold text-xs">
+                                    🥇
+                                  </span>
+                                ) : isTop2 ? (
+                                  <span className="inline-grid size-6 place-items-center rounded-full bg-slate-400/20 text-slate-300 font-bold text-xs">
+                                    🥈
+                                  </span>
+                                ) : isTop3 ? (
+                                  <span className="inline-grid size-6 place-items-center rounded-full bg-amber-700/20 text-amber-600 font-bold text-xs">
+                                    🥉
+                                  </span>
+                                ) : (
+                                  <span className="font-mono text-muted text-[11px]">#{item.rank}</span>
+                                )}
+                              </td>
+
+                              {/* 模型名称 + 统一厂商图标 + 纯粹 gpt-5.6 指向 sol */}
+                              <td className="py-2.5 px-3 font-mono font-medium text-foreground">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <ProviderLogo provider={item.provider} model={item.model} />
+                                  <span className="font-semibold">{item.model}</span>
+                                  {/* 关键修正：只有严格纯名字为 gpt-5.6 时才显示指向 sol */}
+                                  {item.model.trim() === 'gpt-5.6' && (
+                                    <span className="text-[9px] px-1.5 py-0.2 rounded font-sans tracking-tight bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/30">
+                                      → 默认指向 sol
+                                    </span>
+                                  )}
+                                  {/* OX-ALPHA 特别标记：智谱 GLM 模型，正式更名 GLM 5.3 Flash */}
+                                  {item.model.toLowerCase().includes('ox-alpha') && (
+                                    <span className="text-[9px] px-1.5 py-0.2 rounded font-sans tracking-tight bg-teal-500/15 text-teal-600 dark:text-teal-400 font-semibold border border-teal-500/30 flex items-center gap-1">
+                                      <span>智谱GLM</span>
+                                      <span className="opacity-60">·</span>
+                                      <span>更名 GLM 5.3 Flash</span>
+                                    </span>
+                                  )}
+                                  {item.model.toLowerCase() === 'glm-5.3-flash' && (
+                                    <span className="text-[9px] px-1.5 py-0.2 rounded font-sans tracking-tight bg-teal-500/15 text-teal-600 dark:text-teal-400 font-semibold border border-teal-500/30">
+                                      原名 OX-ALPHA
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* 厂商胶囊 */}
+                              <td className="py-2.5 px-3">
+                                <span
+                                  className={cn(
+                                    'text-[10px] px-2 py-0.5 rounded-full font-mono uppercase font-semibold inline-block',
+                                    item.provider === 'openai' && 'bg-blue-500/15 text-blue-500',
+                                    item.provider === 'anthropic' && 'bg-amber-500/15 text-amber-500',
+                                    item.provider === 'gemini' && 'bg-emerald-500/15 text-emerald-500',
+                                    item.provider === 'deepseek' && 'bg-cyan-500/15 text-cyan-500',
+                                    item.provider === 'ollama' && 'bg-purple-500/15 text-purple-500',
+                                    item.provider === 'custom' && 'bg-neutral-500/15 text-neutral-400',
+                                  )}
+                                >
+                                  {item.provider}
+                                </span>
+                              </td>
+
+                              {/* 核心跑分与进度条 */}
+                              <td className="py-2.5 px-3">
+                                <div className="space-y-1">
+                                  <div className="flex justify-between items-center text-[11px] font-mono">
+                                    <span className="font-bold text-foreground">{item.metric_val}</span>
+                                    {item.sub_score && item.sub_score !== item.metric_val && (
+                                      <span className="text-[10px] text-muted">{item.sub_score}</span>
+                                    )}
+                                  </div>
+                                  <div className="h-1.5 w-full bg-separator/50 rounded-full overflow-hidden">
+                                    <div
+                                      className={cn(
+                                        'h-full rounded-full transition-all',
+                                        item.rank <= 3
+                                          ? 'bg-amber-500'
+                                          : item.rank <= 10
+                                            ? 'bg-accent'
+                                            : 'bg-muted/80',
+                                      )}
+                                      style={{
+                                        width: `${Math.min(100, Math.max(15, (item.score / maxScore) * 100))}%`,
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </td>
+
+                              {/* 专项指标与多模态/特色标签 */}
+                              <td className="py-2.5 px-3">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  {/* 指标详情展示 */}
+                                  {item.details && (
+                                    <>
+                                      {item.details.appearances && (
+                                        <span className="text-[10px] font-mono bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded font-semibold">
+                                          {item.details.appearances}
+                                        </span>
+                                      )}
+                                      {item.details.on_chart_avg && (
+                                        <span className="text-[10px] font-mono bg-surface-secondary px-1.5 py-0.5 rounded text-muted">
+                                          在榜均位: {item.details.on_chart_avg}
+                                        </span>
+                                      )}
+                                      {item.details.ttft && (
+                                        <span className="text-[10px] font-mono bg-surface-secondary px-1.5 py-0.5 rounded text-muted">
+                                          TTFT: {item.details.ttft}
+                                        </span>
+                                      )}
+                                      {item.details.tps && (
+                                        <span className="text-[10px] font-mono bg-surface-secondary px-1.5 py-0.5 rounded text-muted">
+                                          TPS: {item.details.tps}
+                                        </span>
+                                      )}
+                                      {item.details.price && (
+                                        <span className="text-[10px] font-mono bg-surface-secondary px-1.5 py-0.5 rounded text-muted">
+                                          {item.details.price}
+                                        </span>
+                                      )}
+                                      {item.details.length && (
+                                        <span className="text-[10px] font-mono bg-surface-secondary px-1.5 py-0.5 rounded text-muted">
+                                          长度: {item.details.length}
+                                        </span>
+                                      )}
+                                      {item.details.vocab && (
+                                        <span className="text-[10px] font-mono bg-surface-secondary px-1.5 py-0.5 rounded text-muted">
+                                          词汇: {item.details.vocab}
+                                        </span>
+                                      )}
+                                      {item.details.win_rate && (
+                                        <span className="text-[10px] font-mono bg-surface-secondary px-1.5 py-0.5 rounded text-muted">
+                                          胜率: {item.details.win_rate}
+                                        </span>
+                                      )}
+                                      {item.details.context && (
+                                        <span className="text-[10px] font-mono bg-surface-secondary px-1.5 py-0.5 rounded text-muted">
+                                          上下文: {item.details.context}
+                                        </span>
+                                      )}
+                                    </>
+                                  )}
+
+                                  {/* 特色标签：严格修复 sol 误伤、多模态支持高亮 */}
+                                  {(item.tags || [])
+                                    .filter((tag) => {
+                                      // 关键逻辑：若非纯 gpt-5.6，绝不显示“指向 sol”
+                                      if (tag.includes('sol') && item.model.trim() !== 'gpt-5.6') return false
+                                      return true
+                                    })
+                                    .map((tag) => {
+                                      const isMultimodal = tag === '多模态支持'
+                                      const isGlm = tag.includes('GLM') || tag.includes('智谱')
+                                        const isSol = tag === '指向 sol'
+                                      const isFullHouse = tag.includes('大满贯')
+                                      const isFrequent = tag.includes('常客')
+                                      return (
+                                        <span
+                                          key={tag}
+                                          className={cn(
+                                            'text-[10px] px-1.5 py-0.2 rounded font-sans font-medium',
+                                            isMultimodal
+                                              ? 'bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30 font-semibold flex items-center gap-0.5'
+                                              : isGlm
+                                                ? 'bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/30 font-semibold'
+                                                : isSol
+                                                ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                                                : isFullHouse
+                                                  ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-semibold'
+                                                  : isFrequent
+                                                    ? 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-semibold'
+                                                    : 'bg-accent/10 border border-accent/20 text-accent',
+                                          )}
+                                        >
+                                          {isMultimodal && <Sparkles className="size-2.5 inline mr-0.5" />}
+                                          {tag}
+                                        </span>
+                                      )
+                                    })}
+                                </div>
+                              </td>
+
+                              {/* 快捷采用操作 */}
+                              <td className="py-2.5 px-3 text-right">
+                                <Button
+                                  size="sm"
+                                  variant={isCurrentConfigModel ? 'secondary' : 'primary'}
+                                  className={cn(
+                                    'rounded-lg text-[11px] h-7 px-2.5 cursor-pointer font-medium transition-transform active:scale-95',
+                                    isCurrentConfigModel
+                                      ? 'border border-accent/40 text-accent'
+                                      : 'bg-accent text-accent-foreground hover:bg-accent/90',
+                                  )}
+                                  onPress={() => handleApplyLeaderboardModel(item)}
+                                >
+                                  {isCurrentConfigModel ? '重新装配' : '🚀 采用此模型'}
+                                </Button>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                        {filteredItems.length === 0 && (
+                          <tr>
+                            <td colSpan={6} className="py-8 text-center text-xs text-muted">
+                              未找到符合当前筛选条件的在榜模型
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+        )}
+      </Card>
+    )
+  }
+
+
+
+  const handleTestChatSend = async () => {
+    const q = testChatInput.trim() || '海拉，能收到我的联络信号吗？'
+    setIsTestChatSending(true)
+    try {
+      const res = await sendAIChatMessage(selectedChar?.char_id || 90001001, q, activeUid)
+      if (res.code === 0 && res.data) {
+        setTestChatReply({
+          query: q,
+          reply: res.data.reply || res.data.content || '（已收到信号）',
+          latency_ms: res.data.latency_ms,
+        })
+        setTestChatInput('')
+        showToast('试聊回复成功生成！')
+      } else {
+        showToast(res.msg || '试聊请求失败', 'warning')
+      }
+    } catch (err: any) {
+      showToast(err?.message || '试聊请求异常', 'warning')
+    } finally {
+      setIsTestChatSending(false)
+    }
+  }
+
+  // 保存模型配置
+  const handleSaveModelAction = async () => {
+    try {
+      const payload: any = {
+        provider: editProvider,
+        model: editModel,
+        base_url: editBaseUrl,
+        timeout_seconds: parseInt(editTimeout) || 30,
+        max_tokens: parseInt(editMaxTokens) || 1024,
+        temperature: parseFloat(editTemp) || 0.7,
+        max_history_turns: parseInt(editMaxHistoryTurns) || 10,
+        system_prefix: editSystemPrefix,
+      }
+      if (editApiKey.trim()) {
+        payload.api_key = editApiKey.trim()
+      }
+      const res = await saveAIChatConfig(payload)
+      if (res.code === 0 && res.data) {
+        setModelConfig(res.data)
+      }
+      if (res.code === 0) {
+        setEditApiKey('')
+        showToast('大模型参数已安全持久化保存至 .env 与受控配置文件')
+      }
+    } catch (error: any) {
+      showToast(error?.message || '大模型参数保存失败', 'warning')
+    }
+  }
+
+  const activeGreetingCount = (characters || []).filter((c) => c && c.greeting_mode !== 'none').length
+  const isQuotaWarning = activeGreetingCount > 3
+  const activePreset = PROVIDER_PRESETS.find((p) => p.id === editProvider) || PROVIDER_PRESETS[PROVIDER_PRESETS.length - 1]
+
+  return (
+    <div className="space-y-6">
+      {/* 顶部标题栏 + 双工作台分段选项卡 */}
+      <PageHeader
+        title="AI修正者聊天与问候中枢"
+        description="基于 100% 离线深空万年历、3 线程安全并发隔离池与大模型人设 Prompt，实现沉浸式即时拟真对话与节日祝福。"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            {/* 顶栏分段页签控制器 */}
+            <div className="flex rounded-xl bg-surface-secondary/80 p-1 border border-separator/80 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setActiveTab('chat')}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer',
+                  activeTab === 'chat'
+                    ? 'bg-surface font-semibold text-foreground shadow-xs'
+                    : 'text-muted hover:text-foreground',
+                )}
+              >
+                <Bot className="size-4 text-accent" />
+                <span>修正者互动与会话</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('config')}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer',
+                  activeTab === 'config'
+                    ? 'bg-surface font-semibold text-foreground shadow-xs'
+                    : 'text-muted hover:text-foreground',
+                )}
+              >
+                <SlidersHorizontal className="size-4 text-accent" />
+                <span>大模型接入与推理引擎</span>
+              </button>
+            </div>
+
+            {/* 引擎快速状态胶囊（点击可平滑切入配置页） */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('config')}
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-separator/70 bg-surface px-2.5 py-1 text-xs text-muted hover:border-accent/50 hover:text-foreground transition-all cursor-pointer"
+              title="点击查看与调优大模型端点"
+            >
+              <span className="size-2 rounded-full bg-success animate-pulse" />
+              <span className="font-mono font-medium">{modelConfig?.model || 'LLM Ready'}</span>
+              {connResult?.latency_ms ? (
+                <span className="font-mono text-[10px] text-muted">({connResult.latency_ms}ms)</span>
+              ) : null}
+            </button>
+
+            {/* 问候派发按钮 */}
+            <Button
+              size="sm"
+              variant="primary"
+              className="gap-1.5 rounded-xl"
+              onPress={handleTriggerGreetingAction}
+              isDisabled={isTriggeringGreeting}
+            >
+              <Mail className={`size-4 ${isTriggeringGreeting ? 'animate-spin' : ''}`} />
+              触发问候邮件派发
+            </Button>
+          </div>
+        }
+      />
+
+      {/* Toast 交互提示框 */}
+      {toastMsg && (
+        <div
+          className={cn(
+            'flex items-center justify-between rounded-xl px-4 py-2.5 text-xs font-medium shadow-sm transition-all animate-in fade-in slide-in-from-top-2',
+            toastMsg.type === 'warning'
+              ? 'bg-warning-soft border border-warning/40 text-warning-soft-foreground'
+              : 'bg-success-soft border border-success/40 text-success-soft-foreground',
+          )}
+        >
+          <div className="flex items-center gap-2">
+            {toastMsg.type === 'warning' ? (
+              <AlertTriangle className="size-4 shrink-0 text-warning" />
+            ) : (
+              <CheckCircle2 className="size-4 shrink-0 text-success" />
+            )}
+            <span>{toastMsg.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setToastMsg(null)}
+            className="text-muted hover:text-foreground cursor-pointer text-xs ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 视图分支 1: 修正者互动与拟真会话 (activeTab === 'chat') */}
+      {/* ========================================================================= */}
+      {activeTab === 'chat' && (
+        <div className="space-y-6">
+          {/* 指标卡矩阵 */}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <StatCard label="当前会话修正者" value={selectedChar?.char_name || '修正者'} icon={Bot} tone="accent" />
+            <StatCard label="驱动引擎模型" value={modelConfig?.model || 'gemini-3.8-flash'} icon={Cpu} tone="success" />
+            <StatCard
+              label="今日历法与节气"
+              value={calendar?.today?.solar_term || calendar?.today?.lunar_date || calendar?.today?.lunar_str || '八月初五'}
+              icon={Calendar}
+              tone="default"
+            />
+            <StatCard label="问候调度并发槽" value="3 线程并发池" icon={Sparkles} tone="warning" />
+          </div>
+
+          {/* 深空日历与节气诊断横幅 */}
+          <Card className="overflow-hidden border border-separator bg-surface p-4 shadow-none">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-separator/60 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+                  <Calendar className="size-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold tracking-tight">
+                      公历 {calendar?.today?.solar_date || calendar?.today?.date || '2026-09-15'} · 农历 {calendar?.today?.lunar_date || calendar?.today?.lunar_str || '八月初五'}
+                    </span>
+                    <Chip size="sm" variant="soft" color="accent">
+                      <Chip.Label>节气：{calendar?.today?.solar_term || '非交节期'}</Chip.Label>
+                    </Chip>
+                    {calendar?.today?.is_player_birthday && (
+                      <Chip size="sm" variant="soft" color="danger">
+                        <Chip.Label>管理员生日特权激活</Chip.Label>
+                      </Chip>
+                    )}
+                    {Array.isArray(calendar?.today?.holidays) && calendar.today.holidays.length > 0 && (
+                      <Chip size="sm" variant="soft" color="success">
+                        <Chip.Label>节日: {calendar.today.holidays.join(', ')}</Chip.Label>
+                      </Chip>
+                    )}
+                  </div>
+                  <p className="mt-0.5 text-xs text-muted">
+                    内置紫金山天文台太阳黄经离线算法，100% 摆脱大模型联网依赖，精准驱动全天候节日与生日事件。
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                size="sm"
+                variant="ghost"
+                className="gap-1.5 text-xs"
+                onPress={loadAllData}
+                isDisabled={isRefreshing}
+              >
+                <RefreshCw className={`size-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                刷新数据
+              </Button>
+            </div>
+
+            {/* 当月寿星走廊 */}
+            <div className="flex items-center gap-2.5 overflow-x-auto pt-3 text-xs">
+              <span className="flex shrink-0 items-center gap-1 font-semibold text-muted">
+                <Clock className="size-3.5" />
+                {calendar?.current_month || 9}月寿星修正者 ({calendar?.total_month_birthdays ?? (calendar?.month_heroes || []).length}人):
+              </span>
+              <div className="flex shrink-0 items-center gap-2">
+                {(calendar?.month_heroes || []).map((hero) => (
+                  <span
+                    key={hero.record_id}
+                    className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-mono ${
+                      hero.is_today
+                        ? 'border-danger/40 bg-danger-soft text-danger font-semibold'
+                        : 'border-separator bg-background text-foreground'
+                    }`}
+                  >
+                    <span>{hero.hero_name}</span>
+                    <span className="text-muted">({hero.birthday})</span>
+                    {hero.is_today && <span className="rounded-full bg-danger px-1 text-[9px] text-white">今日</span>}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          {/* 并发额度警告栏 */}
+          {isQuotaWarning && (
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-warning/40 bg-warning-soft p-3.5 text-xs text-warning-soft-foreground">
+              <div className="flex items-center gap-2.5">
+                <AlertTriangle className="size-4 shrink-0 text-warning" />
+                <span>
+                  <strong>并发额度与 Token 消耗提示：</strong>
+                  当前已有 <span className="underline font-bold">{activeGreetingCount}</span> 位修正者启用节假日/生日自动问候。
+                  多角色并发将消耗更多 API 额度，底层已开启 3 线程并发隔离池保护。
+                </span>
+              </div>
+              <Chip size="sm" variant="soft" color="warning">
+                <Chip.Label>3-Thread Pool Active</Chip.Label>
+              </Chip>
+            </div>
+          )}
+
+          {/* 主工作区：左侧独立卡片名册 + 右侧对话沙盒 */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
+            {/* 左侧：名册与派遣策略 (7列) */}
+            <div className="space-y-4 lg:col-span-7">
+              <Card className="flex h-[700px] flex-col overflow-hidden rounded-2xl border border-separator bg-surface shadow-none">
+                {/* 卡片顶栏 */}
+                <div className="flex items-center justify-between border-b border-separator/60 p-4 bg-muted/5 shrink-0">
+                  <div className="flex items-center gap-2.5">
+                    <div className="grid size-8 place-items-center rounded-xl bg-accent-soft text-accent">
+                      <Bot className="size-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold tracking-tight">修正者名册与问候策略</h3>
+                      <p className="text-xs text-muted">独立配置每位修正者的节气与节日问候触发规则</p>
+                    </div>
+                  </div>
+                  <Chip size="sm" variant="soft" color="accent" className="font-mono text-xs">
+                    <Chip.Label>{(characters || []).length} 位修正者在役</Chip.Label>
+                  </Chip>
+                </div>
+
+                {/* 名册滚动区 */}
+                <ScrollShadow className="flex-1 overflow-y-auto p-3 cp-scroll">
+                  <div className="space-y-2.5">
+                    {(characters || []).map((char) => {
+                      const isSelected = selectedChar?.char_id === char.char_id
+                      return (
+                        <Card
+                          key={char.char_id}
+                          className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border p-3.5 shadow-none transition-colors ${
+                            isSelected
+                              ? 'border-accent/55 bg-accent-soft/55'
+                              : 'border-separator bg-surface hover:border-accent/30 hover:bg-surface-secondary/45'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <CharacterAvatar
+                              src={char.avatar}
+                              name={char.char_name}
+                              size="md"
+                              className="size-10"
+                            />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-semibold truncate">{char.char_name}</span>
+                                <span className="rounded-lg bg-muted/20 px-1.5 py-0.5 font-mono text-[10px] text-muted">
+                                  {char.ip_location}
+                                </span>
+                                <span className="font-mono text-[10px] text-muted">
+                                  生日: {char.birthday || '未录入'}
+                                </span>
+                              </div>
+                              <p className="mt-0.5 truncate text-xs text-muted">{char.sign || char.greeting_msg}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Select
+                              aria-label="问候策略"
+                              className="w-[180px] shrink-0"
+                              selectedKey={char.greeting_mode}
+                              onSelectionChange={(key) =>
+                                handleUpdateGreeting(
+                                  char.char_id,
+                                  String(key) as 'all' | 'holiday' | 'birthday' | 'none'
+                                )
+                              }
+                            >
+                              <Select.Trigger className="h-8.5 rounded-xl border border-separator/80 bg-background/80 text-xs shadow-none hover:bg-background">
+                                <Select.Value />
+                                <Select.Indicator />
+                              </Select.Trigger>
+                              <Select.Popover className="rounded-2xl border border-separator bg-surface shadow-xl p-1 backdrop-blur-md">
+                                <ListBox className="space-y-0.5">
+                                  <ListBox.Item id="all" textValue="全部触发 (节日+生日)" className="rounded-xl px-2.5 py-1.5 text-xs">
+                                    全部触发 (节日+生日)
+                                  </ListBox.Item>
+                                  <ListBox.Item id="holiday" textValue="仅节假日" className="rounded-xl px-2.5 py-1.5 text-xs">
+                                    仅节假日
+                                  </ListBox.Item>
+                                  <ListBox.Item id="birthday" textValue="仅角色生日" className="rounded-xl px-2.5 py-1.5 text-xs">
+                                    仅角色生日
+                                  </ListBox.Item>
+                                  <ListBox.Item id="none" textValue="静音停用" className="rounded-xl px-2.5 py-1.5 text-xs">
+                                    静音停用
+                                  </ListBox.Item>
+                                </ListBox>
+                              </Select.Popover>
+                            </Select>
+
+                            <Button
+                              isIconOnly
+                              size="sm"
+                              variant="ghost"
+                              className="size-8 rounded-xl text-muted hover:text-accent hover:bg-accent-soft cursor-pointer"
+                              onPress={() => handleOpenPersona(char)}
+                              aria-label="人设 Prompt 调优"
+                            >
+                              <Edit3 className="size-3.5" />
+                            </Button>
+
+                            <Button
+                              size="sm"
+                              variant={isSelected ? 'primary' : 'secondary'}
+                              className="h-8.5 text-xs px-3 rounded-xl font-medium cursor-pointer"
+                              onPress={() => handleSelectChar(char)}
+                            >
+                              {isSelected ? '会话中' : '发起会话'}
+                            </Button>
+                          </div>
+                        </Card>
+                      )
+                    })}
+                  </div>
+                </ScrollShadow>
+
+                {/* 卡片底栏 */}
+                <div className="flex items-center justify-between border-t border-separator/60 bg-muted/5 px-4 py-2.5 text-xs text-muted shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-success animate-pulse" />
+                    <span className="font-mono text-[11px]">离线万年历调度就绪 · 活跃问候 {activeGreetingCount} 位</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 text-[11px] rounded-lg text-muted hover:text-foreground cursor-pointer"
+                    onPress={loadAllData}
+                  >
+                    <RefreshCw className={`size-3 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    同步名册
+                  </Button>
+                </div>
+              </Card>
+            </div>
+
+            {/* 右侧：即时拟真交互对话视窗 (5列) - 等高 700px */}
+            <div className="space-y-4 lg:col-span-5">
+              <Card className="flex h-[700px] flex-col overflow-hidden rounded-2xl border border-separator bg-surface shadow-none">
+                {/* 顶栏 */}
+                <div className="flex items-center justify-between border-b border-separator/60 bg-surface px-4 py-3 shrink-0">
+                  <div className="flex items-center gap-3">
+                    <CharacterAvatar
+                      src={selectedChar.avatar}
+                      name={selectedChar.char_name}
+                      size="sm"
+                      className="size-9"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-foreground">{selectedChar?.char_name || '修正者'}</span>
+                        <Chip size="sm" variant="soft" color="accent" className="h-4.5 px-1.5 text-[10px] rounded-lg">
+                          <Chip.Label>{selectedChar?.ip_location || '同服'}</Chip.Label>
+                        </Chip>
+                      </div>
+                      <p className="text-[10px] text-muted truncate max-w-[200px] mt-0.5">
+                        模型: {modelConfig?.model || 'gemini-3.8-flash'} · 会话 {(messages || []).length} 轮
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="ghost"
+                      className="size-8 rounded-xl text-muted hover:text-accent hover:bg-accent-soft cursor-pointer"
+                      onPress={() => handleOpenPersona(selectedChar)}
+                      aria-label="查看/编辑当前人设"
+                    >
+                      <Edit3 className="size-3.5" />
+                    </Button>
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="ghost"
+                      className="size-8 rounded-xl text-muted hover:text-danger hover:bg-danger-soft cursor-pointer"
+                      onPress={() => setIsClearModalOpen(true)}
+                      aria-label="清空当前历史对话记忆"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 消息滚动流 */}
+                <ScrollShadow ref={chatScrollRef} className="flex-1 space-y-5 overflow-y-auto bg-background/35 p-4 cp-scroll">
+                  {(!messages || messages.length === 0) ? (
+                    <div className="flex h-full min-h-[360px] flex-col items-center justify-center text-center p-6 text-muted">
+                      <div className="size-12 rounded-2xl bg-surface-secondary flex items-center justify-center text-muted mb-3 shadow-inner">
+                        <MessageSquare className="size-6 text-muted" />
+                      </div>
+                      <p className="text-xs font-semibold text-foreground">暂无历史对话记忆</p>
+                      <p className="text-[11px] text-muted mt-1 max-w-[260px] leading-relaxed">
+                        当前角色在服务端没有对话记忆或已被清空。在下方发送讯息即可开启全新会话。
+                      </p>
+                    </div>
+                  ) : (
+                    (messages || []).map((msg) => {
+                    const isUser = msg.role === 'user'
+                    const msgDateStr = new Date(msg.timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+
+                    if (isUser) {
+                      return (
+                        <div key={msg.id} className="flex items-start justify-end gap-2.5 max-w-[90%] sm:max-w-[85%] ml-auto">
+                          <div className="flex flex-col items-end space-y-1">
+                            <div className="flex items-center gap-1.5 px-1 text-[10px] text-muted">
+                              <span className="font-medium text-foreground">管理员</span>
+                              <span>·</span>
+                              <span className="font-mono">{msgDateStr}</span>
+                            </div>
+                            <div className="rounded-2xl bg-accent px-4 py-2.5 text-xs leading-relaxed text-accent-foreground shadow-none">
+                              <p className="whitespace-pre-wrap select-text">{msg.content}</p>
+                            </div>
+                          </div>
+                          <AdminAvatar size="sm" className="mt-0.5" />
+                        </div>
+                      )
+                    }
+
+                    return (
+                      <div key={msg.id} className="flex items-start gap-2.5 max-w-[90%] sm:max-w-[85%]">
+                        <CharacterAvatar
+                          src={selectedChar.avatar}
+                          name={selectedChar.char_name}
+                          size="sm"
+                          className="mt-0.5"
+                        />
+                        <div className="flex flex-col items-start space-y-1">
+                          <div className="flex items-center gap-1.5 px-1 text-[10px] text-muted">
+                            <span className="font-semibold text-foreground">{selectedChar.char_name}</span>
+                            <span className="rounded-md bg-muted/20 px-1 text-[9px] text-muted font-mono">
+                              {selectedChar.ip_location}
+                            </span>
+                            <span>·</span>
+                            <span className="font-mono">{msgDateStr}</span>
+                          </div>
+                          <div className="rounded-2xl border border-separator/70 bg-surface px-4 py-3 text-xs leading-relaxed text-foreground shadow-none">
+                            <p className="whitespace-pre-wrap select-text">{msg.content}</p>
+                          </div>
+                          <div className="flex items-center gap-2 px-2 text-[10px] text-muted font-mono">
+                            <span>{msg.model || modelConfig.model}</span>
+                            {msg.latency_ms !== undefined && (
+                              <>
+                                <span>·</span>
+                                <span>{msg.latency_ms}ms</span>
+                              </>
+                            )}
+                            {msg.is_fallback && (
+                              <Chip size="sm" variant="soft" color="warning" className="h-4 rounded-full px-1.5 text-[9px]">
+                                <Chip.Label>规则引擎降级</Chip.Label>
+                              </Chip>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }))}
+
+                  {isSending && (
+                    <div className="flex items-start gap-2.5 max-w-[85%]">
+                      <CharacterAvatar
+                        src={selectedChar.avatar}
+                        name={selectedChar.char_name}
+                        size="sm"
+                        className="mt-0.5 animate-pulse"
+                      />
+                      <div className="flex flex-col items-start space-y-1">
+                        <span className="text-[10px] text-muted px-1">{selectedChar.char_name}</span>
+                        <div className="flex items-center gap-2 rounded-2xl border border-separator/70 bg-surface px-4 py-2.5 text-xs text-muted shadow-none">
+                          <span className="inline-flex gap-1 items-center">
+                            <span className="size-1.5 rounded-full bg-accent animate-bounce" />
+                            <span className="size-1.5 rounded-full bg-accent animate-bounce [animation-delay:0.2s]" />
+                            <span className="size-1.5 rounded-full bg-accent animate-bounce [animation-delay:0.4s]" />
+                          </span>
+                          <span className="text-xs">正在思考并组织回复...</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </ScrollShadow>
+
+                {/* 快捷测试胶囊 */}
+                <div className="flex items-center gap-1.5 overflow-x-auto border-t border-separator/60 bg-surface p-2 text-[11px] cp-scroll shrink-0">
+                  <span className="ml-1 shrink-0 font-medium text-muted text-[10px]">快捷语:</span>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="h-7 rounded-xl px-2.5 text-[11px] shrink-0 border border-separator/60 cursor-pointer"
+                    onPress={() => handleSend('你好呀，今天忙不忙？')}
+                  >
+                    你好呀，今天忙不忙？
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="h-7 rounded-xl px-2.5 text-[11px] shrink-0 border border-separator/60 cursor-pointer"
+                    onPress={() => handleSend('能为我提供一些作战物资补给吗？')}
+                  >
+                    申请物资补给
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="h-7 rounded-xl px-2.5 text-[11px] shrink-0 border border-separator/60 cursor-pointer"
+                    onPress={() => handleSend('今天天气真好，一起去散步吧！')}
+                  >
+                    一起散步吧
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="h-7 rounded-xl px-2.5 text-[11px] shrink-0 border border-separator/60 cursor-pointer"
+                    onPress={() => handleSend('今天是我的生日，有什么祝福想对我说吗？')}
+                  >
+                    生日祝福
+                  </Button>
+                </div>
+
+                {/* 输入发送栏 */}
+                <div className="flex items-center gap-2 border-t border-separator bg-surface p-3 shrink-0">
+                  <input
+                    type="text"
+                    placeholder={`与 ${selectedChar.char_name} 交流... (回车发送)`}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handleSend()
+                      }
+                    }}
+                    disabled={isSending}
+                    className="flex-1 rounded-2xl border border-separator bg-background px-3.5 py-2 text-xs text-foreground shadow-none outline-none transition-colors focus:border-accent"
+                  />
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    className="h-8.5 px-3.5 rounded-xl cursor-pointer"
+                    onPress={() => handleSend()}
+                    isDisabled={isSending || !inputText.trim()}
+                  >
+                    <Send className="size-3.5" />
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          </div>
+
+          {renderLeaderboardsSection()}
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 视图分支 2: 大模型接入与推理引擎工作台 (activeTab === 'config') */}
+      {/* ========================================================================= */}
+      {activeTab === 'config' && (
+        <div className="space-y-6">
+          {/* 1. 模型引擎状态总览卡片 */}
+          <Card className="p-4 border border-separator/80 bg-surface rounded-2xl shadow-none">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="grid size-11 place-items-center rounded-2xl bg-accent-soft text-accent">
+                  <Cpu className="size-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-bold text-foreground">大模型接入与推理引擎</h2>
+                    <Chip size="sm" variant="soft" color="accent" className="font-mono text-xs">
+                      <Chip.Label>{modelConfig?.provider || editProvider}</Chip.Label>
+                    </Chip>
+                    {modelConfig?.has_api_key ? (
+                      <Chip size="sm" variant="soft" color="success" className="text-xs">
+                        <Chip.Label>密钥受控保护中</Chip.Label>
+                      </Chip>
+                    ) : (
+                      <Chip size="sm" variant="soft" color="warning" className="text-xs">
+                        <Chip.Label>未配置 API 密钥</Chip.Label>
+                      </Chip>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted mt-1 flex items-center gap-2">
+                    <span>当前生效模型：<strong className="font-mono text-foreground">{modelConfig?.model || editModel}</strong></span>
+                    <span>·</span>
+                    <span className="truncate max-w-[380px]">基址：<span className="font-mono text-muted-foreground">{modelConfig?.base_url || editBaseUrl || '未配置'}</span></span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                {connResult && (
+                  <div
+                    className={cn(
+                      'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
+                      connResult.success
+                        ? 'border-success/40 bg-success-soft text-success'
+                        : 'border-danger/40 bg-danger-soft text-danger',
+                    )}
+                  >
+                    {connResult.success ? (
+                      <CheckCircle2 className="size-4 shrink-0" />
+                    ) : (
+                      <AlertTriangle className="size-4 shrink-0" />
+                    )}
+                    <span>
+                      {connResult.success
+                        ? `端点就绪 (${connResult.latency_ms ?? 0}ms)`
+                        : '连接探测异常'}
+                    </span>
+                  </div>
+                )}
+                <Button
+                  size="sm"
+                  variant="primary"
+                  className="gap-1.5 text-xs font-semibold rounded-xl px-4 cursor-pointer"
+                  onPress={handleSaveModelAction}
+                >
+                  <ShieldCheck className="size-4" />
+                  保存大模型参数
+                </Button>
+              </div>
+            </div>
+          </Card>
+
+          {/* 2. 主体双栏：左 7 列（服务商与网关端点） + 右 5 列（推理调优与实时诊断） */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* 左侧 7 列：服务商与网关端点卡片 */}
+            <div className="space-y-4 lg:col-span-7">
+              <Card className="flex flex-col overflow-hidden rounded-2xl border border-separator bg-surface p-5 space-y-5 shadow-none">
+                {/* 标题 */}
+                <div className="flex items-center justify-between border-b border-separator/60 pb-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="grid size-8 place-items-center rounded-xl bg-accent-soft text-accent">
+                      <SlidersHorizontal className="size-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold tracking-tight">服务商与网关端点</h3>
+                      <p className="text-xs text-muted">选择服务商模板或自由配置 OpenAI 兼容反代基址与私有密钥</p>
+                    </div>
+                  </div>
+                  <Chip size="sm" variant="soft" color="default" className="text-xs">
+                    <Chip.Label>安全隔离写入 .env</Chip.Label>
+                  </Chip>
+                </div>
+
+                {/* 厂商预设矩阵 */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-foreground">快速预设厂商 (Preset Provider)</Label>
+                    <span className="text-[11px] text-muted">点击快速回填官方端点与推荐模型</span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {PROVIDER_PRESETS.map((preset) => {
+                      const isSelected = editProvider === preset.id
+                      return (
+                        <div
+                          key={preset.id}
+                          onClick={() => handleSelectPreset(preset)}
+                          className={cn(
+                            'p-2.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-1 group',
+                            isSelected
+                              ? 'border-accent bg-accent-soft/40 shadow-xs'
+                              : 'border-separator/80 bg-surface-secondary/30 hover:border-accent/40 hover:bg-surface-secondary/60',
+                          )}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className={cn('text-xs font-semibold truncate', isSelected ? 'text-accent' : 'text-foreground')}>
+                              {preset.name}
+                            </span>
+                            <span
+                              className={cn(
+                                'text-[9px] px-1.5 py-0.2 rounded font-mono shrink-0 ml-1',
+                                isSelected ? 'bg-accent text-accent-foreground font-bold' : 'bg-muted/20 text-muted',
+                              )}
+                            >
+                              {preset.badge}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-muted line-clamp-1">{preset.hint}</p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* API 基础地址 (Base URL) */}
+                <TextField fullWidth value={editBaseUrl} onChange={setEditBaseUrl}>
+                  <div className="flex justify-between items-center mb-1">
+                    <Label className="text-xs font-semibold text-foreground">API 基础基址 (Base URL)</Label>
+                    <span className="text-[11px] text-muted font-mono">{activePreset.apiKeyEnv}</span>
+                  </div>
+                  <Input
+                    placeholder="例如: https://generativelanguage.googleapis.com/v1beta/openai"
+                    className="font-mono text-xs rounded-xl"
+                  />
+                  <Description className="text-[11px] text-muted mt-1">
+                    自定义第三方兼容端点，通常以 /v1 或 /v1beta/openai 结尾。
+                  </Description>
+                </TextField>
+
+                {/* API 密钥 (API Key) */}
+                <TextField fullWidth value={editApiKey} onChange={setEditApiKey}>
+                  <div className="flex justify-between items-center mb-1">
+                    <Label className="text-xs font-semibold text-foreground">API 密钥 (API Key)</Label>
+                    <span className="text-[10px] font-mono text-muted">
+                      {modelConfig.has_api_key ? '已配置安全掩码脱敏保护' : '未检测到配置'}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type={showApiKey ? 'text' : 'password'}
+                      placeholder={modelConfig.has_api_key ? `留空保持当前配置 (${modelConfig.api_key_masked})` : '请输入您的 API 密钥...'}
+                      className="font-mono text-xs pr-9 rounded-xl"
+                    />
+                    <Button
+                      type="button"
+                      isIconOnly
+                      size="sm"
+                      variant="ghost"
+                      onPress={() => setShowApiKey(!showApiKey)}
+                      className="absolute right-1 top-1 size-7 rounded-lg text-muted hover:text-foreground cursor-pointer"
+                      aria-label="显示或隐藏密钥"
+                    >
+                      {showApiKey ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                    </Button>
+                  </div>
+                  <Description className="text-[11px] text-muted mt-1">
+                    新填入的密钥将安全写入服务端受控 .env 文件，绝不随客户端或代码提交泄露。
+                  </Description>
+                </TextField>
+
+                {/* 模型名称与快捷候选 Chips */}
+                <div className="space-y-1.5">
+                  <TextField fullWidth value={editModel} onChange={setEditModel}>
+                    <Label className="text-xs font-semibold text-foreground">模型名称 (Model Identifier)</Label>
+                    <Input
+                      placeholder="例如: gemini-3.8-flash / gpt-5.6 / deepseek-flash / claude-sonnet-5"
+                      className="font-mono text-xs rounded-xl"
+                    />
+                  </TextField>
+                  {activePreset.candidateModels.length > 0 && (
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-muted font-medium">
+                          官方推荐候选 ({activePreset.candidateModels.length} 款):
+                        </span>
+                        {activePreset.candidateModels.length > 6 && (
+                          <div className="relative flex items-center">
+                            <Search className="w-3 h-3 text-muted absolute left-1.5 pointer-events-none" />
+                            <input
+                              type="text"
+                              value={modelSearch}
+                              onChange={(e) => setModelSearch(e.target.value)}
+                              placeholder="筛选型号..."
+                              className="pl-5 pr-2 py-0.5 text-[11px] font-mono bg-surface-secondary/80 border border-separator/70 rounded-md text-foreground placeholder:text-muted/60 focus:outline-hidden focus:border-accent w-28 transition-all"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-1.5 max-h-[160px] overflow-y-auto pr-0.5 custom-scrollbar">
+                        {activePreset.candidateModels
+                          .filter((m) => (modelSearch.trim() ? m.toLowerCase().includes(modelSearch.trim().toLowerCase()) : true))
+                          .map((m) => (
+                            <button
+                              key={m}
+                              type="button"
+                              onClick={() => setEditModel(m)}
+                              className={cn(
+                                'rounded-lg px-2 py-0.5 text-xs font-mono transition-all cursor-pointer border flex items-center gap-1',
+                                editModel === m
+                                  ? 'bg-accent text-accent-foreground border-accent font-semibold shadow-xs'
+                                  : 'bg-surface-secondary/60 border-separator/80 text-muted hover:text-foreground hover:border-accent/40',
+                              )}
+                            >
+                              <ProviderLogo provider={activePreset.id} model={m} className="size-3.5" />
+                              <span>{m}</span>
+                              {m === 'gpt-5.6' && (
+                                <span
+                                  className={cn(
+                                    'text-[9px] px-1 py-0.2 rounded font-sans tracking-tight',
+                                    editModel === m
+                                      ? 'bg-accent-foreground/20 text-accent-foreground font-bold'
+                                      : 'bg-emerald-500/15 text-emerald-500 font-medium',
+                                  )}
+                                >
+                                  → sol
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        {modelSearch.trim() &&
+                          activePreset.candidateModels.filter((m) =>
+                            m.toLowerCase().includes(modelSearch.trim().toLowerCase()),
+                          ).length === 0 && (
+                            <span className="text-[11px] text-muted/70 italic py-1">未匹配到该型号</span>
+                          )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 超时时限 */}
+                <TextField fullWidth value={editTimeout} onChange={setEditTimeout}>
+                  <div className="flex justify-between items-center mb-1">
+                    <Label className="text-xs font-semibold text-foreground">请求超时时限 (Timeout Seconds)</Label>
+                    <span className="text-[11px] text-muted font-mono">{editTimeout} 秒</span>
+                  </div>
+                  <Input
+                    type="number"
+                    placeholder="30"
+                    className="font-mono text-xs rounded-xl"
+                  />
+                  <Description className="text-[11px] text-muted mt-1">
+                    网络等待超时时间，推荐 20~60 秒，复杂深度推理或本地慢速硬件可适当调大。
+                  </Description>
+                </TextField>
+              </Card>
+            </div>
+
+            {/* 右侧 5 列：高级推理调优与实时诊断控制台 */}
+            <div className="space-y-4 lg:col-span-5">
+              {/* 卡片 1: 推理调优参数 */}
+              <Card className="flex flex-col overflow-hidden rounded-2xl border border-separator bg-surface p-5 space-y-4 shadow-none">
+                <div className="flex items-center gap-2.5 border-b border-separator/60 pb-3">
+                  <div className="grid size-8 place-items-center rounded-xl bg-accent-soft text-accent">
+                    <Sparkles className="size-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold tracking-tight">模型推理参数微调</h3>
+                    <p className="text-xs text-muted">精细控制生成风格、发散度与上下文深度</p>
+                  </div>
+                </div>
+
+                {/* 温度 */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-xs font-medium text-foreground">温度系数 (Temperature)</Label>
+                    <span className="text-xs font-mono font-bold text-accent">{editTemp}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1.5"
+                      step="0.05"
+                      value={editTemp}
+                      onChange={(e) => setEditTemp(e.target.value)}
+                      className="w-full accent-accent cursor-pointer"
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-muted">
+                    <span>0.1 (严谨严肃)</span>
+                    <span className="font-semibold text-foreground">0.7 (角色平衡·推荐)</span>
+                    <span>1.3 (创意脑洞)</span>
+                  </div>
+                </div>
+
+                {/* 最大输出 Token */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-xs font-medium text-foreground">最大生成 Token (Max Tokens)</Label>
+                    <span className="text-xs font-mono font-bold text-foreground">{editMaxTokens}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="range"
+                      min="256"
+                      max="4096"
+                      step="128"
+                      value={editMaxTokens}
+                      onChange={(e) => setEditMaxTokens(e.target.value)}
+                      className="w-full accent-accent cursor-pointer"
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-muted">
+                    <span>256 (短语速答)</span>
+                    <span>1024 (标准对话)</span>
+                    <span>4096 (长篇叙事)</span>
+                  </div>
+                </div>
+
+                {/* 上下文记忆携带轮数 */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-xs font-medium text-foreground">记忆轮数 (Context Turns)</Label>
+                    <span className="text-xs font-mono font-bold text-foreground">{editMaxHistoryTurns} 轮</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="range"
+                      min="2"
+                      max="30"
+                      step="2"
+                      value={editMaxHistoryTurns}
+                      onChange={(e) => setEditMaxHistoryTurns(e.target.value)}
+                      className="w-full accent-accent cursor-pointer"
+                    />
+                  </div>
+                  <p className="text-[11px] text-muted">
+                    限制会话携带的历史消息条数，防止上下文无限累积导致响应减慢与 Token 费用骤增。
+                  </p>
+                </div>
+
+                {/* 系统级沉浸提示词前缀 */}
+                <div className="space-y-1">
+                  <Label className="text-xs font-medium text-foreground">系统全局前缀提示词 (System Prefix)</Label>
+                  <textarea
+                    rows={2}
+                    value={editSystemPrefix}
+                    onChange={(e) => setEditSystemPrefix(e.target.value)}
+                    placeholder="你正在与《深空之眼》的管理员进行游戏内私聊..."
+                    className="w-full rounded-xl border border-separator/80 bg-background p-2.5 text-xs text-foreground font-mono focus:border-accent focus:outline-none transition-colors"
+                  />
+                  <p className="text-[10px] text-muted">
+                    前置注入每位修正者人设之前，强制约束输出简明口语化，杜绝代码块与 AI 身份泄露。
+                  </p>
+                </div>
+              </Card>
+
+              {/* 卡片 2: 连通性诊断与极速试聊控制台 */}
+              <Card className="flex flex-col overflow-hidden rounded-2xl border border-separator bg-surface p-5 space-y-4 shadow-none">
+                <div className="flex items-center justify-between border-b border-separator/60 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="grid size-8 place-items-center rounded-xl bg-accent-soft text-accent">
+                      <Activity className="size-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold tracking-tight">连通诊断与极速试聊</h3>
+                      <p className="text-xs text-muted">检测网络可用性与握手延迟，支持原地免切换试聊</p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="text-xs rounded-xl cursor-pointer"
+                    onPress={handleTestConnAction}
+                    isDisabled={isTestingConn}
+                  >
+                    <RefreshCw className={cn('size-3.5 mr-1', isTestingConn && 'animate-spin')} />
+                    {isTestingConn ? '探测中...' : '测试连通性'}
+                  </Button>
+                </div>
+
+                {/* 探测结果卡片 */}
+                {connResult ? (
+                  <div
+                    className={cn(
+                      'p-3.5 rounded-xl border text-xs space-y-1.5 transition-all',
+                      connResult.success
+                        ? 'border-success/40 bg-success-soft/60 text-success'
+                        : 'border-danger/40 bg-danger-soft/60 text-danger',
+                    )}
+                  >
+                    <div className="flex items-center justify-between font-semibold">
+                      <div className="flex items-center gap-2">
+                        {connResult.success ? (
+                          <CheckCircle2 className="size-4 shrink-0" />
+                        ) : (
+                          <AlertTriangle className="size-4 shrink-0" />
+                        )}
+                        <span>{connResult.success ? '端点握手成功 (HTTP 200 OK)' : '连通探测失败'}</span>
+                      </div>
+                      {connResult.latency_ms !== undefined && (
+                        <span className="font-mono text-[11px]">延迟: {connResult.latency_ms} ms</span>
+                      )}
+                    </div>
+                    <p className="text-[11px] opacity-90">{connResult.msg}</p>
+                    {connResult.error && (
+                      <p className="text-[10px] font-mono break-all text-danger/80 bg-danger/10 p-1.5 rounded-lg mt-1">
+                        {connResult.error}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-xl border border-dashed border-separator/70 bg-surface-secondary/20 text-center text-xs text-muted">
+                    点击上方「测试连通性」发起端点握手并检测响应延迟
+                  </div>
+                )}
+
+                {/* 极速试聊小沙盒 */}
+                <div className="pt-2 border-t border-separator/60 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-foreground flex items-center gap-1.5">
+                      <Bot className="size-3.5 text-accent" />
+                      原地试聊预览 ({selectedChar?.char_name || '当前修正者'})
+                    </span>
+                    <span className="text-[10px] text-muted">直接测试生成效果</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={testChatInput}
+                      onChange={(e) => setTestChatInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleTestChatSend()
+                        }
+                      }}
+                      placeholder="输入测试问候，如：海拉，今天忙不忙？"
+                      disabled={isTestChatSending}
+                      className="flex-1 rounded-xl border border-separator bg-background px-3 py-1.5 text-xs text-foreground focus:border-accent focus:outline-none transition-colors"
+                    />
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="rounded-xl px-3 text-xs shrink-0 cursor-pointer"
+                      onPress={handleTestChatSend}
+                      isDisabled={isTestChatSending}
+                    >
+                      <Send className={cn('size-3.5 mr-1', isTestChatSending && 'animate-spin')} />
+                      {isTestChatSending ? '生成中...' : '试聊'}
+                    </Button>
+                  </div>
+
+                  {testChatReply && (
+                    <div className="p-3 rounded-xl border border-separator/70 bg-surface-secondary/40 text-xs space-y-1">
+                      <div className="flex items-center justify-between text-[10px] text-muted">
+                        <span>管理员: "{testChatReply.query}"</span>
+                        {testChatReply.latency_ms && <span className="font-mono">{testChatReply.latency_ms}ms</span>}
+                      </div>
+                      <div className="font-medium text-foreground select-text">
+                        <span className="text-accent font-semibold">{selectedChar?.char_name}:</span> {testChatReply.reply}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            </div>
+          </div>
+
+          {renderLeaderboardsSection()}
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 弹窗: 修正者人设与 Prompt 调优模态框 (独立保留) */}
+      {/* ========================================================================= */}
+      <Modal.Root isOpen={isPersonaModalOpen} onOpenChange={setIsPersonaModalOpen}>
+        <Modal.Backdrop className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <Modal.Container className="w-full max-w-lg max-h-[85vh] flex flex-col pointer-events-none">
+            <Modal.Dialog className="relative w-full pointer-events-auto bg-surface border border-separator rounded-3xl shadow-2xl p-6 flex flex-col max-h-[85vh] overflow-hidden">
+              <Modal.Header className="flex items-center justify-between pb-3.5 border-b border-separator shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="grid size-8 place-items-center rounded-xl bg-accent-soft text-accent">
+                    <Edit3 className="size-4" />
+                  </div>
+                  <Modal.Heading className="text-sm font-semibold text-foreground">
+                    修正者「{editCharName}」人设与 Prompt 调优
+                  </Modal.Heading>
+                </div>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-xl cursor-pointer"
+                  aria-label="关闭"
+                  onPress={() => setIsPersonaModalOpen(false)}
+                >
+                  <X className="size-4" />
+                </Button>
+              </Modal.Header>
+
+              <Modal.Body className="py-4 space-y-4 flex-1 overflow-y-auto cp-scroll">
+                <TextField fullWidth value={editCharName} onChange={setEditCharName}>
+                  <Label className="text-xs font-medium text-foreground">修正者称号与姓名</Label>
+                  <Input placeholder="如：早樱·大国主" className="text-xs rounded-xl" />
+                </TextField>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <TextField fullWidth value={editLocation} onChange={setEditLocation}>
+                    <Label className="text-xs font-medium text-foreground">IP 属地 / 所属原质区</Label>
+                    <Input placeholder="如：笹波 / 欧林匹斯" className="text-xs rounded-xl" />
+                  </TextField>
+                  <TextField fullWidth value={editSign} onChange={setEditSign}>
+                    <Label className="text-xs font-medium text-foreground">个性签名</Label>
+                    <Input placeholder="个性签名..." className="text-xs rounded-xl" />
+                  </TextField>
+                </div>
+
+                <TextField fullWidth value={editGreetingMsg} onChange={setEditGreetingMsg}>
+                  <Label className="text-xs font-medium text-foreground">首次见面默认问候语</Label>
+                  <Input placeholder="首次聊天或清空会话后的默认第一句问候..." className="text-xs rounded-xl" />
+                </TextField>
+
+                <div className="space-y-1">
+                  <Label className="text-xs font-medium text-foreground">核心人设 System Prompt</Label>
+                  <textarea
+                    rows={5}
+                    value={editSystemPrompt}
+                    onChange={(e) => setEditSystemPrompt(e.target.value)}
+                    placeholder="详细描述修正者的外貌、性格特征、说话口吻、对待管理员的态度..."
+                    className="w-full rounded-2xl border border-separator bg-background p-3 text-xs leading-relaxed text-foreground shadow-none outline-none focus:border-accent"
+                  />
+                  <p className="text-[10px] text-muted">
+                    定义该修正者的专属 Prompt，将与全局 System Prefix 组合后注入大模型生成上下文。
+                  </p>
+                </div>
+              </Modal.Body>
+
+              <Modal.Footer className="flex justify-end gap-2 border-t border-separator pt-3.5 shrink-0">
+                <Button size="sm" variant="ghost" className="text-xs rounded-xl cursor-pointer" onPress={() => setIsPersonaModalOpen(false)}>
+                  取消
+                </Button>
+                <Button size="sm" variant="primary" className="text-xs rounded-xl cursor-pointer" onPress={handleSavePersona}>
+                  保存人设
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal.Root>
+
+      {/* ========================================================================= */}
+      {/* 弹窗: 清空会话记忆二次确认模态框 */}
+      {/* ========================================================================= */}
+      <Modal.Root isOpen={isClearModalOpen} onOpenChange={setIsClearModalOpen}>
+        <Modal.Backdrop className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <Modal.Container className="w-full max-w-md flex flex-col pointer-events-none">
+            <Modal.Dialog className="relative w-full pointer-events-auto bg-surface border border-separator rounded-3xl shadow-2xl p-6 flex flex-col overflow-hidden">
+              <Modal.Header className="flex items-center justify-between pb-3.5 border-b border-separator shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="grid size-8 place-items-center rounded-xl bg-danger-soft text-danger">
+                    <Trash2 className="size-4" />
+                  </div>
+                  <Modal.Heading className="text-sm font-semibold text-foreground">
+                    清空会话记忆确认
+                  </Modal.Heading>
+                </div>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-xl cursor-pointer"
+                  aria-label="关闭"
+                  onPress={() => setIsClearModalOpen(false)}
+                >
+                  <X className="size-4" />
+                </Button>
+              </Modal.Header>
+
+              <Modal.Body className="py-4 space-y-3">
+                <p className="text-xs text-foreground leading-relaxed">
+                  您确定要清空与修正者【<strong className="text-foreground font-semibold">{selectedChar?.char_name}</strong>】的历史对话记录吗？
+                </p>
+                <div className="rounded-2xl border border-warning/30 bg-warning-soft/80 p-3 text-[11px] text-warning-soft-foreground space-y-1">
+                  <p className="font-semibold text-warning">注意事项：</p>
+                  <p className="leading-relaxed text-muted">
+                    此操作将清除服务端内部的对话记忆并重置大模型上下文滑动窗口。后续向该修正者发信时将开启全新会话，大模型将不再携带此前的历史记忆。
+                  </p>
+                </div>
+              </Modal.Body>
+
+              <Modal.Footer className="flex items-center justify-end gap-2 border-t border-separator pt-3.5 shrink-0">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-xs rounded-xl cursor-pointer"
+                  onPress={() => setIsClearModalOpen(false)}
+                  isDisabled={isClearing}
+                >
+                  取消
+                </Button>
+                <Button
+                  size="sm"
+                  variant="primary"
+                  className="text-xs rounded-xl bg-danger hover:bg-danger/90 text-danger-foreground cursor-pointer font-medium"
+                  onPress={handleConfirmClear}
+                  isDisabled={isClearing}
+                >
+                  {isClearing ? '正在清空...' : '确认清空'}
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal.Root>
+    </div>
+  )
+}

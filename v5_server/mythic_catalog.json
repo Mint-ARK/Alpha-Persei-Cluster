@@ -1,0 +1,1075 @@
+{
+  "difficulties": {
+    "1": {
+      "id": 1,
+      "name": "难度1",
+      "background": "icon_b1",
+      "difficulty": 1,
+      "desc": "晚钟已响。",
+      "recommend_level": [
+        40,
+        45
+      ]
+    },
+    "2": {
+      "id": 2,
+      "name": "难度2",
+      "background": "icon_b2",
+      "difficulty": 1,
+      "desc": "万物将息。",
+      "recommend_level": [
+        45,
+        50
+      ]
+    },
+    "3": {
+      "id": 3,
+      "name": "难度3",
+      "background": "icon_b3",
+      "difficulty": 1,
+      "desc": "夜色朦胧。",
+      "recommend_level": [
+        50,
+        55
+      ]
+    },
+    "4": {
+      "id": 4,
+      "name": "难度4",
+      "background": "icon_b4",
+      "difficulty": 1,
+      "desc": "薄暮低垂。",
+      "recommend_level": [
+        55,
+        60
+      ]
+    },
+    "5": {
+      "id": 5,
+      "name": "难度5",
+      "background": "icon_b5",
+      "difficulty": 1,
+      "desc": "寂寥夜空。",
+      "recommend_level": [
+        60,
+        65
+      ]
+    },
+    "6": {
+      "id": 6,
+      "name": "难度6",
+      "background": "icon_b6",
+      "difficulty": 1,
+      "desc": "唯星长明。",
+      "recommend_level": [
+        65,
+        70
+      ]
+    },
+    "7": {
+      "id": 7,
+      "name": "难度7",
+      "background": "icon_b7",
+      "difficulty": 1,
+      "desc": "万籁俱寂。",
+      "recommend_level": [
+        70,
+        80
+      ]
+    },
+    "8": {
+      "id": 8,
+      "name": "难度8",
+      "background": "icon_b8",
+      "difficulty": 1,
+      "desc": "晦暗无边。",
+      "recommend_level": [
+        80,
+        100
+      ]
+    },
+    "9": {
+      "id": 9,
+      "name": "难度9",
+      "background": "icon_b9",
+      "difficulty": 1,
+      "desc": "极夜漫漫。",
+      "recommend_level": [
+        80,
+        100
+      ]
+    },
+    "10": {
+      "id": 10,
+      "name": "难度10",
+      "background": "icon_b10",
+      "difficulty": 1,
+      "desc": "似无终时。",
+      "recommend_level": [
+        80,
+        100
+      ]
+    },
+    "11": {
+      "id": 11,
+      "name": "难度11",
+      "background": "icon_b11",
+      "difficulty": 1,
+      "desc": "百鬼夜行。",
+      "recommend_level": [
+        80,
+        100
+      ]
+    },
+    "12": {
+      "id": 12,
+      "name": "难度12",
+      "background": "icon_b12",
+      "difficulty": 1,
+      "desc": "无明无夜。",
+      "recommend_level": [
+        80,
+        100
+      ]
+    },
+    "13": {
+      "id": 13,
+      "name": "难度13",
+      "background": "icon_b13",
+      "difficulty": 1,
+      "desc": "冥昭瞢暗。",
+      "recommend_level": [
+        80,
+        100
+      ]
+    },
+    "1001": {
+      "id": 1001,
+      "name": "难度Ω",
+      "background": "icon_b21",
+      "difficulty": 2,
+      "desc": "苦难梦魇，异变永黯。",
+      "recommend_level": [
+        80,
+        100
+      ]
+    },
+    "all": {}
+  },
+  "partitions": {
+    "1": {
+      "id": 1,
+      "name": "难度1主分区",
+      "monster_level": 27,
+      "attribute_factor": [
+        1000,
+        1000,
+        8620
+      ]
+    },
+    "2": {
+      "id": 2,
+      "name": "难度2主分区",
+      "monster_level": 35,
+      "attribute_factor": [
+        1000,
+        1000,
+        6088
+      ]
+    },
+    "3": {
+      "id": 3,
+      "name": "难度3主分区",
+      "monster_level": 45,
+      "attribute_factor": [
+        1000,
+        1000,
+        6072
+      ]
+    },
+    "4": {
+      "id": 4,
+      "name": "难度4主分区",
+      "monster_level": 50,
+      "attribute_factor": [
+        1000,
+        1000,
+        6274
+      ]
+    },
+    "5": {
+      "id": 5,
+      "name": "难度5主分区",
+      "monster_level": 55,
+      "attribute_factor": [
+        1000,
+        1000,
+        8323
+      ]
+    },
+    "6": {
+      "id": 6,
+      "name": "难度6主分区",
+      "monster_level": 60,
+      "attribute_factor": [
+        1000,
+        1000,
+        9391
+      ]
+    },
+    "7": {
+      "id": 7,
+      "name": "难度7主分区",
+      "monster_level": 70,
+      "attribute_factor": [
+        1000,
+        1000,
+        11392
+      ]
+    },
+    "8": {
+      "id": 8,
+      "name": "难度8主分区",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        13711
+      ]
+    },
+    "9": {
+      "id": 9,
+      "name": "难度9主分区",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        14927
+      ]
+    },
+    "10": {
+      "id": 10,
+      "name": "难度10主分区",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        16770
+      ]
+    },
+    "11": {
+      "id": 11,
+      "name": "难度11主分区",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        18038
+      ]
+    },
+    "12": {
+      "id": 12,
+      "name": "难度12主分区",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        18261
+      ]
+    },
+    "13": {
+      "id": 13,
+      "name": "难度13主分区",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        19580
+      ]
+    },
+    "101": {
+      "id": 101,
+      "name": "难度1次分区1",
+      "monster_level": 27,
+      "attribute_factor": [
+        1000,
+        1000,
+        3448
+      ]
+    },
+    "102": {
+      "id": 102,
+      "name": "难度1次分区2",
+      "monster_level": 27,
+      "attribute_factor": [
+        1000,
+        1000,
+        3448
+      ]
+    },
+    "103": {
+      "id": 103,
+      "name": "难度1次分区3",
+      "monster_level": 27,
+      "attribute_factor": [
+        1000,
+        1000,
+        3448
+      ]
+    },
+    "201": {
+      "id": 201,
+      "name": "难度2次分区1",
+      "monster_level": 35,
+      "attribute_factor": [
+        1000,
+        1000,
+        2435
+      ]
+    },
+    "202": {
+      "id": 202,
+      "name": "难度2次分区2",
+      "monster_level": 35,
+      "attribute_factor": [
+        1000,
+        1000,
+        2435
+      ]
+    },
+    "203": {
+      "id": 203,
+      "name": "难度2次分区3",
+      "monster_level": 35,
+      "attribute_factor": [
+        1000,
+        1000,
+        2435
+      ]
+    },
+    "301": {
+      "id": 301,
+      "name": "难度3次分区1",
+      "monster_level": 45,
+      "attribute_factor": [
+        1000,
+        1000,
+        2428
+      ]
+    },
+    "302": {
+      "id": 302,
+      "name": "难度3次分区2",
+      "monster_level": 45,
+      "attribute_factor": [
+        1000,
+        1000,
+        2428
+      ]
+    },
+    "303": {
+      "id": 303,
+      "name": "难度3次分区3",
+      "monster_level": 45,
+      "attribute_factor": [
+        1000,
+        1000,
+        2428
+      ]
+    },
+    "401": {
+      "id": 401,
+      "name": "难度4次分区1",
+      "monster_level": 50,
+      "attribute_factor": [
+        1000,
+        1000,
+        2509
+      ]
+    },
+    "402": {
+      "id": 402,
+      "name": "难度4次分区2",
+      "monster_level": 50,
+      "attribute_factor": [
+        1000,
+        1000,
+        2509
+      ]
+    },
+    "403": {
+      "id": 403,
+      "name": "难度4次分区3",
+      "monster_level": 50,
+      "attribute_factor": [
+        1000,
+        1000,
+        2509
+      ]
+    },
+    "501": {
+      "id": 501,
+      "name": "难度5次分区1",
+      "monster_level": 55,
+      "attribute_factor": [
+        1000,
+        1000,
+        3329
+      ]
+    },
+    "502": {
+      "id": 502,
+      "name": "难度5次分区2",
+      "monster_level": 55,
+      "attribute_factor": [
+        1000,
+        1000,
+        3329
+      ]
+    },
+    "503": {
+      "id": 503,
+      "name": "难度5次分区3",
+      "monster_level": 55,
+      "attribute_factor": [
+        1000,
+        1000,
+        3329
+      ]
+    },
+    "601": {
+      "id": 601,
+      "name": "难度6次分区1",
+      "monster_level": 60,
+      "attribute_factor": [
+        1000,
+        1000,
+        3756
+      ]
+    },
+    "602": {
+      "id": 602,
+      "name": "难度6次分区2",
+      "monster_level": 60,
+      "attribute_factor": [
+        1000,
+        1000,
+        3756
+      ]
+    },
+    "603": {
+      "id": 603,
+      "name": "难度6次分区3",
+      "monster_level": 60,
+      "attribute_factor": [
+        1000,
+        1000,
+        3756
+      ]
+    },
+    "701": {
+      "id": 701,
+      "name": "难度7次分区1",
+      "monster_level": 70,
+      "attribute_factor": [
+        1000,
+        1000,
+        4556
+      ]
+    },
+    "702": {
+      "id": 702,
+      "name": "难度7次分区2",
+      "monster_level": 70,
+      "attribute_factor": [
+        1000,
+        1000,
+        4556
+      ]
+    },
+    "703": {
+      "id": 703,
+      "name": "难度7次分区3",
+      "monster_level": 70,
+      "attribute_factor": [
+        1000,
+        1000,
+        4556
+      ]
+    },
+    "801": {
+      "id": 801,
+      "name": "难度8次分区1",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        5484
+      ]
+    },
+    "802": {
+      "id": 802,
+      "name": "难度8次分区2",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        5484
+      ]
+    },
+    "803": {
+      "id": 803,
+      "name": "难度8次分区3",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        5484
+      ]
+    },
+    "901": {
+      "id": 901,
+      "name": "难度9次分区1",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        5970
+      ]
+    },
+    "902": {
+      "id": 902,
+      "name": "难度9次分区2",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        5970
+      ]
+    },
+    "903": {
+      "id": 903,
+      "name": "难度9次分区3",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        5970
+      ]
+    },
+    "1001": {
+      "id": 1001,
+      "name": "难度10次分区1",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        6708
+      ]
+    },
+    "1002": {
+      "id": 1002,
+      "name": "难度10次分区2",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        6708
+      ]
+    },
+    "1003": {
+      "id": 1003,
+      "name": "难度10次分区3",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        6708
+      ]
+    },
+    "1101": {
+      "id": 1101,
+      "name": "难度11次分区1",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        7215
+      ]
+    },
+    "1102": {
+      "id": 1102,
+      "name": "难度11次分区2",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        7215
+      ]
+    },
+    "1103": {
+      "id": 1103,
+      "name": "难度11次分区3",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        7215
+      ]
+    },
+    "1201": {
+      "id": 1201,
+      "name": "难度12次分区1",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        7304
+      ]
+    },
+    "1202": {
+      "id": 1202,
+      "name": "难度12次分区2",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        7304
+      ]
+    },
+    "1203": {
+      "id": 1203,
+      "name": "难度12次分区3",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        7304
+      ]
+    },
+    "1301": {
+      "id": 1301,
+      "name": "难度13次分区1",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        7832
+      ]
+    },
+    "1302": {
+      "id": 1302,
+      "name": "难度13次分区2",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        7832
+      ]
+    },
+    "1303": {
+      "id": 1303,
+      "name": "难度13次分区3",
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1000,
+        7832
+      ]
+    },
+    "all": {}
+  },
+  "final_stages": {
+    "1": {
+      "time": 300,
+      "id": 1,
+      "is_unlock": 0,
+      "level_diffuculty": 100,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        8852
+      ]
+    },
+    "2": {
+      "time": 300,
+      "id": 2,
+      "is_unlock": 0,
+      "level_diffuculty": 110,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        9559
+      ]
+    },
+    "3": {
+      "time": 300,
+      "id": 3,
+      "is_unlock": 0,
+      "level_diffuculty": 120,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        10266
+      ]
+    },
+    "4": {
+      "time": 300,
+      "id": 4,
+      "is_unlock": 0,
+      "level_diffuculty": 130,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        10973
+      ]
+    },
+    "5": {
+      "time": 300,
+      "id": 5,
+      "is_unlock": 0,
+      "level_diffuculty": 140,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        11680
+      ]
+    },
+    "6": {
+      "time": 300,
+      "id": 6,
+      "is_unlock": 0,
+      "level_diffuculty": 150,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        12387
+      ]
+    },
+    "7": {
+      "time": 300,
+      "id": 7,
+      "is_unlock": 0,
+      "level_diffuculty": 160,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        13094
+      ]
+    },
+    "8": {
+      "time": 300,
+      "id": 8,
+      "is_unlock": 0,
+      "level_diffuculty": 170,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        13801
+      ]
+    },
+    "9": {
+      "time": 300,
+      "id": 9,
+      "is_unlock": 0,
+      "level_diffuculty": 180,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        14508
+      ]
+    },
+    "10": {
+      "time": 300,
+      "id": 10,
+      "is_unlock": 0,
+      "level_diffuculty": 190,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        15215
+      ]
+    },
+    "11": {
+      "time": 300,
+      "id": 11,
+      "is_unlock": 1,
+      "level_diffuculty": 200,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        19703
+      ]
+    },
+    "12": {
+      "time": 300,
+      "id": 12,
+      "is_unlock": 1,
+      "level_diffuculty": 210,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        20578
+      ]
+    },
+    "13": {
+      "time": 300,
+      "id": 13,
+      "is_unlock": 1,
+      "level_diffuculty": 220,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        21453
+      ]
+    },
+    "14": {
+      "time": 300,
+      "id": 14,
+      "is_unlock": 1,
+      "level_diffuculty": 230,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        22328
+      ]
+    },
+    "15": {
+      "time": 300,
+      "id": 15,
+      "is_unlock": 1,
+      "level_diffuculty": 240,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        23203
+      ]
+    },
+    "16": {
+      "time": 300,
+      "id": 16,
+      "is_unlock": 1,
+      "level_diffuculty": 250,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        24078
+      ]
+    },
+    "17": {
+      "time": 300,
+      "id": 17,
+      "is_unlock": 1,
+      "level_diffuculty": 260,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        24952
+      ]
+    },
+    "18": {
+      "time": 300,
+      "id": 18,
+      "is_unlock": 1,
+      "level_diffuculty": 270,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        25828
+      ]
+    },
+    "19": {
+      "time": 300,
+      "id": 19,
+      "is_unlock": 1,
+      "level_diffuculty": 280,
+      "monster_level": 80,
+      "team_num": 1,
+      "attribute_factor": [
+        1000,
+        1000,
+        26703
+      ]
+    },
+    "20": {
+      "time": 300,
+      "id": 20,
+      "is_unlock": 1,
+      "level_diffuculty": 300,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        29736
+      ]
+    },
+    "21": {
+      "time": 300,
+      "id": 21,
+      "is_unlock": 1,
+      "level_diffuculty": 310,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        31732
+      ]
+    },
+    "22": {
+      "time": 300,
+      "id": 22,
+      "is_unlock": 1,
+      "level_diffuculty": 320,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        35671
+      ]
+    },
+    "23": {
+      "time": 300,
+      "id": 23,
+      "is_unlock": 1,
+      "level_diffuculty": 330,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        38812
+      ]
+    },
+    "24": {
+      "time": 300,
+      "id": 24,
+      "is_unlock": 1,
+      "level_diffuculty": 340,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        43372
+      ]
+    },
+    "25": {
+      "time": 300,
+      "id": 25,
+      "is_unlock": 1,
+      "level_diffuculty": 350,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        45314
+      ]
+    },
+    "26": {
+      "time": 300,
+      "id": 26,
+      "is_unlock": 1,
+      "level_diffuculty": 360,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        56063
+      ]
+    },
+    "27": {
+      "time": 300,
+      "id": 27,
+      "is_unlock": 1,
+      "level_diffuculty": 370,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        72555
+      ]
+    },
+    "28": {
+      "time": 300,
+      "id": 28,
+      "is_unlock": 1,
+      "level_diffuculty": 380,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        97055
+      ]
+    },
+    "29": {
+      "time": 300,
+      "id": 29,
+      "is_unlock": 1,
+      "level_diffuculty": 390,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        123541
+      ]
+    },
+    "30": {
+      "time": 300,
+      "id": 30,
+      "is_unlock": 1,
+      "level_diffuculty": 400,
+      "monster_level": 80,
+      "team_num": 2,
+      "attribute_factor": [
+        1000,
+        1000,
+        171404
+      ]
+    },
+    "all": {}
+  }
+}

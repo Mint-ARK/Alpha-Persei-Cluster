@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>关于 · 深空之眼</title>
+  <style>
+    /* =========================================================================
+       HeroUI v3 规范视觉系统 (纯净轻量自包含，零外部依赖，极速秒开)
+       ========================================================================= */
+    :root, [data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-secondary: #f1f5f9;
+      --border: #e2e8f0;
+      --border-hover: #cbd5e1;
+      --foreground: #0f172a;
+      --muted: #64748b;
+      --accent: #0070f0;
+      --accent-hover: #0060d0;
+      --accent-soft: rgba(0, 112, 240, 0.08);
+      --accent-foreground: #0070f0;
+      --success: #17c964;
+      --success-soft: rgba(23, 201, 100, 0.1);
+      --warning: #f5a524;
+      --warning-soft: rgba(245, 165, 36, 0.1);
+      --code-bg: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] {
+      --bg: #09090b;
+      --surface: #18181b;
+      --surface-secondary: #27272a;
+      --border: #27272a;
+      --border-hover: #3f3f46;
+      --foreground: #fafafa;
+      --muted: #a1a1aa;
+      --accent: #0070f0;
+      --accent-hover: #0060d0;
+      --accent-soft: rgba(0, 112, 240, 0.15);
+      --accent-foreground: #38bdf8;
+      --success: #17c964;
+      --success-soft: rgba(23, 201, 100, 0.15);
+      --warning: #f5a524;
+      --warning-soft: rgba(245, 165, 36, 0.15);
+      --code-bg: #27272a;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--foreground);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 64px;
+      line-height: 1.5;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Page Header */
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    @media (min-width: 640px) {
+      .header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+    .header-info h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--foreground);
+    }
+    .header-info p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 112, 240, 0.3);
+    }
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+    .btn-outline {
+      background-color: transparent;
+      color: var(--foreground);
+      border-color: var(--border);
+    }
+    .btn-outline:hover {
+      background-color: var(--surface-secondary);
+      border-color: var(--border-hover);
+    }
+
+    /* Tabs Bar */
+    .tabs-container {
+      width: 100%;
+      background-color: var(--surface-secondary);
+      padding: 4px;
+      border-radius: 14px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+    }
+    .tab-btn:hover {
+      color: var(--foreground);
+    }
+    .tab-btn.active {
+      color: var(--foreground);
+      background-color: var(--surface);
+      box-shadow: var(--shadow-sm);
+      font-weight: 600;
+    }
+
+    /* Cards */
+    .card {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--foreground);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+    .card-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .card-body p strong {
+      color: var(--foreground);
+      font-weight: 600;
+    }
+    .card-footer {
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Code Badge */
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      background-color: var(--code-bg);
+      color: var(--accent-foreground);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      word-break: break-all;
+    }
+
+    /* Accordion FAQ */
+    .faq-title-area {
+      margin-top: 8px;
+      margin-bottom: 2px;
+    }
+    .faq-title-area h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+    .faq-title-area p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .accordion-item {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+    .accordion-trigger {
+      width: 100%;
+      padding: 14px 18px;
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--foreground);
+      transition: color 0.15s ease;
+    }
+    .accordion-trigger:hover {
+      color: var(--accent);
+    }
+    .accordion-icon {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+      color: var(--muted);
+    }
+    .accordion-item.open .accordion-icon {
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+    .accordion-content {
+      display: none;
+      padding: 0 18px 16px;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.65;
+      border-top: 1px solid var(--border);
+      margin-top: 2px;
+      padding-top: 12px;
+    }
+    .accordion-item.open .accordion-content {
+      display: block;
+      animation: fadeIn 0.15s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Tab Panes */
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+    .tab-pane.active {
+      display: flex;
+      animation: tabEnter 0.2s ease-out;
+    }
+    @keyframes tabEnter {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Chip Badges */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .chip-accent {
+      background-color: var(--accent-soft);
+      color: var(--accent-foreground);
+      border: 1px solid rgba(0, 112, 240, 0.2);
+    }
+    .chip-success {
+      background-color: var(--success-soft);
+      color: var(--success);
+      border: 1px solid rgba(23, 201, 100, 0.2);
+    }
+
+    .icon-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .icon-box-accent {
+      background-color: var(--accent-soft);
+      color: var(--accent);
+    }
+    .icon-box-warning {
+      background-color: var(--warning-soft);
+      color: var(--warning);
+    }
+    .icon-box-success {
+      background-color: var(--success-soft);
+      color: var(--success);
+    }
+    .icon-box-default {
+      background-color: var(--surface-secondary);
+      color: var(--muted);
+    }
+    .icon-svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 顶部标题与快捷操作栏 -->
+    <header class="header">
+      <div class="header-info">
+        <h1>关于</h1>
+        <p>本项目的少量功能描述版</p>
+      </div>
+      <div class="header-actions">
+        <button id="theme-btn" class="btn btn-outline" type="button" title="切换色彩主题">
+          <svg class="icon-svg" id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <span id="theme-text">浅色模式</span>
+        </button>
+        <button id="top-gm-btn" class="btn btn-primary" type="button">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          <span>打开 GM 控制台</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- HeroUI v3 Tabs 导航 -->
+    <nav class="tabs-container" aria-label="子导航">
+      <button class="tab-btn active" data-tab="support" type="button">
+        <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        <span>关于可能的故障</span>
+      </button>
+      <button class="tab-btn" data-tab="permission" type="button">
+        <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <span>关于权限与原理</span>
+      </button>
+      <button class="tab-btn" data-tab="privacy" type="button">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <span>关于数据与隐私</span>
+      </button>
+      <button class="tab-btn" data-tab="terms" type="button">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        <span>个人声明</span>
+      </button>
+    </nav>
+
+    <!-- =========================================================================
+        Tab 1: 关于可能的故障 (support)
+       ========================================================================= -->
+    <section id="pane-support" class="tab-pane active">
+      <!-- GM 运维控制台直通卡片 (动态回环地址，彻底适配封包) -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <span class="icon-box icon-box-accent">
+                <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+              </span>
+              <span>前往控制台</span>
+            </div>
+            <div class="card-desc">在控制台中查看详情数据</div>
+          </div>
+          <button id="card-gm-btn" class="btn btn-primary" type="button">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            <span>直通控制台</span>
+          </button>
+        </div>
+        <div class="card-body">
+          <p>回环服务直通路径：<code id="display-gm-url">http://127.0.0.1/web/gm_console.html</code></p>
+        </div>
+      </div>
+
+      <!-- FAQ 常见排障折叠面板 -->
+      <div class="faq-title-area">
+        <h2>高频排障常见疑问 (FAQ)</h2>
+        <p>客户端报错、网络连接、引导卡死与局域网接入处理指南</p>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-item open">
+          <button class="accordion-trigger" type="button">
+            <span>1. 游戏启动弹窗网络连接失败并附带4开头错误码</span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="accordion-content">
+            <p>• <strong>证书未安装</strong>：首次在新计算机运行必须导入本地根证书 <code>sdk_ca.crt</code> 至“受信任的根证书颁发机构”；</p>
+            <p>• <strong>特权端口被占用</strong>：请核查本机的 <code>80</code> (HTTP)、<code>443</code> (HTTPS)、<code>8102</code> (网关) 与 <code>8105</code> (游戏服务) 端口是否被其他软件（如 IIS、Apache、Nginx 等）占用；</p>
+            <p>• <strong>域名劫持未生效</strong>：请确认桌面启动壳已正常接管或系统 HOSTS 文件包含 <code>127.0.0.1 open.ys4fun.com</code> 等回环映射条目。</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-trigger" type="button">
+            <span>2. 关于卡死</span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="accordion-content">
+            <p>卡死问题发生多样，现如今已经基本杜绝了“网络连接失败”类卡死，但是不保证不出现loading遮罩卡死。</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-trigger" type="button">
+            <span>3. 如何调整移转之辉、体力与抽卡探测凭证？</span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="accordion-content">
+            <p>控制面板不提供数据库直改，资源只能在 GM 控制台的 <strong>【资源背包】</strong> 中选中后通过 <strong>【邮件系统】</strong> 发送，不可撤销。详细常用货币可以在数据库的currency表中修改具体数据</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-trigger" type="button">
+            <span>4. 移动端真机（iOS / Android）如何连入当前电脑服务端？</span>
+            <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="accordion-content">
+            <p>确保移动端与宿主电脑处于同一个 Wi-Fi 局域网内。在手机端将连接的WIFI的DNS改为手动，DNS地址为计算机在本局域网中的IP，在手机浏览器中输入CMD打印出的描述文件安装信任证书并在iPhone中信任即可。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+        Tab 2: 关于权限与原理 (permission)
+       ========================================================================= -->
+    <section id="pane-permission" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon-box icon-box-warning">
+              <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+            </span>
+            <span>为什么启动服务需要“以管理员身份运行”？</span>
+          </div>
+        </div>
+        <div class="card-desc">端口特权规范与无感拦截机制说明</div>
+        <div class="card-body">
+          <p>《深空之眼》原版游戏客户端在启动自检与登录认证阶段，强制通过标准的 <code>80 (HTTP)</code> 与 <code>443 (HTTPS)</code> 端口发起域名校验。</p>
+          <p>进行HOST劫持需要提权</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon-box icon-box-accent">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+            </span>
+            <span>127.0.0.1 本地回环网络隔离保证</span>
+          </div>
+        </div>
+        <div class="card-desc">网络流量封闭流转，杜绝公网外联与穿透</div>
+        <div class="card-body">
+          <p>单机仿真服务仅监听本地环回网络（Loopback Adapter，即 <code>127.0.0.1</code> / <code>localhost</code>）以及指定的局域网网段。</p>
+          <p><strong>严正承诺：</strong>本程序不会访问外置其他网站，CDN穿透针对的是挂全局T的场景。</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon-box icon-box-success">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+            </span>
+            <span>自签根证书（Root CA）的安全性阐述</span>
+          </div>
+        </div>
+        <div class="card-desc">单向域名沙盒约束，不干涉系统其他 HTTPS 通信</div>
+        <div class="card-body">
+          <p>为满足客户端原生 HTTPS 链路的 TLS 加密验证，安装包内附带了本地自签名的 <code>AetherGazer V5 Root CA</code> 根证书。</p>
+          <p>该证书仅对特定的游戏私有域名（如 <code>*.ys4fun.com</code>、<code>soboten.com</code>）建立本地信任，其专用私钥完整存放在宿主服务端内。它绝不会影响系统日常对银行、微信、支付宝等公网正规站点的安全信任链。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+        Tab 3: 关于数据与隐私 (privacy)
+       ========================================================================= -->
+    <section id="pane-privacy" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon-box icon-box-success">
+              <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="9 12 11 14 15 10"></polyline></svg>
+            </span>
+            <span>整个服务器数据源是库驱动的，除了配置文件外，其他数据都在库里，可以自己改</span>
+          </div>
+        </div>
+        <div class="card-desc">理论上是一个脱机程序。</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon-box icon-box-accent">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </span>
+            <span>没有后台数据采集，我自己的服务器忙着重构呢，这只是纯爱好。</span>
+          </div>
+        </div>
+        <div class="card-desc">原版客户端的很多请求在这里默认批准被空函数吃掉。设备标识不会外流。</div>
+        <div class="card-body">
+          <p>人机验证触发的鉴权程序有一套重放攻击方案，因为TOKEN空载成功已经上线，理论上不会触发。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+        Tab 4: 个人声明 (terms)
+       ========================================================================= -->
+    <section id="pane-terms" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon-box icon-box-default">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            </span>
+            <span>§ 1. 技术研究与非商业化声明</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>纯拿着玩的项目，仅用于软件学习交流，下载后于24小时内删除。不得牟利。</p>
+          <p><strong>声明：</strong>严禁任何个人或组织将本程序、配套服务端及相关工具链用于任何形式的商业转售牟利、付费代理、搭建公开联运或任何破坏他人计算机信息系统之行为。</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon-box icon-box-warning">
+              <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </span>
+            <span>§ 2. 知识产权与版权归属声明</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>《深空之眼》（Aether Gazer）游戏客户端内的一切美术立绘、3D 角色模型、音频音效、UI 界面素材、世界观设定及文案商标等合法知识产权，均全权归原开发商及发行方（勇仕网络等）所有。</p>
+          <p>本程序不包含且不分发游戏客户端的核心私有资源，请广大玩家支持官方正版游戏！</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon-box icon-box-accent">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+            </span>
+            <span>§ 3. 免责声明</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>本程序仅供个人学习交流使用，不承担任何因使用本程序而产生的直接或间接损失。使用者需自行承担使用本程序可能带来的所有风险。</p>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: var(--success);"></span>
+          <span>你不说就证明已生效喽（Ciallo～(∠・ω&lt; )⌒☆） (PERMANENT)</span>
+        </div>
+        <div class="chip chip-accent">
+          <svg class="icon-svg" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+          <span style="font-family: monospace;">HELA</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 动态回环网络直通 (针对封包、不同端口、局域网环境动态自适应)
+    // =========================================================================
+    function getGmConsoleUrl() {
+      if (typeof window !== 'undefined' && window.location.protocol.startsWith('http')) {
+        return window.location.protocol + '//' + window.location.host + '/web/gm_console.html';
+      }
+      return 'http://127.0.0.1/web/gm_console.html';
+    }
+
+    const gmUrl = getGmConsoleUrl();
+    const displayEl = document.getElementById('display-gm-url');
+    if (displayEl) {
+      displayEl.textContent = gmUrl;
+    }
+
+    function openGM() {
+      window.open(getGmConsoleUrl(), '_blank');
+    }
+    document.getElementById('top-gm-btn')?.addEventListener('click', openGM);
+    document.getElementById('card-gm-btn')?.addEventListener('click', openGM);
+
+    // =========================================================================
+    // 浅色 / 深色主题切换 (自动跟随与记忆)
+    // =========================================================================
+    const themeBtn = document.getElementById('theme-btn');
+    const themeText = document.getElementById('theme-text');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function applyTheme(mode) {
+      document.documentElement.setAttribute('data-theme', mode);
+      try { localStorage.setItem('theme', mode); } catch {}
+      if (mode === 'dark') {
+        themeText.textContent = '浅色模式';
+        themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+      } else {
+        themeText.textContent = '深色模式';
+        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      }
+    }
+
+    let currentTheme = 'dark';
+    try {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light' || saved === 'dark') {
+        currentTheme = saved;
+      }
+    } catch {}
+    applyTheme(currentTheme);
+
+    themeBtn?.addEventListener('click', () => {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(currentTheme);
+    });
+
+    // =========================================================================
+    // Tabs 选项卡切换与 URL 参数联动 (?tab=support|permission|privacy|terms)
+    // =========================================================================
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanes = {
+      support: document.getElementById('pane-support'),
+      permission: document.getElementById('pane-permission'),
+      privacy: document.getElementById('pane-privacy'),
+      terms: document.getElementById('pane-terms'),
+    };
+
+    function switchTab(tabKey) {
+      if (!tabPanes[tabKey]) tabKey = 'support';
+      tabBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabKey);
+      });
+      Object.keys(tabPanes).forEach(k => {
+        tabPanes[k]?.classList.toggle('active', k === tabKey);
+      });
+      try {
+        const u = new URL(window.location.href);
+        u.searchParams.set('tab', tabKey);
+        window.history.replaceState(null, '', u.toString());
+      } catch {}
+    }
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    // 读取初始 tab
+    try {
+      const p = new URLSearchParams(window.location.search).get('tab');
+      if (p && tabPanes[p]) {
+        switchTab(p);
+      } else {
+        const h = window.location.hash.replace('#', '');
+        if (h && tabPanes[h]) {
+          switchTab(h);
+        }
+      }
+    } catch {}
+
+    // =========================================================================
+    // Accordion 手风琴折叠展开交互
+    // =========================================================================
+    document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const item = trigger.closest('.accordion-item');
+        if (item) {
+          item.classList.toggle('open');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

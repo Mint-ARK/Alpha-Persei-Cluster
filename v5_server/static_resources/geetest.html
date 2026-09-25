@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="pragma" content="no-cache" />
+  <meta http-equiv="cache-control" content="no-cache" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="renderer" content="webkit" />
+  <meta name="force-rendering" content="webkit" />
+  <meta name="viewport"
+    content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="author" content="YONGSHI-FE" />
+  <meta name="copyright" content="YONGSHI" />
+  <meta name="description" content="勇仕网络" />
+  <meta name="keywords" content="勇仕网络" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="format-detection" content="email=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-status-bar-style" content="black-translucent" />
+  <link id="icon" rel="shortcut icon" href="https://skzy.ys4fun.com/favicon.ico" />
+  <script src="https://static.geetest.com/static/js/gt.0.4.9.js"></script>
+</head>
+
+<style type="text/css">
+  .geetest_panel .geetest_feedback {
+    display: none !important;
+  }
+</style>
+
+<body>
+
+
+  <!-- <script>
+    if (!window.unityPostMessage) {
+      window.unityPostMessage = console.log
+    }
+  </script> -->
+
+  <script>
+    var getUrlQueryParams = function (url) {
+      var params = {};
+      var arr = url.split('?');
+      if (arr.length <= 1) {
+        return params;
+      }
+      arr = arr[1].split('&');
+      for (var i = 0; i < arr.length; i++) {
+        var data = arr[i].split('=');
+        params[data[0]] = data[1];
+      }
+      return params;
+    };
+
+    var params = getUrlQueryParams(window.location.href);
+
+    if (!params.captchaId || !params.challenge) {
+      console.error('缺少参数 captchaId 或 challenge')
+    } else {
+      initGeetest({
+        // 以下配置参数来自服务端 SDK
+        gt: params.captchaId,
+        challenge: params.challenge,
+        offline: !(params.success == 'true'),
+        new_captcha: true,
+        product: 'bind',
+        lang: params.lang || 'zh-cn',
+      }, function (captchaObj) {
+        // 这里可以调用验证实例 captchaObj 的实例方法
+
+        captchaObj
+          .onReady(() => {
+            captchaObj.verify()
+            console.log('onReady')
+          })
+          .onClose(() => {
+            console.log('closeVerifyModal')
+            unityPostMessageClose()
+          })
+          .onSuccess(() => {
+            let result = captchaObj.getValidate()
+            console.log('onSuccess', result)
+            unityPostMessage(result)
+          })
+          .onError((error) => {
+            unityPostMessage(error)
+          })
+      })
+    }
+  </script>
+</body>
+
+</html>

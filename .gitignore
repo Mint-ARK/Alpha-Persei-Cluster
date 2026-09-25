@@ -1,0 +1,65 @@
+# ==============================================================================
+# Alpha-Persei-Cluster - Git Ignore Configuration
+# ==============================================================================
+
+# Security, Credentials & Local Environments
+*.pem
+*.key
+*.p12
+*.pfx
+*.env
+.env
+.env.*
+!.env.example
+*.pid
+.secret_vault.json
+
+# Database Files & SQLite State Wal
+*.db
+*.db-*
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.bak
+*.bak_*
+account.db
+backup/
+db_backup/
+
+# Traffic Dumps & Execution Logs
+*.pcap
+*.pcapng
+*.log
+logs/
+**/logs/
+
+# Python Runtimes & Bytecode Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+venv/
+.venv/
+
+# WinUI 3 / .NET Build Artifacts & User State
+**/bin/
+**/obj/
+**/.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Frontend Dependencies & Staging Bundles
+node_modules/
+**/node_modules/
+.vite/
+dist/
+
+# OS Specific & Editor Metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

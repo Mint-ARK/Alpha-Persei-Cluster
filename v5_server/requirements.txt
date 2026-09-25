@@ -1,0 +1,9 @@
+# Alpha Persei Cluster - Server Core Dependencies
+#
+# Note:
+# Portable (.zip) and Setup (.exe) distributions already bundle the complete
+# embedded Python runtime environment. This file is strictly for developers
+# running the server directly from source code.
+
+flask>=2.0.0
+cryptography>=3.4.0

@@ -1,0 +1,554 @@
+{
+  "182211": {
+    "activity_id": 182211,
+    "name": "虚恒区下-庚辰皮肤抽取-活动",
+    "theme": 18,
+    "template": 221,
+    "sub_activity_id_list": [
+      182221,
+      182222,
+      180048,
+      181462
+    ]
+  },
+  "272211": {
+    "activity_id": 272211,
+    "name": "虚恒区下-庚辰皮肤抽取-活动",
+    "theme": 27,
+    "template": 221,
+    "sub_activity_id_list": [
+      272221,
+      272222,
+      270046,
+      271462
+    ]
+  },
+  "292211": {
+    "activity_id": 292211,
+    "name": "梵天半周年-托特皮肤抽取活动",
+    "theme": 29,
+    "template": 221,
+    "sub_activity_id_list": [
+      292221,
+      292222,
+      292223,
+      290046,
+      291463,
+      292231
+    ]
+  },
+  "312211": {
+    "activity_id": 312211,
+    "name": "夜宴之邀",
+    "theme": 31,
+    "template": 221,
+    "sub_activity_id_list": [
+      312221,
+      312222,
+      310049,
+      311465,
+      312231,
+      312233
+    ]
+  },
+  "332211": {
+    "activity_id": 332211,
+    "name": "梵天T0皮肤抽取活动",
+    "theme": 33,
+    "template": 221,
+    "sub_activity_id_list": [
+      332221,
+      332222,
+      330041,
+      331461,
+      332231
+    ]
+  },
+  "3522101": {
+    "activity_id": 3522101,
+    "name": "4.3复刻-托特皮肤抽取活动",
+    "theme": 35,
+    "template": 221,
+    "sub_activity_id_list": [
+      3522201,
+      3522202,
+      3522203,
+      3522301,
+      3500406,
+      3514601
+    ]
+  },
+  "3722101": {
+    "activity_id": 3722101,
+    "name": "诗蔻蒂T0皮肤抽取活动",
+    "theme": 37,
+    "template": 221,
+    "sub_activity_id_list": [
+      3722201,
+      3722202,
+      3722301,
+      3700407,
+      3714601
+    ]
+  },
+  "4022101": {
+    "activity_id": 4022101,
+    "name": "4.8复刻-梵天T0皮肤抽取活动",
+    "theme": 40,
+    "template": 221,
+    "sub_activity_id_list": [
+      4022201,
+      4022202,
+      4022301,
+      4000410,
+      4014601
+    ]
+  },
+  "4122101": {
+    "activity_id": 4122101,
+    "name": "5.0-荷鲁斯T0皮肤抽取活动",
+    "theme": 41,
+    "template": 221,
+    "sub_activity_id_list": [
+      4122201,
+      4122202,
+      4122301,
+      4100402,
+      4114601
+    ]
+  },
+  "4322101": {
+    "activity_id": 4322101,
+    "name": "5.2-诗蔻蒂T0皮肤抽取活动",
+    "theme": 43,
+    "template": 221,
+    "sub_activity_id_list": [
+      4322201,
+      4322202,
+      4322301,
+      4300407,
+      4314601
+    ]
+  },
+  "4042301": {
+    "activity_id": 4042301,
+    "name": "小美誓约皮卡池活动",
+    "theme": 40,
+    "template": 423,
+    "sub_activity_id_list": [
+      4042401,
+      4042402,
+      4014602
+    ]
+  },
+  "4342301": {
+    "activity_id": 4342301,
+    "name": "托特誓约皮卡池活动",
+    "theme": 43,
+    "template": 423,
+    "sub_activity_id_list": [
+      4342401,
+      4342402,
+      4314602
+    ]
+  },
+  "182221": {
+    "activity_id": 182221,
+    "name": "虚恒区下-庚辰皮肤抽取-卡池",
+    "theme": 18,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "182222": {
+    "activity_id": 182222,
+    "name": "虚恒区下-庚辰背景抽取-卡池",
+    "theme": 18,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "180048": {
+    "activity_id": 180048,
+    "name": "虚恒区下-庚辰皮肤抽取-皮肤任务",
+    "theme": 18,
+    "template": 4,
+    "sub_activity_id_list": []
+  },
+  "181462": {
+    "activity_id": 181462,
+    "name": "虚恒区下-庚辰皮肤抽取-皮肤商店",
+    "theme": 18,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "272221": {
+    "activity_id": 272221,
+    "name": "虚恒区下-庚辰皮肤抽取-卡池",
+    "theme": 27,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "272222": {
+    "activity_id": 272222,
+    "name": "虚恒区下-庚辰背景抽取-卡池",
+    "theme": 27,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "270046": {
+    "activity_id": 270046,
+    "name": "虚恒区下-庚辰皮肤抽取-皮肤任务",
+    "theme": 27,
+    "template": 4,
+    "sub_activity_id_list": []
+  },
+  "271462": {
+    "activity_id": 271462,
+    "name": "虚恒区下-庚辰皮肤抽取-皮肤商店",
+    "theme": 27,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "292221": {
+    "activity_id": 292221,
+    "name": "梵天半周年-托特皮肤抽取-卡池",
+    "theme": 29,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "292222": {
+    "activity_id": 292222,
+    "name": "梵天半周年-托特背景抽取-卡池1",
+    "theme": 29,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "292223": {
+    "activity_id": 292223,
+    "name": "梵天半周年-托特背景抽取-卡池2",
+    "theme": 29,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "290046": {
+    "activity_id": 290046,
+    "name": "梵天半周年-托特皮肤抽取-皮肤任务",
+    "theme": 29,
+    "template": 4,
+    "sub_activity_id_list": []
+  },
+  "291463": {
+    "activity_id": 291463,
+    "name": "梵天半周年-托特皮肤抽取-皮肤商店",
+    "theme": 29,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "292231": {
+    "activity_id": 292231,
+    "name": "梵天半周年-托特皮肤抽取-背景剧情1",
+    "theme": 29,
+    "template": 223,
+    "sub_activity_id_list": []
+  },
+  "312221": {
+    "activity_id": 312221,
+    "name": "夜宴之邀-换装",
+    "theme": 31,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "312222": {
+    "activity_id": 312222,
+    "name": "夜宴之邀-场景",
+    "theme": 31,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "310049": {
+    "activity_id": 310049,
+    "name": "夜宴之邀-见闻任务",
+    "theme": 31,
+    "template": 4,
+    "sub_activity_id_list": []
+  },
+  "311465": {
+    "activity_id": 311465,
+    "name": "夜宴之邀-换装商店",
+    "theme": 31,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "312231": {
+    "activity_id": 312231,
+    "name": "夜宴之邀-剧情1",
+    "theme": 31,
+    "template": 223,
+    "sub_activity_id_list": []
+  },
+  "312233": {
+    "activity_id": 312233,
+    "name": "夜宴之邀-剧情3",
+    "theme": 31,
+    "template": 223,
+    "sub_activity_id_list": []
+  },
+  "332221": {
+    "activity_id": 332221,
+    "name": "梵天T0皮肤抽取-卡池",
+    "theme": 33,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "332222": {
+    "activity_id": 332222,
+    "name": "梵天T0背景抽取-卡池",
+    "theme": 33,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "330041": {
+    "activity_id": 330041,
+    "name": "梵天T0皮肤抽取-皮肤任务",
+    "theme": 33,
+    "template": 4,
+    "sub_activity_id_list": []
+  },
+  "331461": {
+    "activity_id": 331461,
+    "name": "梵天T0皮肤抽取-皮肤商店",
+    "theme": 33,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "332231": {
+    "activity_id": 332231,
+    "name": "梵天T0皮肤抽取-背景剧情1",
+    "theme": 33,
+    "template": 223,
+    "sub_activity_id_list": []
+  },
+  "3522201": {
+    "activity_id": 3522201,
+    "name": "4.3复刻-托特皮肤抽取-卡池",
+    "theme": 35,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "3522202": {
+    "activity_id": 3522202,
+    "name": "4.3复刻-托特背景抽取-卡池1",
+    "theme": 35,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "3522203": {
+    "activity_id": 3522203,
+    "name": "4.3复刻-托特背景抽取-卡池2",
+    "theme": 35,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "3522301": {
+    "activity_id": 3522301,
+    "name": "4.3复刻-托特皮肤抽取-背景剧情1",
+    "theme": 35,
+    "template": 223,
+    "sub_activity_id_list": []
+  },
+  "3500406": {
+    "activity_id": 3500406,
+    "name": "4.3复刻-托特皮肤抽取-皮肤任务",
+    "theme": 35,
+    "template": 4,
+    "sub_activity_id_list": []
+  },
+  "3514601": {
+    "activity_id": 3514601,
+    "name": "4.3复刻-托特皮肤抽取-皮肤商店",
+    "theme": 35,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "3722201": {
+    "activity_id": 3722201,
+    "name": "诗蔻蒂T0皮肤抽取-卡池",
+    "theme": 37,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "3722202": {
+    "activity_id": 3722202,
+    "name": "诗蔻蒂T0背景抽取-卡池",
+    "theme": 37,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "3722301": {
+    "activity_id": 3722301,
+    "name": "诗蔻蒂T0皮肤抽取-背景剧情1",
+    "theme": 37,
+    "template": 223,
+    "sub_activity_id_list": []
+  },
+  "3700407": {
+    "activity_id": 3700407,
+    "name": "诗蔻蒂T0皮肤抽取-皮肤任务",
+    "theme": 37,
+    "template": 4,
+    "sub_activity_id_list": []
+  },
+  "3714601": {
+    "activity_id": 3714601,
+    "name": "诗蔻蒂T0皮肤抽取-皮肤商店",
+    "theme": 37,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "4022201": {
+    "activity_id": 4022201,
+    "name": "4.8复刻-梵天T0皮肤抽取活动-换装卡池",
+    "theme": 40,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "4022202": {
+    "activity_id": 4022202,
+    "name": "4.8复刻-梵天T0皮肤抽取活动-场景卡池",
+    "theme": 40,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "4022301": {
+    "activity_id": 4022301,
+    "name": "4.8复刻-梵天T0皮肤抽取活动-剧情1",
+    "theme": 40,
+    "template": 223,
+    "sub_activity_id_list": []
+  },
+  "4000410": {
+    "activity_id": 4000410,
+    "name": "4.8复刻-梵天T0皮肤抽取活动-见闻任务",
+    "theme": 40,
+    "template": 4,
+    "sub_activity_id_list": []
+  },
+  "4014601": {
+    "activity_id": 4014601,
+    "name": "4.8复刻-梵天T0皮肤抽取活动-换装商店",
+    "theme": 40,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "4122201": {
+    "activity_id": 4122201,
+    "name": "5.0-荷鲁斯T0皮肤抽取活动-换装卡池",
+    "theme": 41,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "4122202": {
+    "activity_id": 4122202,
+    "name": "5.0-荷鲁斯T0皮肤抽取活动-场景卡池",
+    "theme": 41,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "4122301": {
+    "activity_id": 4122301,
+    "name": "5.0-荷鲁斯T0皮肤抽取活动-剧情1",
+    "theme": 41,
+    "template": 223,
+    "sub_activity_id_list": []
+  },
+  "4100402": {
+    "activity_id": 4100402,
+    "name": "5.0-荷鲁斯T0皮肤抽取活动-见闻任务",
+    "theme": 41,
+    "template": 4,
+    "sub_activity_id_list": []
+  },
+  "4114601": {
+    "activity_id": 4114601,
+    "name": "5.0-荷鲁斯T0皮肤抽取活动-换装商店",
+    "theme": 41,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "4322201": {
+    "activity_id": 4322201,
+    "name": "5.2-诗蔻蒂T0皮肤抽取活动-换装卡池",
+    "theme": 43,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "4322202": {
+    "activity_id": 4322202,
+    "name": "5.2-诗蔻蒂T0皮肤抽取活动-场景卡池",
+    "theme": 43,
+    "template": 222,
+    "sub_activity_id_list": []
+  },
+  "4322301": {
+    "activity_id": 4322301,
+    "name": "5.2-诗蔻蒂T0皮肤抽取活动-剧情1",
+    "theme": 43,
+    "template": 223,
+    "sub_activity_id_list": []
+  },
+  "4300407": {
+    "activity_id": 4300407,
+    "name": "5.2-诗蔻蒂T0皮肤抽取活动-见闻任务",
+    "theme": 43,
+    "template": 4,
+    "sub_activity_id_list": []
+  },
+  "4314601": {
+    "activity_id": 4314601,
+    "name": "5.2-诗蔻蒂T0皮肤抽取活动-换装商店",
+    "theme": 43,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "4042401": {
+    "activity_id": 4042401,
+    "name": "小美誓约皮卡池-换装卡池",
+    "theme": 40,
+    "template": 424,
+    "sub_activity_id_list": []
+  },
+  "4042402": {
+    "activity_id": 4042402,
+    "name": "小美誓约皮卡池-场景卡池",
+    "theme": 40,
+    "template": 424,
+    "sub_activity_id_list": []
+  },
+  "4014602": {
+    "activity_id": 4014602,
+    "name": "小美誓约皮卡池-换装商店",
+    "theme": 40,
+    "template": 146,
+    "sub_activity_id_list": []
+  },
+  "4342401": {
+    "activity_id": 4342401,
+    "name": "托特誓约皮卡池-换装卡池",
+    "theme": 43,
+    "template": 424,
+    "sub_activity_id_list": []
+  },
+  "4342402": {
+    "activity_id": 4342402,
+    "name": "托特誓约皮卡池-场景卡池",
+    "theme": 43,
+    "template": 424,
+    "sub_activity_id_list": []
+  },
+  "4314602": {
+    "activity_id": 4314602,
+    "name": "托特誓约皮卡池-换装商店",
+    "theme": 43,
+    "template": 146,
+    "sub_activity_id_list": []
+  }
+}

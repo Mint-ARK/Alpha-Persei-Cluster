@@ -1,0 +1,3668 @@
+{
+  "tiers": {
+    "1001": {
+      "id": 1001,
+      "tier": 1,
+      "level": 1
+    },
+    "1002": {
+      "id": 1002,
+      "tier": 1,
+      "level": 2
+    },
+    "1003": {
+      "id": 1003,
+      "tier": 1,
+      "level": 3
+    },
+    "1004": {
+      "id": 1004,
+      "tier": 1,
+      "level": 4
+    },
+    "1005": {
+      "id": 1005,
+      "tier": 1,
+      "level": 5
+    },
+    "1006": {
+      "id": 1006,
+      "tier": 1,
+      "level": 6
+    },
+    "1007": {
+      "id": 1007,
+      "tier": 1,
+      "level": 7
+    },
+    "2001": {
+      "id": 2001,
+      "tier": 2,
+      "level": 1
+    },
+    "2002": {
+      "id": 2002,
+      "tier": 2,
+      "level": 2
+    },
+    "2003": {
+      "id": 2003,
+      "tier": 2,
+      "level": 3
+    },
+    "2004": {
+      "id": 2004,
+      "tier": 2,
+      "level": 4
+    },
+    "2005": {
+      "id": 2005,
+      "tier": 2,
+      "level": 5
+    },
+    "2006": {
+      "id": 2006,
+      "tier": 2,
+      "level": 6
+    },
+    "2007": {
+      "id": 2007,
+      "tier": 2,
+      "level": 7
+    },
+    "2008": {
+      "id": 2008,
+      "tier": 2,
+      "level": 8
+    },
+    "3001": {
+      "id": 3001,
+      "tier": 3,
+      "level": 1
+    },
+    "3002": {
+      "id": 3002,
+      "tier": 3,
+      "level": 2
+    },
+    "3003": {
+      "id": 3003,
+      "tier": 3,
+      "level": 3
+    },
+    "3004": {
+      "id": 3004,
+      "tier": 3,
+      "level": 4
+    },
+    "3005": {
+      "id": 3005,
+      "tier": 3,
+      "level": 5
+    },
+    "3006": {
+      "id": 3006,
+      "tier": 3,
+      "level": 6
+    },
+    "3007": {
+      "id": 3007,
+      "tier": 3,
+      "level": 7
+    },
+    "3008": {
+      "id": 3008,
+      "tier": 3,
+      "level": 8
+    },
+    "3009": {
+      "id": 3009,
+      "tier": 3,
+      "level": 9
+    },
+    "3010": {
+      "id": 3010,
+      "tier": 3,
+      "level": 10
+    }
+  },
+  "events": {
+    "1001": {
+      "id": 1001,
+      "event_type": 1,
+      "params": []
+    },
+    "1002": {
+      "id": 1002,
+      "event_type": 1,
+      "params": []
+    },
+    "1003": {
+      "id": 1003,
+      "event_type": 1,
+      "params": []
+    },
+    "1002001": {
+      "id": 1002001,
+      "event_type": 1002,
+      "params": []
+    },
+    "1002002": {
+      "id": 1002002,
+      "event_type": 1002,
+      "params": []
+    },
+    "1002003": {
+      "id": 1002003,
+      "event_type": 1002,
+      "params": []
+    },
+    "2001": {
+      "id": 2001,
+      "event_type": 2,
+      "params": []
+    },
+    "2002": {
+      "id": 2002,
+      "event_type": 2,
+      "params": []
+    },
+    "2003": {
+      "id": 2003,
+      "event_type": 2,
+      "params": []
+    },
+    "3001": {
+      "id": 3001,
+      "event_type": 3,
+      "params": []
+    },
+    "3002": {
+      "id": 3002,
+      "event_type": 3,
+      "params": []
+    },
+    "3003": {
+      "id": 3003,
+      "event_type": 3,
+      "params": []
+    },
+    "3002001": {
+      "id": 3002001,
+      "event_type": 3002,
+      "params": []
+    },
+    "3002002": {
+      "id": 3002002,
+      "event_type": 3002,
+      "params": []
+    },
+    "3002003": {
+      "id": 3002003,
+      "event_type": 3002,
+      "params": []
+    },
+    "4001": {
+      "id": 4001,
+      "event_type": 4,
+      "params": []
+    },
+    "4002": {
+      "id": 4002,
+      "event_type": 4,
+      "params": []
+    },
+    "4003": {
+      "id": 4003,
+      "event_type": 4,
+      "params": []
+    },
+    "5001": {
+      "id": 5001,
+      "event_type": 5,
+      "params": []
+    },
+    "5002": {
+      "id": 5002,
+      "event_type": 5,
+      "params": []
+    },
+    "5003": {
+      "id": 5003,
+      "event_type": 5,
+      "params": []
+    },
+    "6001": {
+      "id": 6001,
+      "event_type": 6,
+      "params": []
+    },
+    "6002": {
+      "id": 6002,
+      "event_type": 6,
+      "params": []
+    },
+    "7001": {
+      "id": 7001,
+      "event_type": 7,
+      "params": []
+    },
+    "8001": {
+      "id": 8001,
+      "event_type": 8,
+      "params": []
+    },
+    "8002": {
+      "id": 8002,
+      "event_type": 8,
+      "params": []
+    },
+    "8003": {
+      "id": 8003,
+      "event_type": 8,
+      "params": []
+    },
+    "9001": {
+      "id": 9001,
+      "event_type": 9,
+      "params": []
+    },
+    "9002": {
+      "id": 9002,
+      "event_type": 9,
+      "params": []
+    },
+    "10001001": {
+      "id": 10001001,
+      "event_type": 10001,
+      "params": []
+    },
+    "10001002": {
+      "id": 10001002,
+      "event_type": 10001,
+      "params": []
+    },
+    "10001011": {
+      "id": 10001011,
+      "event_type": 10001,
+      "params": []
+    },
+    "10001012": {
+      "id": 10001012,
+      "event_type": 10001,
+      "params": []
+    },
+    "10001021": {
+      "id": 10001021,
+      "event_type": 10001,
+      "params": []
+    },
+    "10001022": {
+      "id": 10001022,
+      "event_type": 10001,
+      "params": []
+    },
+    "10002001": {
+      "id": 10002001,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002002": {
+      "id": 10002002,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002003": {
+      "id": 10002003,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002004": {
+      "id": 10002004,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002011": {
+      "id": 10002011,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002012": {
+      "id": 10002012,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002013": {
+      "id": 10002013,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002014": {
+      "id": 10002014,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002021": {
+      "id": 10002021,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002022": {
+      "id": 10002022,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002023": {
+      "id": 10002023,
+      "event_type": 10002,
+      "params": []
+    },
+    "10002024": {
+      "id": 10002024,
+      "event_type": 10002,
+      "params": []
+    }
+  },
+  "gates": [
+    {
+      "id": 1,
+      "gate_index": 10001,
+      "event_type": 1,
+      "reward_type": 1
+    },
+    {
+      "id": 2,
+      "gate_index": 20001,
+      "event_type": 1002,
+      "reward_type": 1
+    },
+    {
+      "id": 3,
+      "gate_index": 10002,
+      "event_type": 2,
+      "reward_type": 0
+    },
+    {
+      "id": 4,
+      "gate_index": 13001,
+      "event_type": 3,
+      "reward_type": 3001
+    },
+    {
+      "id": 5,
+      "gate_index": 13002,
+      "event_type": 3,
+      "reward_type": 3002
+    },
+    {
+      "id": 6,
+      "gate_index": 13003,
+      "event_type": 3,
+      "reward_type": 3003
+    },
+    {
+      "id": 7,
+      "gate_index": 13004,
+      "event_type": 3,
+      "reward_type": 3004
+    },
+    {
+      "id": 8,
+      "gate_index": 13005,
+      "event_type": 3,
+      "reward_type": 3005
+    },
+    {
+      "id": 9,
+      "gate_index": 13006,
+      "event_type": 3,
+      "reward_type": 3006
+    },
+    {
+      "id": 10,
+      "gate_index": 23001,
+      "event_type": 3002,
+      "reward_type": 3001
+    },
+    {
+      "id": 11,
+      "gate_index": 23002,
+      "event_type": 3002,
+      "reward_type": 3002
+    },
+    {
+      "id": 12,
+      "gate_index": 23003,
+      "event_type": 3002,
+      "reward_type": 3003
+    },
+    {
+      "id": 13,
+      "gate_index": 23004,
+      "event_type": 3002,
+      "reward_type": 3004
+    },
+    {
+      "id": 14,
+      "gate_index": 23005,
+      "event_type": 3002,
+      "reward_type": 3005
+    },
+    {
+      "id": 15,
+      "gate_index": 23006,
+      "event_type": 3002,
+      "reward_type": 3006
+    },
+    {
+      "id": 16,
+      "gate_index": 10004,
+      "event_type": 4,
+      "reward_type": 0
+    },
+    {
+      "id": 17,
+      "gate_index": 10005,
+      "event_type": 5,
+      "reward_type": 0
+    },
+    {
+      "id": 18,
+      "gate_index": 30001,
+      "event_type": 6,
+      "reward_type": 0
+    },
+    {
+      "id": 19,
+      "gate_index": 30002,
+      "event_type": 7,
+      "reward_type": 0
+    },
+    {
+      "id": 20,
+      "gate_index": 10007,
+      "event_type": 8,
+      "reward_type": 7
+    },
+    {
+      "id": 21,
+      "gate_index": 2,
+      "event_type": 9,
+      "reward_type": 0
+    },
+    {
+      "id": 22,
+      "gate_index": 1,
+      "event_type": 10001,
+      "reward_type": 0
+    },
+    {
+      "id": 23,
+      "gate_index": 1,
+      "event_type": 10002,
+      "reward_type": 0
+    },
+    {
+      "id": 24,
+      "gate_index": 13008,
+      "event_type": 3,
+      "reward_type": 3008
+    },
+    {
+      "id": 25,
+      "gate_index": 23008,
+      "event_type": 3002,
+      "reward_type": 3008
+    },
+    {
+      "id": 26,
+      "gate_index": 13009,
+      "event_type": 3,
+      "reward_type": 3009
+    },
+    {
+      "id": 27,
+      "gate_index": 23009,
+      "event_type": 3002,
+      "reward_type": 3009
+    },
+    {
+      "id": 999,
+      "gate_index": 999,
+      "event_type": 999,
+      "reward_type": 999
+    }
+  ],
+  "artifacts": {
+    "101701": {
+      "id": 101701,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1017,
+      "affix_id": 70101,
+      "affix_target": 3
+    },
+    "101702": {
+      "id": 101702,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1017,
+      "affix_id": 70102,
+      "affix_target": 3
+    },
+    "101703": {
+      "id": 101703,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1017,
+      "affix_id": 70103,
+      "affix_target": 3
+    },
+    "101704": {
+      "id": 101704,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1017,
+      "affix_id": 70104,
+      "affix_target": 3
+    },
+    "101705": {
+      "id": 101705,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1017,
+      "affix_id": 70105,
+      "affix_target": 3
+    },
+    "109701": {
+      "id": 109701,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1097,
+      "affix_id": 70106,
+      "affix_target": 3
+    },
+    "109702": {
+      "id": 109702,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1097,
+      "affix_id": 70107,
+      "affix_target": 3
+    },
+    "109703": {
+      "id": 109703,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1097,
+      "affix_id": 70108,
+      "affix_target": 3
+    },
+    "109704": {
+      "id": 109704,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1097,
+      "affix_id": 70109,
+      "affix_target": 3
+    },
+    "109705": {
+      "id": 109705,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1097,
+      "affix_id": 70110,
+      "affix_target": 3
+    },
+    "108001": {
+      "id": 108001,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1080,
+      "affix_id": 70111,
+      "affix_target": 3
+    },
+    "108002": {
+      "id": 108002,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1080,
+      "affix_id": 70112,
+      "affix_target": 3
+    },
+    "108003": {
+      "id": 108003,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1080,
+      "affix_id": 70113,
+      "affix_target": 3
+    },
+    "108004": {
+      "id": 108004,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1080,
+      "affix_id": 70114,
+      "affix_target": 3
+    },
+    "108005": {
+      "id": 108005,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1080,
+      "affix_id": 70115,
+      "affix_target": 3
+    },
+    "105801": {
+      "id": 105801,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1058,
+      "affix_id": 70116,
+      "affix_target": 3
+    },
+    "105802": {
+      "id": 105802,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1058,
+      "affix_id": 70117,
+      "affix_target": 3
+    },
+    "105803": {
+      "id": 105803,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1058,
+      "affix_id": 70118,
+      "affix_target": 3
+    },
+    "105804": {
+      "id": 105804,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1058,
+      "affix_id": 70119,
+      "affix_target": 3
+    },
+    "105805": {
+      "id": 105805,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1058,
+      "affix_id": 70120,
+      "affix_target": 3
+    },
+    "105001": {
+      "id": 105001,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1050,
+      "affix_id": 70121,
+      "affix_target": 3
+    },
+    "105002": {
+      "id": 105002,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1050,
+      "affix_id": 70122,
+      "affix_target": 3
+    },
+    "105003": {
+      "id": 105003,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1050,
+      "affix_id": 70123,
+      "affix_target": 3
+    },
+    "105004": {
+      "id": 105004,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1050,
+      "affix_id": 70124,
+      "affix_target": 3
+    },
+    "105005": {
+      "id": 105005,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1050,
+      "affix_id": 70125,
+      "affix_target": 3
+    },
+    "108401": {
+      "id": 108401,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1084,
+      "affix_id": 70126,
+      "affix_target": 3
+    },
+    "108402": {
+      "id": 108402,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1084,
+      "affix_id": 70127,
+      "affix_target": 3
+    },
+    "108403": {
+      "id": 108403,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1084,
+      "affix_id": 70128,
+      "affix_target": 3
+    },
+    "108404": {
+      "id": 108404,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1084,
+      "affix_id": 70129,
+      "affix_target": 3
+    },
+    "108405": {
+      "id": 108405,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1084,
+      "affix_id": 70130,
+      "affix_target": 3
+    },
+    "101901": {
+      "id": 101901,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1019,
+      "affix_id": 70131,
+      "affix_target": 3
+    },
+    "101902": {
+      "id": 101902,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1019,
+      "affix_id": 70132,
+      "affix_target": 3
+    },
+    "101903": {
+      "id": 101903,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1019,
+      "affix_id": 70133,
+      "affix_target": 3
+    },
+    "101904": {
+      "id": 101904,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1019,
+      "affix_id": 70134,
+      "affix_target": 3
+    },
+    "101905": {
+      "id": 101905,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1019,
+      "affix_id": 70135,
+      "affix_target": 3
+    },
+    "119901": {
+      "id": 119901,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1199,
+      "affix_id": 70136,
+      "affix_target": 3
+    },
+    "119902": {
+      "id": 119902,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1199,
+      "affix_id": 70137,
+      "affix_target": 3
+    },
+    "119903": {
+      "id": 119903,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1199,
+      "affix_id": 70138,
+      "affix_target": 3
+    },
+    "119904": {
+      "id": 119904,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1199,
+      "affix_id": 70139,
+      "affix_target": 3
+    },
+    "119905": {
+      "id": 119905,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1199,
+      "affix_id": 70140,
+      "affix_target": 3
+    },
+    "114801": {
+      "id": 114801,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1148,
+      "affix_id": 70141,
+      "affix_target": 3
+    },
+    "114802": {
+      "id": 114802,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1148,
+      "affix_id": 70142,
+      "affix_target": 3
+    },
+    "114803": {
+      "id": 114803,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1148,
+      "affix_id": 70143,
+      "affix_target": 3
+    },
+    "114804": {
+      "id": 114804,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1148,
+      "affix_id": 70144,
+      "affix_target": 3
+    },
+    "114805": {
+      "id": 114805,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1148,
+      "affix_id": 70145,
+      "affix_target": 3
+    },
+    "109301": {
+      "id": 109301,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1093,
+      "affix_id": 70146,
+      "affix_target": 3
+    },
+    "109302": {
+      "id": 109302,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1093,
+      "affix_id": 70147,
+      "affix_target": 3
+    },
+    "109303": {
+      "id": 109303,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1093,
+      "affix_id": 70148,
+      "affix_target": 3
+    },
+    "109304": {
+      "id": 109304,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1093,
+      "affix_id": 70149,
+      "affix_target": 3
+    },
+    "109305": {
+      "id": 109305,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1093,
+      "affix_id": 70150,
+      "affix_target": 3
+    },
+    "102601": {
+      "id": 102601,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1026,
+      "affix_id": 70151,
+      "affix_target": 3
+    },
+    "102602": {
+      "id": 102602,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1026,
+      "affix_id": 70152,
+      "affix_target": 3
+    },
+    "102603": {
+      "id": 102603,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1026,
+      "affix_id": 70153,
+      "affix_target": 3
+    },
+    "102604": {
+      "id": 102604,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1026,
+      "affix_id": 70154,
+      "affix_target": 3
+    },
+    "102605": {
+      "id": 102605,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1026,
+      "affix_id": 70155,
+      "affix_target": 3
+    },
+    "104801": {
+      "id": 104801,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1048,
+      "affix_id": 70156,
+      "affix_target": 3
+    },
+    "104802": {
+      "id": 104802,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1048,
+      "affix_id": 70157,
+      "affix_target": 3
+    },
+    "104803": {
+      "id": 104803,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1048,
+      "affix_id": 70158,
+      "affix_target": 3
+    },
+    "104804": {
+      "id": 104804,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1048,
+      "affix_id": 70159,
+      "affix_target": 3
+    },
+    "104805": {
+      "id": 104805,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1048,
+      "affix_id": 70160,
+      "affix_target": 3
+    },
+    "103501": {
+      "id": 103501,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1035,
+      "affix_id": 70161,
+      "affix_target": 3
+    },
+    "103502": {
+      "id": 103502,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1035,
+      "affix_id": 70162,
+      "affix_target": 3
+    },
+    "103503": {
+      "id": 103503,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1035,
+      "affix_id": 70163,
+      "affix_target": 3
+    },
+    "103504": {
+      "id": 103504,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1035,
+      "affix_id": 70164,
+      "affix_target": 3
+    },
+    "103505": {
+      "id": 103505,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1035,
+      "affix_id": 70165,
+      "affix_target": 3
+    },
+    "102701": {
+      "id": 102701,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1027,
+      "affix_id": 70166,
+      "affix_target": 3
+    },
+    "102702": {
+      "id": 102702,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1027,
+      "affix_id": 70167,
+      "affix_target": 3
+    },
+    "102703": {
+      "id": 102703,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1027,
+      "affix_id": 70168,
+      "affix_target": 3
+    },
+    "102704": {
+      "id": 102704,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1027,
+      "affix_id": 70169,
+      "affix_target": 3
+    },
+    "102705": {
+      "id": 102705,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1027,
+      "affix_id": 70170,
+      "affix_target": 3
+    },
+    "103801": {
+      "id": 103801,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1038,
+      "affix_id": 70171,
+      "affix_target": 3
+    },
+    "103802": {
+      "id": 103802,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1038,
+      "affix_id": 70172,
+      "affix_target": 3
+    },
+    "103803": {
+      "id": 103803,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1038,
+      "affix_id": 70173,
+      "affix_target": 3
+    },
+    "103804": {
+      "id": 103804,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1038,
+      "affix_id": 70174,
+      "affix_target": 3
+    },
+    "103805": {
+      "id": 103805,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1038,
+      "affix_id": 70175,
+      "affix_target": 3
+    },
+    "106601": {
+      "id": 106601,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1066,
+      "affix_id": 70176,
+      "affix_target": 3
+    },
+    "106602": {
+      "id": 106602,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1066,
+      "affix_id": 70177,
+      "affix_target": 3
+    },
+    "106603": {
+      "id": 106603,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1066,
+      "affix_id": 70178,
+      "affix_target": 3
+    },
+    "106604": {
+      "id": 106604,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1066,
+      "affix_id": 70179,
+      "affix_target": 3
+    },
+    "106605": {
+      "id": 106605,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1066,
+      "affix_id": 70180,
+      "affix_target": 3
+    },
+    "102801": {
+      "id": 102801,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1028,
+      "affix_id": 70181,
+      "affix_target": 3
+    },
+    "102802": {
+      "id": 102802,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1028,
+      "affix_id": 70182,
+      "affix_target": 3
+    },
+    "102803": {
+      "id": 102803,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1028,
+      "affix_id": 70183,
+      "affix_target": 3
+    },
+    "102804": {
+      "id": 102804,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1028,
+      "affix_id": 70184,
+      "affix_target": 3
+    },
+    "102805": {
+      "id": 102805,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1028,
+      "affix_id": 70185,
+      "affix_target": 3
+    },
+    "105601": {
+      "id": 105601,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1056,
+      "affix_id": 70186,
+      "affix_target": 3
+    },
+    "105602": {
+      "id": 105602,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1056,
+      "affix_id": 70187,
+      "affix_target": 3
+    },
+    "105603": {
+      "id": 105603,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1056,
+      "affix_id": 70188,
+      "affix_target": 3
+    },
+    "105604": {
+      "id": 105604,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1056,
+      "affix_id": 70189,
+      "affix_target": 3
+    },
+    "105605": {
+      "id": 105605,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1056,
+      "affix_id": 70190,
+      "affix_target": 3
+    },
+    "103701": {
+      "id": 103701,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1037,
+      "affix_id": 70191,
+      "affix_target": 3
+    },
+    "103702": {
+      "id": 103702,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1037,
+      "affix_id": 70192,
+      "affix_target": 3
+    },
+    "103703": {
+      "id": 103703,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1037,
+      "affix_id": 70193,
+      "affix_target": 3
+    },
+    "103704": {
+      "id": 103704,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1037,
+      "affix_id": 70194,
+      "affix_target": 3
+    },
+    "103705": {
+      "id": 103705,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1037,
+      "affix_id": 70195,
+      "affix_target": 3
+    },
+    "109401": {
+      "id": 109401,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1094,
+      "affix_id": 70196,
+      "affix_target": 3
+    },
+    "109402": {
+      "id": 109402,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1094,
+      "affix_id": 70197,
+      "affix_target": 3
+    },
+    "109403": {
+      "id": 109403,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1094,
+      "affix_id": 70198,
+      "affix_target": 3
+    },
+    "109404": {
+      "id": 109404,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1094,
+      "affix_id": 70199,
+      "affix_target": 3
+    },
+    "109405": {
+      "id": 109405,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1094,
+      "affix_id": 70200,
+      "affix_target": 3
+    },
+    "106801": {
+      "id": 106801,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1068,
+      "affix_id": 70201,
+      "affix_target": 3
+    },
+    "106802": {
+      "id": 106802,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1068,
+      "affix_id": 70202,
+      "affix_target": 3
+    },
+    "106803": {
+      "id": 106803,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1068,
+      "affix_id": 70203,
+      "affix_target": 3
+    },
+    "106804": {
+      "id": 106804,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1068,
+      "affix_id": 70204,
+      "affix_target": 3
+    },
+    "106805": {
+      "id": 106805,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1068,
+      "affix_id": 70205,
+      "affix_target": 3
+    },
+    "104901": {
+      "id": 104901,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1049,
+      "affix_id": 70206,
+      "affix_target": 3
+    },
+    "104902": {
+      "id": 104902,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1049,
+      "affix_id": 70207,
+      "affix_target": 3
+    },
+    "104903": {
+      "id": 104903,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1049,
+      "affix_id": 70208,
+      "affix_target": 3
+    },
+    "104904": {
+      "id": 104904,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1049,
+      "affix_id": 70209,
+      "affix_target": 3
+    },
+    "104905": {
+      "id": 104905,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1049,
+      "affix_id": 70210,
+      "affix_target": 3
+    },
+    "128401": {
+      "id": 128401,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1284,
+      "affix_id": 70211,
+      "affix_target": 3
+    },
+    "128402": {
+      "id": 128402,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1284,
+      "affix_id": 70212,
+      "affix_target": 3
+    },
+    "128403": {
+      "id": 128403,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1284,
+      "affix_id": 70213,
+      "affix_target": 3
+    },
+    "128404": {
+      "id": 128404,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1284,
+      "affix_id": 70214,
+      "affix_target": 3
+    },
+    "128405": {
+      "id": 128405,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1284,
+      "affix_id": 70215,
+      "affix_target": 3
+    },
+    "105501": {
+      "id": 105501,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1055,
+      "affix_id": 70216,
+      "affix_target": 3
+    },
+    "105502": {
+      "id": 105502,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1055,
+      "affix_id": 70217,
+      "affix_target": 3
+    },
+    "105503": {
+      "id": 105503,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1055,
+      "affix_id": 70218,
+      "affix_target": 3
+    },
+    "105504": {
+      "id": 105504,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1055,
+      "affix_id": 70219,
+      "affix_target": 3
+    },
+    "105505": {
+      "id": 105505,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1055,
+      "affix_id": 70220,
+      "affix_target": 3
+    },
+    "112701": {
+      "id": 112701,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1127,
+      "affix_id": 70221,
+      "affix_target": 3
+    },
+    "112702": {
+      "id": 112702,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1127,
+      "affix_id": 70222,
+      "affix_target": 3
+    },
+    "112703": {
+      "id": 112703,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1127,
+      "affix_id": 70223,
+      "affix_target": 3
+    },
+    "112704": {
+      "id": 112704,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1127,
+      "affix_id": 70224,
+      "affix_target": 3
+    },
+    "112705": {
+      "id": 112705,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1127,
+      "affix_id": 70225,
+      "affix_target": 3
+    },
+    "111101": {
+      "id": 111101,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1111,
+      "affix_id": 70226,
+      "affix_target": 3
+    },
+    "111102": {
+      "id": 111102,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1111,
+      "affix_id": 70227,
+      "affix_target": 3
+    },
+    "111103": {
+      "id": 111103,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1111,
+      "affix_id": 70228,
+      "affix_target": 3
+    },
+    "111104": {
+      "id": 111104,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1111,
+      "affix_id": 70229,
+      "affix_target": 3
+    },
+    "111105": {
+      "id": 111105,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1111,
+      "affix_id": 70230,
+      "affix_target": 3
+    },
+    "119701": {
+      "id": 119701,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1197,
+      "affix_id": 70231,
+      "affix_target": 3
+    },
+    "119702": {
+      "id": 119702,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1197,
+      "affix_id": 70232,
+      "affix_target": 3
+    },
+    "119703": {
+      "id": 119703,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1197,
+      "affix_id": 70233,
+      "affix_target": 3
+    },
+    "119704": {
+      "id": 119704,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1197,
+      "affix_id": 70234,
+      "affix_target": 3
+    },
+    "119705": {
+      "id": 119705,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1197,
+      "affix_id": 70235,
+      "affix_target": 3
+    },
+    "113801": {
+      "id": 113801,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1138,
+      "affix_id": 70236,
+      "affix_target": 3
+    },
+    "113802": {
+      "id": 113802,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1138,
+      "affix_id": 70237,
+      "affix_target": 3
+    },
+    "113803": {
+      "id": 113803,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1138,
+      "affix_id": 70238,
+      "affix_target": 3
+    },
+    "113804": {
+      "id": 113804,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1138,
+      "affix_id": 70239,
+      "affix_target": 3
+    },
+    "113805": {
+      "id": 113805,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1138,
+      "affix_id": 70240,
+      "affix_target": 3
+    },
+    "103301": {
+      "id": 103301,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1033,
+      "affix_id": 70241,
+      "affix_target": 3
+    },
+    "103302": {
+      "id": 103302,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1033,
+      "affix_id": 70242,
+      "affix_target": 3
+    },
+    "103303": {
+      "id": 103303,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1033,
+      "affix_id": 70243,
+      "affix_target": 3
+    },
+    "103304": {
+      "id": 103304,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1033,
+      "affix_id": 70244,
+      "affix_target": 3
+    },
+    "103305": {
+      "id": 103305,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1033,
+      "affix_id": 70245,
+      "affix_target": 3
+    },
+    "115001": {
+      "id": 115001,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1150,
+      "affix_id": 70246,
+      "affix_target": 3
+    },
+    "115002": {
+      "id": 115002,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1150,
+      "affix_id": 70247,
+      "affix_target": 3
+    },
+    "115003": {
+      "id": 115003,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1150,
+      "affix_id": 70248,
+      "affix_target": 3
+    },
+    "115004": {
+      "id": 115004,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1150,
+      "affix_id": 70249,
+      "affix_target": 3
+    },
+    "115005": {
+      "id": 115005,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1150,
+      "affix_id": 70250,
+      "affix_target": 3
+    },
+    "107501": {
+      "id": 107501,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1075,
+      "affix_id": 70251,
+      "affix_target": 3
+    },
+    "107502": {
+      "id": 107502,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1075,
+      "affix_id": 70252,
+      "affix_target": 3
+    },
+    "107503": {
+      "id": 107503,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1075,
+      "affix_id": 70253,
+      "affix_target": 3
+    },
+    "107504": {
+      "id": 107504,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1075,
+      "affix_id": 70254,
+      "affix_target": 3
+    },
+    "107505": {
+      "id": 107505,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1075,
+      "affix_id": 70255,
+      "affix_target": 3
+    },
+    "106001": {
+      "id": 106001,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1060,
+      "affix_id": 70256,
+      "affix_target": 3
+    },
+    "106002": {
+      "id": 106002,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1060,
+      "affix_id": 70257,
+      "affix_target": 3
+    },
+    "106003": {
+      "id": 106003,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1060,
+      "affix_id": 70258,
+      "affix_target": 3
+    },
+    "106004": {
+      "id": 106004,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1060,
+      "affix_id": 70259,
+      "affix_target": 3
+    },
+    "106005": {
+      "id": 106005,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1060,
+      "affix_id": 70260,
+      "affix_target": 3
+    },
+    "106101": {
+      "id": 106101,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1061,
+      "affix_id": 70261,
+      "affix_target": 3
+    },
+    "106102": {
+      "id": 106102,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1061,
+      "affix_id": 70262,
+      "affix_target": 3
+    },
+    "106103": {
+      "id": 106103,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1061,
+      "affix_id": 70263,
+      "affix_target": 3
+    },
+    "106104": {
+      "id": 106104,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1061,
+      "affix_id": 70264,
+      "affix_target": 3
+    },
+    "106105": {
+      "id": 106105,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1061,
+      "affix_id": 70265,
+      "affix_target": 3
+    },
+    "109601": {
+      "id": 109601,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1096,
+      "affix_id": 70266,
+      "affix_target": 3
+    },
+    "109602": {
+      "id": 109602,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1096,
+      "affix_id": 70267,
+      "affix_target": 3
+    },
+    "109603": {
+      "id": 109603,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1096,
+      "affix_id": 70268,
+      "affix_target": 3
+    },
+    "109604": {
+      "id": 109604,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1096,
+      "affix_id": 70269,
+      "affix_target": 3
+    },
+    "109605": {
+      "id": 109605,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1096,
+      "affix_id": 70270,
+      "affix_target": 3
+    },
+    "103901": {
+      "id": 103901,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1039,
+      "affix_id": 70271,
+      "affix_target": 3
+    },
+    "103902": {
+      "id": 103902,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1039,
+      "affix_id": 70272,
+      "affix_target": 3
+    },
+    "103903": {
+      "id": 103903,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1039,
+      "affix_id": 70273,
+      "affix_target": 3
+    },
+    "103904": {
+      "id": 103904,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1039,
+      "affix_id": 70274,
+      "affix_target": 3
+    },
+    "103905": {
+      "id": 103905,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1039,
+      "affix_id": 70275,
+      "affix_target": 3
+    },
+    "101101": {
+      "id": 101101,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1011,
+      "affix_id": 70276,
+      "affix_target": 3
+    },
+    "101102": {
+      "id": 101102,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1011,
+      "affix_id": 70277,
+      "affix_target": 3
+    },
+    "101103": {
+      "id": 101103,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1011,
+      "affix_id": 70278,
+      "affix_target": 3
+    },
+    "101104": {
+      "id": 101104,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1011,
+      "affix_id": 70279,
+      "affix_target": 3
+    },
+    "101105": {
+      "id": 101105,
+      "sub_type": 3007,
+      "exclusive_hero_id": 1011,
+      "affix_id": 70280,
+      "affix_target": 3
+    },
+    "70501": {
+      "id": 70501,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70501,
+      "affix_target": 3
+    },
+    "70502": {
+      "id": 70502,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70502,
+      "affix_target": 3
+    },
+    "70503": {
+      "id": 70503,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70503,
+      "affix_target": 3
+    },
+    "70504": {
+      "id": 70504,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70504,
+      "affix_target": 3
+    },
+    "70505": {
+      "id": 70505,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70505,
+      "affix_target": 3
+    },
+    "70506": {
+      "id": 70506,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70506,
+      "affix_target": 3
+    },
+    "70507": {
+      "id": 70507,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70507,
+      "affix_target": 3
+    },
+    "70508": {
+      "id": 70508,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70508,
+      "affix_target": 3
+    },
+    "70509": {
+      "id": 70509,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70509,
+      "affix_target": 3
+    },
+    "70510": {
+      "id": 70510,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70510,
+      "affix_target": 3
+    },
+    "70511": {
+      "id": 70511,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70511,
+      "affix_target": 3
+    },
+    "70512": {
+      "id": 70512,
+      "sub_type": 3001,
+      "exclusive_hero_id": 0,
+      "affix_id": 70512,
+      "affix_target": 3
+    },
+    "70551": {
+      "id": 70551,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70551,
+      "affix_target": 3
+    },
+    "70552": {
+      "id": 70552,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70552,
+      "affix_target": 3
+    },
+    "70553": {
+      "id": 70553,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70553,
+      "affix_target": 3
+    },
+    "70554": {
+      "id": 70554,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70554,
+      "affix_target": 3
+    },
+    "70555": {
+      "id": 70555,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70555,
+      "affix_target": 3
+    },
+    "70556": {
+      "id": 70556,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70556,
+      "affix_target": 3
+    },
+    "70557": {
+      "id": 70557,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70557,
+      "affix_target": 3
+    },
+    "70558": {
+      "id": 70558,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70558,
+      "affix_target": 3
+    },
+    "70559": {
+      "id": 70559,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70559,
+      "affix_target": 3
+    },
+    "70560": {
+      "id": 70560,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70560,
+      "affix_target": 3
+    },
+    "70561": {
+      "id": 70561,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70561,
+      "affix_target": 3
+    },
+    "70562": {
+      "id": 70562,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70562,
+      "affix_target": 3
+    },
+    "70563": {
+      "id": 70563,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70563,
+      "affix_target": 3
+    },
+    "70564": {
+      "id": 70564,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70564,
+      "affix_target": 3
+    },
+    "70565": {
+      "id": 70565,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70565,
+      "affix_target": 3
+    },
+    "70566": {
+      "id": 70566,
+      "sub_type": 3002,
+      "exclusive_hero_id": 0,
+      "affix_id": 70566,
+      "affix_target": 3
+    },
+    "70601": {
+      "id": 70601,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70601,
+      "affix_target": 3
+    },
+    "70602": {
+      "id": 70602,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70602,
+      "affix_target": 3
+    },
+    "70603": {
+      "id": 70603,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70603,
+      "affix_target": 3
+    },
+    "70604": {
+      "id": 70604,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70604,
+      "affix_target": 3
+    },
+    "70605": {
+      "id": 70605,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70605,
+      "affix_target": 3
+    },
+    "70606": {
+      "id": 70606,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70606,
+      "affix_target": 3
+    },
+    "70607": {
+      "id": 70607,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70607,
+      "affix_target": 3
+    },
+    "70608": {
+      "id": 70608,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70608,
+      "affix_target": 3
+    },
+    "70609": {
+      "id": 70609,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70609,
+      "affix_target": 3
+    },
+    "70610": {
+      "id": 70610,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70610,
+      "affix_target": 3
+    },
+    "70611": {
+      "id": 70611,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70611,
+      "affix_target": 3
+    },
+    "70612": {
+      "id": 70612,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70612,
+      "affix_target": 3
+    },
+    "70613": {
+      "id": 70613,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70613,
+      "affix_target": 3
+    },
+    "70614": {
+      "id": 70614,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70614,
+      "affix_target": 3
+    },
+    "70615": {
+      "id": 70615,
+      "sub_type": 3003,
+      "exclusive_hero_id": 0,
+      "affix_id": 70615,
+      "affix_target": 3
+    },
+    "70651": {
+      "id": 70651,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70651,
+      "affix_target": 3
+    },
+    "70652": {
+      "id": 70652,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70652,
+      "affix_target": 3
+    },
+    "70653": {
+      "id": 70653,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70653,
+      "affix_target": 3
+    },
+    "70654": {
+      "id": 70654,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70654,
+      "affix_target": 3
+    },
+    "70655": {
+      "id": 70655,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70655,
+      "affix_target": 3
+    },
+    "70656": {
+      "id": 70656,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70656,
+      "affix_target": 3
+    },
+    "70657": {
+      "id": 70657,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70657,
+      "affix_target": 3
+    },
+    "70658": {
+      "id": 70658,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70658,
+      "affix_target": 3
+    },
+    "70659": {
+      "id": 70659,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70659,
+      "affix_target": 3
+    },
+    "70660": {
+      "id": 70660,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70660,
+      "affix_target": 3
+    },
+    "70661": {
+      "id": 70661,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70661,
+      "affix_target": 3
+    },
+    "70662": {
+      "id": 70662,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70662,
+      "affix_target": 3
+    },
+    "70663": {
+      "id": 70663,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70663,
+      "affix_target": 3
+    },
+    "70664": {
+      "id": 70664,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70664,
+      "affix_target": 3
+    },
+    "70665": {
+      "id": 70665,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70665,
+      "affix_target": 3
+    },
+    "70666": {
+      "id": 70666,
+      "sub_type": 3004,
+      "exclusive_hero_id": 0,
+      "affix_id": 70666,
+      "affix_target": 3
+    },
+    "70701": {
+      "id": 70701,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70701,
+      "affix_target": 3
+    },
+    "70702": {
+      "id": 70702,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70702,
+      "affix_target": 3
+    },
+    "70703": {
+      "id": 70703,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70703,
+      "affix_target": 3
+    },
+    "70704": {
+      "id": 70704,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70704,
+      "affix_target": 3
+    },
+    "70705": {
+      "id": 70705,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70705,
+      "affix_target": 3
+    },
+    "70706": {
+      "id": 70706,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70706,
+      "affix_target": 3
+    },
+    "70707": {
+      "id": 70707,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70707,
+      "affix_target": 3
+    },
+    "70708": {
+      "id": 70708,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70708,
+      "affix_target": 3
+    },
+    "70709": {
+      "id": 70709,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70709,
+      "affix_target": 3
+    },
+    "70710": {
+      "id": 70710,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70710,
+      "affix_target": 3
+    },
+    "70711": {
+      "id": 70711,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70711,
+      "affix_target": 3
+    },
+    "70712": {
+      "id": 70712,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70712,
+      "affix_target": 3
+    },
+    "70713": {
+      "id": 70713,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70713,
+      "affix_target": 3
+    },
+    "70714": {
+      "id": 70714,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70714,
+      "affix_target": 3
+    },
+    "70715": {
+      "id": 70715,
+      "sub_type": 3005,
+      "exclusive_hero_id": 0,
+      "affix_id": 70715,
+      "affix_target": 3
+    },
+    "70751": {
+      "id": 70751,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70751,
+      "affix_target": 3
+    },
+    "70752": {
+      "id": 70752,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70752,
+      "affix_target": 3
+    },
+    "70753": {
+      "id": 70753,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70753,
+      "affix_target": 3
+    },
+    "70754": {
+      "id": 70754,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70754,
+      "affix_target": 3
+    },
+    "70755": {
+      "id": 70755,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70755,
+      "affix_target": 3
+    },
+    "70756": {
+      "id": 70756,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70756,
+      "affix_target": 3
+    },
+    "70757": {
+      "id": 70757,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70757,
+      "affix_target": 3
+    },
+    "70758": {
+      "id": 70758,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70758,
+      "affix_target": 3
+    },
+    "70759": {
+      "id": 70759,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70759,
+      "affix_target": 3
+    },
+    "70760": {
+      "id": 70760,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70760,
+      "affix_target": 3
+    },
+    "70761": {
+      "id": 70761,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70761,
+      "affix_target": 3
+    },
+    "70762": {
+      "id": 70762,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70762,
+      "affix_target": 3
+    },
+    "70763": {
+      "id": 70763,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70763,
+      "affix_target": 3
+    },
+    "70764": {
+      "id": 70764,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70764,
+      "affix_target": 3
+    },
+    "70765": {
+      "id": 70765,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70765,
+      "affix_target": 3
+    },
+    "70766": {
+      "id": 70766,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70766,
+      "affix_target": 3
+    },
+    "70767": {
+      "id": 70767,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70767,
+      "affix_target": 3
+    },
+    "70768": {
+      "id": 70768,
+      "sub_type": 3006,
+      "exclusive_hero_id": 0,
+      "affix_id": 70768,
+      "affix_target": 3
+    },
+    "70801": {
+      "id": 70801,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70801,
+      "affix_target": 3
+    },
+    "70802": {
+      "id": 70802,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70802,
+      "affix_target": 3
+    },
+    "70803": {
+      "id": 70803,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70803,
+      "affix_target": 3
+    },
+    "70804": {
+      "id": 70804,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70804,
+      "affix_target": 3
+    },
+    "70805": {
+      "id": 70805,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70805,
+      "affix_target": 3
+    },
+    "70806": {
+      "id": 70806,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70806,
+      "affix_target": 3
+    },
+    "70807": {
+      "id": 70807,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70807,
+      "affix_target": 3
+    },
+    "70808": {
+      "id": 70808,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70808,
+      "affix_target": 3
+    },
+    "70809": {
+      "id": 70809,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70809,
+      "affix_target": 3
+    },
+    "70810": {
+      "id": 70810,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70810,
+      "affix_target": 3
+    },
+    "70811": {
+      "id": 70811,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70811,
+      "affix_target": 3
+    },
+    "70812": {
+      "id": 70812,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70812,
+      "affix_target": 3
+    },
+    "70813": {
+      "id": 70813,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70813,
+      "affix_target": 3
+    },
+    "70814": {
+      "id": 70814,
+      "sub_type": 3008,
+      "exclusive_hero_id": 0,
+      "affix_id": 70814,
+      "affix_target": 3
+    },
+    "70851": {
+      "id": 70851,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70851,
+      "affix_target": 3
+    },
+    "70852": {
+      "id": 70852,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70852,
+      "affix_target": 3
+    },
+    "70853": {
+      "id": 70853,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70853,
+      "affix_target": 3
+    },
+    "70854": {
+      "id": 70854,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70854,
+      "affix_target": 3
+    },
+    "70855": {
+      "id": 70855,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70855,
+      "affix_target": 3
+    },
+    "70856": {
+      "id": 70856,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70856,
+      "affix_target": 3
+    },
+    "70857": {
+      "id": 70857,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70857,
+      "affix_target": 3
+    },
+    "70858": {
+      "id": 70858,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70858,
+      "affix_target": 3
+    },
+    "70859": {
+      "id": 70859,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70859,
+      "affix_target": 3
+    },
+    "70860": {
+      "id": 70860,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70860,
+      "affix_target": 3
+    },
+    "70861": {
+      "id": 70861,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70861,
+      "affix_target": 3
+    },
+    "70862": {
+      "id": 70862,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70862,
+      "affix_target": 3
+    },
+    "70863": {
+      "id": 70863,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70863,
+      "affix_target": 3
+    },
+    "70864": {
+      "id": 70864,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70864,
+      "affix_target": 3
+    },
+    "70865": {
+      "id": 70865,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70865,
+      "affix_target": 3
+    },
+    "70866": {
+      "id": 70866,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70866,
+      "affix_target": 3
+    },
+    "70867": {
+      "id": 70867,
+      "sub_type": 3009,
+      "exclusive_hero_id": 0,
+      "affix_id": 70867,
+      "affix_target": 3
+    }
+  },
+  "artifacts_by_sub_type": {
+    "3007": [
+      101701,
+      101702,
+      101703,
+      101704,
+      101705,
+      109701,
+      109702,
+      109703,
+      109704,
+      109705,
+      108001,
+      108002,
+      108003,
+      108004,
+      108005,
+      105801,
+      105802,
+      105803,
+      105804,
+      105805,
+      105001,
+      105002,
+      105003,
+      105004,
+      105005,
+      108401,
+      108402,
+      108403,
+      108404,
+      108405,
+      101901,
+      101902,
+      101903,
+      101904,
+      101905,
+      119901,
+      119902,
+      119903,
+      119904,
+      119905,
+      114801,
+      114802,
+      114803,
+      114804,
+      114805,
+      109301,
+      109302,
+      109303,
+      109304,
+      109305,
+      102601,
+      102602,
+      102603,
+      102604,
+      102605,
+      104801,
+      104802,
+      104803,
+      104804,
+      104805,
+      103501,
+      103502,
+      103503,
+      103504,
+      103505,
+      102701,
+      102702,
+      102703,
+      102704,
+      102705,
+      103801,
+      103802,
+      103803,
+      103804,
+      103805,
+      106601,
+      106602,
+      106603,
+      106604,
+      106605,
+      102801,
+      102802,
+      102803,
+      102804,
+      102805,
+      105601,
+      105602,
+      105603,
+      105604,
+      105605,
+      103701,
+      103702,
+      103703,
+      103704,
+      103705,
+      109401,
+      109402,
+      109403,
+      109404,
+      109405,
+      106801,
+      106802,
+      106803,
+      106804,
+      106805,
+      104901,
+      104902,
+      104903,
+      104904,
+      104905,
+      128401,
+      128402,
+      128403,
+      128404,
+      128405,
+      105501,
+      105502,
+      105503,
+      105504,
+      105505,
+      112701,
+      112702,
+      112703,
+      112704,
+      112705,
+      111101,
+      111102,
+      111103,
+      111104,
+      111105,
+      119701,
+      119702,
+      119703,
+      119704,
+      119705,
+      113801,
+      113802,
+      113803,
+      113804,
+      113805,
+      103301,
+      103302,
+      103303,
+      103304,
+      103305,
+      115001,
+      115002,
+      115003,
+      115004,
+      115005,
+      107501,
+      107502,
+      107503,
+      107504,
+      107505,
+      106001,
+      106002,
+      106003,
+      106004,
+      106005,
+      106101,
+      106102,
+      106103,
+      106104,
+      106105,
+      109601,
+      109602,
+      109603,
+      109604,
+      109605,
+      103901,
+      103902,
+      103903,
+      103904,
+      103905,
+      101101,
+      101102,
+      101103,
+      101104,
+      101105
+    ],
+    "3001": [
+      70501,
+      70502,
+      70503,
+      70504,
+      70505,
+      70506,
+      70507,
+      70508,
+      70509,
+      70510,
+      70511,
+      70512
+    ],
+    "3002": [
+      70551,
+      70552,
+      70553,
+      70554,
+      70555,
+      70556,
+      70557,
+      70558,
+      70559,
+      70560,
+      70561,
+      70562,
+      70563,
+      70564,
+      70565,
+      70566
+    ],
+    "3003": [
+      70601,
+      70602,
+      70603,
+      70604,
+      70605,
+      70606,
+      70607,
+      70608,
+      70609,
+      70610,
+      70611,
+      70612,
+      70613,
+      70614,
+      70615
+    ],
+    "3004": [
+      70651,
+      70652,
+      70653,
+      70654,
+      70655,
+      70656,
+      70657,
+      70658,
+      70659,
+      70660,
+      70661,
+      70662,
+      70663,
+      70664,
+      70665,
+      70666
+    ],
+    "3005": [
+      70701,
+      70702,
+      70703,
+      70704,
+      70705,
+      70706,
+      70707,
+      70708,
+      70709,
+      70710,
+      70711,
+      70712,
+      70713,
+      70714,
+      70715
+    ],
+    "3006": [
+      70751,
+      70752,
+      70753,
+      70754,
+      70755,
+      70756,
+      70757,
+      70758,
+      70759,
+      70760,
+      70761,
+      70762,
+      70763,
+      70764,
+      70765,
+      70766,
+      70767,
+      70768
+    ],
+    "3008": [
+      70801,
+      70802,
+      70803,
+      70804,
+      70805,
+      70806,
+      70807,
+      70808,
+      70809,
+      70810,
+      70811,
+      70812,
+      70813,
+      70814
+    ],
+    "3009": [
+      70851,
+      70852,
+      70853,
+      70854,
+      70855,
+      70856,
+      70857,
+      70858,
+      70859,
+      70860,
+      70861,
+      70862,
+      70863,
+      70864,
+      70865,
+      70866,
+      70867
+    ]
+  },
+  "artifacts_by_hero": {
+    "1017": [
+      101701,
+      101702,
+      101703,
+      101704,
+      101705
+    ],
+    "1097": [
+      109701,
+      109702,
+      109703,
+      109704,
+      109705
+    ],
+    "1080": [
+      108001,
+      108002,
+      108003,
+      108004,
+      108005
+    ],
+    "1058": [
+      105801,
+      105802,
+      105803,
+      105804,
+      105805
+    ],
+    "1050": [
+      105001,
+      105002,
+      105003,
+      105004,
+      105005
+    ],
+    "1084": [
+      108401,
+      108402,
+      108403,
+      108404,
+      108405
+    ],
+    "1019": [
+      101901,
+      101902,
+      101903,
+      101904,
+      101905
+    ],
+    "1199": [
+      119901,
+      119902,
+      119903,
+      119904,
+      119905
+    ],
+    "1148": [
+      114801,
+      114802,
+      114803,
+      114804,
+      114805
+    ],
+    "1093": [
+      109301,
+      109302,
+      109303,
+      109304,
+      109305
+    ],
+    "1026": [
+      102601,
+      102602,
+      102603,
+      102604,
+      102605
+    ],
+    "1048": [
+      104801,
+      104802,
+      104803,
+      104804,
+      104805
+    ],
+    "1035": [
+      103501,
+      103502,
+      103503,
+      103504,
+      103505
+    ],
+    "1027": [
+      102701,
+      102702,
+      102703,
+      102704,
+      102705
+    ],
+    "1038": [
+      103801,
+      103802,
+      103803,
+      103804,
+      103805
+    ],
+    "1066": [
+      106601,
+      106602,
+      106603,
+      106604,
+      106605
+    ],
+    "1028": [
+      102801,
+      102802,
+      102803,
+      102804,
+      102805
+    ],
+    "1056": [
+      105601,
+      105602,
+      105603,
+      105604,
+      105605
+    ],
+    "1037": [
+      103701,
+      103702,
+      103703,
+      103704,
+      103705
+    ],
+    "1094": [
+      109401,
+      109402,
+      109403,
+      109404,
+      109405
+    ],
+    "1068": [
+      106801,
+      106802,
+      106803,
+      106804,
+      106805
+    ],
+    "1049": [
+      104901,
+      104902,
+      104903,
+      104904,
+      104905
+    ],
+    "1284": [
+      128401,
+      128402,
+      128403,
+      128404,
+      128405
+    ],
+    "1055": [
+      105501,
+      105502,
+      105503,
+      105504,
+      105505
+    ],
+    "1127": [
+      112701,
+      112702,
+      112703,
+      112704,
+      112705
+    ],
+    "1111": [
+      111101,
+      111102,
+      111103,
+      111104,
+      111105
+    ],
+    "1197": [
+      119701,
+      119702,
+      119703,
+      119704,
+      119705
+    ],
+    "1138": [
+      113801,
+      113802,
+      113803,
+      113804,
+      113805
+    ],
+    "1033": [
+      103301,
+      103302,
+      103303,
+      103304,
+      103305
+    ],
+    "1150": [
+      115001,
+      115002,
+      115003,
+      115004,
+      115005
+    ],
+    "1075": [
+      107501,
+      107502,
+      107503,
+      107504,
+      107505
+    ],
+    "1060": [
+      106001,
+      106002,
+      106003,
+      106004,
+      106005
+    ],
+    "1061": [
+      106101,
+      106102,
+      106103,
+      106104,
+      106105
+    ],
+    "1096": [
+      109601,
+      109602,
+      109603,
+      109604,
+      109605
+    ],
+    "1039": [
+      103901,
+      103902,
+      103903,
+      103904,
+      103905
+    ],
+    "1011": [
+      101101,
+      101102,
+      101103,
+      101104,
+      101105
+    ]
+  },
+  "stages": [
+    3035105,
+    3035106,
+    3035107,
+    3035108,
+    3035109,
+    3035110,
+    3035111,
+    3035112,
+    3035199,
+    3035205,
+    3035206,
+    3035207,
+    3035208,
+    3035301,
+    3035302,
+    3035303,
+    3035304,
+    3035401,
+    3035521,
+    3035522,
+    3035523,
+    3035524,
+    3035541,
+    3035542,
+    3035561,
+    3035562,
+    3035601,
+    3036105,
+    3036106,
+    3036107,
+    3036108,
+    3036109,
+    3036110,
+    3036111,
+    3036112,
+    3036205,
+    3036206,
+    3036207,
+    3036208,
+    3036301,
+    3036302,
+    3036303,
+    3036304,
+    3036401,
+    3036521,
+    3036522,
+    3036523,
+    3036524,
+    3036541,
+    3036542,
+    3036543,
+    3036561,
+    3036562,
+    3036601,
+    3037105,
+    3037106,
+    3037107,
+    3037108,
+    3037109,
+    3037110,
+    3037111,
+    3037112,
+    3037205,
+    3037206,
+    3037207,
+    3037208,
+    3037301,
+    3037302,
+    3037303,
+    3037304,
+    3037401,
+    3037521,
+    3037522,
+    3037523,
+    3037524,
+    3037525,
+    3037541,
+    3037542,
+    3037561,
+    3037562,
+    3037601
+  ],
+  "poly_heroes": {
+    "1184": {
+      "hero_id": 1184,
+      "standard_id": 3051184,
+      "need_coin": 800
+    },
+    "1027": {
+      "hero_id": 1027,
+      "standard_id": 3051027,
+      "need_coin": 800
+    },
+    "1093": {
+      "hero_id": 1093,
+      "standard_id": 3051093,
+      "need_coin": 800
+    },
+    "1094": {
+      "hero_id": 1094,
+      "standard_id": 3051094,
+      "need_coin": 800
+    },
+    "1148": {
+      "hero_id": 1148,
+      "standard_id": 3051148,
+      "need_coin": 800
+    },
+    "1066": {
+      "hero_id": 1066,
+      "standard_id": 3051066,
+      "need_coin": 800
+    },
+    "1099": {
+      "hero_id": 1099,
+      "standard_id": 3051099,
+      "need_coin": 800
+    },
+    "1037": {
+      "hero_id": 1037,
+      "standard_id": 3051037,
+      "need_coin": 800
+    },
+    "1038": {
+      "hero_id": 1038,
+      "standard_id": 3051038,
+      "need_coin": 800
+    },
+    "1039": {
+      "hero_id": 1039,
+      "standard_id": 3051039,
+      "need_coin": 800
+    },
+    "1199": {
+      "hero_id": 1199,
+      "standard_id": 3051199,
+      "need_coin": 800
+    },
+    "1048": {
+      "hero_id": 1048,
+      "standard_id": 3051048,
+      "need_coin": 800
+    },
+    "1011": {
+      "hero_id": 1011,
+      "standard_id": 3051011,
+      "need_coin": 800
+    },
+    "1080": {
+      "hero_id": 1080,
+      "standard_id": 3051080,
+      "need_coin": 800
+    },
+    "1050": {
+      "hero_id": 1050,
+      "standard_id": 3051050,
+      "need_coin": 800
+    },
+    "1019": {
+      "hero_id": 1019,
+      "standard_id": 3051019,
+      "need_coin": 800
+    },
+    "1084": {
+      "hero_id": 1084,
+      "standard_id": 3051084,
+      "need_coin": 800
+    },
+    "1026": {
+      "hero_id": 1026,
+      "standard_id": 3051026,
+      "need_coin": 800
+    },
+    "1058": {
+      "hero_id": 1058,
+      "standard_id": 3051058,
+      "need_coin": 800
+    },
+    "1059": {
+      "hero_id": 1059,
+      "standard_id": 3051059,
+      "need_coin": 800
+    },
+    "1096": {
+      "hero_id": 1096,
+      "standard_id": 3051096,
+      "need_coin": 800
+    },
+    "1097": {
+      "hero_id": 1097,
+      "standard_id": 3051097,
+      "need_coin": 800
+    },
+    "1139": {
+      "hero_id": 1139,
+      "standard_id": 3051139,
+      "need_coin": 800
+    },
+    "1035": {
+      "hero_id": 1035,
+      "standard_id": 3051035,
+      "need_coin": 800
+    },
+    "1032": {
+      "hero_id": 1032,
+      "standard_id": 3051032,
+      "need_coin": 800
+    },
+    "1013": {
+      "hero_id": 1013,
+      "standard_id": 3051013,
+      "need_coin": 800
+    },
+    "1138": {
+      "hero_id": 1138,
+      "standard_id": 3051138,
+      "need_coin": 800
+    },
+    "1081": {
+      "hero_id": 1081,
+      "standard_id": 3051081,
+      "need_coin": 800
+    },
+    "1127": {
+      "hero_id": 1127,
+      "standard_id": 3051127,
+      "need_coin": 800
+    },
+    "1056": {
+      "hero_id": 1056,
+      "standard_id": 3051056,
+      "need_coin": 800
+    },
+    "1042": {
+      "hero_id": 1042,
+      "standard_id": 3051042,
+      "need_coin": 800
+    },
+    "1119": {
+      "hero_id": 1119,
+      "standard_id": 3051119,
+      "need_coin": 800
+    },
+    "1067": {
+      "hero_id": 1067,
+      "standard_id": 3051067,
+      "need_coin": 800
+    },
+    "1041": {
+      "hero_id": 1041,
+      "standard_id": 3051041,
+      "need_coin": 800
+    },
+    "1068": {
+      "hero_id": 1068,
+      "standard_id": 3051068,
+      "need_coin": 800
+    },
+    "1033": {
+      "hero_id": 1033,
+      "standard_id": 3051033,
+      "need_coin": 800
+    },
+    "1017": {
+      "hero_id": 1017,
+      "standard_id": 3051017,
+      "need_coin": 800
+    },
+    "1016": {
+      "hero_id": 1016,
+      "standard_id": 3051016,
+      "need_coin": 800
+    },
+    "1052": {
+      "hero_id": 1052,
+      "standard_id": 3051052,
+      "need_coin": 800
+    },
+    "1024": {
+      "hero_id": 1024,
+      "standard_id": 3051024,
+      "need_coin": 800
+    },
+    "1028": {
+      "hero_id": 1028,
+      "standard_id": 3051028,
+      "need_coin": 800
+    },
+    "1132": {
+      "hero_id": 1132,
+      "standard_id": 3051132,
+      "need_coin": 800
+    },
+    "1049": {
+      "hero_id": 1049,
+      "standard_id": 3051049,
+      "need_coin": 800
+    },
+    "1284": {
+      "hero_id": 1284,
+      "standard_id": 3051284,
+      "need_coin": 800
+    },
+    "1055": {
+      "hero_id": 1055,
+      "standard_id": 3051055,
+      "need_coin": 800
+    },
+    "1111": {
+      "hero_id": 1111,
+      "standard_id": 3051111,
+      "need_coin": 800
+    },
+    "1197": {
+      "hero_id": 1197,
+      "standard_id": 3051197,
+      "need_coin": 800
+    },
+    "1150": {
+      "hero_id": 1150,
+      "standard_id": 3051150,
+      "need_coin": 800
+    },
+    "1075": {
+      "hero_id": 1075,
+      "standard_id": 3051075,
+      "need_coin": 800
+    },
+    "1060": {
+      "hero_id": 1060,
+      "standard_id": 3051060,
+      "need_coin": 800
+    },
+    "1061": {
+      "hero_id": 1061,
+      "standard_id": 3051061,
+      "need_coin": 800
+    },
+    "1133": {
+      "hero_id": 1133,
+      "standard_id": 3051133,
+      "need_coin": 800
+    },
+    "1012": {
+      "hero_id": 1012,
+      "standard_id": 3051012,
+      "need_coin": 800
+    }
+  },
+  "beacons": {
+    "1": {
+      "id": 1
+    },
+    "2": {
+      "id": 2
+    },
+    "3": {
+      "id": 3
+    },
+    "4": {
+      "id": 4
+    },
+    "5": {
+      "id": 5
+    },
+    "6": {
+      "id": 6
+    },
+    "7": {
+      "id": 7
+    },
+    "8": {
+      "id": 8
+    },
+    "9": {
+      "id": 9
+    },
+    "10": {
+      "id": 10
+    },
+    "11": {
+      "id": 11
+    },
+    "12": {
+      "id": 12
+    },
+    "13": {
+      "id": 13
+    },
+    "14": {
+      "id": 14
+    }
+  },
+  "boss_stages": {
+    "1": 5001,
+    "2": 5002,
+    "3": 5003
+  },
+  "tier_routes": {
+    "1": [
+      1001,
+      1002,
+      1003,
+      1004,
+      1005,
+      1006,
+      1007
+    ],
+    "2": [
+      2001,
+      2002,
+      2003,
+      2004,
+      2005,
+      2006,
+      2007,
+      2008
+    ],
+    "3": [
+      3001,
+      3002,
+      3003,
+      3004,
+      3005,
+      3006,
+      3007,
+      3008,
+      3009,
+      3010
+    ]
+  }
+}

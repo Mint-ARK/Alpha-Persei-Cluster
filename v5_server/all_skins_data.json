@@ -1,0 +1,1623 @@
+[
+  {
+    "sid": 100102,
+    "name": "常服·极地白",
+    "hero_id": 1001,
+    "hero_name": "1001文案预留·管理员",
+    "category": "活动/战令/特殊换装",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [],
+    "desc": "黑白配色简约而富有层次的设计，面料轻盈舒适，轻松打造各种造型风格。"
+  },
+  {
+    "sid": 101201,
+    "name": "倚新妆",
+    "hero_id": 1012,
+    "hero_name": "天诫·白泽",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000031
+    ],
+    "desc": "在导购小姐赞不绝口的力荐中换上，又在满店的赞不绝口中结了账，等到离开店..."
+  },
+  {
+    "sid": 101301,
+    "name": "余烬",
+    "hero_id": 1013,
+    "hero_name": "障月·阿修罗",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000002
+    ],
+    "desc": "阿修罗过去在夏什瓦特的着装打扮，由弥楼衍提供材料与设计，为她量身定制的..."
+  },
+  {
+    "sid": 101501,
+    "name": "危险教官",
+    "hero_id": 1015,
+    "hero_name": "狂狮·塞赫麦特",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000011
+    ],
+    "desc": "塞赫麦特曾经回到精英学院任职犯罪心理学讲师时的制式服装。据说那段时间里..."
+  },
+  {
+    "sid": 101502,
+    "name": "不予投诉",
+    "hero_id": 1015,
+    "hero_name": "狂狮·塞赫麦特",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6029「指名服务」"
+    ],
+    "goods": [
+      15000030
+    ],
+    "desc": "塞赫麦特为了某次见面特别准备的服装，据她所说只是配合着环境一时兴起。\\..."
+  },
+  {
+    "sid": 101701,
+    "name": "伪装",
+    "hero_id": 1017,
+    "hero_name": "灵猫·芭丝特",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000013
+    ],
+    "desc": "积压在阿卡德公会仓库角落的一件服装，具体是谁采购的已经无从查证。在去找..."
+  },
+  {
+    "sid": 102001,
+    "name": "轻纱梦华",
+    "hero_id": 1020,
+    "hero_name": "三相·梵天",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6016「嬉闹午后」"
+    ],
+    "goods": [
+      15000022
+    ],
+    "desc": "为了能与管理员度过一个愉快的下午，梵天运用权能为自己准备的家居服，每一..."
+  },
+  {
+    "sid": 102003,
+    "name": "无间玩伴",
+    "hero_id": 1020,
+    "hero_name": "三相·梵天",
+    "category": "T0顶级限定换装",
+    "level": 2,
+    "has_timeline": true,
+    "has_plot": true,
+    "scenes": [
+      "6030「喧笑的时光」"
+    ],
+    "goods": [],
+    "desc": "借着权能之便，梵天给自己创造过许多各具特色的衣服，而这件则是她为了与管..."
+  },
+  {
+    "sid": 102101,
+    "name": "炫色夏虹",
+    "hero_id": 1021,
+    "hero_name": "曦光·阿尔忒弥斯",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6015「少女的绮想」"
+    ],
+    "goods": [
+      15000021
+    ],
+    "desc": "在少女还不是团长的时候，她也曾像普通少女一般在海边嬉戏。而此时为了与管..."
+  },
+  {
+    "sid": 102201,
+    "name": "海滩漫步",
+    "hero_id": 1022,
+    "hero_name": "幽月·塞勒涅",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6014「于月色中」"
+    ],
+    "goods": [
+      15000020
+    ],
+    "desc": "轻装度假的塞勒涅随手在夏维斯特岛上的一家服装店购买的服饰，只是因为距离..."
+  },
+  {
+    "sid": 102202,
+    "name": "沉醉旖旎",
+    "hero_id": 1022,
+    "hero_name": "幽月·塞勒涅",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6028「杯光摇曳时」"
+    ],
+    "goods": [
+      15000029
+    ],
+    "desc": "受哈迪斯所托前来帮忙的塞勒涅换上了这套特制的服装，而在这里她遇见了意料..."
+  },
+  {
+    "sid": 102701,
+    "name": "返校日",
+    "hero_id": 1027,
+    "hero_name": "低吹雪·利维坦",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      17000011
+    ],
+    "desc": "设计参考了大多数学院的校服改良而成。在保证优秀性能的基础上，极大地洋溢..."
+  },
+  {
+    "sid": 102801,
+    "name": "喧哗颂歌",
+    "hero_id": 1028,
+    "hero_name": "轰雷·托尔",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000010
+    ],
+    "desc": "某年苹果珍酿庆典的冠军奖品，喝了太多珍酿的托尔一路高唱着颂歌回到宿舍，..."
+  },
+  {
+    "sid": 102802,
+    "name": "运动时间",
+    "hero_id": 1028,
+    "hero_name": "轰雷·托尔",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000033
+    ],
+    "desc": "托尔在训练室时会穿着的运动服，使用了快干材质的面料，确保了她在高强度运..."
+  },
+  {
+    "sid": 103203,
+    "name": "盛音礼赞",
+    "hero_id": 1032,
+    "hero_name": "熯天·提尔",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000007
+    ],
+    "desc": "来自欧莫菲斯原质区顶级服装设计师定制的白色礼服，设计精美、剪裁考究，完..."
+  },
+  {
+    "sid": 103401,
+    "name": "家政小帮手",
+    "hero_id": 1034,
+    "hero_name": "潜蛇·瓦吉特",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6027「预设中的意外」"
+    ],
+    "goods": [
+      15000028
+    ],
+    "desc": "由瓦吉特亲手设计的女仆装，在保留经典设计的同时加入了潮流的剪裁，似乎还..."
+  },
+  {
+    "sid": 103402,
+    "name": "恋恋春光",
+    "hero_id": 1034,
+    "hero_name": "潜蛇·瓦吉特",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6046「心房一角」"
+    ],
+    "goods": [
+      15000044
+    ],
+    "desc": "难得从工作中抽身，为了与你共度一段值得回忆的时光，瓦吉特特意精心打扮了..."
+  },
+  {
+    "sid": 103701,
+    "name": "冒牌女仆",
+    "hero_id": 1037,
+    "hero_name": "夜之寄生·霍德尔",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000001
+    ],
+    "desc": "深空之眼临时制备的女仆装。为了在某次作战中完成潜入宅邸的任务而设计。\\..."
+  },
+  {
+    "sid": 103901,
+    "name": "恋海",
+    "hero_id": 1039,
+    "hero_name": "潮音·波塞冬",
+    "category": "活动/战令/特殊换装",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [],
+    "desc": "白蓝交织的色调搭配得体的剪裁，带来如同海风拂面般的清爽感觉，是非常适合..."
+  },
+  {
+    "sid": 103906,
+    "name": "浥轻尘",
+    "hero_id": 1039,
+    "hero_name": "潮音·波塞冬",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000015
+    ],
+    "desc": "由虚恒百年老店的裁缝师傅亲自操刀，使用经典的款式加上复古的图案设计，最..."
+  },
+  {
+    "sid": 104101,
+    "name": "荣勋",
+    "hero_id": 1041,
+    "hero_name": "铃兰之弦·雅典娜",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      17000003,
+      94000020
+    ],
+    "desc": "雅典娜接任铃兰骑士团时所穿着的服饰，具有观赏性的同时兼具战斗需求。但实..."
+  },
+  {
+    "sid": 104103,
+    "name": "红与黑",
+    "hero_id": 1041,
+    "hero_name": "铃兰之弦·雅典娜",
+    "category": "活动/战令/特殊换装",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [],
+    "desc": "阿尔忒弥斯为雅典娜特别定制的晚礼服，据说名字源于旧世代的一部经典文学名..."
+  },
+  {
+    "sid": 104201,
+    "name": "冥夜鸢尾",
+    "hero_id": 1042,
+    "hero_name": "操偶师·哈迪斯",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000006
+    ],
+    "desc": "由欧莫菲斯顶级工坊制作的刺绣礼服裙，摇曳的裙摆犹如初绽的鸢尾花瓣，散发..."
+  },
+  {
+    "sid": 104204,
+    "name": "忘川灯影",
+    "hero_id": 1042,
+    "hero_name": "操偶师·哈迪斯",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000014
+    ],
+    "desc": "体现着虚恒最高工艺水平的礼服，典雅与时尚并重，闪耀着超凡脱俗的光辉。\\..."
+  },
+  {
+    "sid": 104205,
+    "name": "慵懒假日",
+    "hero_id": 1042,
+    "hero_name": "操偶师·哈迪斯",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      17000006
+    ],
+    "desc": "布料柔软、剪裁精致的欧莫菲斯定制泳装，哈迪斯难得给予好评的款式。\\n夏..."
+  },
+  {
+    "sid": 104301,
+    "name": "童话式复古",
+    "hero_id": 1043,
+    "hero_name": "隐夜·伊里伽尔",
+    "category": "伴生独立大场景限定",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6044「窗隅拾光」"
+    ],
+    "goods": [],
+    "desc": "因为看不见，伊里伽尔的服装订购常让奈提和奈奈代劳，有时候它们难免会搜索..."
+  },
+  {
+    "sid": 104401,
+    "name": "炸毛警报",
+    "hero_id": 1044,
+    "hero_name": "不灭王权·荷鲁斯",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6043「摸摸许可证」"
+    ],
+    "goods": [
+      15000042
+    ],
+    "desc": "游乐园分发的小动物主题水手服，荷鲁斯本来打算兼职的时候偷偷穿，没想到被..."
+  },
+  {
+    "sid": 104402,
+    "name": "完美合奏",
+    "hero_id": 1044,
+    "hero_name": "不灭王权·荷鲁斯",
+    "category": "T0顶级限定换装",
+    "level": 2,
+    "has_timeline": true,
+    "has_plot": true,
+    "scenes": [
+      "6052「少女欢奏之夜」"
+    ],
+    "goods": [],
+    "desc": "一款清新舒适的居家常服，设计上采用了荷鲁斯和管理员的一些巧思。荷鲁斯对..."
+  },
+  {
+    "sid": 104501,
+    "name": "瑰色倾情",
+    "hero_id": 1045,
+    "hero_name": "赤音·亚莉莎",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6037「新的旅程」"
+    ],
+    "goods": [
+      15000037
+    ],
+    "desc": "亚莉莎专门定制的晚礼服，长裙飘逸而大胆，展示出这位神机使平时难得一见的..."
+  },
+  {
+    "sid": 104601,
+    "name": "浮光织雪",
+    "hero_id": 1046,
+    "hero_name": "血弹·雪儿",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6036「静夜心语」"
+    ],
+    "goods": [
+      15000036
+    ],
+    "desc": "为了今天的见面，雪儿特意换上的礼服，柔美起伏的裙摆线条，似乎也代表着少..."
+  },
+  {
+    "sid": 104701,
+    "name": "午夜沉沦",
+    "hero_id": 1047,
+    "hero_name": "裁暗之锋·塞尔凯特",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6040「吸引力法则」"
+    ],
+    "goods": [
+      15000039
+    ],
+    "desc": "塞尔凯特在卡达斯王国获得的泳者套装，精致的首饰和布料的细闪犹如夜空繁星..."
+  },
+  {
+    "sid": 104801,
+    "name": "晖耀",
+    "hero_id": 1048,
+    "hero_name": "彗光·前鬼坊天狗",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000003
+    ],
+    "desc": "采用隐科组研发的新型反光面料制作而成，能够有效干扰敌人的视线，争取作战..."
+  },
+  {
+    "sid": 104901,
+    "name": "彼岸浮生",
+    "hero_id": 1049,
+    "hero_name": "镜花黄泉·伊邪那美",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000006
+    ],
+    "desc": "鸦越家举行家族祭典时的礼仪服饰，独属于伊邪那美。\\n在母亲的帮助下将绘..."
+  },
+  {
+    "sid": 104902,
+    "name": "海之恋歌",
+    "hero_id": 1049,
+    "hero_name": "镜花黄泉·伊邪那美",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6012「浮光的初景」"
+    ],
+    "goods": [
+      15000019
+    ],
+    "desc": "伊邪那美被邀请前往海边时获赠的衣服，少女的身姿宛如传说中的人鱼，深邃透..."
+  },
+  {
+    "sid": 104903,
+    "name": "初雪千华",
+    "hero_id": 1049,
+    "hero_name": "镜花黄泉·伊邪那美",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6049「尘世之缘」"
+    ],
+    "goods": [
+      15000047
+    ],
+    "desc": "素白如雪，樱华千绽。笹波的传统服饰虽穿起来繁琐，但与之而来的那份庄重与..."
+  },
+  {
+    "sid": 105201,
+    "name": "先行者",
+    "hero_id": 1052,
+    "hero_name": "怒蛇·马尔杜克",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      17000004,
+      95000019
+    ],
+    "desc": "第五代「先行者」金属武装装甲，完美贴合人体构造，可以对穿着者的单兵作战..."
+  },
+  {
+    "sid": 105301,
+    "name": "暮色华尔兹",
+    "hero_id": 1053,
+    "hero_name": "怀阳·羲和",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6050「天际线之上」"
+    ],
+    "goods": [
+      15000048
+    ],
+    "desc": "羲和挑选的日常小礼服，绸缎面料如月光般在身体曲线上流淌，深蓝如暮色时的..."
+  },
+  {
+    "sid": 105401,
+    "name": "慵懒靠近你",
+    "hero_id": 1054,
+    "hero_name": "双司镇命·无常",
+    "category": "伴生独立大场景限定",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6053「心动烘焙日记」"
+    ],
+    "goods": [],
+    "desc": "衬衫随着动作轻轻摆动，敞开的水手领落在肩上，让甜美又慵懒的闲暇时间缓缓..."
+  },
+  {
+    "sid": 105501,
+    "name": "绚烂律动",
+    "hero_id": 1055,
+    "hero_name": "霜影·暗御津羽",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000004
+    ],
+    "desc": "暗御津羽参与地下演出时的装束，剪裁与纹饰皆体现出与音律谐动的活泼。\\n..."
+  },
+  {
+    "sid": 105502,
+    "name": "庆典遐思",
+    "hero_id": 1055,
+    "hero_name": "霜影·暗御津羽",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000035
+    ],
+    "desc": "笹波女孩在节庆或是祭典时会穿的衣服，是因为要和管理员一起造访神社，暗御..."
+  },
+  {
+    "sid": 105804,
+    "name": "闲雅午憩",
+    "hero_id": 1058,
+    "hero_name": "龙切·迦具土",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000005,
+      17000002,
+      92000020
+    ],
+    "desc": "从友人处得到的赠礼，在其他原质区的礼服款式基础上糅入笹波的服饰特点，形..."
+  },
+  {
+    "sid": 106001,
+    "name": "金错刀",
+    "hero_id": 1060,
+    "hero_name": "九司·陆吾",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      17000007
+    ],
+    "desc": "美人赠我金错刀，何以报之英琼瑶。\\n路远莫致倚逍遥，何为怀忧心烦劳。"
+  },
+  {
+    "sid": 106101,
+    "name": "云雾敛",
+    "hero_id": 1061,
+    "hero_name": "玄机·执明",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6005「相见欢」"
+    ],
+    "goods": [
+      15000009
+    ],
+    "desc": "制衣匠人在夜游长安桥时灵感迸发从而诞生的作品，成衣还原出了夜色中月光如..."
+  },
+  {
+    "sid": 106102,
+    "name": "绵暖冬意",
+    "hero_id": 1061,
+    "hero_name": "玄机·执明",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6024「烘焙甜蜜」"
+    ],
+    "goods": [
+      15000025
+    ],
+    "desc": "执明在秋冬季节穿的居家服，材质柔软，装饰则是少女的巧思。\\n落雪时节，..."
+  },
+  {
+    "sid": 106103,
+    "name": "沉溺于夏日",
+    "hero_id": 1061,
+    "hero_name": "玄机·执明",
+    "category": "伴生独立大场景限定",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6039「悠闲盛夏」"
+    ],
+    "goods": [],
+    "desc": "执明在卡达斯王国获得的泳者套装，简约而不失可爱，半透的薄纱比夏日的晴空..."
+  },
+  {
+    "sid": 106603,
+    "name": "长日绯樱",
+    "hero_id": 1066,
+    "hero_name": "早樱·大国主",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      17000001
+    ],
+    "desc": "大国主专为夏日研发的科技面料泳装，能够安然在树荫下享受海浪带来的清凉和..."
+  },
+  {
+    "sid": 106604,
+    "name": "兔迎初岁",
+    "hero_id": 1066,
+    "hero_name": "早樱·大国主",
+    "category": "活动/战令/特殊换装",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [],
+    "desc": "深空之眼与天禄贸易达成商业合作后，收到的第一批服装类产品。为虚恒传统服..."
+  },
+  {
+    "sid": 107001,
+    "name": "水色晴空",
+    "hero_id": 1070,
+    "hero_name": "十曜·金乌",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000002
+    ],
+    "desc": "来自好友英招的馈赠，虚恒知名品牌剪裁师的高定。喜欢上夏天的金乌对这套泳..."
+  },
+  {
+    "sid": 107002,
+    "name": "金雀钗",
+    "hero_id": 1070,
+    "hero_name": "十曜·金乌",
+    "category": "伴生独立大场景限定",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6026「知我意」"
+    ],
+    "goods": [],
+    "desc": "金雀钗，红粉面，花里暂时相见。知我意，感君怜，此情须问天。"
+  },
+  {
+    "sid": 107101,
+    "name": "太平令",
+    "hero_id": 1071,
+    "hero_name": "青君·孟章",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      17000008,
+      97000001
+    ],
+    "desc": "孟章为新年定制的正装，在融入现代元素的同时保留了虚恒古韵的端庄雍容。\\..."
+  },
+  {
+    "sid": 107201,
+    "name": "粽香滚滚",
+    "hero_id": 1072,
+    "hero_name": "百解·禄良",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000017
+    ],
+    "desc": "天禄贸易踏足服饰行业后尝试推出的第一款节日主题套装，为了迎合市场额外加..."
+  },
+  {
+    "sid": 107301,
+    "name": "岁华似锦",
+    "hero_id": 1073,
+    "hero_name": "巧构·麟钰",
+    "category": "伴生独立大场景限定",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6033「清平乐」"
+    ],
+    "goods": [],
+    "desc": "回到家乡的麟钰换上了旧时的服饰，绣衣簪花，街头贩货，为刺桐港南来北往的..."
+  },
+  {
+    "sid": 107401,
+    "name": "听风消夏",
+    "hero_id": 1074,
+    "hero_name": "巡天·英招",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000001
+    ],
+    "desc": "虚恒知名品牌剪裁师的高定，频繁出差之人，闲暇之余必备的舒适泳装，很适合..."
+  },
+  {
+    "sid": 107402,
+    "name": "效率至上",
+    "hero_id": 1074,
+    "hero_name": "巡天·英招",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6010「慌张时刻」"
+    ],
+    "goods": [
+      15000015
+    ],
+    "desc": "天禄贸易事务繁多，作为人事兼贸易部长，英招始终保持着高效的工作方针。\\..."
+  },
+  {
+    "sid": 107501,
+    "name": "古墓来客",
+    "hero_id": 1075,
+    "hero_name": "澄心·陵光",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6004「朱阁幽话」"
+    ],
+    "goods": [
+      15000007
+    ],
+    "desc": "源自古书记载的一种特殊装扮，陵光受管理员邀请而特别定制。\\n——「听说..."
+  },
+  {
+    "sid": 107502,
+    "name": "霞语相思",
+    "hero_id": 1075,
+    "hero_name": "澄心·陵光",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6008「轻舞幽梦」"
+    ],
+    "goods": [
+      15000014
+    ],
+    "desc": "在夏什瓦特结束公务后，管理员对当地的舞蹈产生了兴趣。难得雅兴，陵光自然..."
+  },
+  {
+    "sid": 107503,
+    "name": "试春衣",
+    "hero_id": 1075,
+    "hero_name": "澄心·陵光",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6031「不思量」"
+    ],
+    "goods": [
+      15000032
+    ],
+    "desc": "深心未忍轻分付，回头一笑，花间归去，只恐被花知。"
+  },
+  {
+    "sid": 107601,
+    "name": "代班董事",
+    "hero_id": 1076,
+    "hero_name": "太一·庚辰",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6009「休憩时间」"
+    ],
+    "goods": [
+      15000016,
+      16000016
+    ],
+    "desc": "收到奥丁意料之外的请求后，庚辰不得不穿上深空之眼高管的定制服装，临时代..."
+  },
+  {
+    "sid": 107602,
+    "name": "海上的私语",
+    "hero_id": 1076,
+    "hero_name": "太一·庚辰",
+    "category": "T0顶级限定换装",
+    "level": 2,
+    "has_timeline": true,
+    "has_plot": true,
+    "scenes": [
+      "6001「暮色珍珠」"
+    ],
+    "goods": [],
+    "desc": "「游艇会议」结束后，庚辰收到了管理员的邀请，前来参加即将开始的晚宴。\\..."
+  },
+  {
+    "sid": 107701,
+    "name": "沐兰泽",
+    "hero_id": 1077,
+    "hero_name": "锻玉·武罗",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6056「良宵长」"
+    ],
+    "goods": [
+      15000051
+    ],
+    "desc": "岁初裁新衣，兰花沐春衫。步履轻移间，暗金滚边与襟前暗纹似流光泛起柔和光..."
+  },
+  {
+    "sid": 108301,
+    "name": "热带蓝调",
+    "hero_id": 1083,
+    "hero_name": "硝芒·埃克什瓦",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6041「夏日比拼」"
+    ],
+    "goods": [
+      15000041
+    ],
+    "desc": "极具夏日风情的装扮，适合各种海滩度假场合，埃什特意在小摊购买了鸡蛋花项..."
+  },
+  {
+    "sid": 108403,
+    "name": "踏雪寻梅",
+    "hero_id": 1084,
+    "hero_name": "朝约·薇儿丹蒂",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      17000005,
+      96000001
+    ],
+    "desc": "来自虚恒顶级设计师的作品——一款裁剪独到的新春服饰，穿上它的薇儿丹蒂分..."
+  },
+  {
+    "sid": 108404,
+    "name": "甜心厨娘",
+    "hero_id": 1084,
+    "hero_name": "朝约·薇儿丹蒂",
+    "category": "活动/战令/特殊换装",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      51000016
+    ],
+    "desc": "深空之眼独家定制的厨娘装扮，采取甜美活泼的设计，辅以薇儿最爱的烤肉装饰..."
+  },
+  {
+    "sid": 108501,
+    "name": "梦的伊始",
+    "hero_id": 1085,
+    "hero_name": "绮望·诗蔻蒂",
+    "category": "伴生独立大场景限定",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6032「少女的思绪」"
+    ],
+    "goods": [],
+    "desc": "不是适逢其会的偶然，而是命运的必然。无论命运的轮盘重启多少次，诗蔻蒂都..."
+  },
+  {
+    "sid": 108502,
+    "name": "永夜眷恋",
+    "hero_id": 1085,
+    "hero_name": "绮望·诗蔻蒂",
+    "category": "T0顶级限定换装",
+    "level": 2,
+    "has_timeline": true,
+    "has_plot": true,
+    "scenes": [
+      "6042「暮光的心旅」"
+    ],
+    "goods": [],
+    "desc": "管理员和诗蔻蒂根据角色扮演的需要，一同参与打造的一套装扮，两人的心意也..."
+  },
+  {
+    "sid": 108901,
+    "name": "奢宴流风",
+    "hero_id": 1089,
+    "hero_name": "焚轮·帕尔瓦蒂",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6021「倦梦夜华」"
+    ],
+    "goods": [
+      15000023
+    ],
+    "desc": "身为梵天的副手，帕尔瓦蒂总有许多躲也躲不开的事务，所幸……这一次晚宴的..."
+  },
+  {
+    "sid": 108902,
+    "name": "沉默信仰",
+    "hero_id": 1089,
+    "hero_name": "焚轮·帕尔瓦蒂",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6054「荒庭中的祈祷诗」"
+    ],
+    "goods": [
+      15000049
+    ],
+    "desc": "以白银的荆棘作为装饰，黑白的布料静默地勾勒出流动的曲线。当她闭眼，世界..."
+  },
+  {
+    "sid": 109303,
+    "name": "谧夏绮影",
+    "hero_id": 1093,
+    "hero_name": "觅影·国常立",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000004
+    ],
+    "desc": "国常立偏爱的度夏装扮，柔软贴身又便于行动的剪裁设计，展露出随风轻拂的薄..."
+  },
+  {
+    "sid": 109304,
+    "name": "护理时间",
+    "hero_id": 1093,
+    "hero_name": "觅影·国常立",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6003「特别看护」"
+    ],
+    "goods": [
+      15000005
+    ],
+    "desc": "国常立协助医疗中心进行急救科普时的着装。\\n她看向你时若有若无的笑意，..."
+  },
+  {
+    "sid": 109402,
+    "name": "幻萤蝶梦",
+    "hero_id": 1094,
+    "hero_name": "暗星·海拉",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000018
+    ],
+    "desc": "剪裁精致的小礼服，设计灵感来自某种只在都市传说中存在的白蝶。\\n墓园中..."
+  },
+  {
+    "sid": 109404,
+    "name": "镇魂乐章",
+    "hero_id": 1094,
+    "hero_name": "暗星·海拉",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000019
+    ],
+    "desc": "沿用欧莫菲斯设计风格的交响乐队服饰，制式典雅，裁剪精细，勾勒出少女的体..."
+  },
+  {
+    "sid": 109501,
+    "name": "入暮之诗",
+    "hero_id": 1095,
+    "hero_name": "苍鹭·托特",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6007「花庭余响」"
+    ],
+    "goods": [
+      15000013
+    ],
+    "desc": "为了和管理员共同参加舞会而准备的高定，来自欧莫菲斯著名设计师，简约的裁..."
+  },
+  {
+    "sid": 109502,
+    "name": "绘夜之诗",
+    "hero_id": 1095,
+    "hero_name": "苍鹭·托特",
+    "category": "T0顶级限定换装",
+    "level": 2,
+    "has_timeline": true,
+    "has_plot": true,
+    "scenes": [
+      "6017「思念的归处·晨意」",
+      "6018「思念的归处·夜语」"
+    ],
+    "goods": [],
+    "desc": "托特非常喜欢的一套私人定制常服，宽松舒适。据说最终款式的选择是来自管理..."
+  },
+  {
+    "sid": 109503,
+    "name": "扉页之吻",
+    "hero_id": 1095,
+    "hero_name": "苍鹭·托特",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6057「飞羽栖处是归乡」"
+    ],
+    "goods": [
+      15000052
+    ],
+    "desc": "白色纱裙层层叠落，黑色内衬的薄纱与蕾丝在裙摆间若隐若现，明暗交织间，勾..."
+  },
+  {
+    "sid": 109701,
+    "name": "南柯惊梦",
+    "hero_id": 1097,
+    "hero_name": "小困·俄尼里伊",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      17000009,
+      205000001
+    ],
+    "desc": "款式灵动的中式礼服裙，少女的梦被封存其中，静候重见天日。\\n水墨氤氲间..."
+  },
+  {
+    "sid": 111101,
+    "name": "鸦羽幽梦",
+    "hero_id": 1111,
+    "hero_name": "生魂·奥西里斯",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000009
+    ],
+    "desc": "定制款哥特风礼服，黑纱内衬外搭轻盈雪纺裙，俏皮又不失优雅。\\n她非常喜..."
+  },
+  {
+    "sid": 111102,
+    "name": "瑞龙吟",
+    "hero_id": 1111,
+    "hero_name": "生魂·奥西里斯",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6006「青玉案」"
+    ],
+    "goods": [
+      15000010
+    ],
+    "desc": "冥王阅读奥西里斯带来的虚恒小说后购买的服饰，放置于心象房间中。\\n「背..."
+  },
+  {
+    "sid": 113301,
+    "name": "凝落初雪",
+    "hero_id": 1133,
+    "hero_name": "天卫·海姆达尔",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6025「星灯下的梦」"
+    ],
+    "goods": [
+      15000027
+    ],
+    "desc": "海姆达尔为冰雪节定制的服装，在体现节日主题之外，剪裁和装饰完全依照少女..."
+  },
+  {
+    "sid": 113701,
+    "name": "幽情祷告",
+    "hero_id": 1137,
+    "hero_name": "谧光之刻·霍德尔",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6048「私人表演」"
+    ],
+    "goods": [
+      15000046
+    ],
+    "desc": "霍德尔自称是为了排练话剧扮成修女，不得不穿的衣服，但你莫名觉得自己意外..."
+  },
+  {
+    "sid": 113801,
+    "name": "青空之境",
+    "hero_id": 1138,
+    "hero_name": "黎幻·赫拉",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000012
+    ],
+    "desc": "赫拉本人提供灵感并全程参与制作的晚礼服，当成品诞生后，连制作工匠本人都..."
+  },
+  {
+    "sid": 113803,
+    "name": "荆棘花之梦",
+    "hero_id": 1138,
+    "hero_name": "黎幻·赫拉",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000008
+    ],
+    "desc": "赫拉参与冰雪节舞会时的着装，利落的剪裁勾勒出淑女优雅的身形。\\n而她正..."
+  },
+  {
+    "sid": 113903,
+    "name": "白夜奇谭",
+    "hero_id": 1139,
+    "hero_name": "冰渊·波塞冬",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000008
+    ],
+    "desc": "自冰雪中诞生的白鸟渴望太阳的光芒，追逐着地平线尽头的微弱光亮，却在一次..."
+  },
+  {
+    "sid": 113907,
+    "name": "澄灵海色",
+    "hero_id": 1139,
+    "hero_name": "冰渊·波塞冬",
+    "category": "伴生独立大场景限定",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6013「温柔的回响」"
+    ],
+    "goods": [],
+    "desc": "蓝白配色体现夏日的清凉，轻盈的布料更有利于在水中活动，贴身的设计展现出..."
+  },
+  {
+    "sid": 114801,
+    "name": "校园时光",
+    "hero_id": 1148,
+    "hero_name": "追炎·前鬼坊天狗",
+    "category": "活动/战令/特殊换装",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [],
+    "desc": "设计参考了大多数学院的校服改良而成。在保证优秀性能的基础上，极大地洋溢..."
+  },
+  {
+    "sid": 115001,
+    "name": "警备少女",
+    "hero_id": 1150,
+    "hero_name": "绯染·丰前坊天狗",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000012
+    ],
+    "desc": "学校发生了小规模骚乱事件，为避免不必要的麻烦，丰前坊穿上了学生制服，前..."
+  },
+  {
+    "sid": 115002,
+    "name": "专属女仆",
+    "hero_id": 1150,
+    "hero_name": "绯染·丰前坊天狗",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6023「诚挚心意」"
+    ],
+    "goods": [
+      15000026
+    ],
+    "desc": "在和暗御津羽密谋之后，丰前坊天狗购置了这一套服装，似乎有着什么神秘的打..."
+  },
+  {
+    "sid": 115601,
+    "name": "静谧时光",
+    "hero_id": 1156,
+    "hero_name": "伐灭·伽梨",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      17000010,
+      302000001
+    ],
+    "desc": "即便是那位整日为了他人奔走、坚韧不拔的少女，也会需要心灵的安宁，今日就..."
+  },
+  {
+    "sid": 116601,
+    "name": "兔兔奇遇",
+    "hero_id": 1166,
+    "hero_name": "星仪·大国主",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6058「仅予你的魔法」"
+    ],
+    "goods": [
+      15000053
+    ],
+    "desc": "黑色的漆皮包裹出身体的曲线，兔耳朵随着动作晃动， 毛茸茸的兔尾巴在身后..."
+  },
+  {
+    "sid": 117001,
+    "name": "毛绒派对",
+    "hero_id": 1170,
+    "hero_name": "昭阳·金乌",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6055「幸运娃娃机」"
+    ],
+    "goods": [
+      15000050
+    ],
+    "desc": "毛茸茸的玩偶挂在衣服上，兜帽垂下的狗狗耳朵贴在脸侧，少女的睡衣派对即将..."
+  },
+  {
+    "sid": 119401,
+    "name": "魔女见习夜",
+    "hero_id": 1194,
+    "hero_name": "悼亡之蝶·海拉",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6045「廊桥辉月」"
+    ],
+    "goods": [
+      15000043
+    ],
+    "desc": "和以前的小洋装风格不同，这条裙子是海拉特意为今晚准备的。她戴着小女巫的..."
+  },
+  {
+    "sid": 119701,
+    "name": "星之砂",
+    "hero_id": 1197,
+    "hero_name": "梦影·俄尼里伊",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6011「梦游奇境」"
+    ],
+    "goods": [
+      15000018
+    ],
+    "desc": "为了能够尽情享受大海与夏日，少女获赠的一套新服装。\\n在洒满星星的大海..."
+  },
+  {
+    "sid": 119901,
+    "name": "星月萤",
+    "hero_id": 1199,
+    "hero_name": "震离·月读",
+    "category": "Shop 16 直购换装（桥接换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      16000011
+    ],
+    "desc": "月读对于着装的要求只有便于行动这一条准则，但面对着搞错需求的后勤管理人..."
+  },
+  {
+    "sid": 119904,
+    "name": "课后补习",
+    "hero_id": 1199,
+    "hero_name": "震离·月读",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000003
+    ],
+    "desc": "一向成绩优异的同学似乎遭遇了什么烦恼，偷偷将信封塞进你的课本……放学后..."
+  },
+  {
+    "sid": 121101,
+    "name": "绛羽拾花",
+    "hero_id": 1211,
+    "hero_name": "魂羽·奥西里斯",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6034「一枝春」"
+    ],
+    "goods": [
+      15000038
+    ],
+    "desc": "奥西里斯在虚恒游玩时购入的当地特色服装，融入了现代元素的轻盈设计和鲜明..."
+  },
+  {
+    "sid": 121102,
+    "name": "邻座细语",
+    "hero_id": 1211,
+    "hero_name": "魂羽·奥西里斯",
+    "category": "Shop 17 再贩商店（980移转之辉）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6051「邻座细语」"
+    ],
+    "goods": [
+      17000012
+    ],
+    "desc": "即使是已经独当一面的现在，奥西里斯仍然喜欢与你一同温习知识，空旷的教室..."
+  },
+  {
+    "sid": 124801,
+    "name": "南瓜小鬼头",
+    "hero_id": 1248,
+    "hero_name": "神威·前鬼坊天狗",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6047「给糖也捣蛋」"
+    ],
+    "goods": [
+      15000045
+    ],
+    "desc": "前鬼的万圣节恶作剧战袍，用了很符合节日氛围的邪恶南瓜配色，上面贴着几只..."
+  },
+  {
+    "sid": 128401,
+    "name": "圣歌精灵",
+    "hero_id": 1284,
+    "hero_name": "黯耀·薇儿丹蒂",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [
+      15000017
+    ],
+    "desc": "回到深空之眼后少女获赠的服装，和象征宿命的黑甲截然相反，光洁的白铠，恰..."
+  },
+  {
+    "sid": 128402,
+    "name": "致未来的我们",
+    "hero_id": 1284,
+    "hero_name": "黯耀·薇儿丹蒂",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6022「纯白之誓」"
+    ],
+    "goods": [
+      15000024
+    ],
+    "desc": "你说过未来的路还很长，还有很多很多故事要讲……可是，我等不及想听，也等..."
+  },
+  {
+    "sid": 128403,
+    "name": "与你同在的每一日",
+    "hero_id": 1284,
+    "hero_name": "黯耀·薇儿丹蒂",
+    "category": "伴生独立大场景限定",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6059「雨夜之约」"
+    ],
+    "goods": [],
+    "desc": "仔细整理裙摆，精心系好发带。少女跃步来到眼前，脸上挂着一如往常的笑颜。..."
+  },
+  {
+    "sid": 128404,
+    "name": "粉珊瑚狂热",
+    "hero_id": 1284,
+    "hero_name": "黯耀·薇儿丹蒂",
+    "category": "Shop 15 换装商店（换装券）",
+    "level": 1,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [
+      "6038「夏月夜」"
+    ],
+    "goods": [
+      15000040
+    ],
+    "desc": "薇儿在卡达斯王国获得的泳者套装，如同珊瑚般明亮的颜色明晃晃地宣告着夏天..."
+  },
+  {
+    "sid": 605601,
+    "name": "轻纱梦华成女",
+    "hero_id": 6056,
+    "hero_name": "修正者 6056",
+    "category": "活动/战令/特殊换装",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [],
+    "desc": "为了能管理员一同与度过一个愉快的下午，梵天运用权能为自己准备的家居服，..."
+  },
+  {
+    "sid": 605603,
+    "name": "梵天T0成女",
+    "hero_id": 6056,
+    "hero_name": "修正者 6056",
+    "category": "活动/战令/特殊换装",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [],
+    "desc": "借着权能之便，梵天给自己创造过许多各具特色的衣服，而这件则是她为了与管..."
+  },
+  {
+    "sid": 614801,
+    "name": "白无常T4皮肤",
+    "hero_id": 6148,
+    "hero_name": "修正者 6148",
+    "category": "活动/战令/特殊换装",
+    "level": 0,
+    "has_timeline": true,
+    "has_plot": false,
+    "scenes": [],
+    "goods": [],
+    "desc": "综合考量修正者的能力和个人需求设计定制的作战服，在不影响体感的基础上，..."
+  }
+]
