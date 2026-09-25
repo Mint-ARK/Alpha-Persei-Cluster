@@ -163,7 +163,7 @@ Add static resolution entries to `C:\Windows\System32\drivers\etc\hosts` pointin
 1. Connect both the PC and mobile device to the same local Wi-Fi network;
 2. Start the server with LAN IP binding and DNS forwarding enabled:
    ```powershell
-   python main.py --host-ip 192.168.1.100 --dns
+   python main.py --dns
    ```
 3. In iOS Wi-Fi settings, manually set the DNS server to the PC's LAN IP (`192.168.1.100`);
 4. Open Safari on iOS, navigate to `http://192.168.1.100/sdk_ca.mobileconfig`, then install and trust the profile;
@@ -376,6 +376,9 @@ The management console is built with **React 19 + TypeScript + Tailwind CSS** an
   - Tower Climb has no protocol implementation; AutoChess and Verthandi events lack rigorous testing;
 - [ ] **Automated Account Migration**: Packet analysis and database conversion tools have not yet been automated;
 - [ ] **Costume Gacha Banner**: Exclusive costume banner mechanics have not yet been implemented.
+- [ ] **DNS Issue**: There is a distribution problem with the current DNS component when connecting the iPhone, causing the device to go offline when using this DNS address.
+- [ ] **Potential Program Issues**: In addition to the known issues mentioned above, you may still encounter other problems while using this program—such as the loading overlay freezing or "Network Connection Failed" pop-ups. These issues typically stem from Lua crashes caused by anomalous server protocol frame fields, or a failure to receive responses (or receiving responses with incorrect frame numbers) due to missing fallback mappings for skeleton files.
+- [ ] **Gameplay/Experience Issues**: These are issues affecting your actual in-game experience, such as items not being granted correctly, items being deducted multiple times or at incorrect rates, incorrect return rates for items, anomalies in item or numerical value updates, and toast notifications indicating errors like "Remote Call Error." These problems generally arise from anomalies in the program's internal execution logic; minor numerical display issues can often be resolved by exiting to the login screen and re-entering the game. If the issue involves database errors, you may—if you have the technical capability—compile the source code yourself to update the core, or submit an issue to provide feedback. I am deeply grateful to everyone willing to try this project and submit reports; your contributions significantly improve the project's usability.
 
 ---
 
