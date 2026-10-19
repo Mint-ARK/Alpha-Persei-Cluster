@@ -30,8 +30,12 @@ Back up your database, extract to a separate directory, and stop the previous se
 
 **Platform and resource support:**
 
-- **iOS: Only builds 321 / 229 are currently supported. Build 229 supports the in-app purchase experience. The 311 version option is invalid**, as the maintainer missed capturing the iOS311 resource package and its corresponding resource manifests are unavailable.
-- **Android and other platforms:** Due to the maintainer's limited access to devices and testing environments, the corresponding internal asset manifests have not been configured. Users must configure and import these manifests themselves.
+| Platform | Supported builds | Notes |
+| --- | --- | --- |
+| **PC** | **All three: 229 / 311 / 321** | Resource manifests are configured for all three builds. |
+| **iOS** | **229 / 321; 311 is invalid** | **Build 229 supports the in-app purchase experience**. The maintainer missed capturing the iOS311 resource package, so its corresponding manifests are unavailable. |
+| **Android and other unlisted platforms** | **Manual configuration required** | Due to limited access to devices and testing environments, the corresponding internal asset manifests have not been configured. Users must configure and import them themselves. |
+
 
 ---
 
