@@ -239,6 +239,130 @@ def has_hero_template(hero_id):
     return os.path.exists(os.path.join(_HERO_DIR, f"hero_{key}.json"))
 
 
+def _configured_hero_skills(hero_id):
+    """返回角色配置中的技能 ID；无有效技能配置时返回空列表。"""
+    try:
+        hero_id = int(hero_id)
+    except (TypeError, ValueError):
+        return []
+    cfg = _get_hero_skills_cfg()
+    skills = cfg.get(str(hero_id)) or cfg.get(hero_id) or []
+    if not isinstance(skills, list):
+        return []
+    out = []
+    for skill_id in skills:
+        try:
+            skill_id = int(skill_id)
+        except (TypeError, ValueError):
+            continue
+        if skill_id > 0:
+            out.append(skill_id)
+    return out
+
+
+def is_hero_payload_candidate(hero_id):
+    """登录角色列表候选：有展开模板，或有明确的角色技能配置。"""
+    try:
+        hero_id = int(hero_id)
+    except (TypeError, ValueError):
+        return False
+    return hero_id > 0 and (has_hero_template(hero_id) or bool(_configured_hero_skills(hero_id)))
+
+
+def count_hero_payload_records(db, uid):
+    """返回与 build_hero_payload 完全相同筛选规则下可编码的自持角色数。"""
+    rows = db.query("SELECT id FROM hero WHERE uid=? AND unlock=1 ORDER BY id", (uid,))
+    return sum(1 for row in rows if is_hero_payload_candidate(row["id"]))
+
+
+_HERO_JSON_COLUMNS = {
+    "skill_list": (list, []),
+    "using_astrolabe": (list, []),
+    "unlock_astrolabe": (list, []),
+    "exclusive_skill_list": ((dict, list), {}),
+    "skill_intensify": (list, []),
+    "equip_slot": (dict, {}),
+    "chip_state": ((dict, list), {}),
+    "relation_net": (list, []),
+    "clear_mission_list": (list, []),
+}
+
+
+def normalize_hero_db_row(row):
+    """Parse JSON TEXT hero columns while preserving missing and SQL NULL values."""
+    normalized = dict(row or {})
+    for column, (expected, empty_value) in _HERO_JSON_COLUMNS.items():
+        if column not in normalized or normalized[column] is None:
+            continue
+        value = normalized[column]
+        if isinstance(value, str):
+            try:
+                value = json.loads(value)
+            except (TypeError, ValueError):
+                value = empty_value
+        if not isinstance(value, expected):
+            value = empty_value
+        normalized[column] = value
+    return normalized
+
+
+def _int_value(row, key, default=0):
+    value = row.get(key)
+    return int(default if value is None else (value or 0))
+
+
+def build_hero_net_rec_from_db(row, template=None):
+    """Build a hero_net_rec from one DB row, optionally applying the same mapping to a template.
+
+    This is shared by sc_14009/sc_14007 and battle hero_base_info so both use one DB column map.
+    """
+    row = normalize_hero_db_row(row)
+    if template is None:
+        hid = _int_value(row, "id")
+        module_level = row.get("weapon_module_level")
+        if module_level is None:
+            module_level = row.get("module_level")
+        module_assignment = row.get("weapon_module_assignment")
+        if module_assignment is None:
+            module_assignment = row.get("module_assignment")
+        hbi = [
+            [1, "v", hid],
+            [2, "v", _int_value(row, "level", 1)],
+            [3, "v", _int_value(row, "star")],
+            [4, "v", _int_value(row, "exp")],
+            [6, "m", [[1, "v", _int_value(row, "weapon_exp")],
+                       [2, "v", _int_value(row, "weapon_break")],
+                       [3, "v", _int_value(row, "weapon_servant_uid")]]],
+            [7, "m", [[1, "v", 0], [2, "v", 0]]],
+            [10, "v", _int_value(row, "using_skin")],
+            [11, "v", _int_value(row, "break_level")],
+            [13, "v", int(module_level or 0)],
+            [15, "v", _int_value(row, "battle_using_skin")],
+        ]
+        trust = [
+            [1, "v", _int_value(row, "trust_level", 1)],
+            [2, "v", _int_value(row, "trust_exp")],
+            [3, "v", _int_value(row, "trust_mood", 1)],
+            [4, "b", ""],
+        ]
+        template = [
+            [1, "m", hbi],
+            [2, "v", _int_value(row, "unlock", 1)],
+        ] + [
+            [3, "m", [[1, "v", pos], [2, "v", 0]]]
+            for pos in range(1, 7)
+        ] + [
+            [4, "v", _int_value(row, "clear_times")],
+            [7, "v", int(module_assignment or 0)],
+            [8, "m", trust],
+        ]
+        if "clear_mission_list" in row and row["clear_mission_list"] is not None:
+            template.extend([5, "v", int(mid)] for mid in row["clear_mission_list"] if mid)
+    if not apply_db(template, row):
+        raise ValueError("hero_net_rec is missing hero_base_info")
+    return template
+
+
 def _find(exp, field):
     return [it for it in exp if it[0] == field]
 
@@ -275,6 +399,7 @@ def _get_skin_hero_map():
 
 def apply_db(exp, row):
     """用 hero 表独立列 row(dict) 覆盖展开结构字段。"""
+    row = normalize_hero_db_row(row)
     hbi = None
     for it in exp:
         if it[0] == 1 and it[1] == "m":
@@ -306,40 +431,46 @@ def apply_db(exp, row):
                 hid = it[2]
                 break
 
-    skill_map = {}
-    for s_item in _find(hbi, 5):
-        if s_item[1] == "m":
-            sub = s_item[2]
-            sid = next((x[2] for x in sub if x[0] == 1 and x[1] == "v"), None)
-            slv = next((x[2] for x in sub if x[0] == 2 and x[1] == "v"), 1)
-            if sid:
-                skill_map[int(sid)] = int(slv)
-
     skills = row.get("skill_list")
-    if isinstance(skills, list) and skills:
+    # SQL JSON TEXT 空列表也是权威值：以基础技能等级重建，不沿用模板中的旧等级。
+    # 字段缺失或 SQL NULL 才保留模板中的技能数据。
+    skill_map = {}
+    if skills is None:
+        for s_item in _find(hbi, 5):
+            if s_item[1] == "m":
+                sub = s_item[2]
+                sid = next((x[2] for x in sub if x[0] == 1 and x[1] == "v"), None)
+                slv = next((x[2] for x in sub if x[0] == 2 and x[1] == "v"), 1)
+                if sid:
+                    skill_map[int(sid)] = int(slv)
+    elif isinstance(skills, list):
         for sk in skills:
             if isinstance(sk, (list, tuple)) and len(sk) >= 2:
-                skill_map[int(sk[0])] = int(sk[1])
+                sid, slv = int(sk[0]), int(sk[1])
             elif isinstance(sk, dict):
-                skill_map[int(sk.get("skill_id") or sk.get("id"))] = int(sk.get("skill_level") or sk.get("level") or 1)
+                sid = int(sk.get("skill_id") or sk.get("id") or 0)
+                slv = int(sk.get("skill_level") or sk.get("level") or 1)
+            else:
+                continue
+            if sid > 0:
+                skill_map[sid] = slv
 
     cfg_map = _get_hero_skills_cfg()
-    canonical_skills = cfg_map.get(str(hid)) or (cfg_map.get(int(hid)) if hid else None)
+    canonical_skills = _configured_hero_skills(hid)
     if not canonical_skills and hid:
-        canonical_skills = [
-            int(hid) * 1000 + 101,
-            int(hid) * 1000 + 201,
-            int(hid) * 1000 + 202,
-            int(hid) * 1000 + 203,
-            int(hid) * 1000 + 209,
-            int(hid) * 1000 + 305,
-        ]
+        configured = cfg_map.get(str(hid)) or cfg_map.get(int(hid))
+        if isinstance(configured, list):
+            canonical_skills = [int(s) for s in configured if int(s) > 0]
 
     new_s_items = []
     if canonical_skills:
         for sid in canonical_skills:
             lv = skill_map.get(int(sid), 1)
             new_s_items.append([5, "m", [[1, "v", int(sid)], [2, "v", int(lv)]]])
+    elif skills is not None:
+        # 没有角色配置时只发 DB 明确给出的技能；显式 [] 会清除模板技能。
+        for sid, lv in skill_map.items():
+            new_s_items.append([5, "m", [[1, "v", sid], [2, "v", lv]]])
     else:
         seen_skills = set()
         for s_item in _find(hbi, 5):
@@ -354,19 +485,12 @@ def apply_db(exp, row):
                             _set_varint(sub, 2, skill_map[sid])
                         new_s_items.append(s_item)
 
-    if new_s_items:
-        hbi[:] = [it for it in hbi if it[0] != 5] + new_s_items
+    hbi[:] = [it for it in hbi if it[0] != 5] + new_s_items
     # 技能属性强化覆盖：hbi f14 每项 {index, level}
     intens = row.get("skill_intensify")
     if intens is not None:
-        if isinstance(intens, str):
-            try:
-                import json as _j
-                intens = _j.loads(intens)
-            except Exception:
-                intens = []
-        if isinstance(intens, list) and intens:
-            hbi[:] = [it for it in hbi if it[0] != 14]
+        hbi[:] = [it for it in hbi if it[0] != 14]
+        if isinstance(intens, list):
             for item in intens:
                 if isinstance(item, (list, tuple)) and len(item) >= 2:
                     hbi.append([14, "m", [[1, "v", int(item[0])], [2, "v", int(item[1])]]])
@@ -377,7 +501,10 @@ def apply_db(exp, row):
                         hbi.append([14, "m", [[1, "v", idx], [2, "v", lv]]])
     # 武器覆盖：hbi f6 {exp, breakthrough, servant_uid}
     w = _find(hbi, 6)
-    if w and w[0][1] == "m":
+    if not w:
+        w = [[6, "m", [[1, "v", 0], [2, "v", 0], [3, "v", 0]]]]
+        hbi.append(w[0])
+    if w[0][1] == "m":
         wsub = w[0][2]
         if row.get("weapon_exp") is not None:
             _set_varint(wsub, 1, int(row["weapon_exp"] or 0))
@@ -387,12 +514,13 @@ def apply_db(exp, row):
             _set_varint(wsub, 3, int(row["weapon_servant_uid"] or 0))
     # 钥从覆盖：hbi f7 {id, stage}（专属钥从进入战斗触发关键特技）
     s_info = row.get("servant_info") or row.get("servant")
-    if s_info:
+    servant_source = ("servant_info" in row or "servant" in row or
+                      ("weapon_servant_uid" in row and row.get("weapon_servant_uid") is not None))
+    if s_info or servant_source:
         if isinstance(s_info, str):
             try:
-                import json as _j
-                s_info = _j.loads(s_info)
-            except Exception:
+                s_info = json.loads(s_info)
+            except (TypeError, ValueError):
                 s_info = None
         s_id, s_stage = None, 1
         if isinstance(s_info, dict):
@@ -402,9 +530,12 @@ def apply_db(exp, row):
             s_id = s_info[0]
             if len(s_info) >= 2:
                 s_stage = s_info[1]
+        hbi[:] = [it for it in hbi if it[0] != 7]
         if s_id:
-            hbi[:] = [it for it in hbi if it[0] != 7]
-            hbi.append([7, "m", [[1, "v", int(s_id)], [2, "v", int(s_stage or 1)]]])
+            servant_body = [[1, "v", int(s_id)], [2, "v", int(s_stage or 1)]]
+        else:
+            servant_body = [[1, "v", 0], [2, "v", 0]]
+        hbi.append([7, "m", servant_body])
     if not _find(hbi, 7):
         hbi.append([7, "m", [[1, "v", 0], [2, "v", 0]]])
     if not _find(hbi, 6):
@@ -424,8 +555,9 @@ def apply_db(exp, row):
             if a:
                 hbi.append([9, "v", int(a)])
     # 跃迁系统覆盖：hbi f12 exclusive_skill_list
-    norm_ex = normalize_exclusive_skills(row.get("exclusive_skill_list"))
-    if norm_ex:
+    exclusive = row.get("exclusive_skill_list")
+    if exclusive is not None:
+        norm_ex = normalize_exclusive_skills(exclusive)
         f12_entries = []
         for slot_id_str, sdata in norm_ex.items():
             slot_id = int(slot_id_str)
@@ -439,11 +571,13 @@ def apply_db(exp, row):
                     sub.append([2, "m", [[1, "v", sid], [2, "v", slv]]])
             sub.append([3, "v", t_pts])
             f12_entries.append([12, "m", sub])
-        if f12_entries:
-            hbi[:] = [it for it in hbi if it[0] != 12] + f12_entries
+        hbi[:] = [it for it in hbi if it[0] != 12] + f12_entries
     # 同调武器模块等级覆盖：hbi f13 weapon_module_level
     if row.get("weapon_module_level") is not None or row.get("module_level") is not None:
-        m_lv = int(row.get("weapon_module_level") or row.get("module_level") or 0)
+        m_lv = row.get("weapon_module_level")
+        if m_lv is None:
+            m_lv = row.get("module_level")
+        m_lv = int(m_lv or 0)
         _set_varint(hbi, 13, m_lv)
     # 突破等级 f11 已覆盖
 
@@ -452,64 +586,123 @@ def apply_db(exp, row):
         _set_varint(exp, 2, int(row["unlock"]))
     if row.get("clear_times") is not None:
         _set_varint(exp, 4, int(row["clear_times"] or 0))
-    if row.get("module_assignment") is not None:
-        _set_varint(exp, 7, int(row["module_assignment"] or 0))
+    module_assignment = row.get("weapon_module_assignment")
+    if module_assignment is None:
+        module_assignment = row.get("module_assignment")
+    if module_assignment is not None:
+        _set_varint(exp, 7, int(module_assignment or 0))
     # 皮肤解锁列表覆盖：f6 unlocked_skin（repeated lasted_skin）
     unlocked_skins = row.get("unlocked_skin_list")
     if unlocked_skins is not None:
         exp[:] = [it for it in exp if it[0] != 6]
-        for sid in unlocked_skins:
-            exp.append([6, "m", [[1, "v", int(sid)], [2, "v", 0]]])
+        for skin in unlocked_skins:
+            if isinstance(skin, dict):
+                sid = skin.get("skin_id") or skin.get("id")
+                # lasted_skin.time is an expiry, not the acquisition timestamp.
+                expiry_ts = skin.get("time") or 0
+            else:
+                sid, expiry_ts = skin, 0
+            if sid:
+                exp.append([6, "m", [[1, "v", int(sid)], [2, "v", int(expiry_ts)]]])
     # 装备槽覆盖：f3 ×6 {pos, equip_id}（必须恒为 1..6 孔稠密数组，空槽填 0，防客户端 Lua 崩溃）
     es = row.get("equip_slot")
-    if not isinstance(es, dict):
-        es = {}
-    new_f3 = []
-    for pos in (1, 2, 3, 4, 5, 6):
-        eid = es.get(str(pos)) or es.get(pos) or 0
-        new_f3.append([3, "m", [[1, "v", pos], [2, "v", int(eid)]]])
-    exp[:] = [it for it in exp if it[0] != 3] + new_f3
+    if es is not None:
+        if not isinstance(es, dict):
+            es = {}
+        new_f3 = []
+        for pos in (1, 2, 3, 4, 5, 6):
+            eid = es.get(str(pos)) or es.get(pos) or 0
+            new_f3.append([3, "m", [[1, "v", pos], [2, "v", int(eid)]]])
+        exp[:] = [it for it in exp if it[0] != 3] + new_f3
+    # clear_mission_list is only overridden when the DB row actually provides it.
+    if row.get("clear_mission_list") is not None:
+        exp[:] = [it for it in exp if it[0] != 5]
+        exp.extend([5, "v", int(mid)] for mid in row["clear_mission_list"] if mid)
     # 关系网与好感度覆盖：f8 trust (hero_trust_net_rec)
     t_lvl = row.get("trust_level")
     t_exp = row.get("trust_exp")
     t_mood = row.get("trust_mood")
     rel_net = row.get("relation_net")
-    if t_lvl is not None or rel_net is not None:
+    if any(row.get(k) is not None for k in ("trust_level", "trust_exp", "trust_mood", "relation_net")):
         trust_sub = [it for it in exp if it[0] == 8]
-        if trust_sub and trust_sub[0][1] == "m":
+        if not trust_sub or trust_sub[0][1] != "m":
+            ts_list = [[1, "v", 1], [2, "v", 0], [3, "v", 1], [4, "b", ""]]
+            exp[:] = [it for it in exp if it[0] != 8]
+            exp.append([8, "m", ts_list])
+        else:
             ts_list = trust_sub[0][2]
-            if t_lvl is not None:
-                _set_varint(ts_list, 1, int(t_lvl or 0))
-            if t_exp is not None:
-                _set_varint(ts_list, 2, int(t_exp or 0))
-            if t_mood is not None:
-                _set_varint(ts_list, 3, int(t_mood or 1))
-            if rel_net is not None:
-                if isinstance(rel_net, str):
-                    import json as _j
-                    try:
-                        rel_net = _j.loads(rel_net)
-                    except Exception:
-                        rel_net = []
-                ts_list[:] = [it for it in ts_list if it[0] != 4]
-                if isinstance(rel_net, list) and rel_net:
-                    tier_entries = []
-                    for t in rel_net:
-                        tier_num = int(t.get("tier", 1))
-                        # 编码层防御：客户端以 Lua 1-based 下标索引 relation_upgrade_group，
-                        # tier/group_index 越界会让角色列表页 GetRelationNetAttr nil index 崩溃，
-                        # 脏值（0/负数/越界）在此丢弃，绝不外推。
-                        if not (1 <= tier_num <= 5):
-                            continue
-                        upgrades = [int(u) for u in t.get("upgrade_complete_list", []) if 1 <= int(u) <= 3]
-                        tier_sub = [[1, "v", tier_num]]
-                        for u in upgrades:
-                            tier_sub.append([2, "v", u])
-                        tier_entries.append([1, "m", tier_sub])
-                    ts_list.append([4, "m", tier_entries])
-                else:
-                    ts_list.append([4, "b", ""])
+        if t_lvl is not None:
+            _set_varint(ts_list, 1, int(t_lvl or 0))
+        if t_exp is not None:
+            _set_varint(ts_list, 2, int(t_exp or 0))
+        if t_mood is not None:
+            _set_varint(ts_list, 3, int(t_mood or 1))
+        if rel_net is not None:
+            if not isinstance(rel_net, list):
+                rel_net = []
+            ts_list[:] = [it for it in ts_list if it[0] != 4]
+            if rel_net:
+                tier_entries = []
+                for t in rel_net:
+                    if not isinstance(t, dict):
+                        continue
+                    tier_num = int(t.get("tier", 1))
+                    # 编码层防御：客户端以 Lua 1-based 下标索引 relation_upgrade_group，
+                    # tier/group_index 越界会让角色列表页 GetRelationNetAttr nil index 崩溃，
+                    # 脏值（0/负数/越界）在此丢弃，绝不外推。
+                    if not (1 <= tier_num <= 5):
+                        continue
+                    upgrades = [int(u) for u in t.get("upgrade_complete_list", []) if 1 <= int(u) <= 3]
+                    tier_sub = [[1, "v", tier_num]]
+                    for u in upgrades:
+                        tier_sub.append([2, "v", u])
+                    tier_entries.append([1, "m", tier_sub])
+                ts_list.append([4, "m", tier_entries])
+            else:
+                ts_list.append([4, "b", ""])
     return True
+
+
+def _load_hero_payload_assets(db, uid):
+    """Load DB-authoritative unlocked skins and servants for one account."""
+    skin_map = _get_skin_hero_map()
+    skin_rows = db.query(
+        "SELECT skin_id FROM player_skin_unlocked WHERE uid=? ORDER BY skin_id",
+        (uid,),
+    )
+    unlocked_by_hero = {}
+    for skin in skin_rows:
+        skin_id = int(skin["skin_id"])
+        hero_id = skin_map.get(skin_id)
+        if hero_id:
+            unlocked_by_hero.setdefault(int(hero_id), []).append({
+                "skin_id": skin_id,
+                # This ownership table records permanent unlocks; unlock_ts is
+                # when they were acquired. The client requires time=0 for these.
+                "time": 0,
+            })
+
+    servant_rows = db.query(
+        "SELECT id, prefab_id, stage FROM servant WHERE uid=? ORDER BY id",
+        (uid,),
+    )
+    servant_map = {
+        int(r["id"]): {"id": int(r["prefab_id"]), "stage": int(r["stage"] or 0)}
+        for r in servant_rows
+    }
+    return unlocked_by_hero, servant_map
+
+
+def _with_hero_payload_assets(row, unlocked_by_hero, servant_map):
+    """Return a normalized row decorated with current account-owned assets."""
+    result = normalize_hero_db_row(row)
+    hero_id = int(result["id"])
+    result["unlocked_skin_list"] = list(unlocked_by_hero.get(hero_id, []))
+    servant_uid = result.get("weapon_servant_uid")
+    if servant_uid is not None and int(servant_uid or 0) > 0:
+        # Set even when no matching servant row exists so a stale template key is cleared.
+        result["servant_info"] = servant_map.get(int(servant_uid))
+    return result
 
 
 def build_hero_payload(db, uid):
@@ -520,94 +713,36 @@ def build_hero_payload(db, uid):
       f3 archives（repeated archive，账号资产静态模板 hero_14009_extra.json）
       f4 piece_list（repeated piece_info）
       f5 favorites（repeated uint32）
-    每个 hero 若模板含 astrolabe_list（f5 顶层，repeated varint）且展开模板缺失 → 附加补齐。
+    已解锁角色按模板（若存在）与数据库行统一映射；缺模板的已配置角色由数据库行构建。
     """
-    import json as _j
     rows = db.query(
-        "SELECT * FROM hero WHERE uid=? ORDER BY id", (uid,))
-    
-    # 获取全量已解锁皮肤
-    skin_map = _get_skin_hero_map()
-    skin_rows = db.query("SELECT skin_id FROM player_skin_unlocked WHERE uid=?", (uid,)) if db and uid else []
-    owned_skins = set([r["skin_id"] for r in skin_rows])
-
-    # 预载玩家所有钥从
-    servant_rows = db.query("SELECT id, prefab_id, stage FROM servant WHERE uid=?", (uid,)) if db and uid else []
-    servant_map = {r["id"]: {"id": r["prefab_id"], "stage": r["stage"]} for r in servant_rows}
+        "SELECT * FROM hero WHERE uid=? AND unlock=1 ORDER BY id", (uid,))
+    unlocked_by_hero, servant_map = _load_hero_payload_assets(db, uid)
 
     parts = []
     for r in rows:
-        if not r.get("unlock"):
+        hero_id = int(r["id"])
+        if not is_hero_payload_candidate(hero_id):
             continue
-        exp = load_hero_expanded(r["id"])
-        if exp is None:
-            continue
-        row = dict(r)
-        # JSON 列解析为 dict/list
-        for k in ("skill_list", "using_astrolabe", "equip_slot", "chip_state",
-                  "unlock_astrolabe", "exclusive_skill_list", "skill_intensify"):
-            if isinstance(row.get(k), str) and row[k]:
-                try:
-                    row[k] = _j.loads(row[k])
-                except Exception:
-                    row[k] = {} if k in ("equip_slot", "chip_state", "exclusive_skill_list") else []
-        
-        # 注入该英雄已解锁皮肤
-        h_unlocked = [sid for sid in owned_skins if skin_map.get(sid) == int(r["id"])]
-        existing_f6 = [it[2] for it in exp if it[0] == 6 and it[1] == "m"]
-        existing_sids = set()
-        for sub in existing_f6:
-            for item in sub:
-                if item[0] == 1 and item[1] == "v":
-                    existing_sids.add(item[2])
-        row["unlocked_skin_list"] = list(existing_sids.union(h_unlocked))
-
-        # 注入钥从数据
-        w_uid = row.get("weapon_servant_uid")
-        if w_uid and w_uid in servant_map:
-            row["servant_info"] = servant_map[w_uid]
-        
-        apply_db(exp, row)
+        exp = load_hero_expanded(hero_id)
+        row = _with_hero_payload_assets(r, unlocked_by_hero, servant_map)
+        exp = build_hero_net_rec_from_db(row, template=exp)
         blob = encode_expanded(exp)
         parts.append(b"\x0a" + _varint(len(blob)) + blob)
-    if not parts:
-        return None
     return b"".join(parts) + _encode_extra_fields(db, uid)
 
 
 def build_single_hero_frame(db, uid, hero_id):
-    """[Fix by Gemini 3.7-flash] 构建并编码单个英雄的 sc_14007 帧 payload (用于换装购买等即时同步)"""
-    exp = load_hero_expanded(hero_id)
-    if exp is None:
+    """Build one current hero_net_rec for sc_14007 using the shared DB mapping."""
+    rows = db.query(
+        "SELECT * FROM hero WHERE uid=? AND id=? AND unlock=1 LIMIT 1",
+        (uid, hero_id),
+    )
+    if not rows or not is_hero_payload_candidate(hero_id):
         return None
-    rows = db.query("SELECT * FROM hero WHERE uid=? AND id=?", (uid, hero_id))
-    row = dict(rows[0]) if rows else {"id": hero_id, "unlock": 1}
-    for k in ("skill_list", "using_astrolabe", "equip_slot", "chip_state",
-              "unlock_astrolabe", "exclusive_skill_list", "skill_intensify"):
-        if k in row and isinstance(row[k], str) and row[k]:
-            try:
-                import json as _j
-                row[k] = _j.loads(row[k])
-            except Exception:
-                row[k] = {} if k in ("equip_slot", "chip_state", "exclusive_skill_list") else []
-    skin_map = _get_skin_hero_map()
-    skin_rows = db.query("SELECT skin_id FROM player_skin_unlocked WHERE uid=?", (uid,)) if db and uid else []
-    h_unlocked = [r["skin_id"] for r in skin_rows if skin_map.get(r["skin_id"]) == hero_id]
-    existing_f6 = [it[2] for it in exp if it[0] == 6 and it[1] == "m"]
-    existing_sids = set()
-    for sub in existing_f6:
-        for item in sub:
-            if item[0] == 1 and item[1] == "v":
-                existing_sids.add(item[2])
-    row["unlocked_skin_list"] = list(existing_sids.union(h_unlocked))
-
-    w_uid = row.get("weapon_servant_uid")
-    if w_uid and db:
-        s_rows = db.query("SELECT prefab_id, stage FROM servant WHERE uid=? AND id=?", (uid, w_uid))
-        if s_rows:
-            row["servant_info"] = {"id": s_rows[0]["prefab_id"], "stage": s_rows[0]["stage"]}
-
-    apply_db(exp, row)
+    unlocked_by_hero, servant_map = _load_hero_payload_assets(db, uid)
+    row = _with_hero_payload_assets(rows[0], unlocked_by_hero, servant_map)
+    exp = build_hero_net_rec_from_db(row, template=load_hero_expanded(hero_id))
     hero_bytes = encode_expanded(exp)
     return b"\x0a" + _varint(len(hero_bytes)) + hero_bytes
 
@@ -628,23 +763,24 @@ def _encode_extra_fields(db=None, uid=None):
     f4 piece_list 优先从 account.db 的 hero_piece 表动态查询，确保碎片变动与登录流实时一致。
     """
     from codec import encode as _enc
-    extra = _load_extra()
-    if not extra and not (db and uid):
+    dynamic = db is not None and uid is not None
+    # Runtime DB is authoritative; static replay assets are used only by offline callers.
+    extra = {} if dynamic else _load_extra()
+    if not extra and not dynamic:
         return b""
     out = bytearray()
     # f3 archives（repeated archive，tag 0x1a）
     # 动态从数据库 hero_archive 读取规范档案数据（63 档案 / 84 战斗形态）。
     # 历史库只有 hero 行时，按已解锁英雄的本体映射补齐空档案。
     archive_svc = None
-    if db and uid:
+    if dynamic:
         try:
             from archive_service import ArchiveService
             archive_svc = ArchiveService.get_instance()
-            archive_svc.ensure_user_archives(db, uid)
         except Exception:
             pass
-    arch_rows = db.query("SELECT * FROM hero_archive WHERE uid=? ORDER BY archive_id", (uid,)) if (db and uid) else []
-    if arch_rows:
+    arch_rows = db.query("SELECT * FROM hero_archive WHERE uid=? ORDER BY archive_id", (uid,)) if dynamic else []
+    if dynamic:
         archives = []
         for r in arch_rows:
             if archive_svc is not None and int(r.get("archive_id") or 0) not in archive_svc.archives:
@@ -680,8 +816,8 @@ def _encode_extra_fields(db=None, uid=None):
 
     # f4 piece_list（repeated piece_info，tag 0x22）
     # 动态从数据库 hero_piece 读取碎片数据
-    piece_rows = db.query("SELECT hero_id, num FROM hero_piece WHERE uid=? ORDER BY hero_id", (uid,)) if (db and uid) else []
-    if piece_rows:
+    piece_rows = db.query("SELECT hero_id, num FROM hero_piece WHERE uid=? ORDER BY hero_id", (uid,)) if dynamic else []
+    if dynamic:
         pieces = [{"id": r["hero_id"], "num": r["num"]} for r in piece_rows]
     else:
         pieces = extra.get("piece_list") or []
@@ -695,8 +831,8 @@ def _encode_extra_fields(db=None, uid=None):
             out += _varint((4 << 3) | 2) + _varint(len(sub)) + sub
 
     # f5 favorites（repeated uint32，tag 0x28）
-    fav_rows = db.query("SELECT id FROM hero WHERE uid=? AND is_favorite=1 ORDER BY id", (uid,)) if (db and uid) else []
-    if fav_rows:
+    fav_rows = db.query("SELECT id FROM hero WHERE uid=? AND is_favorite=1 ORDER BY id", (uid,)) if dynamic else []
+    if dynamic:
         favs = [r["id"] for r in fav_rows]
     else:
         favs = extra.get("favorites") or []

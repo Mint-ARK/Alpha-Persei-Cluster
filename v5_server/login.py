@@ -52,10 +52,11 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
     import res_version_manager as _rvm
     login_res_version = _rvm.get_current_version()
     # 311_CORE_VERIFICATION_GUARD:
-    # Build 311 的活动根 111 只开放 template=433 (Mode 4)。旧登录表仍含 sc_89013
-    # (Mode 1)；若让它回退到库内 blob，311 会在 CoreVerificationChallengeData.InitTaskInfo
+    # Theme 44+ (Build 311, 321, 322...) 的活动根 111 只开放 template=433 (Mode 4)。旧登录表仍含 sc_89013
+    # (Mode 1)；若让它回退到库内 blob，311+ 会在 CoreVerificationChallengeData.InitTaskInfo
     # 中索引 ActivityCfg[nil] 并卡死大厅 Loading。这里必须跳过整帧，不能返回 None 走 blob 兜底。
-    version_suppressed_cmds = {"311": {89013}}
+    login_ver_cfg = _rvm.get_version_config(login_res_version)
+    suppressed_cmds = set(login_ver_cfg.get("suppressed_cmds", set()))
     sent = dyn_hit = 0
     sock.settimeout(5)
 
@@ -78,10 +79,10 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
 
     try:
         for seq, cmd, header, blob, dynamic, payload_json in frames:
-            if cmd in version_suppressed_cmds.get(login_res_version, set()):
+            if cmd in suppressed_cmds:
                 log(
                     f"[login] version={login_res_version} 跳过不兼容推送 sc_{cmd} "
-                    "(311_CORE_VERIFICATION_GUARD)",
+                    "(THEME44_CORE_VERIFICATION_GUARD)",
                     "INFO",
                 )
                 continue
@@ -95,6 +96,8 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                     )
                 except Exception as e:
                     log(f"[login] sc_{cmd} 业务动态生成异常: {e}", "WARN")
+                    if cmd in (13009, 14009, 46011):
+                        raise RuntimeError(f"sc_{cmd} 当前资产读取失败，拒绝回退旧录制资产") from e
 
             # 2. 非 dynamic 帧（或 generator 未实现该 cmd），走 payload_json 现场 Protobuf 编码
             if gen is None and payload_json and _codec_encode is not None:

@@ -63,3 +63,11 @@ dist/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local work records and partial downloads are not release sources.
+/AGENT_BOARD.md
+/.agent-memory.md
+/agent-memory.md
+/archive/
+*.before*
+*.part

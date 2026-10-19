@@ -11,6 +11,8 @@ reserve_codec.py — 预备编队与出战队伍持久化编解码器（sc_63005
 import json
 import time
 
+from formation_codec import build_formation_fields
+
 
 def _varint(v):
     v = int(v)
@@ -168,7 +170,11 @@ def build_sc_63005(db, uid):
     if not body:
         # 最小合法帧：team_type=0 空 cont_teams（官方新号语义，无幻影编队）
         body = bytearray()
-        body += _pb_varint(1, 0)
+        # sc_63005.f1 is a message field; wrap the team_type in that message.
+        body += _pb_msg(1, _pb_varint(1, 0))
+
+    # Saved formations use sc_63005.f4 and are independent of stage_team.
+    body.extend(build_formation_fields(db, uid))
 
     return bytes(body)
 

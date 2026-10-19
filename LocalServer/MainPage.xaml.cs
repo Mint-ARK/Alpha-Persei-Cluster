@@ -29,6 +29,8 @@ public sealed partial class MainPage : Page
 
     private bool _autoScroll = true;
     private string _filterKeyword = "";
+    private bool _redeployingCertificate;
+    private bool _preparingCertificate;
     private const int MaxLogLines = 2500;
     private const string WebConsoleUrl = "http://127.0.0.1/web/gm_console.html";
     private static readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromMilliseconds(600) };
@@ -69,12 +71,14 @@ public sealed partial class MainPage : Page
         Loaded += MainPage_Loaded;
     }
 
-    private void MainPage_Loaded(object sender, RoutedEventArgs e)
+    private async void MainPage_Loaded(object sender, RoutedEventArgs e)
     {
         // 1. 尝试自动探测并接管可能在后台运行的独立服务
         ServerSupervisor.Instance.TryAttachExistingServer();
 
         UpdateUIState(ServerSupervisor.Instance.IsRunning);
+
+        LoadDynamicVersions();
 
         // 优先加载已持久化的配置文件，未配置项再执行环境推测
         bool configLoaded = LoadConfigFromFile();
@@ -87,8 +91,10 @@ public sealed partial class MainPage : Page
             RecommendCdnDrive();
         }
 
+        UpdateDashboardResVersionDisplay();
         CheckPortStatuses();
         CheckHostsStatus();
+        await CheckCertificateStatusAsync(logToTerminal: true);
 
         if (ToggleAlwaysPlaySplash != null)
         {
@@ -133,6 +139,7 @@ public sealed partial class MainPage : Page
 
     private async void OnToggleServerClick(object sender, RoutedEventArgs e)
     {
+        if (_redeployingCertificate || _preparingCertificate) return;
         if (ServerSupervisor.Instance.IsRunning)
         {
             BtnToggleServer.IsEnabled = false;
@@ -147,6 +154,17 @@ public sealed partial class MainPage : Page
             StatusText.Text = "正在启动服务...";
             StatusBadge.Background = new SolidColorBrush(Color.FromArgb(0x26, 0x3B, 0x82, 0xF6));
             StatusText.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x3B, 0x82, 0xF6));
+
+            _preparingCertificate = true;
+            bool certificateReady;
+            try { certificateReady = await PrepareCertificateForStartupAsync(); }
+            finally { _preparingCertificate = false; }
+            if (!certificateReady)
+            {
+                BtnToggleServer.IsEnabled = true;
+                UpdateUIState(false);
+                return;
+            }
 
             // 装配启动参数（若有自定义配置）
             var argsList = new List<string>();
@@ -409,27 +427,29 @@ public sealed partial class MainPage : Page
         {
             StatusBadge.Background = new SolidColorBrush(Color.FromArgb(0x26, 0x10, 0xB9, 0x81));
             StatusText.Text = ServerSupervisor.Instance.IsAttached
-                ? $"守护进程运行中 (已接入后台进程 PID: {pid.Value})"
-                : $"守护进程运行中 (PID: {pid.Value})";
+                ? $"运行中 · 已接管 (PID: {pid.Value})"
+                : $"运行中 (PID: {pid.Value})";
             StatusText.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x10, 0xB9, 0x81));
             ServerDetailText.Text = ServerSupervisor.Instance.IsAttached
                 ? $"运行基准路径: {ServerSupervisor.Instance.LastResolvedServerDir ?? "已就绪"} | 进程拓扑: 已接入已有独立后台守护进程"
                 : $"运行基准路径: {ServerSupervisor.Instance.LastResolvedServerDir ?? "已就绪"} | 进程拓扑: 作业对象严格宿主托管";
 
-            TxtGwPortStatus.Text = "🟢 监听中 (LISTENING)";
+            TxtGwPortStatus.Text = "🟢 监听中";
             TxtGwPortStatus.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x10, 0xB9, 0x81));
 
-            TxtGamePortStatus.Text = "🟢 就绪 (READY)";
+            TxtGamePortStatus.Text = "🟢 业务就绪";
             TxtGamePortStatus.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x10, 0xB9, 0x81));
 
-            TxtHttpsPortStatus.Text = "🟢 443 直通 (ACTIVE)";
+            TxtHttpsPortStatus.Text = "🟢 直通激活";
             TxtHttpsPortStatus.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x10, 0xB9, 0x81));
 
-            TxtWebPortStatus.Text = "🟢 80 就绪 (READY)";
+            TxtWebPortStatus.Text = "🟢 运维就绪";
             TxtWebPortStatus.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x10, 0xB9, 0x81));
 
-            TxtCdnStateStatus.Text = "🟢 就绪 (READY)";
+            TxtCdnStateStatus.Text = "🟢 缓存就绪";
             TxtCdnStateStatus.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x10, 0xB9, 0x81));
+
+            QueryServerActiveVersionAsync();
         }
         else
         {
@@ -438,20 +458,22 @@ public sealed partial class MainPage : Page
             StatusText.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0xEF, 0x44, 0x44));
             ServerDetailText.Text = "守护状态: 闲置 (IDLE) | 端口监听: 闲置 | 托管拓扑: 待命";
 
-            TxtGwPortStatus.Text = "空闲 (IDLE)";
+            TxtGwPortStatus.Text = "空闲";
             TxtGwPortStatus.Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"];
 
-            TxtGamePortStatus.Text = "空闲 (IDLE)";
+            TxtGamePortStatus.Text = "空闲";
             TxtGamePortStatus.Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"];
 
-            TxtHttpsPortStatus.Text = "空闲 (IDLE)";
+            TxtHttpsPortStatus.Text = "空闲";
             TxtHttpsPortStatus.Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"];
 
-            TxtWebPortStatus.Text = "空闲 (IDLE)";
+            TxtWebPortStatus.Text = "空闲";
             TxtWebPortStatus.Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"];
 
-            TxtCdnStateStatus.Text = "待命 (STANDBY)";
+            TxtCdnStateStatus.Text = "待命";
             TxtCdnStateStatus.Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"];
+
+            UpdateDashboardResVersionDisplay(null);
         }
     }
 
@@ -480,6 +502,152 @@ public sealed partial class MainPage : Page
 
     #endregion
 
+    #region 协议版本协商与两级基线管理
+
+    private void OnResVersionSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        UpdateDashboardResVersionDisplay();
+    }
+
+    private void LoadDynamicVersions()
+    {
+        try
+        {
+            string? srvDir = ServerSupervisor.Instance.FindServerDir();
+            if (string.IsNullOrEmpty(srvDir)) return;
+            string dynPath = Path.Combine(srvDir, "dynamic_versions.json");
+            if (!File.Exists(dynPath)) return;
+
+            string json = File.ReadAllText(dynPath);
+            using var doc = JsonDocument.Parse(json);
+            if (doc.RootElement.ValueKind == JsonValueKind.Object)
+            {
+                var existingTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var item in CmbResVersion.Items)
+                {
+                    if (item is ComboBoxItem cbi && cbi.Tag != null)
+                        existingTags.Add(cbi.Tag.ToString()!);
+                }
+
+                foreach (var prop in doc.RootElement.EnumerateObject())
+                {
+                    string verKey = prop.Name;
+                    if (!existingTags.Contains(verKey))
+                    {
+                        string displayName = $"Build {verKey} (动态注册)";
+                        if (prop.Value.TryGetProperty("display_name", out var dnElem))
+                        {
+                            displayName = dnElem.GetString() ?? displayName;
+                        }
+                        CmbResVersion.Items.Add(new ComboBoxItem
+                        {
+                            Content = displayName,
+                            Tag = verKey
+                        });
+                        existingTags.Add(verKey);
+                    }
+                }
+            }
+        }
+        catch { }
+    }
+
+    private static string? InspectClientResourceBuild(string clientRoot)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(clientRoot) || !Directory.Exists(clientRoot)) return null;
+
+            string[] candidates = [
+                Path.Combine(clientRoot, "AetherGazer_Data", "StreamingAssets", "Windows"),
+                Path.Combine(clientRoot, "StreamingAssets", "Windows"),
+                Path.Combine(clientRoot, "AetherGazer_Data", "StreamingAssets"),
+                Path.Combine(clientRoot, "StreamingAssets"),
+                clientRoot
+            ];
+
+            foreach (var c in candidates)
+            {
+                if (!Directory.Exists(c)) continue;
+                var files = Directory.GetFiles(c, "assethash_307_*.bytes");
+                int maxBuild = -1;
+                foreach (var f in files)
+                {
+                    string fname = Path.GetFileName(f);
+                    var parts = fname.Split('_');
+                    if (parts.Length >= 4 && int.TryParse(parts[2], out int b))
+                    {
+                        if (b > maxBuild) maxBuild = b;
+                    }
+                }
+                if (maxBuild > 0)
+                {
+                    return maxBuild.ToString();
+                }
+            }
+        }
+        catch { }
+        return null;
+    }
+
+    private void UpdateDashboardResVersionDisplay(string? liveVersion = null)
+    {
+        if (TxtDashResVersion == null) return;
+
+        if (!string.IsNullOrEmpty(liveVersion))
+        {
+            string themeDesc = (int.TryParse(liveVersion, out int b) && b >= 311) ? "Theme 44 演进基线" : "Theme 43 兼容基线";
+            TxtDashResVersion.Text = $"协议对齐基线: Build {liveVersion} ({themeDesc} · 活跃运行)";
+            return;
+        }
+
+        string selectedVer = (CmbResVersion?.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "auto";
+        if (selectedVer == "auto")
+        {
+            string clientPath = TxtClientPath?.Text?.Trim() ?? "";
+            string? detectedBuild = InspectClientResourceBuild(clientPath);
+            if (!string.IsNullOrEmpty(detectedBuild))
+            {
+                string themeDesc = (int.TryParse(detectedBuild, out int db) && db >= 311) ? "Theme 44 演进基线" : "Theme 43 兼容基线";
+                TxtDashResVersion.Text = $"协议对齐基线: auto → 预期匹配 Build {detectedBuild} ({themeDesc})";
+            }
+            else
+            {
+                TxtDashResVersion.Text = "协议对齐基线: auto (客户端自动协商)";
+            }
+        }
+        else
+        {
+            string themeDesc = (int.TryParse(selectedVer, out int sb) && sb >= 311) ? "Theme 44 演进基线" : "Theme 43 兼容基线";
+            TxtDashResVersion.Text = $"协议对齐基线: Build {selectedVer} ({themeDesc} · 待命就绪)";
+        }
+    }
+
+    private async void QueryServerActiveVersionAsync()
+    {
+        try
+        {
+            var res = await _httpClient.GetAsync("http://127.0.0.1/api/system/res_version");
+            if (res.IsSuccessStatusCode)
+            {
+                string json = await res.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("data", out var dataElem) &&
+                    dataElem.TryGetProperty("current_version", out var verElem))
+                {
+                    string? curVer = verElem.GetString();
+                    if (!string.IsNullOrEmpty(curVer))
+                    {
+                        DispatcherQueue.TryEnqueue(() => UpdateDashboardResVersionDisplay(curVer));
+                    }
+                }
+            }
+        }
+        catch { }
+    }
+
+    #endregion
+
     #region 智能探测与部署配置
 
     private void TryQuickDetectEnvironment()
@@ -490,7 +658,16 @@ public sealed partial class MainPage : Page
         {
             TxtClientPath.Text = clientDir;
             TxtDashClientDir.Text = $"客户端: {clientDir}";
-            TxtClientDetectionResult.Text = $"✔️ 已从桌面快捷方式/常见盘符自动匹配";
+            string? buildVer = InspectClientResourceBuild(clientDir);
+            if (!string.IsNullOrEmpty(buildVer))
+            {
+                TxtClientDetectionResult.Text = $"✔️ 已匹配客户端，资源版本: Build {buildVer} (v5.{(int.TryParse(buildVer, out int bv) && bv >= 311 ? "3" : "2")})";
+            }
+            else
+            {
+                TxtClientDetectionResult.Text = $"✔️ 已从桌面快捷方式/常见盘符自动匹配";
+            }
+            UpdateDashboardResVersionDisplay();
         }
 
         // 2. 自动推荐 CDN 磁盘
@@ -572,7 +749,16 @@ public sealed partial class MainPage : Page
         {
             TxtClientPath.Text = client;
             TxtDashClientDir.Text = $"客户端: {client}";
-            TxtClientDetectionResult.Text = "自动探测完成，已识别客户端运行时目录。";
+            string? buildVer = InspectClientResourceBuild(client);
+            if (!string.IsNullOrEmpty(buildVer))
+            {
+                TxtClientDetectionResult.Text = $"✔️ 自动探测成功，已识别客户端 (资源构建: Build {buildVer} · v5.{(int.TryParse(buildVer, out int bv) && bv >= 311 ? "3" : "2")})";
+            }
+            else
+            {
+                TxtClientDetectionResult.Text = "自动探测完成，已识别客户端运行时目录。";
+            }
+            UpdateDashboardResVersionDisplay();
         }
         else
         {
@@ -587,7 +773,16 @@ public sealed partial class MainPage : Page
         {
             TxtClientPath.Text = folder;
             TxtDashClientDir.Text = $"客户端: {folder}";
-            TxtClientDetectionResult.Text = "已选定自定义路径。";
+            string? buildVer = InspectClientResourceBuild(folder);
+            if (!string.IsNullOrEmpty(buildVer))
+            {
+                TxtClientDetectionResult.Text = $"✔️ 已选定自定义路径 (资源构建: Build {buildVer} · v5.{(int.TryParse(buildVer, out int bv) && bv >= 311 ? "3" : "2")})";
+            }
+            else
+            {
+                TxtClientDetectionResult.Text = "已选定自定义路径。";
+            }
+            UpdateDashboardResVersionDisplay();
         }
     }
 
@@ -655,119 +850,180 @@ public sealed partial class MainPage : Page
         return Task.FromResult(folder);
     }
 
-    private void OnInstallCertClick(object sender, RoutedEventArgs e)
+    #region 证书管理与安全基线
+
+    private async void OnCheckCertClick(object sender, RoutedEventArgs e)
+    {
+        if (!_redeployingCertificate) await CheckCertificateStatusAsync(logToTerminal: true);
+    }
+
+    private async Task<bool> CheckCertificateStatusAsync(bool logToTerminal = false)
     {
         try
         {
-            string? srvDir = ServerSupervisor.Instance.FindServerDir();
-            if (string.IsNullOrEmpty(srvDir))
+            string directory = ServerSupervisor.Instance.FindServerDir()
+                ?? throw new InvalidOperationException("未定位服务端目录。");
+            CertificateStatus status = await CertificateManager.InspectAsync(
+                ServerSupervisor.Instance.FindPythonPath(), directory);
+            string thumb = status.Files.RootThumbprint;
+            UpdateCertUIStatus(status.Ready, status.Badge,
+                string.IsNullOrEmpty(thumb) ? null : $"指纹: {thumb[..Math.Min(8, thumb.Length)]}...");
+            if (logToTerminal)
             {
-                OnLogReceived("[CertManager ERROR] 未能定位服务端目录，无法提取证书文件。");
-                return;
+                if (status.Ready)
+                    OnLogReceived($"[CertManager SUCCESS] 游戏握手证书检查通过，根指纹: {thumb}；服务证书有效至 {status.Files.LeafNotAfter}。");
+                foreach (string issue in status.Issues) OnLogReceived("[CertManager WARNING] " + issue);
             }
+            return status.Ready;
+        }
+        catch (Exception error)
+        {
+            UpdateCertUIStatus(false, "⚠️ 证书检查失败", null);
+            OnLogReceived("[CertManager ERROR] " + error.Message);
+            return false;
+        }
+    }
 
-            string certPath = Path.Combine(srvDir, "sdk_ca.crt");
-            string[] batCandidates = [
-                Path.Combine(srvDir, "install_cert.bat"),
-                Path.Combine(srvDir, "import_cert.bat"),
-                Path.Combine(srvDir, "一键安装Windows证书.bat")
-            ];
-            string? batPath = batCandidates.FirstOrDefault(File.Exists);
-
-            if (!string.IsNullOrEmpty(batPath))
+    private async Task<bool> PrepareCertificateForStartupAsync()
+    {
+        try
+        {
+            string directory = ServerSupervisor.Instance.FindServerDir()
+                ?? throw new InvalidOperationException("未定位服务端目录。");
+            // 只自动修复叶证书与安装文件；正常启动不导入系统根、不替换既有根。
+            CertificateCommand prepared = await CertificateManager.RunGeneratorAsync(
+                ServerSupervisor.Instance.FindPythonPath(), directory);
+            if (prepared.ExitCode != 0)
             {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = batPath,
-                    UseShellExecute = true,
-                    Verb = "runas",
-                    WorkingDirectory = srvDir
-                };
-                Process.Start(psi);
-                OnLogReceived("[CertManager] 已调用管理员权限脚本导入根证书。");
+                LogCertificateCommand(prepared);
+                await CheckCertificateStatusAsync(logToTerminal: true);
+                OnLogReceived("[CertManager WARNING] 请点击【重新部署并安装根证书】后再启动游戏服务。");
+                return false;
             }
-            else if (File.Exists(certPath))
+            return await CheckCertificateStatusAsync(logToTerminal: true);
+        }
+        catch (Exception error)
+        {
+            UpdateCertUIStatus(false, "⚠️ 证书准备失败", null);
+            OnLogReceived("[CertManager ERROR] " + error.Message);
+            return false;
+        }
+    }
+
+    private void LogCertificateCommand(CertificateCommand command)
+    {
+        foreach (string line in (command.Output + "\n" + command.Error).Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
+            OnLogReceived("[CertManager] " + line);
+    }
+
+    private void UpdateCertUIStatus(bool isTrusted, string badgeText, string? thumbprintText)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (BadgeCertStatus != null && TxtCertStatus != null)
             {
-                var psi = new ProcessStartInfo
+                BadgeCertStatus.Background = new SolidColorBrush(isTrusted
+                    ? Color.FromArgb(0x26, 0x10, 0xB9, 0x81)
+                    : Color.FromArgb(0x26, 0xF5, 0x9E, 0x0B));
+                TxtCertStatus.Foreground = new SolidColorBrush(isTrusted
+                    ? Color.FromArgb(0xFF, 0x10, 0xB9, 0x81)
+                    : Color.FromArgb(0xFF, 0xF5, 0x9E, 0x0B));
+                TxtCertStatus.Text = badgeText;
+            }
+            if (TxtCertThumbprint != null)
+            {
+                TxtCertThumbprint.Text = thumbprintText ?? "";
+            }
+        });
+    }
+
+    private async void OnRedeployCertClick(object sender, RoutedEventArgs e)
+    {
+        if (_redeployingCertificate || _preparingCertificate) return;
+        if (ServerSupervisor.Instance.IsRunning)
+        {
+            OnLogReceived("[CertManager WARNING] 请先停止服务，再重新部署证书；运行中的 HTTPS 监听仍使用启动时加载的证书。");
+            return;
+        }
+        _redeployingCertificate = true;
+        BtnToggleServer.IsEnabled = false;
+        if (BtnQuickRedeployCert != null) BtnQuickRedeployCert.IsEnabled = false;
+        try
+        {
+            string directory = ServerSupervisor.Instance.FindServerDir()
+                ?? throw new InvalidOperationException("未定位服务端目录。");
+            string python = ServerSupervisor.Instance.FindPythonPath();
+            CertificateStatus previous = await CertificateManager.InspectAsync(python, directory);
+            bool replaceRoot = previous.Files.RequiresRootReplacement;
+            OnLogReceived(replaceRoot
+                ? "[CertManager] 根证书已丢失、损坏或临期，将重新生成根证书并同步 iOS 描述文件。"
+                : "[CertManager] 保留现有根证书，修复服务证书及 Windows/iOS 安装文件。");
+            CertificateCommand generated = await CertificateManager.RunGeneratorAsync(
+                python, directory, replaceRoot ? "--force-ca" : "--force");
+            LogCertificateCommand(generated);
+            if (generated.ExitCode != 0)
+                throw new InvalidOperationException($"证书生成失败（退出码 {generated.ExitCode}），未执行系统导入。");
+
+            CertificateStatus filesCheck = await CertificateManager.InspectAsync(python, directory);
+            if (!filesCheck.Files.Ready)
+                throw new InvalidOperationException("生成后证书检查未通过：" + string.Join("；", filesCheck.Files.Issues));
+            bool rootChanged = !string.Equals(previous.Files.RootThumbprint,
+                filesCheck.Files.RootThumbprint, StringComparison.OrdinalIgnoreCase);
+            // 同步文件已经生成；实际换根时即使 Windows 导入失败，也应提示 iOS 信任需要更新。
+            if (rootChanged)
+            {
+                OnLogReceived("[CertManager WARNING] 根证书已更新：iOS 请重新安装 AetherGazer.mobileconfig，并在设置→通用→关于本机→证书信任设置开启完全信任。");
+                var notice = new ContentDialog
                 {
-                    FileName = "certutil",
-                    Arguments = $"-addstore -f \"Root\" \"{certPath}\"",
-                    UseShellExecute = true,
-                    Verb = "runas"
+                    XamlRoot = this.XamlRoot,
+                    Title = "iOS 根证书需要更新",
+                    Content = "新的 iOS 描述文件已同步生成。请在 iPhone 重新安装 AetherGazer.mobileconfig，并在“设置 → 通用 → 关于本机 → 证书信任设置”开启新根证书的完全信任。",
+                    CloseButtonText = "知道了",
                 };
-                Process.Start(psi);
-                OnLogReceived("[CertManager] 已通过 certutil 向受信任根证书存储区导入 sdk_ca.crt。");
+                await notice.ShowAsync();
             }
             else
+                OnLogReceived("[CertManager] 根指纹保持不变，iOS 已信任的根无需重新安装；两份描述文件已检查同步。");
+
+            try
             {
-                OnLogReceived("[CertManager WARNING] 未找到 sdk_ca.crt 证书文件，请核实服务端文件。");
+                CertificateManager.InstallCurrentUserRoot(directory);
+                OnLogReceived("[CertManager] 当前用户根证书导入并精确核验通过。");
             }
+            catch (Exception error)
+            {
+                OnLogReceived("[CertManager WARNING] 当前用户根导入失败：" + error.Message);
+            }
+            try
+            {
+                int code = await CertificateManager.InstallMachineRootAsync(directory);
+                if (code != 0) OnLogReceived($"[CertManager WARNING] 计算机根导入失败，退出码 {code}。");
+            }
+            catch (System.ComponentModel.Win32Exception error) when (error.NativeErrorCode == 1223)
+            {
+                OnLogReceived("[CertManager] 管理员授权已取消，下面检查当前用户是否仍能通过游戏握手。");
+            }
+            catch (Exception error)
+            {
+                OnLogReceived("[CertManager WARNING] 计算机根导入失败：" + error.Message);
+            }
+            if (!await CheckCertificateStatusAsync(logToTerminal: true))
+                OnLogReceived("[CertManager ERROR] 部署未完成：当前 Windows 游戏握手校验仍未通过。");
         }
-        catch (Exception ex)
+        catch (Exception error)
         {
-            OnLogReceived($"[CertManager ERROR] 导入证书失败: {ex.Message}");
+            OnLogReceived("[CertManager ERROR] " + error.Message);
+            await CheckCertificateStatusAsync(logToTerminal: true);
+        }
+        finally
+        {
+            _redeployingCertificate = false;
+            BtnToggleServer.IsEnabled = true;
+            if (BtnQuickRedeployCert != null) BtnQuickRedeployCert.IsEnabled = true;
         }
     }
 
-    private async void OnRegenerateCertClick(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            string? srvDir = ServerSupervisor.Instance.FindServerDir();
-            if (string.IsNullOrEmpty(srvDir))
-            {
-                OnLogReceived("[CertManager ERROR] 未能定位服务端目录，无法重新生成证书。");
-                return;
-            }
-
-            string pyExe = ServerSupervisor.Instance.FindPythonPath();
-            string genCertScript = Path.Combine(srvDir, "gen_cert.py");
-            if (!File.Exists(genCertScript))
-            {
-                OnLogReceived($"[CertManager ERROR] 未在服务端目录找到 gen_cert.py: {genCertScript}");
-                return;
-            }
-
-            OnLogReceived("[CertManager] 正在强制重新生成 Windows 信任证书与适用于 iPhone 的描述文件 (.mobileconfig)...");
-            var psi = new ProcessStartInfo
-            {
-                FileName = pyExe,
-                Arguments = $"\"{genCertScript}\" --force",
-                WorkingDirectory = srvDir,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            using var proc = Process.Start(psi);
-            if (proc != null)
-            {
-                string stdout = await proc.StandardOutput.ReadToEndAsync();
-                string stderr = await proc.StandardError.ReadToEndAsync();
-                await proc.WaitForExitAsync();
-                if (proc.ExitCode == 0)
-                {
-                    OnLogReceived("[CertManager SUCCESS] 证书体系与 iPhone 描述文件已重新生成完成！");
-                    if (!string.IsNullOrWhiteSpace(stdout))
-                    {
-                        foreach (var line in stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
-                        {
-                            OnLogReceived($"[CertManager] {line}");
-                        }
-                    }
-                }
-                else
-                {
-                    OnLogReceived($"[CertManager ERROR] 重新生成证书失败 (退出码 {proc.ExitCode}): {stderr}");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            OnLogReceived($"[CertManager ERROR] 重新生成证书异常: {ex.Message}");
-        }
-    }
+    #endregion
 
     private bool LoadConfigFromFile()
     {
@@ -1001,6 +1257,8 @@ public sealed partial class MainPage : Page
                 TxtSaveResult.Text = "配置已安全保存至用户本地数据区 (LocalAppData)。";
                 OnLogReceived($"[ConfigManager] 服务端目录受系统写保护，配置已平滑降级保存至: {userConfigPath}");
             }
+
+            UpdateDashboardResVersionDisplay();
         }
         catch (Exception ex)
         {

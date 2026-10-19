@@ -23,6 +23,7 @@ import logging
 import threading
 from inventory_service import InventoryService
 from event_bus import bus, Events
+from operation_notifications import checkpoint_notifications, restore_notifications
 
 logger = logging.getLogger("mail_service")
 _send_mail_lock = threading.Lock()
@@ -45,6 +46,7 @@ class MailService:
     _LETTERS_BY_HERO = None
     _TEMPLATES_CACHE = None
     _TEMPLATES_WITH_PARAM_SET = None
+    _TEMPLATES_WARNING_EMITTED = False
 
     def __init__(self, db=None):
         self.db = db
@@ -96,7 +98,12 @@ class MailService:
                         if "%s" in t_title or "%d" in t_title:
                             param_set.add(int(t["id"]))
                 except Exception as e:
-                    logger.error(f"加载 mail_templates.json 失败: {e}")
+                    if not cls._TEMPLATES_WARNING_EMITTED:
+                        logger.warning(f"加载 mail_templates.json 失败，邮件列表继续使用字面标题: {e}")
+                        cls._TEMPLATES_WARNING_EMITTED = True
+            elif not cls._TEMPLATES_WARNING_EMITTED:
+                logger.warning("mail_templates.json 不存在，邮件列表继续使用字面标题")
+                cls._TEMPLATES_WARNING_EMITTED = True
             cls._TEMPLATES_CACHE = templates
             cls._TEMPLATES_WITH_PARAM_SET = param_set
 
@@ -158,14 +165,6 @@ class MailService:
             if not attachment_list:
                 attach_flag = 2
 
-            tpl_id = int(r.get("template_id") or 0)
-            # 模板占位符安全规约：若模板标题含有 %s/%d 占位符且无 title_format 实参（如 1001-1044 充值周期包等），
-            # 必须置 mail_template_id=0 直出完整 title，防止客户端 MailData.GetMailTitle unpack({}) 触发 string.format 缺少参数崩溃
-            if (self._TEMPLATES_WITH_PARAM_SET and tpl_id in self._TEMPLATES_WITH_PARAM_SET) or not tpl_id:
-                mail_tpl_id = 0
-            else:
-                mail_tpl_id = tpl_id
-
             lst.append({
                 "id": int(r["mail_id"]),
                 "date": int(r.get("send_time") or 0),
@@ -175,7 +174,9 @@ class MailService:
                 "attachment_list": attachment_list,
                 "timeout_timestamp": exp,
                 "star_state": int(r.get("star_state") or 0),
-                "mail_template_id": mail_tpl_id,
+                # `title` is already rendered and title_format is empty; always bypass
+                # client template formatting to prevent string.format on missing args.
+                "mail_template_id": 0,
                 "title_format": [],
                 "i18n_info": []
             })
@@ -192,17 +193,11 @@ class MailService:
         )
         lst = []
         for r in rows:
-            tpl_id = int(r.get("template_id") or 0)
-            if (self._TEMPLATES_WITH_PARAM_SET and tpl_id in self._TEMPLATES_WITH_PARAM_SET) or not tpl_id:
-                mail_tpl_id = 0
-            else:
-                mail_tpl_id = tpl_id
-
             lst.append({
                 "id": int(r["mail_id"]),
                 "collect_date": int(r.get("update_ts") or r.get("send_time") or 0),
                 "title": str(r.get("title") or ""),
-                "mail_template_id": mail_tpl_id,
+                "mail_template_id": 0,
                 "title_format": [],
                 "i18n_info": [],
                 "mail_timestamp": int(r.get("send_time") or 0)
@@ -297,14 +292,25 @@ class MailService:
         全量接入统一资产中心 InventoryService：
         - 无论是货币、材料、刻印、钥从、换装（含重复自动分解 1680 移转之辉）、场景、气泡、头像框等，全部规范持久化并派发事件；
         - 更新对应邮件 attach_flag=2, read_flag=2。
-        返回：{"attachment_list": [...], "success_mail_ids": [...], "touched_heroes": [...], "touched_scene": bool}"""
+        返回附件、成功邮件ID及需要刷新的英雄/换装/场景。
+        独立调用自带事务；Core内嵌套时异常必须继续传播到外层，不能吞错后提交。"""
         _db = (ctx.db if ctx and hasattr(ctx, "db") and ctx.db else None) or self._get_db(db)
         if not _db:
-            return {"attachment_list": [], "success_mail_ids": [], "touched_heroes": [], "touched_scene": False}
+            raise ValueError("领取邮件附件缺少数据库")
+        checkpoint = checkpoint_notifications(ctx) if ctx is not None else None
+        try:
+            with _db.transaction():
+                return self._claim_mail_attachments(uid, mail_id, ctx, _db)
+        except BaseException:
+            if checkpoint is not None:
+                restore_notifications(ctx, checkpoint)
+            raise
 
+    def _claim_mail_attachments(self, uid, mail_id, ctx, _db):
+        """调用方持有事务：只选待领邮件，完整发奖后才确认领取事实。"""
         mid = int(mail_id or 0)
         if mid > 0:
-            rows = _db.query("SELECT * FROM mail WHERE uid=? AND mail_id=?", (uid, mid))
+            rows = _db.query("SELECT * FROM mail WHERE uid=? AND mail_id=? AND attach_flag=1", (uid, mid))
         else:
             rows = _db.query("SELECT * FROM mail WHERE uid=? AND attach_flag=1", (uid,))
 
@@ -316,10 +322,9 @@ class MailService:
         for m in rows:
             m_id = int(m["mail_id"])
             attach_list = []
-            try:
-                attach_list = json.loads(m.get("attachment_json") or "[]")
-            except Exception:
-                attach_list = []
+            attach_list = json.loads(m.get("attachment_json") or "[]")
+            if not isinstance(attach_list, list):
+                raise ValueError(f"邮件 {m_id} 附件必须是列表")
 
             for it in attach_list:
                 if isinstance(it, dict):
@@ -328,29 +333,29 @@ class MailService:
                 elif isinstance(it, (list, tuple)) and len(it) >= 2:
                     iid, num = int(it[0]), int(it[1])
                 else:
-                    continue
+                    raise ValueError(f"邮件 {m_id} 含无效附件")
                 if iid <= 0 or num <= 0:
-                    continue
+                    raise ValueError(f"邮件 {m_id} 附件ID与数量必须为正数")
 
                 all_items_to_add.append((iid, num))
                 claimed_attachments.append({"id": iid, "number": num})
 
-            # 标记该邮件已读且附件已领
-            _db.execute(
-                "UPDATE mail SET attach_flag=2, read_flag=2, update_ts=? WHERE uid=? AND mail_id=?",
-                (now_ts, uid, m_id)
-            )
             success_mail_ids.append(m_id)
 
         # 统一转交 InventoryService 进行批量发奖与事件广播
         summary = {}
         if all_items_to_add:
-            try:
-                summary = InventoryService.grant_items(ctx or _db, uid, all_items_to_add, source="mail")
-            except Exception as e:
-                logger.error(f"邮件附件发放异常: {e}")
+            summary = InventoryService.grant_items(ctx or _db, uid, all_items_to_add, source="mail")
 
-        touched_heroes = list(set((summary.get("hero_unlocked") or []) + (summary.get("skins") or [])))
+        for m_id in success_mail_ids:
+            changed = _db.execute(
+                "UPDATE mail SET attach_flag=2, read_flag=2, update_ts=? WHERE uid=? AND mail_id=? AND attach_flag=1",
+                (now_ts, uid, m_id)
+            )
+            if changed.rowcount != 1:
+                raise ValueError(f"邮件 {m_id} 领取状态发生变化")
+
+        touched_heroes = list(set(summary.get("hero_unlocked") or []))
         touched_scene = bool(summary.get("scenes"))
 
         logger.info(f"uid={uid} 成功领取邮件附件: 邮件数={len(success_mail_ids)} 道具数={len(claimed_attachments)}")
@@ -358,6 +363,7 @@ class MailService:
             "attachment_list": claimed_attachments,
             "success_mail_ids": success_mail_ids,
             "touched_heroes": touched_heroes,
+            "touched_skins": list(set(summary.get("skins") or [])),
             "touched_scene": touched_scene
         }
 

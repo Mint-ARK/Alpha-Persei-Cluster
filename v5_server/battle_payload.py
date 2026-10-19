@@ -22,6 +22,7 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 import hero_codec
+from enchant_slots_util import normalize_enchant_slots
 
 
 def _varint(v):
@@ -91,19 +92,10 @@ def build_battle_equip_bytes(eq_row):
     if eq_row.get("now_break_level"):
         body += _pb_varint(6, int(eq_row["now_break_level"]))
 
-    # 赋能槽位解析
-    enchants = eq_row.get("enchant_slots")
-    if enchants:
-        if isinstance(enchants, str):
-            try:
-                enchants = json.loads(enchants)
-            except Exception:
-                enchants = []
-        if isinstance(enchants, list):
-            for es in enchants:
-                if isinstance(es, dict) and es.get("effect_list"):
-                    slot_b = build_enchant_slot_bytes(es)
-                    body += _pb_msg(7, slot_b)
+    # The client schema requires both slot records even when their effect lists are empty.
+    for es in normalize_enchant_slots(eq_row.get("enchant_slots")):
+        slot_b = build_enchant_slot_bytes(es)
+        body += _pb_msg(7, slot_b)
 
     if eq_row.get("race"):
         body += _pb_varint(8, int(eq_row["race"]))
@@ -123,11 +115,6 @@ def build_battle_hero_bytes(db_conn, uid, hid):
     cur = db_conn.cursor()
     cur.execute("SELECT * FROM hero WHERE uid=? AND id=?;", (uid, hid))
     row = cur.fetchone()
-    if not row:
-        # 尝试不限 uid 查兜底
-        cur.execute("SELECT * FROM hero WHERE id=? LIMIT 1;", (hid,))
-        row = cur.fetchone()
-
     h = dict(row) if row else {}
 
     # 查询角色绑定的专属钥从
@@ -135,11 +122,10 @@ def build_battle_hero_bytes(db_conn, uid, hid):
     if w_uid:
         cur.execute("SELECT prefab_id, stage FROM servant WHERE uid=? AND id=?;", (uid, w_uid))
         s_r = cur.fetchone()
-        if not s_r:
-            cur.execute("SELECT prefab_id, stage FROM servant WHERE id=? LIMIT 1;", (w_uid,))
-            s_r = cur.fetchone()
         if s_r:
             h["servant_info"] = {"id": s_r[0], "stage": s_r[1]}
+        else:
+            h["servant_info"] = None
 
     # 预设试用角色库加载（严格基于 Lua TemplateHeroDataTemplate 与 HeroStandardSystemCfg）
     _trial_meta = None
@@ -269,13 +255,16 @@ def build_battle_hero_bytes(db_conn, uid, hid):
         body += _pb_varint(6, 0)
         return bytes(body)
 
-    # 1. 玩家自持角色：构建完整 hero_base_info
+    # A non-trial role must belong to this account. Do not build progression for an absent role.
+    if not h:
+        return None
+
+    # 1. 玩家自持角色：完整角色共用登录侧 DB 映射；未知配置角色保留原最小形态。
     exp = hero_codec.load_hero_expanded(hid)
+    mapped_record = hero_codec.build_hero_net_rec_from_db(h, template=exp)
     hero_type_val = 1
-    if exp:
-        if h:
-            hero_codec.apply_db(exp, h)
-        hbi = next((it[2] for it in exp if it[0] == 1 and it[1] == "m"), None)
+    if hero_codec.is_hero_payload_candidate(hid):
+        hbi = next((it[2] for it in mapped_record if it[0] == 1 and it[1] == "m"), None)
         hbi_body = hero_codec.encode_expanded(hbi) if hbi else b""
     else:
         # 兜底最小 hero_base_info
@@ -325,12 +314,9 @@ def build_battle_hero_bytes(db_conn, uid, hid):
     # 3. 宿舍等级
     body += _pb_varint(4, 0)
 
-    # 4. 好感度（必须包含 relation.tier_list 否则客户端在扫荡结算时访问 nil 报错卡死）
-    t_lvl = int(h.get("trust_level") or 1)
-    t_exp = int(h.get("trust_exp") or 0)
-    t_mood = int(h.get("trust_mood") or 1)
-    rel_b = _pb_msg(1, _pb_varint(1, 1))  # HERO_RELATION_NET_NET_REC { tier_list: [{tier: 1}] }
-    trust_b = _pb_varint(1, t_lvl) + _pb_varint(2, t_exp) + _pb_varint(3, t_mood) + _pb_msg(4, rel_b)
+    # 4. 好感度沿用相同 hero_net_rec 映射中的 trust f8。
+    trust_expanded = next((it[2] for it in mapped_record if it[0] == 8 and it[1] == "m"), None)
+    trust_b = hero_codec.encode_expanded(trust_expanded) if trust_expanded else b""
     body += _pb_msg(5, trust_b)
 
     # 5. 主伤害类型

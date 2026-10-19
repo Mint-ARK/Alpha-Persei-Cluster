@@ -1653,6 +1653,86 @@ class GMReader:
     # 4. 资源背包视图 (Inventory ViewDTO)
     # -----------------------------------------------------------------------
 
+    def _get_inventory_equip_progress(self, prefab_id, total_exp, break_level):
+        """从当前刻印实例与静态配置计算库存 DTO 的真实星级和等级。
+
+        ``equip.id`` 是实例 ID，``equip.prefab_id`` 才是静态配置 ID。GM
+        读取器保留实例存储的配置 ID；缺少配置时星级和等级返回未知值 0，
+        经验曲线缺失时也不把刻印宣称为满级。
+        """
+        try:
+            prefab_id = int(prefab_id or 0)
+        except (TypeError, ValueError):
+            prefab_id = 0
+        if prefab_id <= 0:
+            return {"config_id": 0, "star": 0, "level": 0}
+
+        cfg = self.query_one(
+            """SELECT prefab_id, starlevel, exp_variant, max_level
+               FROM equip_cfg WHERE prefab_id = ?""",
+            (prefab_id,),
+        )
+        if not cfg:
+            return {"config_id": prefab_id, "star": 0, "level": 0}
+
+        try:
+            star = max(0, int(cfg.get("starlevel") or 0))
+        except (TypeError, ValueError):
+            star = 0
+
+        def _json_list(value):
+            if isinstance(value, (list, tuple)):
+                raw = value
+            else:
+                try:
+                    raw = json.loads(value or "[]")
+                except (TypeError, ValueError, json.JSONDecodeError):
+                    return []
+            if not isinstance(raw, (list, tuple)):
+                return []
+            result = []
+            for item in raw:
+                try:
+                    result.append(int(item))
+                except (TypeError, ValueError):
+                    return []
+            return result
+
+        variants = _json_list(cfg.get("exp_variant"))
+        max_levels = _json_list(cfg.get("max_level"))
+        variant = variants[0] if variants else 0
+        if not 1 <= variant <= 7 or not max_levels:
+            return {"config_id": prefab_id, "star": star, "level": 0}
+
+        try:
+            break_idx = max(0, int(break_level or 0))
+        except (TypeError, ValueError):
+            break_idx = 0
+        max_lv = max_levels[min(break_idx, len(max_levels) - 1)]
+        if max_lv <= 0:
+            return {"config_id": prefab_id, "star": star, "level": 0}
+
+        # Guard the service helper's synthetic fallback: a missing curve is
+        # an unknown level, not evidence that the instance reached a default.
+        curve_rows = self.query(
+            f"SELECT level, exp{variant} AS need FROM equip_exp_curve ORDER BY level"
+        )
+        if not curve_rows:
+            return {"config_id": prefab_id, "star": star, "level": 0}
+
+        try:
+            from equip_service import EquipService
+
+            exp = max(0, int(total_exp or 0))
+            level, _, _ = EquipService(db=self).calc_equip_level(
+                variant, exp, max_lv=max_lv, db=self
+            )
+            level = max(0, min(int(max_lv), int(level)))
+        except (TypeError, ValueError, ImportError, AttributeError, KeyError, sqlite3.Error):
+            level = 0
+
+        return {"config_id": prefab_id, "star": star, "level": level}
+
     def get_inventory_items_view(self, uid):
         """反查玩家背包当前所有货币、素材与刻印持仓。"""
         uid = int(uid)
@@ -1668,14 +1748,20 @@ class GMReader:
         for r in m_rows:
             items.append({"id": r["id"], "num": r["num"], "type": "material"})
 
-        # 3. 刻印表
-        e_rows = self.query("SELECT id, equip_id, star, level FROM equip WHERE uid = ?", (uid,))
+        # 3. 刻印表：实例 id 与 prefab/config id 必须保持区分。
+        e_rows = self.query(
+            "SELECT id, prefab_id, exp, now_break_level FROM equip WHERE uid = ?",
+            (uid,),
+        )
         for r in e_rows:
+            progress = self._get_inventory_equip_progress(
+                r.get("prefab_id"), r.get("exp"), r.get("now_break_level")
+            )
             items.append({
-                "id": r.get("equip_id") or r.get("id"),
+                "id": progress["config_id"],
                 "instance_id": r.get("id"),
-                "star": r.get("star", 5),
-                "level": r.get("level", 60),
+                "star": progress["star"],
+                "level": progress["level"],
                 "type": "equip",
                 "num": 1,
             })

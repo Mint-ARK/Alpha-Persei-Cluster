@@ -16,6 +16,7 @@ import time
 
 from account_db import get_db, DEFAULT_DB  # noqa: E402
 from codec import encode, decode  # noqa: E402
+from enchant_slots_util import normalize_enchant_slots
 
 DEFAULT_UID = 2174928301  # 业务 UID（掩码随机 UID）
 
@@ -91,14 +92,9 @@ def gen_23009(pkt, db, uid):
     u = db.get("users", uid)
     if not u:
         return None
-    # hero_num 必须与 sc_14009 实际编码数一致（hero_codec 只编码有 hero_<id>.json 模板的英雄，
-    # 库 hero 表可能比模板多——直接用 hero_codec 的编码数，防客户端数据不一致卡死）
-    try:
-        import hero_codec as _hc
-        _rows = db.query("SELECT id FROM hero WHERE uid=? AND unlock=1", (uid,))
-        _n = sum(1 for r in _rows if _hc.has_hero_template(r["id"]))
-    except Exception:
-        _n = db.query("SELECT COUNT(*) AS n FROM hero WHERE uid=? AND unlock=1", (uid,))[0]["n"]
+    # 与完整英雄编码共用同一组已解锁角色，不依赖开发期展开模板。
+    import hero_codec as _hc
+    _n = _hc.count_hero_payload_records(db, uid)
     obj = {"nick": u.get("nick", ""), "total_exp": u.get("exp", 0),
            "hero_num": _n,
            "plot_progress": u.get("plot_progress") or 0,
@@ -204,6 +200,8 @@ def gen_sc_49003(uid, chapter_id, db=None):
 def gen_28001(pkt, db, uid):
     """生成全量任务列表 sc_28001 (登录洪流第 68 帧)"""
     db.check_and_refresh_periodic_tasks(uid)
+    from task_listener import sync_cleared_stage_tasks
+    sync_cleared_stage_tasks(db, uid)
     tasks = db.query(
         "SELECT task_id, progress, complete_flag, expired_ts FROM task WHERE uid=?",
         (uid,)
@@ -646,6 +644,9 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         touched = kw.get("touched_items")
         wl = kw.get("weapon_list")
         el = kw.get("equip_list")
+        if el:
+            el = [dict(e, enchant_slot_list=normalize_enchant_slots(e.get("enchant_slot_list")))
+                  for e in el]
         if touched is not None:
             bl = kw.get("back_home_list")
             if not touched and not wl and not el and not bl:
@@ -689,6 +690,8 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                         continue
 
                     if itype not in (1, 2, 3, 4, 5, 6, 8, 10, 11, 12, 13, 14, 17, 18, 20, 21, 22, 23, 25, 26, 27, 28, 29):
+                        if kw.get("strict"):
+                            raise ValueError(f"sc_17023 无法确认道具 {iid} 的类型")
                         continue
                     
                     bal = 0
@@ -724,6 +727,8 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                     
                     normal_items.append({"id": iid, "num": bal})
                 except Exception:
+                    if kw.get("strict"):
+                        raise
                     pass
             payload_dict = {}
             if normal_items:
@@ -1082,14 +1087,9 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         u = db.get("users", uid)
         if not u:
             return None
-        # 玩家信息补全（required 字段齐全，格式与素材还原体一致）：
-        # hero_num 与 sc_14009 实际编码数一致（hero_codec 只编有模板的英雄，防客户端不一致卡死）
-        try:
-            import hero_codec as _hc
-            _rows = db.query("SELECT id FROM hero WHERE uid=? AND unlock=1", (uid,))
-            _n = sum(1 for r in _rows if _hc.has_hero_template(r["id"]))
-        except Exception:
-            _n = db.query("SELECT COUNT(*) AS n FROM hero WHERE uid=? AND unlock=1", (uid,))[0]["n"]
+        # 与 sc_14009 采用相同记录选择规则。
+        import hero_codec as _hc
+        _n = _hc.count_hero_payload_records(db, uid)
         return encode("sc_23009", {
             "nick": u.get("nick", ""), "total_exp": u.get("exp", 0),
             "hero_num": _n,
@@ -1100,7 +1100,7 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         # 英雄列表库驱动：hero 表独立列 → 展开结构覆盖 → 编码（hero_codec）
         import hero_codec as _hc
         payload = _hc.build_hero_payload(db, uid)
-        return payload if payload else None
+        return payload
     if cmd == 68151:
         # 换装/场景卡池状态下发（默认诗蔻蒂换装子活动 4322201）
         state = db.get_skin_draw_pool_state(uid, 1001)
@@ -1281,8 +1281,9 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
             except Exception:
                 sub_list = []
 
-            if cur_ver == "311":
-                # 311 客户端版本自适应
+            is_theme44_plus = (version_cfg.get("theme_id", 43) >= 44)
+            if is_theme44_plus:
+                # Theme 44+ 客户端版本自适应 (311, 321, 322...)
                 if aid in all_pool_aids:
                     # 卡池活动（包括 Theme 44 的 4400301/4400303 与历史/229卡池）权威受控于在架状态
                     state = 1 if is_pool else 0
@@ -1309,7 +1310,7 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                     et = far_future_ts
                     sub_list = [4443301, 4443302, 4443303, 4443304]
                 elif aid == 4310001 or str(aid).startswith("43") or theme == 43:
-                    # 在 311 下关闭 Theme 43 专属大厅与剧情关卡活动，确保大厅入口完全切换至 Theme 44
+                    # 在 311/321 下关闭 Theme 43 专属大厅与剧情关卡活动，确保大厅入口完全切换至 Theme 44
                     state = 0
                 else:
                     if is_sub:
@@ -1339,8 +1340,8 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                 "sub_activity_id_list": sub_list
             })
 
-        # 311 版本核心活动保底补齐（防止数据库缺失记录导致客户端判断崩溃）
-        if cur_ver == "311":
+        # Theme 44+ 版本核心活动保底补齐（防止数据库缺失记录导致客户端判断崩溃）
+        if version_cfg.get("theme_id", 43) >= 44:
             for caid, cfg in theme44_config.items():
                 if caid not in seen_acts:
                     seen_acts.add(caid)
@@ -1364,10 +1365,11 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                         "sub_activity_id_list": list(cfg["sub_activity_id_list"])
                     })
 
+        is_t44 = (version_cfg.get("theme_id", 43) >= 44)
         for aid in needed_acts:
-            if cur_ver == "229" and aid in theme44_native_ids:
+            if not is_t44 and aid in theme44_native_ids:
                 continue
-            if cur_ver == "311" and (aid == 4310001 or str(aid).startswith("43")):
+            if is_t44 and (aid == 4310001 or str(aid).startswith("43")):
                 continue
             if aid not in seen_acts:
                 seen_acts.add(aid)
@@ -1382,9 +1384,9 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                 })
 
         for aid, pent in pool_act_map.items():
-            if cur_ver == "229" and aid in theme44_native_ids:
+            if not is_t44 and aid in theme44_native_ids:
                 continue
-            if cur_ver == "311" and aid == 4310001:
+            if is_t44 and aid == 4310001:
                 continue
             if aid not in seen_acts:
                 seen_acts.add(aid)
@@ -1461,7 +1463,6 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         #       f6 now_break_level, f7 enchant_slot_list{id,effect_list{id,level},preview_list{effect_list}},
         #       f8 race, f9 race_preview}
         # 保证每个装备至少下发 slot 1 和 slot 2（即使无词条），防止客户端进入洗练界面时访问 nil 崩溃
-        import json as _je
         target_eid = kw.get("equip_id")
         if target_eid:
             rows = db.query("SELECT * FROM equip WHERE uid=? AND id=?", (uid, int(target_eid)))
@@ -1469,30 +1470,7 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
             rows = db.query("SELECT * FROM equip WHERE uid=? ORDER BY id", (uid,))
         lst = []
         for r in rows:
-            slots = []
-            try:
-                _es = _je.loads(r.get("enchant_slots") or "[]")
-            except Exception:
-                _es = []
-            slot_map = {}
-            for s in (_es or []):
-                sid = int(s.get("id") or 1)
-                eff = [{"id": e.get("id"), "level": e.get("level")} for e in (s.get("effect_list") or []) if isinstance(e, dict) and e.get("id")]
-                raw_prev = s.get("preview_list") or []
-                prev = []
-                for p in raw_prev:
-                    if isinstance(p, list):
-                        p_eff = [{"id": pe.get("id"), "level": pe.get("level")} for pe in p if isinstance(pe, dict) and pe.get("id")]
-                        if p_eff:
-                            prev.append({"effect_list": p_eff})
-                    elif isinstance(p, dict) and p.get("id"):
-                        prev.append({"effect_list": [{"id": p.get("id"), "level": p.get("level", 1)}]})
-                slot_map[sid] = {"id": sid, "effect_list": eff, "preview_list": prev}
-            # 基础槽位 1 与 2 保底（客户端 EquipStruct.ParseServerData 依赖下发的 slot.id 初始化 enchant 与 enchant_preview 容器）
-            for base_sid in (1, 2):
-                if base_sid not in slot_map:
-                    slot_map[base_sid] = {"id": base_sid, "effect_list": [], "preview_list": []}
-            slots = sorted(slot_map.values(), key=lambda x: x["id"])
+            slots = normalize_enchant_slots(r.get("enchant_slots"))
             lst.append({
                 "equip_id": r.get("id"),
                 "prefab_id": r.get("prefab_id"),
@@ -1504,9 +1482,7 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                 "race": r.get("race_hero") or r.get("race") or 0,
                 "race_preview": r.get("race_preview") or 0,
             })
-        if lst:
-            return encode("sc_13009", {"equip_list": lst, "is_init": 0})
-        return None
+        return encode("sc_13009", {"equip_list": lst, "is_init": 0})
     if cmd == 46011:
         # 钥从实例库驱动（servant 表 → sc_46011 servant_list）
         # 协议：servant{uid 实例uid, id 配置id, stage 突破, is_locked}
@@ -1519,9 +1495,7 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                 "stage": r.get("stage") or 1,
                 "is_locked": r.get("is_locked") or 0,
             })
-        if lst:
-            return encode("sc_46011", {"servant_list": lst})
-        return None
+        return encode("sc_46011", {"servant_list": lst})
     if cmd == 50001:
         # 芯片解锁库驱动（统一委托给 ChipService -> sc_50001）
         from chip_service import ChipService
@@ -1798,26 +1772,26 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         from shop_service import ShopService
         import res_version_manager
         shop_cfg_data = ShopService.get_instance(db=db).get_shop_cfg_payload()
-        if res_version_manager.get_version_config(kw.get("res_version"))["version"] == "311":
-            dep_shops = set(res_version_manager.VERSION_CONFIGS["311"].get("deprecated_shops", []))
-            if "shop_item_cfg_list" in shop_cfg_data:
-                shop_cfg_data["shop_item_cfg_list"] = [
-                    s for s in shop_cfg_data["shop_item_cfg_list"]
-                    if int(s.get("shop_id", 0)) not in dep_shops
-                ]
+        ver_cfg = res_version_manager.get_version_config(kw.get("res_version"))
+        dep_shops = set(ver_cfg.get("deprecated_shops", []))
+        if dep_shops and "shop_item_cfg_list" in shop_cfg_data:
+            shop_cfg_data["shop_item_cfg_list"] = [
+                s for s in shop_cfg_data["shop_item_cfg_list"]
+                if int(s.get("shop_id", 0)) not in dep_shops
+            ]
         return encode("sc_20007", shop_cfg_data)
     if cmd == 20009:
         # 全量 116+ 商店购买状态与限购计数数据驱动 → sc_20009 (由 ShopService 统筹每日货架与刷新状态)
         from shop_service import ShopService
         import res_version_manager
         shop_data = ShopService.get_instance(db=db).get_shop_data_payload(uid)
-        if res_version_manager.get_version_config(kw.get("res_version"))["version"] == "311":
-            dep_shops = set(res_version_manager.VERSION_CONFIGS["311"].get("deprecated_shops", []))
-            if "shop_item_list" in shop_data:
-                shop_data["shop_item_list"] = [
-                    s for s in shop_data["shop_item_list"]
-                    if int(s.get("shop_id", 0)) not in dep_shops
-                ]
+        ver_cfg = res_version_manager.get_version_config(kw.get("res_version"))
+        dep_shops = set(ver_cfg.get("deprecated_shops", []))
+        if dep_shops and "shop_item_list" in shop_data:
+            shop_data["shop_item_list"] = [
+                s for s in shop_data["shop_item_list"]
+                if int(s.get("shop_id", 0)) not in dep_shops
+            ]
         return encode("sc_20009", shop_data)
     if cmd == 12029:
         # [2026-09-06 外围模块迁移] 大厅 BGM 登录推送动态化（原静态 blob id=4，

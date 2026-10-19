@@ -28,6 +28,90 @@ logger = logging.getLogger("hero_service")
 _SKIN_HERO_MAP = None
 _SKIN_SCENE_MAP = None
 _SKIN_PORTRAIT_MAP = None
+_WEAPON_MODULE_MAX_LEVELS = None
+_WEAPON_MODULE_RULES = None
+
+
+def _get_weapon_module_max_levels():
+    """Read the allowlist and exact module caps exported from WeaponModuleCfg.cost."""
+    global _WEAPON_MODULE_MAX_LEVELS
+    if _WEAPON_MODULE_MAX_LEVELS is None:
+        cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "weapon_module_cfg.json")
+        try:
+            with open(cfg_path, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+            roles = cfg.get("roles")
+            if not isinstance(roles, dict):
+                raise ValueError("roles must be an object")
+            parsed = {}
+            for hero_id, max_level in roles.items():
+                hid = int(hero_id)
+                cap = int(max_level)
+                if hid > 0 and cap > 0:
+                    parsed[hid] = cap
+            _WEAPON_MODULE_MAX_LEVELS = parsed
+        except Exception as exc:
+            logger.warning("加载 weapon_module_cfg.json 失败，武器模块升级按拒绝处理: %s", exc)
+            _WEAPON_MODULE_MAX_LEVELS = {}
+    return _WEAPON_MODULE_MAX_LEVELS
+
+
+def _get_weapon_module_rules():
+    """Packaged client conditions/costs; missing rules never mean free upgrades."""
+    global _WEAPON_MODULE_RULES
+    if _WEAPON_MODULE_RULES is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "weapon_module_cfg.json")
+        try:
+            with open(path, encoding="utf-8") as stream:
+                rules = json.load(stream).get("rules")
+            if not isinstance(rules, dict):
+                raise ValueError("missing module rules")
+            _WEAPON_MODULE_RULES = rules
+        except Exception as exc:
+            logger.warning("加载模组资格/消耗规则失败，拒绝操作: %s", exc)
+            _WEAPON_MODULE_RULES = {}
+    return _WEAPON_MODULE_RULES
+
+
+def _module_condition_met(db, uid, hero, condition):
+    """Mirror only verified client conditions using current persistent facts."""
+    kind = int(condition["type"])
+    params = condition["params"]
+    required = int(params[0])
+    if kind == 1001:
+        return int(hero.get("level") or 0) >= required
+    if kind == 1003:
+        return int(hero.get("star") or 0) >= required * 100
+    if kind == 1004:
+        return min(int(hero.get("clear_times") or 0), 100) >= required
+    if kind == 1007:
+        return int(hero.get("weapon_exp") or 0) >= int(condition["required_weapon_exp"])
+    if kind in (1011, 5002):
+        table = condition["stage_table"]
+        if table not in ("chapter", "stage_sub"):
+            raise OperationError(406, "模组关卡条件配置无效")
+        rows = db.query(f"SELECT clear_times FROM {table} WHERE uid=? AND id=?", (uid, required))
+        if not rows and table == "stage_sub":
+            rows = db.query("SELECT clear_times FROM chapter WHERE uid=? AND id=?", (uid, required))
+        return bool(rows and int(rows[0].get("clear_times") or 0) > 0)
+    if kind == 5001:
+        plots = condition["plot_ids"]
+        if not plots:
+            raise OperationError(406, "模组档案条件缺少剧情配置")
+        rows = db.query("SELECT video_list FROM hero_archive WHERE uid=? AND archive_id=?",
+                        (uid, int(condition["archive_id"])))
+        raw = rows[0].get("video_list") if rows else []
+        try:
+            viewed = json.loads(raw) if isinstance(raw, str) else (raw or [])
+            if not isinstance(viewed, list):
+                raise ValueError("invalid video list")
+            viewed = {int(value) for value in viewed}
+        except (ValueError, TypeError):
+            raise OperationError(406, "模组档案已读记录无效")
+        return all(int(plot) in viewed for plot in plots)
+    # 1048's HistoryData condition has no authoritative persistent producer yet.
+    # Never replace that history with a guessed module/mission flag.
+    raise OperationError(406, f"模组条件 {condition['id']} 尚无可验证的持久进度")
 
 def _get_skin_hero_map():
     global _SKIN_HERO_MAP
@@ -355,13 +439,17 @@ class HeroService:
         # 优先使用 InventoryService
         try:
             from inventory_service import InventoryService
+        except ModuleNotFoundError as exc:
+            if exc.name != "inventory_service":
+                raise
+        else:
             succ = InventoryService.cost_item(ctx, uid, iid, num)
-            if succ:
-                return
-        except Exception:
-            pass
+            if not succ:
+                raise OperationError(3, f"道具扣减失败或余额不足: id={iid} 需{num}")
+            return
 
-        # 安全回退本地执行
+        # Only absence of the inventory module permits this legacy path.
+        # An attempted debit must propagate failures to the outer transaction.
         db = getattr(ctx, "db", self.db)
         if not db:
             return
@@ -1229,16 +1317,66 @@ class HeroService:
         return {"hero_id": hid, "slot_id": sid, "skills": clean_skills}
 
     def level_up_module(self, ctx, uid, hero_id):
-        """同调武器模块升级：cs_14116 -> sc_14117"""
+        """同调模组首次开启及升级，按当前级别核任务/条件/费用。"""
         db = getattr(ctx, "db", self.db)
+        if db is None:
+            raise OperationError(406, "模组操作缺少数据库")
+        from account_db import savepoint_transaction
+        from operation_notifications import checkpoint_notifications, restore_notifications
+        from types import SimpleNamespace
+        context = ctx if ctx is not None else SimpleNamespace(db=db, touched_items=set())
+        checkpoint = checkpoint_notifications(context)
+        try:
+            with savepoint_transaction(db):
+                return self._apply_module_level(context, uid, hero_id)
+        except BaseException:
+            restore_notifications(context, checkpoint)
+            raise
+
+    def _apply_module_level(self, ctx, uid, hero_id):
+        db = ctx.db
         hid = int(hero_id)
-        hrow = db.query("SELECT weapon_module_level, module_level FROM hero WHERE uid=? AND id=?", (uid, hid))
+        hrow = db.query("SELECT * FROM hero WHERE uid=? AND id=?", (uid, hid))
         if not hrow:
             raise OperationError(406, f"英雄 {hid} 不存在")
-        cur_m_lv = int(hrow[0]["weapon_module_level"] or hrow[0]["module_level"] or 0)
+        if int(hrow[0].get("unlock") or 0) <= 0:
+            raise OperationError(406, f"英雄 {hid} 尚未解锁")
+        max_level = _get_weapon_module_max_levels().get(hid)
+        if max_level is None:
+            raise OperationError(406, f"英雄 {hid} 没有武器模块配置")
+        primary_module_level = hrow[0].get("weapon_module_level")
+        if primary_module_level is None:
+            # Legacy compatibility is valid only when the primary field has
+            # not been initialized. A stored zero is an authoritative lock.
+            primary_module_level = hrow[0].get("module_level")
+        cur_m_lv = int(primary_module_level or 0)
+        if cur_m_lv < 0 or cur_m_lv >= max_level:
+            raise OperationError(406, f"英雄 {hid} 武器模块已达到上限 {max_level}")
+        if cur_m_lv == 0:
+            assignment = hrow[0].get("weapon_module_assignment")
+            if assignment is None:
+                assignment = hrow[0].get("module_assignment")
+            if int(assignment or 0) <= 0:
+                raise OperationError(406, f"英雄 {hid} 模组初始任务尚未完成")
+        rules = _get_weapon_module_rules().get(str(hid))
+        if not isinstance(rules, list) or len(rules) != max_level:
+            raise OperationError(406, f"英雄 {hid} 模组资格/消耗配置缺失")
+        rule = rules[cur_m_lv]
+        for condition in rule["conditions"]:
+            if not _module_condition_met(db, uid, hrow[0], condition):
+                raise OperationError(406, f"英雄 {hid} 模组条件 {condition['id']} 未达成")
+        costs = rule["cost"]
+        if not costs or any(len(pair) != 2 or int(pair[0]) <= 0 or int(pair[1]) <= 0 for pair in costs):
+            raise OperationError(406, f"英雄 {hid} 模组消耗配置无效")
+        for item_id, count in costs:
+            self._deduct_item(ctx, uid, int(item_id), int(count))
         new_m_lv = cur_m_lv + 1
-        db.execute("UPDATE hero SET weapon_module_level=?, module_level=?, update_ts=? WHERE uid=? AND id=?",
-                   (new_m_lv, new_m_lv, int(time.time()), uid, hid))
+        changed = db.execute(
+            "UPDATE hero SET weapon_module_level=?, module_level=?, update_ts=? "
+            "WHERE uid=? AND id=? AND COALESCE(weapon_module_level,module_level,0)=?",
+            (new_m_lv, new_m_lv, int(time.time()), uid, hid, cur_m_lv))
+        if changed.rowcount != 1:
+            raise OperationError(406, "模组等级已变化，请刷新后重试")
         return {"hero_id": hid, "level": new_m_lv}
 
     # ==================== 7. 外观形态与个性化 (Customization & Chips) ====================
@@ -1525,15 +1663,18 @@ class HeroService:
 
     # ==================== 9. 下行推送与标准 GM 接口 (Frame & GM API) ====================
 
-    def build_hero_refresh_frames(self, ctx, uid, hero_id=None):
+    def build_hero_refresh_frames(self, ctx, uid, hero_id=None, *, strict=False):
         """
         统一角色养成原子差量刷新帧：
-        - sc_17023: 原子差量变动帧（变动的货币、道具、突破材料、钥从/刻印移除），必须优先于英雄帧与响应帧下发！
+        - sc_17023: 原子差量变动帧，先于本函数生成的英雄帧。
         - sc_14007: 英雄即时全量同步帧（技能、突破、等级等）
+        strict路径在提交前构建，必要帧失败向外传播；业务ACK相对位置须按客户端回调确定。
         """
         out = []
         db = getattr(ctx, "db", self.db)
         if not (db and uid):
+            if strict:
+                raise ValueError("必要角色刷新缺少数据库或uid")
             return out
 
         # 1. 优先调取通用 generator 刷新变动的资产与钥从 (sc_17023)，确保客户端原生数据先落地
@@ -1548,10 +1689,14 @@ class HeroService:
                 rem_wl = (rem_wl or []) + wl_from_del
 
             if touched is not None or rem_eq or rem_wl:
-                p_diff = _gen.gen_payload(17023, uid=uid, db=db, touched_items=(touched or set()), equip_list=rem_eq, weapon_list=rem_wl)
+                p_diff = _gen.gen_payload(17023, uid=uid, db=db, touched_items=(touched or set()), equip_list=rem_eq, weapon_list=rem_wl, strict=strict)
                 if p_diff:
                     out.append(DownFrame(17023, p_diff))
+                elif strict and (touched or rem_eq or rem_wl):
+                    raise ValueError("必要资产差量sc_17023为空")
         except Exception as e:
+            if strict:
+                raise
             logger.warning(f"生成原子差量帧 17023 异常: {e}")
 
         # 2. 刷新英雄自身全量数据 (sc_14007)
@@ -1561,7 +1706,11 @@ class HeroService:
                 hf = _hc.build_hero_14007_frame(db, uid, int(hero_id))
                 if hf:
                     out.append(hf)
+                elif strict:
+                    raise ValueError(f"必要角色刷新sc_14007为空: hero={hero_id}")
             except Exception as e:
+                if strict:
+                    raise
                 logger.warning(f"构建 sc_14007 异常: {e}")
 
         if hasattr(ctx, "pop_pending_frames"):

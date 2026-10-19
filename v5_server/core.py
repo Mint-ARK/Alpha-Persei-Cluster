@@ -24,6 +24,11 @@ import threading
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from operation_notifications import (
+    checkpoint_notifications, restore_notifications,
+    clear_instance_deletions, take_pending_frames,
+)
+
 import middleware as _mw  # noqa: E402
 from middleware import (  # noqa: E402
     CSRequest, DownFrame, CSResponse, HandlerCtx,
@@ -157,6 +162,12 @@ class Operation:
     cmd = None          # cs cmd（子类必须定义）
     sc = None           # 主响应 sc（错误回包用）
 
+    # Opt in only after auditing respond and its callees: preparing a response
+    # may read uncommitted SQL and drain operation notifications, but must not
+    # send messages or perform irreversible external work. Legacy operations
+    # keep their existing boundary until reviewed individually.
+    prepare_response_in_transaction = False
+
     # uid 走线程本地存储 —— OPERATIONS 注册表里存的是**单例实例**，而 server_net 是
     # ThreadingTCPServer 每连接一线程。若 uid 是普通实例属性，两个连接并发时
     # `op.uid = cs_req.uid` 会互相覆盖，玩家 A 的操作可能落到玩家 B 的 uid 上。
@@ -220,6 +231,7 @@ class Operation:
                 ctx.removed_equips.clear()
             else:
                 ctx.removed_equips = []
+            clear_instance_deletions(ctx)
             if hasattr(ctx, "pending_frames") and ctx.pending_frames is not None:
                 ctx.pending_frames.clear()
         data = self.parse(req, ctx)
@@ -773,25 +785,57 @@ class Core:
             except Exception as _lte:
                 ctx.log(f"[core] lazy_timer.pulse 执行异常: {_lte}", "WARN")
 
+        # 此时的摘要属于已完成的pulse，避免后续购买刷新把旧摘要排在新摘要之后。
+        pulse_mail_summaries = self._take_pending_mail_summaries(ctx)
+
         # 0. OPERATIONS：操作调度（玩家操作 → 解析/校验/计算/落库/双端响应）
         op = OPERATIONS.get(cs_req.cmd)
         if op is not None:
-            return self._run_operation(op, cs_req, ctx)
+            return self._finish_mail_summary_response(
+                self._run_operation(op, cs_req, ctx), ctx, pulse_mail_summaries)
         # 1-4. 响应调度（middleware 链）
         resp = _dispatch(cs_req, ctx)
         if getattr(ctx, "log", None):
             n = len(resp.frames) if resp is not None else 0
             src = (getattr(resp, "src", "") or "?") if resp is not None else "no-reply"
             ctx.log(f"cs_{cs_req.cmd} -> 响应 {n} 帧({src})", "DEBUG", module="CORE", cmd=cs_req.cmd, to_console=False)
-        return CoreResponse.from_cs_response(resp)
+        return self._finish_mail_summary_response(
+            CoreResponse.from_cs_response(resp), ctx, pulse_mail_summaries)
+
+    def _take_pending_mail_summaries(self, ctx):
+        pending = getattr(ctx, "pending_frames", None)
+        summaries = [f for f in (pending or []) if f.cmd == 30001]
+        if summaries:
+            pending[:] = [f for f in pending if f.cmd != 30001]
+        return summaries
+
+    def _finish_mail_summary_response(self, response, ctx, pulse_summaries=()):
+        """交付尚未消费的邮件摘要，包括普通心跳/无业务回执出口。"""
+        summaries = [*pulse_summaries, *self._take_pending_mail_summaries(ctx)]
+        # 操作生成的摘要晚于前置pulse，优先使用它，购买路径不重复推送。
+        if not any(f["sc"] == 30001 for f in response.frames):
+            if not summaries:
+                return response
+            frame = summaries[-1]
+            response.frames.insert(0, {"sc": frame.cmd, "payload": frame.payload,
+                                       "flag": frame.flag, "srv": frame.srv})
+            response.reply = True
+        return response
 
     def _run_operation(self, op, cs_req, ctx):
-        """执行操作：parse → validate → apply(事务) → respond。
-        任何环节 OperationError → 回 sc 错误帧（result=非0）。
-        未知异常 → 回滚 + 错误帧（操作不产生半状态）。"""
+        """Apply atomically; audited operations also prepare frames before commit.
+
+        SQL and operation notifications roll back on pre-commit failure. Legacy
+        post-commit response failures cannot undo SQL; never replay apply here.
+        Transport delivery and arbitrary Python/external side effects are not
+        made transactional by this boundary.
+        """
         sc = op.sc or cs_req.cmd
-        if hasattr(ctx, "reset_operation_state"):
-            ctx.reset_operation_state()
+        # dispatch already reset the previous request before the timer pulse.
+        # Keep legitimate pulse notifications; roll back only this operation's
+        # additions when its SQL transaction fails.
+        notification_checkpoint = checkpoint_notifications(ctx)
+        apply_committed = False
         try:
             op.uid = cs_req.uid  # 操作内可用 self.uid 取玩家 uid
             # 参数层防御：parse/validate 的任何异常 → 干净 code=2（缺参/格式错），
@@ -807,62 +851,35 @@ class Core:
             try:
                 with ctx.db.transaction() if ctx.db else _null_cm():
                     result = op.apply(data, ctx)
+                    if op.prepare_response_in_transaction:
+                        try:
+                            response = self._prepare_operation_response(op, cs_req, ctx, result, data)
+                        except OperationError:
+                            raise
+                        except Exception as exc:
+                            raise OperationError(1, f"响应准备失败: {exc}") from exc
+                apply_committed = True
             except OperationError:
                 raise
             except Exception as e:
                 raise OperationError(9, f"执行失败: {e}")
-            # 帧组装：以 op.respond 返回的动态帧为主，补充 skeleton 结构帧
-            sk = _mw.get_skeleton(cs_req.cmd)
-            op_frames = op.respond(result, data, ctx)  # 动态业务帧
-            if isinstance(op_frames, list):
-                op_list = op_frames
-            elif isinstance(op_frames, CSResponse):
-                op_list = op_frames.frames
-            else:
-                op_list = []
-
-            if not op_list:
-                resp = CSResponse([], reply=False, src="dynamic")
-            elif sk and sk.get("frames") and sk.get("reply") != "no":
-                frames = list(op_list)
-                covered_scs = {f.cmd for f in op_list}
-                # 补充 skeleton 中有但 op_list 未显式包含的兜底帧
-                for f in sk["frames"]:
-                    f_sc = int(f["sc"])
-                    if f_sc in covered_scs:
-                        continue
-                    # 语义互斥保护：若操作已返回材料原子差分帧 17023，不重复补充全量材料 17009
-                    if f_sc == 17009 and 17023 in covered_scs:
-                        continue
-                    # 任务进度帧保护：绝不向客户端下发 0 字节的 sc_28007 空帧（避免客户端触发无意义重算与振荡）
-                    if f_sc == 28007:
-                        continue
-                    if f.get("hex"):
-                        pl = bytes.fromhex(f["hex"])
-                    else:
-                        pl = _mw.fallback_payload(f_sc)
-                    if pl is None:
-                        continue
-                    frames.append(DownFrame(f_sc, pl, flag=int(f.get("flag", 0)), srv=f.get("srv")))
-                    covered_scs.add(f_sc)
-                resp = CSResponse(frames, src="dynamic")
-            else:
-                resp = CSResponse(op_list, src="dynamic")
-
-            # 提炼玩家物流操作动向日志（入库、消费、操作语义高亮）
-            import log_sifter
-            op_name = log_sifter.get_operation_name(cs_req.cmd, op)
-            details = log_sifter.extract_logistics_details(result, data)
-            logistics_line = log_sifter.build_logistics_line(cs_req.cmd, sc, cs_req.uid, op_name, details)
-            ctx.log(logistics_line, "INFO", module="LOGISTICS", cmd=cs_req.cmd, uid=cs_req.uid)
-            return CoreResponse.from_cs_response(resp)
+            if not op.prepare_response_in_transaction:
+                response = self._prepare_operation_response(op, cs_req, ctx, result, data)
+            self._log_operation(op, cs_req, ctx, result=result, data=data)
+            clear_instance_deletions(ctx)
+            return response
         except OperationError as e:
-            import log_sifter
-            op_name = log_sifter.get_operation_name(cs_req.cmd, op)
-            ctx.log(f"CS_{cs_req.cmd} -> SC_{sc} {op_name}校验拦截: code={e.code} ({e.msg})", "WARN", module="LOGISTICS", cmd=cs_req.cmd, uid=cs_req.uid)
+            if not apply_committed:
+                restore_notifications(ctx, notification_checkpoint)
+            self._log_operation(op, cs_req, ctx, error=e)
             payload = b"\x08" + _mw._varint(e.code & 0xFFFFFFFFFFFFFFFF)
             err_frames = []
-            if getattr(ctx, "removed_equips", None):
+            if not apply_committed:
+                err_frames.extend(
+                    {"sc": f.cmd, "payload": f.payload, "flag": f.flag, "srv": f.srv}
+                    for f in take_pending_frames(ctx)
+                )
+            if apply_committed and getattr(ctx, "removed_equips", None):
                 try:
                     import generator as _gen
                     p_diff = _gen.gen_payload(17023, uid=cs_req.uid, db=ctx.db, equip_list=ctx.removed_equips)
@@ -873,10 +890,81 @@ class Core:
             err_frames.append({"sc": sc, "payload": payload, "flag": 0, "srv": None})
             return CoreResponse(err_frames, reply=True, src="dynamic")
         except Exception as e:
+            if not apply_committed:
+                restore_notifications(ctx, notification_checkpoint)
+            self._log_operation(op, cs_req, ctx, error=e)
+            err_frames = []
+            if not apply_committed:
+                err_frames.extend(
+                    {"sc": f.cmd, "payload": f.payload, "flag": f.flag, "srv": f.srv}
+                    for f in take_pending_frames(ctx)
+                )
+            err_frames.append({"sc": sc, "payload": b"\x08\x01", "flag": 0, "srv": None})
+            return CoreResponse(err_frames, reply=True, src="dynamic")
+
+    def _prepare_operation_response(self, op, cs_req, ctx, result, data):
+        """Build the existing ordered frame set without sending it."""
+        sk = _mw.get_skeleton(cs_req.cmd)
+        op_frames = op.respond(result, data, ctx)
+        if isinstance(op_frames, list):
+            op_list = op_frames
+        elif isinstance(op_frames, CSResponse):
+            op_list = op_frames.frames
+        else:
+            op_list = []
+        if op.prepare_response_in_transaction:
+            sc = op.sc or cs_req.cmd
+            if sum(f.cmd == sc for f in op_list) != 1:
+                raise ValueError(f"必要回执 sc_{sc} 缺失或重复")
+        if not op_list:
+            resp = CSResponse([], reply=False, src="dynamic")
+        elif sk and sk.get("frames") and sk.get("reply") != "no":
+            frames = list(op_list)
+            covered_scs = {f.cmd for f in op_list}
+            for f in sk["frames"]:
+                f_sc = int(f["sc"])
+                if f_sc in covered_scs:
+                    continue
+                if f_sc == 17009 and 17023 in covered_scs:
+                    continue
+                if f_sc == 28007:
+                    continue
+                pl = bytes.fromhex(f["hex"]) if f.get("hex") else _mw.fallback_payload(f_sc)
+                if pl is None:
+                    continue
+                frames.append(DownFrame(f_sc, pl, flag=int(f.get("flag", 0)), srv=f.get("srv")))
+                covered_scs.add(f_sc)
+            resp = CSResponse(frames, src="dynamic")
+        else:
+            resp = CSResponse(op_list, src="dynamic")
+        response = CoreResponse.from_cs_response(resp)
+        if op.prepare_response_in_transaction:
+            for frame in response.frames:
+                if not isinstance(frame["payload"], (bytes, bytearray, memoryview)):
+                    raise TypeError(f"sc_{frame['sc']} payload must be bytes")
+                frame["payload"] = bytes(frame["payload"])
+        return response
+
+    def _log_operation(self, op, cs_req, ctx, result=None, data=None, error=None):
+        """Formatting/import failures are optional too, including error logging."""
+        try:
             import log_sifter
+            sc = op.sc or cs_req.cmd
             op_name = log_sifter.get_operation_name(cs_req.cmd, op)
-            ctx.log(f"CS_{cs_req.cmd} -> SC_{sc} {op_name}处理异常: {e}", "ERROR", module="LOGISTICS", cmd=cs_req.cmd, uid=cs_req.uid)
-            return CoreResponse([{"sc": sc, "payload": b"\x08\x01", "flag": 0, "srv": None}], reply=True, src="dynamic")
+            if error is None:
+                details = log_sifter.extract_logistics_details(result, data)
+                line = log_sifter.build_logistics_line(cs_req.cmd, sc, cs_req.uid, op_name, details)
+                level = "INFO"
+            elif isinstance(error, OperationError):
+                line = f"CS_{cs_req.cmd} -> SC_{sc} {op_name}校验拦截: code={error.code} ({error.msg})"
+                level = "WARN"
+            else:
+                line = f"CS_{cs_req.cmd} -> SC_{sc} {op_name}处理异常: {error}"
+                level = "ERROR"
+            ctx.log(line, level, module="LOGISTICS", cmd=cs_req.cmd, uid=cs_req.uid)
+        except Exception as exc:
+            ctx.log_failure_count = getattr(ctx, "log_failure_count", 0) + 1
+            ctx.last_log_failure = type(exc).__name__
 
     def handle(self, cmd, payload=b"", uid=0, conn=None, index=0, server_idx=0):
         """便捷入口：cmd + payload → CoreResponse（无 CSRequest 构造样板）。"""

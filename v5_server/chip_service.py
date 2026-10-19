@@ -88,24 +88,30 @@ class ChipService:
             return
         try:
             import inventory_service
+        except ModuleNotFoundError as exc:
+            if exc.name != "inventory_service":
+                raise
+        else:
+            # Once cost_item is called its outcome may include writes. Never
+            # debit again on an exception; let the caller's transaction roll back.
             succ = inventory_service.cost_item(ctx, uid, iid, cnt)
             if not succ:
                 t, have = inventory_service.get_item_balance(ctx, uid, iid)
                 raise OperationError(3, f"材料不足: 道具 {iid} 需 {cnt}，当前仅有 {have}")
-        except OperationError:
-            raise
-        except Exception:
-            db = self._get_db(ctx)
-            cat_rows = db.query("SELECT type FROM item_catalog WHERE id=?", (iid,))
-            itype = cat_rows[0].get("type") if cat_rows else None
-            tbl = "currency" if itype == 1 else "material"
-            rows = db.query(f"SELECT num FROM {tbl} WHERE uid=? AND id=?", (uid, iid))
-            have = rows[0]["num"] if rows else 0
-            if have < cnt:
-                raise OperationError(3, f"材料不足: 道具 {iid} 需 {cnt}，当前仅有 {have} ({tbl}表)")
-            db.execute(f"UPDATE {tbl} SET num=num-? WHERE uid=? AND id=?", (cnt, uid, iid))
-            if hasattr(ctx, "touched_items") and ctx.touched_items is not None:
-                ctx.touched_items.add(iid)
+            return
+
+        # Legacy compatibility only when inventory_service was never imported.
+        db = self._get_db(ctx)
+        cat_rows = db.query("SELECT type FROM item_catalog WHERE id=?", (iid,))
+        itype = cat_rows[0].get("type") if cat_rows else None
+        tbl = "currency" if itype == 1 else "material"
+        rows = db.query(f"SELECT num FROM {tbl} WHERE uid=? AND id=?", (uid, iid))
+        have = rows[0]["num"] if rows else 0
+        if have < cnt:
+            raise OperationError(3, f"材料不足: 道具 {iid} 需 {cnt}，当前仅有 {have} ({tbl}表)")
+        db.execute(f"UPDATE {tbl} SET num=num-? WHERE uid=? AND id=?", (cnt, uid, iid))
+        if hasattr(ctx, "touched_items") and ctx.touched_items is not None:
+            ctx.touched_items.add(iid)
 
     # =========================================================================
     # 1. 弥弥尔管理喵芯片子系统 (Mimir Kernel & Secondary Chips)

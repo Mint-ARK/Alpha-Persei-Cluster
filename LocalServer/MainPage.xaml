@@ -50,8 +50,8 @@
                                     <StackPanel Spacing="18">
                                         <!-- 第一层：服务标题与运行状态徽标 -->
                                         <Grid ColumnDefinitions="Auto, Auto, *">
-                                            <TextBlock Text="本地服务端运行时 (Local Server Runtime)" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
-                                            <Border Grid.Column="1" x:Name="StatusBadge" CornerRadius="12" Padding="12,3" Margin="14,0,0,0" Background="#26EF4444" VerticalAlignment="Center">
+                                            <TextBlock Text="本地服务端运行时" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <Border Grid.Column="1" x:Name="StatusBadge" CornerRadius="12" Padding="10,3" Margin="12,0,0,0" Background="#26EF4444" VerticalAlignment="Center">
                                                 <TextBlock x:Name="StatusText" Text="守护进程未运行" FontSize="12" Foreground="#EF4444" FontWeight="SemiBold"/>
                                             </Border>
                                         </Grid>
@@ -83,35 +83,35 @@
                                         </StackPanel>
 
                                         <!-- 第三层：服务组件状态矩阵卡片 -->
-                                        <Grid ColumnDefinitions="*, *, *, *, *">
-                                            <Border Grid.Column="0" Margin="0,0,8,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="14,10">
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock Text="8102 网关代理 (Gateway)" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
-                                                    <TextBlock x:Name="TxtGwPortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        <Grid ColumnDefinitions="*, *, *, *, *" ColumnSpacing="8">
+                                            <Border Grid.Column="0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="10,8">
+                                                <StackPanel Spacing="3">
+                                                    <TextBlock Text="8102 网关" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock x:Name="TxtGwPortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
                                                 </StackPanel>
                                             </Border>
-                                            <Border Grid.Column="1" Margin="4,0,4,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="14,10">
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock Text="8105 业务逻辑 (Core)" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
-                                                    <TextBlock x:Name="TxtGamePortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            <Border Grid.Column="1" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="10,8">
+                                                <StackPanel Spacing="3">
+                                                    <TextBlock Text="8105 核心" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock x:Name="TxtGamePortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
                                                 </StackPanel>
                                             </Border>
-                                            <Border Grid.Column="2" Margin="4,0,4,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="14,10">
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock Text="443 鉴权分发 (Auth/HTTPS)" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
-                                                    <TextBlock x:Name="TxtHttpsPortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            <Border Grid.Column="2" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="10,8">
+                                                <StackPanel Spacing="3">
+                                                    <TextBlock Text="443 鉴权" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock x:Name="TxtHttpsPortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
                                                 </StackPanel>
                                             </Border>
-                                            <Border Grid.Column="3" Margin="4,0,4,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="14,10">
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock Text="80 运维控制端 (Admin/HTTP)" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
-                                                    <TextBlock x:Name="TxtWebPortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            <Border Grid.Column="3" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="10,8">
+                                                <StackPanel Spacing="3">
+                                                    <TextBlock Text="80 运维" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock x:Name="TxtWebPortStatus" Text="空闲" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
                                                 </StackPanel>
                                             </Border>
-                                            <Border Grid.Column="4" Margin="8,0,0,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="14,10">
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock Text="CDN 缓存代理 (Storage Proxy)" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
-                                                    <TextBlock x:Name="TxtCdnStateStatus" Text="待命" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            <Border Grid.Column="4" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="10,8">
+                                                <StackPanel Spacing="3">
+                                                    <TextBlock Text="CDN 缓存" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock x:Name="TxtCdnStateStatus" Text="待命" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
                                                 </StackPanel>
                                             </Border>
                                         </Grid>
@@ -119,39 +119,57 @@
                                 </Border>
 
                                 <!-- 运行环境与安全基线简报 (流式均分两列) -->
-                                <Grid ColumnDefinitions="*, *">
+                                <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
                                     <!-- 客户端环境与协议基线 -->
-                                    <Border Grid.Column="0" Margin="0,0,10,0"
+                                    <Border Grid.Column="0"
                                             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                            BorderThickness="1" CornerRadius="12" Padding="20">
-                                        <StackPanel Spacing="12">
+                                            BorderThickness="1" CornerRadius="12" Padding="16,14">
+                                        <StackPanel Spacing="10">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <FontIcon Glyph="&#xE7FC;" FontSize="16" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"/>
-                                                <TextBlock Text="客户端运行环境与协议基线 (Client Runtime &amp; Protocol)" FontWeight="SemiBold" FontSize="14"/>
+                                                <FontIcon Glyph="&#xE7FC;" FontSize="15" Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"/>
+                                                <TextBlock Text="客户端运行环境与协议基线" FontWeight="SemiBold" FontSize="14"/>
                                             </StackPanel>
                                             <TextBlock x:Name="TxtDashClientDir" Text="客户端基准路径: 自动嗅探中..." FontSize="12" TextWrapping="Wrap"
                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            <TextBlock x:Name="TxtDashResVersion" Text="协议对齐基线: Build 229 (v5.2.1 兼容协议)" FontSize="12"
+                                            <TextBlock x:Name="TxtDashResVersion" Text="协议对齐基线: auto (客户端自动协商)" FontSize="12"
                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            <Button Click="OnGoSettingsClick" Content="配置环境参数 (Environment Settings)" HorizontalAlignment="Left" Style="{StaticResource DefaultButtonStyle}"/>
+                                            <Button Click="OnGoSettingsClick" Content="配置环境参数 (Settings)" HorizontalAlignment="Left" Style="{StaticResource DefaultButtonStyle}" Padding="12,6"/>
                                         </StackPanel>
                                     </Border>
 
                                     <!-- 根证书与安全状态 -->
-                                    <Border Grid.Column="1" Margin="10,0,0,0"
+                                    <Border Grid.Column="1"
                                             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                            BorderThickness="1" CornerRadius="12" Padding="20">
-                                        <StackPanel Spacing="12">
+                                            BorderThickness="1" CornerRadius="12" Padding="16,14">
+                                        <StackPanel Spacing="10">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <FontIcon Glyph="&#xE72E;" FontSize="16" Foreground="#10B981"/>
-                                                <TextBlock Text="本地自签名 CA 根证书 (Local CA Certificate Chain)" FontWeight="SemiBold" FontSize="14"/>
+                                                <FontIcon Glyph="&#xE72E;" FontSize="15" Foreground="#10B981"/>
+                                                <TextBlock Text="本地自签名 CA 根证书" FontWeight="SemiBold" FontSize="14"/>
                                             </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                                <Button x:Name="BtnQuickInstallCert" Click="OnInstallCertClick" Content="安装 CA 根证书至系统存储区 (Install Root CA)"/>
-                                                <Button x:Name="BtnQuickRegenerateCert" Click="OnRegenerateCertClick" Content="重新生成证书 (Regenerate Cert)"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <Border x:Name="BadgeCertStatus" CornerRadius="10" Padding="8,2" Background="#2610B981" VerticalAlignment="Center">
+                                                    <TextBlock x:Name="TxtCertStatus" Text="状态检测中..." FontSize="11" FontWeight="SemiBold" Foreground="#10B981"/>
+                                                </Border>
+                                                <TextBlock x:Name="TxtCertThumbprint" Text="" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                             </StackPanel>
+                                            <Grid ColumnDefinitions="*, *" ColumnSpacing="8">
+                                                <Button Grid.Column="0" x:Name="BtnQuickCheckCert" Click="OnCheckCertClick" HorizontalAlignment="Stretch" Padding="6,7"
+                                                        ToolTipService.ToolTip="检查当前根证书、服务证书及 Windows 游戏握手信任链">
+                                                    <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+                                                        <FontIcon Glyph="&#xE73E;" FontSize="12" />
+                                                        <TextBlock Text="检查证书状态" FontSize="12"/>
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button Grid.Column="1" x:Name="BtnQuickRedeployCert" Click="OnRedeployCertClick" HorizontalAlignment="Stretch" Padding="6,7"
+                                                        ToolTipService.ToolTip="修复并部署游戏握手证书；根证书变化时需在 iOS 重新安装描述文件">
+                                                    <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+                                                        <FontIcon Glyph="&#xE777;" FontSize="12" />
+                                                        <TextBlock Text="重新部署并安装根证书" FontSize="12"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
                                         </StackPanel>
                                     </Border>
                                 </Grid>
@@ -254,7 +272,7 @@
                                         BorderThickness="1" CornerRadius="10" Padding="18">
                                     <StackPanel Spacing="10">
                                         <TextBlock Text="🎮 客户端安装基准路径 (Client Deployment Directory)" FontWeight="SemiBold" FontSize="14"/>
-                                        <TextBlock Text="服务端只读比对客户端 StreamingAssets 下的 AssetHash 校验清单以自动协商协议版本 (Build 229 / 311)，不修改客户端任何文件。"
+                                        <TextBlock Text="服务端只读比对客户端 StreamingAssets 下的 AssetHash 校验清单以自动协商协议版本 (Build 229 / 311 / 321+ 两级基线)，不修改客户端任何文件。"
                                                    FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                         <Grid ColumnDefinitions="*, Auto, Auto">
                                             <TextBox x:Name="TxtClientPath" Margin="0,0,8,0" PlaceholderText="例如: D:\AtherGazer\AetherGazerLauncher\AetherGazer"/>
@@ -290,10 +308,11 @@
                                         <TextBlock Text="🏷️ 资产清单协商策略 (Asset Manifest Alignment Policy)" FontWeight="SemiBold" FontSize="14"/>
                                         <TextBlock Text="指定服务端对外分发的资源哈希基线版本。建议选择 auto 模式以自动与客户端探测版本保持一致。"
                                                    FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                        <ComboBox x:Name="CmbResVersion" SelectedIndex="0" Width="340">
+                                        <ComboBox x:Name="CmbResVersion" SelectedIndex="0" Width="360" SelectionChanged="OnResVersionSelectionChanged">
                                             <ComboBoxItem Content="auto (自动按客户端清单协商 · 推荐)" Tag="auto"/>
-                                            <ComboBoxItem Content="Build 229 (v5.2.1 协议基线)" Tag="229"/>
-                                            <ComboBoxItem Content="Build 311 (v5.3.0 协议基线)" Tag="311"/>
+                                            <ComboBoxItem Content="Build 229 (v5.2.1 兼容基线 · Theme 43)" Tag="229"/>
+                                            <ComboBoxItem Content="Build 311 (v5.3.0 演进基线 · Theme 44)" Tag="311"/>
+                                            <ComboBoxItem Content="Build 321 (v5.3.1 官方最新 · Theme 44)" Tag="321"/>
                                         </ComboBox>
                                     </StackPanel>
                                 </Border>
@@ -304,11 +323,11 @@
                                         BorderThickness="1" CornerRadius="10" Padding="18">
                                     <StackPanel Spacing="10">
                                         <TextBlock Text="🛡️ 本地自签名 CA 根证书 (Local CA Certificate Chain)" FontWeight="SemiBold" FontSize="14"/>
-                                        <TextBlock Text="将服务端颁发的自签名根证书 (sdk_ca.crt) 导入 Windows 受信任根证书颁发机构存储区，确立 SSL/TLS 安全通信信任链。"
+                                        <TextBlock Text="启动时检查游戏握手证书与 Windows 信任链；网络变化或续期保持根证书不变。重新部署若更换了根证书，iOS 需重新安装描述文件并开启完全信任。"
                                                    FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                         <StackPanel Orientation="Horizontal" Spacing="10">
-                                            <Button Click="OnInstallCertClick" Content="安装 CA 根证书至系统存储区 (certutil)" Style="{StaticResource AccentButtonStyle}"/>
-                                            <Button Click="OnRegenerateCertClick" Content="重新生成证书 (Windows / iPhone)"/>
+                                            <Button Click="OnCheckCertClick" Content="检查证书状态 (Check Status)" Style="{StaticResource AccentButtonStyle}"/>
+                                            <Button Click="OnRedeployCertClick" Content="重新部署并安装根证书 (Redeploy &amp; Install)"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>

@@ -17,6 +17,7 @@ main.py — V5 服务器入口（模块装配）
   python main.py --self-check       # 自检退出
 """
 import argparse
+from ipaddress import IPv4Address
 import os
 import struct
 import sys
@@ -82,6 +83,13 @@ def build_core(db=None, generator=None, codec_encode=None, codec_decode=None, lo
     return core
 
 
+def _check_protocol_assets(encoder):
+    """在打开数据库或监听端口前校验网关所需的协议定义。"""
+    for message in ("sc_10039", "sc_10043"):
+        if encoder(message, {"result": 1}) != b"\x08\x01":
+            raise RuntimeError(f"协议数据缺失或不可用: {message}，请检查 lua_proto_messages.json")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="V5 模块化服务器（MAIN 装配）")
     ap.add_argument("--host-ip", default="", help="宿主机局域网 IP（默认自动检测真实 LAN IPv4）")
@@ -90,7 +98,9 @@ def main(argv=None):
     ap.add_argument("--game-port", type=int, default=8105, help="game TCP 端口")
     ap.add_argument("--capture-cdn", action="store_true", default=True, help="开启官方 CDN 资源智能穿透与抓包（默认开启）")
     ap.add_argument("--no-capture-cdn", action="store_true", help="强制禁用官方 CDN 抓包（纯离线模式）")
-    ap.add_argument("--dns", action="store_true", help="启动内置轻量 UDP:53 DNS 服务器（需管理员权限）")
+    ap.add_argument("--dns", action="store_true", help="启动内置轻量 UDP/TCP:53 DNS 服务器（需管理员权限）")
+    ap.add_argument("--dns-upstream", action="append", type=IPv4Address, metavar="IPv4",
+                    help="DNS 转发上游，可重复指定；本机代理改写公共 DNS 时可指定局域网路由器")
     ap.add_argument("--replay", default="", metavar="素材目录",
                     help="激活重放模块并指定素材目录（如 archive/20260805_全流程_服务器2_蒂卡拉/complete_replay）")
     ap.add_argument("--frame-delay", type=float, default=0.001, help="重放帧间延迟")
@@ -99,8 +109,10 @@ def main(argv=None):
                     help="UDP 动态战斗服端口（0=禁用；sc_54007 下发给客户端）")
     ap.add_argument("--db", default=os.environ.get("ACCOUNT_DB_PATH", "account.db"),
                     help="指定挂载的数据库文件路径或名称 (默认: account.db)")
-    ap.add_argument("--res-version", choices=["auto", "229", "311"], default="auto",
-                    help="指定客户端分发资源版本 (默认: auto 优先自动对齐客户端目录版本, 可选: 229, 311)")
+    ap.add_argument("--res-version", default="auto",
+                    help="指定客户端分发资源版本 (默认: auto 优先自动对齐客户端目录版本, 可选: 229, 311, 321 或已注册版本)")
+    ap.add_argument("--check-update", action="store_true", help="主动检查官方服务器最新版本及差异文件并退出")
+    ap.add_argument("--sync-update", action="store_true", help="主动检查并下载官方最新版本资源与清单并退出")
     ap.add_argument("--client-assets-dir", default="",
                     help="指定客户端 StreamingAssets 资源目录（用于自动版本探测，留空使用默认官方路径）")
     ap.add_argument("--log-level", choices=["DEBUG", "INFO", "WARN", "ERROR"],
@@ -109,10 +121,25 @@ def main(argv=None):
     ap.add_argument("--self-check", action="store_true", help="自检并退出")
     args = ap.parse_args(argv)
 
+    if args.check_update:
+        import res_version_manager
+        res_version_manager.check_and_print_update(sync=False)
+        sys.exit(0)
+
+    if args.sync_update:
+        import res_version_manager
+        res_version_manager.check_and_print_update(sync=True)
+        sys.exit(0)
+
     import logger as _logger
     _logger.set_level(args.log_level)
 
     v5_dir = os.path.dirname(os.path.abspath(__file__))
+
+    try:
+        _check_protocol_assets(_enc)
+    except Exception as exc:
+        ap.error(f"协议资源校验失败，未打开数据库或监听端口: {exc}")
 
     # 确定权威数据库挂载路径（默认使用 account.db 生产库）
     target_db = args.db
@@ -303,6 +330,7 @@ def main(argv=None):
     import cdn_proxy
     host_ip = args.host_ip.strip() if args.host_ip else gen_cert.get_default_lan_ip()
     server_net.set_host_ip(host_ip)
+    cdn_proxy.set_source_ip(host_ip)
 
     if args.no_capture_cdn:
         cdn_proxy.set_capture_enabled(False)
@@ -335,12 +363,15 @@ def main(argv=None):
 
     # 自动校验与生成 ATS 合规双层证书与 iPhone 描述文件（若已有对应证书则不主动生成）
     v5_dir = os.path.dirname(os.path.abspath(__file__))
-    gen_cert.generate_dual_layer_certs(output_dir=v5_dir, extra_ips=[host_ip], log=log, force=False)
+    if not gen_cert.generate_dual_layer_certs(output_dir=v5_dir, extra_ips=[host_ip], log=log, force=False):
+        log("证书准备失败，请在启动壳重新部署证书后再启动。", module="CERT")
+        return 1
 
     # 启动可选内置 DNS 服务
     if args.dns:
         import dns_server
-        dns_server.start_dns_service(host_ip=host_ip, log=log)
+        upstreams = [(str(ip), 53) for ip in args.dns_upstream] if args.dns_upstream else None
+        dns_server.start_dns_service(host_ip=host_ip, log=log, upstreams=upstreams)
 
     # 装配数据库 + CORE
     db = get_db(target_db)
@@ -428,7 +459,7 @@ def main(argv=None):
         battle_srv = _bs.BattleServer(
             args.battle_port,
             log=lambda *a, **k: log(*a, module="BATTLE"),
-            server_ts=lambda: int(time.time()),
+            server_ts=time.time,
             bind_host="0.0.0.0")
         # 132 结果由战斗服内部登记（get_result/pop_battle_result 取用），
         # 客户端战毕必然回发 cs_54032 → h_54032 结算引擎被动应答，无需 UDP 线程推 TCP

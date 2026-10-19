@@ -26,6 +26,8 @@ from inventory_service import InventoryService, ItemType
 from core import OperationError
 from lazy_timer import get_daily_5am_ts, get_weekly_mon_5am_ts, get_monthly_5am_ts
 from periodic_gift_service import PeriodicGiftService
+from enchant_slots_util import normalize_enchant_slots
+from operation_notifications import checkpoint_notifications, restore_notifications
 
 logger = logging.getLogger("shop_service")
 
@@ -620,6 +622,19 @@ class ShopService:
         return {cid: total}
 
     def buy_goods(self, ctx, uid, shop_id, buy_goods_list, buy_source=0):
+        """直接服务调用也与Core一样，保证费用、赠品、履约和限购同一事务。"""
+        db = getattr(ctx, "db", None) or self.db
+        if db is None or self.db is not db:
+            raise OperationError(9, "商店数据库上下文不一致")
+        checkpoint = checkpoint_notifications(ctx)
+        try:
+            with db.transaction():
+                return self._buy_goods(ctx, uid, shop_id, buy_goods_list, buy_source)
+        except BaseException:
+            restore_notifications(ctx, checkpoint)
+            raise
+
+    def _buy_goods(self, ctx, uid, shop_id, buy_goods_list, buy_source=0):
         """
         商城物品购买统一引擎：
         1. 严格校验阶梯前置 (pre_goods_id)、限购与库存；
@@ -643,6 +658,12 @@ class ShopService:
         cost_items = []
         touched_heroes = set()
         touched_scene = False
+        granted_equips = []
+
+        def grant_shop_items(item_list, source):
+            summary = InventoryService.grant_items(ctx, uid, item_list, source=source)
+            granted_equips.extend(summary.get("equips") or [])
+            return summary
 
         for b in buy_goods_list:
             gid = int(b.get("buy_id") or b.get("goods_id") or 0)
@@ -784,11 +805,14 @@ class ShopService:
                 imme_items = periodic_cfg.get("imme_items") or []
                 for rw_id, rw_cnt in imme_items:
                     total_give = int(rw_cnt) * buy_num
-                    InventoryService.grant_items(ctx, uid, [(rw_id, total_give)], source="periodic_gift_imme")
+                    grant_shop_items([(rw_id, total_give)], source="periodic_gift_imme")
                     give_items.append({"item_id": rw_id, "item_num": total_give})
 
-                # 广播 PERIODIC_GIFT_BUY 事件，由 PeriodicGiftService 激活生命周期并立即派发首日邮件
+                # 订阅及首日邮件是必要交付，必须向购买事务传播失败。
                 actual_desc_id = int(periodic_cfg.get("id") or desc_target or item_target or gid)
+                if pg_svc.on_gift_buy(ctx, uid, gid, actual_desc_id, buy_num) is not True:
+                    raise OperationError(9, "周期礼包必要履约失败")
+                # 只通知可选观察者；旧激活订阅已解除，不能再次创建订阅。
                 bus.emit(
                     Events.PERIODIC_GIFT_BUY,
                     ctx,
@@ -810,7 +834,7 @@ class ShopService:
                             already_owned = bool(existing)
                         if already_owned:
                             # 礼包内重复皮肤自动分解为 1000 移转之辉 (ID 1)
-                            InventoryService.grant_items(ctx, uid, [(1, 1000 * total_give)], source="skin_duplicate_breakdown")
+                            grant_shop_items([(1, 1000 * total_give)], source="skin_duplicate_breakdown")
                             give_items.append({"item_id": 1, "item_num": 1000 * total_give})
                         else:
                             if self.db:
@@ -827,7 +851,7 @@ class ShopService:
                             already_owned = bool(existing)
                         if already_owned:
                             # 礼包内重复场景自动分解为 500 移转之辉 (ID 1)
-                            InventoryService.grant_items(ctx, uid, [(1, 500 * total_give)], source="scene_duplicate_breakdown")
+                            grant_shop_items([(1, 500 * total_give)], source="scene_duplicate_breakdown")
                             give_items.append({"item_id": 1, "item_num": 500 * total_give})
                         else:
                             if self.db:
@@ -837,7 +861,7 @@ class ShopService:
                             touched_scene = True
                             give_items.append({"item_id": rw_id, "item_num": total_give})
                     else:
-                        InventoryService.grant_items(ctx, uid, [(rw_id, total_give)], source="shop_buy")
+                        grant_shop_items([(rw_id, total_give)], source="shop_buy")
                         give_items.append({"item_id": rw_id, "item_num": total_give})
             elif target_scene:
                 # 单独场景解锁与重复获取分解检测
@@ -847,7 +871,7 @@ class ShopService:
                     already_owned = bool(existing)
                 if already_owned:
                     # 重复场景自动分解为 500 移转之辉 (ID 1)
-                    InventoryService.grant_items(ctx, uid, [(1, 500 * give_num)], source="scene_duplicate_breakdown")
+                    grant_shop_items([(1, 500 * give_num)], source="scene_duplicate_breakdown")
                     give_items.append({"item_id": 1, "item_num": 500 * give_num})
                 else:
                     if self.db:
@@ -865,7 +889,7 @@ class ShopService:
                     already_owned = bool(existing)
                 if already_owned:
                     # 重复皮肤自动分解为 1000 移转之辉 (ID 1)
-                    InventoryService.grant_items(ctx, uid, [(1, 1000 * give_num)], source="skin_duplicate_breakdown")
+                    grant_shop_items([(1, 1000 * give_num)], source="skin_duplicate_breakdown")
                     give_items.append({"item_id": 1, "item_num": 1000 * give_num})
                 else:
                     if self.db:
@@ -878,7 +902,7 @@ class ShopService:
             else:
                 real_target = item_target or give_target or desc_target
                 if real_target:
-                    InventoryService.grant_items(ctx, uid, [(real_target, give_num)], source="shop_buy")
+                    grant_shop_items([(real_target, give_num)], source="shop_buy")
                     give_items.append({"item_id": real_target, "item_num": give_num})
 
             # 5. 更新限购记录 store_purchase
@@ -920,9 +944,35 @@ class ShopService:
             "result": 0,
             "give_items": give_items,
             "cost_items": cost_items
-        }) or b"\x08\x00"
+        })
+        if not p20013:
+            raise ValueError("必要商店购买回执 sc_20013 为空")
 
-        frames = [DownFrame(20013, p20013)]
+        # New equip instances must reach client memory before the purchase
+        # callback reads its inventory. The returned summary is only a record
+        # of the instances created above; do not grant them a second time.
+        equip_list = []
+        seen_equip_ids = set()
+        for equip in granted_equips:
+            equip_id = int(equip.get("id") or equip.get("equip_id") or 0)
+            if equip_id <= 0 or equip_id in seen_equip_ids:
+                continue
+            seen_equip_ids.add(equip_id)
+            equip_list.append({
+                "equip_id": equip_id,
+                "prefab_id": int(equip.get("prefab_id") or 0),
+                "num": 1,
+                "enchant_slot_list": normalize_enchant_slots(equip.get("enchant_slot_list")),
+                "race": int(equip.get("race") or 0),
+            })
+
+        frames = []
+        if equip_list:
+            equip_payload = encode("sc_17023", {"equip_list": equip_list})
+            if not equip_payload:
+                raise RuntimeError("商店刻印发放后无法编码 sc_17023 差量帧")
+            frames.append(DownFrame(17023, equip_payload))
+        frames.append(DownFrame(20013, p20013))
 
         # 追加 sc_20005 商店变动帧（仅常规代币货架商店需下发；充值礼包/补给商店严禁下发，以防客户端 SingleShopUpdate 遍历非 ShopCfg 道具崩溃）
         if sid in NORMAL_SHOP_IDS and sid != 3:

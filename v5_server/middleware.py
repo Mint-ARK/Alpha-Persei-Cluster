@@ -19,6 +19,7 @@ import json
 from logger import log as _file_log  # noqa: E402
 import schema_default as _sd  # noqa: E402  兜底响应的字段补齐器
 import battle_payload  # 动态战斗初始化帧构建器
+from enchant_slots_util import default_slot_list
 
 
 def fallback_payload(sc_cmd, values=None):
@@ -143,7 +144,10 @@ class HandlerCtx:
         self.codec_encode = codec_encode    # codec.encode
         self.codec_decode = codec_decode    # codec.decode
         # 默认落盘日志器；外部可注入自定义 log（测试/对接时）
-        self.log = log or (lambda msg, level="INFO", **kw: _file_log(msg, level, **kw))
+        self._log_sink = log or (lambda msg, level="INFO", **kw: _file_log(msg, level, **kw))
+        self.log_failure_count = 0
+        self.last_log_failure = None
+        self.log = self._safe_log
         # 战斗链路状态（连接级）
         self.battle_id = [None]             # sc_54035 生成 → cs_54032 校验/回显
         self.battle_stage = [0]             # cs_54034 解析 → sc_54033 的 dest
@@ -156,7 +160,21 @@ class HandlerCtx:
         # 操作级道具变动原子追踪集（sc_17023 差量推送）与事件待发帧队列
         self.touched_items = set()
         self.removed_equips = []
+        self.removed_weapons = []
+        self.deleted_servants = []
         self.pending_frames = []
+
+    def _safe_log(self, *args, **kwargs):
+        """Optional logging must never change the outcome of an operation.
+
+        Keep a bounded diagnostic on the connection if the sink is unavailable;
+        do not retry through the same failing sink or retain request contents.
+        """
+        try:
+            return self._log_sink(*args, **kwargs)
+        except Exception as exc:
+            self.log_failure_count += 1
+            self.last_log_failure = type(exc).__name__
 
     def append_frame(self, frame):
         """添加异步待下发帧（如任务进度广播 sc_28007）"""
@@ -173,6 +191,8 @@ class HandlerCtx:
         """重置单次操作级状态（防止跨请求累积泄漏导致客户端重复删除/Lua崩溃）"""
         self.touched_items.clear()
         self.removed_equips.clear()
+        self.removed_weapons.clear()
+        self.deleted_servants.clear()
         self.pending_frames.clear()
 
     # ---- payload 加载器（素材提取，惰性） ----
@@ -1058,7 +1078,10 @@ def _parse_battle_common(req, ctx):
             out["battle_times"] = int(ci.get("battle_times") or 1)
             out["type"] = int(ci.get("type") or 0)
             out["cooperate_skill"] = int(ci.get("cooperate_unique_skill_id") or 0)
-            out["mimir_info"] = ci.get("mimir_info")
+            mimir = ci.get("mimir_info") or {}
+            if isinstance(mimir, list):
+                mimir = next((item for item in mimir if isinstance(item, dict)), {})
+            out["mimir_info"] = mimir if isinstance(mimir, dict) else {}
             for h in (ci.get("hero_list") or []):
                 # 实测（两次失败抓包 cs_54030）hero_list[].hero_base_info 是裸 varint
                 # hero_id（schema 标注的嵌套 hero_base_net_rec 与线上格式不符），两种都兼容
@@ -1515,7 +1538,7 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                                                 "equip_id": eq["id"],
                                                 "prefab_id": eq["prefab_id"],
                                                 "num": 1,
-                                                "enchant_slot_list": [],
+                                                "enchant_slot_list": default_slot_list(),
                                                 "race": 0,
                                             })
                                 except Exception:
@@ -1532,7 +1555,7 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                                             "equip_id": new_eid,
                                             "prefab_id": prefab_id,
                                             "num": 1,
-                                            "enchant_slot_list": [],
+                                            "enchant_slot_list": default_slot_list(),
                                             "race": 0,
                                         })
                                         import event_bus as _eb
@@ -2307,12 +2330,14 @@ def h_54032(req, ctx):
         result = int(res_obj or 1)
         b_info = {}
 
-    if "br" in session and "extra" in session:
-        br, extra = session["br"], session["extra"]
+    if "br" in session:
+        # 只重放不可变结算回执。extra 含库存/角色/图鉴/活动等绝对状态，
+        # 再次发送会覆盖此后发生的变化；更新状态也不能重新执行结算发奖。
+        # 兼容旧会话中仍有 extra 的情况，但不再读取或重发它。
+        br, extra = session["br"], []
     else:
         br, extra = _settle_frames(ctx, req.uid, bid, result, dest, times=times, heroes=heroes, battle_info=b_info, stage_type=stage_type, activity_id=activity_id)
         session["br"] = br
-        session["extra"] = extra
     _p33 = ctx.codec_encode("sc_54033", {"result": 0, "battle_result": br}) or b"\x08\x00"
     ctx.log(f"cs_54032 -> 结算 bid={bid} result={result} dest={dest} 掉落组={len(br['all_drop_list'])} 三星={br.get('star_list')}")
     return CSResponse(extra + [DownFrame(54033, _p33)])
@@ -2399,6 +2424,20 @@ def h_63000(req, ctx):
             ctx.log(f"[reserve] cs_63000 写库失败: {e}", "WARN")
     ctx.log(f"cs_63000 -> 保存编队 team_type={req_data.get('team_type', 0)}")
     return CSResponse([DownFrame(63001, b"\x08\x00")])
+
+
+def h_63010(req, ctx):
+    """保存自定义编队方案，只有成功提交后才回复 result=0。"""
+    from formation_codec import FormationCodecError, save_formation
+    try:
+        save_formation(ctx.db, req.uid, req.payload)
+    except FormationCodecError as exc:
+        ctx.log(f"[formation] cs_63010 参数无效: {exc}", "WARN")
+        return CSResponse([DownFrame(63011, b"\x08\x02")])
+    except Exception as exc:
+        ctx.log(f"[formation] cs_63010 保存失败: {exc}", "ERROR")
+        return CSResponse([DownFrame(63011, b"\x08\x09")])
+    return CSResponse([DownFrame(63011, b"\x08\x00")])
 
 
 def h_63006(req, ctx):
@@ -3362,7 +3401,7 @@ _CS2SC = {
     58002: 58003, 28014: 28015, 62012: 62013, 16010: 16011, 91002: 91003,
     91016: 91017, 91006: 91007, 91014: 91015, 28010: 28011, 54034: 54035,
     54032: 54033, 43002: 43003, 54030: 54031, 54038: 54039, 56002: 56002,
-    63000: 63001, 15016: 15017, 17012: 17013, 12046: 12047, 24014: 24015,
+    63000: 63001, 63010: 63011, 15016: 15017, 17012: 17013, 12046: 12047, 24014: 24015,
     12002: 12003, 52004: 52005, 52014: 52015, 52016: 52017, 52018: 52019,
     52022: 52023, 12026: 12027, 14104: 14105, 14106: 14107, 14108: 14109,
     73016: 73017, 73020: 73021, 73014: 73015, 73012: 73013, 73022: 73023,
@@ -3652,6 +3691,7 @@ CORE_HANDLERS = {
     54038: h_54038,   # 扫荡
     56002: h_56002,   # 红点已读上报（写库+回空包）
     63000: h_63000,   # 保存编队（写库+sc_63001）
+    63010: h_63010,   # 自定义方案持久化（写库+sc_63011）
     63006: h_63006,   # 上阵即存（关卡现役编队原子保存，Push 单向）
     15016: h_15016,   # 移转之辉兑换体力（sc_15017+sc_15007+sc_15009）
     17012: h_17012,   # 使用道具/体力药（sc_17013+sc_17009+sc_15009）

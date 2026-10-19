@@ -11,10 +11,13 @@ recharge_service.py — 充值发货与累计充值服务中枢 (Recharge & Pay 
 """
 import copy
 import json
+import logging
 import os
 import re
 import threading
 import time
+
+logger = logging.getLogger("recharge_service")
 
 # 基础内置充值商品配置（对齐官方 PaymentCfg.lua）
 DEFAULT_PAYMENT_CFG = {
@@ -83,13 +86,44 @@ class RechargeService:
             return cls._instance
 
     def _load_configs_from_lua(self):
-        """尝试从 decompiled_v2 配置表中加载全量配置以扩充内置词典。"""
+        """加载包内累充快照，再兼容开发树中的 Lua 配置。"""
         v5_dir = os.path.dirname(os.path.abspath(__file__))
         decomp_dir = os.path.join(os.path.dirname(v5_dir), "decompiled_v2", "x64", "game", "config")
 
-        # 1. 加载 TotalRechargeCfg.lua
-        tr_path = os.path.join(decomp_dir, "TotalRechargeCfg.lua")
-        if os.path.isfile(tr_path):
+        # 1. 包内快照是安装包没有 decompiled_v2 时的权威配置来源。
+        snapshot_path = os.path.join(v5_dir, "total_recharge_cfg.json")
+        if os.path.isfile(snapshot_path):
+            try:
+                with open(snapshot_path, "r", encoding="utf-8") as f:
+                    snapshot = json.load(f)
+                if int(snapshot.get("source", {}).get("version") or 0) != 2:
+                    raise ValueError("total_recharge_cfg.json version must be 2")
+                snapshot_cfg = {}
+                for tier in snapshot.get("tiers") or []:
+                    rid = int(tier["id"])
+                    num = int(tier["num"])
+                    rewards = tier["reward"]
+                    if rid <= 0 or num < 0 or not isinstance(rewards, list):
+                        raise ValueError(f"invalid total recharge tier: {rid}")
+                    normalized_rewards = []
+                    for item in rewards:
+                        iid = int(item["id"])
+                        inum = int(item["num"])
+                        if iid <= 0 or inum < 0:
+                            raise ValueError(f"invalid reward in total recharge tier: {rid}")
+                        normalized_rewards.append({"id": iid, "num": inum})
+                    snapshot_cfg[rid] = {"id": rid, "num": num, "reward": normalized_rewards}
+                if not snapshot_cfg:
+                    raise ValueError("total_recharge_cfg.json contains no tiers")
+                self.total_recharge_cfg.update(snapshot_cfg)
+            except Exception as exc:
+                logger.warning("加载包内 total_recharge_cfg.json 失败: %s", exc)
+
+        # 2. 开发环境仍从 Lua 加载；同时兼容 Linux 上实际的小写文件名。
+        tr_path = next((os.path.join(decomp_dir, name) for name in
+                        ("TotalRechargeCfg.lua", "totalrechargecfg.lua")
+                        if os.path.isfile(os.path.join(decomp_dir, name))), None)
+        if tr_path and os.path.isfile(tr_path):
             try:
                 with open(tr_path, "r", encoding="utf-8", errors="ignore") as f:
                     content = f.read()
@@ -471,8 +505,11 @@ class RechargeService:
         all_rewards = []
 
         for item_id in id_list:
-            bid = int(item_id)
-            if bid in claimed:
+            try:
+                bid = int(item_id)
+            except (TypeError, ValueError):
+                continue
+            if bid in claimed or bid not in self.total_recharge_cfg:
                 continue
             tier = self.get_total_recharge_tier(bid)
             # 档位门槛金额（元/积分）<= 累充积分（元/积分）
@@ -494,7 +531,7 @@ class RechargeService:
         return {
             "result": 0,
             "reward_list": all_rewards,
-            "id_list": id_list  # 按照官方客户端习惯，回显请求的 id_list
+            "receive_total_recharge_list": sorted(claimed)
         }
 
     def handle_claim_version_bonus(self, db, uid: int, id_list: list, log=print) -> dict:
@@ -507,8 +544,11 @@ class RechargeService:
         all_rewards = []
 
         for item_id in id_list:
-            bid = int(item_id)
-            if bid in claimed:
+            try:
+                bid = int(item_id)
+            except (TypeError, ValueError):
+                continue
+            if bid in claimed or bid not in self.total_recharge_cfg:
                 continue
             tier = self.get_total_recharge_tier(bid)
             if tier["num"] <= cur_limit_points:
@@ -528,8 +568,7 @@ class RechargeService:
         return {
             "result": 0,
             "reward_list": all_rewards,
-            "id_list": id_list,
-            "receive_time_limit_recharge_list": recharge_data["claimed_limit_bonus"]
+            "receive_time_limit_recharge_list": sorted(claimed)
         }
 
 

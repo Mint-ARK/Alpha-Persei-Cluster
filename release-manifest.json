@@ -1,0 +1,89 @@
+{
+  "release": "v5.0.1",
+  "completed_at": "2026-10-19T20:51:02.676593+08:00",
+  "artifacts": [
+    {
+      "name": "AetherGazer_Server_v5.0_Portable.zip",
+      "size_bytes": 282513812,
+      "sha256": "5441c9eb0c8fb21bb53fc69cf1da10b720df92b71548bea11599052825f7f73f"
+    },
+    {
+      "name": "AetherGazer_Server_v5.0_Setup.exe",
+      "size_bytes": 206627551,
+      "sha256": "7401df3fcf8b77c64fc44d899f8b8241e83b30370f43a2c4591cccd9519ee215"
+    },
+    {
+      "name": "AetherGazer_Server_v5_Release.zip",
+      "size_bytes": 160220741,
+      "sha256": "5f19c989f9c034fa519c417aacef9299b82e616664f15eed6396a82879721472"
+    }
+  ],
+  "validation": {
+    "zip_crc_inventory_sha256": true,
+    "required_protocol_and_config": true,
+    "isolated_payload_probe": {
+      "tls_handshakes": [
+        "open.ys4fun.com",
+        "127.0.0.1"
+      ],
+      "version_responses": [
+        {
+          "version": "229",
+          "platform": "pc",
+          "version_name": "v5.2.1"
+        },
+        {
+          "version": "229",
+          "platform": "ios",
+          "version_name": "v5.2.1"
+        },
+        {
+          "version": "229",
+          "platform": "android",
+          "version_name": "v5.2.1"
+        },
+        {
+          "version": "311",
+          "platform": "pc",
+          "version_name": "v5.3.0"
+        },
+        {
+          "version": "311",
+          "platform": "ios",
+          "version_name": "v5.3.0"
+        },
+        {
+          "version": "311",
+          "platform": "android",
+          "version_name": "v5.3.0"
+        },
+        {
+          "version": "321",
+          "platform": "pc",
+          "version_name": "v5.3.1"
+        },
+        {
+          "version": "321",
+          "platform": "ios",
+          "version_name": "v5.3.1"
+        },
+        {
+          "version": "321",
+          "platform": "android",
+          "version_name": "v5.3.1"
+        }
+      ],
+      "codec_roundtrip": true,
+      "issue2_sc10039_decode": true,
+      "mail_templates_loaded": 333,
+      "shell_version_poll_quiet": true
+    },
+    "native_gui_installation_tested": false,
+    "full_game_regression_tested": false
+  },
+  "distribution": {
+    "game_resources_included": false,
+    "original_ios311_manifest_included": false,
+    "separate_distribution_certificates": true
+  }
+}

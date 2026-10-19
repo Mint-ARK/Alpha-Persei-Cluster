@@ -19,11 +19,15 @@ cdn_proxy.py — 深空之眼 高性能流式 CDN 资源穿透与动态抓包拦
    - 完美适配 Unity WebRequest 分片、断点续传及多线程下载。
 """
 import http.client
+import hashlib
+import ipaddress
 import json
 import os
+import re
 import shutil
 import socket
 import ssl
+import struct
 import sys
 import threading
 import time
@@ -61,21 +65,24 @@ def _resolve_platform_dir(platform_name: str, legacy_drive_dir: str = "") -> str
     r"""
     确定平台 CDN 资源存储目录，优先级：
     1. 平台专属环境变量 CDN_<PLATFORM>_DIR
-    2. 全局 CDN 根目录配置 (server_config.json 或 CDN_CACHE_DIR)
-    3. 历史专属盘目录 (D:\<PLATFORM>_DATA，若已存在)
+    2. 历史专属盘目录 (D:\<PLATFORM>_DATA，若已存在且有内容，最高优先级)
+    3. 全局 CDN 根目录配置 (server_config.json 或 CDN_CACHE_DIR)
     4. 兜底相对路径: server/cdn_cache/<platform>
     """
     env_key = f"CDN_{platform_name.upper()}_DIR"
     if os.environ.get(env_key):
         return os.environ[env_key]
 
+    # 优先使用已经沉淀海量完整资源的专属盘 (D:\PC_DATA, D:\iOS_DATA, D:\Android_DATA)
+    if legacy_drive_dir and os.path.exists(legacy_drive_dir):
+        return legacy_drive_dir
+
     root = _get_configured_cdn_root()
     if root:
         return os.path.join(root, platform_name)
 
-    if legacy_drive_dir and os.path.exists(legacy_drive_dir):
-        return legacy_drive_dir
     return os.path.join(_SERVER_DIR, "cdn_cache", platform_name)
+
 
 PLATFORM_DIRS = {
     "pc": _resolve_platform_dir("pc", r"D:\PC_DATA"),
@@ -106,6 +113,7 @@ _CAPTURE_ENABLED = True
 _AUTO_CACHE_FALLBACK = True
 _DNS_CACHE = {}
 _DNS_LOCK = threading.Lock()
+_SOURCE_IP = None
 
 # 官方常用域名备用静态 IP（防止极端情况下 DoH 不可用）
 FALLBACK_IPS = {
@@ -195,11 +203,77 @@ def set_capture_enabled(val: bool):
     print(f"[CDN_PROXY] 抓包器状态已更新为: {'[已开启]' if _CAPTURE_ENABLED else '[已关闭]'}", flush=True)
 
 
+def _is_public_ipv4(value):
+    try:
+        address = ipaddress.ip_address(value)
+        return address.version == 4 and address.is_global
+    except ValueError:
+        return False
+
+
+def set_source_ip(value):
+    """使用 main 已确认的 LAN 地址，不更改系统路由或代理。"""
+    address = ipaddress.IPv4Address(value)
+    if address.is_unspecified or address.is_loopback or address in ipaddress.IPv4Network("198.18.0.0/15"):
+        raise ValueError("CDN 出站地址必须是本机真实 LAN 地址")
+    global _SOURCE_IP
+    _SOURCE_IP = str(address)
+    with _DNS_LOCK:
+        _DNS_CACHE.clear()
+
+
+def _source_ip():
+    if _SOURCE_IP:
+        return _SOURCE_IP
+    import gen_cert
+    return gen_cert.get_default_lan_ip()
+
+
+def _resolve_lan_dns_ipv4(host):
+    # 使用既有 DNS 报文校验/出站绑定，排除 TUN fake-IP 与 hosts 回环。
+    import dns_server
+    source = _source_ip()
+    resolver = dns_server.DnsServer(source, upstream_bind_ip=source)
+    question = (host, 1, 1)
+    packet = struct.pack("!HHHHHH", time.time_ns() & 0xFFFF, 0x0100, 1, 0, 0, 0)
+    packet += dns_server._encoded_question(question)
+    for upstream in resolver.upstreams:
+        try:
+            response = resolver._exchange(packet, upstream, False)
+            if response[3] & 15:
+                continue
+            _, offset = dns_server.parse_domain(response)
+            offset += 4
+            ips = []
+            for _ in range(struct.unpack_from("!H", response, 6)[0]):
+                _, offset = dns_server.parse_domain(response, offset)
+                kind, cls, _, length = struct.unpack_from("!HHIH", response, offset)
+                offset += 10
+                if kind == 1 and cls == 1 and length == 4:
+                    value = socket.inet_ntoa(response[offset:offset + 4])
+                    if _is_public_ipv4(value) and value not in ips:
+                        ips.append(value)
+                offset += length
+            if ips:
+                return ips
+        except (OSError, ValueError, struct.error):
+            continue
+    return []
+
+
 def resolve_doh(host):
-    """通过 DoH 解析真实公网 IPv4，绕过本地 hosts。"""
+    """先物理 LAN DNS，再 DoH；只接受真实公网 IPv4。"""
     with _DNS_LOCK:
         if host in _DNS_CACHE and _DNS_CACHE[host]:
-            return _DNS_CACHE[host]
+            cached = [value for value in _DNS_CACHE[host] if _is_public_ipv4(value)]
+            if cached:
+                return cached
+
+    ips = _resolve_lan_dns_ipv4(host)
+    if ips:
+        with _DNS_LOCK:
+            _DNS_CACHE[host] = ips
+        return ips
 
     doh_urls = [
         f"https://dns.alidns.com/resolve?name={host}&type=A",
@@ -208,20 +282,19 @@ def resolve_doh(host):
     ]
 
     ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), urllib.request.HTTPSHandler(context=ctx))
 
     ips = []
     for u in doh_urls:
         try:
             req = urllib.request.Request(u, headers={"User-Agent": "curl/8.0"})
-            with urllib.request.urlopen(req, context=ctx, timeout=3) as resp:
+            with opener.open(req, timeout=3) as resp:
                 if resp.status == 200:
                     j = json.loads(resp.read().decode("utf-8"))
                     for a in j.get("Answer", []):
                         if a.get("type") == 1 and a.get("data"):
                             ip = a["data"].strip()
-                            if not ip.startswith("127.") and not ip.startswith("0."):
+                            if _is_public_ipv4(ip):
                                 ips.append(ip)
             if ips:
                 break
@@ -229,53 +302,72 @@ def resolve_doh(host):
             continue
 
     if not ips and host in FALLBACK_IPS:
-        ips = list(FALLBACK_IPS[host])
+        ips = [value for value in FALLBACK_IPS[host] if _is_public_ipv4(value)]
 
     if ips:
         with _DNS_LOCK:
             _DNS_CACHE[host] = ips
         return ips
-    return ["183.204.11.49"]
+    raise OSError(f"无法解析可信官方公网地址: {host}")
 
 
 def create_direct_socket(target_ip, port=443, timeout=30):
     """创建直接物理局域网网卡直连 Socket，绕过 Clash TUN 虚拟网卡环回拦截。"""
+    if not _is_public_ipv4(target_ip):
+        raise OSError(f"拒绝将官方请求发送到非公网地址: {target_ip}")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        import gen_cert
-        local_ip = gen_cert.get_default_lan_ip()
-        if local_ip and not local_ip.startswith("127.") and not local_ip.startswith("198.18."):
-            sock.bind((local_ip, 0))
+        sock.bind((_source_ip(), 0))
+        sock.settimeout(timeout)
+        sock.connect((target_ip, port))
+        return sock
     except Exception:
-        pass
-    sock.settimeout(timeout)
-    sock.connect((target_ip, port))
-    return sock
+        sock.close()
+        raise
 
 
 def find_cached_file(filename: str, platform: str = "pc"):
-    """在指定平台的专属存储目录与备用目录查找本地已存在的文件。
-    优先级：
+    r"""在指定平台的专属存储目录与备用目录查找本地已存在的文件。
+    级联多级回退检索池：
     1. static_resources/<platform>/ （优先下发标准清单与平台特化配置）
-    2. static_resources/ 根目录
-    3. 平台专属数据目录（cdn_cache/<platform> 或 D:\\<PLATFORM>_DATA）
+    2. static_resources/ 根目录 (非 .ys 配置文件)
+    3. 平台当前专属主数据目录 (get_data_dir，默认优先指向 D:\<PLATFORM>_DATA)
+    4. 历史专属盘目录 (D:\PC_DATA, D:\iOS_DATA, D:\Android_DATA，严格物理分盘隔离)
+    5. 本地相对缓存目录 server/cdn_cache/<platform>
+    6. 提取差分目录 D:\DIFF_ASSETS_307_229_vs_311
     """
-    # 1. static_resources/<platform>/ (例如 static_resources/ios/)
-    cand1 = os.path.join(DEFAULT_STATIC_DIR, platform, filename)
-    if os.path.isfile(cand1) and os.path.getsize(cand1) > 0:
-        return cand1
-
-    # 2. static_resources/ 根目录（仅允许通用配置文件如 html/json，严禁 .ys 跨平台资产匹配）
+    plat = platform.lower() if platform else "pc"
+    candidates = [
+        os.path.join(DEFAULT_STATIC_DIR, plat, filename),
+    ]
     if not filename.endswith(".ys"):
-        cand2 = os.path.join(DEFAULT_STATIC_DIR, filename)
-        if os.path.isfile(cand2) and os.path.getsize(cand2) > 0:
-            return cand2
+        candidates.append(os.path.join(DEFAULT_STATIC_DIR, filename))
 
-    # 3. 当前平台专属数据目录 (D:\PC_DATA 或 D:\iOS_DATA，严格物理分盘隔离)
-    plat_dir = get_data_dir(platform)
-    cand3 = os.path.join(plat_dir, filename)
-    if os.path.isfile(cand3) and os.path.getsize(cand3) > 0:
-        return cand3
+    plat_dir = get_data_dir(plat)
+    if plat_dir:
+        candidates.append(os.path.join(plat_dir, filename))
+
+    legacy_map = {
+        "pc": r"D:\PC_DATA",
+        "ios": r"D:\iOS_DATA",
+        "android": r"D:\Android_DATA",
+    }
+    leg = legacy_map.get(plat)
+    if leg:
+        candidates.append(os.path.join(leg, filename))
+
+    candidates.append(os.path.join(_SERVER_DIR, "cdn_cache", plat, filename))
+
+    for c in candidates:
+        if c and os.path.isfile(c) and os.path.getsize(c) > 0:
+            return c
+
+    # 若仍未命中，尝试在 D:\DIFF_ASSETS_307_229_vs_311 中查找
+    diff_root = r"D:\DIFF_ASSETS_307_229_vs_311"
+    if os.path.isdir(diff_root):
+        diff_cand = os.path.join(diff_root, "v229", filename)
+        if os.path.isfile(diff_cand) and os.path.getsize(diff_cand) > 0:
+            return diff_cand
 
     return None
 
@@ -342,12 +434,10 @@ def stream_upstream_and_cache(path, host="download-eo.ys4fun.com", query="", hea
     platform = get_platform_from_path(path, headers)
     target_dir = get_data_dir(platform)
     final_file = os.path.join(target_dir, fn)
-    part_file = os.path.join(target_dir, f"{fn}.{os.getpid()}_{int(time.time()*1000)}.part")
+    part_file = os.path.join(target_dir, f"{fn}.{os.getpid()}_{time.time_ns()}.part")
 
     ips = resolve_doh(host)
     ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
 
     full_path = path + (f"?{query}" if query else "")
     req_headers = {
@@ -407,15 +497,27 @@ def stream_upstream_and_cache(path, host="download-eo.ys4fun.com", query="", hea
     # 过程日志写入全量底账文件，不污染控制台
     log(f"开始流式抓取 ({platform.upper()}): {fn} (status={status_code}, len={content_len_hdr or 'chunked'}B)...", "DEBUG", module="CDN", to_console=False)
 
-    # 仅当捕获完整文件（200 或 Range=0-）时才落盘为完整文件
-    can_cache_full = (status_code == 200) or (range_header and range_header.startswith("bytes=0-"))
+    # 根据响应 Content-Range 判断完整性，不能把请求 bytes=0-1023 当成全文件。
+    range_size = None
+    full_range = re.fullmatch(r"bytes 0-(\d+)/(\d+)", content_range or "")
+    if full_range and int(full_range[1]) + 1 == int(full_range[2]):
+        range_size = int(full_range[2])
+    can_cache_full = status_code == 200 or (status_code == 206 and range_size is not None
+                                          and (expected_len is None or expected_len == range_size))
+    hash_match = re.fullmatch(r"([0-9a-fA-F]{32})\.ys", fn)
+    if hash_match is None:
+        hash_match = re.fullmatch(r"assethash_\d+_\d+_([0-9a-fA-F]{32})\.bytes", fn)
+    expected_md5 = hash_match[1].lower() if hash_match else None
 
     def _stream_gen():
         total_downloaded = 0
         part_fp = None
+        reached_eof = False
+        write_ok = True
+        digest = hashlib.md5()
         if can_cache_full:
             try:
-                part_fp = open(part_file, "wb")
+                part_fp = open(part_file, "xb")
             except Exception as e:
                 log(f"无法创建临时落盘文件 {part_file}: {e}", "WARN", module="CDN", to_console=False)
                 part_fp = None
@@ -424,13 +526,16 @@ def stream_upstream_and_cache(path, host="download-eo.ys4fun.com", query="", hea
             while True:
                 chunk = u_resp.read(UPSTREAM_CHUNK_SIZE)
                 if not chunk:
+                    reached_eof = True
                     break
                 total_downloaded += len(chunk)
+                digest.update(chunk)
                 if part_fp:
                     try:
                         part_fp.write(chunk)
-                    except Exception:
-                        pass
+                    except Exception as error:
+                        write_ok = False
+                        log(f"抓取写入失败，保留未完成文件: {part_file}: {error}", "WARN", module="CDN")
                 yield chunk
         finally:
             if part_fp:
@@ -438,7 +543,7 @@ def stream_upstream_and_cache(path, host="download-eo.ys4fun.com", query="", hea
                     part_fp.flush()
                     part_fp.close()
                 except Exception:
-                    pass
+                    write_ok = False
 
             if conn:
                 try:
@@ -448,19 +553,20 @@ def stream_upstream_and_cache(path, host="download-eo.ys4fun.com", query="", hea
 
             # 校验并原子重命名
             if can_cache_full and os.path.isfile(part_file):
-                if expected_len is None or total_downloaded >= expected_len:
+                expected_total = range_size if status_code == 206 else expected_len
+                complete = (reached_eof and write_ok
+                            and (expected_total is None or total_downloaded == expected_total)
+                            and os.path.getsize(part_file) == total_downloaded
+                            and (expected_md5 is None or digest.hexdigest() == expected_md5))
+                if complete:
                     rename_ok = False
                     try:
+                        if os.path.exists(final_file):
+                            shutil.copy2(final_file, f"{final_file}.before_capture_{time.time_ns()}")
                         os.replace(part_file, final_file)
                         rename_ok = True
-                    except Exception:
-                        try:
-                            if os.path.exists(final_file):
-                                os.remove(final_file)
-                            os.rename(part_file, final_file)
-                            rename_ok = True
-                        except Exception as re2:
-                            log(f"重命名落盘异常: {re2}", "WARN", module="CDN")
+                    except Exception as error:
+                        log(f"抓取发布失败，原件及part保留: {error}", "WARN", module="CDN")
                     if rename_ok:
                         # 流程完毕直接在控制台输出单行干净的人机日志
                         summary = log_sifter.asset_flow_shaper.format_asset_finished(
@@ -468,11 +574,7 @@ def stream_upstream_and_cache(path, host="download-eo.ys4fun.com", query="", hea
                         )
                         _logger_log(summary, "INFO", module="CDN")
                 else:
-                    # 未下载完整则清理
-                    try:
-                        os.remove(part_file)
-                    except Exception:
-                        pass
+                    log(f"抓取未完整或校验失败，保留part且不发布: {part_file}", "WARN", module="CDN")
 
     resp = Response(_stream_gen(), status=status_code, mimetype=content_type)
     if content_len_hdr:
@@ -490,8 +592,6 @@ def fetch_upstream(host, path, query="", headers=None, method="GET", body=None, 
     """单次短请求官方接口穿透（供 updateversion/getLatest 等小 JSON 接口使用）。"""
     ips = resolve_doh(host)
     ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
 
     full_path = path + (f"?{query}" if query else "")
     req_headers = {

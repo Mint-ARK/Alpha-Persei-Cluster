@@ -7,8 +7,7 @@ periodic_gift_service.py — 周期连续时间礼包领域服务 (PeriodicGiftS
 
 【架构链路】：
   ShopService (购买触发) 
-      └──> EventBus.emit(Events.PERIODIC_GIFT_BUY)
-              └──> PeriodicGiftService.on_gift_buy
+      └──> PeriodicGiftService.on_gift_buy（必要履约，失败传播）
                       ├──> 入库 user_periodic_gift (订阅激活)
                       └──> 首日邮件立即下发 (剩余 total_days - 1 天)
 
@@ -26,6 +25,8 @@ import json
 import time
 import datetime
 import logging
+from contextlib import contextmanager
+from account_db import savepoint_transaction
 
 from event_bus import bus, Events
 from mail_service import MailService
@@ -35,6 +36,13 @@ logger = logging.getLogger("periodic_gift")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CATALOG_PATH = os.path.join(BASE_DIR, "periodic_gift_catalog.json")
+
+
+@contextmanager
+def _gift_delivery_scope(db):
+    """嵌套时也能独立撤销本批邮件，避免上层通知总线吞错后提交半批。"""
+    with savepoint_transaction(db):
+        yield
 
 
 class PeriodicGiftService:
@@ -99,11 +107,13 @@ class PeriodicGiftService:
         3. 立即下发第 1 天配额邮件，并将剩余天数置为 total_days - 1；
         4. 标记 last_dispatch_date 为当日 5am 周期。
         """
-        _db = self._get_db()
+        _db = self._get_db(getattr(ctx, "db", None))
         if not _db:
-            logger.error("[PeriodicGiftService] 无法获取数据库连接")
-            return False
+            raise ValueError("周期礼包激活缺少数据库")
+        with _gift_delivery_scope(_db):
+            return self._activate_gift(uid, goods_id, desc_id, buy_num, _db)
 
+    def _activate_gift(self, uid, goods_id, desc_id, buy_num, _db):
         cfg = self.get_gift_cfg(desc_id) or self.get_gift_cfg(goods_id)
         if not cfg:
             logger.warning(f"[PeriodicGiftService] 未找到周期礼包元数据: goods_id={goods_id}, desc_id={desc_id}")
@@ -114,6 +124,8 @@ class PeriodicGiftService:
         cur_date = datetime.datetime.fromtimestamp(cur_5am).strftime("%Y-%m-%d")
 
         total_days = int(cfg.get("total_days") or 0)
+        if total_days <= 0 or int(buy_num or 1) <= 0:
+            raise ValueError("周期礼包天数或购买数量无效")
         template_id = int(cfg.get("template_id") or 0)
         daily_items = cfg.get("daily_items") or []
         daily_json = json.dumps(daily_items, ensure_ascii=False)
@@ -143,7 +155,7 @@ class PeriodicGiftService:
             desc = raw_desc.replace("%s", str(remain_days))
             sender = mtpl.get("mail_sender") or "深空之眼第九部门"
 
-            mail_svc.send_mail(
+            mail_id = mail_svc.send_mail(
                 uid=uid,
                 title=title,
                 content=desc,
@@ -152,6 +164,8 @@ class PeriodicGiftService:
                 template_id=template_id,
                 db=_db
             )
+            if int(mail_id or 0) <= 0:
+                raise ValueError("周期礼包首日邮件未创建")
             logger.info(f"[PeriodicGiftService] 成功激活订阅并派发首日邮件: uid={uid}, desc_id={desc_id}, 剩余天数={remain_days}")
 
         return True
@@ -161,19 +175,37 @@ class PeriodicGiftService:
         每日 05:00 跨天重置或玩家登录脉冲时触发：
         检查所有处于生效中 (status=1) 的周期礼包订阅，按日推演补发当日配额邮件。
         """
-        _db = self._get_db()
+        _db = self._get_db(getattr(ctx, "db", None))
         if not _db:
-            return
+            raise ValueError("周期礼包每日派发缺少数据库")
+        with _gift_delivery_scope(_db):
+            sent = self._dispatch_daily(uid, now_ts, _db)
+        # 在线摘要仅在本批履约确认后生成；登录前置无出站队列，沿登录洪流读SQL。
+        if sent and callable(getattr(ctx, "append_frame", None)):
+            try:
+                generator = getattr(ctx, "generator", None)
+                if generator is not None:
+                    from middleware import DownFrame
+                    payload = generator.gen_payload(30001, uid=uid, db=_db)
+                    if not payload:
+                        raise ValueError("周期礼包邮件摘要为空")
+                    ctx.append_frame(DownFrame(30001, payload))
+            except Exception:
+                # 通知失败不能反向重复派发已确认的邮件；冷读仍以SQL为准。
+                logger.exception("[PeriodicGiftService] uid=%s 邮件摘要生成失败", uid)
+        return sent
 
+    def _dispatch_daily(self, uid, now_ts, _db):
         now_ts = int(now_ts) if now_ts else int(time.time())
         cur_5am = get_daily_5am_ts(now_ts)
         cur_date = datetime.datetime.fromtimestamp(cur_5am).strftime("%Y-%m-%d")
 
         rows = _db.query("SELECT * FROM user_periodic_gift WHERE uid=? AND status=1", (uid,))
         if not rows:
-            return
+            return 0
 
         mail_svc = MailService.get_instance(_db)
+        sent = 0
 
         for row in rows:
             sub_id = int(row["id"])
@@ -217,7 +249,7 @@ class PeriodicGiftService:
                 remain_days -= 1
                 title = raw_title.replace("%s", str(remain_days))
                 desc = raw_desc.replace("%s", str(remain_days))
-                mail_svc.send_mail(
+                mail_id = mail_svc.send_mail(
                     uid=uid,
                     title=title,
                     content=desc,
@@ -226,22 +258,30 @@ class PeriodicGiftService:
                     template_id=template_id,
                     db=_db
                 )
+                if int(mail_id or 0) <= 0:
+                    raise ValueError("周期礼包每日邮件未创建")
 
             new_status = 2 if remain_days <= 0 else 1
-            _db.execute(
-                "UPDATE user_periodic_gift SET remain_days=?, last_dispatch_date=?, status=?, update_ts=? WHERE id=?",
-                (remain_days, cur_date, new_status, now_ts, sub_id)
+            changed = _db.execute(
+                "UPDATE user_periodic_gift SET remain_days=?, last_dispatch_date=?, status=?, update_ts=? "
+                "WHERE id=? AND uid=? AND status=1 AND last_dispatch_date IS ? AND remain_days=?",
+                (remain_days, cur_date, new_status, now_ts, sub_id, uid,
+                 row.get("last_dispatch_date"), int(row.get("remain_days") or 0))
             )
+            if changed.rowcount != 1:
+                raise ValueError(f"周期礼包 {sub_id} 派发进度发生变化")
+            sent += send_count
             logger.info(
                 f"[PeriodicGiftService] uid={uid} sub_id={sub_id} 补发 {send_count} 封邮件, "
                 f"剩余天数: {remain_days}, 新状态: {new_status}"
             )
+        return sent
 
 
 # ==================== 全局事件监听器绑定 ====================
 
-@bus.subscribe(Events.PERIODIC_GIFT_BUY)
 def _on_periodic_gift_buy(ctx, uid, **kwargs):
+    """旧显式调用适配器；购买者已直接履约，不能再注册为购买通知订阅。"""
     goods_id = kwargs.get("goods_id", 0)
     desc_id = kwargs.get("desc_id", 0)
     buy_num = kwargs.get("buy_num", 1)

@@ -10,12 +10,14 @@ fetch_manifests.py — 客户端资源清单文件下载与多平台物理隔离
    - Android: assethash_307_229_3807d27e1a6e26853f1fccfa8b7681d0.bytes, voice_package_list_307_229.bytes
 2. 分别保存到 static_resources/pc/, static_resources/ios/, static_resources/android/
    以及 D:\PC_DATA, D:\iOS_DATA, D:\Android_DATA，确保各端 100% 独立隔离！
+3. 启动优先复用本平台本地清单；Android 缺失项仅告警，不自动下载。
 """
 import os
 import sys
 import ssl
 import http.client
 import shutil
+import time
 
 v5_dir = os.path.dirname(os.path.abspath(__file__))
 if v5_dir not in sys.path:
@@ -28,6 +30,14 @@ HOST = "download-eo.ys4fun.com"
 
 PLATFORM_MANIFESTS = {
     "pc": [
+        "assethash_307_321_a66c600ea8c72f003e03969fdd352250.bytes",
+        "voice_package_list_307_321.bytes",
+        "voice_hash_zh_30700321.bytes",
+        "voice_hash_ja_30700321.bytes",
+        "assethash_307_311_738463f12c9b762e6650822b949bd091.bytes",
+        "voice_package_list_307_311.bytes",
+        "voice_hash_zh_30700311.bytes",
+        "voice_hash_ja_30700311.bytes",
         "assethash_307_229_3807d27e1a6e26853f1fccfa8b7681d0.bytes",
         "voice_package_list_307_229.bytes",
         "voice_hash_zh_30700229.bytes",
@@ -38,12 +48,21 @@ PLATFORM_MANIFESTS = {
         "voice_hash_ja_30700227.bytes",
     ],
     "ios": [
+        "assethash_307_321_fd5db716ec33e1924528de483faca2ce.bytes",
+        "voice_package_list_307_321.bytes",
+        "voice_hash_zh_30700321.bytes",
+        "voice_hash_ja_30700321.bytes",
         "assethash_307_229_29e8f745e8ec6032937a65a0bfd3a9cf.bytes",
         "voice_package_list_307_229.bytes",
         "voice_hash_zh_30700229.bytes",
         "voice_hash_ja_30700229.bytes",
     ],
     "android": [
+        "assethash_307_321_da9ef437b47a66311f0e2e89e7318388.bytes",
+        "voice_package_list_307_321.bytes",
+        "voice_hash_zh_30700321.bytes",
+        "voice_hash_ja_30700321.bytes",
+        "assethash_307_311_738463f12c9b762e6650822b949bd091.bytes",
         "assethash_307_229_3807d27e1a6e26853f1fccfa8b7681d0.bytes",
         "voice_package_list_307_229.bytes",
         "voice_hash_zh_30700229.bytes",
@@ -86,12 +105,25 @@ def download_single_manifest(platform, fn, output_path, log=print):
     return False
 
 
+def _backup_existing_manifest(path):
+    if os.path.isfile(path):
+        shutil.copy2(path, f"{path}.before_prepare_{time.time_ns()}")
+
+
+def _copy_manifest(source, destination):
+    if os.path.abspath(source) == os.path.abspath(destination):
+        return
+    _backup_existing_manifest(destination)
+    shutil.copy2(source, destination)
+
+
 def prepare_manifests(res_dir=None, force_download=False, log=print):
-    """确保所有平台的专属清单在本地及 D 盘专属目录就绪。"""
+    """优先复用本平台缓存；Android 仅用本地清单，缺失只告警。"""
     res_dir = res_dir or DEFAULT_RES_DIR
     os.makedirs(res_dir, exist_ok=True)
     total = 0
     ready = 0
+    android_missing = 0
 
     for plat, fns in PLATFORM_MANIFESTS.items():
         plat_dir = os.path.join(res_dir, plat)
@@ -103,26 +135,54 @@ def prepare_manifests(res_dir=None, force_download=False, log=print):
             target_static = os.path.join(plat_dir, fn)
             target_data = os.path.join(data_dir, fn)
 
-            if os.path.isfile(target_static) and os.path.getsize(target_static) > 0 and not force_download:
+            use_local = not force_download or plat == "android"
+            if os.path.isfile(target_static) and os.path.getsize(target_static) > 0 and use_local:
                 ready += 1
                 if not os.path.isfile(target_data) or os.path.getsize(target_data) == 0:
                     try:
-                        shutil.copy2(target_static, target_data)
+                        _copy_manifest(target_static, target_data)
                     except Exception:
                         pass
                 continue
 
+            if use_local:
+                # 严格只取当前平台，静态目录缺失不代表本地专属盘/缓存也缺失。
+                candidates = (target_data, os.path.join(v5_dir, "cdn_cache", plat, fn))
+                cached = next((path for path in candidates
+                               if os.path.isfile(path) and os.path.getsize(path) > 0), None)
+                if cached:
+                    try:
+                        _copy_manifest(cached, target_static)
+                    except OSError as error:
+                        log(f"[WARN] 复用 [{plat.upper()}] 本地清单失败: {fn} ({error})")
+                    else:
+                        ready += 1
+                        if not os.path.isfile(target_data) or os.path.getsize(target_data) == 0:
+                            try:
+                                _copy_manifest(target_static, target_data)
+                            except OSError as error:
+                                log(f"[WARN] 同步 [{plat.upper()}] 清单到专属目录失败: {fn} ({error})")
+                        log(f"[Manifest] 复用 [{plat.upper()}] 本地清单: {fn}")
+                        continue
+
+            if plat == "android":
+                android_missing += 1
+                log(f"[WARN] 未能准备 [ANDROID] 本地清单文件: {fn}（仅告警，不下载；该版本清单未就绪）")
+                continue
+
+            _backup_existing_manifest(target_static)
             ok = download_single_manifest(plat, fn, target_static, log=log)
             if ok:
                 ready += 1
                 try:
-                    shutil.copy2(target_static, target_data)
+                    _copy_manifest(target_static, target_data)
                 except Exception:
                     pass
             else:
                 log(f"[WARN] 未能准备 [{plat.upper()}] 清单文件: {fn}")
 
-    log(f"[Manifest] 官方资源清单多平台物理隔离准备完毕: {ready}/{total} 个就绪")
+    log(f"[Manifest] 官方资源清单多平台物理隔离准备完毕: {ready}/{total} 个就绪；"
+        f"Android 缺失 {android_missing} 个（仅告警，不下载）")
     return ready == total
 
 

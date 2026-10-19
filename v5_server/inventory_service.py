@@ -11,6 +11,7 @@ import time
 import random
 import logging
 import event_bus
+from enchant_slots_util import default_slot_list
 
 logger = logging.getLogger("inventory_service")
 
@@ -775,13 +776,21 @@ class InventoryService:
 
             for _ in range(count):
                 curr_id += 1
+                enchant_slots = default_slot_list()
                 db.execute(
                     "INSERT INTO equip (uid, id, prefab_id, exp, hero_id, is_lock, now_break_level, "
                     "enchant_slots, race, race_preview, race_hero, race_faction, update_ts, is_init) "
-                    "VALUES (?, ?, ?, 0, 0, 0, 0, '[]', 0, 0, 0, 0, ?, 0)",
-                    (uid, curr_id, iid, now_ts),
+                    "VALUES (?, ?, ?, 0, 0, 0, 0, ?, 0, 0, 0, 0, ?, 0)",
+                    (uid, curr_id, iid, json.dumps(enchant_slots, ensure_ascii=False), now_ts),
                 )
-                allocated_equips.append({"id": curr_id, "prefab_id": iid, "suit_id": suit_id, "pos": pos})
+                allocated_equips.append({
+                    "id": curr_id,
+                    "prefab_id": iid,
+                    "suit_id": suit_id,
+                    "pos": pos,
+                    "enchant_slot_list": enchant_slots,
+                    "race": 0,
+                })
 
             events_to_emit.append(
                 (

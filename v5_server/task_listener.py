@@ -5,14 +5,46 @@ task_listener.py — 任务系统事件总线订阅器 (Task Listener)
 """
 
 import json
+import logging
 import time
 from codec import encode
 from middleware import DownFrame
 from event_bus import bus, Events
 from lazy_timer import get_daily_5am_ts
+from account_db import savepoint_transaction
+
+logger = logging.getLogger("task_listener")
 
 
-def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=False):
+def _task_parameter_values(raw_value):
+    """Parse assignmentcfg additional_parameter into integer values."""
+    if raw_value is None:
+        return []
+    if isinstance(raw_value, str):
+        raw_value = raw_value.strip()
+        if not raw_value:
+            return []
+        try:
+            parsed = json.loads(raw_value)
+        except Exception:
+            parsed = [part.strip() for part in raw_value.split(",") if part.strip()]
+    elif isinstance(raw_value, (list, tuple)):
+        parsed = list(raw_value)
+    else:
+        parsed = [raw_value]
+    if not isinstance(parsed, (list, tuple)):
+        parsed = [parsed]
+    values = []
+    for value in parsed:
+        try:
+            values.append(int(value))
+        except (TypeError, ValueError):
+            continue
+    return values
+
+
+def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=False,
+                            task_type_filter=None, activity_zero_only=False):
     """
     通用任务条件进度推进核心函数。
     1. 查询所有未领取的、匹配 condition 的任务；
@@ -23,15 +55,26 @@ def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=F
     """
     cond_int = int(condition)
     # 以 task_cfg 为主表，LEFT JOIN task 表，按需激活老账号缺省任务
+    extra_where = ""
+    extra_params = []
+    if task_type_filter is not None:
+        extra_where += " AND c.task_type = ?"
+        extra_params.append(int(task_type_filter))
+    if activity_zero_only:
+        extra_where += " AND COALESCE(c.activity_id, 0) = 0"
     rows = db.query(
-        """
+        f"""
         SELECT c.task_id, t.task_id as in_task, COALESCE(t.progress, 0) as progress, 
                COALESCE(c.need, 1) as need, c.additional_parameter,
                COALESCE(t.claimed_ts, 0) as claimed_ts, COALESCE(t.complete_flag, 0) as complete_flag
         FROM task_cfg c
         LEFT JOIN task t ON t.task_id = c.task_id AND t.uid = ?
         WHERE COALESCE(c.condition, 0) = ? 
-          AND (t.task_id IS NOT NULL OR c.condition IN (392001, 423002, 380001, 501, 400004, 160001, 160002, 160003, 160004, 160005, 160006, 160007, 160008, 422001, 422002, 422003, 422004, 50104, 350001, 411008))
+          AND (
+              t.task_id IS NOT NULL
+              OR c.condition IN (392001, 423002, 380001, 501, 400004, 160001, 160002, 160003, 160004, 160005, 160006, 160007, 160008, 422001, 422002, 422003, 422004, 50104, 350001, 411008)
+              OR (c.condition = 401 AND c.task_type = 3 AND COALESCE(c.activity_id, 0) = 0)
+          )
           AND COALESCE(t.claimed_ts, 0) = 0
           AND COALESCE(t.complete_flag, 0) = 0
           AND (
@@ -44,8 +87,9 @@ def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=F
                     AND cl.key_id = c.task_id
               )
           )
+          {extra_where}
         """,
-        (uid, cond_int, uid)
+        (uid, cond_int, uid, *extra_params)
     )
     if not rows:
         return []
@@ -60,9 +104,19 @@ def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=F
         old_prog = int(r["progress"] or 0)
         need = int(r["need"] or 1)
 
-        # 校验 additional_parameter（如体力/金币/特定关卡类型等）
+        # Cond 401 is a stage-clear fact. Its Lua config always identifies the stage;
+        # empty or malformed parameters must never act as a wildcard.
         param_str = r.get("additional_parameter")
-        if param_str:
+        if cond_int == 401:
+            try:
+                stage_id = int(param)
+            except Exception:
+                continue
+            stage_ids = _task_parameter_values(param_str)
+            if stage_id <= 0 or stage_id not in stage_ids:
+                continue
+        # 校验 additional_parameter（如体力/金币/特定关卡类型等）
+        elif param_str:
             try:
                 if isinstance(param_str, str):
                     if param_str.startswith("["):
@@ -157,23 +211,29 @@ def on_stage_pass(ctx, uid, times=1, stage_id=0, stage_type=None, **kwargs):
     if not db:
         from account_db import get_db
         db = get_db()
-    # 1. 通关任意关卡 (cond=402: 6002 需1次, 6004 需5次)
+    # 1. 通关主线指定关卡 (cond=401; Lua additional_parameter contains stage_id).
+    # set_value makes repeated clears idempotent and uses the successful stage-pass event.
+    c0 = []
+    if stage_id:
+        c0 = _trigger_task_condition(db, uid, condition=401, delta=1,
+                                     param=stage_id, set_value=True)
+    # 2. 通关任意关卡 (cond=402: 6002 需1次, 6004 需5次)
     c1 = _trigger_task_condition(db, uid, condition=402, delta=times)
-    # 2. 历战轮回 (cond=405)
+    # 3. 历战轮回 (cond=405)
     c2 = []
     if stage_type == "regular" or (isinstance(stage_id, int) and 100000 <= stage_id < 200000):
         c2 = _trigger_task_condition(db, uid, condition=405, delta=times)
-    # 3. 黑区净化 (cond=453)
+    # 4. 黑区净化 (cond=453)
     c3 = []
     if stage_type == "black_zone" or (isinstance(stage_id, int) and 200000 <= stage_id < 300000):
         c3 = _trigger_task_condition(ctx.db, uid, condition=453, delta=times)
 
-    # 4. 海拉弹珠关卡 (cond=392001)
+    # 5. 海拉弹珠关卡 (cond=392001)
     c4 = []
     if stage_type == "minigame_pinball" or (isinstance(stage_id, int) and 40601 <= stage_id <= 40650):
         c4 = _trigger_task_condition(db, uid, condition=392001, delta=1, param=stage_id, set_value=True)
 
-    # 5. 灰烬牛仔关卡 (cond=380001 & cond=501)
+    # 6. 灰烬牛仔关卡 (cond=380001 & cond=501)
     c5 = []
     ash_stage_id = kwargs.get("ash_stage_id") or stage_id
     if stage_type == "ash_shoot" or (isinstance(stage_id, int) and (404101 <= stage_id <= 404401 or 5280301 <= stage_id <= 5280327)):
@@ -188,7 +248,7 @@ def on_stage_pass(ctx, uid, times=1, stage_id=0, stage_type=None, **kwargs):
         c5_total = _trigger_task_condition(db, uid, condition=501, delta=done_cnt, set_value=True)
         c5 = c5_single + c5_total
 
-    # 6. 卡达斯夏活坦克配件收集 (cond=423002)
+    # 7. 卡达斯夏活坦克配件收集 (cond=423002)
     c6 = []
     if stage_type == "summer_race":
         module_count = kwargs.get("module_count")
@@ -196,13 +256,13 @@ def on_stage_pass(ctx, uid, times=1, stage_id=0, stage_type=None, **kwargs):
             module_type = kwargs.get("module_type", 1)
             c6 = _trigger_task_condition(db, uid, condition=423002, delta=module_count, param=module_type, set_value=True)
 
-    # 7. 霍德尔活动关卡首通 (cond=400004)
+    # 8. 霍德尔活动关卡首通 (cond=400004)
     c7 = []
     stg = stage_id or kwargs.get("dest_int", 0)
     if stage_type == "hodur" or (isinstance(stg, int) and 5310201 <= stg <= 5310222):
         c7 = _trigger_task_condition(db, uid, condition=400004, delta=1, param=stg, set_value=True)
 
-    # 8. 薇儿丹蒂 SP 潜质觉醒任务 (cond=160002 训练熟练度, cond=160003 Boss得分, cond=160007 满熟练度)
+    # 9. 薇儿丹蒂 SP 潜质觉醒任务 (cond=160002 训练熟练度, cond=160003 Boss得分, cond=160007 满熟练度)
     c8 = []
     if stage_type == "sphero_train":
         grp = kwargs.get("group_type")
@@ -217,7 +277,7 @@ def on_stage_pass(ctx, uid, times=1, stage_id=0, stage_type=None, **kwargs):
         if boss_sc >= 4000000:
             c8.extend(_trigger_task_condition(db, uid, condition=160003, delta=1, param=stg, set_value=True))
 
-    # 9. 乌尔碰碰车 (极限机装, cond=422001 关卡通关, cond=422002 击杀怪物, cond=422003 合成技能, cond=422004 累计通关, cond=501 小游戏通关)
+    # 10. 乌尔碰碰车 (极限机装, cond=422001 关卡通关, cond=422002 击杀怪物, cond=422003 合成技能, cond=422004 累计通关, cond=501 小游戏通关)
     c9 = []
     if stage_type == "vehicle_ball":
         stg = stage_id or kwargs.get("dest_int", 0)
@@ -232,7 +292,7 @@ def on_stage_pass(ctx, uid, times=1, stage_id=0, stage_type=None, **kwargs):
         if merges > 0:
             c9.extend(_trigger_task_condition(db, uid, condition=422003, delta=merges))
 
-    # 10. 浮光绎曲音乐会 (cond=50104 完成指定乐曲初战任务 40601001~40601008)
+    # 11. 浮光绎曲音乐会 (cond=50104 完成指定乐曲初战任务 40601001~40601008)
     c10 = []
     if stage_type == "music_game":
         tid = kwargs.get("task_id")
@@ -245,7 +305,7 @@ def on_stage_pass(ctx, uid, times=1, stage_id=0, stage_type=None, **kwargs):
                 db.execute("UPDATE task SET progress = 1 WHERE uid = ? AND task_id = ?", (uid, tid))
                 c10.append({"id": tid, "progress": 1, "complete_flag": 0})
 
-    _push_task_diff(ctx, uid, c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8 + c9 + c10)
+    _push_task_diff(ctx, uid, c0 + c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8 + c9 + c10)
 
 
 @bus.subscribe(Events.STAMINA_COST)
@@ -381,44 +441,45 @@ def on_user_login(ctx, uid, is_first_login=True, now_ts=None, **kwargs):
         now_ts = int(time.time())
     cur_cycle = get_daily_5am_ts(now_ts)
 
-    # 1. 检查 game_user 上的 last_login_task_cycle_ts 周期锁
-    user = ctx.db.get("game_user", uid)
-    last_cycle = int((user.get("last_login_task_cycle_ts") if user else 0) or 0)
-    if last_cycle >= cur_cycle:
-        # 当前 05:00 游戏日周期已计入首次登录，幂等拦截
-        return
+    # 周期占位、任务和时迹计数共同确认；总线隔离异常时也不能留下半批。
+    with savepoint_transaction(ctx.db):
+        user = ctx.db.get("game_user", uid)
+        if not user:
+            raise ValueError("登录任务缺少game_user记录")
+        last_cycle = int(user.get("last_login_task_cycle_ts") or 0)
+        if last_cycle >= cur_cycle:
+            return
+        claimed = ctx.db.execute(
+            "UPDATE game_user SET last_login_task_cycle_ts=? WHERE uid=? "
+            "AND COALESCE(last_login_task_cycle_ts, 0)=?",
+            (cur_cycle, uid, last_cycle)
+        )
+        if claimed.rowcount != 1:
+            raise ValueError("登录任务周期占位发生变化")
 
-    # 标记当前周期已处理
-    ctx.db.execute(
-        "UPDATE game_user SET last_login_task_cycle_ts = ? WHERE uid = ?",
-        (cur_cycle, uid)
-    )
-
-    # 2. 推进登录条件任务 (cond=1)
-    c = _trigger_task_condition(ctx.db, uid, condition=1, delta=1)
-    _push_task_diff(ctx, uid, c)
-
-    # 3. 联动推进【时迹馈赠】(accumulate_sign)
-    try:
+        c = _trigger_task_condition(ctx.db, uid, condition=1, delta=1)
         acc = ctx.db.get("accumulate_sign", uid)
         if acc:
             new_days = int(acc.get("login_days") or 0) + 1
             ver = int(acc.get("version") or 2)
-            ctx.db.execute(
+            changed = ctx.db.execute(
                 "UPDATE accumulate_sign SET login_days = ?, open_sign = 1, update_ts = ? WHERE uid = ?",
                 (new_days, now_ts, uid)
             )
         else:
             new_days = 1
             ver = 2
-            ctx.db.execute(
+            changed = ctx.db.execute(
                 "INSERT INTO accumulate_sign (uid, version, open_sign, login_days, update_ts) VALUES (?, ?, 1, 1, ?)",
                 (uid, ver, now_ts)
             )
-        _push_accumulate_sign_diff(ctx, uid, new_days, version=ver)
-    except Exception as e:
-        if hasattr(ctx, 'log'):
-            ctx.log(f"[TaskListener] 时迹馈赠联动异常: {e}", "WARN")
+        if changed.rowcount != 1:
+            raise ValueError("时迹馈赠登录计数未唯一确认")
+
+    # 只在必要SQL成功后生成通知；显示编码失败沿原可选通知合同记录，
+    # 不通过重新计天或重发签到奖励补通知。
+    _push_task_diff(ctx, uid, c)
+    _push_accumulate_sign_diff(ctx, uid, new_days, version=ver)
 
     # 4. 家园图鉴任务全量自愈与校准 (Type 905)
     try:
@@ -444,17 +505,17 @@ def on_activity_point_gain(ctx, uid, pt_id=1, amount=0, item_id=22, **kwargs):
 
 @bus.subscribe(Events.MONSTER_KILL)
 def on_monster_kill(ctx, uid, monster_id=0, count=1, race=0, monster_type=0, **kwargs):
-    """击杀怪物/视骸/精英/Boss (cond=401 击杀指定怪; cond=403 击杀精英; cond=404 击杀Boss; cond=406 击杀指定种族)"""
+    """击杀怪物/视骸/精英/Boss (cond=403 击杀精英; cond=404 击杀Boss; cond=406 击杀指定种族)"""
     if count <= 0:
         return
-    c1 = _trigger_task_condition(ctx.db, uid, condition=401, delta=count, param=monster_id)
+    # Cond 401 means completing a configured stage (assignmentcfg.lua), never a kill.
     c2 = _trigger_task_condition(ctx.db, uid, condition=406, delta=count, param=race)
     c3 = []
     if monster_type == 1: # 精英怪
         c3 = _trigger_task_condition(ctx.db, uid, condition=403, delta=count)
     elif monster_type == 2: # 首领 Boss
         c3 = _trigger_task_condition(ctx.db, uid, condition=404, delta=count)
-    _push_task_diff(ctx, uid, c1 + c2 + c3)
+    _push_task_diff(ctx, uid, c2 + c3)
 
 
 @bus.subscribe(Events.STAGE_FIRST_CLEAR)
@@ -483,6 +544,35 @@ def on_player_level_up(ctx, uid, old_lv=1, new_lv=1, stamina_gain=0, **kwargs):
 
 
 # ==================== 家园图鉴全量自愈服务 ====================
+
+def sync_cleared_stage_tasks(db, uid):
+    """Idempotently restore missing main-story cond=401 progress from chapter clear facts.
+
+    Only task_type=3, activity_id=0 rows are eligible for auto-creation. Existing
+    activity tasks are deliberately excluded from this historical backfill.
+    """
+    if not db or not uid:
+        return []
+    changed = []
+    try:
+        rows = db.query(
+            "SELECT id FROM chapter WHERE uid=? AND COALESCE(clear_times, 0) > 0 ORDER BY id",
+            (uid,)
+        )
+        for row in rows or []:
+            try:
+                stage_id = int(row.get("id") or 0)
+            except (TypeError, ValueError):
+                continue
+            if stage_id <= 0:
+                continue
+            changed.extend(_trigger_task_condition(
+                db, uid, condition=401, delta=1, param=stage_id, set_value=True,
+                task_type_filter=3, activity_zero_only=True
+            ))
+    except Exception as exc:
+        logger.warning("sync_cleared_stage_tasks failed for uid=%s: %s", uid, exc)
+    return changed
 
 def sync_dorm_illu_tasks(db, uid):
     """

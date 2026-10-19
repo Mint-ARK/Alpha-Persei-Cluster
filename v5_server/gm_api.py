@@ -1871,6 +1871,67 @@ def post_set_res_version():
         return err(GMErrorCode.SERVICE_ERROR, f"切换客户端资源版本异常: {e}")
 
 
+@gm_bp.route("/system/check_update", methods=["GET"])
+@gm_bp.route("/check_update", methods=["GET"])
+def get_check_update():
+    """【只读通道】主动穿透探测官方最新版本并计算增量差异。"""
+    try:
+        import res_version_manager
+        plat = request.args.get("platform", "pc")
+        diff_res = res_version_manager.calculate_manifest_diff(platform=plat)
+        if not diff_res.get("success"):
+            return err(GMErrorCode.SERVICE_ERROR, diff_res.get("error", "检查更新失败"))
+        return ok(diff_res)
+    except Exception as e:
+        return err(GMErrorCode.SERVICE_ERROR, f"检查官方更新异常: {e}")
+
+
+@gm_bp.route("/system/sync_update", methods=["POST"])
+@gm_bp.route("/sync_update", methods=["POST"])
+def post_sync_update():
+    """【写通道】启动官方新版本清单与增量资源后台下载同步。"""
+    try:
+        import res_version_manager
+        data = request.get_json(silent=True) or {}
+        target_ver = data.get("target_version")
+        dl_assets = data.get("download_diff_assets", True)
+        plats = tuple(data.get("platforms", ["pc", "android", "ios"]))
+        ok_flag, msg = res_version_manager.update_task_manager.start_sync(
+            target_version=target_ver,
+            download_diff_assets=dl_assets,
+            platforms=plats,
+        )
+        if not ok_flag:
+            return err(GMErrorCode.SERVICE_ERROR, msg)
+        return ok({"started": True}, msg=msg)
+    except Exception as e:
+        return err(GMErrorCode.SERVICE_ERROR, f"启动更新下载异常: {e}")
+
+
+@gm_bp.route("/system/update_progress", methods=["GET"])
+@gm_bp.route("/update_progress", methods=["GET"])
+def get_update_progress():
+    """【只读通道】获取当前后台下载任务的实时状态与传输速率。"""
+    try:
+        import res_version_manager
+        prog = res_version_manager.update_task_manager.get_progress()
+        return ok(prog)
+    except Exception as e:
+        return err(GMErrorCode.SERVICE_ERROR, f"获取更新进度异常: {e}")
+
+
+@gm_bp.route("/system/cancel_update", methods=["POST"])
+@gm_bp.route("/cancel_update", methods=["POST"])
+def post_cancel_update():
+    """【写通道】中断取消正在运行的更新同步任务。"""
+    try:
+        import res_version_manager
+        res_version_manager.update_task_manager.cancel()
+        return ok({"cancelled": True}, msg="已请求中断更新任务")
+    except Exception as e:
+        return err(GMErrorCode.SERVICE_ERROR, f"取消更新任务异常: {e}")
+
+
 # ===========================================================================
 # 7. 商店系统管理 (/shop)
 # ===========================================================================

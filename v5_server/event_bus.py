@@ -5,8 +5,31 @@ event_bus.py — V5 服务端全局事件总线（EventBus）
 """
 
 import logging
+import inspect
 
 logger = logging.getLogger('event_bus')
+
+
+def _bind_handler_call(handler, ctx, uid, kwargs):
+    """Choose a compatible call without executing the subscriber body."""
+    candidates = (
+        ((ctx, uid), kwargs),
+        ((), {"uid": uid, **kwargs}),
+        ((), kwargs),
+    )
+    try:
+        signature = inspect.signature(handler)
+    except (TypeError, ValueError):
+        # Some extension callables expose no signature. Use the primary
+        # contract once; their body exceptions must never trigger a retry.
+        return candidates[0]
+    for args, call_kwargs in candidates:
+        try:
+            signature.bind(*args, **call_kwargs)
+        except TypeError:
+            continue
+        return args, call_kwargs
+    raise TypeError(f"事件监听器签名不匹配支持的调用形式: {signature}")
 
 
 class Events:
@@ -131,8 +154,8 @@ class EventBus:
     def emit(cls, event_name, ctx=None, uid=0, **kwargs):
         """广播事件到所有订阅者。
 
-        具备自适应传参与沙箱隔离：
-        依次尝试:
+        调用前按签名选择一种参数形式，函数体最多执行一次；异常仍隔离：
+        依次匹配:
         1. handler(ctx, uid, **kwargs)
         2. handler(uid=uid, **kwargs)
         3. handler(**kwargs)
@@ -143,13 +166,8 @@ class EventBus:
 
         for handler in list(handlers):
             try:
-                try:
-                    handler(ctx, uid, **kwargs)
-                except TypeError:
-                    try:
-                        handler(uid=uid, **kwargs)
-                    except TypeError:
-                        handler(**kwargs)
+                args, call_kwargs = _bind_handler_call(handler, ctx, uid, kwargs)
+                handler(*args, **call_kwargs)
             except Exception as e:
                 hname = getattr(handler, '__name__', str(handler))
                 msg = f'[EventBus ERROR] 事件 {event_name} 处理器 {hname} 执行异常: {e}'

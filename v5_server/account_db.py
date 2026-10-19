@@ -26,6 +26,7 @@ import os
 import sqlite3
 import threading
 import time
+from contextlib import contextmanager
 
 DEFAULT_DB = os.environ.get(
     "ACCOUNT_DB_PATH",
@@ -1509,6 +1510,15 @@ CREATE TABLE IF NOT EXISTS user_setting (            -- sc_21001 提醒设置
     month_card_propel_switch INTEGER DEFAULT 1,
     update_ts INTEGER DEFAULT 0
 );
+CREATE TABLE IF NOT EXISTS formation_team (         -- cs_63010 自定义编队方案原始消息体
+    uid         INTEGER NOT NULL,
+    team_type   INTEGER NOT NULL,
+    cont_id     INTEGER NOT NULL,
+    cont_team   BLOB NOT NULL,
+    data_rec    BLOB NOT NULL,
+    update_ts   INTEGER DEFAULT 0,
+    PRIMARY KEY (uid, team_type, cont_id)
+);
 CREATE TABLE IF NOT EXISTS reserve_team (            -- sc_63005 预备编队（含芯片）
     uid INTEGER NOT NULL,
     team_type INTEGER NOT NULL,                      -- 0默认/1剧情/104深渊/219区域战/411奥西里斯等
@@ -2047,6 +2057,13 @@ CREATE TABLE IF NOT EXISTS boss_challenge_scores (   -- 梦境再构首领挑战
     update_ts       INTEGER DEFAULT 0,
     PRIMARY KEY (uid, boss_id)
 );
+CREATE TABLE IF NOT EXISTS boss_challenge_exchange ( -- 梦境再构兑换次数，与周四重置使用同一表
+    uid             INTEGER NOT NULL,
+    goods_id        INTEGER NOT NULL,
+    exchange_times  INTEGER DEFAULT 0,
+    update_ts       INTEGER DEFAULT 0,
+    PRIMARY KEY (uid, goods_id)
+);
 CREATE TABLE IF NOT EXISTS boss_challenge_claimed_rewards ( -- 梦境再构已领奖励
     uid             INTEGER NOT NULL,
     reward_type     INTEGER NOT NULL,                -- 1=星级奖励, 2=积分奖励
@@ -2375,6 +2392,26 @@ class AccountDB:
     def _in_txn(self):
         return getattr(self._local, "in_txn", False)
 
+    def _rollback_or_discard(self, conn):
+        """失败写入只允许回滚；回滚失败的连接不能供下次请求复用。"""
+        try:
+            conn.rollback()
+        except BaseException:
+            try:
+                conn.close()
+            except BaseException:
+                pass
+            finally:
+                if getattr(self._local, "conn", None) is conn:
+                    self._local.conn = None
+
+    def _checked_conn(self):
+        conn = self._conn()
+        if not self._in_txn() and conn.in_transaction:
+            self._rollback_or_discard(conn)
+            raise sqlite3.OperationalError("发现无所属的 SQLite 事务，已回滚或隔离连接；本次请求未执行")
+        return conn
+
     def init_schema(self):
         c = self._conn()
         # 权威建库来源：lib/db_schema.sql（从实库导出的 217 张表，全部 IF NOT EXISTS，幂等）。
@@ -2412,21 +2449,33 @@ class AccountDB:
     # ---------- 通用 CRUD（uid 隔离） ----------
 
     def execute(self, sql, args=()):
-        c = self._conn()
-        cur = c.execute(sql, args)
-        if not self._in_txn():
-            c.commit()
-        return cur
+        c = self._checked_conn()
+        owns_commit = not self._in_txn()
+        try:
+            cur = c.execute(sql, args)
+            if owns_commit:
+                c.commit()
+            return cur
+        except BaseException:
+            if owns_commit:
+                self._rollback_or_discard(c)
+            raise
 
     def executemany(self, sql, seq_of_args):
-        c = self._conn()
-        cur = c.executemany(sql, seq_of_args)
-        if not self._in_txn():
-            c.commit()
-        return cur
+        c = self._checked_conn()
+        owns_commit = not self._in_txn()
+        try:
+            cur = c.executemany(sql, seq_of_args)
+            if owns_commit:
+                c.commit()
+            return cur
+        except BaseException:
+            if owns_commit:
+                self._rollback_or_discard(c)
+            raise
 
     def query(self, sql, args=()):
-        c = self._conn()
+        c = self._checked_conn()
         return [dict(r) for r in c.execute(sql, args).fetchall()]
 
     def get_system_config(self, key: str, default: str = "") -> str:
@@ -3022,6 +3071,8 @@ class AccountDB:
         """获取或初始化战令数据记录，保证 uid 对应的 battlepass 行始终存在。"""
         rows = self.query("SELECT * FROM battlepass WHERE uid=?", (uid,))
         if not rows:
+            from res_version_manager import get_version_config
+            list_id = int(get_version_config()["battlepass_list_id"])
             now_ts = int(time.time())
             start_ts = now_ts - 7 * 86400
             end_ts = now_ts + 60 * 86400
@@ -3030,8 +3081,8 @@ class AccountDB:
             self.execute(
                 "INSERT OR IGNORE INTO battlepass "
                 "(uid, battlepass_list_id, pay_level, is_start, weekly_gain_exp, start_timestamp, end_timestamp, next_refresh_timestamp, receive_info, update_ts) "
-                "VALUES (?, 20032, 0, 1, 0, ?, ?, ?, '[]', ?)",
-                (uid, start_ts, end_ts, next_ref, now_ts)
+                "VALUES (?, ?, 0, 1, 0, ?, ?, ?, '[]', ?)",
+                (uid, list_id, start_ts, end_ts, next_ref, now_ts)
             )
             rows = self.query("SELECT * FROM battlepass WHERE uid=?", (uid,))
         return rows[0] if rows else {}
@@ -6589,6 +6640,25 @@ def get_db(path=DEFAULT_DB):
     return _db
 
 
+@contextmanager
+def savepoint_transaction(db):
+    """可选领域边界：嵌套时也独立回滚，原有transaction合并语义不变。"""
+    with db.transaction():
+        connection = db._checked_conn()
+        db.execute("SAVEPOINT service_write")
+        try:
+            yield
+            db.execute("RELEASE SAVEPOINT service_write")
+        except BaseException:
+            try:
+                db.execute("ROLLBACK TO SAVEPOINT service_write")
+                db.execute("RELEASE SAVEPOINT service_write")
+            except BaseException:
+                connection.close()
+                raise
+            raise
+
+
 class _Transaction:
     """事务上下文：with db.transaction(): 内 execute 不自动 commit，退出统一 commit/rollback。
     嵌套支持：内层事务并入外层（同连接 in_txn 标记）。"""
@@ -6596,9 +6666,10 @@ class _Transaction:
     def __init__(self, db):
         self.db = db
         self._outer = False
+        self._connection = None
 
     def __enter__(self):
-        c = self.db._conn()
+        c = self.db._checked_conn()
         if not self.db._in_txn():
             # 顺序要紧：先 BEGIN 成功再置 in_txn。
             # 反过来的话（先置标记再 BEGIN），一旦 BEGIN 抛异常（例如上一条 DML 的
@@ -6608,16 +6679,21 @@ class _Transaction:
             c.execute("BEGIN")
             self.db._local.in_txn = True
             self._outer = True
+            self._connection = c
         return self
 
     def __exit__(self, exc_type, exc, tb):
-        c = self.db._conn()
         if self._outer:
+            c = self._connection
             try:
                 if exc_type is None:
-                    c.commit()
+                    try:
+                        c.commit()
+                    except BaseException:
+                        self.db._rollback_or_discard(c)
+                        raise
                 else:
-                    c.rollback()
+                    self.db._rollback_or_discard(c)
             finally:
                 self.db._local.in_txn = False
         return False  # 异常继续向上抛

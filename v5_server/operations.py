@@ -288,18 +288,17 @@ def _item_deduct(ctx, uid, item_id, num):
     if USE_NEW_INVENTORY_SERVICE:
         try:
             import inventory_service
+        except ModuleNotFoundError as exc:
+            # Compatibility is safe only before any inventory call, and only
+            # when this module itself is absent. Broken nested imports fail.
+            if exc.name != "inventory_service":
+                raise
+        else:
             succ = inventory_service.cost_item(ctx, uid, iid, num)
             if not succ:
                 t, have = inventory_service.get_item_balance(ctx, uid, iid)
                 raise OperationError(3, f"条目不足: id={iid} 需{num} 有{have}（{t}表）")
             return
-        except OperationError:
-            raise
-        except Exception as e:
-            if hasattr(ctx, "log"):
-                ctx.log(f"[InventoryService WARN] cost_item 异常: {e}，降级至旧逻辑")
-            else:
-                logger.warning(f"[InventoryService WARN] cost_item 异常: {e}，降级至旧逻辑")
 
     # ================= 🛡️ 旧版就地代码（完全保留保底） =================
     t, have = _item_balance(ctx, uid, iid)
@@ -339,9 +338,10 @@ def _item_deduct(ctx, uid, item_id, num):
     return t
 
 
-def _refresh_frames(ctx, uid, hero_id=None):
+def _refresh_frames(ctx, uid, hero_id=None, *, strict=False):
     """操作后补推数据原子差量刷新帧：sc_14007（单英雄实时数据）+ sc_17023（道具/货币差量原子推送）。
-    彻底剥离 15009/17009/14019/46011/50001 等全量重刷包，消灭客户端 GC 卡顿。"""
+    strict 用于已核对的提交前准备路径：必要差量失败须向外传播，由事务回滚。
+    其他调用保持原容错和帧顺序。"""
     out = []
     # 1. 优先推送原子差量帧 (sc_17023: 货币、材料、被销毁钥从/刻印)
     try:
@@ -354,13 +354,17 @@ def _refresh_frames(ctx, uid, hero_id=None):
             wl_from_del = [{"uid": x["uid"], "item": {"id": x["id"], "num": 0}} for x in del_servants if x.get("id")]
             rem_wl = (rem_wl or []) + wl_from_del
         if touched is not None or rem_eq or rem_wl:
-            p = _gen.gen_payload(17023, uid=uid, db=ctx.db, touched_items=(touched or set()), equip_list=rem_eq, weapon_list=rem_wl)
+            p = _gen.gen_payload(17023, uid=uid, db=ctx.db, touched_items=(touched or set()), equip_list=rem_eq, weapon_list=rem_wl, strict=strict)
             if p:
                 out.append(DownFrame(17023, p))
+            elif strict and (touched or rem_eq or rem_wl):
+                raise ValueError("必要资产差量 sc_17023 为空")
             if touched and (4 in touched):
                 p_17025 = _gen.gen_payload(17025, uid=uid, db=ctx.db)
                 if p_17025:
                     out.append(DownFrame(17025, p_17025))
+                elif strict:
+                    raise ValueError("必要体力更新 sc_17025 为空")
 
         # 表情/贴纸专属原子差量推送 (sc_12039)
         need_stickers = getattr(ctx, "touched_chat_stickers", False)
@@ -373,7 +377,11 @@ def _refresh_frames(ctx, uid, hero_id=None):
             p_12039 = _gen.gen_payload(12039, uid=uid, db=ctx.db)
             if p_12039:
                 out.append(DownFrame(12039, p_12039))
+            elif strict:
+                raise ValueError("必要表情更新 sc_12039 为空")
     except Exception:
+        if strict:
+            raise
         pass
     # 2. 英雄实时数据帧 (sc_14007)
     if hero_id:
@@ -383,6 +391,8 @@ def _refresh_frames(ctx, uid, hero_id=None):
             if hf:
                 out.append(hf)
         except Exception:
+            if strict:
+                raise
             pass
 
     # 3. 收集由 EventBus / Listener 在当前上下文中产生的待发帧（如 sc_28007）
@@ -404,6 +414,8 @@ def _refresh_frames(ctx, uid, hero_id=None):
                     if dec.get("progress_list"):
                         task_frames.append(f)
                 except Exception:
+                    if strict:
+                        raise
                     pass
     other_frames = [f for f in pending if f.cmd != 28007]
     if len(task_frames) > 1:
@@ -421,12 +433,16 @@ def _refresh_frames(ctx, uid, hero_id=None):
                     else:
                         seen[tid]["progress"] = max(seen[tid].get("progress", 0), p.get("progress", 0))
             except Exception:
+                if strict:
+                    raise
                 pass
         if merged_progress:
             import codec as _codec
             p_28007 = _codec.encode("sc_28007", {"progress_list": merged_progress})
             if p_28007:
                 out.append(DownFrame(28007, p_28007))
+            elif strict:
+                raise ValueError("必要任务更新 sc_28007 为空")
         out.extend(other_frames)
     elif len(task_frames) == 1:
         out.append(task_frames[0])
@@ -438,6 +454,17 @@ def _refresh_frames(ctx, uid, hero_id=None):
 
 
 # ---------------- 11081 签到 ----------------
+
+def _record_user_login(ctx, uid, now_ts):
+    """必要登录进度先确认；其余领域仍使用原可选通知隔离。"""
+    from task_listener import on_user_login
+    on_user_login(ctx, uid, is_first_login=True, now_ts=now_ts)
+    try:
+        event_bus.bus.emit(event_bus.Events.USER_LOGIN, ctx, uid,
+                           is_first_login=True, now_ts=now_ts)
+    except Exception:
+        pass
+
 
 @operation
 class SignOp(Operation):
@@ -491,10 +518,7 @@ class SignOp(Operation):
             "last_sign_ts=excluded.last_sign_ts",
             (self.uid, aid, now.tm_year, now.tm_mon, now.tm_mday,
              json.dumps(new_list), new_count, now_ts))
-        try:
-            event_bus.bus.emit(event_bus.Events.USER_LOGIN, ctx, self.uid, is_first_login=True)
-        except Exception:
-            pass
+        _record_user_login(ctx, self.uid, now_ts)
         return {"already": False, "sign_num": new_count, "aid": aid, "items": items}
 
     def respond(self, result, data, ctx):
@@ -527,6 +551,7 @@ class DailySignOp(Operation):
 
     cmd = 11010
     sc = 11011
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -572,10 +597,7 @@ class DailySignOp(Operation):
                  _j.dumps(new_list), sign_count, now_ts)
             )
             sign_list = new_list
-            try:
-                event_bus.bus.emit(event_bus.Events.USER_LOGIN, ctx, self.uid, is_first_login=True)
-            except Exception:
-                pass
+            _record_user_login(ctx, self.uid, now_ts)
         else:
             # 今日已签：按当前 sign_count 回显今日已得奖励，确保界面展示不为空
             if sign_act_id in (_g._SIGN_DAILY, _g._SIGN_MONTHCARD):
@@ -589,21 +611,33 @@ class DailySignOp(Operation):
 
     def respond(self, result, data, ctx):
         rec_items = [{"id": it["id"], "num": it["num"]} for it in result["rewards"]]
-        payload = ctx.codec_encode("sc_11011", {"result": 0, "item_list": rec_items}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_11011", {"result": 0, "item_list": rec_items})
+        if not payload:
+            raise ValueError("必要签到回执 sc_11011 为空")
         frames = [DownFrame(self.sc, payload)]
+        # Seven-day callbacks increment locally even on a repeated success.
+        # Restore this requested activity's authoritative count after the ACK;
+        # generic gen_payload(11015) is a login preset for a different purpose.
+        import generator as _g
+        activity_id = int(result["activity_id"])
+        sign_act_id = 3 if activity_id in (0, 3, 10001) else activity_id
+        if sign_act_id not in (_g._SIGN_DAILY, _g._SIGN_MONTHCARD):
+            p15 = _g.gen_11015(sign_act_id, uid=self.uid, db=ctx.db)
+            if not p15:
+                raise ValueError("必要七日签到状态 sc_11015 为空")
+            frames.append(DownFrame(11015, p15))
         # 签到成功后回推最新 sc_11013（日历含今天）与 sc_17027（时迹回赠累计天数）
         if ctx.generator is not None and result["rewards"]:
-            try:
-                p13 = ctx.generator.gen_payload(11013, uid=self.uid, db=ctx.db)
-                if p13:
-                    frames.append(DownFrame(11013, p13))
-                p27 = ctx.generator.gen_payload(17027, uid=self.uid, db=ctx.db)
-                if p27:
-                    frames.append(DownFrame(17027, p27))
-            except Exception:
-                pass
+            p13 = ctx.generator.gen_payload(11013, uid=self.uid, db=ctx.db)
+            if not p13:
+                raise ValueError("必要签到日历 sc_11013 为空")
+            frames.append(DownFrame(11013, p13))
+            p27 = ctx.generator.gen_payload(17027, uid=self.uid, db=ctx.db)
+            if not p27:
+                raise ValueError("必要签到累计 sc_17027 为空")
+            frames.append(DownFrame(17027, p27))
         ctx.log(f"cs_11010 -> 每日签到 act={result['activity_id']} 累计{result['sign_count']}天 {'(今日已签)' if result.get('already') else ''} 获得={result['rewards']}")
-        return frames + _refresh_frames(ctx, self.uid)
+        return frames + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation
@@ -648,10 +682,7 @@ class MonthCardBonusOp(Operation):
             "last_sign_ts=excluded.last_sign_ts",
             (uid, now.tm_year, now.tm_mon, now.tm_mday, _j.dumps(sl), len(sl), now_ts)
         )
-        try:
-            event_bus.bus.emit(event_bus.Events.USER_LOGIN, ctx, self.uid, is_first_login=True)
-        except Exception:
-            pass
+        _record_user_login(ctx, self.uid, now_ts)
         return {"already": False, "is_sign": 1, "reward": {"id": 1, "num": 90}}
 
 
@@ -754,7 +785,7 @@ class GetTotalRechargeBonusOp(Operation):
         return svc.handle_claim_total_bonus(ctx.db, ctx.uid, id_list, log=ctx.log)
 
     def respond(self, result, data, ctx):
-        p34013 = ctx.codec_encode(self.sc, result) or b""
+        p34013 = ctx.codec_encode("sc_34013", result)
         frames = [DownFrame(self.sc, p34013)]
         try:
             import recharge_service
@@ -781,7 +812,7 @@ class GetVersionRechargeBonusOp(Operation):
         return svc.handle_claim_version_bonus(ctx.db, ctx.uid, id_list, log=ctx.log)
 
     def respond(self, result, data, ctx):
-        p34119 = ctx.codec_encode(self.sc, result) or b""
+        p34119 = ctx.codec_encode("sc_34119", result)
         return [DownFrame(self.sc, p34119)]
 
 
@@ -1213,7 +1244,17 @@ class DrawOp(Operation):
             "newbie_choose_draw_flag": result.get("newbie_choose_draw_flag", True),
             "ssr_draw_times": result.get("ssr_draw_times", 0)
         }) or b"\x08\x00"
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        frames = [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        if int(result.get("keyongs") or 0) > 0:
+            try:
+                import generator
+                servant_payload = generator.gen_payload(46011, uid=self.uid, db=ctx.db)
+                if servant_payload is None:
+                    raise RuntimeError("钥从列表生成失败")
+                frames.append(DownFrame(46011, servant_payload))
+            except Exception as exc:
+                ctx.log(f"[draw] 已提交抽卡的钥从刷新失败: {exc}", "WARN")
+        return frames
 
 
 @operation
@@ -1631,6 +1672,7 @@ class ShopBuyOp(Operation):
 
     cmd = 20012
     sc = 20013
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -2379,6 +2421,7 @@ class MailReceiveOp(Operation):
 
     cmd = 30004
     sc = 30005
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -2392,31 +2435,38 @@ class MailReceiveOp(Operation):
             "result": 0,
             "attachment_list": result["attachment_list"],
             "success_mail_ids": result["success_mail_ids"]
-        }) or b"\x08\x00"
-        ctx.log(f"cs_30004 -> 领取邮件附件 count={len(result['success_mail_ids'])} items={result['attachment_list']}")
+        })
+        if not payload:
+            raise ValueError("必要邮件领取回执 sc_30005 为空")
 
         extra_frames = []
         # 换装即时推送 sc_14007
-        for hid in result.get("touched_heroes") or []:
-            try:
-                import hero_codec as _hc
-                hf = _hc.build_single_hero_frame(ctx.db, self.uid, hid)
-                if hf:
-                    extra_frames.append(DownFrame(14007, hf))
-            except Exception:
-                pass
+        hero_ids = set(result.get("touched_heroes") or [])
+        if result.get("touched_skins"):
+            skin_map = _get_skin_hero_map()
+            for sid in result["touched_skins"]:
+                hid = skin_map.get(int(sid))
+                if not hid:
+                    raise ValueError(f"邮件换装 {sid} 缺少英雄映射")
+                # 可以先拥有换装、以后再解锁英雄；此时不伪造角色刷新。
+                if ctx.db.query("SELECT 1 FROM hero WHERE uid=? AND id=? AND unlock=1", (self.uid, hid)):
+                    hero_ids.add(hid)
+        for hid in sorted(hero_ids):
+            import hero_codec as _hc
+            hf = _hc.build_single_hero_frame(ctx.db, self.uid, hid)
+            if not hf:
+                raise ValueError(f"必要邮件角色刷新 sc_14007 为空: {hid}")
+            extra_frames.append(DownFrame(14007, hf))
 
         # 场景即时推送 sc_32009
         if result.get("touched_scene"):
-            try:
-                import generator as _gen
-                p = _gen.gen_payload(32009, uid=self.uid, db=ctx.db)
-                if p:
-                    extra_frames.append(DownFrame(32009, p))
-            except Exception:
-                pass
+            import generator as _gen
+            p = _gen.gen_payload(32009, uid=self.uid, db=ctx.db)
+            if not p:
+                raise ValueError("必要邮件场景刷新 sc_32009 为空")
+            extra_frames.append(DownFrame(32009, p))
 
-        return _refresh_frames(ctx, self.uid) + extra_frames + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, strict=True) + extra_frames + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -2797,6 +2847,7 @@ class HeroAddExpOp(Operation):
 
     cmd = 14014
     sc = 14015
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -2807,11 +2858,13 @@ class HeroAddExpOp(Operation):
         return svc.add_hero_exp(ctx, self.uid, hid, items)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_14015", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_14014 -> 英雄加经验 hero={result['hero_id']} +{result['exp_add']}exp → Lv{result['level']} ({result['exp']})")
+        payload = ctx.codec_encode("sc_14015", {"result": 0})
+        if not payload:
+            raise ValueError("必要回执sc_14015为空")
         from hero_service import HeroService
         svc = HeroService.get_instance(db=ctx.db)
-        return [DownFrame(self.sc, payload)] + svc.build_hero_refresh_frames(ctx, self.uid, hero_id=result.get("hero_id"))
+        # Preserve the UI's cached nextLv/finalExp callback before a full refresh.
+        return [DownFrame(self.sc, payload)] + svc.build_hero_refresh_frames(ctx, self.uid, hero_id=result.get("hero_id"), strict=True)
 
 
 @operation
@@ -2821,6 +2874,7 @@ class HeroBreakOp(Operation):
 
     cmd = 14036
     sc = 14037
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -2830,11 +2884,14 @@ class HeroBreakOp(Operation):
         return svc.break_hero(ctx, self.uid, hid)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_14037", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_14036 -> 英雄突破 hero={result['hero_id']} → 突破阶数 {result['break_level']}")
+        payload = ctx.codec_encode("sc_14037", {"result": 0})
+        if not payload:
+            raise ValueError("必要回执sc_14037为空")
         from hero_service import HeroService
         svc = HeroService.get_instance(db=ctx.db)
-        return [DownFrame(self.sc, payload)] + svc.build_hero_refresh_frames(ctx, self.uid, hero_id=result.get("hero_id"))
+        # OnHeroBreak increments the current model value. Sending 14007 first
+        # would make the callback increment an already updated break level.
+        return [DownFrame(self.sc, payload)] + svc.build_hero_refresh_frames(ctx, self.uid, hero_id=result.get("hero_id"), strict=True)
 
 
 @operation
@@ -2872,10 +2929,11 @@ class SkillUpOp(Operation):
     """技能升级：cs_14030 {hero_id, skill_id, num} → sc_14031 {result}。
     统一委托给 HeroService 领域服务处理。
     注意：客户端 OnHeroSkillUpgrade 会在收到 sc_14031 后本地累加 num 级，
-    因此严禁下发 SC_14007，否则会导致技能等级被刷新覆盖后再累加，发生翻倍叠加并越界崩溃。"""
+    不主动构建SC_14007；关系网监听器已有的整角色刷新须排在成功回调之后，避免先覆盖再累加。"""
 
     cmd = 14030
     sc = 14031
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -2887,11 +2945,30 @@ class SkillUpOp(Operation):
         return svc.upgrade_skill(ctx, self.uid, hid, sid, num=num)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_14031", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_14030 -> 技能升级 hero={result['hero_id']} skill={result['skill']} +{result['num']}级 → Lv{result['level']} (消耗神力因子:{result.get('factor_cost', 0)})")
+        payload = ctx.codec_encode("sc_14031", {"result": 0})
+        if not payload:
+            raise ValueError("必要回执sc_14031为空")
         from hero_service import HeroService
         svc = HeroService.get_instance(db=ctx.db)
-        return svc.build_hero_refresh_frames(ctx, self.uid, hero_id=None) + [DownFrame(self.sc, payload)]
+        frames = svc.build_hero_refresh_frames(ctx, self.uid, hero_id=None, strict=True)
+        # A relation listener can already have queued a full 14007 for this
+        # hero. Its callback must run first. A timer frame may also predate the
+        # upgrade: rebuild from current SQL rather than replaying that old value
+        # after the ACK. Keep original frame objects intact for rollback.
+        before_ack, after_ack = [], []
+        for frame in frames:
+            if frame.cmd == 14007:
+                packet = ctx.codec_decode(frame.payload, "sc_14007")
+                hid = int(packet["hero"]["hero_base_info"]["id"])
+                if hid == int(result["hero_id"]):
+                    import hero_codec as _hc
+                    current = _hc.build_hero_14007_frame(ctx.db, self.uid, hid)
+                    if not current or not current.payload:
+                        raise ValueError(f"必要关系网角色刷新为空: hero={hid}")
+                    after_ack.append(DownFrame(14007, current.payload, flag=frame.flag, srv=frame.srv))
+                    continue
+            before_ack.append(frame)
+        return before_ack + [DownFrame(self.sc, payload)] + after_ack
 
 
 @operation
@@ -3105,6 +3182,7 @@ class HeroSendGiftOp(Operation):
 
     cmd = 14100
     sc = 14101
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -3120,13 +3198,15 @@ class HeroSendGiftOp(Operation):
             raise OperationError(2, str(exc))
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_14101", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_14100 -> 好感度送礼 archive={result['archive_id']} +{result['exp_added']}exp")
+        payload = ctx.codec_encode("sc_14101", {"result": 0})
+        if not payload:
+            raise ValueError("必要回执 sc_14101 为空")
+        # Completion logging belongs to Core, after COMMIT.
         from archive_service import ArchiveService
         _, cfg = ArchiveService.get_instance().get_archive_config(result.get("archive_id"))
         hids = (cfg.get("hero_ids") or []) if cfg else []
         hid = hids[0] if hids else result.get("archive_id")
-        return _refresh_frames(ctx, self.uid, hero_id=hid) + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, hero_id=hid, strict=True) + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -3609,6 +3689,7 @@ class LevelUpModuleOp(Operation):
 
     cmd = 14116
     sc = 14117
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -3617,9 +3698,27 @@ class LevelUpModuleOp(Operation):
         return HeroService.get_instance(ctx.db).level_up_module(ctx, self.uid, hid)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_14117", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_14116 -> 同调武器模块升级 hero={result['hero_id']} → Lv{result['level']}")
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid, hero_id=result.get("hero_id"))
+        payload = ctx.codec_encode("sc_14117", {"result": 0})
+        if not payload:
+            raise ValueError("必要模组回执sc_14117为空")
+        from hero_service import HeroService
+        svc = HeroService.get_instance(db=ctx.db)
+        frames = svc.build_hero_refresh_frames(ctx, self.uid,
+                                              hero_id=result["hero_id"], strict=True)
+        # The 14117 callback increments locally. Keep every full current-hero
+        # frame after it and rebuild older pending snapshots from current SQL.
+        for index, frame in enumerate(frames):
+            if frame.cmd != 14007:
+                continue
+            packet = ctx.codec_decode(frame.payload, "sc_14007")
+            hid = int(packet["hero"]["hero_base_info"]["id"])
+            if hid == int(result["hero_id"]):
+                import hero_codec as _hc
+                current = _hc.build_hero_14007_frame(ctx.db, self.uid, hid)
+                if not current or not current.payload:
+                    raise ValueError("必要模组角色刷新为空")
+                frames[index] = DownFrame(14007, current.payload, flag=frame.flag, srv=frame.srv)
+        return [DownFrame(self.sc, payload)] + frames
 
 
 @operation
@@ -4652,6 +4751,7 @@ class MomoTalkSetReadOp(Operation):
 
     cmd = 91006
     sc = 91007
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -4661,8 +4761,10 @@ class MomoTalkSetReadOp(Operation):
         return {"session_id": s_id}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_91007", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_91006 -> MomoTalk 设为已读 session={result['session_id']}")
+        payload = ctx.codec_encode("sc_91007", {"result": 0})
+        if not payload:
+            raise ValueError("必要回执 sc_91007 为空")
+        # Completion logging belongs to Core, after COMMIT.
         return [DownFrame(self.sc, payload)]
 
 
@@ -8124,10 +8226,7 @@ class BigMonthCardSignOp(Operation):
             "total_sign_receive_list=excluded.total_sign_receive_list, daily_record=excluded.daily_record, update_ts=excluded.update_ts",
             (uid, int(brow.get("buy_timestamp") or now_ts), total_times, json.dumps(rec_list), json.dumps(daily_rec), template_id, now_ts)
         )
-        try:
-            event_bus.bus.emit(event_bus.Events.USER_LOGIN, ctx, self.uid, is_first_login=True)
-        except Exception:
-            pass
+        _record_user_login(ctx, self.uid, now_ts)
         return {
             "already": False,
             "rewards": rewards,
@@ -8212,33 +8311,74 @@ class DailyFatigueOp(Operation):
 
     cmd = 12046
     sc = 12047
+    prepare_response_in_transaction = True
+
+    def validate(self, data, ctx):
+        """校验真实 Lua 资格：仅允许 11/18 档，且严格晚于对应东八区时刻。"""
+        if not isinstance(data, dict) or "type" not in data:
+            raise OperationError(2, "每日体力缺少 type")
+        try:
+            dessert_type = int(data["type"])
+        except (TypeError, ValueError) as exc:
+            raise OperationError(2, "每日体力 type 非法") from exc
+
+        import daily_fatigue_codec as _dfc
+        if dessert_type not in _dfc.DAILY_FATIGUE_TYPES:
+            raise OperationError(2, f"每日体力 type 非法: {dessert_type}")
+
+        now_ts = int(time.time())
+        state = _dfc.get_daily_fatigue_state(
+            ctx.db, self.uid, dessert_type, now_ts=now_ts
+        )
+        # Lua 先判断 is_got；重复请求保持幂等成功，不再次发奖。
+        if not state["claimed"] and not state["time_open"]:
+            hour = _dfc.DAILY_FATIGUE_HOURS[dessert_type]
+            raise OperationError(2, f"每日体力 {hour}:00 尚未开放")
+
+        normalized = dict(data)
+        normalized["type"] = dessert_type
+        normalized["_daily_fatigue_now_ts"] = now_ts
+        normalized["_daily_fatigue_already"] = bool(state["claimed"])
+        return normalized
 
     def apply(self, data, ctx):
         uid = self.uid
-        now_ts = int(time.time())
-        today_str = time.strftime("%Y-%m-%d")
-        dessert_type = int(data.get("type") or 11)
+        dessert_type = int(data["type"])
+        now_ts = int(data["_daily_fatigue_now_ts"])
+
+        if data.get("_daily_fatigue_already"):
+            return {"type": dessert_type, "already": True}
+
+        import daily_fatigue_codec as _dfc
+        if not _dfc.claim_daily_fatigue(ctx.db, uid, dessert_type, now_ts=now_ts):
+            # 处理 validate 后并发到达的同档请求：保持 Lua 客户端可接受的
+            # 幂等成功语义，但不重复写资产。
+            return {"type": dessert_type, "already": True}
 
         # 发放 60 体力 (CurrencyConst.CURRENCY_TYPE_FATIGUE = item 4)
         _item_add(ctx, uid, 4, 60)
-        ctx.db.execute(
-            "INSERT OR REPLACE INTO daily_fatigue (uid, type, date_str, update_ts) VALUES (?, ?, ?, ?)",
-            (uid, dessert_type, today_str, now_ts)
-        )
-        return {"type": dessert_type}
+        return {"type": dessert_type, "already": False}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_12047", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_12046 -> 领取每日免费体力甜点 type={result['type']} (+60 体力)")
-        frames = [DownFrame(self.sc, payload)]
-        if ctx.generator is not None:
-            try:
-                p45 = ctx.generator.gen_payload(12045, uid=self.uid, db=ctx.db)
-                if p45:
-                    frames.append(DownFrame(12045, p45))
-            except Exception:
-                pass
-        return frames + _refresh_frames(ctx, self.uid)
+        payload = ctx.codec_encode("sc_12047", {"result": 0})
+        if not payload:
+            raise ValueError("必要免费体力回执 sc_12047 为空")
+
+        import daily_fatigue_codec as _dfc
+        p45 = _dfc.build_sc_12045(
+            ctx.db, self.uid, codec_encode=ctx.codec_encode,
+            now_ts=data.get("_daily_fatigue_now_ts"),
+        )
+        if not p45:
+            raise ValueError("必要免费体力状态 sc_12045 为空")
+
+        already = bool(result.get("already"))
+        detail = "幂等回显" if already else "+60 体力"
+        ctx.log(f"cs_12046 -> 领取每日免费体力甜点 type={result['type']} ({detail})")
+        frames = [DownFrame(self.sc, payload), DownFrame(12045, p45)]
+        if already:
+            return frames
+        return frames + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation

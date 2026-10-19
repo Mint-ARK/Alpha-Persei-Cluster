@@ -513,8 +513,19 @@ class GatewayHandler(socketserver.StreamRequestHandler):
                     if out:
                         traffic_tracker.record_bytes(len(out))
                         self.request.sendall(out)
-        except (ConnectionResetError, BrokenPipeError, OSError):
+        except (ConnectionResetError, BrokenPipeError):
             pass
+        except Exception:
+            import traceback
+            self.server.core.log(
+                f"[GW:{self.server.gw_port}] [{peer}] 处理失败:\n{traceback.format_exc()}", "ERROR")
+            # 编码资源损坏时仍给出可识别的非零 result，不再次调用故障编码器。
+            if locals().get("cmd") in (10038, 10042):
+                try:
+                    self.request.sendall(pack_down(cmd + 1, b"\x08\x01",
+                                                  up["index"], up["server_idx"] + 1))
+                except OSError:
+                    pass
         finally:
             self.server.core.log(f"[GW:{self.server.gw_port}] [{peer}] 连接关闭", "INFO")
 
@@ -558,6 +569,10 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
         from gm_api import gm_bp, init_gm_api
         init_gm_api(core=core, game_port=game_port, gw_port=gw_port, host_ip=lan_ip)
         app.register_blueprint(gm_bp, url_prefix="/api/gm")
+        # Existing launcher versions poll this legacy URL every 1.5 seconds.
+        # Reuse the read-only GM endpoint instead of the noisy SDK catch-all.
+        app.add_url_rule("/api/system/res_version", endpoint="shell_res_version",
+                         view_func=app.view_functions["gm_api.get_res_version"], methods=["GET"])
         print("[V5] GM API 统一蓝图已成功挂载到 /api/gm", flush=True)
     except Exception as _e:
         print(f"[V5] 挂载 GM API 蓝图异常: {_e}", flush=True)
@@ -1567,7 +1582,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                             "sortWeight": 0,
                             "type": "install",
                             "version": "307",
-                            "versionName": "307",
+                            "versionName": cur_ver_name,
                             "forceUpdate": False,
                             "fileSize": 0,
                             "disDate": int(time.time() * 1000),
@@ -1602,7 +1617,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                     {
                         "createDate": 1785986740964, "modifyDate": 1785986740964,
                         "sortWeight": 0, "type": "install", "version": "307",
-                        "versionName": "307", "forceUpdate": True, "fileSize": 0,
+                        "versionName": cur_ver_name, "forceUpdate": False, "fileSize": 0,
                         "disDate": 1751385600000,
                         "downloadUrl": "https://packaging.ys4fun.com/packagepc/prod/307/AetherGazer_zh_cn_ali_prod_307_210_3_windows_limit_sdk_release_W12000000_5FF9A0158EA7C050D03D419F16DB8625.zip",
                         "extraData": "{\"videoMd5\":\"80ed3ea7f7a1c5314b86c33a0378f65c\",\"videoSize\":\"83636032\",\"videoName\":\"5.2_PV\",\"videoUrl\":\"https://download.ys4fun.com/video/5.2_PV.usm\"}",

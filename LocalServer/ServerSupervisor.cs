@@ -61,16 +61,55 @@ public sealed class ServerSupervisor : IDisposable
             }
         }
 
-        // 2. 查找环境变量中的 python
+        // 2. 检查本机标准用户及系统 Python 安装目录 (避免踩入 WindowsApps 0 字节别名陷阱)
+        string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string[] standardCandidates = [
+            Path.Combine(localAppData, "Python", "bin", "python.exe"),
+            Path.Combine(localAppData, "Programs", "Python", "Python314", "python.exe"),
+            Path.Combine(localAppData, "Programs", "Python", "Python313", "python.exe"),
+            Path.Combine(localAppData, "Programs", "Python", "Python312", "python.exe"),
+            Path.Combine(localAppData, "Programs", "Python", "Python311", "python.exe"),
+            Path.Combine(localAppData, "Programs", "Python", "Python310", "python.exe"),
+            @"C:\Program Files\Python314\python.exe",
+            @"C:\Program Files\Python313\python.exe",
+            @"C:\Program Files\Python312\python.exe",
+            @"C:\Program Files\Python311\python.exe",
+            @"C:\Program Files\Python310\python.exe"
+        ];
+
+        foreach (var candidate in standardCandidates)
+        {
+            if (File.Exists(candidate))
+            {
+                try
+                {
+                    if (new FileInfo(candidate).Length > 0)
+                        return candidate;
+                }
+                catch { }
+            }
+        }
+
+        // 3. 查找环境变量中的 python (严格过滤 WindowsApps 假别名与空文件)
         string? envPath = Environment.GetEnvironmentVariable("PATH");
         if (!string.IsNullOrEmpty(envPath))
         {
             foreach (string p in envPath.Split(Path.PathSeparator))
             {
-                string candidate = Path.Combine(p.Trim(), "python.exe");
+                string dirTrimmed = p.Trim();
+                if (dirTrimmed.Contains("WindowsApps", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                string candidate = Path.Combine(dirTrimmed, "python.exe");
                 if (File.Exists(candidate))
                 {
-                    return candidate;
+                    try
+                    {
+                        if (new FileInfo(candidate).Length > 0)
+                            return candidate;
+                    }
+                    catch { }
                 }
             }
         }

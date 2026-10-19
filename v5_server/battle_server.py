@@ -223,7 +223,7 @@ class BattleServer:
         self.port = port
         self.log = log or (lambda *a, **k: None)
         self.on_result = on_result
-        self.server_ts = server_ts   # 与游戏服一致的 unix 秒（Pong 时间基准；None 用收敛差值序列）
+        self.server_ts = server_ts   # Unix 秒，可含小数；Pong 在线路上使用毫秒，None 保留兼容序列
         self.running = False
         self._lock = threading.Lock()
         self._conns = {}             # client_id -> session
@@ -277,7 +277,8 @@ class BattleServer:
     def _new_session(self, client_id, server_id, addr):
         st = {"conn": server_id, "conv": client_id, "client_id": client_id,
               "ts": 0, "sn": -1, "ack_una": 0, "frame_count": 0, "started": False,
-              "sn_peer_base": None, "addr": addr, "last_seen": time.time()}
+              "sn_peer_base": None, "addr": addr, "last_seen": time.time(),
+              "entry_started": time.monotonic(), "entry_pings": 0}
         self._conns[client_id] = st
         return st
 
@@ -370,18 +371,29 @@ class BattleServer:
         op, rpc = f["opcode"], f["rpc_id"]
         addr = st.get("addr")
         if op == OP_PING:
+            ping_started = time.monotonic()
             ct = parse_ping(f["body"])
             with self._lock:
                 n = self._pong_seq.get(st["client_id"], 0)
                 self._pong_seq[st["client_id"]] = n + 1
             if self.server_ts:
-                srv = int(self.server_ts()) * 1000 if callable(self.server_ts) \
-                    else int(self.server_ts) * 1000
+                srv = int(self.server_ts() * 1000) if callable(self.server_ts) \
+                    else int(self.server_ts * 1000)
             else:
                 srv = ct + PONG_DELTAS[min(n, len(PONG_DELTAS) - 1)]
             # KCP.Input 按段逐个解析，一段失败整包丢弃 → Pong 必须独立成包，不与 ACK 合并
             self._send_frame(addr, st, OP_PONG, _u64(ct) + _u64(srv),
                              rpc_id=rpc, ts=srv & 0xFFFFFFFF)
+            elapsed_ms = (time.monotonic() - ping_started) * 1000
+            st["entry_pings"] = st.get("entry_pings", 0) + 1
+            delta = srv - ct
+            st["pong_delta_min"] = min(st.get("pong_delta_min", delta), delta)
+            st["pong_delta_max"] = max(st.get("pong_delta_max", delta), delta)
+            st["pong_max_handler_ms"] = max(st.get("pong_max_handler_ms", 0), elapsed_ms)
+            if st["entry_pings"] == 1:
+                first_ms = (ping_started - st.get("entry_started", ping_started)) * 1000
+                self.log(f"[BattleSrv] 入场首个PONG client={st['client_id']} after_ms={first_ms:.2f} "
+                         f"client_ms={ct} server_ms={srv} handler_ms={elapsed_ms:.2f}")
         elif op == OP_CONNECT_REQUEST:
             self._send_frame(addr, st, OP_CONNECT_RESPONSE,
                              _f_varint2(1, 0) + _f_varint2(2, 1) + _f_varint2(3, 1), rpc_id=rpc)
@@ -393,6 +405,7 @@ class BattleServer:
                              enc_ack_join_room(battle_id, 1, role_id), rpc_id=rpc)
             self._send_frame(addr, st, OP_START_MATCH, b"", flag=0)
         elif op == OP_PLAYER_READY:
+            ready_started = time.monotonic()
             uuid_v, battle_id = parse_player_ready(f["body"])
             st["battle_id"] = battle_id
             st["player_ready"] = True
@@ -401,6 +414,15 @@ class BattleServer:
                              enc_ack_player_ready(battle_id or 1), rpc_id=rpc)
             self._send_frame(addr, st, OP_START_MATCH, b"", flag=0)
             st["started"] = True
+            if not st.get("entry_ready_logged"):
+                st["entry_ready_logged"] = True
+                now = time.monotonic()
+                total_ms = (now - st.get("entry_started", ready_started)) * 1000
+                delta_span = st.get("pong_delta_max", 0) - st.get("pong_delta_min", 0)
+                self.log(f"[BattleSrv] 入场Ready client={st['client_id']} total_ms={total_ms:.2f} "
+                         f"pings={st.get('entry_pings', 0)} delta_span_ms={delta_span} "
+                         f"pong_max_handler_ms={st.get('pong_max_handler_ms', 0):.2f} "
+                         f"ready_reply_ms={(now - ready_started) * 1000:.2f}")
         elif op == OP_FETCH_TEAM_INFO:
             self._send_frame(addr, st, OP_ACK_FETCH_TEAM_INFO, b"", rpc_id=rpc)
         elif op == OP_BATTLE_RESULT:
