@@ -1,5 +1,7 @@
 # Alpha Persei Cluster
 
+> This project is maintained by one person. Recent commitments may slow down bug investigation and fixes; thank you for your patience and understanding.
+
 <div align="center">
 
 [简体中文](./README.md) | **English**
@@ -193,7 +195,7 @@ Run `python main.py --help` in the `v5_server` directory to inspect available op
 | `--client-assets-dir` | `string` | Empty | Path to the client's `StreamingAssets` directory for version detection |
 | `--capture-cdn` | `flag` | `True` | Forward CDN requests to official mirrors and cache downloaded assets locally |
 | `--no-capture-cdn` | `flag` | - | Disable external CDN probing; operate strictly offline |
-| `--dns` | `flag` | `False` | Run a lightweight UDP:53 DNS redirection server (requires Administrator) |
+| `--dns` | `flag` | `False` | Run a lightweight UDP/TCP:53 DNS redirection server (requires Administrator) |
 | `--log-level` | `enum` | `INFO` | Console output verbosity: `DEBUG`, `INFO`, `WARN`, `ERROR` |
 | `--self-check` | `flag` | - | Validate component initialization and operation registrations, then exit |
 
@@ -214,7 +216,7 @@ The 70 Python modules in `v5_server` are systematically divided into 9 functiona
 
 * **`server_net.py`**: Multi-protocol network gateway. Listens on TCP 8102 (Gateway) and 8105 (Game), provides HTTPS (443) and HTTP (80) routing, and serves static files and WebP assets;
 * **`transport.py`**: Binary TCP transport framer. Handles streaming packet boundaries, magic bytes, payload length calculations, and sequence numbers;
-* **`dns_server.py`**: Lightweight UDP:53 DNS server for redirecting target domains to the server machine's local IP;
+* **`dns_server.py`**: Lightweight UDP/TCP:53 DNS server that redirects target domains to the host's LAN IP and forwards other queries upstream;
 * **`cdn_proxy.py`**: Transparent CDN proxy and caching module. Retrieves remote asset patches requested by clients and writes them to local storage;
 * **`fetch_manifests.py`**: Remote asset manifest fetcher and parser for indexing version hashes;
 * **`gen_cert.py`**: Self-signed Certificate Authority (CA) and SSL certificate generator, with support for exporting `.mobileconfig` profiles for iOS.
@@ -382,7 +384,7 @@ The management console is built with **React 19 + TypeScript + Tailwind CSS** an
   - Tower Climb has no protocol implementation; AutoChess and Verthandi events lack rigorous testing;
 - [ ] **Automated Account Migration**: Packet analysis and database conversion tools have not yet been automated;
 - [ ] **Costume Gacha Banner**: Exclusive costume banner mechanics have not yet been implemented.
-- [ ] **DNS Issue**: There is a distribution problem with the current DNS component when connecting the iPhone, causing the device to go offline when using this DNS address.
+- [x] **DNS issue (initially resolved)**: Forwarding for non-target domains has been fixed, with UDP/TCP queries and failure responses supported. Further observation across iPhones and other devices on different networks is still needed.
 - [ ] **Potential Program Issues**: In addition to the known issues mentioned above, you may still encounter other problems while using this program—such as the loading overlay freezing or "Network Connection Failed" pop-ups. These issues typically stem from Lua crashes caused by anomalous server protocol frame fields, or a failure to receive responses (or receiving responses with incorrect frame numbers) due to missing fallback mappings for skeleton files.
 - [ ] **Gameplay/Experience Issues**: These are issues affecting your actual in-game experience, such as items not being granted correctly, items being deducted multiple times or at incorrect rates, incorrect return rates for items, anomalies in item or numerical value updates, and toast notifications indicating errors like "Remote Call Error." These problems generally arise from anomalies in the program's internal execution logic; minor numerical display issues can often be resolved by exiting to the login screen and re-entering the game. If the issue involves database errors, you may—if you have the technical capability—compile the source code yourself to update the core, or submit an issue to provide feedback. I am deeply grateful to everyone willing to try this project and submit reports; your contributions significantly improve the project's usability.
 
