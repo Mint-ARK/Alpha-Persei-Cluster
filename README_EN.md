@@ -26,7 +26,12 @@
 
 This maintenance release updates runtime flows and packaging integrity. Download the validated portable, installer, or backend package from [v5.0.1](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/tag/v5.0.1). See the [changelog](CHANGELOG.md) and verify downloads with [SHA256SUMS.txt](SHA256SUMS.txt).
 
-Back up your database, extract to a separate directory, and stop the previous server before starting the update. Distribution certificates are separate from the development environment; mobile devices must install and trust the certificate/profile provided by their current host. Full game resources and external CDN caches are not included. The archived iOS resource manifests cover builds 229/321; the original iOS311 manifest remains unavailable.
+Back up your database, extract to a separate directory, and stop the previous server before starting the update. Distribution certificates are separate from the development environment; mobile devices must install and trust the certificate/profile provided by their current host. Full game resources and external CDN caches are not included.
+
+**Platform and resource support:**
+
+- **iOS: Only builds 321 / 229 are currently supported. Build 229 supports the in-app purchase experience. The 311 version option is invalid**, as the maintainer missed capturing the iOS311 resource package and its corresponding resource manifests are unavailable.
+- **Android and other platforms:** Due to the maintainer's limited access to devices and testing environments, the corresponding internal asset manifests have not been configured. Users must configure and import these manifests themselves.
 
 ---
 
