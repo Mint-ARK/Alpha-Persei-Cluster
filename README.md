@@ -2,6 +2,8 @@
 
 > 本项目由个人独立维护，近期事务较多，问题排查与修复进度可能较慢，感谢大家的耐心与理解。
 
+> **问题排查**：请先查阅[问题索引与扫描报告](https://github.com/Mint-ARK/Alpha-Persei-Cluster/blob/codex/diagnostic-reports-20261020/reports/README.md)，按功能模块和异常现象找到对应报告，再结合其中的初步定位、相关文件与协议入口排查；也可将报告交给 Agent 辅助定位。提交 Issue 时，请附上客户端平台、版本、复现步骤及相关日志，并注明对应的 A 编号（如有）。
+
 <div align="center">
 
 **简体中文** | [English](./README_EN.md)

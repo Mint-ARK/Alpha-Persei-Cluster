@@ -2,6 +2,8 @@
 
 > This project is maintained by one person. Recent commitments may slow down bug investigation and fixes; thank you for your patience and understanding.
 
+> **Troubleshooting**: Start with the [issue index and scan reports](https://github.com/Mint-ARK/Alpha-Persei-Cluster/blob/codex/diagnostic-reports-20261020/reports/README.md). Find the relevant feature and symptom, then use the report's initial diagnosis, files, and protocol entry points to investigate, or share it with an agent for help. When opening an Issue, include your client platform, version, reproduction steps, relevant logs, and the matching A-number if available.
+
 <div align="center">
 
 [简体中文](./README.md) | **English**
