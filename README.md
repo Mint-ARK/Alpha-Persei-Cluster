@@ -28,6 +28,8 @@
 
 本次为运行链路与封包修复更新。下载已验证的便携版、安装版或独立后端包，请前往 [v5.0.1 发行页](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/tag/v5.0.1)；变更与限制见 [更新记录](CHANGELOG.md)，下载后可按 [SHA256SUMS.txt](SHA256SUMS.txt) 校验。
 
+**推荐下载便携压缩包 `AetherGazer_Server_v5.0_Portable.zip`，无需安装。** 解压后可自由选择启动方式：运行 `启动离线单机服务(控制台).bat` 使用 CMD，或运行 `LocalServer.exe` / `启动离线单机服务(GUI界面).bat` 使用壳程序。安装包可按需选择。
+
 升级前请备份原数据库，将新版解压至独立目录，关闭旧服务后再启动。发布包使用独立的发行证书；移动端需安装并信任本次宿主机提供的证书/描述文件。游戏完整资源与外置 CDN 缓存不随服务端包提供。
 
 **平台与资源支持说明：**
