@@ -235,24 +235,34 @@ def validate_release_database(path):
         conn.close()
 
 
-def seal_runtime(target, plan, python_executable=sys.executable):
+def seal_runtime(target, plan, python_executable=sys.executable, *, additional_saves=()):
     """Only a validated payload gets an inventory and can proceed to publication."""
     target = Path(target)
     validate_staged_assets(target, plan)
     for name in ("account.db", "run_server.bat"):
         if not (target / name).is_file() or (target / name).stat().st_size == 0:
             raise PackageContractError(f"缺少完整发布包必需文件: {name}")
-    validate_release_database(target / 'account.db')
+    save_files = {"account.db"}
+    for name in additional_saves:
+        name = relative_name(name)
+        if "/" in name or not name.lower().endswith(".db") or len(Path(name).stem) > 32:
+            raise PackageContractError(f"额外发行存档名称无效: {name}")
+        save_files.add(name)
+    for name in sorted(save_files):
+        path = target / name
+        if not path.is_file() or path.is_symlink() or path.stat().st_size == 0:
+            raise PackageContractError(f"缺少指定发行存档: {name}")
+        validate_release_database(path)
     probe = probe_runtime(target, python_executable)
-    inventory = {"version": 1, "probe": probe, "files": {}}
+    inventory = {"version": 1, "probe": probe, "save_files": sorted(save_files), "files": {}}
     for path in sorted(target.rglob("*")):
         if not path.is_file():
             continue
         name = path.relative_to(target).as_posix()
         if name == INVENTORY_NAME:
             raise PackageContractError("暂存目录已有封包清单，拒绝覆盖")
-        if path.suffix.lower() == ".db" and name != "account.db":
-            raise PackageContractError(f"发布目录混入非主数据库: {name}")
+        if path.suffix.lower() == ".db" and name not in save_files:
+            raise PackageContractError(f"发布目录混入未指定数据库: {name}")
         inventory["files"][name] = {"size": path.stat().st_size, "sha256": file_hash(path)}
     (target / INVENTORY_NAME).write_text(json.dumps(inventory, ensure_ascii=False, indent=2), encoding="utf-8")
     return inventory
