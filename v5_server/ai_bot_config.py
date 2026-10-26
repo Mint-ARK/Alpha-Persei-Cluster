@@ -12,6 +12,7 @@ import json
 import re
 import shutil
 import tempfile
+import copy
 
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ai_bot_config.json")
 LOCAL_ENV_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
@@ -229,6 +230,37 @@ def get_bot_config() -> dict:
                 p_info["api_key"] = get_api_key(env_key)
 
     return config
+
+
+def validate_model_route(route, providers=None):
+    """A save stores provider/model selection only, never credentials/endpoints."""
+    if not isinstance(route, dict) or set(route) != {'provider', 'model'}:
+        raise ValueError('角色模型配置只能包含provider和model')
+    provider = route['provider']
+    model = route['model']
+    if not isinstance(provider, str) or not provider.strip():
+        raise ValueError('角色模型provider不能为空')
+    provider = provider.strip()
+    providers = providers if providers is not None else get_bot_config().get('providers', {})
+    if provider not in providers:
+        raise ValueError('角色模型provider未在服务端配置')
+    if not isinstance(model, str) or not model.strip() or len(model) > 160 or any(c in model for c in '\r\n\t'):
+        raise ValueError('角色模型model必须为1至160字符的单行调用名')
+    return {'provider': provider, 'model': model.strip()}
+
+
+def resolve_character_config(db, uid, char_id, cfg=None):
+    """Resolve one request without mutating the shared/global provider config."""
+    base = cfg if cfg is not None else get_bot_config()
+    getter = getattr(db, 'get_character_model_route', None)
+    route = getter(uid, char_id) if getter is not None else None
+    if not route:
+        return base
+    route = validate_model_route(route, base.get('providers', {}))
+    resolved = copy.deepcopy(base)
+    resolved['provider'] = route['provider']
+    resolved['providers'][route['provider']]['model'] = route['model']
+    return resolved
 
 
 def get_masked_config(cfg=None) -> dict:

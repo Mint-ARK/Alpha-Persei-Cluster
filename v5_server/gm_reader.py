@@ -14,6 +14,7 @@ import time
 import json
 import sqlite3
 import threading
+from pathlib import Path
 
 DEFAULT_DB = os.environ.get(
     "ACCOUNT_DB_PATH",
@@ -458,22 +459,17 @@ def _calc_star_skill_add(hero_id: int, star: int) -> dict:
 class GMReader:
     """GM 只读数据查询组件。"""
 
-    def __init__(self, db_path=DEFAULT_DB):
-        self.db_path = db_path
+    def __init__(self, db_path=None):
+        self.db_path = DEFAULT_DB if db_path is None else db_path
         self._local = threading.local()
 
     def _get_ro_conn(self):
         """获取当前线程专属的只读 SQLite 连接。"""
         conn = getattr(self._local, "conn", None)
         if conn is None:
-            # 优先使用 SQLite URI 只读模式
-            abs_path = os.path.abspath(self.db_path).replace("\\", "/")
-            uri = f"file:{abs_path}?mode=ro"
-            try:
-                conn = sqlite3.connect(uri, uri=True, timeout=5.0)
-            except Exception:
-                # 降级常规只读
-                conn = sqlite3.connect(self.db_path, timeout=5.0)
+            # A deleted/unavailable save must not be recreated as an empty DB.
+            uri = Path(self.db_path).resolve().as_uri() + '?mode=ro'
+            conn = sqlite3.connect(uri, uri=True, timeout=5.0)
 
             conn.row_factory = sqlite3.Row
             try:
@@ -790,12 +786,13 @@ class GMReader:
         # 1. 基础档案
         level = int(u_row.get("level") or 80)
         exp = int(u_row.get("exp") or 0)
-        sign = u_row.get("sign") or "心之所向，剑之所指。"
+        from profile_rules import signature_value
+        sign = signature_value(u_row, extra)
         nick = u_row.get("nick") or f"管理员_{uid}"
 
         # 2. game_user 辅助查询
         gu_row = self.query_one(
-            "SELECT board_hero, cur_portrait, cur_icon_frame, cur_card_bg, cur_bubble, birth_month, birth_day FROM game_user WHERE uid = ?", (uid,)
+            "SELECT board_hero, cur_portrait, cur_icon_frame, cur_card_bg, cur_bubble, birth_month, birth_day, cur_sticker_bg FROM game_user WHERE uid = ?", (uid,)
         ) or {}
 
         portrait_id = gu_row.get("cur_portrait") or u_row.get("portrait") or 1084
@@ -871,115 +868,25 @@ class GMReader:
         is_online = bool(w_row.get("is_online", 0))
         client_device = "Windows 在线" if is_online else "离线"
 
-        # 8. 贴纸画册与个性化贴纸墙 (Sticker Wall)
-        stickers_catalog = {}
+        # 8. Share selection with gameplay; selecting an unsaved wall is an empty wall.
+        from sticker_wall_rules import web_wall_views
+        with open(os.path.join(os.path.dirname(__file__), "stickers_catalog.json"), encoding="utf-8") as stream:
+            stickers_catalog = json.load(stream)
+        cards = self.query("SELECT kind, item_id, obtained FROM player_card WHERE uid=?", (uid,))
+        sticker_wall, sticker_walls = web_wall_views(extra, gu_row, cards, stickers_catalog)
+
+        from profile_rules import birthday_from_rows
+        # The generic Reader query swallows SQL errors. Birthday reads must
+        # distinguish a missing row from a failure before showing an unset date.
+        birthday_rows = [dict(row) for row in self._get_ro_conn().execute(
+            "SELECT birth_month, birth_day FROM game_user WHERE uid=?", (uid,)).fetchall()]
+        birthday_invalid = False
         try:
-            stk_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stickers_catalog.json")
-            with open(stk_path, "r", encoding="utf-8") as f:
-                stickers_catalog = json.load(f)
-        except Exception:
-            pass
-
-        stk_map = stickers_catalog.get("stickers", {})
-        bg_map = stickers_catalog.get("backgrounds", {})
-
-        raw_sticker_pages = extra.get("sticker_show_info") or []
-        active_page_id = extra.get("sticker_show_page")
-
-        # 找到当前展示的背景页 (若未指定，则取第一页或默认背景 4002)
-        cur_page = None
-        if active_page_id:
-            for p in raw_sticker_pages:
-                if isinstance(p, dict) and p.get("page_id") == active_page_id:
-                    cur_page = p
-                    break
-        if not cur_page and raw_sticker_pages and isinstance(raw_sticker_pages[0], dict):
-            cur_page = raw_sticker_pages[0]
-
-        if not cur_page:
-            cur_page = {"page_id": 4002, "foreground": 0, "sticker_display_info": []}
-
-        page_id = cur_page.get("page_id", 4002)
-        bg_meta = bg_map.get(str(page_id), {})
-        page_name = bg_meta.get("name", f"背景_{page_id}")
-        page_desc = bg_meta.get("desc", "")
-
-        stickers_list = []
-        for s in cur_page.get("sticker_display_info") or []:
-            sid = s.get("sticker_id")
-            s_meta = stk_map.get(str(sid), {})
-            stickers_list.append({
-                "id": sid,
-                "name": s_meta.get("name", f"贴纸_{sid}"),
-                "desc": s_meta.get("desc", ""),
-                "rare": s_meta.get("rare", 5),
-                "location_x": s.get("location_x", 0),
-                "location_y": s.get("location_y", 0),
-                "scale": s.get("scale", 5000),
-                "layer": s.get("layer", 1),
-                "rotate": s.get("rotate", 0),
-            })
-
-        # 按 layer 从小到大排序
-        stickers_list.sort(key=lambda x: x["layer"])
-
-        sticker_wall = {
-            "page_id": page_id,
-            "page_name": page_name,
-            "page_desc": page_desc,
-            "foreground": cur_page.get("foreground", 0),
-            "total_stickers": len(stickers_list),
-            "stickers": stickers_list,
-        }
-
-        # 构建支持完整左右切换的多贴纸墙画卷列表
-        user_pages_map = {}
-        for p in raw_sticker_pages:
-            if isinstance(p, dict) and "page_id" in p:
-                user_pages_map[p["page_id"]] = p
-
-        all_bg_ids = [4007, 4001, 4002, 4003, 4004, 4006, 4008, 4009]
-        ordered_bg_ids = []
-        if page_id in all_bg_ids:
-            ordered_bg_ids.append(page_id)
-        for bid in all_bg_ids:
-            if bid not in ordered_bg_ids:
-                ordered_bg_ids.append(bid)
-        for pid in user_pages_map:
-            if pid not in ordered_bg_ids:
-                ordered_bg_ids.append(pid)
-
-        sticker_walls = []
-        for pid in ordered_bg_ids:
-            p_data = user_pages_map.get(pid, {"page_id": pid, "foreground": 0, "sticker_display_info": []})
-            p_meta = bg_map.get(str(pid), {})
-            p_name = p_meta.get("name", f"背景_{pid}")
-            p_desc = p_meta.get("desc", "")
-            p_stickers = []
-            for s in p_data.get("sticker_display_info") or []:
-                sid = s.get("sticker_id")
-                s_meta = stk_map.get(str(sid), {})
-                p_stickers.append({
-                    "id": sid,
-                    "name": s_meta.get("name", f"贴纸_{sid}"),
-                    "desc": s_meta.get("desc", ""),
-                    "rare": s_meta.get("rare", 5),
-                    "location_x": s.get("location_x", 0),
-                    "location_y": s.get("location_y", 0),
-                    "scale": s.get("scale", 5000),
-                    "layer": s.get("layer", 1),
-                    "rotate": s.get("rotate", 0),
-                })
-            p_stickers.sort(key=lambda x: x["layer"])
-            sticker_walls.append({
-                "page_id": pid,
-                "page_name": p_name,
-                "page_desc": p_desc,
-                "foreground": p_data.get("foreground", 0),
-                "is_active": (pid == page_id),
-                "total_stickers": len(p_stickers),
-                "stickers": p_stickers,
-            })
+            birthday = birthday_from_rows(birthday_rows)
+        except ValueError:
+            # Keep the profile editable so a GM can correct an old invalid date.
+            birthday = {"month": 0, "day": 0}
+            birthday_invalid = True
 
         profile = {
             "uid": uid,
@@ -987,6 +894,8 @@ class GMReader:
             "level": level,
             "exp": exp,
             "sign": sign,
+            "birthday": birthday,
+            "birthday_invalid": birthday_invalid,
             "avatar_id": portrait_id,
             "icon_frame_id": icon_frame_id,
             "profile_tags": profile_tags,
@@ -2668,11 +2577,13 @@ _reader_instance = None
 _reader_lock = threading.Lock()
 
 
-def get_reader(db_path=DEFAULT_DB):
+def get_reader(db_path=None):
     """获取 GMReader 单例对象。"""
     global _reader_instance
-    if _reader_instance is None:
-        with _reader_lock:
-            if _reader_instance is None:
-                _reader_instance = GMReader(db_path=db_path)
-    return _reader_instance
+    target = DEFAULT_DB if db_path is None else db_path
+    with _reader_lock:
+        if _reader_instance is None or os.path.abspath(_reader_instance.db_path) != os.path.abspath(target):
+            # Replace the object instead of rebinding an in-flight reader's
+            # thread-local SQLite connection to a different save.
+            _reader_instance = GMReader(db_path=target)
+        return _reader_instance

@@ -48,6 +48,40 @@ HERO_BIRTHDAYS_PATH = os.path.join(BASE_DIR, "data", "ai_hero_birthdays.json")
 SKIN_DATA_PATH = os.path.join(os.path.dirname(BASE_DIR), "all_skins_data.json")
 
 
+_MAIL_TASK_RULES = (
+    "【本轮场景：独立邮件写作】\n"
+    "保持发信角色的人格与语气，克制的角色无需刻意热情。"
+    "普通私聊的1至3句话、JSON或工程报告三段格式不适用于本次邮件；"
+    "第一行只写“标题：XXX”，空一行后写120至250字左右的自然中文正文。"
+    "不输出JSON、Markdown、会话编号、测试哨兵或内部指令，不向收信人追问写信所需条件。"
+    "身份、日期和生日归属以本轮写信任务为准；不能把角色生日写成管理员生日。"
+    "未提供关系或过往经历时，不虚构恋爱关系、共同事件或已经完成的操作。"
+    "礼物只概述为随信心意或补给，不擅自承诺具体道具、数量或额外奖励。"
+)
+
+
+def _birthday_mail_timing(event_info):
+    """Describe delivery versus birthday dates without consulting chat history."""
+    def read_date(key):
+        try:
+            return datetime.date.fromisoformat(event_info.get(key) or '')
+        except (ValueError, TypeError):
+            return None
+
+    delivery = read_date('delivery_date') or datetime.date.today()
+    birthday = read_date('birthday_date')
+    catchup = bool(event_info.get('is_catchup')) or bool(birthday and birthday < delivery)
+    birthday_label = birthday.isoformat() if birthday else '此前的生日'
+    if catchup:
+        context = (
+            f"本次投递日期为{delivery.isoformat()}，这是为管理员{birthday_label}补送的生日祝福。\n"
+            "请自然表达补送的心意，不编造迟到原因；不要说今天是管理员生日，也不安排已经过去的当天庆典。\n"
+        )
+    else:
+        context = f"本次投递日期为{delivery.isoformat()}。今天是深空之眼管理员（玩家）的生日。\n"
+    return catchup, birthday_label, context
+
+
 def _load_user_extra(db, uid):
     try:
         rows = db.query("SELECT extra FROM users WHERE uid=?", (uid,))
@@ -370,6 +404,9 @@ class AITranslator:
         event_name = event_info.get("name", "特别纪念日")
         event_desc = event_info.get("desc", "")
         event_type = event_info.get("type", "holiday")
+        birthday_context = ''
+        if event_type in ("user_birthday", "player_birthday"):
+            _, _, birthday_context = _birthday_mail_timing(event_info)
 
         # 角色生日双轨判定：
         # 第一判定：是否有角色人格提示词。
@@ -411,7 +448,7 @@ class AITranslator:
             mail_content = ""
             use_llm = True
 
-        cfg = ai_bot_config.get_bot_config()
+        cfg = ai_bot_config.resolve_character_config(db, uid, 0 if is_overview_mode else char_id)
         active_provider = cfg.get("provider", "opencode")
         p_info = cfg.get("providers", {}).get(active_provider, {})
         has_key = bool(p_info.get("api_key") or active_provider == "ollama")
@@ -428,7 +465,7 @@ class AITranslator:
                     if event_type in ("user_birthday", "player_birthday"):
                         gen_prompt = (
                             "你是《深空之眼》总务处。\n"
-                            "今天是深空之眼管理员（玩家）的生日。\n"
+                            f"{birthday_context}"
                             "请谨代表深空之眼总务处与全体在编修正者，向管理员致一封正式、温暖且充满崇高敬意的生日贺函。\n"
                             "要求：\n"
                             "1. 祝贺管理员生日快乐，由衷感谢管理员一直以来的战术统筹、守护与并肩作战；\n"
@@ -466,7 +503,7 @@ class AITranslator:
                 elif event_type in ("user_birthday", "player_birthday"):
                     gen_prompt = (
                         f"你是《深空之眼》中的修正者【{char_name}】。\n"
-                        f"今天是深空之眼管理员（玩家）的生日！\n"
+                        f"{birthday_context}"
                         f"请以符合你身份性格与说话习惯的第一人称口吻，给深空之眼的管理员写一封真挚、温暖且富有个性特色的生日祝贺邮件。\n"
                         f"要求：\n"
                         f"1. 祝贺管理员生日快乐，表达并肩作战以来的信任与羁绊，感谢管理员一直以来的守护与指导；\n"
@@ -489,6 +526,7 @@ class AITranslator:
 
                 if system_prompt and not is_overview_mode:
                     gen_prompt = f"{system_prompt}\n\n---\n{gen_prompt}"
+                gen_prompt = f"{gen_prompt}\n\n{_MAIL_TASK_RULES}"
 
                 llm_reply = ai_bot_service.generate_response(
                     system_prompt=gen_prompt,
@@ -556,6 +594,16 @@ class AITranslator:
         is_overview_mode = bool(is_overview or is_mascot)
         etype = event_info.get("type")
         ename = event_info.get("name")
+
+        if etype in ("user_birthday", "player_birthday"):
+            catchup, birthday_label, _ = _birthday_mail_timing(event_info)
+            if catchup:
+                key = 'deepspace_birthday_catchup' if is_overview_mode else 'user_birthday_catchup'
+                template = self._templates.get(key) or {
+                    'title': '【生日祝愿】补送给管理员的心意',
+                    'content': '管理员：\n为您{birthday_date}补送一份生日祝福。随信附上心意，愿您接下来的日子平安顺遂。',
+                }
+                return dict(template, content=template.get('content', '').replace('{birthday_date}', birthday_label))
 
         if is_overview_mode:
             if etype in ("user_birthday", "player_birthday"):
@@ -632,7 +680,12 @@ class AITranslator:
         today_date = cur_date if cur_date is not None else datetime.date.today()
         if isinstance(today_date, datetime.datetime): today_date = today_date.date()
         cal_data = get_calendar_events(today_date, uid=uid, db=_db)
-        events = cal_data.get("events", [])
+        events = [event for event in cal_data.get("events", [])
+                  if event.get('type') not in ('user_birthday','player_birthday')]
+        if _db is not None and uid:
+            from birthday_service import due_greeting_event
+            birthday_event=due_greeting_event(_db,uid,today_date)
+            if birthday_event:events.append(birthday_event)
         if not events:
             return {
                 "status": "no_events",
@@ -649,6 +702,8 @@ class AITranslator:
         all_dispatched = []
 
         for ev in events:
+            # Carry the scheduler's date into worker threads and simulated checks.
+            ev = dict(ev, delivery_date=date_str)
             ev_type = ev.get("type", "holiday")
             ev_name = ev.get("name", "特别日")
 
@@ -657,10 +712,11 @@ class AITranslator:
                 char_tag = ev.get("record_id") or ev.get("char_id") or ev_name
                 ev_key = f"{date_str}_hero_birthday_{ev_name}_{char_tag}"
             elif ev_type in ("user_birthday", "player_birthday"):
-                ev_key = f"{date_str}_user_birthday"
+                birthday_year=int(ev.get('birthday_year') or cur_year)
+                ev_key = f"{date_str}_user_birthday_{birthday_year}"
                 # 玩家生日年度防重锁
                 last_b_year = extra.get("last_birthday_mail_year", 0)
-                if not force and last_b_year == cur_year:
+                if not force and int(last_b_year or 0) >= birthday_year:
                     continue
             else:
                 ev_key = f"{date_str}_{ev_type}_{ev_name}"
@@ -711,7 +767,7 @@ class AITranslator:
             if event_dispatched:
                 sent_history.setdefault(date_str, []).append(ev_key)
                 if ev_type in ("user_birthday", "player_birthday"):
-                    extra["last_birthday_mail_year"] = cur_year
+                    extra["last_birthday_mail_year"] = max(int(extra.get('last_birthday_mail_year') or 0),birthday_year)
 
         state_saved = _save_user_extra(_db, uid, extra)
         return {
@@ -722,11 +778,19 @@ class AITranslator:
             "state_saved": state_saved,
         }
 
-    def trigger_login_greeting(self, uid, db=None):
+    def trigger_login_greeting(self, uid, db=None, cur_date=None):
         """登录钩子：静默触发今日问候检查（零阻塞）"""
+        bound_db = self._get_db(db)
         def _worker():
             try:
-                return self.check_daily_greetings(uid, db=db, force=False)
+                result = self.check_daily_greetings(uid, db=bound_db, cur_date=cur_date, force=False)
+                if result.get('dispatched_count', 0):
+                    try:
+                        from server_net import push_mail_notice
+                        push_mail_notice(uid, expected_db=bound_db)
+                    except Exception as exc:
+                        logger.warning('问候邮件已发送，但在线摘要推送失败 uid=%s: %s', uid, exc)
+                return result
             except Exception as e:
                 logger.warning(f"登录触发 AI 问候信件异常 (uid={uid}): {e}")
                 return None

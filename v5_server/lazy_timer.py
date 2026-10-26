@@ -69,6 +69,13 @@ def get_monthly_5am_ts(now_ts=None):
 
 # ==================== 惰性时间戳广播源核心类 ====================
 
+def get_next_monthly_5am_ts(now_ts=None):
+    """当前游戏月结束的自然月1日05:00，兼容月初05:00前与跨年。"""
+    start = datetime.datetime.fromtimestamp(get_monthly_5am_ts(now_ts))
+    year, month = (start.year + 1, 1) if start.month == 12 else (start.year, start.month + 1)
+    return int(start.replace(year=year, month=month).timestamp())
+
+
 class LazyTimerBroadcaster:
     """全局惰性时间广播源"""
 
@@ -81,7 +88,7 @@ class LazyTimerBroadcaster:
         2. 微防抖与周期边界判定（未跨界且 < 5s 时极速跳过）；
         3. 按严格优先级广播跨周期事件（月 -> 周一 -> 周四 -> 日）；
         4. 广播连续物理时间流逝事件（TIME_TICK）；
-        5. 原子更新水位线。
+        5. 已成功监听器持久去重，全部成功才推进对应周期水位。
         """
         if not uid or not hasattr(ctx, 'db') or ctx.db is None:
             return
@@ -126,23 +133,23 @@ class LazyTimerBroadcaster:
 
         # 1. 每月 1 日 05:00 跨月重置
         if last_monthly < cur_monthly_5am:
-            bus.emit(Events.MONTHLY_RESET_5AM, ctx, uid, cycle_start_ts=cur_monthly_5am, now_ts=now_ts)
-            updates['last_monthly_ts'] = cur_monthly_5am
+            if bus.emit_cycle(Events.MONTHLY_RESET_5AM, ctx, uid, cycle_start_ts=cur_monthly_5am, now_ts=now_ts):
+                updates['last_monthly_ts'] = cur_monthly_5am
 
         # 2. 每周一 05:00 周常重置
         if last_wk_mon < cur_wk_mon_5am:
-            bus.emit(Events.WEEKLY_RESET_MON_5AM, ctx, uid, cycle_start_ts=cur_wk_mon_5am, now_ts=now_ts)
-            updates['last_weekly_mon_ts'] = cur_wk_mon_5am
+            if bus.emit_cycle(Events.WEEKLY_RESET_MON_5AM, ctx, uid, cycle_start_ts=cur_wk_mon_5am, now_ts=now_ts):
+                updates['last_weekly_mon_ts'] = cur_wk_mon_5am
 
         # 3. 每周四 05:00 梦境再构/Boss 玩法轮换
         if last_wk_thu < cur_wk_thu_5am:
-            bus.emit(Events.WEEKLY_RESET_THU_5AM, ctx, uid, cycle_start_ts=cur_wk_thu_5am, now_ts=now_ts)
-            updates['last_weekly_thu_ts'] = cur_wk_thu_5am
+            if bus.emit_cycle(Events.WEEKLY_RESET_THU_5AM, ctx, uid, cycle_start_ts=cur_wk_thu_5am, now_ts=now_ts):
+                updates['last_weekly_thu_ts'] = cur_wk_thu_5am
 
         # 4. 每日 05:00 日常跨天重置
         if last_daily < cur_daily_5am:
-            bus.emit(Events.DAILY_RESET_5AM, ctx, uid, cycle_start_ts=cur_daily_5am, now_ts=now_ts)
-            updates['last_daily_5am_ts'] = cur_daily_5am
+            if bus.emit_cycle(Events.DAILY_RESET_5AM, ctx, uid, cycle_start_ts=cur_daily_5am, now_ts=now_ts):
+                updates['last_daily_5am_ts'] = cur_daily_5am
 
         # ---------------- 连续物理时间增量广播 ----------------
         if delta_t > 0:

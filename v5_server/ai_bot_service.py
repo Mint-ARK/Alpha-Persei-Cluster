@@ -318,7 +318,7 @@ def _chat_sync_locked(uid, char_id, user_msg, db, cfg=None, log_fn=None) -> dict
             "timestamp": int(time.time()),
         }
 
-    cfg = cfg or ai_bot_config.get_bot_config()
+    cfg = ai_bot_config.resolve_character_config(db, uid, char_id, cfg=cfg)
     now_ts = int(time.time())
 
     # 1. 严格防 OOC 校验：未配置专属人格提示词的角色拒绝会话与广播

@@ -240,19 +240,7 @@ class PeripheralService:
             return True
 
         if kind == "scene":
-            rows = self.db.query("SELECT scene_id FROM user_scene WHERE uid=? AND scene_id=?", (uid, item_id))
-            if rows:
-                return True
-            rows = self.db.query("SELECT scene_id FROM scene WHERE uid=? AND scene_id=?", (uid, item_id))
-            if rows:
-                return True
-            scene_skin_map = {int(v): int(k) for k, v in _get_skin_scene_map().items()}
-            bound_skin = scene_skin_map.get(item_id)
-            if bound_skin:
-                s_rows = self.db.query("SELECT skin_id FROM player_skin_unlocked WHERE uid=? AND skin_id=?", (uid, bound_skin))
-                if s_rows:
-                    return True
-            return False
+            return any(row['id'] == item_id for row in self.get_scene_entries(uid))
 
         db_kind = "title" if kind == "tag" else kind
         rows = self.db.query(
@@ -313,23 +301,45 @@ class PeripheralService:
         bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="bubble", value=bubble_id)
         return bubble_id
 
+    def _profile_hero_owned(self, uid, hero_id):
+        if type(hero_id) is not int or hero_id <= 0:
+            return False
+        if hero_id == 1084:  # Existing initial-character policy.
+            return True
+        rows = self.db.query("SELECT unlock FROM hero WHERE uid=? AND id=?", (uid, hero_id))
+        return bool(rows and rows[0].get("unlock") == 1)
+
     def change_show_heroes(self, uid, heroes, ctx=None):
-        """更换名片展示英雄：cs_32014 {heroes[]}。最多展示 3 位修正者。"""
-        hero_list = _as_id_list(heroes)
-        if len(hero_list) > 3:
-            raise OperationError(2, "名片展示英雄最多3位")
-        # 校验英雄是否拥有
-        if self.db and hero_list:
-            placeholders = ",".join("?" for _ in hero_list)
-            rows = self.db.query(f"SELECT id FROM hero WHERE uid=? AND id IN ({placeholders})", (uid, *hero_list))
-            unlocked = {int(r["id"]) for r in (rows or [])}
-            for hid in hero_list:
-                if hid not in unlocked and hid != 1084:  # 1084 朝约初始放行
-                    raise OperationError(406, f"未解锁展示英雄: {hid}")
-        if self.db:
-            _safe_upsert(self.db, "game_user", uid, {"show_hero": json.dumps(hero_list)})
-        bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="show_hero", value=hero_list)
+        from sticker_wall_rules import read_extra, StickerWallError
+        hero_list = [] if heroes is None else heroes
+        if (not isinstance(hero_list, list) or len(hero_list) > 3
+                or any(type(h) is not int or h <= 0 for h in hero_list)
+                or len(set(hero_list)) != len(hero_list)):
+            raise OperationError(2, "名片展示需为最多3位不同角色")
+        try:
+            with self.db.transaction():
+                read_extra(self.db, uid)
+                if any(not self._profile_hero_owned(uid, hid) for hid in hero_list):
+                    raise OperationError(406, "尚未解锁展示角色")
+                cursor = self.db.execute(
+                    "INSERT INTO game_user(uid,show_hero) VALUES(?,?) ON CONFLICT(uid) DO UPDATE SET show_hero=excluded.show_hero",
+                    (uid, json.dumps(hero_list)))
+                if cursor.rowcount != 1:
+                    raise OperationError(406, "展示角色未保存")
+                bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="show_hero", value=hero_list)
+        except StickerWallError as exc:
+            raise OperationError(exc.code, str(exc)) from exc
         return hero_list
+
+    def get_show_heroes(self, uid, db=None):
+        db = db if db is not None else self.db
+        rows = db.query("SELECT show_hero FROM game_user WHERE uid=?", (uid,))
+        if not rows:
+            return [1084]
+        heroes = json.loads(rows[0].get("show_hero") or "[]")
+        if not isinstance(heroes, list) or any(type(h) is not int for h in heroes):
+            raise ValueError("历史名片角色格式无效")
+        return list(dict.fromkeys(h for h in heroes if self._profile_hero_owned(uid, h)))[:3]
 
     def change_tags(self, uid, tags, ctx=None):
         """更换个性标签/称号：cs_32116 {tags[]}。客户端最多允许设置3个。"""
@@ -349,18 +359,33 @@ class PeripheralService:
         return tag_list
 
     def change_sign(self, uid, sign, ctx=None):
-        """修改个性签名：cs_32012 {sign}。"""
+        """Save the primary signature and its legacy mirror atomically."""
+        from sticker_wall_rules import read_extra, StickerWallError
         sign_str = str(sign or "").strip()
-        extra = _load_user_extra(self.db, uid)
-        extra["profile_sign"] = sign_str
-        _save_user_extra(self.db, uid, extra)
-        if self.db:
-            try:
-                self.db.execute("UPDATE users SET sign=? WHERE uid=?", (sign_str, uid))
-            except Exception as e:
-                logger.warning(f"同步 users.sign 异常: {e}")
-        bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="sign", value=sign_str)
+        try:
+            with self.db.transaction():
+                extra = read_extra(self.db, uid)
+                extra["profile_sign"] = sign_str
+                cursor = self.db.execute("UPDATE users SET extra=? WHERE uid=?", (json.dumps(extra, ensure_ascii=False), uid))
+                if cursor.rowcount != 1:
+                    raise StickerWallError("账号不存在或不唯一", 406)
+                cursor = self.db.execute("UPDATE users SET sign=? WHERE uid=?", (sign_str, uid))
+                if cursor.rowcount != 1:
+                    raise StickerWallError("签名未保存", 406)
+                bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="sign", value=sign_str)
+        except StickerWallError as exc:
+            raise OperationError(exc.code, str(exc)) from exc
         return sign_str
+
+    def get_profile_signature(self, uid, db=None):
+        from profile_rules import signature_value
+        from sticker_wall_rules import read_extra
+        db = db if db is not None else self.db
+        rows = db.query("SELECT sign FROM users WHERE uid=?", (uid,))
+        if len(rows) != 1:
+            raise OperationError(406, "账号不存在或不唯一")
+        extra = read_extra(db, uid) if rows[0].get("sign") is None else {}
+        return signature_value(rows[0], extra)
 
     def send_like(self, uid, target_uid, source=0, activity_id=0, ctx=None):
         """
@@ -406,6 +431,19 @@ class PeripheralService:
         val = {"likes": target_likes, "target_uid": target_uid, "source": source, "activity_id": activity_id}
         bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="likes", value=val)
         return val
+
+    def unlock_acquisition_portrait(self, uid, skin_id, ctx=None):
+        """Persist the portrait attached to an acquired base/alternative skin."""
+        from profile_rules import skin_portrait_config
+        info = skin_portrait_config().get(str(int(skin_id)))
+        if not info or not int(info.get('portrait_id') or 0):
+            return 0
+        portrait_id = int(info['portrait_id'])
+        self.db.upsert('player_card', uid, dict(kind='portrait', item_id=portrait_id, obtained=1),
+                       keys=('uid', 'kind', 'item_id'))
+        if getattr(ctx, 'touched_items', None) is not None:
+            ctx.touched_items.add(portrait_id)
+        return portrait_id
 
     def query_portraits(self, uid):
         """查询头像持有列表：cs_32062。"""
@@ -592,12 +630,11 @@ class PeripheralService:
                 "icon": icon,
                 "icon_frame": icon_frame
             },
-            "sign": sign,
-            "sticker_show_info": {
-                "page_id": 1,
-                "foreground": 0,
-                "sticker_display_info": []
-            },
+            "sign": self.get_profile_signature(target_uid)
+                if self.db and self.db.query("SELECT 1 FROM users WHERE uid=?", (target_uid,)) else sign,
+            "sticker_show_info": self.get_sticker_wall_state(target_uid)["display"]
+                if self.db and self.db.query("SELECT 1 FROM users WHERE uid=?", (target_uid,))
+                else {"page_id": 4002, "foreground": 0, "sticker_display_info": []},
             "hero_list": hero_list,
             "level": level,
             "is_online": 1,
@@ -614,10 +651,7 @@ class PeripheralService:
                 "star": 3,
                 "using_skin": poster_skin
             },
-            "birthday": {
-                "month": 1,
-                "day": 1
-            },
+            "birthday": self.get_birthday_info(target_uid),
             "backhome_architecture_id": 0,
             "hero_id_list": [h["hero_id"] for h in hero_list],
             "likes": likes,
@@ -677,9 +711,8 @@ class PeripheralService:
 
         now_ts = int(time.time())
         # 结算上一任看板娘累计时长
-        self.settle_board_hero_duration(uid)
+        self.settle_board_hero_duration(uid, now_ts=now_ts)
         extra = _load_user_extra(self.db, uid)
-        extra["board_hero_last_ts"] = now_ts
         # 同步静态与实时看板娘，对齐角色当前 using_skin，绝对严禁触碰出战皮肤
         extra["active_board_hero"] = hid
         extra["active_board_skin"] = using_skin
@@ -691,31 +724,39 @@ class PeripheralService:
         return hid
 
     def record_active_board_hero(self, uid, skin_or_hero_id, background_id=0):
-        """
-        [32132 捕获核心] 记录大厅多看板娘轮换/随机展示时当前登台的角色与场景。
-        客户端在大厅根据轮换策略加载角色后，会触发 Push(32132, {hero_id=skinId, background_id=sceneId})。
-        """
-        raw_id = int(skin_or_hero_id or 0)
-        if raw_id <= 0:
-            return
-        hid = skin_to_hero_id(raw_id)
-        if hid <= 0:
-            hid = raw_id
-
+        """Validate the complete silent report before closing the old segment."""
+        from sticker_wall_rules import read_extra
+        raw_id = skin_or_hero_id
+        if type(raw_id) is not int or raw_id <= 0:
+            raise OperationError(406, "看板角色无效")
+        mapping = _get_skin_hero_map()
+        hid = int(mapping.get(str(raw_id), raw_id))
+        if not self._profile_hero_owned(uid, hid):
+            raise OperationError(406, "尚未解锁看板角色")
+        def skin_owned(skin):
+            return (skin == hid or mapping.get(str(skin)) == hid and bool(self.db.query(
+                "SELECT skin_id FROM player_skin_unlocked WHERE uid=? AND skin_id=?", (uid, skin))))
+        if not skin_owned(raw_id):
+            raise OperationError(406, "未拥有或不匹配的看板皮肤")
         real_skin_id = raw_id
-        if real_skin_id == hid and self.db:
-            h_rows = self.db.query("SELECT using_skin FROM hero WHERE uid=? AND id=?", (uid, hid))
-            if h_rows and int(h_rows[0].get("using_skin") or 0) > 0:
-                real_skin_id = int(h_rows[0]["using_skin"])
-
-        bg_id = int(background_id or 0)
-        extra = _load_user_extra(self.db, uid)
-        extra["active_board_hero"] = hid
-        extra["active_board_skin"] = real_skin_id
-        if bg_id > 0:
-            extra["active_scene_id"] = bg_id
-        _save_user_extra(self.db, uid, extra)
-        logger.debug(f"[peripheral] uid={uid} 捕获大厅实时看板娘: hero={hid} skin={real_skin_id} bg={bg_id}")
+        if raw_id == hid:
+            rows = self.db.query("SELECT using_skin FROM hero WHERE uid=? AND id=?", (uid, hid))
+            stored_skin = int(rows[0].get("using_skin") or hid) if rows else hid
+            real_skin_id = stored_skin if skin_owned(stored_skin) else hid
+        if type(background_id) is not int or background_id < 0:
+            raise OperationError(406, "看板场景无效")
+        now_ts = int(time.time())
+        if background_id and not self.check_asset_ownership(uid, "scene", background_id):
+            raise OperationError(406, "未拥有或已到期的看板场景")
+        with self.db.transaction():
+            read_extra(self.db, uid)
+            self.settle_board_hero_duration(uid, now_ts=now_ts)
+            extra = read_extra(self.db, uid)
+            extra["active_board_hero"] = hid
+            extra["active_board_skin"] = real_skin_id
+            if background_id:
+                extra["active_scene_id"] = background_id
+            _save_user_extra(self.db, uid, extra)
 
     def touch_poster_girl(self, ctx, uid):
         """
@@ -730,8 +771,10 @@ class PeripheralService:
         if not hero_id and self.db:
             gu = self.db.query("SELECT board_hero FROM game_user WHERE uid=?", (uid,))
             hero_id = int(gu[0]["board_hero"] or 0) if gu else 0
-        if not hero_id:
-            hero_id = 1084  # 终极兜底：朝约薇儿丹蒂
+        if not self._profile_hero_owned(uid, hero_id):
+            rows = self.db.query("SELECT board_hero FROM game_user WHERE uid=?", (uid,))
+            selected = int(rows[0].get("board_hero") or 0) if rows else 0
+            hero_id = selected if self._profile_hero_owned(uid, selected) else 1084
 
         # 1. 累计总触摸次数（写入 user_behavior_stat）
         total_count = self._increment_behavior_stat(uid, "main_interact", hero_id, delta=1)
@@ -749,9 +792,9 @@ class PeripheralService:
         logger.info(f"[peripheral] 触摸看板娘 uid={uid} hero={hero_id} daily={daily_count} total={total_count} (广播已发射)")
         return {"hero_id": hero_id, "daily_count": daily_count, "total_count": total_count}
 
-    def settle_board_hero_duration(self, uid, hero_id=None):
+    def settle_board_hero_duration(self, uid, hero_id=None, *, now_ts=None):
         """结算当前看板娘陪伴累计时长（秒）。"""
-        now_ts = int(time.time())
+        now_ts = int(time.time()) if now_ts is None else int(now_ts)
         extra = _load_user_extra(self.db, uid)
         last_ts = int(extra.get("board_hero_last_ts") or 0)
         if last_ts <= 0:
@@ -766,7 +809,7 @@ class PeripheralService:
             if not hero_id and self.db:
                 gu = self.db.query("SELECT board_hero FROM game_user WHERE uid=?", (uid,))
                 hero_id = int(gu[0]["board_hero"] or 0) if gu else 0
-        if hero_id > 0:
+        if self._profile_hero_owned(uid, hero_id):
             self._increment_behavior_stat(uid, "board_hero_seconds", hero_id, delta=delta)
         extra["board_hero_last_ts"] = now_ts
         _save_user_extra(self.db, uid, extra)
@@ -799,13 +842,8 @@ class PeripheralService:
         now_ts = int(time.time())
         if self.db:
             self.db.execute("UPDATE scene SET is_current=0 WHERE uid=?", (uid,))
-            self.db.execute(
-                "INSERT OR REPLACE INTO scene (uid, scene_id, name, scene_type, is_current, obtain_time) "
-                "VALUES (?, ?, '', 1, 1, ?)", (uid, scene_id, now_ts)
-            )
-            _safe_upsert(self.db, "user_scene", uid,
-                         {"scene_id": scene_id, "lasted_time": 0, "obtain_time": now_ts, "update_ts": now_ts},
-                         keys=("uid", "scene_id"))
+            # Selection does not grant ownership or make a trial permanent.
+            self.db.execute("UPDATE scene SET is_current=1 WHERE uid=? AND scene_id=?", (uid, scene_id))
             _safe_upsert(self.db, "game_user", uid, {"cur_scene": scene_id})
         extra = _load_user_extra(self.db, uid)
         extra["active_scene_id"] = scene_id
@@ -827,23 +865,37 @@ class PeripheralService:
         bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="bgm", value=bgm_id)
         return bgm_id
 
+    def _save_lobby_setting(self, uid, key, value, ctx=None):
+        from sticker_wall_rules import read_extra, StickerWallError
+        try:
+            with self.db.transaction():
+                extra = read_extra(self.db, uid)
+                extra[key] = value
+                cursor = self.db.execute("UPDATE users SET extra=? WHERE uid=?", (json.dumps(extra, ensure_ascii=False), uid))
+                if cursor.rowcount != 1:
+                    raise StickerWallError("账号不存在或不唯一", 406)
+                bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind=key, value=value)
+        except StickerWallError as exc:
+            raise OperationError(exc.code, str(exc)) from exc
+        return value
+
     def set_pure_mode(self, uid, info, ctx=None):
-        """大厅纯白模式设置：cs_32068。"""
-        info_dict = info or {}
-        extra = _load_user_extra(self.db, uid)
-        extra["pure_mode"] = info_dict
-        _save_user_extra(self.db, uid, extra)
-        bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="pure_mode", value=info_dict)
-        return info_dict
+        """Validate current UI indices, retaining its legacy zero aliases."""
+        from profile_rules import validate_pure_mode
+        try:
+            value = validate_pure_mode(info)
+        except ValueError as exc:
+            raise OperationError(5, str(exc)) from exc
+        return self._save_lobby_setting(uid, "pure_mode", value, ctx)
 
     def set_table_module(self, uid, modules, ctx=None):
-        """大厅桌面组件布置：cs_32070。"""
-        mod_list = modules or []
-        extra = _load_user_extra(self.db, uid)
-        extra["table_modules"] = mod_list
-        _save_user_extra(self.db, uid, extra)
-        bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="table_modules", value=mod_list)
-        return mod_list
+        """Nonempty input is a complete three-component snapshot."""
+        from profile_rules import validate_modules
+        try:
+            value = validate_modules(modules)
+        except ValueError as exc:
+            raise OperationError(5, str(exc)) from exc
+        return self._save_lobby_setting(uid, "table_modules", value, ctx)
 
     def set_random_info(self, uid, info_list, ctx=None):
         """上传随机场景/少女装扮：cs_32122。"""
@@ -917,120 +969,87 @@ class PeripheralService:
     # 三、贴纸画册与套装奖励域 (Sticker Canvas & Suits)
     # ------------------------------------------------------------------
 
+    def get_sticker_wall_state(self, uid, db=None):
+        from sticker_wall_rules import load_rules, read_extra, owned_assets, projected_pages, active_page_id, display_page, StickerWallError
+        db = db if db is not None else self.db
+        try:
+            rules = load_rules()
+            extra = read_extra(db, uid)
+            cards = db.query("SELECT kind, item_id, obtained FROM player_card WHERE uid=?", (uid,))
+            gu = db.query("SELECT cur_sticker_bg FROM game_user WHERE uid=?", (uid,))
+            mirror = gu[0] if gu else {}
+            owned = owned_assets(cards, rules)
+            return dict(pages=projected_pages(extra, owned, rules), selected=active_page_id(extra, mirror, rules, owned),
+                        display=display_page(extra, mirror, rules, owned), owned=owned)
+        except StickerWallError as exc:
+            raise OperationError(exc.code, str(exc)) from exc
+
     def save_sticker_show_info(self, uid, layout_list):
-        """
-        [32038 捕获核心] 客户端保存贴纸排版画册：Push(32038, {sticker_show_info = [...]})。
-        - 支持多背景独立排版增量合并（Upsert by page_id）；
-        - 全局唯一性收敛（跨背景抢夺自动卸下）：当背景 B 抢夺了背景 A 已使用的贴纸或前景时，
-          服务端主动从背景 A 中卸下对应贴纸并重整层级，确保全画册贴纸资产全局唯一，杜绝幽灵克隆与客户端渲染冲突。
-        """
+        """Apply changed-page snapshots atomically; never replace the whole album."""
+        from sticker_wall_rules import load_rules, read_extra, owned_assets, merge_pages, StickerWallError
+        db = self.db
+        if not isinstance(layout_list, list):
+            raise OperationError(2, "贴纸画册必须是页面列表")
         if not layout_list:
             return
-        extra = _load_user_extra(self.db, uid)
-        existing = extra.get("sticker_show_info") or []
-        page_map = {}
-        for p in existing:
-            if isinstance(p, dict) and p.get("page_id"):
-                page_map[int(p["page_id"])] = p
-
-        # 1. 扫描本次新上报/修改的背景页，收集被其占用的全部贴纸 ID 和前景 ID
-        incoming_pages = set()
-        incoming_stickers = {}  # sticker_id -> page_id
-        incoming_fgs = {}       # fg_id -> page_id
-
-        for p in layout_list:
-            if not isinstance(p, dict) or not p.get("page_id"):
-                continue
-            pid = int(p["page_id"])
-            incoming_pages.add(pid)
-            fg = int(p.get("foreground") or 0)
-            if fg > 0:
-                incoming_fgs[fg] = pid
-            for s in p.get("sticker_display_info") or []:
-                sid = int(s.get("sticker_id") or 0)
-                if sid > 0:
-                    incoming_stickers[sid] = pid
-
-        # 2. 跨背景抢夺收敛：检查现存的历史未上报背景，若有被抢夺的贴纸或前景，主动剥离卸下！
-        for pid, page in page_map.items():
-            if pid in incoming_pages:
-                continue  # 本次变动的页面后续会直接更新，此处只清洗其他历史页面
-
-            modified = False
-            # 检查前景抢夺
-            cur_fg = int(page.get("foreground") or 0)
-            if cur_fg > 0 and cur_fg in incoming_fgs and incoming_fgs[cur_fg] != pid:
-                logger.info(f"[peripheral] uid={uid} 背景 {pid} 的前景 {cur_fg} 被背景 {incoming_fgs[cur_fg]} 抢夺，自动从原背景卸下")
-                page["foreground"] = 0
-                modified = True
-
-            # 检查贴纸抢夺
-            cur_stickers = page.get("sticker_display_info") or []
-            new_stickers = []
-            layer_idx = 1
-            for s in cur_stickers:
-                sid = int(s.get("sticker_id") or 0)
-                if sid in incoming_stickers and incoming_stickers[sid] != pid:
-                    logger.info(f"[peripheral] uid={uid} 背景 {pid} 的贴纸 {sid} 被背景 {incoming_stickers[sid]} 抢夺，自动从原背景卸下")
-                    modified = True
-                    continue  # 被抢夺，从原背景移除
-                s_copy = dict(s)
-                s_copy["layer"] = layer_idx
-                layer_idx += 1
-                new_stickers.append(s_copy)
-
-            if modified:
-                page["sticker_display_info"] = new_stickers
-
-        # 3. 将本次上报的背景页正式合入 page_map
-        for p in layout_list:
-            if isinstance(p, dict) and p.get("page_id"):
-                page_map[int(p["page_id"])] = p
-
-        merged = list(page_map.values())
-        extra["sticker_show_info"] = merged
-        _save_user_extra(self.db, uid, extra)
-        logger.info(f"[peripheral] uid={uid} 贴纸画册排版已增量合并保存 (总背景数={len(merged)}, 本次变动={len(incoming_pages)})")
+        try:
+            with db.transaction():
+                rules = load_rules()
+                extra = read_extra(db, uid)
+                cards = db.query("SELECT kind, item_id, obtained FROM player_card WHERE uid=?", (uid,))
+                extra["sticker_show_info"] = merge_pages(extra, layout_list, owned_assets(cards, rules), rules)
+                updated = db.execute("UPDATE users SET extra=? WHERE uid=?",
+                                     (json.dumps(extra, ensure_ascii=False), uid))
+                if updated.rowcount != 1:
+                    raise OperationError(406, "贴纸墙保存未命中账号")
+        except StickerWallError as exc:
+            raise OperationError(exc.code, str(exc)) from exc
 
     def change_sticker_show_page(self, uid, page_id):
-        """切换贴纸展示页：cs_32056 {page_id}。"""
-        page_id = int(page_id or 0)
-        extra = _load_user_extra(self.db, uid)
-        extra["sticker_show_page"] = page_id
-        _save_user_extra(self.db, uid, extra)
-        if self.db and page_id > 0:
-            _safe_upsert(self.db, "game_user", uid, {"cur_sticker_bg": page_id})
+        """Change only the selected wall, including an owned empty wall."""
+        from sticker_wall_rules import load_rules, read_extra, owned_assets, StickerWallError
+        db = self.db
+        try:
+            with db.transaction():
+                rules = load_rules()
+                extra = read_extra(db, uid)
+                if type(page_id) is not int or page_id not in rules["backgrounds"]:
+                    raise OperationError(2, "贴纸背景配置无效")
+                cards = db.query("SELECT kind, item_id, obtained FROM player_card WHERE uid=?", (uid,))
+                if page_id not in owned_assets(cards, rules)["backgrounds"]:
+                    raise OperationError(406, "尚未获得该贴纸背景")
+                extra["sticker_show_page"] = page_id
+                updated = db.execute("UPDATE users SET extra=? WHERE uid=?",
+                                     (json.dumps(extra, ensure_ascii=False), uid))
+                if updated.rowcount != 1:
+                    raise OperationError(406, "贴纸展示选择未命中账号")
+                db.execute("INSERT INTO game_user(uid, cur_sticker_bg) VALUES(?, ?) "
+                           "ON CONFLICT(uid) DO UPDATE SET cur_sticker_bg=excluded.cur_sticker_bg", (uid, page_id))
+        except StickerWallError as exc:
+            raise OperationError(exc.code, str(exc)) from exc
         return page_id
 
-    def claim_sticker_suit_reward(self, uid, suit_id_list):
-        """
-        领取贴纸套装奖励：cs_32058 {reward_id_list = [suit_id]} -> sc_32059。
-        对齐 StickerSuitCfg，发放奖励并记入 admitted_suit_reaward_list。
-        """
-        sids = _as_id_list(suit_id_list)
-        if not sids:
-            return []
-        extra = _load_user_extra(self.db, uid)
-        rewarded = set(extra.get("sticker_suit_rewarded") or [])
-        granted_rewards = []
-
-        for sid in sids:
-            if sid in rewarded:
-                continue  # 已领取过
-            rewarded.add(sid)
-            # 官方默认套装奖励：移转之辉 id=1, num=25
-            reward_item = {"id": 1, "num": 25}
-            granted_rewards.append(reward_item)
-            if self.db and hasattr(self.db, "add_currency"):
-                try:
-                    self.db.add_currency(uid, 1, 25)
-                except Exception as e:
-                    logger.warning(f"贴纸发奖异常: {e}")
-
-        extra["sticker_suit_rewarded"] = list(rewarded)
-        _save_user_extra(self.db, uid, extra)
-        logger.info(f"[peripheral] uid={uid} 领取贴纸套装奖励 suits={sids} rewards={granted_rewards}")
-        return granted_rewards
+    def claim_sticker_suit_reward(self, uid, suit_id_list, ctx=None):
+        """Validate the whole batch, grant and mark in the same transaction."""
+        from sticker_wall_rules import load_rules, read_extra, owned_assets, suit_reward_plan, StickerWallError
+        from inventory_service import InventoryService
+        db = self.db
+        try:
+            with db.transaction():
+                extra = read_extra(db, uid)
+                cards = db.query("SELECT kind, item_id, obtained FROM player_card WHERE uid=?", (uid,))
+                history, rewards = suit_reward_plan(suit_id_list, extra, owned_assets(cards, load_rules()))
+                if not rewards:
+                    return []
+                InventoryService.grant_items(ctx if ctx is not None else db, uid,
+                                            [(r["id"], r["num"]) for r in rewards], source="sticker_suit")
+                extra["sticker_suit_rewarded"] = history
+                cursor = db.execute("UPDATE users SET extra=? WHERE uid=?", (json.dumps(extra, ensure_ascii=False), uid))
+                if cursor.rowcount != 1:
+                    raise StickerWallError("账号不存在或不唯一", 406)
+                return rewards
+        except StickerWallError as exc:
+            raise OperationError(exc.code, str(exc)) from exc
 
     def claim_skin_gift(self, uid, skin_id):
         """领取皮肤赠礼：cs_32052 {skin_id}。"""
@@ -1048,29 +1067,59 @@ class PeripheralService:
     # ------------------------------------------------------------------
 
     def change_nickname(self, uid, nick, ctx=None):
-        """修改昵称：cs_23012 {nick}。"""
+        """23012: opening name (0->1), first rename (1->2), then gifts/card 6."""
+        from inventory_service import InventoryService
         nick_str = str(nick or "").strip()
         if not nick_str:
             raise OperationError(5, "昵称不能为空")
         if len(nick_str) > 16:
             raise OperationError(5, "昵称过长")
-        if self.db:
-            self.db.execute(
-                "UPDATE users SET nick=?, is_changed_nick=1, change_nick_times=COALESCE(change_nick_times, 0)+1 WHERE uid=?",
-                (nick_str, uid)
-            )
-        bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="nick", value=nick_str)
-        return nick_str
+        with self.db.transaction():
+            rows = self.db.query(
+                "SELECT nick,is_changed_nick,change_nick_times FROM users WHERE uid=?", (uid,))
+            if len(rows) != 1:
+                raise OperationError(406, "账号不存在或不唯一")
+            user = rows[0]
+            state = int(user.get("is_changed_nick") or 0)
+            free_times = max(0, int(user.get("change_nick_times") or 0))
+            costs = []
+            # The same confirmed name is also safe to retry after a lost reply.
+            if state == 0 or nick_str != user["nick"]:
+                if state < 2:
+                    state += 1
+                elif free_times:
+                    free_times -= 1
+                else:
+                    if not InventoryService.cost_item(ctx if ctx is not None else self.db, uid, 6, 1):
+                        raise OperationError(3, "改名卡不足")
+                    costs = [{"id": 6, "num": 1}]
+                cursor = self.db.execute(
+                    "UPDATE users SET nick=?, is_changed_nick=?, change_nick_times=? WHERE uid=?",
+                    (nick_str, state, free_times, uid))
+                if cursor.rowcount != 1:
+                    raise OperationError(406, "昵称记录未保存")
+                bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="nick", value=nick_str)
+        return {"nick": nick_str, "is_changed_nick": state,
+                "system_change_nick_times": free_times, "cost_item_list": costs}
 
     def set_birthday(self, uid, month, day, ctx=None):
-        """设置生日：cs_12030 {month, day}。"""
-        month = int(month or 0)
-        day = int(day or 0)
-        if not (1 <= month <= 12 and 1 <= day <= 31):
+        """Persist a yearless calendar date; February 29 remains valid."""
+        from profile_rules import valid_birthday
+        if not valid_birthday(month, day):
             raise OperationError(5, "生日格式不合法")
-        if self.db:
-            _safe_upsert(self.db, "game_user", uid, {"birth_month": month, "birth_day": day})
-        bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="birthday", value={"month": month, "day": day})
+        with self.db.transaction():
+            if len(self.db.query("SELECT uid FROM users WHERE uid=?", (uid,))) != 1:
+                raise OperationError(406, "账号不存在或不唯一")
+            cursor = self.db.execute(
+                "INSERT INTO game_user(uid,birth_month,birth_day) VALUES(?,?,?) "
+                "ON CONFLICT(uid) DO UPDATE SET birth_month=excluded.birth_month,birth_day=excluded.birth_day",
+                (uid, month, day))
+            if cursor.rowcount != 1:
+                raise OperationError(406, "生日记录未保存")
+            from birthday_service import record_birthday_setting, ensure_official_mail
+            record_birthday_setting(self.db, uid)
+            ensure_official_mail(self.db, uid, ctx=ctx)
+            bus.emit(Events.PROFILE_UPDATE, ctx, uid, kind="birthday", value={"month": month, "day": day})
         return {"month": month, "day": day}
 
     def set_text_language(self, uid, lang, ctx=None):
@@ -1116,6 +1165,16 @@ class PeripheralService:
     # 五、登录洪流数据闭环 (Login Push Payloads)
     # ------------------------------------------------------------------
 
+    def get_scene_entries(self, uid, db=None):
+        from profile_rules import project_home_scenes
+        db = db if db is not None else self.db
+        rows = db.query("SELECT scene_id,lasted_time,obtain_time FROM user_scene WHERE uid=?", (uid,))
+        legacy = db.query("SELECT scene_id,obtain_time FROM scene WHERE uid=?", (uid,))
+        skin_map = _get_skin_scene_map()
+        skins = db.query("SELECT skin_id FROM player_skin_unlocked WHERE uid=?", (uid,))
+        bound = [skin_map[str(row['skin_id'])] for row in skins if str(row['skin_id']) in skin_map]
+        return project_home_scenes(rows, legacy, bound, now_ts=int(time.time()))
+
     def get_profile_card_payload(self, uid, db):
         """
         [sc_32009 玩家资料卡全量真值闭环]
@@ -1124,9 +1183,7 @@ class PeripheralService:
         from codec import decode, encode
 
         # 1. 场景列表
-        scenes = db.query("SELECT scene_id, lasted_time, obtain_time FROM user_scene WHERE uid=? ORDER BY scene_id", (uid,))
-        poster_bg = [{"id": s["scene_id"], "lasted_time": s["lasted_time"] or 0, "obtain_time": s["obtain_time"] or 0}
-                     for s in (scenes or [])]
+        poster_bg = self.get_scene_entries(uid, db)
 
         # 2. 读取原始模板
         lp = db.query("SELECT payload FROM login_push WHERE cmd=32009")
@@ -1139,8 +1196,7 @@ class PeripheralService:
         if not isinstance(obj, dict):
             obj = {}
 
-        if poster_bg:
-            obj["poster_background_list"] = poster_bg
+        obj["poster_background_list"] = poster_bg
 
         # 3. 动态注入 game_user 装扮真值
         try:
@@ -1338,6 +1394,28 @@ class PeripheralService:
         except Exception as e:
             logger.warning(f"users.extra 真值注入异常: {e}")
 
+        # Sticker state and entitlement lists must override even an old nonempty template.
+        wall = self.get_sticker_wall_state(uid, db)
+        obj["sticker_show_info"] = wall["pages"]
+        obj["sticker_background"] = wall["selected"]
+        obj["all_sticker_list"] = sorted(wall["owned"]["stickers"])
+        obj["all_foreground_list"] = sorted(wall["owned"]["foregrounds"])
+        obj["all_background_list"] = sorted(wall["owned"]["backgrounds"])
+        obj["sign"] = self.get_profile_signature(uid, db)
+        obj["heroes"] = self.get_show_heroes(uid, db)
+        from sticker_wall_rules import read_extra
+        extra = read_extra(db, uid)
+        from profile_rules import default_home_scene_ids, project_like_history
+        if int(obj.get('poster_background_id') or 0) not in {row['id'] for row in poster_bg}:
+            obj['poster_background_id'] = default_home_scene_ids()[0]
+        obj['info_list'] = project_like_history(extra.get('profile_like_history'))
+        obj["admitted_suit_reaward_list"] = extra.get("sticker_suit_rewarded", [])
+        from profile_rules import project_pure_mode, project_modules
+        obj["table_setting"] = project_pure_mode(extra.get("pure_mode"))
+        obj["table_setting_module"] = project_modules(extra.get("table_modules"))
+        if ("pure_mode" in extra and extra["pure_mode"] != obj["table_setting"]
+                or "table_modules" in extra and extra["table_modules"] != obj["table_setting_module"]):
+            logger.warning(f"uid={uid} 历史纯白/桌面设置已作安全读取投影，原存档保留")
         return encode("sc_32009", obj)
 
     def get_bgm_push_payload(self, uid, db):
@@ -1352,20 +1430,15 @@ class PeripheralService:
             bgm_id = 0
         return encode("sc_12029", {"id": bgm_id or 4})
 
+    def get_birthday_info(self, uid):
+        from profile_rules import read_birthday
+        return read_birthday(self.db, uid)
+
     def get_birthday_push_payload(self, uid, db):
-        """sc_12033 生日登录推送。动态读取 game_user.birth_month 与 birth_day，默认 10月28日。"""
+        """sc_12033: preserve unset state; never invent a birthday on read error."""
         from codec import encode
-        month, day = 10, 28
-        try:
-            rows = db.query("SELECT birth_month, birth_day FROM game_user WHERE uid=?", (uid,))
-            if rows:
-                m = rows[0].get("birth_month")
-                d = rows[0].get("birth_day")
-                if m and d:
-                    month, day = int(m), int(d)
-        except Exception as e:
-            logger.warning(f"读取用户生日异常: {e}")
-        return encode("sc_12033", {"month": month, "day": day})
+        from profile_rules import read_birthday
+        return encode("sc_12033", read_birthday(db, uid))
 
 
 # ======================================================================
@@ -1463,12 +1536,19 @@ class ChangePosterGirlOp(_PeripheralOkOp):
 class ChangeShowHerosOp(_PeripheralOkOp):
     cmd = 32014
     sc = 32015
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
         service = PeripheralService.get_instance(ctx.db)
         res = service.change_show_heroes(self.uid, data.get("heroes"), ctx)
         return {"heroes": res}
+
+    def respond(self, result, data, ctx):
+        payload = ctx.codec_encode("sc_32015", {"result": 0})
+        if not payload:
+            raise ValueError("必要名片角色回执sc_32015为空")
+        return [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -1538,12 +1618,19 @@ class SendLikeOp(_PeripheralOkOp):
 class ChangeSignOp(_PeripheralOkOp):
     cmd = 32012
     sc = 32013
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
         service = PeripheralService.get_instance(ctx.db)
         res = service.change_sign(self.uid, data.get("sign"), ctx)
         return {"sign": res}
+
+    def respond(self, result, data, ctx):
+        payload = ctx.codec_encode("sc_32013", {"result": 0})
+        if not payload:
+            raise ValueError("必要签名回执sc_32013为空")
+        return [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -1607,34 +1694,54 @@ class GetForeignHeroInfoOp(Operation):
 class ChangeNicknameOp(Operation):
     cmd = 23012
     sc = 23013
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
         service = PeripheralService.get_instance(ctx.db)
-        res = service.change_nickname(self.uid, data.get("nick"), ctx)
-        return {"nick": res}
+        return service.change_nickname(self.uid, data.get("nick"), ctx)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_23013", {"result": 0, "is_changed_nick": 1}) or b"\\x08\\x00"
-        return [DownFrame(self.sc, payload)]
+        payload = ctx.codec_encode("sc_23013", {"result": 0,
+            "is_changed_nick": result["is_changed_nick"],
+            "system_change_nick_times": result["system_change_nick_times"],
+            "cost_item_list": result["cost_item_list"]})
+        if not payload:
+            raise ValueError("必要改名回执sc_23013为空")
+        frames = [DownFrame(self.sc, payload)]
+        if result["cost_item_list"]:
+            from operations import _refresh_frames
+            frames += _refresh_frames(ctx, self.uid, strict=True)
+        return frames
 
 
 @operation
 class ChangeBirthdayOp(_PeripheralOkOp):
     cmd = 12030
     sc = 12031
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
         service = PeripheralService.get_instance(ctx.db)
-        res = service.set_birthday(self.uid, data.get("month"), data.get("day"), ctx)
-        return res
+        return service.set_birthday(self.uid, data.get("month"), data.get("day"), ctx)
+
+    def respond(self, result, data, ctx):
+        payload = ctx.codec_encode("sc_12031", {"result": 0})
+        if not payload:
+            raise ValueError("必要生日回执sc_12031为空")
+        return [DownFrame(self.sc, payload)]
+
+    def after_commit(self, result, data, ctx):
+        from birthday_service import trigger_today_greeting
+        trigger_today_greeting(ctx.db, self.uid)
 
 
 @operation
 class SetPureModeOp(_PeripheralOkOp):
     cmd = 32068
     sc = 32069
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -1642,17 +1749,30 @@ class SetPureModeOp(_PeripheralOkOp):
         res = service.set_pure_mode(self.uid, data.get("info"), ctx)
         return {"info": res}
 
+    def respond(self, result, data, ctx):
+        payload = ctx.codec_encode("sc_32069", {"result": 0})
+        if not payload:
+            raise ValueError("必要大厅设置回执为空")
+        return [DownFrame(self.sc, payload)]
+
 
 @operation
 class SetTableModuleOp(_PeripheralOkOp):
     cmd = 32070
     sc = 32071
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
         service = PeripheralService.get_instance(ctx.db)
-        res = service.set_table_module(self.uid, data.get("module"), ctx)
+        res = service.set_table_module(self.uid, data.get("module", []), ctx)
         return {"module": res}
+
+    def respond(self, result, data, ctx):
+        payload = ctx.codec_encode("sc_32071", {"result": 0})
+        if not payload:
+            raise ValueError("必要大厅设置回执为空")
+        return [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -1735,12 +1855,21 @@ class TouchPosterGirlOp(_PeripheralOkOp):
     """
     cmd = 32054
     sc = 32055
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
         service = PeripheralService.get_instance(ctx.db)
         res = service.touch_poster_girl(ctx, self.uid)
         return res
+
+    def respond(self, result, data, ctx):
+        from operation_notifications import take_pending_frames
+        # Deliver the listener's current task snapshot before acknowledging the touch.
+        payload = ctx.codec_encode("sc_32055", {"result": 0})
+        if not payload:
+            raise ValueError("必要触摸回执 sc_32055 为空")
+        return take_pending_frames(ctx) + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -1780,10 +1909,17 @@ class ReceiveSkinGiftOp(_PeripheralOkOp):
 class ChangeStickerShowOp(_PeripheralOkOp):
     cmd = 32056
     sc = 32057
+    prepare_response_in_transaction = True
+
+    def respond(self, result, data, ctx):
+        payload = ctx.codec_encode("sc_32057", {"result": 0})
+        if not payload:
+            raise ValueError("必要贴纸展示回执sc_32057为空")
+        return [DownFrame(self.sc, payload)]
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
-        page_id = int(data.get("page_id") or 0)
+        page_id = data.get("page_id", 0)
         service = PeripheralService.get_instance(ctx.db)
         res = service.change_sticker_show_page(self.uid, page_id)
         return {"page_id": res}
@@ -1793,17 +1929,20 @@ class ChangeStickerShowOp(_PeripheralOkOp):
 class ReceiveStickerSuitRewardOp(Operation):
     cmd = 32058
     sc = 32059
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
-        sids = _as_id_list(data.get("reward_id_list"))
         service = PeripheralService.get_instance(ctx.db)
-        rewards = service.claim_sticker_suit_reward(self.uid, sids)
+        rewards = service.claim_sticker_suit_reward(self.uid, data.get("reward_id_list", []), ctx=ctx)
         return {"reward_list": rewards}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_32059", {"result": 0, "reward_list": result["reward_list"]}) or b"\\x08\\x00"
-        return [DownFrame(self.sc, payload)]
+        payload = ctx.codec_encode("sc_32059", {"result": 0, "reward_list": result["reward_list"]})
+        if not payload:
+            raise ValueError("必要贴纸套装回执sc_32059为空")
+        from operations import _refresh_frames
+        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation
@@ -1899,6 +2038,7 @@ class QueryBubbleListOp(Operation):
 @operation
 class RecordActiveBoardHeroOp(Operation):
     """大厅多看板娘/场景上报：Push(32132) -> 静默不回包。"""
+    no_reply = True
     cmd = 32132
     sc = None
 
@@ -1918,6 +2058,18 @@ class RecordActiveBoardHeroOp(Operation):
 # 总线监听
 # ======================================================================
 
+@bus.subscribe(Events.HERO_UNLOCK)
+def on_portrait_hero_unlock(ctx, uid, hero_id=0, **kwargs):
+    if hero_id and getattr(ctx, 'db', None) is not None:
+        PeripheralService(ctx.db).unlock_acquisition_portrait(uid, hero_id, ctx)
+
+
+@bus.subscribe(Events.SKIN_UNLOCK)
+def on_portrait_skin_unlock(ctx, uid, skin_id=0, **kwargs):
+    if skin_id and getattr(ctx, 'db', None) is not None:
+        PeripheralService(ctx.db).unlock_acquisition_portrait(uid, skin_id, ctx)
+
+
 @bus.subscribe(Events.USER_LOGIN)
 def on_peripheral_login(ctx, uid, is_first_login=False, **kwargs):
     """
@@ -1927,6 +2079,12 @@ def on_peripheral_login(ctx, uid, is_first_login=False, **kwargs):
     """
     if not uid or not hasattr(ctx, 'db') or ctx.db is None:
         return
+    # Recover portraits for legitimately owned assets from older saves too.
+    acquired = {int(row['id']) for row in ctx.db.query('SELECT id FROM hero WHERE uid=? AND unlock=1', (uid,))}
+    acquired.update(int(row['skin_id']) for row in ctx.db.query('SELECT skin_id FROM player_skin_unlocked WHERE uid=?', (uid,)))
+    service = PeripheralService(ctx.db)
+    for skin_id in sorted(acquired):
+        service.unlock_acquisition_portrait(uid, skin_id)
     extra = _load_user_extra(ctx.db, uid)
     changed = False
     if "profile_like_today" in extra:

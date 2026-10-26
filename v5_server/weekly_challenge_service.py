@@ -493,6 +493,11 @@ def get_mythic_data(uid, db):
         "challenge_info": final_prog.get("challenge_info", [])
     }
     
+    from new_player_service import enabled, payload
+    if enabled(db,uid):
+        sc_44009_obj=payload(db,uid,44009)
+        sc_44019_obj=payload(db,uid,44019)
+        sc_44023_obj=payload(db,uid,44023)
     return sc_44007_obj, sc_44009_obj, sc_44019_obj, sc_44021_obj, sc_44023_obj
 
 
@@ -516,8 +521,11 @@ def get_polyhedron_data(uid, db, res_version=None):
             "hero_id": hr["hero_id"],
             "astrolabe_id_list": astros
         })
+    from new_player_service import enabled
+    fresh_save=enabled(db,uid)
     if not unlocked_heroes:
-        default_init_heroes = [1084, 1094, 1284]
+        default_init_heroes = ([r['id'] for r in db.query('SELECT id FROM hero WHERE uid=? AND unlock=1',(uid,))]
+                               if fresh_save else [1084,1094,1284])
         for hid in default_init_heroes:
             unlocked_heroes.append({"hero_id": hid, "astrolabe_id_list": []})
             db.upsert("polyhedron_hero", uid, {
@@ -527,6 +535,9 @@ def get_polyhedron_data(uid, db, res_version=None):
                 "astrolabe_3": 0,
                 "update_ts": now
             }, keys=("uid", "hero_id"))
+    if fresh_save:
+        owned={r['id'] for r in db.query('SELECT id FROM hero WHERE uid=? AND unlock=1',(uid,))}
+        unlocked_heroes=[item for item in unlocked_heroes if item['hero_id'] in owned]
 
     # 2. 已解锁信标列表
     beacon_rows = db.query("SELECT beacon_id FROM polyhedron_beacon WHERE uid = ?", (uid,))
@@ -568,6 +579,16 @@ def get_polyhedron_data(uid, db, res_version=None):
             {"id": 70704, "state": 2}, {"id": 70610, "state": 1}, {"id": 70615, "state": 1},
             {"id": 70609, "state": 2}, {"id": 109402, "state": 1}, {"id": 109401, "state": 2}
         ]
+
+    if fresh_save:
+        if not beacon_rows:
+            beacon_id_list=[]
+        if not term_rows:
+            terminal_upgrades=[]
+        if not diff_rows:
+            clear_difficulties=[]
+        if not art_rows:
+            manual_samples=[]
 
     # 6. 历程周期性刷新检测（仅重置维度偏移 Currency 45 与已领取记录）
     try:

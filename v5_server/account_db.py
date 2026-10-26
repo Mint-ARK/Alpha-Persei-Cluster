@@ -633,6 +633,22 @@ CREATE TABLE IF NOT EXISTS user_skin_story (     -- 换装活动剧情完成状�
     finish_ts INTEGER DEFAULT 0,
     PRIMARY KEY (uid, activity_id, story_id)
 );
+CREATE TABLE IF NOT EXISTS user_skin_draw_progress (
+    uid INTEGER NOT NULL,
+    pool_id INTEGER NOT NULL,
+    misses INTEGER NOT NULL DEFAULT 0,
+    last_drop INTEGER NOT NULL DEFAULT 0,
+    already_drop TEXT NOT NULL DEFAULT '[0,0,0,0,0,0,0,0,0,0]',
+    update_ts INTEGER DEFAULT 0,
+    PRIMARY KEY (uid, pool_id)
+);
+CREATE TABLE IF NOT EXISTS user_skin_draw_pop (
+    uid INTEGER NOT NULL,
+    skin_id INTEGER NOT NULL,
+    item_id INTEGER NOT NULL,
+    claimed INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (uid, skin_id)
+);
 CREATE TABLE IF NOT EXISTS activity (                -- sc_11001 活动列表全量
     uid INTEGER NOT NULL,
     activity_id INTEGER NOT NULL,                    -- 对应 activitycfg.lua [id]
@@ -1001,7 +1017,27 @@ CREATE TABLE IF NOT EXISTS activity_buff_rotation (  -- sc_22779 队伍肉鸽 bu
     update_ts INTEGER DEFAULT 0,
     PRIMARY KEY (uid, activity_id)
 );
-CREATE TABLE IF NOT EXISTS chapter_v2_map_node (     -- sc_24065 章节V2地图事件节点（行化）
+CREATE TABLE IF NOT EXISTS chapter19_state (         -- sc_24029 第19章扫描/线索/档案/日期操作
+    uid INTEGER PRIMARY KEY,
+    state_json TEXT NOT NULL,
+    update_ts INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS chapter_v2_map_state (    -- sc_24061 当前地图位置与补充资料阅读
+    uid INTEGER PRIMARY KEY,
+    now_location INTEGER NOT NULL DEFAULT 0,
+    read_events_json TEXT NOT NULL DEFAULT '[]',
+    update_ts INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS chapter_v2_backtrack (    -- 当前回溯游标与临时位置；永久进度单独保留
+    uid INTEGER PRIMARY KEY,
+    map_id INTEGER NOT NULL,
+    start_event INTEGER NOT NULL,
+    now_location INTEGER NOT NULL,
+    token TEXT NOT NULL,
+    update_ts INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS chapter_v2_map_node (     -- 旧录制节点；不作为24061事件完成事实
     uid INTEGER NOT NULL,
     node_id INTEGER NOT NULL,                        -- 帧小 ID（101~313）
     ev_type INTEGER DEFAULT 0,                       -- 1主线40801xx/2支线40802xx/3补充40803xx/0运行时
@@ -2183,6 +2219,23 @@ CREATE TABLE IF NOT EXISTS user_timer_watermark (   -- 全局惰性时间戳与�
     last_logout_ts       INTEGER DEFAULT 0,          -- 上次离线时间戳
     update_ts            INTEGER DEFAULT 0
 );
+CREATE TABLE IF NOT EXISTS user_timer_listener_watermark (
+    uid                  INTEGER NOT NULL,
+    event_name           TEXT NOT NULL,
+    listener_key         TEXT NOT NULL,
+    cycle_start_ts       INTEGER NOT NULL,
+    PRIMARY KEY (uid, event_name, listener_key)
+);
+CREATE TABLE IF NOT EXISTS user_timer_listener_retry (
+    uid                  INTEGER NOT NULL,
+    event_name           TEXT NOT NULL,
+    listener_key         TEXT NOT NULL,
+    cycle_start_ts       INTEGER NOT NULL,
+    attempts             INTEGER NOT NULL DEFAULT 0,
+    next_retry_ts        INTEGER NOT NULL DEFAULT 0,
+    last_error           TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY (uid, event_name, listener_key)
+);
 CREATE TABLE IF NOT EXISTS combo_skill_state (      -- 连携技能（协作技能网 p73）等级与进度状态
     uid                  INTEGER NOT NULL,
     skill_id             INTEGER NOT NULL,          -- ComboSkillCfg.id (1~85)，cs_73018 上报的 cooperate_unique_skill_id
@@ -2438,6 +2491,21 @@ class AccountDB:
         self.init_ai_characters()
         # 启动时自动初始化因果观测（WarChess）章节数据
         self.init_warchess_chapters()
+        self._ensure_default_account()
+
+    def _ensure_default_account(self):
+        """旧库保留管理员种子；单账号实验库只保留已绑定的存档主人。"""
+        c = self._conn()
+        marker = c.execute(
+            "SELECT value FROM server_global_config WHERE key='save.owner_uid'").fetchone()
+        if marker is not None:
+            raw = str(marker[0])
+            if not raw.isascii() or not raw.isdigit() or not 0 < int(raw) <= 2**63-1:
+                raise ValueError("单账号存档的 save.owner_uid 无效")
+            owners = [row[0] for row in c.execute('SELECT uid FROM users')]
+            if owners != [int(raw)]:
+                raise ValueError("单账号存档的 users 与存档主人不一致")
+            return
         # 确保默认测试/管理员账号存在于非内存主库 users 表中
         if getattr(self, "path", None) != ":memory:":
             c.execute("""
@@ -2446,7 +2514,318 @@ class AccountDB:
             """)
             c.commit()
 
+    @staticmethod
+    def export_single_account_copy(source_path, destination_path, uid, backup_dir):
+        """从只读一致性快照拆出单账号底稿；不重置进度、不改表结构。
+
+        仅过滤有 uid 列的表。无 uid 表（含抓包模板）原样保留，仍需后续审查。
+        数据库写入集中在本模块，CLI 只负责参数和报告。已有文件拒绝覆盖。
+        """
+        import datetime
+        import hashlib
+        import uuid
+        from pathlib import Path
+
+        if type(uid) is not int or not 0 < uid <= 2**63-1:
+            raise ValueError("uid 必须是有效的正整数")
+        source = Path(source_path).resolve(strict=True)
+        destination = Path(destination_path).resolve()
+        if destination == source or destination.exists():
+            raise FileExistsError("目标必须是不存在的新数据库文件")
+        source_conn = sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)
+        snapshot_conn = output_conn = None
+        try:
+            source_conn.execute('PRAGMA query_only=ON')
+            if not source_conn.execute('SELECT 1 FROM users WHERE uid=?', (uid,)).fetchone():
+                raise ValueError("源库不存在指定账号")
+            stamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+            backup_root = Path(backup_dir).resolve()
+            backup_root.mkdir(parents=True, exist_ok=True)
+            snapshot = backup_root / f'single_account_source_{stamp}_{uuid.uuid4().hex[:8]}.db'
+            with snapshot.open('xb'):
+                pass
+            snapshot_conn = sqlite3.connect(snapshot)
+            source_conn.backup(snapshot_conn)
+            source_conn.close()
+            source_conn = None
+            if snapshot_conn.execute('PRAGMA quick_check').fetchall() != [('ok',)]:
+                raise ValueError("源库快照完整性检查失败；快照保留，未生成实验库")
+            if snapshot_conn.execute("SELECT 1 FROM sqlite_master WHERE type='trigger'").fetchone():
+                raise ValueError("源库包含触发器，需要先审查其过滤副作用")
+            schema = snapshot_conn.execute(
+                "SELECT type,name,tbl_name,sql FROM sqlite_master ORDER BY type,name").fetchall()
+            names = [row[0] for row in snapshot_conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' "
+                "AND name NOT LIKE 'sqlite_%' ORDER BY name")]
+            if 'server_global_config' not in names:
+                raise ValueError("源库缺少存档标记所需的既有配置表")
+            old_marker = snapshot_conn.execute(
+                "SELECT value FROM server_global_config WHERE key='save.owner_uid'").fetchone()
+            if old_marker is not None and str(old_marker[0]) != str(uid):
+                raise ValueError("源库已绑定其他存档主人")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open('xb'):
+                pass
+            output_conn = sqlite3.connect(destination)
+            snapshot_conn.backup(output_conn)
+            table_report = []
+
+            def quoted(name):
+                return '"' + name.replace('"', '""') + '"'
+
+            def digest(rows):
+                hashes = sorted(hashlib.sha256(repr(tuple(row)).encode('utf-8')).digest()
+                                for row in rows)
+                return len(hashes), hashlib.sha256(b''.join(hashes)).hexdigest()
+
+            with output_conn:
+                for name in names:
+                    q = quoted(name)
+                    columns = [row[1] for row in snapshot_conn.execute(f'PRAGMA table_info({q})')]
+                    scoped = 'uid' in columns
+                    original_count = snapshot_conn.execute(f'SELECT COUNT(*) FROM {q}').fetchone()[0]
+                    if scoped:
+                        output_conn.execute(f'DELETE FROM {q} WHERE uid IS NULL OR uid<>?', (uid,))
+                    if name == 'server_global_config':
+                        continue  # 下方单独核对唯一允许新增的存档归属标记。
+                    expected = digest(snapshot_conn.execute(
+                        f'SELECT * FROM {q}' + (' WHERE uid=?' if scoped else ''),
+                        (uid,) if scoped else ()))
+                    actual = digest(output_conn.execute(f'SELECT * FROM {q}'))
+                    if expected != actual:
+                        raise ValueError(f'保留数据不一致: {name}')
+                    table_report.append(dict(name=name, uid_scoped=scoped,
+                                             source_rows=original_count, kept_rows=actual[0],
+                                             removed_rows=original_count-actual[0],
+                                             retained_sha256=actual[1]))
+                original_config = dict(snapshot_conn.execute('SELECT key,value FROM server_global_config'))
+                output_conn.execute(
+                    "INSERT INTO server_global_config(key,value) VALUES('save.owner_uid',?) "
+                    "ON CONFLICT(key) DO UPDATE SET value=excluded.value", (str(uid),))
+                expected_config = dict(original_config, **{'save.owner_uid': str(uid)})
+                if dict(output_conn.execute('SELECT key,value FROM server_global_config')) != expected_config:
+                    raise ValueError('存档归属标记以外的配置发生变化')
+                table_report.append(dict(name='server_global_config', uid_scoped=False,
+                                         source_rows=len(original_config), kept_rows=len(expected_config),
+                                         added_keys=[] if old_marker else ['save.owner_uid']))
+                if output_conn.execute('SELECT uid FROM users').fetchall() != [(uid,)]:
+                    raise ValueError('实验库必须恰好包含一个账号')
+                actual_schema = output_conn.execute(
+                    "SELECT type,name,tbl_name,sql FROM sqlite_master ORDER BY type,name").fetchall()
+                if schema != actual_schema:
+                    raise ValueError('实验库表结构发生变化')
+                if output_conn.execute('PRAGMA quick_check').fetchall() != [('ok',)]:
+                    raise ValueError('实验库完整性检查失败')
+                if output_conn.execute('PRAGMA foreign_key_check').fetchone():
+                    raise ValueError('实验库外键检查失败')
+            return dict(format_version=1, kind='single_account_baseline', owner_uid=uid,
+                        source=str(source), source_snapshot=str(snapshot), destination=str(destination),
+                        table_count=len(names), schema_unchanged=True, quick_check='ok',
+                        uid_scoped_tables=sum(t['uid_scoped'] for t in table_report),
+                        removed_rows=sum(t.get('removed_rows', 0) for t in table_report),
+                        progress_reset=False, unscoped_contents_reviewed=False,
+                        tables=sorted(table_report, key=lambda table: table['name']))
+        finally:
+            for connection in (source_conn, snapshot_conn, output_conn):
+                if connection is not None:
+                    connection.close()
+
     # ---------- 通用 CRUD（uid 隔离） ----------
+
+    @staticmethod
+    def backup_save_file(path):
+        """Snapshot a save including committed WAL without mounting/migrating it."""
+        from pathlib import Path
+        import uuid
+        source = Path(path).resolve(strict=True)
+        backup_root = Path(__file__).resolve().parent.parent / 'db_backup'
+        backup_root.mkdir(parents=True, exist_ok=True)
+        backup = backup_root / ('save_delete_pre_' + source.stem + '_' + str(time.time_ns()) + '_' + uuid.uuid4().hex[:8] + '.db')
+        # Exclusive creation preserves earlier backups even on a name collision.
+        with backup.open('xb'):
+            pass
+        started = time.monotonic()
+        def progress(status, remaining, total):
+            if time.monotonic() - started > 10:
+                raise TimeoutError('存档备份超过10秒，未删除原文件')
+        source_conn = sqlite3.connect(source.as_uri() + '?mode=ro', uri=True, timeout=2)
+        try:
+            target_conn = sqlite3.connect(backup)
+            try:
+                source_conn.backup(target_conn, pages=128, progress=progress, sleep=0.02)
+                if target_conn.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
+                    raise ValueError('存档备份完整性检查失败，未删除原文件')
+            finally:
+                target_conn.close()
+        finally:
+            source_conn.close()
+        return str(backup)
+
+    @classmethod
+    def new_save_workspace(cls):
+        """仅在内存中装配新存档，不运行旧库迁移、默认账号补种或自愈。"""
+        from pathlib import Path
+        db = cls.__new__(cls)
+        db.path = ':memory:'
+        db._local = threading.local()
+        db._ai_chat_lock = threading.Lock()
+        try:
+            conn = sqlite3.connect(':memory:', uri=True)
+            conn.row_factory = sqlite3.Row
+            db._local.conn = conn
+            conn.executescript(Path(__file__).with_name('db_schema.sql').read_text('utf-8'))
+            return db
+        except BaseException:
+            db.close()
+            raise
+
+    def export_new_save(self, path):
+        """完整新档先留根目录备份，再写入新文件；不允许覆盖任何既有文件。"""
+        import uuid
+        from pathlib import Path
+        path = Path(path).resolve()
+        if self.path != ':memory:' or self._in_txn():
+            raise ValueError('仅允许导出已提交的内存新档')
+        if path.exists():
+            raise FileExistsError(f'存档已存在，请换一个名称：{path.name}')
+        if self.query('PRAGMA integrity_check')[0]['integrity_check'] != 'ok':
+            raise ValueError('新档完整性检查失败')
+        backup_root = Path(__file__).resolve().parent.parent / 'db_backup'
+        backup_root.mkdir(parents=True, exist_ok=True)
+        backup = backup_root / ('generated_save_' + str(time.time_ns()) + '_' + uuid.uuid4().hex[:8] + '.db')
+        # First persist a complete recoverable copy. No source save is mutated.
+        for destination in (backup, path):
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open('xb'):
+                pass
+            conn = sqlite3.connect(destination)
+            try:
+                self._conn().backup(conn)
+            finally:
+                conn.close()
+        return str(backup)
+
+    @classmethod
+    def initialize_new_player_file(cls, path, uid, now_ts=None):
+        """备份并重置已绑定主人的实验库内容；不执行建表或迁移。"""
+        import datetime
+        import uuid
+        from pathlib import Path
+        from new_player_service import config, PROFILE, ensure_tasks
+        path = Path(path).resolve(strict=True)
+        now_ts = int(time.time() if now_ts is None else now_ts)
+        root = Path(__file__).resolve().parent.parent / 'db_backup'
+        root.mkdir(parents=True, exist_ok=True)
+        backup = root / ('new_player_pre_' + datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+                         + '_' + uuid.uuid4().hex[:8] + '.db')
+        source = sqlite3.connect(path.as_uri()+'?mode=ro', uri=True)
+        try:
+            owner = source.execute("SELECT value FROM server_global_config WHERE key='save.owner_uid'").fetchone()
+            if type(uid) is not int or not owner or str(owner[0]) != str(uid):
+                raise ValueError('只能初始化已绑定主人的单账号实验库')
+            if source.execute('SELECT uid FROM users').fetchall() != [(uid,)]:
+                raise ValueError('实验库必须只有存档主人')
+            if source.execute("SELECT 1 FROM sqlite_master WHERE type='trigger'").fetchone():
+                raise ValueError('需要先审查数据库触发器')
+            with backup.open('xb'):
+                pass
+            destination = sqlite3.connect(backup)
+            try:
+                source.backup(destination)
+            finally:
+                destination.close()
+        finally:
+            source.close()
+        # 维护入口仅打开既有结构，避免初始化附带的补种与迁移改变实验范围。
+        db = cls.__new__(cls)
+        db.path = str(path)
+        db._local = threading.local()
+        db._ai_chat_lock = threading.Lock()
+        cfg = config()
+        try:
+            schema_sql = "SELECT type,name,tbl_name,sql FROM sqlite_master ORDER BY type,name"
+            before_schema = [tuple(row) for row in db._conn().execute(schema_sql)]
+            before_users = db.get('users',uid)
+            catalogs = {table:db.query(f'SELECT * FROM {table} WHERE uid=?',(uid,))
+                        for table in ('activity','achievement')}
+            rogue_templates = [r['template_id'] for r in db.query(
+                'SELECT DISTINCT template_id FROM rogueteam_user WHERE uid=?',(uid,))]
+            counts = []
+            parameter_updates=[]
+            with db.transaction():
+                for record in db.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"):
+                    name=record['name']; quoted='"'+name.replace('"','""')+'"'
+                    columns=[r['name'] for r in db.query(f'PRAGMA table_info({quoted})')]
+                    if 'uid' in columns:
+                        cursor=db.execute(f'DELETE FROM {quoted} WHERE uid=?',(uid,))
+                        counts.append(dict(table=name,reset_rows=cursor.rowcount))
+                defaults=cfg['settings']; hero=cfg['starter_hero']; hid=hero['id']
+                db.upsert('users',uid,dict(account=before_users.get('account'),server_id=before_users.get('server_id') or 1,
+                    nick='新手实验',level=1,exp=0,extra='{}',hero_num=1,plot_progress=0,
+                    is_changed_nick=0,change_nick_times=0,sign='',portrait=defaults['profile_avatar_default'][0],
+                    icon_frame=defaults['profile_avatar_frame_default'][0],likes=0,ip_location='',register_ts=now_ts,club_id=0,club_post=0))
+                db.upsert('game_user',uid,dict(birth_month=0,birth_day=0,
+                    cur_portrait=defaults['profile_avatar_default'][0],cur_icon_frame=defaults['profile_avatar_frame_default'][0],
+                    cur_bubble=defaults['profile_chat_bubble_default'][0],cur_card_bg=defaults['profile_business_card_default'][0],
+                    cur_sticker_bg=defaults['sticker_background_default'][0],show_hero=json.dumps([hid]),board_hero=hid,
+                    cur_scene=defaults['home_sence_default'][0]))
+                db.upsert('accumulate_sign',uid,dict(version=max(cfg['accumulate_sign_versions']),
+                    open_sign=1,login_days=0,update_ts=now_ts))
+                hero_row=dict(id=hid,level=1,star=hero['star'],exp=0,
+                    skill_list=json.dumps([[sid,1] for sid in hero['skills']]),weapon_exp=0,weapon_break=0,
+                    weapon_servant_uid=0,servant='[]',using_astrolabe='[]',unlock_astrolabe='[]',using_skin=hid,
+                    break_level=0,exclusive_skill_list='[]',weapon_module_level=0,skill_intensify='[]',
+                    battle_using_skin=hid,clear_times=0,unlock=1,equip_slot='[]',module_level=0,
+                    module_assignment=0,chip_state='[]',update_ts=now_ts)
+                db.upsert('hero',uid,hero_row,keys=('uid','id'))
+                from fatigue_service import get_max_fatigue_by_level
+                for cid in (1,2,4,5,19,30,31,32,36,38,101):
+                    db.set_currency(uid,cid,get_max_fatigue_by_level(1) if cid==4 else 0,ts=now_ts)
+                for kind,key in (('portrait','profile_avatar_default'),('icon_frame','profile_avatar_frame_default'),
+                                 ('chat_bubble','profile_chat_bubble_default'),('card_bg','profile_business_card_default'),
+                                 ('sticker_bg','sticker_background_default')):
+                    db.upsert('player_card',uid,dict(kind=kind,item_id=defaults[key][0],obtained=1),keys=('uid','kind','item_id'))
+                for row in catalogs['activity']:
+                    db.upsert('activity',uid,row,keys=('uid','activity_id'))
+                for row in catalogs['achievement']:
+                    row.update(progress=0,complete_flag=0,achieve_time=0)
+                    db.upsert('achievement',uid,row,keys=('uid','achievement_id'))
+                db.upsert('newbie_activity',uid,dict(completed_time=0,trigger_time=0,max_phase=1,
+                    version_id=cfg['noob_version'],now_sign_times=0,last_sign_ts=0,update_ts=now_ts))
+                db.upsert('mythic_public',uid,dict(current_difficulty=1,is_new_difficulty=0,update_ts=now_ts))
+                db.upsert('autochess_meta',uid,dict(rank_score=0,energy=0,sunglasses=0,update_ts=now_ts))
+                db.upsert('matrix_user',uid,dict(game_state=1,terminal_json='{}',beacon_json='[]',point_reward_got='[]',update_ts=now_ts))
+                db.upsert('abyss',uid,dict(activity_id=cfg['abyss_initial']['activity_id'],
+                    history_max_layer=cfg['abyss_initial']['layer'],last_version_max_unlock_layer=cfg['abyss_initial']['layer'],
+                    is_back=0,update_ts=now_ts),keys=('uid','activity_id'))
+                db.upsert('mythic_difficulty',uid,dict(difficulty_id=1,is_open=1,update_ts=now_ts),keys=('uid','difficulty_id'))
+                db.upsert('mythic_final_progress',uid,dict(now_difficulty=1,can_choose_list='[1]',
+                    receive_reward_list='[]',clear_list='[]',challenge_info_json='[]',is_new_difficulty=0,update_ts=now_ts))
+                for template in rogue_templates:
+                    db.upsert('rogueteam_user',uid,dict(template_id=template,difficult=1,max_difficult=1,
+                        last_score_id=0,point=0,rewarded_list_json='[]',update_ts=now_ts),keys=('uid','template_id'))
+                db.set_system_config('save.profile',PROFILE)
+                db.set_system_config('save.initialized_at',str(now_ts))
+                for tid,task in cfg['tasks'].items():
+                    rows=db.query('SELECT additional_parameter FROM task_cfg WHERE task_id=?',(int(tid),))
+                    if not rows:
+                        raise ValueError(f'实验库缺少任务配置 {tid}')
+                    expected=[] if task['additional_parameter']=='' else task['additional_parameter']
+                    if json.loads(rows[0]['additional_parameter'] or '[]') != expected:
+                        db.execute('UPDATE task_cfg SET additional_parameter=? WHERE task_id=?',
+                                   (json.dumps(expected),int(tid)))
+                        parameter_updates.append(int(tid))
+                ensure_tasks(db,uid,now_ts)
+                after_schema=[tuple(row) for row in db._conn().execute(schema_sql)]
+                if before_schema != after_schema:
+                    raise RuntimeError('初始化不允许改变表结构')
+                if db._conn().execute('PRAGMA quick_check').fetchall()[0][0] != 'ok':
+                    raise RuntimeError('实验库完整性检查失败')
+            return dict(owner_uid=uid,profile=PROFILE,backup=str(backup),schema_unchanged=True,
+                        level=1,starter_hero=hid,reset_tables=counts,task_parameter_updates=parameter_updates,
+                        newbie_trigger_stage=cfg['settings']['newbie_unlock_level_id'][0])
+        finally:
+            db.close()
 
     def execute(self, sql, args=()):
         c = self._checked_conn()
@@ -3194,6 +3573,56 @@ class AccountDB:
             (uid, str(kind), int(key_id), now_ts or int(_t.time())))
         return cur.rowcount > 0
 
+    def get_enemy_statistics(self, uid, valid_ids=()):
+        """Lifetime counters; absent state exposes only existing classified history."""
+        rows = self.query("SELECT value_json FROM ops_common WHERE uid=? AND kind='enemy_statistics' AND item_id='lifetime'", (uid,))
+        if rows:
+            return json.loads(rows[0]['value_json'])
+        known = set(valid_ids)
+        baseline = sum(max(0, int(r['times'] or 0)) for r in self.query(
+            "SELECT item_id,times FROM illustrated WHERE uid=? AND kind='enemy'", (uid,)) if r['item_id'] in known)
+        return dict(version=1, total=baseline, classified=baseline, unclassified=0,
+            legacy_classified=baseline, real_total=0, sweep_total=0, settlements=0,
+            malformed_reports=0, missing_reports=0, unmapped_sweeps=0, aggregate_shortfall=0,
+            unmapped_monsters={})
+
+    def record_enemy_statistics(self, uid, battle_id, event, valid_ids):
+        """One transaction owns settlement dedup, totals and illustrated species counts."""
+        if any(type(event.get(k)) is not int or event[k] < 0 for k in ('total','classified','unclassified')):
+            raise ValueError('Invalid enemy statistics totals')
+        if event['total'] != event['classified'] + event['unclassified'] or event['classified'] != sum(k['count'] for k in event['kills']):
+            raise ValueError('Enemy statistics totals do not reconcile')
+        key = str(int(battle_id))
+        with self.transaction():
+            inserted = self.execute("""INSERT OR IGNORE INTO ops_common(uid,kind,item_id,value_json)
+                VALUES(?,'enemy_settlement',?,?)""", (uid, key, json.dumps(event))).rowcount
+            if not inserted:
+                return None
+            stats = self.get_enemy_statistics(uid, valid_ids)
+            for key in ('total','classified','unclassified','malformed_reports','missing_reports',
+                        'unmapped_sweeps','aggregate_shortfall'):
+                stats[key] += event.get(key, 0)
+            stats['sweep_total' if event['sweep'] else 'real_total'] += event['total']
+            stats['settlements'] += 1
+            unknown = stats.setdefault('unmapped_monsters', {})
+            for mid, count in event.get('unmapped_monsters', {}).items():
+                unknown[mid] = unknown.get(mid, 0) + count
+            diffs = []
+            for killed in event['kills']:
+                mid, count = killed['monster_id'], killed['count']
+                if mid not in valid_ids or type(count) is not int or count <= 0:
+                    raise ValueError('Invalid classified kill')
+                rows = self.query("SELECT times,is_view FROM illustrated WHERE uid=? AND kind='enemy' AND item_id=?", (uid, mid))
+                times = (int(rows[0]['times'] or 0) if rows else 0) + count
+                if times > 0xffffffff:
+                    raise ValueError('Monster illustrated counter exceeds uint32')
+                self.execute("""INSERT INTO illustrated(uid,kind,item_id,times,is_view) VALUES(?,'enemy',?,?,0)
+                    ON CONFLICT(uid,kind,item_id) DO UPDATE SET times=excluded.times""", (uid, mid, times))
+                diffs.append(dict(id=mid, times=times, is_view=int(rows[0]['is_view'] or 0) if rows else 0))
+            self.execute("""INSERT INTO ops_common(uid,kind,item_id,value_json) VALUES(?,'enemy_statistics','lifetime',?)
+                ON CONFLICT(uid,kind,item_id) DO UPDATE SET value_json=excluded.value_json""", (uid, json.dumps(stats)))
+            return diffs
+
     # ---------------- MomoTalk 随身通讯（# [Fix by Gemini 3.7-flash]） ----------------
 
     def get_momotalk_data(self, uid):
@@ -3481,14 +3910,22 @@ class AccountDB:
         """确保玩家在 backhome_hero 表中拥有完整的全部 63 位官方角色档案底表记录。"""
         existing = self.query("SELECT archives_id FROM backhome_hero WHERE uid=?", (uid,))
         exist_aids = set(r["archives_id"] for r in existing)
+        owned = {self.get_archive_id(r['id']) for r in self.query(
+            "SELECT id FROM hero WHERE uid=? AND unlock=1", (uid,))}
         now_ts = int(time.time())
         for aid, primary_hid in ARCHIVE_MAP.items():
             if aid not in exist_aids:
                 self.execute("""
                     INSERT OR IGNORE INTO backhome_hero 
                     (uid, archives_id, hero_id, fatigue, feed_times, total_feed_times, is_lock, update_ts, skin_id)
-                    VALUES (?, ?, ?, 140, 0, 100, 0, ?, 0)
-                """, (uid, aid, primary_hid, now_ts))
+                    VALUES (?, ?, ?, 140, 0, 0, ?, ?, 0)
+                """, (uid, aid, primary_hid, 0 if aid in owned else 1, now_ts))
+        if self.get_system_config('save.profile') == 'new_player_v1':
+            # Older experimental saves may already have directory rows marked
+            # usable. Restrict unowned archives without erasing feeding history.
+            exclusion = " AND archives_id NOT IN (" + ','.join('?' for _ in owned) + ')' if owned else ''
+            self.execute("UPDATE backhome_hero SET is_lock=1 WHERE uid=? AND is_lock=0" + exclusion,
+                         (uid, *sorted(owned)))
 
     def get_backhome_concise(self, uid):
         """[Fix by Gemini 3.7-flash] 获取后宅/家园登录简要数据（sc_58001），包含所有英雄疲劳度与岗位。"""
@@ -3558,19 +3995,24 @@ class AccountDB:
             "careers": careers_list,
             "signature_dish": signature_dish_list,
             "entrust": entrust_list,
-            "accruing_earnings": c_meta[0]["accruing_earnings"] if c_meta else 1847982
+            "accruing_earnings": c_meta[0]["accruing_earnings"] if c_meta else 0
         }]
 
         # 3. 英雄疲劳度与投喂状态（全量 63 官方角色档案库，archives_id 与 hero_id 映射正确）
         hero_rows = self.query("SELECT * FROM backhome_hero WHERE uid=?", (uid,))
         hmap = {r["archives_id"]: r for r in hero_rows}
         backhome_hero = []
+        owned_archives = {self.get_archive_id(r['id']) for r in self.query(
+            "SELECT id FROM hero WHERE uid=? AND unlock=1", (uid,))}
+        is_fresh = self.get_system_config('save.profile') == 'new_player_v1'
         for aid, primary_hid in sorted(ARCHIVE_MAP.items()):
             hr = hmap.get(aid)
             fatigue = hr["fatigue"] if hr else 140
             feed_times = hr["feed_times"] if hr else 0
-            total_feed = hr["total_feed_times"] if hr else 100
-            is_lock = hr["is_lock"] if hr else 0
+            total_feed = hr["total_feed_times"] if hr else 0
+            is_lock = hr["is_lock"] if hr else (0 if aid in owned_archives else 1)
+            if is_fresh and aid not in owned_archives:
+                is_lock = 1
             backhome_hero.append({
                 "archives_id": aid,
                 "hero_id": primary_hid,
@@ -4611,53 +5053,77 @@ class AccountDB:
         """, (uid, int(dorm_id), int(hero_id)))
 
     def gift_furniture_to_hero(self, uid, hero_id, furniture_items):
-        """[Fix by Gemini 3.7-flash] 赠送专属家具增加好感度经验并落库（cs_58136 -> sc_58137，支持 repeated 列表）。"""
+        """Validate a complete manual gift batch, then persist it in the caller's transaction."""
+        from archive_service import ArchiveService
+        from dorm_gift_config import get_dorm_gift_config
+
         now_ts = int(time.time())
         hid = int(hero_id)
-        flist = furniture_items if isinstance(furniture_items, list) else [furniture_items]
-        # 查英雄所在的私人房间
-        rows = self.query("SELECT dorm_id FROM backhome_dorm_hero WHERE uid=? AND hero_id=?", (uid, hid))
-        did = rows[0]["dorm_id"] if rows else None
+        if not isinstance(furniture_items, list) or not furniture_items:
+            raise ValueError("家具赠送列表不能为空")
+        archive_service = ArchiveService.get_instance()
+        archive_id = archive_service.get_archive_id(hid)
+        if not archive_id or archive_id not in archive_service.owned_archive_ids(self, uid):
+            raise ValueError("尚未拥有对应角色")
+        gift_rules, private_ids = get_dorm_gift_config()
+        rows = self.query(
+            "SELECT dh.dorm_id FROM backhome_dorm_hero dh "
+            "JOIN backhome_dorm d ON d.uid=dh.uid AND d.dorm_id=dh.dorm_id "
+            "WHERE dh.uid=? AND dh.hero_id=?", (uid, archive_id)
+        )
+        private_rooms = [int(r["dorm_id"]) for r in rows if int(r["dorm_id"]) in private_ids]
+        if len(private_rooms) != 1:
+            raise ValueError("角色必须有唯一的自有私人房间")
+        did = private_rooms[0]
+        owners = self.query("SELECT hero_id FROM backhome_dorm_hero WHERE uid=? AND dorm_id=?", (uid, did))
+        if len(owners) != 1 or int(owners[0]["hero_id"]) != archive_id:
+            raise ValueError("私人房间主人记录无效")
 
-        # 确保存储表存在
-        self.execute("""
-            CREATE TABLE IF NOT EXISTS backhome_dorm_gift (
-                uid INTEGER NOT NULL,
-                dorm_id INTEGER NOT NULL,
-                hero_id INTEGER NOT NULL,
-                furniture_id INTEGER NOT NULL,
-                num INTEGER DEFAULT 1,
-                update_ts INTEGER DEFAULT 0,
-                PRIMARY KEY (uid, dorm_id, furniture_id)
+        totals = {}
+        for item in furniture_items:
+            if not isinstance(item, dict):
+                raise ValueError("家具赠送参数无效")
+            fur_id = item.get("id", item.get("furniture_id"))
+            num = item.get("num")
+            if type(fur_id) is not int or fur_id not in gift_rules:
+                raise ValueError("该家具不能手动赠送")
+            if "furniture_id" in item and item["furniture_id"] != fur_id:
+                raise ValueError("家具编号不一致")
+            if type(num) is not int or not 0 < num <= 0xffffffff:
+                raise ValueError("赠送数量必须为正整数")
+            totals[fur_id] = totals.get(fur_id, 0) + num
+
+        # Validate aggregate stock and per-room limits before any mutation.
+        for fur_id, num in totals.items():
+            stock = self.query("SELECT num, give_num FROM backhome_furniture WHERE uid=? AND furniture_id=?", (uid, fur_id))
+            if not stock or int(stock[0]["give_num"] or 0) < 0 or int(stock[0]["num"] or 0) - int(stock[0]["give_num"] or 0) < num:
+                raise ValueError("可赠送家具库存不足")
+            gifts = self.query("SELECT num FROM backhome_dorm_gift WHERE uid=? AND dorm_id=? AND furniture_id=?", (uid, did, fur_id))
+            already = int(gifts[0]["num"] or 0) if gifts else 0
+            if already < 0 or already + num > gift_rules[fur_id]:
+                raise ValueError("超过该角色的家具赠送上限")
+
+        for fur_id, num in totals.items():
+            updated = self.execute(
+                "UPDATE backhome_furniture SET give_num=give_num+?, update_ts=? "
+                "WHERE uid=? AND furniture_id=? AND give_num>=0 AND num-give_num>=?",
+                (num, now_ts, uid, fur_id, num)
             )
-        """)
-
-        for item in flist:
-            if not item:
-                continue
-            fur_id = int(item.get("id") or item.get("furniture_id") or 0)
-            num = int(item.get("num") or 1)
-            if did and fur_id:
-                # 每件家具增加经验（基础1000点）
-                self.execute("""
-                    UPDATE backhome_dorm SET exp=exp+?, update_ts=? WHERE uid=? AND dorm_id=?
-                """, (1000 * num, now_ts, uid, did))
-                # 写入宿舍礼物表
-                self.execute("""
-                    INSERT INTO backhome_dorm_gift (uid, dorm_id, hero_id, furniture_id, num, update_ts)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(uid, dorm_id, furniture_id) DO UPDATE SET num=num+excluded.num, update_ts=excluded.update_ts
-                """, (uid, did, hid, fur_id, num, now_ts))
-            if fur_id:
-                self.execute("""
-                    UPDATE backhome_furniture SET give_num=give_num+?, update_ts=? WHERE uid=? AND furniture_id=?
-                """, (num, now_ts, uid, fur_id))
-            if hid:
-                # 赠送专属家具增加英雄好感经验（每件+500）
-                self.execute("""
-                    UPDATE hero SET trust_exp=trust_exp+?
-                    WHERE uid=? AND (id=? OR id=? OR id=?)
-                """, (500 * num, uid, hid, hid // 100, hid % 10000))
+            if updated.rowcount != 1:
+                raise ValueError("可赠送家具库存已变化")
+            self.execute("""
+                INSERT INTO backhome_dorm_gift (uid, dorm_id, hero_id, furniture_id, num, update_ts)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(uid, dorm_id, furniture_id) DO UPDATE SET num=num+excluded.num, update_ts=excluded.update_ts
+            """, (uid, did, archive_id, fur_id, num, now_ts))
+        total = sum(totals.values())
+        # Preserve the existing effective growth amounts; growth policy is separate.
+        self.execute("UPDATE backhome_dorm SET exp=exp+?, update_ts=? WHERE uid=? AND dorm_id=?",
+                     (1000 * total, now_ts, uid, did))
+        self.execute("UPDATE hero SET trust_exp=trust_exp+? WHERE uid=? AND (id=? OR id=? OR id=?)",
+                     (500 * total, uid, hid, hid // 100, hid % 10000))
+        return {"hero_id": archive_id, "dorm_id": did,
+                "furniture": [{"id": fid, "num": num} for fid, num in totals.items()]}
 
     def feed_dorm_hero(self, uid, feed_type, hero_id):
         """[Fix by Gemini 3.7-flash] 给英雄喂食恢复疲劳度 +20（允许超上限至 140），单日限 1 次（cs_58138 -> sc_58139）。"""
@@ -4758,30 +5224,8 @@ class AccountDB:
         return self._SKIN_DRAW_CFG
 
     def get_skin_draw_pool_state(self, uid, pool_id):
-        """获取玩家在指定卡池中的库存状态：{drop_id: {'drop_id': int, 'remain_num': int, 'drawn_num': int}}。
-        若尚未初始化，则从 skin_draw_pool_cfg.json 中读取初始 total 自动入库初始化。
-        """
-        pid = int(pool_id)
-        rows = self.query(
-            "SELECT drop_id, remain_num, drawn_num FROM user_skin_draw_pool WHERE uid=? AND pool_id=?",
-            (uid, pid))
-        if rows:
-            return {int(r["drop_id"]): {"drop_id": int(r["drop_id"]), "remain_num": int(r["remain_num"]), "drawn_num": int(r["drawn_num"])} for r in rows}
-        
-        # 初次访问，从配置初始化
-        cfgs = self._load_skin_draw_pool_cfg()
-        pcfg = cfgs.get(str(pid)) or cfgs.get(pid)
-        state = {}
-        now = int(time.time())
-        if pcfg and "drops" in pcfg:
-            for did_str, dinfo in pcfg["drops"].items():
-                did = int(did_str)
-                tot = int(dinfo.get("total") or 0)
-                state[did] = {"drop_id": did, "remain_num": tot, "drawn_num": 0}
-                self.upsert("user_skin_draw_pool", uid,
-                            {"pool_id": pid, "drop_id": did, "remain_num": tot, "drawn_num": 0, "update_ts": now},
-                            keys=("uid", "pool_id", "drop_id"))
-        return state
+        from skin_draw_service import get_pool_state
+        return get_pool_state(self, uid, pool_id)
 
     def update_skin_draw_pool_item(self, uid, pool_id, drop_id, remain_num, drawn_num):
         """更新单个 drop_id 的剩余和已抽数量。"""
@@ -4945,21 +5389,89 @@ class AccountDB:
 
         # 同一秒内的玩家消息与 AI 回复不能共用 msg_id；锁内探测并递增到空闲编号。
         with self._ai_chat_lock:
-            msg_id = int(now * 1000 + (char_id_int % 1000))
-            with self.transaction():
-                while self.query("SELECT 1 FROM friend_chat WHERE uid=? AND msg_id=?", (uid_int, msg_id)):
-                    msg_id += 1
-                self.execute(
-                    "INSERT INTO ai_chat_memory (uid, char_id, role, content, timestamp, is_read) VALUES (?, ?, ?, ?, ?, 1)",
-                    (uid_int, char_id_int, role_str, content_str, now)
-                )
-                sender_uid = uid_int if role_str == "user" else char_id_int
-                self.execute(
-                    "INSERT INTO friend_chat (uid, msg_id, sender_uid, peer_uid, content, timestamp, update_ts) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    (uid_int, msg_id, sender_uid, char_id_int, content_str, now, now)
-                )
+            return self._save_ai_chat_message_locked(uid_int, char_id_int, role_str, content_str, now)
+
+    def _save_ai_chat_message_locked(self, uid_int, char_id_int, role_str, content_str, now):
+        """Caller owns _ai_chat_lock; nested callers share the surrounding transaction."""
+        msg_id = int(now * 1000 + (char_id_int % 1000))
+        with self.transaction():
+            while self.query("SELECT 1 FROM friend_chat WHERE uid=? AND msg_id=?", (uid_int, msg_id)):
+                msg_id += 1
+            self.execute(
+                "INSERT INTO ai_chat_memory (uid, char_id, role, content, timestamp, is_read) VALUES (?, ?, ?, ?, ?, 1)",
+                (uid_int, char_id_int, role_str, content_str, now)
+            )
+            sender_uid = uid_int if role_str == "user" else char_id_int
+            self.execute(
+                "INSERT INTO friend_chat (uid, msg_id, sender_uid, peer_uid, content, timestamp, update_ts) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (uid_int, msg_id, sender_uid, char_id_int, content_str, now, now)
+            )
         return msg_id
+
+    def get_ai_proactive_persona(self, uid, char_id):
+        """Honor an explicitly empty personal prompt before legacy global fallbacks."""
+        character = self.get_ai_character(char_id) or self.get_ai_character_by_hero_id(char_id)
+        if not character:
+            return ''
+        rows = self.query('SELECT extra FROM users WHERE uid=?', (int(uid),))
+        if not rows:
+            return ''
+        extra = json.loads(rows[0]['extra'] or '{}')
+        prompts = extra.get('ai_custom_prompts', {})
+        keys = [str(character['char_id']), str(char_id)]
+        keys.extend(part.strip() for part in (character.get('hero_ids') or '').split(',') if part.strip())
+        for key in dict.fromkeys(keys):
+            if key in prompts:
+                return str(prompts[key] or '').strip()
+        return str(character.get('system_prompt') or '').strip()
+
+    def get_ai_proactive_greeting(self, uid, char_id, day):
+        rows = self.query("SELECT value_json FROM ops_common WHERE uid=? AND kind='ai_proactive_chat' AND item_id=?",
+                          (int(uid), f'{day}:{int(char_id)}'))
+        return json.loads(rows[0]['value_json']) if rows else None
+
+    def reserve_ai_proactive_greeting(self, uid, char_id, day, events):
+        """One durable generation budget per save/user/canonical role/calendar day."""
+        state = dict(status='generating', char_id=int(char_id), day=str(day), events=events)
+        with self.transaction():
+            cur = self.execute(
+                "INSERT OR IGNORE INTO ops_common(uid,kind,item_id,value_json) VALUES(?,'ai_proactive_chat',?,?)",
+                (int(uid), f'{day}:{int(char_id)}', json.dumps(state, ensure_ascii=False)))
+            return cur.rowcount == 1
+
+    def set_ai_proactive_greeting_status(self, uid, char_id, day, status):
+        with self.transaction():
+            state = self.get_ai_proactive_greeting(uid, char_id, day)
+            if not state:
+                return False
+            state['status'] = str(status)
+            self.execute("UPDATE ops_common SET value_json=? WHERE uid=? AND kind='ai_proactive_chat' AND item_id=?",
+                         (json.dumps(state, ensure_ascii=False), int(uid), f'{day}:{int(char_id)}'))
+        return True
+
+    def complete_ai_proactive_greeting(self, uid, char_id, day, text, persona, clear_ts, timestamp):
+        """Store only the assistant message and its recovery reference in one transaction."""
+        # Match ordinary chat's lock-before-transaction order.
+        with self._ai_chat_lock, self.transaction():
+            state = self.get_ai_proactive_greeting(uid, char_id, day)
+            character = self.get_ai_character(char_id)
+            if (not state or state['status'] != 'generating' or not character
+                    or not character.get('is_active')
+                    or self.get_ai_proactive_persona(uid, char_id) != persona
+                    or self.get_ai_chat_clear_ts(uid, char_id) != clear_ts):
+                return 0
+            message_id = self._save_ai_chat_message_locked(int(uid), int(char_id), 'assistant', str(text), int(timestamp))
+            state.update(status='ready', message_id=message_id, timestamp=int(timestamp))
+            self.execute("UPDATE ops_common SET value_json=? WHERE uid=? AND kind='ai_proactive_chat' AND item_id=?",
+                         (json.dumps(state, ensure_ascii=False), int(uid), f'{day}:{int(char_id)}'))
+            return message_id
+
+    def get_ai_proactive_message(self, uid, state):
+        """A cleared message must never be recovered from the daily dispatch record."""
+        rows = self.query('SELECT content,timestamp FROM friend_chat WHERE uid=? AND msg_id=? AND sender_uid=?',
+                          (int(uid), int(state.get('message_id') or 0), int(state['char_id'])))
+        return rows[0] if rows else None
 
     def get_ai_chat_history(self, uid, char_id, limit=20):
         """获取最近 N 轮对话历史（按时间正序）。"""
@@ -5071,6 +5583,63 @@ class AccountDB:
             self.execute("UPDATE users SET extra = ? WHERE uid = ?", (json.dumps(extra, ensure_ascii=False), int(uid)))
             return True
 
+    def get_character_model_route(self, uid, char_id):
+        """Per-save/UID route; canonical character first, then legacy hero aliases."""
+        rows = self.query('SELECT extra FROM users WHERE uid=?', (int(uid),))
+        if not rows:
+            return None
+        extra = rows[0]['extra'] or '{}'
+        extra = json.loads(extra) if isinstance(extra, str) else extra
+        routes = extra.get('ai_model_routes', {})
+        if not isinstance(routes, dict):
+            raise ValueError('存档ai_model_routes格式错误')
+        if not routes:
+            return None
+        cid = int(char_id)
+        character = (self.get_ai_character(cid) or self.get_ai_character_by_hero_id(cid)) if cid else None
+        keys = []
+        if character:
+            keys.append(str(character['char_id']))
+        keys.append(str(cid))
+        if character:
+            keys.extend(x.strip() for x in str(character.get('hero_ids') or '').split(',') if x.strip())
+        keys.append('default')
+        for key in dict.fromkeys(keys):
+            if key in routes:
+                return routes[key]
+        return None
+
+    def set_ai_model_routes(self, uid, routes):
+        """Replace only this user's model routes; an empty map restores global defaults."""
+        from ai_bot_config import get_bot_config, validate_model_route
+        if not isinstance(routes, dict):
+            raise ValueError('角色模型配置必须为字典')
+        providers = get_bot_config().get('providers', {})
+        normalized = {}
+        for key, value in routes.items():
+            if str(key) == 'default':
+                target = 'default'
+            else:
+                cid = int(key)
+                character = self.get_ai_character(cid) or self.get_ai_character_by_hero_id(cid)
+                if not character:
+                    raise ValueError('角色模型配置包含未知角色')
+                target = str(character['char_id'])
+            route = validate_model_route(value, providers)
+            if target in normalized and normalized[target] != route:
+                raise ValueError('同一角色不同机体的模型配置冲突')
+            normalized[target] = route
+        with self._ai_chat_lock, self.transaction():
+            rows = self.query('SELECT extra FROM users WHERE uid=?', (int(uid),))
+            if not rows:
+                return False
+            extra = rows[0]['extra'] or '{}'
+            extra = json.loads(extra) if isinstance(extra, str) else dict(extra)
+            extra['ai_model_routes'] = normalized
+            changed = self.execute('UPDATE users SET extra=? WHERE uid=?',
+                                   (json.dumps(extra, ensure_ascii=False), int(uid)))
+            return changed.rowcount == 1
+
     def clear_ai_chat_history(self, uid, char_id=None):
         """清空指定玩家与 AI 角色的聊天记录（支持清空单角色或清空全部），并记录截断时间戳。"""
         uid_int = int(uid)
@@ -5109,6 +5678,15 @@ class AccountDB:
                     friend_deleted = max(0, cur.rowcount)
                 cur = self.execute("DELETE FROM ai_chat_memory WHERE uid=?", (uid_int,))
                 memory_deleted = max(0, cur.rowcount)
+
+            # Cancel in-flight/undelivered proactive messages, including same-second clears.
+            for row in self.query("SELECT item_id,value_json FROM ops_common WHERE uid=? AND kind='ai_proactive_chat'", (uid_int,)):
+                state = json.loads(row['value_json'])
+                if (state.get('status') in ('generating', 'ready')
+                        and (char_id is None or int(state['char_id']) == int(char_id))):
+                    state['status'] = 'cancelled'
+                    self.execute("UPDATE ops_common SET value_json=? WHERE uid=? AND kind='ai_proactive_chat' AND item_id=?",
+                                 (json.dumps(state, ensure_ascii=False), uid_int, row['item_id']))
 
             # 在 users.extra 中持久化记录截断时间戳 clear_ts，确保大模型上下文自动过滤更早的历史记录
             u_rows = self.query("SELECT extra FROM users WHERE uid = ?", (uid_int,))
@@ -5398,6 +5976,9 @@ class AccountDB:
 
     def set_mythic_difficulty(self, uid, difficulty):
         """切换黑区净化当前挑战难度。"""
+        from new_player_service import enabled, mythic_open
+        if enabled(self,uid) and int(difficulty) not in mythic_open(self,uid):
+            raise ValueError('黑区难度尚未解锁')
         now = int(time.time())
         self.execute(
             "INSERT INTO mythic_public (uid, current_difficulty, update_ts) VALUES (?, ?, ?) "
@@ -5505,6 +6086,9 @@ class AccountDB:
         now = int(time.time())
         prog = self.get_mythic_final_progress(uid)
         can_choose = prog["can_choose_list"]
+        from new_player_service import enabled
+        if enabled(self,uid) and int(difficulty) not in can_choose:
+            raise ValueError('失序深区档位尚未解锁')
         if int(difficulty) not in can_choose:
             can_choose.append(int(difficulty))
             can_choose.sort()
@@ -6627,6 +7211,26 @@ class AccountDB:
         with self.transaction():
             cur = self.execute(sql, tuple(values))
             return cur.rowcount if cur else 0
+
+    def gm_override_birthday(self, uid, month, day):
+        """GM date override; 0/0 clears it without changing other profile fields."""
+        from profile_rules import valid_birthday
+        if not (valid_birthday(month, day) or type(month) is int and type(day) is int and month == day == 0):
+            raise ValueError("生日月日无效；清除生日须同时为0")
+        uid = int(uid)
+        with self.transaction():
+            if len(self.query("SELECT uid FROM users WHERE uid=?", (uid,))) != 1:
+                raise LookupError("账号不存在或不唯一")
+            cursor = self.execute(
+                "INSERT INTO game_user(uid,birth_month,birth_day) VALUES(?,?,?) "
+                "ON CONFLICT(uid) DO UPDATE SET birth_month=excluded.birth_month,birth_day=excluded.birth_day",
+                (uid, month, day))
+            if cursor.rowcount != 1:
+                raise RuntimeError("生日未保存")
+            if month:
+                from birthday_service import record_birthday_setting
+                record_birthday_setting(self,uid)
+        return {"month": month, "day": day}
 
 
 _db = None

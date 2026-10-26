@@ -461,23 +461,14 @@ class ServantService:
 
     # ==================== 6. 权钥经验喂养狗粮消耗 ====================
 
-    def consume_servants_as_food(self, ctx, uid, servant_uids):
-        """
-        供 HeroService 权钥经验升级时调用（吞噬低星钥从作为经验狗粮）：
-        - 校验未穿戴、未加锁
-        - 按品阶/星级计算经验 (3星=100, 4星=300, 5星=500, 对齐 gamesetting.lua)
-        - 物理删除实体并广播事件
-        - 记录 ctx.deleted_servants 以供后续下发原子帧 sc_17023.weapon_list 彻底清理客户端幽灵数据
-        - 对已不存在的幽灵数据做容错保护（不报错，且强制追加清理指令）
-        - 返回: (valid_count, total_exp)
-        """
+    def plan_servants_as_food(self, ctx, uid, servant_uids):
+        """Read-only experience preview; repeated UIDs can contribute only once."""
         db = getattr(ctx, "db", self.db)
-        uids = [int(x) for x in (servant_uids or []) if str(x).isdigit()]
-        if not uids:
-            return 0, 0
-
+        if not isinstance(servant_uids, (list, tuple)):
+            raise OperationError(2, "钥从材料列表无效")
+        uids = list(dict.fromkeys(int(x) for x in servant_uids if str(x).isdigit()))
         equipped_set = self.get_equipped_servant_uids(uid, db=db)
-        valid_count = 0
+        consumed = []
         total_exp = 0
         deleted_list = []
 
@@ -508,25 +499,36 @@ class ServantService:
                     star = 3
             exp = SERVANT_STAR_EXP.get(star, 100)
             total_exp += exp
+            consumed.append((suid, pid))
+            deleted_list.append({"uid": suid, "id": pid})
+
+        return {"consumed": consumed, "exp": total_exp, "deleted": deleted_list}
+
+    def consume_servants_as_food(self, ctx, uid, servant_uids):
+        """Consume a fresh validated plan and retain the ghost-deletion contract."""
+        db = getattr(ctx, "db", self.db)
+        plan = self.plan_servants_as_food(ctx, uid, servant_uids or [])
+        for suid, pid in plan["consumed"]:
 
             if pid > 0:
                 db.execute("CREATE TABLE IF NOT EXISTS servant_history (uid INTEGER NOT NULL, id INTEGER NOT NULL, prefab_id INTEGER NOT NULL, PRIMARY KEY (uid, id))")
                 db.execute("INSERT OR REPLACE INTO servant_history (uid, id, prefab_id) VALUES (?, ?, ?)", (uid, suid, pid))
-            db.execute("DELETE FROM servant WHERE uid=? AND id=?", (uid, suid))
-            valid_count += 1
-            deleted_list.append({"uid": suid, "id": pid})
+            deleted = db.execute("DELETE FROM servant WHERE uid=? AND id=?", (uid, suid))
+            if deleted.rowcount != 1:
+                raise OperationError(2, "钥从材料状态发生变化")
 
-        if deleted_list:
+        if plan["deleted"]:
             if not hasattr(ctx, "deleted_servants") or ctx.deleted_servants is None:
                 ctx.deleted_servants = []
-            ctx.deleted_servants.extend(deleted_list)
+            ctx.deleted_servants.extend(plan["deleted"])
 
+        valid_count = len(plan["consumed"])
         if valid_count > 0:
             try:
                 event_bus.bus.emit(event_bus.Events.SERVANT_DESTROY, ctx, uid, count=valid_count)
             except Exception:
                 pass
-        return valid_count, total_exp
+        return valid_count, plan["exp"]
 
 
     # ==================== 7. 全量钥从下行包构建 (sc_46011) ====================

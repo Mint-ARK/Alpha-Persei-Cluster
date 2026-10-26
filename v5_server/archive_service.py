@@ -331,6 +331,8 @@ class ArchiveService:
             (json.dumps(normalized), uid, archive_id),
         )
         story_id = super_ids[index - 1]
+        from illustrated_story_service import publish_story_unlock
+        publish_story_unlock(ctx, uid, [story_id])
         if first_view:
             bus.emit(
                 Events.STORY_READ,

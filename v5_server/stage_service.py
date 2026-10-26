@@ -12,7 +12,7 @@ stage_service.py — 全关卡与章节统一领域服务 (Unified Stage Service
    - sc_11001 (activity_list): 自动下发支线绑定的活动激活时间戳，彻底解除前端时间锁
 4. 支持三种可热切换的进度模式预设（控制面板与 GM 接口）：
    - "all_clear"  : 全通全解锁模式（方案 A：真通关、上下篇全解、无挂起锁）
-   - "new_game"   : 纯净开荒模式（方案 B：全0重置，严格按前驱关卡步进）
+   - "new_game"   : 纯净开荒模式（方案 B：清理主支线进度，保留序章）
    - "pcap_replay": 抓包基准进度模式
 """
 
@@ -138,6 +138,13 @@ class StageService:
             return 1, [1, 1, 1], False
 
         sid = int(stage_id)
+        from new_player_service import enabled, stage_available
+        if enabled(self.db,uid):
+            if not self.db._in_txn():
+                with self.db.transaction():
+                    return self.pass_stage(uid,sid,win_stars=win_stars,times=times)
+            if not stage_available(self.db,uid,sid):
+                raise ValueError('关卡尚未解锁')
         meta_info = self.stages.get(str(sid)) or self.stages.get(sid) or {}
         cat = meta_info.get("category", "")
         max_star = meta_info.get("max_star", 3)
@@ -199,6 +206,8 @@ class StageService:
             except Exception:
                 pass
 
+        from new_player_service import after_stage_clear
+        after_stage_clear(self.db,uid,sid)
         # 广播事件总线
         try:
             from event_bus import bus, Events
@@ -220,6 +229,15 @@ class StageService:
     def finish_story(self, uid, story_id):
         """客户端看剧情/跳过剧情 (cs_12002 -> sc_12003) 统一入口。"""
         sid = int(story_id)
+        from new_player_service import enabled, stage_available
+        if enabled(self.db,uid):
+            if not self.db._in_txn():
+                with self.db.transaction():
+                    return self.finish_story(uid,sid)
+            if not stage_available(self.db,uid,sid):
+                raise ValueError('剧情节点尚未解锁')
+            if str(sid) in self.stages and not self.stages[str(sid)].get('is_story'):
+                raise ValueError('战斗关卡不能通过剧情阅读协议通关')
         if self.db:
             try:
                 self.db.execute(
@@ -240,7 +258,7 @@ class StageService:
         严格确保：
         1. 仅包含 ChapterCfg 合法关卡（主线 + 支线剧情全量覆盖）；
         2. 彻底杜绝日常本、刻印本混入引发客户端 InitPlotData 空引用；
-        3. 自愈逻辑：若处于已通关状态，强制保证 clear_times >= 1 与 star_list 自洽，绝不锁下篇！
+        3. 查询使用各关卡对应存储域的完成记录，缺行输出零进度。
         """
         if not self.db:
             return []
@@ -290,10 +308,21 @@ class StageService:
                 sl = json.loads(r["star_list"]) if r["star_list"] else [0, 0, 0]
             except Exception:
                 sl = [0, 0, 0]
-            prog_map[int(r["id"])] = (int(r["clear_times"] or 0), sl)
+            sid = int(r['id'])
+            category = (self.stages.get(str(sid)) or {}).get('category')
+            if category in ('SUB_PLOT', 'CHESS_STORY') or sid not in prog_map:
+                prog_map[sid] = (int(r['clear_times'] or 0), sl)
 
         out_list = []
+        from new_player_service import enabled, StageAvailabilitySnapshot
+        fresh_save=enabled(self.db,uid)
+        available = None
+        if fresh_save:
+            available = StageAvailabilitySnapshot(self.db,uid,chapter_rows=ch_rows,
+                                                  sub_rows=sub_rows).available_stage_ids()
         for sid in all_stage_ids:
+            if available is not None and sid not in available:
+                continue
             ct, sl = prog_map.get(sid, (0, [0, 0, 0]))
             out_list.append({
                 "id": sid,
@@ -375,59 +404,104 @@ class StageService:
 
     # ==================== 5. 进度模式预设切换 (GM/控制面板) ====================
 
-    def apply_stage_preset(self, uid, mode="all_clear"):
+    def resolve_plot_chapter_id(self, chapter_id):
+        """Normalize the GM scope before constructing or writing a plot plan."""
+        if isinstance(chapter_id, str) and chapter_id == 'all':
+            return 'all'
+        if isinstance(chapter_id, bool) or not isinstance(chapter_id, (int, str)):
+            raise ValueError('chapter_id 必须为有效章节编号或 all')
+        if isinstance(chapter_id, str):
+            chapter_id = chapter_id.strip()
+            if not chapter_id.isascii() or not chapter_id.isdecimal():
+                raise ValueError('chapter_id 必须为有效章节编号或 all')
+        cid = int(chapter_id)
+        chapter = self.chapters.get(str(cid))
+        if cid <= 0 or not chapter or int(chapter.get('type', 0)) not in (1, 601):
+            raise ValueError('chapter_id 不属于当前主线或支线章节')
+        if not chapter.get('section_id_list'):
+            raise ValueError('指定章节没有可通关的关卡')
+        return cid
+
+    def apply_stage_preset(self, uid, mode="all_clear", chapter_id="all"):
         """
         支持热切换三种进度模式：
         1. "all_clear"  : 方案 A（真·全通全解锁体验）：全部主线、支线上下篇通关，星级全满，剧情记录补齐，下篇畅通无阻；
-        2. "new_game"   : 方案 B（纯净开荒模式）：全重置为 0，保留序章，前驱关卡严格逐个解锁；
+        2. "new_game"   : 方案 B（纯净开荒模式）：主支线进度归零，保留序章；
         3. "pcap_replay": 抓包基准模式。
+        chapter_id 可限定 all_clear 的主线或支线章节，默认 all 保持全局预设。
         """
         if not self.db or not uid:
             return False, "Database or UID not available"
 
+        chapter_id = self.resolve_plot_chapter_id(chapter_id)
+        if chapter_id != 'all' and mode != 'all_clear':
+            raise ValueError('指定章节仅支持全通操作')
+
         now = int(time.time())
-        logger.info(f"[StageService] 正在为 UID {uid} 应用关卡进度预设: {mode}")
+        logger.info(f"[StageService] 正在为 UID {uid} 应用关卡进度预设: {mode}, chapter={chapter_id}")
 
-        if mode == "all_clear":
-            # 1. 修复 stage_sub (支线 381 关): clear_times 设为 1，star_list 设为合法三星
-            self.db.execute(
-                "UPDATE stage_sub SET clear_times=1, star_list='[1, 1, 1]', update_ts=? WHERE uid=?",
-                (now, uid)
-            )
-            # 2. 修复 chapter (主线 919 关): 确保 clear_times >= 1
-            self.db.execute(
-                "UPDATE chapter SET clear_times=MAX(1, clear_times), update_ts=? WHERE uid=?",
-                (now, uid)
-            )
-            # 3. 补齐所有支线剧情关卡的 story_unlock 记录
-            for sid, sinfo in self.stages.items():
-                if sinfo.get("is_story") or sinfo.get("category") in ("SUB_PLOT", "CHESS_STORY"):
-                    try:
-                        self.db.execute(
-                            "INSERT OR REPLACE INTO story_unlock (uid, story_id, name, unlock_flag) VALUES (?, ?, ?, 1)",
-                            (uid, int(sid), sinfo.get("name", ""))
-                        )
-                    except Exception:
-                        pass
-            return True, "成功切换至【真·全通全解锁进度（方案 A）】，支线上下篇已全部畅通！"
-
-        elif mode == "new_game":
-            # 重置支线
-            self.db.execute(
-                "UPDATE stage_sub SET clear_times=0, star_list='[0, 0, 0]', update_ts=? WHERE uid=?",
-                (now, uid)
-            )
-            # 重置主线非序章关卡
-            self.db.execute(
-                "UPDATE chapter SET clear_times=0, star_list='[0, 0, 0]', update_ts=? WHERE uid=? AND id NOT IN (1030001)",
-                (now, uid)
-            )
-            # 清空 story_unlock
-            self.db.execute("DELETE FROM story_unlock WHERE uid=?", (uid,))
-            return True, "成功切换至【纯净开荒进度（方案 B）】，所有关卡恢复初始未通关！"
-
-        elif mode == "pcap_replay":
-            # 恢复素材基准状态
+        if mode == "pcap_replay":
             return True, "已重载抓包基准进度快照！"
+        if mode not in ('all_clear', 'new_game'):
+            return False, f"未知的预设模式: {mode}"
 
-        return False, f"未知的预设模式: {mode}"
+        # Validate the selected ChapterCfg plan before any write. A missing row
+        # in an old account must not determine which plot stages are included.
+        plan = {}
+        for cid, chapter in self.chapters.items():
+            if chapter_id != 'all' and int(cid) != chapter_id:
+                continue
+            kind = int(chapter.get('type', 0))
+            if kind not in (1, 601):
+                continue
+            table = 'chapter' if kind == 1 else 'stage_sub'
+            for sid in chapter.get('section_id_list', []):
+                info = self.stages.get(str(sid))
+                if info is None:
+                    raise ValueError(f'Missing plot stage metadata: {sid}')
+                stars = int(info['max_star'])
+                if not 0 <= stars <= 3:
+                    raise ValueError(f'Invalid plot star count: {sid}/{stars}')
+                key = (table, int(sid))
+                plan[key] = (int(cid), info, [1] * stars + [0] * (3 - stars))
+
+        from account_db import savepoint_transaction
+        from plot_progress_service import sync_chapter19_tasks, chapter19_tasks
+        with savepoint_transaction(self.db):
+            if mode == 'all_clear':
+                for (table, sid), (cid, info, stars) in plan.items():
+                    self.db.execute(f'''INSERT INTO {table}
+                        (uid,id,chapter_id,name,category,difficulty,max_star,stamina_need,
+                         clear_times,star_list,first_clear_ts,update_ts)
+                        VALUES(?,?,?,?,?,?,?,?,1,?,?,?) ON CONFLICT(uid,id) DO UPDATE SET
+                        chapter_id=excluded.chapter_id,name=excluded.name,category=excluded.category,
+                        max_star=excluded.max_star,stamina_need=excluded.stamina_need,
+                        clear_times=MAX(COALESCE({table}.clear_times,0),1),star_list=excluded.star_list,
+                        first_clear_ts=CASE WHEN COALESCE({table}.first_clear_ts,0)>0
+                          THEN {table}.first_clear_ts ELSE excluded.first_clear_ts END,
+                        update_ts=excluded.update_ts''',
+                        (uid, sid, cid, info.get('name', ''), info['category'], 0,
+                         info['max_star'], info.get('stamina_need', 0), json.dumps(stars), now, now))
+                    if info.get('is_story') or table == 'stage_sub':
+                        self.db.execute('''INSERT OR REPLACE INTO story_unlock
+                            (uid,story_id,name,unlock_flag) VALUES(?,?,?,1)''',
+                            (uid, sid, info.get('name', '')))
+                if chapter_id in ('all', 10119):
+                    sync_chapter19_tasks(self.db, uid)
+            else:
+                self.db.execute('DELETE FROM chapter19_state WHERE uid=?', (uid,))
+                self.db.execute('DELETE FROM chapter_v2_backtrack WHERE uid=?', (uid,))
+                self.db.execute('DELETE FROM chapter_v2_map_state WHERE uid=?', (uid,))
+                for (table, sid), (_, info, _) in plan.items():
+                    if sid != 1030001:
+                        self.db.execute(f'''UPDATE {table} SET clear_times=0,star_list='[0,0,0]',
+                            update_ts=? WHERE uid=? AND id=?''', (now, uid, sid))
+                    if info.get('is_story') or table == 'stage_sub':
+                        self.db.execute('DELETE FROM story_unlock WHERE uid=? AND story_id=?', (uid, sid))
+                # Derived chapter counters reset, while claim receipts remain intact.
+                for tid in chapter19_tasks():
+                    self.db.execute('UPDATE task SET progress=0 WHERE uid=? AND task_id=?', (uid, int(tid)))
+        if chapter_id != 'all':
+            return True, f"章节 {chapter_id} 已按配置补齐全通进度。"
+        return True, ("主线与支线已按配置补齐全通进度。" if mode == 'all_clear'
+                      else "主线与支线已切换为纯净开荒进度。")

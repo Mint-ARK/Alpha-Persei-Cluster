@@ -27,12 +27,12 @@ import time
 # 强制 UTF-8 编码支持（标准输入输出与 Windows 控制台代码页 65001）
 os.environ["PYTHONIOENCODING"] = "utf-8"
 os.environ["PYTHONUTF8"] = "1"
-if hasattr(sys.stdout, "reconfigure"):
-    try:
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-    except Exception:
-        pass
+for _stream in (sys.stdin, sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        try:
+            _stream.reconfigure(encoding="utf-8", errors="replace")
+        except (OSError, ValueError):
+            pass
 if sys.platform == "win32":
     try:
         import ctypes
@@ -92,8 +92,11 @@ def _check_protocol_assets(encoder):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="V5 模块化服务器（MAIN 装配）")
-    ap.add_argument("--host-ip", default="", help="宿主机局域网 IP（默认自动检测真实 LAN IPv4）")
+    ap.add_argument("--host-ip", default="", help="对外发布 IP（公网或局域网 IPv4，默认自动检测 LAN 地址）")
     ap.add_argument("--https-port", type=int, default=443, help="HTTPS SDK/区服端口（443 需管理员）")
+    ap.add_argument("--http-port", type=int, default=80, help="HTTP 辅助端口（0=关闭，反代部署可禁用）")
+    ap.add_argument("--web-bind", type=IPv4Address, default=IPv4Address("0.0.0.0"),
+                    help="HTTP/HTTPS 本机监听地址（反代可使用 127.0.0.1）")
     ap.add_argument("--gw-port", type=int, default=8102, help="gateway TCP 端口")
     ap.add_argument("--game-port", type=int, default=8105, help="game TCP 端口")
     ap.add_argument("--capture-cdn", action="store_true", default=True, help="开启官方 CDN 资源智能穿透与抓包（默认开启）")
@@ -131,6 +134,21 @@ def main(argv=None):
         res_version_manager.check_and_print_update(sync=True)
         sys.exit(0)
 
+    for name in ("https_port", "http_port", "gw_port", "game_port", "battle_port"):
+        minimum = 0 if name in ("http_port", "battle_port") else 1
+        if not minimum <= getattr(args, name) <= 65535:
+            ap.error(f"{name} 端口范围错误")
+    if "AG_ADMIN_AUTH_FILE" in os.environ:
+        from admin_access import load_credentials
+        load_credentials(os.environ["AG_ADMIN_AUTH_FILE"])
+    if sys.platform != "win32" and not args.self_check:
+        from linux_manager import check_ports
+        try:
+            check_ports(args.https_port, args.http_port, args.gw_port, args.game_port,
+                        args.battle_port, str(args.web_bind), args.dns)
+        except OSError as exc:
+            ap.error(str(exc))
+
     import logger as _logger
     _logger.set_level(args.log_level)
 
@@ -153,6 +171,14 @@ def main(argv=None):
     account_db.DEFAULT_DB = target_db
     import gm_reader
     gm_reader.DEFAULT_DB = target_db
+
+    # 同步初始化多存档管理器活跃库
+    try:
+        from save_slot_manager import get_slot_manager
+        slot_mgr = get_slot_manager(v5_dir, base_port=args.gw_port, game_port=args.game_port)
+        slot_mgr.set_active_db(target_db)
+    except Exception as _e:
+        log(f"多存档管理器初始化异常: {_e}", "WARN", module="SAVE")
 
     # 装配客户端资源分发版本状态（默认 auto 优先与客户端自动对齐，支持 CLI 显式覆盖与 GM 面板动态切换）
     import res_version_manager
@@ -249,6 +275,8 @@ def main(argv=None):
 
     # ---------------- 端口自检与冲突进程自动守护 (PortGuard) ----------------
     def _ensure_ports_clean(target_ports):
+        if sys.platform != "win32":
+            return  # Linux 只检测冲突，不终止占用端口的其他服务。
         curr_pid = os.getpid()
         target_ports = set(int(p) for p in target_ports if p and int(p) > 0)
         killed_pids = set()
@@ -323,14 +351,18 @@ def main(argv=None):
 
         log(f"端口自检与进程守护就绪，当前服务单例 PID: {curr_pid}", module="PORT")
 
-    # 执行端口预检与守护
-    _ensure_ports_clean([args.game_port, args.gw_port, args.https_port, args.battle_port, 80])
+    # 执行端口预检与守护（包含 Gateway 32 槽位端口池，自动避开 game_port）
+    from save_slot_manager import TOTAL_SLOTS, slot_id_to_port
+    all_gw_ports = [slot_id_to_port(i, args.gw_port, args.game_port) for i in range(1, TOTAL_SLOTS + 1)]
+    _ensure_ports_clean([args.game_port, *all_gw_ports, args.https_port, args.battle_port, args.http_port])
 
     import gen_cert
     import cdn_proxy
     host_ip = args.host_ip.strip() if args.host_ip else gen_cert.get_default_lan_ip()
     server_net.set_host_ip(host_ip)
-    cdn_proxy.set_source_ip(host_ip)
+    outbound_ip = cdn_proxy.select_source_ip(host_ip)
+    cdn_proxy.set_source_ip(outbound_ip)
+    log(f"对外发布 IP: {host_ip}，CDN 本机出站 IP: {outbound_ip}", module="NET")
 
     if args.no_capture_cdn:
         cdn_proxy.set_capture_enabled(False)
@@ -375,8 +407,10 @@ def main(argv=None):
 
     # 装配数据库 + CORE
     db = get_db(target_db)
+    owner_uid = _gen.bind_save_owner(db)
     core = build_core(db=db, generator=_gen, codec_encode=_enc, codec_decode=_dec, log=log)
     log(f"权威数据库挂载: {os.path.basename(target_db)} ({target_db})", module="MAIN")
+    log(f"默认登录账号 UID={owner_uid}", module="MAIN")
     log(f"CORE 装配完成，操作注册 {len(core_mod.OPERATIONS)} 个", module="MAIN")
 
     # 挂载版本守卫：若当前客户端资源分发版本为 229，执行幂等清洗下架 311 专属卡池
@@ -473,20 +507,24 @@ def main(argv=None):
         replay=replay_mod, material=material, frame_delay=args.frame_delay)
     log(f"game TCP 监听 {args.game_port}", module="NET")
 
-    # 启动 gateway TCP 服务器（登录握手）
+    # 启动 gateway TCP 服务器池（登录握手与多存档槽位管理）
     gws = server_net.start_gateway_server(
-        args.gw_port, core, db, _gen, _enc, _dec, material=material, host_ip=host_ip)
+        args.gw_port, core, db, _gen, _enc, _dec,
+        material=material, host_ip=host_ip, game_port=args.game_port, game_server=srv
+    )
     gws.game_port = args.game_port
+    gws.game_server = srv
     gw_thread = threading.Thread(target=gws.serve_forever, daemon=True)
     gw_thread.start()
-    log(f"gateway TCP 监听 {args.gw_port} (下发目标 IP: {host_ip})", module="NET")
+    log(f"gateway TCP 服务器池监听 {args.gw_port}..{slot_id_to_port(TOTAL_SLOTS, args.gw_port, args.game_port)} (跳过 {args.game_port}) (下发目标 IP: {host_ip})", module="NET")
 
     # 启动 HTTPS（SDK 层 + HTTP:80 辅助 + 官方 CDN 抓包拦截）
     app = server_net.build_https_app(core, material, args.game_port, args.gw_port, host_ip=host_ip)
     https_thread = threading.Thread(
-        target=server_net.start_https, args=(app, args.https_port), daemon=True)
+        target=server_net.start_https, args=(app, args.https_port),
+        kwargs={"http_port": args.http_port, "bind_ip": str(args.web_bind)}, daemon=True)
     https_thread.start()
-    log(f"HTTPS(SDK) 监听 {args.https_port} (HTTP:80 直传已挂载)", module="NET")
+    log(f"HTTPS(SDK) 监听 {args.web_bind}:{args.https_port}，HTTP 辅助端口 {args.http_port or '关闭'}", module="NET")
 
     curr_ver = res_version_manager.get_current_version()
     curr_cfg = res_version_manager.get_version_config(curr_ver)
@@ -500,23 +538,40 @@ def main(argv=None):
         print(f"  - 客户端资源对齐   : [已对齐] 命中客户端 Build {client_info['version']} ({client_info['matched_file']})", flush=True)
     else:
         print(f"  - 客户端资源对齐   : [未对齐/兜底] {client_info.get('detail')}", flush=True)
-    print(f"  - 根证书安装地址   : http://{host_ip}/cert", flush=True)
+    web_base = (f"http://{host_ip}" + (f":{args.http_port}" if args.http_port != 80 else "")) if args.http_port else f"https://{host_ip}:{args.https_port}"
+    console_base = f"https://{host_ip}:{args.https_port}"
+    if args.web_bind.is_loopback:
+        web_base = console_base = "反代对外 HTTPS 地址"
+    print(f"  - 根证书安装地址   : {web_base}/cert", flush=True)
     print(f"  - PC 端资源落盘目录 : {cdn_proxy.get_data_dir('pc')}", flush=True)
     print(f"  - iOS 端资源落盘目录: {cdn_proxy.get_data_dir('ios')}", flush=True)
     print(f"  - 官方资源智能抓包 : {'[已开启] (双向流式转发 + 物理分盘落库)' if cdn_proxy.is_capture_enabled() else '[已关闭] (纯本地缓存)'}", flush=True)
-    print(f"  - GM 运维控制台    : http://{host_ip}/web/gm_console.html", flush=True)
-    print(f"  - 客户端关于与排障 : http://{host_ip}/web/agreement.html", flush=True)
+    print(f"  - GM 运维控制台    : {console_base}/web/gm_console.html", flush=True)
+    print(f"  - 客户端关于与排障 : {web_base}/web/agreement.html", flush=True)
     print("=" * 64, flush=True)
 
-    while True:
-        try:
-            srv.serve_forever()
-        except KeyboardInterrupt:
-            log("正常退出 (KeyboardInterrupt)", module="MAIN")
-            break
-        except BaseException as e:
-            log(f"game TCP 捕获异常: {e}，保持持续运行...", "WARN", module="MAIN")
-            time.sleep(1)
+    try:
+        retries = 0
+        while True:
+            try:
+                srv.serve_forever()
+                break
+            except KeyboardInterrupt:
+                log("正常退出 (KeyboardInterrupt)", module="MAIN")
+                break
+            except Exception as e:
+                retries += 1
+                if retries >= 3:
+                    log(f"game TCP 连续异常达到 3 次，停止服务: {e}", "ERROR", module="MAIN")
+                    raise
+                log(f"game TCP 捕获异常: {e}，重试 {retries}/2...", "WARN", module="MAIN")
+                time.sleep(1)
+    finally:
+        gws.shutdown()
+        gws.server_close()
+        srv.server_close()
+        if battle_srv is not None:
+            battle_srv.stop()
     return 0
 
 

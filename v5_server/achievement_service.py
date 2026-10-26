@@ -527,7 +527,7 @@ class AchievementService:
         if total_login_days is None:
             ach_rows = self.db.query("SELECT MAX(progress) as p FROM achievement WHERE uid=? AND condition=12", (uid,))
             base_days = int(ach_rows[0]["p"] or 0) if ach_rows else 0
-            total_login_days = max(base_days, 251)
+            total_login_days = max(base_days, 0)
 
         last_login_date = extra.get("last_ach_login_date")
         if last_login_date != now_date_str:
@@ -612,13 +612,13 @@ class AchievementService:
                 update_item_progress(item["id"], user_lv)
 
         # 2. 账号累计真实登录天数 (Condition 12)
-        # 彻底解耦时迹馈赠活动(115天)，从 users.extra 维护真正的账号累计登录天数（基准 251 天，每日首次登录自动+1）
+        # Persisted achievement progress can recover legacy totals; a new save starts at zero.
         extra = _load_user_extra(self.db, uid)
         total_login_days = extra.get("total_login_days")
         if total_login_days is None:
             ach_rows = self.db.query("SELECT MAX(progress) as p FROM achievement WHERE uid=? AND condition=12", (uid,))
             base_days = int(ach_rows[0]["p"] or 0) if ach_rows else 0
-            total_login_days = max(base_days, 251)
+            total_login_days = max(base_days, 0)
             extra["total_login_days"] = total_login_days
             _save_user_extra(self.db, uid, extra)
         for item in _CFG_BY_COND.get(12, []):
@@ -1325,7 +1325,11 @@ def _on_stage_first_clear(ctx, uid, **kwargs):
     svc = AchievementService.get_instance(getattr(ctx, "db", None))
     stage_id = int(kwargs.get("stage_id") or 0)
     difficulty = int(kwargs.get("difficulty") or 0)
-    win_stars = int(kwargs.get("win_stars") or 0)
+    ws = kwargs.get("win_stars")
+    if isinstance(ws, (list, tuple)):
+        win_stars = sum(1 for x in ws if x)
+    else:
+        win_stars = int(ws or 0)
     if difficulty and win_stars >= 3:
         svc.trigger_condition(uid, 450, delta=1, param=[difficulty, 3], ctx=ctx)
     if stage_id:

@@ -23,6 +23,9 @@ OATH_HERO_CFG = {
         "skin_id": 128402,
         "ring_id": 41711,    # 专属戒指：纯白之誓
         "heart_req": 5,
+        "heart_type": 1027,  # WeddingCfg: first-tier archive affection.
+        # WeddingCfg.wedding_plot + ConditionCfg330002 (hero, oath level).
+        "plot_levels": {210840111: 2, 210840112: 3},
     },
     1049: {
         "name": "镜花黄泉·伊邪那美",
@@ -30,6 +33,8 @@ OATH_HERO_CFG = {
         "skin_id": 104903,
         "ring_id": 41710,    # 通用戒指：誓约之戒
         "heart_req": 5,
+        "heart_type": 1028,  # WeddingCfg: this battle form's trust level.
+        "plot_levels": {210490111: 2, 210490112: 3},
     },
     1095: {
         "name": "巡天·英灵",
@@ -37,6 +42,8 @@ OATH_HERO_CFG = {
         "skin_id": 109503,
         "ring_id": 41710,    # 通用戒指：誓约之戒
         "heart_req": 5,
+        "heart_type": 1028,
+        "plot_levels": {210950111: 2, 210950112: 3},
     },
 }
 
@@ -196,21 +203,49 @@ class OathService:
             db = getattr(ctx, "db", None)
             if not db or not self.check_gate(db, uid, hid, condition=410000):
                 return
-            self.record_user_stat(db, uid, "main_interact", hid, delta=1)
             tids = self.advance_task_progress(ctx, uid, hid, condition=410000, delta=1)
             if tids:
                 self.push_14503_frame(ctx, uid, tids)
 
+        @bus.subscribe(Events.DORM_ACTION)
+        def on_dorm_state_change(ctx, uid, **kwargs):
+            # Successful room deployment already emits this furniture-state event.
+            if kwargs.get("action_type") != "furniture":
+                return
+            db = getattr(ctx, "db", None)
+            if not db:
+                return
+            changed = []
+            for hid in SUPPORTED_OATH_HEROES:
+                if self.check_gate(db, uid, hid, condition=2022):
+                    changed.extend(self.evaluate_state_tasks(db, uid, hid))
+            if changed:
+                self.push_14503_frame(ctx, uid, changed)
+
         @bus.subscribe(Events.DORM_GIFT)
         def on_dorm_gift(ctx, uid, **kwargs):
-            hid = int(kwargs.get("hero_id", 0))
             db = getattr(ctx, "db", None)
-            if not db or not self.check_gate(db, uid, hid, condition=410001):
+            if not db:
                 return
-            self.record_user_stat(db, uid, "dorm_gift", hid, delta=1)
-            tids = self.advance_task_progress(ctx, uid, hid, condition=410001, delta=1)
-            if tids:
-                self.push_14503_frame(ctx, uid, tids)
+            hid = int(kwargs.get("hero_id") or 0)
+            archive_id = int(kwargs.get("archive_id") or 0)
+            if archive_id:
+                from archive_service import ArchiveService
+                archives = ArchiveService.get_instance()
+                if archives.get_archive_id(hid) != archive_id:
+                    return
+                candidates = [h for h in SUPPORTED_OATH_HEROES if archives.get_archive_id(h) == archive_id]
+            else:
+                candidates = [hid]  # Existing producers may explicitly name a battle form.
+            changed = []
+            for target in candidates:
+                owned = db.query("SELECT unlock FROM hero WHERE uid=? AND id=?", (uid, target))
+                if not owned or int(owned[0]["unlock"] or 0) != 1 or not self.check_gate(db, uid, target, condition=410001):
+                    continue
+                self.record_user_stat(db, uid, "dorm_gift", target, delta=1)
+                changed.extend(self.advance_task_progress(ctx, uid, target, condition=410001, delta=1))
+            if changed:
+                self.push_14503_frame(ctx, uid, changed)
 
         @bus.subscribe(Events.DAILY_ASSISTANT)
         def on_daily_assistant(ctx, uid, **kwargs):
@@ -348,11 +383,18 @@ class OathService:
         now_ts = int(time.time())
 
         # 分流 B: 保存合影相片
-        if picture_url:
-            ctx.db.execute(
-                "UPDATE hero_oath SET picture_link=?, update_ts=? WHERE uid=? AND hero_id=?",
+        if "picture_url" in data:
+            if not isinstance(picture_url, str) or not picture_url.strip():
+                raise ValueError("誓约合影标识不能为空")
+            existing = self.get_hero_oath(ctx.db, uid, hero_id)
+            if not existing or not existing.get("oath"):
+                raise ValueError("尚未缔结誓约，不能保存合影")
+            updated = ctx.db.execute(
+                "UPDATE hero_oath SET picture_link=?, update_ts=? WHERE uid=? AND hero_id=? AND oath=1",
                 (picture_url, now_ts, uid, hero_id)
             )
+            if updated.rowcount != 1:
+                raise ValueError("誓约合影保存失败")
             ctx.log(f"cs_14514 -> 更新誓约合影照片 hero={hero_id} url={picture_url}")
             return {"result": 0, "time": now_ts, "mode": "photo"}
 
@@ -364,6 +406,23 @@ class OathService:
         existing = self.get_hero_oath(ctx.db, uid, hero_id)
         if existing and existing.get("oath"):
             return {"result": 0, "time": int(existing.get("oath_time") or now_ts), "mode": "oath_already"}
+
+        # Check the WeddingCfg condition domain before spending the ring.
+        hero = ctx.db.query("SELECT unlock, trust_level FROM hero WHERE uid=? AND id=?", (uid, hero_id))
+        if not hero or int(hero[0].get("unlock") or 0) != 1:
+            raise ValueError("尚未拥有该修正者")
+        if cfg["heart_type"] == 1027:
+            from archive_service import ArchiveService, MAX_ARCHIVE_EXP
+            archive_id = ArchiveService.get_instance().get_archive_id(hero_id)
+            archive = ctx.db.query("SELECT exp FROM hero_archive WHERE uid=? AND archive_id=?", (uid, archive_id))
+            # Current 1027 condition is affection level 5, the archive cap.
+            if not archive or int(archive[0]["exp"] or 0) < MAX_ARCHIVE_EXP:
+                raise ValueError("一阶好感度尚未达到5级")
+        elif cfg["heart_type"] == 1028:
+            if int(hero[0].get("trust_level") or 0) < cfg["heart_req"]:
+                raise ValueError("交心等级尚未达到缔约要求")
+        else:
+            raise ValueError("不支持的誓约条件")
 
         # 扣除誓约之戒
         _item_deduct(ctx, uid, ring_id, 1)
@@ -396,55 +455,68 @@ class OathService:
         cs_14512 -> sc_14513
         提交誓约任务并触发阶段等级晋升
         """
-        if isinstance(task_ids, (int, str)):
-            task_ids = [int(task_ids)]
-
-        hero_affected = set()
+        if not isinstance(task_ids, list) or not task_ids:
+            raise ValueError("缺少誓约任务列表")
+        # Validate the whole batch against the phase active before this request.
+        pending = {}
+        hero_levels = {}
+        submitted_heroes = set()
         for tid in task_ids:
-            tid = int(tid)
+            if type(tid) is not int:
+                raise ValueError("誓约任务编号无效")
             t_meta = WEDDING_TASKS.get(tid)
             if not t_meta:
-                continue
+                raise ValueError("未知誓约任务")
             hid = t_meta["hero_id"]
-            need = t_meta["need"]
-            ctx.db.execute(
-                """
-                INSERT INTO oath_assignment (uid, assignment_id, progress, complete_flag, update_ts)
-                VALUES (?, ?, ?, 1, ?)
-                ON CONFLICT(uid, assignment_id) DO UPDATE SET
-                    progress=?, complete_flag=1, update_ts=?
-                """,
-                (uid, tid, need, int(time.time()), need, int(time.time()))
+            oath = self.get_hero_oath(ctx.db, uid, hid)
+            if not oath or not oath.get("oath"):
+                raise ValueError("尚未缔结该角色誓约")
+            submitted_heroes.add(hid)
+            cur_lvl = int(oath.get("oath_level") or 0)
+            phase = t_meta["wedding_level"]
+            rows = ctx.db.query(
+                "SELECT progress, complete_flag FROM oath_assignment WHERE uid=? AND assignment_id=?", (uid, tid)
             )
-            hero_affected.add(hid)
-            bus.emit(Events.OATH_TASK_COMPLETE, ctx, uid, hero_id=hid, task_id=tid)
-
-        # 阶段晋升状态机检查
-        upgraded_heroes = []
-        for hid in hero_affected:
-            oath_rec = self.get_hero_oath(ctx.db, uid, hid)
-            if not oath_rec:
+            if not rows or phase > cur_lvl:
+                raise ValueError("誓约任务尚未激活")
+            # Past/current claimed tasks are idempotent retries, with no events.
+            if int(rows[0]["complete_flag"] or 0) == 1:
                 continue
-            cur_lvl = int(oath_rec.get("oath_level") or 1)
+            if phase != cur_lvl or int(rows[0]["progress"] or 0) < t_meta["need"]:
+                raise ValueError("誓约任务尚未达成")
+            pending[tid] = t_meta
+            hero_levels[hid] = cur_lvl
 
-            # 检查 Level 1 任务是否全完结 -> 晋级至 Level 2
-            if cur_lvl == 1 and self._is_level_tasks_all_complete(ctx.db, uid, hid, level=1):
-                cur_lvl = 2
-                ctx.db.execute("UPDATE hero_oath SET oath_level=2, update_ts=? WHERE uid=? AND hero_id=?", (int(time.time()), uid, hid))
-                self.init_hero_tasks(ctx.db, uid, hid, level=2)
-                self.sync_initial_task_state(ctx.db, uid, hid)
-                upgraded_heroes.append((hid, 2))
-                bus.emit(Events.OATH_LEVEL_UP, ctx, uid, hero_id=hid, new_level=2)
+        now_ts = int(time.time())
+        for tid, meta in pending.items():
+            updated = ctx.db.execute(
+                "UPDATE oath_assignment SET complete_flag=1, update_ts=? "
+                "WHERE uid=? AND assignment_id=? AND complete_flag=0 AND progress>=?",
+                (now_ts, uid, tid, meta["need"])
+            )
+            if updated.rowcount != 1:
+                raise ValueError("誓约任务状态已变化")
 
-            # 检查 Level 2 任务是否全完结 -> 晋级至 Level 3 (MAX)
-            if cur_lvl == 2 and self._is_level_tasks_all_complete(ctx.db, uid, hid, level=2):
-                cur_lvl = 3
-                ctx.db.execute("UPDATE hero_oath SET oath_level=3, update_ts=? WHERE uid=? AND hero_id=?", (int(time.time()), uid, hid))
-                upgraded_heroes.append((hid, 3))
-                bus.emit(Events.OATH_LEVEL_UP, ctx, uid, hero_id=hid, new_level=3)
+        # Advance at most one phase per hero; this request cannot claim the next phase.
+        upgraded_heroes = []
+        for hid, cur_lvl in hero_levels.items():
+            if cur_lvl in (1, 2) and self._is_level_tasks_all_complete(ctx.db, uid, hid, level=cur_lvl):
+                next_level = cur_lvl + 1
+                ctx.db.execute("UPDATE hero_oath SET oath_level=?, update_ts=? WHERE uid=? AND hero_id=?", (next_level, now_ts, uid, hid))
+                if next_level == 2:
+                    self.init_hero_tasks(ctx.db, uid, hid, level=2)
+                    self.sync_initial_task_state(ctx.db, uid, hid)
+                upgraded_heroes.append((hid, next_level))
+
+        from oath_rights_service import grant_eligible_rights
+        rights = grant_eligible_rights(ctx, uid, submitted_heroes)
+        for tid, meta in pending.items():
+            bus.emit(Events.OATH_TASK_COMPLETE, ctx, uid, hero_id=meta["hero_id"], task_id=tid)
+        for hid, level in upgraded_heroes:
+            bus.emit(Events.OATH_LEVEL_UP, ctx, uid, hero_id=hid, new_level=level)
 
         ctx.log(f"cs_14512 -> 提交誓约任务 ids={task_ids} 触发晋升={upgraded_heroes}")
-        return {"result": 0, "reward_list": []}
+        return {"result": 0, **rights}
 
     def handle_set_nickname(self, ctx, uid, hero_id, nick):
         """
@@ -496,13 +568,23 @@ class OathService:
         阅读誓约物语并上报记录
         """
         hero_id = int(hero_id)
+        if hero_id not in OATH_HERO_CFG:
+            raise ValueError("角色不支持誓约剧情")
+        oath = self.get_hero_oath(ctx.db, uid, hero_id)
+        if not oath or not oath.get("oath"):
+            raise ValueError("尚未缔结誓约")
+        if not isinstance(text_list, list) or not text_list:
+            raise ValueError("缺少誓约剧情列表")
+        levels = OATH_HERO_CFG[hero_id]["plot_levels"]
+        # Validate the entire request before recording any read history.
+        for txt_id in text_list:
+            if type(txt_id) is not int or txt_id not in levels:
+                raise ValueError("誓约剧情不属于该角色")
+            if int(oath.get("oath_level") or 0) < levels[txt_id]:
+                raise ValueError("誓约剧情尚未开放")
         now_ts = int(time.time())
 
-        if isinstance(text_list, (int, str)):
-            text_list = [int(text_list)]
-
-        for txt_id in text_list:
-            txt_id = int(txt_id)
+        for txt_id in dict.fromkeys(text_list):
             # 幂等校验：已记录的剧情跳过，避免重复累加
             existing = ctx.db.query(
                 "SELECT 1 FROM hero_oath_plot WHERE uid=? AND hero_id=? AND text_id=?",
@@ -523,6 +605,8 @@ class OathService:
                 (uid, hero_id, p_idx, txt_id, now_ts, txt_id, now_ts)
             )
 
+        from illustrated_story_service import publish_story_unlock
+        publish_story_unlock(ctx, uid, text_list)
         ctx.log(f"cs_14510 -> 阅读誓约剧情 hero={hero_id} texts={text_list}")
         return {"result": 0, "hero_id": hero_id}
 
@@ -557,7 +641,6 @@ class OathService:
 
         cur_lvl = int(oath_rec.get("oath_level") or 1)
         hrow = db.query("SELECT level, clear_times, battle_win_times FROM hero WHERE uid=? AND id=?", (uid, hero_id))
-        lvl = int(hrow[0]["level"] or 1) if hrow else 1
         prof = int(hrow[0]["clear_times"] or 0) if hrow else 0
         now_ts = int(time.time())
 
@@ -580,23 +663,32 @@ class OathService:
             # 1. 熟练度达到 30 (110)
             if cond == 110:
                 req_prof = meta.get("req_prof", 30)
-                if prof >= req_prof or lvl >= 30:
+                if prof >= req_prof:
                     matched = True
             # 2. 专属后宅宿舍 (2022)
             elif cond == 2022:
                 try:
-                    d_row = db.query("SELECT 1 FROM backhome_dorm_hero WHERE uid=? AND hero_id=?", (uid, hero_id))
-                    if d_row or True:  # 宿舍未上线系统默认对齐
-                        matched = True
-                except Exception:
-                    matched = True
+                    from archive_service import ArchiveService
+                    archive_id = ArchiveService.get_instance().get_archive_id(hero_id)
+                    # Dorm storage uses ontology IDs; only an owned form's unlocked
+                    # private room counts (DormConst.DORM_PRIVATE_FIRST_ID = 6).
+                    d_row = db.query(
+                        "SELECT 1 FROM backhome_dorm_hero dh "
+                        "JOIN backhome_dorm d ON d.uid=dh.uid AND d.dorm_id=dh.dorm_id "
+                        "JOIN hero h ON h.uid=dh.uid AND h.id=? AND h.unlock=1 "
+                        "WHERE dh.uid=? AND dh.hero_id=? AND dh.dorm_id>=6 LIMIT 1",
+                        (hero_id, uid, archive_id)
+                    )
+                    matched = bool(d_row)
+                except Exception as exc:
+                    logger.warning("[Oath] 宿舍条件读取失败 uid=%s hero=%s: %s", uid, hero_id, exc)
             # 3. 通关指定主线关卡 (401)
             elif cond == 401 and meta.get("stage_id"):
                 sid = meta["stage_id"]
                 try:
-                    s_row = db.query("SELECT 1 FROM stage_sub WHERE uid=? AND id=? AND clear_times > 0", (uid, sid))
-                    if s_row:
-                        matched = True
+                    from stage_service import StageService
+                    # Use this request's connection, without rebinding the global singleton.
+                    matched = StageService(db=db).is_stage_cleared(uid, sid)
                 except Exception:
                     pass
             # 4. 阅读心链故事 (800)
@@ -661,7 +753,7 @@ class OathService:
     # ================= GM 与调试快捷控制指令集 =================
 
     def gm_ready_oath(self, db, uid, hero_id):
-        """一键就绪前置条件：确保拥有角色 + 好感度升至 5 级 + 发放 10 个戒指"""
+        """一键就绪前置条件：拥有角色、对应好感/交心条件、10个戒指。"""
         hero_id = int(hero_id)
         if hero_id not in OATH_HERO_CFG:
             return False, f"角色 {hero_id} 不在支持名单中"
@@ -678,6 +770,13 @@ class OathService:
             """,
             (uid, hero_id)
         )
+        if cfg["heart_type"] == 1027:
+            from archive_service import ArchiveService, MAX_ARCHIVE_EXP
+            archive_id = ArchiveService.get_instance().ensure_archive_row(db, uid, hero_id)
+            db.execute(
+                "UPDATE hero_archive SET exp=MAX(COALESCE(exp,0),?) WHERE uid=? AND archive_id=?",
+                (MAX_ARCHIVE_EXP, uid, archive_id)
+            )
         # 2. 补给戒指
         db.execute(
             """
@@ -686,7 +785,7 @@ class OathService:
             """,
             (uid, ring_id)
         )
-        return True, f"角色 {hero_id} ({cfg['name']}) 誓约前置条件已全部就绪（拥有角色+好感5级+戒指x10）"
+        return True, f"角色 {hero_id} ({cfg['name']}) 誓约前置条件已全部就绪（拥有角色+对应好感/交心条件+戒指x10）"
 
     def gm_unlock_oath(self, db, uid, hero_id):
         """直接完成缔结誓约（跳过 3D 动画，直接生成誓约初态）"""

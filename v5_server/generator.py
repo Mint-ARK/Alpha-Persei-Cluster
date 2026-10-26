@@ -18,7 +18,28 @@ from account_db import get_db, DEFAULT_DB  # noqa: E402
 from codec import encode, decode  # noqa: E402
 from enchant_slots_util import normalize_enchant_slots
 
-DEFAULT_UID = 2174928301  # 业务 UID（掩码随机 UID）
+LEGACY_UID = 2174928301
+DEFAULT_UID = LEGACY_UID  # Cold startup binds this to a single-account save owner.
+
+
+def resolve_save_owner_uid(db):
+    """Validate the save owner without publishing any process-wide state."""
+    marker = db.get_system_config('save.owner_uid')
+    uid = LEGACY_UID
+    if marker:
+        if not marker.isascii() or not marker.isdigit() or not 0 < int(marker) <= 2**63 - 1:
+            raise ValueError('存档主人UID无效')
+        uid = int(marker)
+        if db.query('SELECT uid FROM users') != [{'uid': uid}]:
+            raise ValueError('单账号存档与主人UID不一致')
+    return uid
+
+
+def bind_save_owner(db):
+    """启动时绑定存档主人；无单账号标记的旧库保留原默认账号。"""
+    global DEFAULT_UID
+    DEFAULT_UID = resolve_save_owner_uid(db)
+    return DEFAULT_UID
 
 
 def build_frame(cmd, payload, index=0, server_idx=0, flag=0):
@@ -199,6 +220,9 @@ def gen_sc_49003(uid, chapter_id, db=None):
 
 def gen_28001(pkt, db, uid):
     """生成全量任务列表 sc_28001 (登录洪流第 68 帧)"""
+    import new_player_service as _fresh
+    if _fresh.enabled(db,uid):
+        return encode('sc_28001',_fresh.payload(db,uid,28001))
     db.check_and_refresh_periodic_tasks(uid)
     from task_listener import sync_cleared_stage_tasks
     sync_cleared_stage_tasks(db, uid)
@@ -293,8 +317,9 @@ ROUTER = {
 }
 
 
-def generate(cmd, pkt, uid=DEFAULT_UID, db=None):
+def generate(cmd, pkt, uid=None, db=None):
     """统一入口：cmd + 请求包 → 帧列表 bytes。无路由返回 None（服务器不响应）。"""
+    uid = DEFAULT_UID if uid is None else uid
     db = db or get_db()
     fn = ROUTER.get(cmd)
     if fn is None:
@@ -424,11 +449,15 @@ _SIGN_MONTHCARD = 34024
 
 _SEVEN_DAY_REWARD = None
 
-def seven_day_reward(activity_id, nth):
+def seven_day_reward(activity_id, nth, *, res_version=None):
     """七日/限时签到第 nth 次的奖励：ActivityCumulativeSignCfg[id].config_list[nth-1]
     → SignCfg[sign_id].reward（提取自 x64 Lua：activity_cumulative_sign_cfg.json /
     sign_cfg.json）。返回 (item_id, num) 或 None。"""
     global _SEVEN_DAY_REWARD
+    from sign_service import versioned_seven_day_rewards
+    current = versioned_seven_day_rewards(activity_id, res_version)
+    if current is not None:
+        return tuple(current[nth - 1]) if 1 <= nth <= len(current) else None
     if _SEVEN_DAY_REWARD is None:
         import json as _j7
         try:
@@ -443,8 +472,9 @@ def seven_day_reward(activity_id, nth):
     return lst[nth - 1] if 1 <= nth <= len(lst) else None
 
 
-def gen_11015(activity_id, uid=DEFAULT_UID, db=None):
+def gen_11015(activity_id, uid=None, db=None):
     """生成指定七日签到活动的 sc_11015 状态帧。"""
+    uid = DEFAULT_UID if uid is None else uid
     db = db or get_db()
     rows = db.query("SELECT sign_count, last_sign_ts FROM sign WHERE uid=? AND activity_id=?",
                     (uid, int(activity_id)))
@@ -530,10 +560,280 @@ def _sign_reward(db, month, n):
     return (1, 100)
 
 
-def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
+def get_activity_list(db, uid, res_version=None):
+    # 活动全量列表（sc_11001 activity_list）
+    # 保证全量支线与常驻活动、以及在架卡池的 activity_id 处于开启激活状态，解除客户端时间锁与置灰
+    from stage_service import StageService
+    svc = StageService.get_instance(db=db)
+    needed_acts = set(svc.get_active_activity_ids())
+
+    import json as _j11
+    import res_version_manager
+    cur_ver = str(res_version or res_version_manager.get_current_version())
+    version_cfg = res_version_manager.get_version_config(cur_ver)
+    far_future_ts = res_version_manager.FAR_FUTURE_TIMESTAMP
+
+    # 联动卡池服务，自动将当前激活的卡池对应 activity_id 注入并解除时间锁
+    pool_act_map = {}
+    all_pool_aids = set()
+    try:
+        from draw_service import DrawService
+        draw_svc = DrawService.get_instance(db=db)
+        pool_entries = draw_svc.get_active_activity_entries(uid, res_version=cur_ver)
+        pool_act_map = {ent["activity_id"]: ent for ent in pool_entries}
+        pool_cfg = draw_svc.load_pool_activity_cfg()
+        all_pool_aids = {int(item["activity_id"]) for item in pool_cfg.values() if item.get("activity_id")}
+    except Exception as _e_draw:
+        pass
+
+    # Theme 44 权威拓扑来自 311 ActivityCfg.lua 新增的 26 条记录；
+    # 复刻换装活动则来自 311 ActivityToggleCfg.lua (53006~53010) 的引用。
+    theme44_config = {
+        4410001: {"theme": 44, "template": 100, "sub_activity_id_list": [4435001, 4435002, 4435003, 4435004, 4435005]},
+        4400101: {"theme": 44, "template": 1, "sub_activity_id_list": []},
+        4400301: {"theme": 44, "template": 3, "sub_activity_id_list": []},
+        4400303: {"theme": 44, "template": 3, "sub_activity_id_list": []},
+        4407301: {"theme": 44, "template": 73, "sub_activity_id_list": []},
+        4407302: {"theme": 44, "template": 73, "sub_activity_id_list": []},
+        4412001: {"theme": 44, "template": 120, "sub_activity_id_list": [4405601]},
+        4405601: {"theme": 44, "template": 56, "sub_activity_id_list": [4418201]},
+        4418201: {"theme": 44, "template": 182, "sub_activity_id_list": []},
+        4435001: {"theme": 44, "template": 350, "sub_activity_id_list": []},
+        4435002: {"theme": 44, "template": 350, "sub_activity_id_list": []},
+        4435003: {"theme": 44, "template": 350, "sub_activity_id_list": []},
+        4435004: {"theme": 44, "template": 350, "sub_activity_id_list": []},
+        4435005: {"theme": 44, "template": 350, "sub_activity_id_list": []},
+        4443301: {"theme": 44, "template": 433, "sub_activity_id_list": [4443401, 4443501]},
+        4443302: {"theme": 44, "template": 433, "sub_activity_id_list": [4443402, 4443502]},
+        4443303: {"theme": 44, "template": 433, "sub_activity_id_list": [4443403, 4443503]},
+        4443304: {"theme": 44, "template": 433, "sub_activity_id_list": [4443404, 4443504]},
+        4443401: {"theme": 44, "template": 434, "sub_activity_id_list": []},
+        4443402: {"theme": 44, "template": 434, "sub_activity_id_list": []},
+        4443403: {"theme": 44, "template": 434, "sub_activity_id_list": []},
+        4443404: {"theme": 44, "template": 434, "sub_activity_id_list": []},
+        4443501: {"theme": 44, "template": 435, "sub_activity_id_list": []},
+        4443502: {"theme": 44, "template": 435, "sub_activity_id_list": []},
+        4443503: {"theme": 44, "template": 435, "sub_activity_id_list": []},
+        4443504: {"theme": 44, "template": 435, "sub_activity_id_list": []},
+        # 皮肤抽奖 (Toggle 53006~53010) 与全部实体子活动
+        312211: {"theme": 31, "template": 221, "sub_activity_id_list": [312221, 312222, 310049, 311465, 312231, 312233]},
+        312221: {"theme": 31, "template": 222, "sub_activity_id_list": []},
+        312222: {"theme": 31, "template": 222, "sub_activity_id_list": []},
+        310049: {"theme": 31, "template": 4, "sub_activity_id_list": []},
+        311465: {"theme": 31, "template": 146, "sub_activity_id_list": []},
+        312231: {"theme": 31, "template": 223, "sub_activity_id_list": []},
+        312233: {"theme": 31, "template": 223, "sub_activity_id_list": []},
+
+        3522101: {"theme": 35, "template": 221, "sub_activity_id_list": [3522201, 3522202, 3522203, 3522301, 3500406, 3514601]},
+        3522201: {"theme": 35, "template": 222, "sub_activity_id_list": []},
+        3522202: {"theme": 35, "template": 222, "sub_activity_id_list": []},
+        3522203: {"theme": 35, "template": 222, "sub_activity_id_list": []},
+        3522301: {"theme": 35, "template": 223, "sub_activity_id_list": []},
+        3500406: {"theme": 35, "template": 4, "sub_activity_id_list": []},
+        3514601: {"theme": 35, "template": 146, "sub_activity_id_list": []},
+
+        3722101: {"theme": 37, "template": 221, "sub_activity_id_list": [3722201, 3722202, 3722301, 3700407, 3714601]},
+        3722201: {"theme": 37, "template": 222, "sub_activity_id_list": []},
+        3722202: {"theme": 37, "template": 222, "sub_activity_id_list": []},
+        3722301: {"theme": 37, "template": 223, "sub_activity_id_list": []},
+        3700407: {"theme": 37, "template": 4, "sub_activity_id_list": []},
+        3714601: {"theme": 37, "template": 146, "sub_activity_id_list": []},
+
+        4022101: {"theme": 40, "template": 221, "sub_activity_id_list": [4022201, 4022202, 4022301, 4000410, 4014601]},
+        4022201: {"theme": 40, "template": 222, "sub_activity_id_list": []},
+        4022202: {"theme": 40, "template": 222, "sub_activity_id_list": []},
+        4022301: {"theme": 40, "template": 223, "sub_activity_id_list": []},
+        4000410: {"theme": 40, "template": 4, "sub_activity_id_list": []},
+        4014601: {"theme": 40, "template": 146, "sub_activity_id_list": []},
+
+        4122101: {"theme": 41, "template": 221, "sub_activity_id_list": [4122201, 4122202, 4122301, 4100402, 4114601]},
+        4122201: {"theme": 41, "template": 222, "sub_activity_id_list": []},
+        4122202: {"theme": 41, "template": 222, "sub_activity_id_list": []},
+        4122301: {"theme": 41, "template": 223, "sub_activity_id_list": []},
+        4100402: {"theme": 41, "template": 4, "sub_activity_id_list": []},
+        4114601: {"theme": 41, "template": 146, "sub_activity_id_list": []},
+    }
+    theme44_native_ids = {
+        aid for aid, cfg in theme44_config.items() if int(cfg["theme"]) == 44
+    }
+    # 311_CORE_VERIFICATION_GUARD:
+    # 4443301..4 共用 template=433，同时开启会使客户端缓存被最后一轮覆盖。
+    # 保留全部轮次的远期 stop_time，但只将版本配置指定的首轮设为 state=1。
+    core_verification_active_ids = set(
+        int(aid) for aid in version_cfg.get("core_verification_active_activity_ids", [])
+    )
+    core_verification_round_ids = {
+        aid for aid, cfg in theme44_config.items()
+        if int(cfg["template"]) in (433, 434, 435)
+    }
+
+    act_rows = db.query("SELECT activity_id, start_time, stop_time, state, theme, template, sub_activity_id_list FROM activity WHERE uid=?", (uid,))
+    act_list = []
+    seen_acts = set()
+    for r in (act_rows or []):
+        aid = int(r["activity_id"])
+        seen_acts.add(aid)
+        # 229 ActivityCfg 中根本不存在这 26 个 311 新增 ID。
+        # 即使 state=0 也可能诱发旧客户端索引 nil，因此 229 模式必须完全不下发。
+        if cur_ver == "229" and aid in theme44_native_ids:
+            continue
+        is_sub = aid in needed_acts
+        is_pool = aid in pool_act_map
+
+        st = int(r["start_time"] or 1577836800)
+        # 无论当前模式是否启用该活动，协议时间都保持远期有效。
+        # 版本隔离只由 state/theme/template/topology 表达，禁止再用 stop_time=0 关闭。
+        et = far_future_ts
+        state = int(r["state"]) if r.get("state") is not None else 1
+        theme = int(r.get("theme") or 0)
+        template = int(r.get("template") or 0)
+        try:
+            sub_list = _j11.loads(r["sub_activity_id_list"]) if r["sub_activity_id_list"] else []
+        except Exception:
+            sub_list = []
+
+        is_theme44_plus = (version_cfg.get("theme_id", 43) >= 44)
+        if is_theme44_plus:
+            # Theme 44+ 客户端版本自适应 (311, 321, 322...)
+            if aid in all_pool_aids:
+                # 卡池活动（包括 Theme 44 的 4400301/4400303 与历史/229卡池）权威受控于在架状态
+                state = 1 if is_pool else 0
+                et = far_future_ts
+                if aid in theme44_config:
+                    cfg = theme44_config[aid]
+                    theme = cfg["theme"]
+                    template = cfg["template"]
+                    sub_list = list(cfg["sub_activity_id_list"])
+            elif aid in theme44_config:
+                cfg = theme44_config[aid]
+                state = (
+                    1
+                    if aid not in core_verification_round_ids
+                    or aid in core_verification_active_ids
+                    else 0
+                )
+                et = far_future_ts
+                theme = cfg["theme"]
+                template = cfg["template"]
+                sub_list = list(cfg["sub_activity_id_list"])
+            elif aid == 111:
+                state = 1
+                et = far_future_ts
+                sub_list = [4443301, 4443302, 4443303, 4443304]
+            elif aid == 4310001 or str(aid).startswith("43") or theme == 43:
+                # 在 311/321 下关闭 Theme 43 专属大厅与剧情关卡活动，确保大厅入口完全切换至 Theme 44
+                state = 0
+            else:
+                if is_sub:
+                    state = 1
+                    et = far_future_ts
+        else:
+            # 229 客户端版本自适应
+            if aid in all_pool_aids:
+                # 卡池活动严格受控于在架状态，未在架卡池置 0 消除白屏与噪点
+                state = 1 if is_pool else 0
+                et = far_future_ts
+            elif aid == 111:
+                state = 1
+                et = far_future_ts
+                sub_list = [4243301, 4339301, 4343301]
+            elif aid == 4310001 or str(aid).startswith("43") or theme == 43 or is_sub:
+                state = 1
+                et = far_future_ts
+
+        act_list.append({
+            "activity_id": aid,
+            "start_time": st,
+            "stop_time": et,
+            "state": state,
+            "theme": theme,
+            "template": template,
+            "sub_activity_id_list": sub_list
+        })
+
+    # Theme 44+ 版本核心活动保底补齐（防止数据库缺失记录导致客户端判断崩溃）
+    if version_cfg.get("theme_id", 43) >= 44:
+        for caid, cfg in theme44_config.items():
+            if caid not in seen_acts:
+                seen_acts.add(caid)
+                # 卡池类活动依然严格遵从在架状态，非卡池类核心活动默认开启
+                if caid in all_pool_aids:
+                    c_state = 1 if (caid in pool_act_map) else 0
+                else:
+                    c_state = (
+                        1
+                        if caid not in core_verification_round_ids
+                        or caid in core_verification_active_ids
+                        else 0
+                    )
+                act_list.append({
+                    "activity_id": caid,
+                    "start_time": 1577836800,
+                    "stop_time": far_future_ts,
+                    "state": c_state,
+                    "theme": cfg["theme"],
+                    "template": cfg["template"],
+                    "sub_activity_id_list": list(cfg["sub_activity_id_list"])
+                })
+
+    is_t44 = (version_cfg.get("theme_id", 43) >= 44)
+    for aid in needed_acts:
+        if not is_t44 and aid in theme44_native_ids:
+            continue
+        if is_t44 and (aid == 4310001 or str(aid).startswith("43")):
+            continue
+        if aid not in seen_acts:
+            seen_acts.add(aid)
+            act_list.append({
+                "activity_id": aid,
+                "start_time": 1577836800,
+                "stop_time": far_future_ts,
+                "state": 1,
+                "theme": 0,
+                "template": 0,
+                "sub_activity_id_list": []
+            })
+
+    for aid, pent in pool_act_map.items():
+        if not is_t44 and aid in theme44_native_ids:
+            continue
+        if is_t44 and aid == 4310001:
+            continue
+        if aid not in seen_acts:
+            seen_acts.add(aid)
+            act_list.append({
+                "activity_id": aid,
+                "start_time": pent.get("start_time", 0),
+                "stop_time": far_future_ts,
+                "state": pent.get("state", 1),
+                "theme": pent.get("theme", 0),
+                "template": pent.get("template", 3),
+                "sub_activity_id_list": []
+            })
+
+    from skin_draw_service import merge_activities
+    act_list = merge_activities(act_list, cur_ver)
+    from activity_content_service import complete_activity_tree
+    return complete_activity_tree(act_list, cur_ver)
+
+
+def gen_payload(cmd, uid=None, db=None, **kw):
     """仅编码 payload（不带帧头）——供 10200 进服响应段帧替换用。
     返回 bytes 或 None。支持：17009 材料 / 15009 货币 / 23009 玩家 / 14009 英雄 / 16015 动态卡池。"""
+    uid = DEFAULT_UID if uid is None else uid
     db = db or get_db()
+    import new_player_service as _fresh
+    if _fresh.enabled(db,uid) and cmd in _fresh.OVERRIDE_COMMANDS:
+        return encode('sc_'+str(cmd),_fresh.payload(db,uid,cmd,res_version=kw.get('res_version')))
+    if cmd == 24029:
+        from chapter19_service import service
+        return encode('sc_24029', service.payload(db, uid))
+    if cmd == 24061:
+        from chapter_v2_map_service import service
+        return encode('sc_24061', service.payload(db, uid))
+    if cmd in (47001, 47003):
+        from teach_service import service
+        return encode(f"sc_{cmd}", service.payload(db, uid, cmd))
     if cmd == 16015:
         from draw_service import DrawService
         svc = DrawService.get_instance(db=db)
@@ -700,7 +1000,7 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                         if c_rows:
                             bal = int(c_rows[0].get("num") or 0)
                     elif itype == 2:
-                        h_rows = db.query("SELECT 1 FROM heroes WHERE uid=? AND id=?", (uid, iid))
+                        h_rows = db.query("SELECT 1 FROM hero WHERE uid=? AND id=? AND unlock=1", (uid, iid))
                         bal = 1 if h_rows else 0
                     elif itype == 3:
                         hid = iid % 10000 if iid > 10000 else iid
@@ -765,15 +1065,9 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
     if cmd == 17027:
         # 累计签到数据（accumulatesigndata.lua:19-26 InitAccumulateSignData）
         # 此前登录洪流用素材静态帧：领取后 award_ids 不更新，重登"复活"红点
-        row = db.query("SELECT version, open_sign, login_days FROM accumulate_sign WHERE uid=?", (uid,))
-        aids = db.query("SELECT award_id FROM accumulate_sign_award WHERE uid=? ORDER BY award_id", (uid,))
-        if row:
-            return encode("sc_17027", {
-                "version": int(row[0].get("version") or 1),
-                "open_sign": int(row[0].get("open_sign") or 0),
-                "login_days": int(row[0].get("login_days") or 0),
-                "award_ids": [int(r["award_id"]) for r in aids]})
-        return None
+        from sign_service import accumulate_payload
+        data = accumulate_payload(db, uid)
+        return encode('sc_17027', data) if data is not None else None
     if cmd == 17033:
         # 累计签到折扣购买/战令数据（accumulatesigndata.lua:28-34 InitDiscountData）
         row = db.query("SELECT version, cumulative_buy_card_num FROM accumulate_sign_discount WHERE uid=?", (uid,))
@@ -842,17 +1136,11 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                                    "timestamp": int(_t.time()), "verify_timestamp": 316800,
                                    "uid_sign": "f52a9206f87a10eaa6caa54146a90db9"})
     if cmd == 11015:
-        # 七日签到状态（登录推）：根据当前客户端版本动态自适应下发
-        import time as _t
+        # 七日签到状态（登录推）：根据当前客户端版本动态自适应下发（按数据库真实签到数据下发）
         import res_version_manager
         version_cfg = res_version_manager.get_version_config(kw.get("res_version"))
         act_id = int(version_cfg["sign_activity_id"])
-        now_ts = int(_t.time())
-        return encode("sc_11015", {
-            "activity_id": act_id,
-            "sign_count": 7,
-            "last_sign_time": now_ts
-        })
+        return gen_11015(act_id, uid=uid, db=db)
     if cmd == 12045:
         # 每日免费体力甜点（百宝囊上下午领蛋，登录推，seq=144）
         import time as _t
@@ -863,12 +1151,11 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         return encode("sc_12045", {"daily_fatigue_dessert_list": desserts})
     if cmd == 88305:
         from rogueteam_service import RogueTeamService
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=db)
         out = svc.get_outside_data(uid)
         return encode("sc_88305", {
             "template_id": out["template_id"],
             "difficult": out["difficult"],
-            "max_difficult": out["max_difficult"],
             "collection_list": out["collection_list"],
             "unlock_collection": out["unlock_collection"],
             "view_collection": out["view_collection"],
@@ -1102,23 +1389,19 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         payload = _hc.build_hero_payload(db, uid)
         return payload
     if cmd == 68151:
-        # 换装/场景卡池状态下发（默认诗蔻蒂换装子活动 4322201）
-        state = db.get_skin_draw_pool_state(uid, 1001)
-        state_list = [{"drop_id": did, "num": s["remain_num"]} for did, s in state.items()]
-        return encode("sc_68151", {"activity_id": 4322201, "info": state_list})
+        from skin_draw_service import active_pools, pool_snapshot
+        pools = active_pools(kw.get('res_version'))
+        pool_id = int(kw.get('pool_id') or 1023)
+        return encode('sc_68151', pool_snapshot(db, uid, pools[pool_id]))
     if cmd == 68161:
-        # 换装活动剧情状态下发（默认 4322301）
-        finished = db.get_skin_story_state(uid, 4322301)
-        return encode("sc_68161", {"activity_id": 4322301, "story_stage": 0, "finished_story": finished})
+        from skin_draw_service import story_snapshot
+        return encode('sc_68161', story_snapshot(db, uid, kw.get('activity_id') or 4322301, kw.get('res_version')))
     if cmd == 68185:
-        # 誓约活动卡池状态下发（默认 4342401，卡池 1025）
-        state = db.get_skin_draw_pool_state(uid, 1025)
-        state_list = [{"drop_id": did, "num": s["remain_num"]} for did, s in state.items()]
-        return encode("sc_68185", {
-            "activity_id": 4342401,
-            "info": state_list,
-            "draw_info2": {"last_drop": 0, "already_drop": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
-        })
+        from skin_draw_service import active_pools, pool_snapshot
+        pools = active_pools(kw.get('res_version'))
+        pool_id = int(kw.get('pool_id') or 1025)
+        with db.transaction():
+            return encode('sc_68185', pool_snapshot(db, uid, pools[pool_id], initialize=True))
     if cmd == 12039:
         # 聊天表情与自定义表情列表动态驱动（chat_sticker + material 表）
         base_stickers = [343, 240, 346, 227, 349, 352, 339, 207, 342, 239, 345, 242, 226, 348, 351, 338, 206, 341, 344, 241, 225, 347, 228, 350, 353, 321, 205, 340]
@@ -1150,257 +1433,7 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
             lst = [{"id": r.get("hero_id"), "num": r.get("num") or 0} for r in rows]
             return encode("sc_14019", {"piece_list": lst})
     if cmd == 11001:
-        # 活动全量列表（sc_11001 activity_list）
-        # 保证全量支线与常驻活动、以及在架卡池的 activity_id 处于开启激活状态，解除客户端时间锁与置灰
-        from stage_service import StageService
-        svc = StageService.get_instance(db=db)
-        needed_acts = set(svc.get_active_activity_ids())
-
-        import json as _j11
-        import res_version_manager
-        cur_ver = str(kw.get("res_version") or kw.get("cur_ver") or res_version_manager.get_current_version())
-        version_cfg = res_version_manager.get_version_config(cur_ver)
-        far_future_ts = res_version_manager.FAR_FUTURE_TIMESTAMP
-
-        # 联动卡池服务，自动将当前激活的卡池对应 activity_id 注入并解除时间锁
-        pool_act_map = {}
-        all_pool_aids = set()
-        try:
-            from draw_service import DrawService
-            draw_svc = DrawService.get_instance(db=db)
-            pool_entries = draw_svc.get_active_activity_entries(uid, res_version=cur_ver)
-            pool_act_map = {ent["activity_id"]: ent for ent in pool_entries}
-            pool_cfg = draw_svc.load_pool_activity_cfg()
-            all_pool_aids = {int(item["activity_id"]) for item in pool_cfg.values() if item.get("activity_id")}
-        except Exception as _e_draw:
-            pass
-
-        # Theme 44 权威拓扑来自 311 ActivityCfg.lua 新增的 26 条记录；
-        # 复刻换装活动则来自 311 ActivityToggleCfg.lua (53006~53010) 的引用。
-        theme44_config = {
-            4410001: {"theme": 44, "template": 100, "sub_activity_id_list": [4435001, 4435002, 4435003, 4435004, 4435005]},
-            4400101: {"theme": 44, "template": 1, "sub_activity_id_list": []},
-            4400301: {"theme": 44, "template": 3, "sub_activity_id_list": []},
-            4400303: {"theme": 44, "template": 3, "sub_activity_id_list": []},
-            4407301: {"theme": 44, "template": 73, "sub_activity_id_list": []},
-            4407302: {"theme": 44, "template": 73, "sub_activity_id_list": []},
-            4412001: {"theme": 44, "template": 120, "sub_activity_id_list": [4405601]},
-            4405601: {"theme": 44, "template": 56, "sub_activity_id_list": [4418201]},
-            4418201: {"theme": 44, "template": 182, "sub_activity_id_list": []},
-            4435001: {"theme": 44, "template": 350, "sub_activity_id_list": []},
-            4435002: {"theme": 44, "template": 350, "sub_activity_id_list": []},
-            4435003: {"theme": 44, "template": 350, "sub_activity_id_list": []},
-            4435004: {"theme": 44, "template": 350, "sub_activity_id_list": []},
-            4435005: {"theme": 44, "template": 350, "sub_activity_id_list": []},
-            4443301: {"theme": 44, "template": 433, "sub_activity_id_list": [4443401, 4443501]},
-            4443302: {"theme": 44, "template": 433, "sub_activity_id_list": [4443402, 4443502]},
-            4443303: {"theme": 44, "template": 433, "sub_activity_id_list": [4443403, 4443503]},
-            4443304: {"theme": 44, "template": 433, "sub_activity_id_list": [4443404, 4443504]},
-            4443401: {"theme": 44, "template": 434, "sub_activity_id_list": []},
-            4443402: {"theme": 44, "template": 434, "sub_activity_id_list": []},
-            4443403: {"theme": 44, "template": 434, "sub_activity_id_list": []},
-            4443404: {"theme": 44, "template": 434, "sub_activity_id_list": []},
-            4443501: {"theme": 44, "template": 435, "sub_activity_id_list": []},
-            4443502: {"theme": 44, "template": 435, "sub_activity_id_list": []},
-            4443503: {"theme": 44, "template": 435, "sub_activity_id_list": []},
-            4443504: {"theme": 44, "template": 435, "sub_activity_id_list": []},
-            # 皮肤抽奖 (Toggle 53006~53010) 与全部实体子活动
-            312211: {"theme": 31, "template": 221, "sub_activity_id_list": [312221, 312222, 310049, 311465, 312231, 312233]},
-            312221: {"theme": 31, "template": 222, "sub_activity_id_list": []},
-            312222: {"theme": 31, "template": 222, "sub_activity_id_list": []},
-            310049: {"theme": 31, "template": 4, "sub_activity_id_list": []},
-            311465: {"theme": 31, "template": 146, "sub_activity_id_list": []},
-            312231: {"theme": 31, "template": 223, "sub_activity_id_list": []},
-            312233: {"theme": 31, "template": 223, "sub_activity_id_list": []},
-
-            3522101: {"theme": 35, "template": 221, "sub_activity_id_list": [3522201, 3522202, 3522203, 3522301, 3500406, 3514601]},
-            3522201: {"theme": 35, "template": 222, "sub_activity_id_list": []},
-            3522202: {"theme": 35, "template": 222, "sub_activity_id_list": []},
-            3522203: {"theme": 35, "template": 222, "sub_activity_id_list": []},
-            3522301: {"theme": 35, "template": 223, "sub_activity_id_list": []},
-            3500406: {"theme": 35, "template": 4, "sub_activity_id_list": []},
-            3514601: {"theme": 35, "template": 146, "sub_activity_id_list": []},
-
-            3722101: {"theme": 37, "template": 221, "sub_activity_id_list": [3722201, 3722202, 3722301, 3700407, 3714601]},
-            3722201: {"theme": 37, "template": 222, "sub_activity_id_list": []},
-            3722202: {"theme": 37, "template": 222, "sub_activity_id_list": []},
-            3722301: {"theme": 37, "template": 223, "sub_activity_id_list": []},
-            3700407: {"theme": 37, "template": 4, "sub_activity_id_list": []},
-            3714601: {"theme": 37, "template": 146, "sub_activity_id_list": []},
-
-            4022101: {"theme": 40, "template": 221, "sub_activity_id_list": [4022201, 4022202, 4022301, 4000410, 4014601]},
-            4022201: {"theme": 40, "template": 222, "sub_activity_id_list": []},
-            4022202: {"theme": 40, "template": 222, "sub_activity_id_list": []},
-            4022301: {"theme": 40, "template": 223, "sub_activity_id_list": []},
-            4000410: {"theme": 40, "template": 4, "sub_activity_id_list": []},
-            4014601: {"theme": 40, "template": 146, "sub_activity_id_list": []},
-
-            4122101: {"theme": 41, "template": 221, "sub_activity_id_list": [4122201, 4122202, 4122301, 4100402, 4114601]},
-            4122201: {"theme": 41, "template": 222, "sub_activity_id_list": []},
-            4122202: {"theme": 41, "template": 222, "sub_activity_id_list": []},
-            4122301: {"theme": 41, "template": 223, "sub_activity_id_list": []},
-            4100402: {"theme": 41, "template": 4, "sub_activity_id_list": []},
-            4114601: {"theme": 41, "template": 146, "sub_activity_id_list": []},
-        }
-        theme44_native_ids = {
-            aid for aid, cfg in theme44_config.items() if int(cfg["theme"]) == 44
-        }
-        # 311_CORE_VERIFICATION_GUARD:
-        # 4443301..4 共用 template=433，同时开启会使客户端缓存被最后一轮覆盖。
-        # 保留全部轮次的远期 stop_time，但只将版本配置指定的首轮设为 state=1。
-        core_verification_active_ids = set(
-            int(aid) for aid in version_cfg.get("core_verification_active_activity_ids", [])
-        )
-        core_verification_round_ids = {
-            aid for aid, cfg in theme44_config.items()
-            if int(cfg["template"]) in (433, 434, 435)
-        }
-
-        act_rows = db.query("SELECT activity_id, start_time, stop_time, state, theme, template, sub_activity_id_list FROM activity WHERE uid=?", (uid,))
-        act_list = []
-        seen_acts = set()
-        for r in (act_rows or []):
-            aid = int(r["activity_id"])
-            seen_acts.add(aid)
-            # 229 ActivityCfg 中根本不存在这 26 个 311 新增 ID。
-            # 即使 state=0 也可能诱发旧客户端索引 nil，因此 229 模式必须完全不下发。
-            if cur_ver == "229" and aid in theme44_native_ids:
-                continue
-            is_sub = aid in needed_acts
-            is_pool = aid in pool_act_map
-
-            st = int(r["start_time"] or 1577836800)
-            # 无论当前模式是否启用该活动，协议时间都保持远期有效。
-            # 版本隔离只由 state/theme/template/topology 表达，禁止再用 stop_time=0 关闭。
-            et = far_future_ts
-            state = int(r["state"]) if r.get("state") is not None else 1
-            theme = int(r.get("theme") or 0)
-            template = int(r.get("template") or 0)
-            try:
-                sub_list = _j11.loads(r["sub_activity_id_list"]) if r["sub_activity_id_list"] else []
-            except Exception:
-                sub_list = []
-
-            is_theme44_plus = (version_cfg.get("theme_id", 43) >= 44)
-            if is_theme44_plus:
-                # Theme 44+ 客户端版本自适应 (311, 321, 322...)
-                if aid in all_pool_aids:
-                    # 卡池活动（包括 Theme 44 的 4400301/4400303 与历史/229卡池）权威受控于在架状态
-                    state = 1 if is_pool else 0
-                    et = far_future_ts
-                    if aid in theme44_config:
-                        cfg = theme44_config[aid]
-                        theme = cfg["theme"]
-                        template = cfg["template"]
-                        sub_list = list(cfg["sub_activity_id_list"])
-                elif aid in theme44_config:
-                    cfg = theme44_config[aid]
-                    state = (
-                        1
-                        if aid not in core_verification_round_ids
-                        or aid in core_verification_active_ids
-                        else 0
-                    )
-                    et = far_future_ts
-                    theme = cfg["theme"]
-                    template = cfg["template"]
-                    sub_list = list(cfg["sub_activity_id_list"])
-                elif aid == 111:
-                    state = 1
-                    et = far_future_ts
-                    sub_list = [4443301, 4443302, 4443303, 4443304]
-                elif aid == 4310001 or str(aid).startswith("43") or theme == 43:
-                    # 在 311/321 下关闭 Theme 43 专属大厅与剧情关卡活动，确保大厅入口完全切换至 Theme 44
-                    state = 0
-                else:
-                    if is_sub:
-                        state = 1
-                        et = far_future_ts
-            else:
-                # 229 客户端版本自适应
-                if aid in all_pool_aids:
-                    # 卡池活动严格受控于在架状态，未在架卡池置 0 消除白屏与噪点
-                    state = 1 if is_pool else 0
-                    et = far_future_ts
-                elif aid == 111:
-                    state = 1
-                    et = far_future_ts
-                    sub_list = [4243301, 4339301, 4343301]
-                elif aid == 4310001 or str(aid).startswith("43") or theme == 43 or is_sub:
-                    state = 1
-                    et = far_future_ts
-
-            act_list.append({
-                "activity_id": aid,
-                "start_time": st,
-                "stop_time": et,
-                "state": state,
-                "theme": theme,
-                "template": template,
-                "sub_activity_id_list": sub_list
-            })
-
-        # Theme 44+ 版本核心活动保底补齐（防止数据库缺失记录导致客户端判断崩溃）
-        if version_cfg.get("theme_id", 43) >= 44:
-            for caid, cfg in theme44_config.items():
-                if caid not in seen_acts:
-                    seen_acts.add(caid)
-                    # 卡池类活动依然严格遵从在架状态，非卡池类核心活动默认开启
-                    if caid in all_pool_aids:
-                        c_state = 1 if (caid in pool_act_map) else 0
-                    else:
-                        c_state = (
-                            1
-                            if caid not in core_verification_round_ids
-                            or caid in core_verification_active_ids
-                            else 0
-                        )
-                    act_list.append({
-                        "activity_id": caid,
-                        "start_time": 1577836800,
-                        "stop_time": far_future_ts,
-                        "state": c_state,
-                        "theme": cfg["theme"],
-                        "template": cfg["template"],
-                        "sub_activity_id_list": list(cfg["sub_activity_id_list"])
-                    })
-
-        is_t44 = (version_cfg.get("theme_id", 43) >= 44)
-        for aid in needed_acts:
-            if not is_t44 and aid in theme44_native_ids:
-                continue
-            if is_t44 and (aid == 4310001 or str(aid).startswith("43")):
-                continue
-            if aid not in seen_acts:
-                seen_acts.add(aid)
-                act_list.append({
-                    "activity_id": aid,
-                    "start_time": 1577836800,
-                    "stop_time": far_future_ts,
-                    "state": 1,
-                    "theme": 0,
-                    "template": 0,
-                    "sub_activity_id_list": []
-                })
-
-        for aid, pent in pool_act_map.items():
-            if not is_t44 and aid in theme44_native_ids:
-                continue
-            if is_t44 and aid == 4310001:
-                continue
-            if aid not in seen_acts:
-                seen_acts.add(aid)
-                act_list.append({
-                    "activity_id": aid,
-                    "start_time": pent.get("start_time", 0),
-                    "stop_time": far_future_ts,
-                    "state": pent.get("state", 1),
-                    "theme": pent.get("theme", 0),
-                    "template": pent.get("template", 3),
-                    "sub_activity_id_list": []
-                })
-
-        return encode("sc_11001", {"activity_list": act_list})
+        return encode("sc_11001", {"activity_list": get_activity_list(db, uid, kw.get("res_version") or kw.get("cur_ver"))})
     if cmd == 24009:
         # 章节与剧情进度（StageService 统管驱动 → sc_24009 user_chapter_list）
         # 覆盖全量主线与支线剧情关卡，自愈上下篇与星级对账
@@ -1523,7 +1556,8 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
     if cmd == 10600:
         # [Fix by Gemini 3.7-flash] open_system 全量下发（封锁公会体系 2401/2402/2404/2405/2406，保留通行证 1901/1902/1903/1904/1905/519，其余系统正常开放）
         _sys_ids = [20, 101, 201, 203, 204, 205, 206, 207, 208, 209, 210, 211, 221, 231, 235, 301, 302, 303, 304, 305, 306, 307, 308, 309, 311, 312, 313, 314, 316, 330, 331, 332, 333, 334, 335, 336, 337, 341, 342, 343, 344, 345, 346, 401, 501, 510, 511, 512, 513, 519, 601, 701, 702, 703, 801, 802, 803, 804, 901, 902, 904, 905, 1001, 1101, 1201, 1301, 1401, 1501, 1601, 1701, 1702, 1802, 1803, 1901, 1902, 1903, 1904, 1905, 2001, 2101, 2201, 2301, 2302, 2501, 2510, 2511, 2512, 2513, 2514, 2515, 2601, 2701, 2801, 2901, 3001, 3101, 3110, 3120, 9901, 9902, 9903, 9904, 9905, 9907, 9908, 9909, 9910, 9911, 9912, 10101, 10102, 10301, 10401, 10501, 10601, 10701, 10702, 10703, 10704, 11102, 20001, 20002]
-        return encode("sc_10600", {"open_system": _sys_ids})
+        from multiplayer_policy import open_systems
+        return encode("sc_10600", {"open_system": open_systems(_sys_ids)})
     if cmd == 67001:
         # [AdminCatExplore] 管理员猫咪探索主数据动态下发（sc_67001）
         from admin_cat_explore_service import AdminCatExploreService
@@ -1716,7 +1750,8 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         servants = db.query("SELECT item_id, is_view FROM illustrated WHERE uid=? AND kind='servant' ORDER BY item_id", (uid,))
         enemies = db.query("SELECT item_id, times, is_view FROM illustrated WHERE uid=? AND kind='enemy' ORDER BY item_id", (uid,))
         equips = db.query("SELECT item_id, is_view, pos_list_json FROM illustrated WHERE uid=? AND kind='equip' ORDER BY item_id", (uid,))
-        affixes = db.query("SELECT item_id, is_view FROM illustrated WHERE uid=? AND kind='affix' ORDER BY item_id", (uid,))
+        from worldview_service import snapshot as worldview_snapshot
+        affixes = worldview_snapshot(db, uid)
 
         def _pos_list(js):
             try:
@@ -1725,14 +1760,18 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
             except Exception:
                 return []
 
+        from illustrated_listener import _get_valid_monster_ids
+        valid_m_ids = _get_valid_monster_ids()
+        valid_enemies = [r for r in enemies if r["item_id"] in valid_m_ids] if (enemies and valid_m_ids) else []
+
         return encode("sc_52001", {
             "intelligence_reward": [],
-            "enemy_info": [{"id": r["item_id"], "times": r["times"] or 0, "is_view": r["is_view"] or 0} for r in enemies] if enemies else [],
+            "enemy_info": [{"id": r["item_id"], "times": r["times"] or 0, "is_view": r["is_view"] or 0} for r in valid_enemies],
             "servant_info": [{"id": r["item_id"], "is_view": r["is_view"] or 0} for r in servants] if servants else [],
             "equip_info": [{"suit": r["item_id"], "pos_list": _pos_list(r.get("pos_list_json")), "is_view": r["is_view"] or 0} for r in equips] if equips else [],
             "plot_info": [{"id": r["item_id"], "is_view": r["is_view"] or 0} for r in plots] if plots else [],
             "inbetweening_info": [{"id": r["item_id"], "is_receive": r.get("is_receive") or 0, "is_view": r.get("is_view") or 0} for r in inbetweens] if inbetweens else [],
-            "affix_info": [{"id": r["item_id"], "is_view": r["is_view"] or 0} for r in affixes] if affixes else []
+            "affix_info": affixes
         })
 
     if cmd in (91001, 25465):
@@ -1771,7 +1810,7 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         # 全量动态商店商品配置数据驱动 → sc_20007 (由 ShopService 统一生成并清洗非法字段消除警告)
         from shop_service import ShopService
         import res_version_manager
-        shop_cfg_data = ShopService.get_instance(db=db).get_shop_cfg_payload()
+        shop_cfg_data = ShopService.get_instance(db=db).get_shop_cfg_payload(res_version=kw.get('res_version'))
         ver_cfg = res_version_manager.get_version_config(kw.get("res_version"))
         dep_shops = set(ver_cfg.get("deprecated_shops", []))
         if dep_shops and "shop_item_cfg_list" in shop_cfg_data:
@@ -1784,7 +1823,7 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         # 全量 116+ 商店购买状态与限购计数数据驱动 → sc_20009 (由 ShopService 统筹每日货架与刷新状态)
         from shop_service import ShopService
         import res_version_manager
-        shop_data = ShopService.get_instance(db=db).get_shop_data_payload(uid)
+        shop_data = ShopService.get_instance(db=db).get_shop_data_payload(uid, res_version=kw.get('res_version'))
         ver_cfg = res_version_manager.get_version_config(kw.get("res_version"))
         dep_shops = set(ver_cfg.get("deprecated_shops", []))
         if dep_shops and "shop_item_list" in shop_data:
@@ -1852,10 +1891,13 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         }
         return encode("sc_91001", obj)
     if cmd == 19029:
-        # [AI Bot] 好友初始化数据驱动 → sc_19029 (brief_friend_list 注入所有活跃 AI 角色 + 真实好友)
+        # NPC friend initialization also tells the client which local chat files to load.
         ai_chars = db.get_active_ai_characters() if hasattr(db, "get_active_ai_characters") else []
-        brief_list = [{"user_id": int(c["char_id"]), "timestamp": int(c.get("created_at") or 0)} for c in ai_chars]
-        real_friends = db.query("SELECT friend_uid, timestamp FROM friends WHERE uid = ?", (uid,))
+        # timestamp is a friendship-history cutoff, not login time or roster creation time.
+        # Local NPC friendships have no reset boundary; retain their existing chat history.
+        brief_list = [{"user_id": int(c["char_id"]), "timestamp": 0} for c in ai_chars]
+        # Player-to-player features are globally disabled; retain NPC chats.
+        real_friends = []
         for rf in real_friends:
             brief_list.append({"user_id": int(rf["friend_uid"]), "timestamp": int(rf.get("timestamp") or 0)})
         return encode("sc_19029", {
@@ -1865,7 +1907,6 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
         })
     if cmd == 19001:
         # [AI Bot] 全量好友数据驱动 → sc_19001 (friend_list 完整名片/头像/气泡/签名/在线状态)
-        now_ts = int(time.time())
         ai_chars = db.get_active_ai_characters() if hasattr(db, "get_active_ai_characters") else []
         friend_list = []
         for c in ai_chars:
@@ -1878,13 +1919,13 @@ def gen_payload(cmd, uid=DEFAULT_UID, db=None, **kw):
                 },
                 "online_state": 0,
                 "sign": str(c.get("sign") or ""),
-                "timestamp": now_ts,
+                "timestamp": 0,
                 "ip_location": str(c.get("ip_location") or "未知"),
                 "level": int(c.get("level") or 80),
                 "chat_bubble": int(c.get("chat_bubble") or 9001),
                 "info_background": int(c.get("info_background") or 0)
             })
-        real_friends = db.query("SELECT friend_uid, timestamp FROM friends WHERE uid = ?", (uid,))
+        real_friends = []  # Player contacts are disabled; this list is NPC-only.
         for rf in real_friends:
             f_uid = int(rf["friend_uid"])
             u = db.query("SELECT nick, level, sign, portrait, icon_frame FROM users WHERE uid = ?", (f_uid,))

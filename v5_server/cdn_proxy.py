@@ -19,6 +19,7 @@ cdn_proxy.py — 深空之眼 高性能流式 CDN 资源穿透与动态抓包拦
    - 完美适配 Unity WebRequest 分片、断点续传及多线程下载。
 """
 import http.client
+import errno
 import hashlib
 import ipaddress
 import json
@@ -211,13 +212,49 @@ def _is_public_ipv4(value):
         return False
 
 
-def set_source_ip(value):
-    """使用 main 已确认的 LAN 地址，不更改系统路由或代理。"""
+def _validated_source_ip(value):
     address = ipaddress.IPv4Address(value)
     if address.is_unspecified or address.is_loopback or address in ipaddress.IPv4Network("198.18.0.0/15"):
         raise ValueError("CDN 出站地址必须是本机真实 LAN 地址")
+    return str(address)
+
+
+def select_source_ip(advertised_ip):
+    """Keep a locally bindable host address; NAT public IPs use a real local NIC."""
+    advertised_ip = _validated_source_ip(advertised_ip)
+
+    def bindable(value):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+            probe.bind((value, 0))
+        return value
+
+    try:
+        return bindable(advertised_ip)
+    except OSError as exc:
+        if exc.errno not in (errno.EADDRNOTAVAIL, 10049):
+            raise
+
+    import gen_cert
+    for value in dict.fromkeys(gen_cert.get_all_lan_ips()):
+        try:
+            value = _validated_source_ip(value)
+        except ValueError:
+            continue
+        if value == advertised_ip:
+            continue
+        try:
+            return bindable(value)
+        except OSError as exc:
+            if exc.errno not in (errno.EADDRNOTAVAIL, 10049):
+                raise
+    raise OSError(errno.EADDRNOTAVAIL, "找不到可绑定的本机 CDN 出站 IPv4")
+
+
+def set_source_ip(value):
+    """使用 main 已确认的 LAN 地址，不更改系统路由或代理。"""
+    value = _validated_source_ip(value)
     global _SOURCE_IP
-    _SOURCE_IP = str(address)
+    _SOURCE_IP = value
     with _DNS_LOCK:
         _DNS_CACHE.clear()
 

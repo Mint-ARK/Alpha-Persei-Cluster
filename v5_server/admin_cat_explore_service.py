@@ -11,7 +11,6 @@ admin_cat_explore_service.py — 管理员猫咪探索（弥弥尔探索 / 远�
 - 周常奖励：每周探索天数累积 (1~7 天) 与周末宝箱阶梯倍率领取。
 """
 import json
-import math
 import random
 import time
 from typing import Dict, List, Optional, Tuple
@@ -349,7 +348,7 @@ class AdminCatExploreService:
                 event_id = random.choice(events)
                 event_bonus = EXPLORE_EVENT_CFG.get(event_id, {}).get("effect", [1, 5])[1]
 
-        total_multiplier = 1.0 + (skill_bonus + inborn_bonus + event_bonus) / 100.0
+        total_percent = 100 + skill_bonus + inborn_bonus + event_bonus
 
         # 计算基础掉落并应用倍率
         reward_items = []
@@ -357,7 +356,9 @@ class AdminCatExploreService:
         for item_entry in area_cfg.get("reward", []):
             item_id = item_entry[0]
             base_rate = item_entry[1]
-            amount = int(math.ceil(base_rate * hour_time * total_multiplier))
+            # All configured rates/percentages are integers. Exact ceiling
+            # avoids e.g. 200 * 1.1 becoming 220.00000000000003 -> 221.
+            amount = (base_rate * hour_time * total_percent + 99) // 100
             if amount > 0:
                 reward_items.append({"id": item_id, "num": amount})
                 if item_id in (AdminCatExploreConst.ITEM_COIN_COMMON, AdminCatExploreConst.ITEM_COIN_RARE, AdminCatExploreConst.ITEM_UPGRADE_CHIP):
@@ -388,11 +389,17 @@ class AdminCatExploreService:
         if mimir_id not in cats:
             return AdminCatExploreConst.ERR_MIMIR_NOT_UNLOCKED
 
+        meow_cfg = EXPLORE_MEOW_CFG.get(mimir_id)
+        if not meow_cfg or skill_id != meow_cfg.get("skill"):
+            return AdminCatExploreConst.ERR_PARAMS_INVALID
+        skill_cfg = EXPLORE_MEOW_SKILL_CFG.get(skill_id)
+        if not skill_cfg:
+            return AdminCatExploreConst.ERR_PARAMS_INVALID
+
         cur_level = cats[mimir_id]["skill_level"]
         if cur_level >= 10:
             return AdminCatExploreConst.ERR_SKILL_MAX_LEVEL
 
-        skill_cfg = EXPLORE_MEOW_SKILL_CFG.get(skill_id, EXPLORE_MEOW_SKILL_CFG[10001])
         consumes = skill_cfg.get("skill_up_consume", [])
         c_idx = cur_level - 1
         if c_idx >= len(consumes):
@@ -427,8 +434,11 @@ class AdminCatExploreService:
         if mimir_id in cats:
             return AdminCatExploreConst.SUCCESS  # 已解锁幂等
 
+        level, _ = self.calculate_level(db, uid)
+        if mimir_id not in EXPLORE_LEVEL_CFG[level]["meow"]:
+            return AdminCatExploreConst.ERR_CONDITION_NOT_MET
+
         cfg = EXPLORE_MEOW_CFG[mimir_id]
-        exp_data = self.get_or_create_explore_data(db, uid)
         tot_c = exp_data.get("total_explore_c", 0)
 
         # 检查解锁门槛 (total_explore_c >= requirement)

@@ -1,0 +1,187 @@
+{
+  "mode": "unlocked",
+  "include_groups": [],
+  "source": "decompiled_v2/x64/game/config/systemcfg.lua",
+  "source_sha256": "d7f2d48895379653fd2919cb0f001f9f5ddbf1c15901aaafef6e5f4e28e80ed4",
+  "groups": {
+    "boss": {
+      "label": "梦境再构",
+      "system_id": 305,
+      "open_condition": [
+        [
+          1,
+          30
+        ]
+      ],
+      "system_hide": 0,
+      "commands": [
+        45201,
+        45001,
+        45101
+      ]
+    },
+    "mythic": {
+      "label": "黑区净化",
+      "system_id": 306,
+      "open_condition": [
+        [
+          1,
+          40
+        ]
+      ],
+      "system_hide": 0,
+      "commands": [
+        44007,
+        44009,
+        44019,
+        44021,
+        44023
+      ]
+    },
+    "tower": {
+      "label": "爬塔",
+      "system_id": 307,
+      "open_condition": [
+        [
+          2,
+          1030412,
+          1010412
+        ]
+      ],
+      "system_hide": 0,
+      "commands": [
+        41001
+      ]
+    },
+    "matrix": {
+      "label": "矩阵",
+      "system_id": 311,
+      "open_condition": [
+        [
+          1,
+          45
+        ]
+      ],
+      "system_hide": 0,
+      "commands": [
+        48001,
+        48003
+      ]
+    },
+    "polyhedron": {
+      "label": "多维变量",
+      "system_id": 311,
+      "open_condition": [
+        [
+          1,
+          45
+        ]
+      ],
+      "system_hide": 0,
+      "commands": [
+        18001,
+        11003
+      ]
+    },
+    "warchess": {
+      "label": "因果观测",
+      "system_id": 312,
+      "open_condition": [
+        [
+          2,
+          1030508,
+          1010513
+        ]
+      ],
+      "system_hide": 0,
+      "commands": [
+        49001,
+        49023
+      ]
+    },
+    "abyss": {
+      "label": "深阱残响",
+      "system_id": 2701,
+      "open_condition": [
+        [
+          1,
+          60
+        ]
+      ],
+      "system_hide": 1,
+      "commands": [
+        55001
+      ]
+    },
+    "skin_draw": {
+      "label": "皮肤与场景抽取",
+      "system_id": 2901,
+      "open_condition": [
+        [
+          2,
+          1030107,
+          1010102
+        ]
+      ],
+      "system_hide": 0,
+      "commands": [
+        68151,
+        68155,
+        68161,
+        68185
+      ]
+    },
+    "core_verification": {
+      "label": "核心验证",
+      "system_id": 334,
+      "open_condition": [
+        [
+          1,
+          60
+        ]
+      ],
+      "system_hide": 0,
+      "commands": [
+        75009,
+        89013,
+        89025,
+        89431,
+        89801,
+        89021
+      ]
+    },
+    "mult_heart_demon": {
+      "label": "MultHeartDemon",
+      "system_id": 337,
+      "open_condition": [
+        [
+          1,
+          65
+        ]
+      ],
+      "system_hide": 0,
+      "commands": [
+        75017
+      ]
+    },
+    "hero_trial": {
+      "label": "角色试用",
+      "system_id": 10301,
+      "open_condition": [
+        [
+          1,
+          20
+        ],
+        [
+          2,
+          1030306,
+          1010113
+        ]
+      ],
+      "system_hide": 0,
+      "commands": [
+        11035
+      ]
+    }
+  }
+}

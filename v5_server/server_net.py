@@ -11,6 +11,7 @@ server_net.py — V5 网络层（唯一碰 socket 的模块）
 依赖：transport（帧层）+ core（CORE 分发）。被 main.py 装配。
 """
 import os
+import ipaddress
 import json
 import mimetypes
 import socket
@@ -47,6 +48,7 @@ def set_host_ip(ip):
 
 
 _LATEST_CLIENT_PLATFORM = ["pc"]
+_CLIENT_APP_VERSIONS = {}
 
 
 def get_latest_client_platform() -> str:
@@ -148,6 +150,58 @@ def _resolve_static_web_file(static_web_dir, request_path):
 _online_conns_lock = threading.Lock()
 _online_game_conns = {}  # uid (int) -> set of conn
 
+# A gateway socket only hands the client over to game TCP. Keep it until the
+# matching game handshake succeeds, then close it so the native client can
+# connect to another slot after logout. Key by a unique handoff token as well
+# as peer/slot/UID; two saves may deliberately share the same legacy UID.
+_gateway_handoffs_lock = threading.Lock()
+_gateway_handoffs = {}
+
+
+def _gateway_handoff_key(peer_ip, login_data):
+    if not isinstance(login_data, dict):
+        return None
+    try:
+        peer = ipaddress.ip_address(peer_ip)
+        peer = str(getattr(peer, 'ipv4_mapped', None) or peer)
+        slot = int(login_data.get('server_id', 0))
+        uid = int(login_data.get('user_id', 0))
+        token = str(login_data.get('gstoken') or '')
+        if slot > 0 and uid > 0 and token:
+            return peer, slot, uid, token
+    except (ValueError, TypeError):
+        pass
+    return None
+
+
+def _forget_gateway_handoff(gateway_socket):
+    with _gateway_handoffs_lock:
+        for key in [k for k, value in _gateway_handoffs.items() if value is gateway_socket]:
+            _gateway_handoffs.pop(key)
+
+
+def _register_gateway_handoff(gateway_socket, peer_ip, login_data):
+    key = _gateway_handoff_key(peer_ip, login_data)
+    if key is not None:
+        with _gateway_handoffs_lock:
+            for old_key in [k for k, value in _gateway_handoffs.items() if value is gateway_socket]:
+                _gateway_handoffs.pop(old_key)
+            _gateway_handoffs[key] = gateway_socket
+
+
+def _complete_gateway_handoff(peer_ip, login_data):
+    key = _gateway_handoff_key(peer_ip, login_data)
+    with _gateway_handoffs_lock:
+        gateway_socket = _gateway_handoffs.pop(key, None)
+    if gateway_socket is None:
+        return False
+    try:
+        # Wake the gateway thread's recv; TCPServer owns final socket closure.
+        gateway_socket.shutdown(socket.SHUT_RDWR)
+    except OSError:
+        pass
+    return True
+
 
 def register_game_conn(conn, uid):
     """注册在线游戏 TCP 长连接（支持 uid 动态更新与多连接共存）。"""
@@ -187,7 +241,7 @@ def get_online_uids():
         return list(_online_game_conns.keys())
 
 
-def push_mail_notice(uid):
+def push_mail_notice(uid, expected_db=None):
     """主动向指定 UID 的在线长连接下发 sc_30001（未读红点摘要通知帧）。
     返回成功下发通知的客户端连接数。
     """
@@ -198,6 +252,8 @@ def push_mail_notice(uid):
 
     with _online_conns_lock:
         conns = list(_online_game_conns.get(uid_int, []))
+    if expected_db is not None:
+        conns = [conn for conn in conns if getattr(conn, 'db', None) is expected_db]
     if not conns:
         return 0
 
@@ -238,6 +294,35 @@ def push_mail_notice(uid):
     return pushed_count
 
 
+def push_ai_proactive_message(uid, char_id, message_id, message, expected_db):
+    """Push a persisted greeting only to initialized connections of its owning save."""
+    with _online_conns_lock:
+        conns = [conn for conn in _online_game_conns.get(int(uid), ())
+                 if getattr(conn, 'db', None) is expected_db
+                 and getattr(conn, 'login_ready', False)]
+    character = expected_db.get_ai_character(char_id)
+    if not character:
+        return False
+    delivered = False
+    for conn in conns:
+        try:
+            payload = conn.codec_encode('sc_19039', {'friend_msg_list': [{
+                'chat_base_info': {
+                    'id': int(char_id), 'user_profile_base': {
+                        'nick': str(character['char_name']),
+                        'icon': int(character.get('avatar_icon') or 1084),
+                        'icon_frame': int(character.get('icon_frame') or 2001)},
+                    'type': 1, 'content': message['content'],
+                    'timestamp': int(message['timestamp']), 'msg_id': int(message_id),
+                    'ip_location': str(character.get('ip_location') or '未知'), 'jump_link': ''},
+                'receive_uid': int(uid)}]})
+            if payload and conn.send_push(19039, payload) is True:
+                delivered = True
+        except Exception:
+            _logger_log('[AIHello] 私聊推送失败，保留原消息等待重登补送', 'WARN')
+    return delivered
+
+
 class GameHandler(socketserver.StreamRequestHandler):
     """game TCP 连接处理：收帧 → CORE 分发 → 组帧回发。
     server 属性由 ThreadedServer 装配注入（core/db/generator/codec/replay/material/frame_delay）。"""
@@ -276,8 +361,10 @@ class GameHandler(socketserver.StreamRequestHandler):
                     traffic_tracker.record_bytes(len(raw))
                     self.request.sendall(raw)
                 self.server.core.log(f"[PUSH #{srv}] -> SC_{sc_cmd} | Size: {len(payload)}B | flag={flag}", "INFO")
+                return True
             except Exception as _e:
                 self.server.core.log(f"[PUSH] SC_{sc_cmd} 推送异常: {_e}", "WARN")
+                return False
 
         conn.send_push = _send_push
         register_game_conn(conn, conn.uid)
@@ -331,6 +418,7 @@ class GameHandler(socketserver.StreamRequestHandler):
                     # 登录洪流（10200 触发）——DB 驱动（login_push 表 + generator 动态帧）
                     # 2026-08-16 阶段2：重放系统从功能链路退役，洪流不再读素材文件
                     if cmd == 10200:
+                        conn.login_ready = False
                         import login as _login
                         _login.send_login_flood(
                             self.request, self.server.db, conn.uid,
@@ -341,6 +429,13 @@ class GameHandler(socketserver.StreamRequestHandler):
                             sent_sc_counts[_init_sc] = max(1, sent_sc_counts[_init_sc])
                         # [Boss Directive] 登录洪流下发完毕，广播/注册激活在线体力主动定时器与长连接连接池
                         register_game_conn(conn, conn.uid)
+                        conn.login_ready = True
+                        try:
+                            import ai_proactive_service  # registers GAME_LOGIN_READY subscriber
+                            from event_bus import Events, bus
+                            bus.emit(Events.GAME_LOGIN_READY, conn, conn.uid)
+                        except Exception as _aie:
+                            self.server.core.log(f"[AIHello] 登录主动问候入口异常: {_aie}", "WARN")
                         try:
                             import fatigue_service as _fs
                             _fs.register_active_conn(conn)
@@ -349,6 +444,7 @@ class GameHandler(socketserver.StreamRequestHandler):
                         continue
                     # 登录验证帧（10042→10043）——原生动态生成
                     if cmd == 10042:
+                        dec_up = None
                         try:
                             dec_up = self.server.codec_decode(up["payload"], "cs_10042")
                             if isinstance(dec_up, dict) and dec_up.get("user_id"):
@@ -371,6 +467,8 @@ class GameHandler(socketserver.StreamRequestHandler):
                         out = pack_down(10043, payload, up["index"], up["server_idx"] + 1)
                         traffic_tracker.record_bytes(len(out))
                         self.request.sendall(out)
+                        if _complete_gateway_handoff(self.client_address[0], dec_up):
+                            self.server.core.log("[GAME] 登录交接完成，回收对应网关连接", "INFO")
                         self.server.core.log(f"[GAME] cs_10042 → sc_10043（原生动态生成，uid={conn.uid}）", "INFO")
                         continue
                     # CORE 分发
@@ -413,6 +511,7 @@ class GameHandler(socketserver.StreamRequestHandler):
         except (ConnectionResetError, BrokenPipeError, OSError):
             pass
         finally:
+            conn.login_ready = False
             try:
                 unregister_game_conn(conn, conn.uid)
             except Exception:
@@ -450,6 +549,7 @@ class GatewayHandler(socketserver.StreamRequestHandler):
         self.server.core.log(f"[GW:{self.server.gw_port}] [{peer}] 连接建立", "INFO")
         gw_resp_map = self.server.material.get("gw_resp_map") or {} if self.server.material else {}
         fp = FrameParser("up")
+        gateway_login_ok = False
         try:
             while True:
                 data = self.request.recv(65536)
@@ -467,25 +567,155 @@ class GatewayHandler(socketserver.StreamRequestHandler):
                         continue
                     cmd = up["cmd"]
                     out = b""
+                    close_after_reply = False
                     if cmd == 10038:
-                        # 原生下发 SC_10039：动态判断客户端来源（本机 127.0.0.1 或 局域网 IP）
+                        # Control slots and delete-mode selections only use
+                        # the gateway. They must never continue to game login.
+                        gateway_login_ok = False
+                        close_after_reply = True
+                        # 动态判断客户端来源（本机 127.0.0.1 或 局域网 IP）
                         sock_ip = self.request.getsockname()[0] if hasattr(self.request, "getsockname") else "127.0.0.1"
                         peer_ip = self.client_address[0] if hasattr(self, "client_address") else "127.0.0.1"
                         lan_ip = getattr(self.server, "host_ip", None) or _HOST_IP[0] or get_host_ip()
                         game_ip = "127.0.0.1" if peer_ip in ("127.0.0.1", "::1") else lan_ip
-                        d = {
-                            "result": 0,
-                            "server_id": 1,
-                            "ip": game_ip,
-                            "port": self.server.game_port or 8105,
-                            "user_id": _gen.DEFAULT_UID,
-                            "gstoken": "45f95a4402b51fddcd17b81dd3edfe06",
-                            "timestamp": int(time.time()),
-                        }
-                        payload = self.server.codec_encode("sc_10039", d)
-                        out = pack_down(10039, payload, up["index"], up["server_idx"] + 1)
-                        self.server.core.log(f"[GW] cs_10038 → sc_10039（下发目标 {game_ip}:{self.server.game_port or 8105}，客户端 {peer_ip}）", "INFO")
+
+                        from save_slot_manager import (
+                            get_slot_manager, port_to_slot_id, switch_active_database,
+                            STATE_NORMAL, STATE_DELETE_MODE, STATE_CREATE_MODE, STATE_TIMEOUT_SECONDS,
+                            SLOT_INDEX_NEW, SLOT_INDEX_DELETE_TOGGLE
+                        )
+                        base_gw = getattr(self.server, "base_gw_port", 8102)
+                        game_p = self.server.game_port or 8105
+                        slot_id = port_to_slot_id(self.server.gw_port, base_port=base_gw, game_port=game_p)
+                        slot_mgr = get_slot_manager()
+                        slot_mgr.configure_host(lan_ip)
+                        with slot_mgr.gateway_action(peer_ip):
+                            sess_state = slot_mgr.get_session_state(peer_ip)
+
+                            if sess_state == STATE_CREATE_MODE:
+                                if slot_id == SLOT_INDEX_NEW:
+                                    _, msg = slot_mgr.toggle_create_mode(peer_ip)
+                                else:
+                                    _, msg = slot_mgr.create_preset_save(slot_id, peer_ip)
+                                payload = self.server.codec_encode('sc_10039', {
+                                    'result': 1005, 'ban_reason': msg,
+                                    'unblocking_time': int(time.time()) + int(STATE_TIMEOUT_SECONDS),
+                                    'user_id': _gen.DEFAULT_UID, 'timestamp': int(time.time()),
+                                })
+                                out = pack_down(10039, payload, up['index'], up['server_idx'] + 1)
+                                self.server.core.log(f'[GW] 新建菜单 slot={slot_id}: {msg}', 'INFO')
+
+                            elif slot_id == SLOT_INDEX_NEW:
+                                _, msg = slot_mgr.toggle_create_mode(peer_ip)
+                                d = {
+                                    "result": 1005,  # ACCOUNT_BAN 原生弹窗
+                                    "ban_reason": msg,
+                                    "unblocking_time": int(time.time()) + int(STATE_TIMEOUT_SECONDS),
+                                    "user_id": _gen.DEFAULT_UID,
+                                    "timestamp": int(time.time()),
+                                }
+                                payload = self.server.codec_encode("sc_10039", d)
+                                out = pack_down(10039, payload, up["index"], up["server_idx"] + 1)
+                                self.server.core.log(f"[GW] Slot {slot_id} [新建存档菜单] -> 客户端 {peer_ip}", "INFO")
+
+                            elif slot_id == SLOT_INDEX_DELETE_TOGGLE:
+                                # Slot 2: 删除模式切换跳板
+                                new_state, msg = slot_mgr.toggle_delete_mode(peer_ip)
+                                d = {
+                                    "result": 1005,  # ACCOUNT_BAN 原生弹窗提示
+                                    "ban_reason": msg,
+                                    "unblocking_time": int(time.time()) + int(STATE_TIMEOUT_SECONDS),
+                                    "user_id": _gen.DEFAULT_UID,
+                                    "timestamp": int(time.time()),
+                                }
+                                payload = self.server.codec_encode("sc_10039", d)
+                                out = pack_down(10039, payload, up["index"], up["server_idx"] + 1)
+                                self.server.core.log(f"[GW] Slot {slot_id} [状态机切换 -> {new_state}] -> 客户端 {peer_ip}", "INFO")
+
+                            else:
+                                # Slot 3..32: 真实存档业务槽
+                                if sess_state == STATE_DELETE_MODE:
+                                    # 删除模式下点击存档：执行安全软删除
+                                    success, msg = slot_mgr.delete_slot_save(slot_id, peer_ip)
+                                    d = {
+                                        "result": 1005,
+                                        "ban_reason": msg,
+                                        "unblocking_time": int(time.time()) + int(STATE_TIMEOUT_SECONDS),
+                                        "user_id": _gen.DEFAULT_UID,
+                                        "timestamp": int(time.time()),
+                                    }
+                                    payload = self.server.codec_encode("sc_10039", d)
+                                    out = pack_down(10039, payload, up["index"], up["server_idx"] + 1)
+                                    self.server.core.log(f"[GW] Slot {slot_id} [执行删除] -> {msg} 客户端 {peer_ip}", "INFO")
+                                else:
+                                    # 正常游玩模式：检查并挂载存档进服
+                                    mapping = slot_mgr.get_slot_mapping()
+                                    slot_info = mapping.get(slot_id)
+                                    if not slot_info or not slot_info.db_path or not os.path.isfile(slot_info.db_path):
+                                        d = {
+                                            "result": 1005,
+                                            "ban_reason": "❌ 所选存档不存在或已被移除！请重新打开列表。",
+                                            "unblocking_time": int(time.time()) + int(STATE_TIMEOUT_SECONDS),
+                                            "user_id": _gen.DEFAULT_UID,
+                                            "timestamp": int(time.time()),
+                                        }
+                                        payload = self.server.codec_encode("sc_10039", d)
+                                        out = pack_down(10039, payload, up["index"], up["server_idx"] + 1)
+                                        self.server.core.log(f"[GW] Slot {slot_id} [存档不存在] 客户端 {peer_ip}", "WARN")
+                                    else:
+                                        # 动态热切换数据库
+                                        active_db = slot_mgr.get_active_db()
+                                        if not (active_db and os.path.exists(active_db) and os.path.samefile(slot_info.db_path, active_db)):
+                                            game_srv = getattr(self.server, "game_server", None)
+                                            ok, switch_msg = switch_active_database(slot_info.db_path, core=self.server.core, game_server=game_srv)
+                                            if ok:
+                                                # 同步更新 gateway pool 各实例的 db 属性
+                                                pool = getattr(self.server, "pool", None)
+                                                if pool:
+                                                    pool.db = self.server.core.db
+                                                self.server.db = self.server.core.db
+                                                self.server.core.log(f"[GW] 热切换数据库成功: {slot_info.save_name} ({slot_info.db_path})", "INFO")
+                                            else:
+                                                self.server.core.log(f"[GW] 热切换数据库失败: {switch_msg}", "ERROR")
+                                                notice = self.server.codec_encode('sc_10039', {
+                                                    'result': 1005,
+                                                    'ban_reason': '存档加载失败，请重新选择。\n' + switch_msg,
+                                                    'unblocking_time': int(time.time()) + int(STATE_TIMEOUT_SECONDS),
+                                                    'timestamp': int(time.time()),
+                                                })
+                                                failure = pack_down(10039, notice, up['index'], up['server_idx'] + 1)
+                                                traffic_tracker.record_bytes(len(failure))
+                                                self.request.sendall(failure)
+                                                return
+
+                                        target_uid = slot_info.uid or _gen.DEFAULT_UID
+                                        d = {
+                                            "result": 0,
+                                            "server_id": slot_id,
+                                            "ip": game_ip,
+                                            "port": self.server.game_port or 8105,
+                                            "user_id": target_uid,
+                                            "gstoken": uuid.uuid4().hex,
+                                            "timestamp": int(time.time()),
+                                        }
+                                        from new_player_service import gateway_new_player
+                                        d['is_new_player'] = 1 if gateway_new_player(self.server.db, target_uid) else 0
+                                        payload = self.server.codec_encode("sc_10039", d)
+                                        out = pack_down(10039, payload, up["index"], up["server_idx"] + 1)
+                                        _register_gateway_handoff(self.request, peer_ip, d)
+                                        gateway_login_ok = True
+                                        close_after_reply = False
+                                        self.server.core.log(
+                                            f"[GW] 选服登录: Slot {slot_id} ({slot_info.save_name}) -> 下发 {game_ip}:{self.server.game_port or 8105}，UID: {target_uid}",
+                                            "INFO"
+                                        )
                     elif cmd == 10042:
+                        if not gateway_login_ok:
+                            out = pack_down(10043, self.server.codec_encode("sc_10043", {"result": 2}),
+                                            up["index"], up["server_idx"] + 1)
+                            traffic_tracker.record_bytes(len(out))
+                            self.request.sendall(out)
+                            return
                         # 原生下发 SC_10043（登录验证）
                         d = {
                             "result": 0,
@@ -513,6 +743,10 @@ class GatewayHandler(socketserver.StreamRequestHandler):
                     if out:
                         traffic_tracker.record_bytes(len(out))
                         self.request.sendall(out)
+                        if close_after_reply:
+                            # Returning hands the socket back to TCPServer,
+                            # which finishes this request and closes it.
+                            return
         except (ConnectionResetError, BrokenPipeError):
             pass
         except Exception:
@@ -527,23 +761,95 @@ class GatewayHandler(socketserver.StreamRequestHandler):
                 except OSError:
                     pass
         finally:
+            _forget_gateway_handoff(self.request)
             self.server.core.log(f"[GW:{self.server.gw_port}] [{peer}] 连接关闭", "INFO")
 
 
+class GatewayPool:
+    """Gateway 端口池：监听 8102..8134 (跳过 8105)，映射 32 个区服槽位"""
+
+    def __init__(self, servers, core=None, game_port=8105, game_server=None):
+        self.servers = servers
+        self.core = core
+        self._game_port = game_port
+        self.game_server = game_server
+        self._threads = []
+
+    @property
+    def game_port(self):
+        return self._game_port
+
+    @game_port.setter
+    def game_port(self, val):
+        self._game_port = val
+        for s in self.servers:
+            s.game_port = val
+
+    @property
+    def db(self):
+        return self.servers[0].db if self.servers else None
+
+    @db.setter
+    def db(self, val):
+        for s in self.servers:
+            s.db = val
+
+    @property
+    def gw_port(self):
+        return self.servers[0].gw_port if self.servers else 8102
+
+    def serve_forever(self):
+        for s in self.servers[1:]:
+            t = threading.Thread(target=s.serve_forever, daemon=True)
+            t.start()
+            self._threads.append(t)
+        if self.servers:
+            self.servers[0].serve_forever()
+
+    def shutdown(self):
+        for s in self.servers:
+            try:
+                s.shutdown()
+            except Exception:
+                pass
+
+    def server_close(self):
+        for s in self.servers:
+            try:
+                s.server_close()
+            except Exception:
+                pass
+
+
 def start_gateway_server(port, core, db, generator, codec_encode, codec_decode,
-                         material=None, host_ip=None):
-    """启动 gateway TCP 服务器（登录握手）。"""
-    srv = ThreadedServer(("0.0.0.0", port), GatewayHandler)
-    srv.core = core
-    srv.db = db
-    srv.generator = generator
-    srv.codec_encode = codec_encode
-    srv.codec_decode = codec_decode
-    srv.material = material
-    srv.gw_port = port
-    srv.host_ip = host_ip or _HOST_IP[0]
-    srv.game_port = None  # main 装配时设为 game 端口
-    return srv
+                         material=None, host_ip=None, game_port=8105, game_server=None):
+    """启动 gateway TCP 服务器池（支持 32 个区服槽位对应端口）。"""
+    from save_slot_manager import TOTAL_SLOTS, slot_id_to_port
+    servers = []
+    for slot_id in range(1, TOTAL_SLOTS + 1):
+        p = slot_id_to_port(slot_id, base_port=port, game_port=game_port)
+        try:
+            srv = ThreadedServer(("0.0.0.0", p), GatewayHandler)
+            srv.core = core
+            srv.db = db
+            srv.generator = generator
+            srv.codec_encode = codec_encode
+            srv.codec_decode = codec_decode
+            srv.material = material
+            srv.gw_port = p
+            srv.base_gw_port = port
+            srv.host_ip = host_ip or _HOST_IP[0]
+            srv.game_port = game_port
+            srv.game_server = game_server
+            servers.append(srv)
+        except Exception as e:
+            if core:
+                core.log(f"[GW_POOL] 槽位 {slot_id} 绑定端口 {p} 异常: {e}", "WARN")
+
+    pool = GatewayPool(servers, core=core, game_port=game_port, game_server=game_server)
+    for s in servers:
+        s.pool = pool
+    return pool
 
 
 # ---------------- HTTPS 层（Flask：原生 SDK 服务 + 直通登录 + 区服列表） ----------------
@@ -561,6 +867,8 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
     from flask import Flask, request, jsonify, Response, send_file, redirect
 
     app = Flask("v5_https")
+    from admin_access import install_admin_guard
+    install_admin_guard(app)
     idx = material.get("http_index") or {} if (material and isinstance(material, dict)) else {}
     lan_ip = host_ip or _HOST_IP[0] or get_host_ip()
 
@@ -1114,6 +1422,12 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
         # 13. 区服与客户端基础配置接口：gateway/get (action=base 或 action=server)
         if "gateway/get" in path or path.endswith("/gateway/get") or path.endswith("/gateway/get/"):
             action = request.args.get("action", "")
+            req_ver = request.args.get("version")
+            c_ip = (request.headers.get("X-Real-IP") or
+                    request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or
+                    request.remote_addr or "")
+            if req_ver and c_ip:
+                _CLIENT_APP_VERSIONS[c_ip] = str(req_ver).strip()
             if action == "base" or "action=base" in qs:
                 return jsonify({
                     "errorCode": "0",
@@ -1133,61 +1447,39 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
 
             # 默认返回区服列表 (action=server)
             mix_id = request.args.get("mixId", str(_gen.DEFAULT_UID))
-            gw_ip = "127.0.0.1" if request.remote_addr in ("127.0.0.1", "::1") else lan_ip
+            client_ip = (request.headers.get("X-Real-IP") or
+                         request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or
+                         request.remote_addr or "")
+            if lan_ip and lan_ip not in ("127.0.0.1", "::1", "localhost"):
+                gw_ip = lan_ip
+            else:
+                gw_ip = "127.0.0.1" if client_ip in ("127.0.0.1", "::1") else lan_ip
 
-            # 读取动态区服配置（支持自定义服名与多区服管理）
-            zones_cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "server_zones.json")
-            zones_list = []
-            if os.path.isfile(zones_cfg_path):
-                try:
-                    with open(zones_cfg_path, "r", encoding="utf-8") as f:
-                        z_data = json.load(f)
-                        zones_list = z_data.get("zones", [])
-                except Exception:
-                    zones_list = []
+            # 动态生成多存档自适应区服列表 (Slot 1..32)
+            from save_slot_manager import get_slot_manager
+            slot_mgr = get_slot_manager()
+            slot_mgr.base_port = gw_port
+            slot_mgr.game_port = game_port
+            slot_mgr.configure_host(gw_ip)
+            refresh_started = time.monotonic()
+            refresh_result = slot_mgr.wait_for_gateway_refresh(client_ip)
+            core.log(f"[SDK] 区服刷新 {refresh_result}, "
+                     f"等待 {(time.monotonic() - refresh_started) * 1000:.1f}ms", "INFO")
+            if refresh_result == 'timeout':
+                # Do not return a stale successful list for a stuck action.
+                # Do not take the registry lock again after this deadline.
+                return Response("Save operation in progress; retry later", status=503,
+                                mimetype="text/plain", headers={"Retry-After": "1"})
 
-            if not zones_list:
-                zones_list = [
-                    {"serverId": "1", "serverName": "艾因索菲", "env": "prod", "newServerFlag": 1, "maintain": False, "maintainReason": ""},
-                    {"serverId": "2", "serverName": "蒂卡拉", "env": "prod", "newServerFlag": 0, "maintain": False, "maintainReason": ""},
-                ]
-
-            server_data = []
-            for z in zones_list:
-                s_id = str(z.get("serverId", "1"))
-                s_name = str(z.get("serverName") or ("艾因索菲" if s_id == "1" else "蒂卡拉"))
-                s_env = str(z.get("env") or "prod")
-                s_new = int(z.get("newServerFlag", 1 if s_id == "1" else 0))
-                s_maint = bool(z.get("maintain", False))
-                s_reason = str(z.get("maintainReason", ""))
-                server_data.append({
-                    "serverId": s_id,
-                    "serverName": s_name,
-                    "env": s_env,
-                    "ip": gw_ip,
-                    "port": gw_port,
-                    "newServerFlag": s_new,
-                    "maintain": s_maint,
-                    "maintainReason": s_reason,
-                    "config": [
-                        {"key": "OFFICIAL_URL", "value": "https://skzy.ys4fun.com/m/"},
-                        {"key": "USE_SDK_HOT_FIX", "value": "true"},
-                        {"key": "REST_URL", "value": "https://prod-api-activity.ys4fun.com/skzy-activity"},
-                        {"key": "PC_FEEDBACK", "value": "https://open.ys4fun.com/web/agreement.html?tab=support"}
-                    ],
-                    "gameUserInfoList": [
-                        {
-                            "uid": str(_gen.DEFAULT_UID), "currentLevel": 93,
-                            "nickName": "Admin", "lastLoginTime": "2026-08-28 12:00:00",
-                            "mixId": str(mix_id or _gen.DEFAULT_UID)
-                        }
-                    ]
-                })
-
-            return jsonify({
+            server_data = slot_mgr.build_zones_response(
+                client_ip=client_ip, host_ip=gw_ip, game_port=game_port
+            )
+            response = jsonify({
                 "errorCode": "0",
                 "data": server_data
             })
+            response.headers['Cache-Control'] = 'no-store'
+            return response
 
 
         # 4.1 证书一键下载（供 iOS / Android 设备 Safari 访问 http://<HOST_IP>/cert 一键安装根证书）
@@ -1551,8 +1843,83 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             cur_ver_name = ver_cfg["version_name"]
             chosen_assethash = res_version_manager.get_assethash(platform=cur_plat)
 
-            if is_ios or is_android:
-                print(f"[SDK] 移动端 ({cur_plat}) 版本检查响应 -> 下发配置 (version={cur_ver}, assethash={chosen_assethash})", flush=True)
+            if is_ios:
+                # 动态自适应 iOS 307 与 308（兼容官方 App Store 308 构建）
+                c_ip = (request.headers.get("X-Real-IP") or
+                        request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or
+                        request.remote_addr or "")
+                detected_app_ver = (
+                    request.args.get("appVersion")
+                    or request.form.get("appVersion")
+                    or req_json.get("appVersion")
+                    or request.args.get("version")
+                    or request.form.get("version")
+                    or req_json.get("version")
+                    or _CLIENT_APP_VERSIONS.get(c_ip)
+                    or "307"
+                )
+                detected_app_ver = str(detected_app_ver).strip()
+
+                now_ms = int(time.time() * 1000)
+                cdn_url = "https://download-eo.ys4fun.com/ios/resources/;https://download.ys4fun.com/ios/resources/"
+
+                # 331 构建条目（突破 App Store 321 内置基线）
+                hash_308_331 = "assethash_308_331_a1b758805b37e09ab0643ab909c95f2d.bytes"
+                hash_307_331 = "assethash_307_331_df5de71cf7e15f54e7baca0338ecc77b.bytes"
+                entry_308_331 = {
+                    "createDate": now_ms, "modifyDate": now_ms, "sortWeight": 0, "type": "noInstall",
+                    "version": "331", "versionName": "v5.3.1", "matchedAppVersion": "308",
+                    "forceUpdate": False, "fileSize": 0, "disDate": now_ms,
+                    "downloadUrl": cdn_url, "extraData": json.dumps({"assethash": hash_308_331}),
+                    "platformType": "ios", "enableWhiteList": False, "enableFullPub": True, "enableGrayPub": True,
+                    "assethash": hash_308_331, "batchId": 0
+                }
+                entry_307_331 = {
+                    "createDate": now_ms, "modifyDate": now_ms, "sortWeight": 0, "type": "noInstall",
+                    "version": "331", "versionName": "v5.3.1", "matchedAppVersion": "307",
+                    "forceUpdate": False, "fileSize": 0, "disDate": now_ms,
+                    "downloadUrl": cdn_url, "extraData": json.dumps({"assethash": hash_307_331}),
+                    "platformType": "ios", "enableWhiteList": False, "enableFullPub": True, "enableGrayPub": True,
+                    "assethash": hash_307_331, "batchId": 0
+                }
+
+                # 229 基线条目（主力机 iPhone 16 Pro 307 保障）
+                hash_307_229 = "assethash_307_229_29e8f745e8ec6032937a65a0bfd3a9cf.bytes"
+                entry_307_229 = {
+                    "createDate": now_ms, "modifyDate": now_ms, "sortWeight": 0, "type": "noInstall",
+                    "version": cur_ver, "versionName": cur_ver_name, "matchedAppVersion": "307",
+                    "forceUpdate": False, "fileSize": 0, "disDate": now_ms,
+                    "downloadUrl": cdn_url, "extraData": json.dumps({"assethash": hash_307_229}),
+                    "platformType": "ios", "enableWhiteList": False, "enableFullPub": True, "enableGrayPub": True,
+                    "assethash": hash_307_229, "batchId": 0
+                }
+
+                install_entry = {
+                    "createDate": now_ms, "modifyDate": now_ms, "sortWeight": 0, "type": "install",
+                    "version": "308", "versionName": "308", "forceUpdate": False, "fileSize": 0,
+                    "disDate": 1751385600000, "downloadUrl": "https://apps.apple.com/cn/app/id1507863649",
+                    "platformType": "ios", "enableWhiteList": False, "enableFullPub": True, "enableGrayPub": False,
+                    "batchId": 9
+                }
+
+                if detected_app_ver == "308":
+                    no_install_list = [entry_308_331, entry_307_331, entry_307_229]
+                    chosen_hash = hash_308_331
+                    chosen_ver = "331"
+                else:
+                    no_install_list = [entry_307_229, entry_308_331, entry_307_331]
+                    chosen_hash = hash_307_229
+                    chosen_ver = cur_ver
+
+                print(f"[SDK] 移动端 (ios) 版本检查响应 -> 下发配置 (client_app_ver={detected_app_ver}, res_ver={chosen_ver}, assethash={chosen_hash})", flush=True)
+
+                return jsonify({
+                    "errorCode": "0",
+                    "data": no_install_list + [install_entry]
+                })
+
+            if is_android:
+                print(f"[SDK] 移动端 (android) 版本检查响应 -> 下发配置 (version={cur_ver}, assethash={chosen_assethash})", flush=True)
                 return jsonify({
                     "errorCode": "0",
                     "data": [
@@ -1567,9 +1934,9 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                             "forceUpdate": False,
                             "fileSize": 0,
                             "disDate": int(time.time() * 1000),
-                            "downloadUrl": f"https://download-eo.ys4fun.com/{cur_plat}/resources/;https://download.ys4fun.com/{cur_plat}/resources/",
+                            "downloadUrl": f"https://download-eo.ys4fun.com/android/resources/;https://download.ys4fun.com/android/resources/",
                             "extraData": json.dumps({"assethash": chosen_assethash}),
-                            "platformType": cur_plat,
+                            "platformType": "android",
                             "enableWhiteList": False,
                             "enableFullPub": True,
                             "enableGrayPub": True,
@@ -1586,9 +1953,9 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                             "forceUpdate": False,
                             "fileSize": 0,
                             "disDate": int(time.time() * 1000),
-                            "downloadUrl": f"https://download-eo.ys4fun.com/{cur_plat}/resources/",
+                            "downloadUrl": "https://download-eo.ys4fun.com/android/resources/",
                             "extraData": "{\"videoMd5\":\"80ed3ea7f7a1c5314b86c33a0378f65c\",\"videoSize\":\"83636032\",\"videoName\":\"5.2_PV\",\"videoUrl\":\"https://download.ys4fun.com/video/5.2_PV.usm\"}",
-                            "platformType": cur_plat,
+                            "platformType": "android",
                             "enableWhiteList": False,
                             "enableFullPub": True,
                             "enableGrayPub": False,
@@ -1666,7 +2033,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
     return app
 
 
-def start_https(app, port, cert_file=None, key_file=None):
+def start_https(app, port, cert_file=None, key_file=None, *, http_port=80, bind_ip="0.0.0.0"):
     """启动 Flask HTTPS（SDK 层）。端口 443 需管理员。
     证书：默认用 v5 目录的 sdk_cert.pem/sdk_key.pem（客户端需信任该证书）。"""
     cert_file = cert_file or os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdk_cert.pem")
@@ -1702,19 +2069,20 @@ def start_https(app, port, cert_file=None, key_file=None):
     # 同时在后台启动 HTTP:80 监听，专供 C# OSS SDK 免证书免 DNS 极速直传
     def _start_http():
         try:
-            srv_http = make_server("0.0.0.0", 80, app, request_handler=_FilteredWSGIRequestHandler, threaded=True)
+            srv_http = make_server(bind_ip, http_port, app, request_handler=_FilteredWSGIRequestHandler, threaded=True)
             try:
                 srv_http.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 2 * 1024 * 1024)
             except Exception:
                 pass
             srv_http.serve_forever()
         except Exception as e:
-            print(f"[V5] HTTP:80 监听跳过: {e}")
+            print(f"[V5] HTTP:{http_port} 监听跳过: {e}")
 
-    threading.Thread(target=_start_http, daemon=True).start()
+    if http_port:
+        threading.Thread(target=_start_http, daemon=True).start()
 
     try:
-        srv_https = make_server("0.0.0.0", port, app, request_handler=_FilteredWSGIRequestHandler, ssl_context=ssl_ctx, threaded=True)
+        srv_https = make_server(bind_ip, port, app, request_handler=_FilteredWSGIRequestHandler, ssl_context=ssl_ctx, threaded=True)
         try:
             srv_https.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 2 * 1024 * 1024)
         except Exception:

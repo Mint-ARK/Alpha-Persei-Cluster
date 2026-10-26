@@ -24,14 +24,15 @@ def _get_user_level_cfg():
     global _USER_LEVEL_SETTINGS_CACHE
     if _USER_LEVEL_SETTINGS_CACHE is None:
         p = os.path.join(_DIR, "user_level_setting.json")
-        if os.path.exists(p):
-            try:
-                with open(p, "r", encoding="utf-8") as f:
-                    _USER_LEVEL_SETTINGS_CACHE = {int(k): int(v) for k, v in json.load(f).items()}
-            except Exception:
-                _USER_LEVEL_SETTINGS_CACHE = {}
-        else:
-            _USER_LEVEL_SETTINGS_CACHE = {}
+        with open(p, "r", encoding="utf-8-sig") as f:
+            raw = json.load(f)
+        cfg = {int(k): v for k, v in raw.items()}
+        if (not cfg or len(cfg) != len(raw)
+                or set(cfg) != set(range(1, max(cfg) + 1))
+                or any(type(v) is not int or v < 0 for v in cfg.values())
+                or any(cfg[level] == 0 for level in range(1, max(cfg)))):
+            raise ValueError("玩家经验曲线配置无效")
+        _USER_LEVEL_SETTINGS_CACHE = cfg
     return _USER_LEVEL_SETTINGS_CACHE
 
 
@@ -149,7 +150,7 @@ COSMETIC_KIND_MAP = {
     18: "sticker_bg",
     22: "title",
     23: "card_bg",
-    25: "home_bg",
+    25: "sticker_fg",
     26: "bubble",
     28: "portrait",
 }
@@ -158,15 +159,27 @@ COSMETIC_KIND_MAP = {
 class InventoryService:
     """统一道具与资产管理服务单例/门面"""
 
+    @staticmethod
+    def rewards_after_overflow(items, summary):
+        """Subtract each converted source once, even when it yields two currencies."""
+        merged = {}
+        for iid, count in items:
+            merged[iid] = merged.get(iid, 0) + count
+        for iid, count in summary.get('overflow_consumed', {}).items():
+            merged[iid] = merged.get(iid, 0) - count
+        for row in summary.get('overflow_converted', []):
+            iid = row['target_id']
+            merged[iid] = merged.get(iid, 0) + row['target_num']
+        return [(iid, count) for iid, count in merged.items() if count > 0]
+
     @classmethod
     def calc_player_level(cls, total_exp):
-        """根据 user_level_setting.json 累加总经验计算玩家真实等级。"""
+        """Match LvTools.CheckUserExp using total experience and unshifted Lua ids."""
         cfg = _get_user_level_cfg()
-        if not cfg:
-            return 92
         lv = 1
         rem = int(total_exp or 0)
-        while lv in cfg and rem >= cfg[lv]:
+        # Lua stops when the next level is absent or has a zero-exp sentinel.
+        while lv + 1 in cfg and cfg[lv + 1] != 0 and rem >= cfg[lv]:
             rem -= cfg[lv]
             lv += 1
         return lv
@@ -317,6 +330,34 @@ class InventoryService:
         return actual_add, surplus, exchange_grants
 
     @classmethod
+    def ensure_cosmetic_owned(cls, ctx, uid, item_id, *, silent=False, source=""):
+        """Restore an existing cosmetic's ownership or grant one missing asset.
+
+        A retained material unit proves prior acquisition; adopting it must not
+        issue another copy or run duplicate-item conversion.
+        """
+        db = getattr(ctx, "db", ctx)
+        iid = int(item_id)
+        if cls.classify_item(db, iid) != ItemType.COSMETIC:
+            raise ValueError(f"非装扮道具: {iid}")
+        catalog = db.query("SELECT type FROM item_catalog WHERE id=?", (iid,))
+        kind = COSMETIC_KIND_MAP.get(int(catalog[0]["type"])) if catalog else None
+        if not kind:
+            raise ValueError(f"装扮类型无效: {iid}")
+        owned = db.query("SELECT obtained FROM player_card WHERE uid=? AND kind=? AND item_id=?", (uid, kind, iid))
+        if owned and int(owned[0]["obtained"] or 0) == 1:
+            return {"material": {}}
+        material = db.query("SELECT num FROM material WHERE uid=? AND id=?", (uid, iid))
+        if material and int(material[0]["num"] or 0) > 0:
+            db.execute(
+                "INSERT INTO player_card (uid,kind,item_id,name,obtained) VALUES (?,?,?,'',1) "
+                "ON CONFLICT(uid,kind,item_id) DO UPDATE SET obtained=1", (uid, kind, iid))
+            if hasattr(ctx, "touched_items") and ctx.touched_items is not None:
+                ctx.touched_items.add(iid)
+            return {"material": {}}
+        return cls.grant_item(ctx, uid, iid, 1, silent=silent, source=source)
+
+    @classmethod
     def grant_item(cls, ctx, uid, item_id, count=1, silent=False, source="", **kwargs):
         """单道具发放统一入口"""
         return cls.grant_items(ctx, uid, [(item_id, count)], silent=silent, source=source)
@@ -351,6 +392,7 @@ class InventoryService:
             "skins": [],
             "scenes": [],
             "overflow_converted": [],
+            "overflow_consumed": {},
         }
 
         # 待触发的后置事件列表（确保 DB 操作完全成功后才 emit）
@@ -374,9 +416,15 @@ class InventoryService:
                 if iid == 12:  # 管理员/玩家账号经验 (CURRENCY_TYPE_USER_EXP)
                     u_rows = db.query("SELECT exp, level FROM users WHERE uid=?", (uid,))
                     old_exp = int(u_rows[0]["exp"] or 0) if u_rows else 0
-                    old_lv = int(u_rows[0]["level"] or 1) if u_rows else 1
+                    # Reward only thresholds crossed by this grant. Correcting a
+                    # stale stored level must not replay historical stamina gifts.
+                    old_lv = cls.calc_player_level(old_exp)
                     new_exp = old_exp + count
                     new_lv = cls.calc_player_level(new_exp)
+                    # Resolve the full reward before writing experience or balances.
+                    if new_lv > old_lv:
+                        import fatigue_service as _fs
+                        stamina_gain = _fs.get_level_up_fatigue_reward(old_lv, new_lv)
                     db.execute("UPDATE users SET exp=?, level=? WHERE uid=?", (new_exp, new_lv, uid))
                     # 保持 currency 表中的 id=12 严格等于实际 total_exp (用于 sc_15009/sc_17023 全量与差量)
                     db.execute(
@@ -384,10 +432,8 @@ class InventoryService:
                         "ON CONFLICT(uid, id) DO UPDATE SET num = excluded.num, update_ts = excluded.update_ts",
                         (uid, new_exp, now),
                     )
-                    # 若升级，按各级上限累加赠送体力、时间戳清零进入静止态，并广播升级事件
+                    # 升级奖励与体力上限独立；跨级累加每个新等级的配置奖励。
                     if new_lv > old_lv:
-                        import fatigue_service as _fs
-                        stamina_gain = sum(_fs.get_max_fatigue_by_level(lvl) for lvl in range(old_lv + 1, new_lv + 1))
                         _fs.on_fatigue_grant(db, uid, stamina_gain, now_ts=now)
                         summary["currency"][4] = summary["currency"].get(4, 0) + stamina_gain
                         if hasattr(ctx, "touched_items") and ctx.touched_items is not None:
@@ -479,6 +525,7 @@ class InventoryService:
                     if surplus > 0:
                         logger.info(f"[InventoryService] 材料/表情 {iid} 触发限额 (拥有={cur_num}, 请求={count}), 溢出={surplus}")
                         if exch_grants:
+                            summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                             cls.grant_items(ctx, uid, exch_grants, silent=True, source=f"{source}_overflow")
                             for eid, enum in exch_grants:
                                 summary["overflow_converted"].append({"src_id": iid, "surplus": surplus, "target_id": eid, "target_num": enum})
@@ -519,7 +566,13 @@ class InventoryService:
                     is_new, is_piece, hid, pieces = cls._grant_single_hero(ctx, db, uid, iid, now)
                     if is_new:
                         summary["hero_unlocked"].append(hid)
-                        pending_events.append((event_bus.Events.HERO_UNLOCK, {"hero_id": hid}))
+                        from peripheral_service import PeripheralService
+                        from profile_rules import skin_portrait_config
+                        portrait_id = PeripheralService(db).unlock_acquisition_portrait(uid, hid, ctx)
+                        info = skin_portrait_config().get(str(hid), {})
+                        pending_events.append((event_bus.Events.HERO_UNLOCK, {
+                            'hero_id': hid, 'race': int(info.get('race') or 0),
+                            'portrait_id': portrait_id, 'source': source}))
                     elif is_piece:
                         summary["hero_converted"].append({"hero_id": hid, "pieces": pieces})
                         summary["hero_piece"][hid] = summary["hero_piece"].get(hid, 0) + pieces
@@ -560,10 +613,18 @@ class InventoryService:
                             (uid, iid, now, now),
                         )
                     summary["skins"].append(iid)
+                    from peripheral_service import PeripheralService
+                    from profile_rules import skin_portrait_config
+                    portrait_id = PeripheralService(db).unlock_acquisition_portrait(uid, iid, ctx)
+                    info = skin_portrait_config().get(str(iid), {})
+                    pending_events.append((event_bus.Events.SKIN_UNLOCK, {
+                        'skin_id': iid, 'hero_id': int(info.get('hero_id') or 0),
+                        'portrait_id': portrait_id, 'source': source}))
 
                 if surplus > 0:
                     logger.info(f"[InventoryService] 皮肤 {iid} 触发保护性限额 (拥有={cur_num}, 请求={count}), 溢出={surplus}")
                     if exch_grants:
+                        summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                         cls.grant_items(ctx, uid, exch_grants, silent=True, source=f"{source}_overflow")
                         for eid, enum in exch_grants:
                             summary["overflow_converted"].append({"src_id": iid, "surplus": surplus, "target_id": eid, "target_num": enum})
@@ -571,8 +632,10 @@ class InventoryService:
             elif itype == ItemType.SCENE:
                 exch_info = _get_exchange_cfg().get(str(iid))
                 limit = int(exch_info.get("limit") or 1) if exch_info else 1
-                rows = db.query("SELECT 1 FROM user_scene WHERE uid=? AND scene_id=?", (uid, iid))
-                cur_num = 1 if rows else 0
+                rows = db.query("SELECT lasted_time FROM user_scene WHERE uid=? AND scene_id=?", (uid, iid))
+                # A permanent reward upgrades a trial, even when its expiry is
+                # still in the future. Only permanent ownership is a duplicate.
+                cur_num = 1 if rows and int(rows[0].get('lasted_time') or 0) == 0 else 0
 
                 actual_add, surplus, exch_grants = cls._check_overflow_and_exchange(
                     ctx, db, uid, iid, count, cur_num, limit, exch_info, source=source
@@ -597,6 +660,7 @@ class InventoryService:
                 if surplus > 0:
                     logger.info(f"[InventoryService] 场景 {iid} 触发保护性限额 (拥有={cur_num}, 请求={count}), 溢出={surplus}")
                     if exch_grants:
+                        summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                         cls.grant_items(ctx, uid, exch_grants, silent=True, source=f"{source}_overflow")
                         for eid, enum in exch_grants:
                             summary["overflow_converted"].append({"src_id": iid, "surplus": surplus, "target_id": eid, "target_num": enum})
@@ -659,6 +723,9 @@ class InventoryService:
                 kind = COSMETIC_KIND_MAP.get(sub_t, "sticker")
 
                 exch_info = _get_exchange_cfg().get(str(iid))
+                if sub_t in (13, 18, 25):
+                    # Offline sticker-wall policy: each duplicate grants 100 of each.
+                    exch_info = {'limit': 1, 'num_exchange_item': [[1, 100], [32, 100]]}
                 # 装饰、名片、头像框、气泡等资产官方全局硬上限为 1
                 limit = int(exch_info.get("limit") or 1) if exch_info else 1
 
@@ -697,6 +764,7 @@ class InventoryService:
                 if surplus > 0:
                     logger.info(f"[InventoryService] 装饰资产 {iid} (kind={kind}) 触发限额 (拥有={cur_num}, 请求={count}), 溢出={surplus}")
                     if exch_grants:
+                        summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                         cls.grant_items(ctx, uid, exch_grants, silent=True, source=f"{source}_overflow")
                         for eid, enum in exch_grants:
                             summary["overflow_converted"].append({"src_id": iid, "surplus": surplus, "target_id": eid, "target_num": enum})
@@ -706,12 +774,23 @@ class InventoryService:
             new_equips, eq_events = cls._grant_equips_batch(ctx, db, uid, equip_items, now)
             summary["equips"].extend(new_equips)
             pending_events.extend(eq_events)
+            if hasattr(ctx, 'append_frame'):
+                if not hasattr(ctx, 'added_equips'):
+                    ctx.added_equips = []
+                ctx.added_equips.extend(dict(equip_id=e['id'], prefab_id=e['prefab_id'], num=1,
+                                             enchant_slot_list=e['enchant_slot_list'], race=e['race'])
+                                        for e in new_equips)
 
         # 3. 批量处理钥从类（一次性预分配自增 ID）
         if servant_items:
             new_servants, sv_events = cls._grant_servants_batch(ctx, db, uid, servant_items, now)
             summary["servants"].extend(new_servants)
             pending_events.extend(sv_events)
+            if hasattr(ctx, 'append_frame'):
+                if not hasattr(ctx, 'added_weapons'):
+                    ctx.added_weapons = []
+                ctx.added_weapons.extend(dict(uid=s['id'], item=dict(id=s['prefab_id'], num=1))
+                                         for s in new_servants)
 
         # 4. 事务后置触发 EventBus 广播
         if not silent and pending_events:
@@ -728,7 +807,7 @@ class InventoryService:
         """单角色发放内部处理：未拥有则初始化，已拥有则折算碎片"""
         cfg = None
         try:
-            cfg = db.query("SELECT unlock_star FROM hero_cfg WHERE hero_id=?", (hero_id,))
+            cfg = db.query("SELECT unlock_star,name FROM hero_cfg WHERE hero_id=?", (hero_id,))
         except Exception:
             cfg = None
         if not cfg or not cfg[0].get("unlock_star"):
@@ -741,11 +820,20 @@ class InventoryService:
 
         exists = db.query("SELECT id FROM hero WHERE uid=? AND id=?", (uid, hero_id))
         if not exists:
-            db.execute(
-                "INSERT INTO hero (uid, id, level, star, exp, skill_list, unlock, update_ts) "
-                "VALUES (?, ?, 1, ?, 0, '[]', 1, ?)",
-                (uid, hero_id, star, now_ts),
-            )
+            from hero_codec import initial_hero_row
+            from account_db import HERO_TO_ARCHIVE
+            archive = int(HERO_TO_ARCHIVE.get(hero_id, hero_id))
+            owned = db.query("SELECT id FROM hero WHERE uid=? AND unlock=1", (uid,))
+            previously_owned = any(int(HERO_TO_ARCHIVE.get(r['id'], r['id'])) == archive for r in owned)
+            initial = initial_hero_row(hero_id, star, now_ts)
+            if cfg and cfg[0].get('name'):
+                initial['name'] = cfg[0]['name']
+            db.upsert('hero', uid, initial, keys=('uid', 'id'))
+            if not previously_owned:
+                # Unlock the newly acquired archive, preserving manual locks on
+                # archives the account already owned through another hero form.
+                db.execute("UPDATE backhome_hero SET is_lock=0,update_ts=? WHERE uid=? AND archives_id=?",
+                           (now_ts, uid, archive))
             return True, False, hero_id, 0
         else:
             prow = db.query("SELECT num FROM hero_piece WHERE uid=? AND hero_id=?", (uid, hero_id))
@@ -973,6 +1061,12 @@ class InventoryService:
             if count <= 0 or iid <= 0:
                 continue
 
+            # Replay keepsakes play stories in the client; retain ownership.
+            from birthday_service import commemorative_items
+            from save_generator import generation_config
+            if iid in commemorative_items() or iid in generation_config()['permanent_replay_items']:
+                continue
+
             # 扣除道具
             succ = cls.cost_item(ctx, uid, iid, count=count)
             if not succ:
@@ -1151,24 +1245,10 @@ class InventoryService:
                             pass
 
         # 4. 合并 drop_list 相同道具并联动过量分解/碎片折算产物
-        merged_drops = {}
-        for d in raw_drops:
-            did = d["id"]
-            merged_drops[did] = merged_drops.get(did, 0) + d["num"]
+        merged_drops = dict(cls.rewards_after_overflow(
+            [(d['id'], d['num']) for d in raw_drops], grant_res))
 
         if grant_res:
-            if grant_res.get("overflow_converted"):
-                for conv in grant_res["overflow_converted"]:
-                    src_id = conv["src_id"]
-                    surplus = conv["surplus"]
-                    target_id = conv["target_id"]
-                    target_num = conv["target_num"]
-                    if src_id in merged_drops:
-                        merged_drops[src_id] -= surplus
-                        if merged_drops[src_id] <= 0:
-                            del merged_drops[src_id]
-                    merged_drops[target_id] = merged_drops.get(target_id, 0) + target_num
-
             if grant_res.get("hero_converted"):
                 for conv in grant_res["hero_converted"]:
                     hid = conv["hero_id"]

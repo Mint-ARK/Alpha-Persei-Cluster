@@ -570,6 +570,12 @@ class RogueTeamService:
         db = self._db()
         user_row = db.get("rogueteam_user", uid, "AND template_id=?", (template_id,))
         if not user_row:
+            from new_player_service import enabled
+            if enabled(db,uid):
+                db.upsert('rogueteam_user',uid,dict(template_id=template_id,difficult=1,max_difficult=1,
+                    point=0,last_score_id=0,update_ts=int(time.time())),keys=('uid','template_id'))
+                user_row=db.get('rogueteam_user',uid,'AND template_id=?',(template_id,))
+        if not user_row:
             user_row = {
                 "template_id": template_id,
                 "difficult": 1,
@@ -612,6 +618,12 @@ class RogueTeamService:
         # 且必须覆盖全部 condition==0 的圣物，否则 ShowItemInfo 的 black 分支
         # RogueTeamConditionCfg[0].desc 空指针 → 进圣物图鉴即崩、返回键同时失效。
         full_unlock_collection = sorted(self._relic_item_ids() | set(unlock_collection))
+        from new_player_service import enabled
+        if enabled(db,uid):
+            natural={int(key) for key,item in self.config.items.items()
+                     if isinstance(item,dict) and int(item.get('type',0))==RogueTeamConst.ITEM_TYPE_RELIC
+                     and not item.get('condition')}
+            full_unlock_collection=sorted(natural | set(unlock_collection))
 
         return {
             "template_id": template_id,

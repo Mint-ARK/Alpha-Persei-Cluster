@@ -133746,5 +133746,408 @@
         60009
       ]
     ]
-  }
+  },
+  "level_cfgs": {
+    "1": {
+      "hero_exp": 0,
+      "weapon_exp": 0
+    },
+    "2": {
+      "hero_exp": 10,
+      "weapon_exp": 200
+    },
+    "3": {
+      "hero_exp": 30,
+      "weapon_exp": 400
+    },
+    "4": {
+      "hero_exp": 60,
+      "weapon_exp": 600
+    },
+    "5": {
+      "hero_exp": 110,
+      "weapon_exp": 800
+    },
+    "6": {
+      "hero_exp": 210,
+      "weapon_exp": 1000
+    },
+    "7": {
+      "hero_exp": 360,
+      "weapon_exp": 1200
+    },
+    "8": {
+      "hero_exp": 560,
+      "weapon_exp": 1400
+    },
+    "9": {
+      "hero_exp": 810,
+      "weapon_exp": 1600
+    },
+    "10": {
+      "hero_exp": 1110,
+      "weapon_exp": 1800
+    },
+    "11": {
+      "hero_exp": 1510,
+      "weapon_exp": 2100
+    },
+    "12": {
+      "hero_exp": 2010,
+      "weapon_exp": 2400
+    },
+    "13": {
+      "hero_exp": 2610,
+      "weapon_exp": 2700
+    },
+    "14": {
+      "hero_exp": 3310,
+      "weapon_exp": 3000
+    },
+    "15": {
+      "hero_exp": 4110,
+      "weapon_exp": 3300
+    },
+    "16": {
+      "hero_exp": 5010,
+      "weapon_exp": 3600
+    },
+    "17": {
+      "hero_exp": 6010,
+      "weapon_exp": 3900
+    },
+    "18": {
+      "hero_exp": 7110,
+      "weapon_exp": 4200
+    },
+    "19": {
+      "hero_exp": 8310,
+      "weapon_exp": 4500
+    },
+    "20": {
+      "hero_exp": 9610,
+      "weapon_exp": 4800
+    },
+    "21": {
+      "hero_exp": 11010,
+      "weapon_exp": 5300
+    },
+    "22": {
+      "hero_exp": 12510,
+      "weapon_exp": 5800
+    },
+    "23": {
+      "hero_exp": 14110,
+      "weapon_exp": 6300
+    },
+    "24": {
+      "hero_exp": 15810,
+      "weapon_exp": 6800
+    },
+    "25": {
+      "hero_exp": 17610,
+      "weapon_exp": 7300
+    },
+    "26": {
+      "hero_exp": 19510,
+      "weapon_exp": 7800
+    },
+    "27": {
+      "hero_exp": 21510,
+      "weapon_exp": 8300
+    },
+    "28": {
+      "hero_exp": 23610,
+      "weapon_exp": 8800
+    },
+    "29": {
+      "hero_exp": 25810,
+      "weapon_exp": 9300
+    },
+    "30": {
+      "hero_exp": 28110,
+      "weapon_exp": 9800
+    },
+    "31": {
+      "hero_exp": 30610,
+      "weapon_exp": 10800
+    },
+    "32": {
+      "hero_exp": 33310,
+      "weapon_exp": 11800
+    },
+    "33": {
+      "hero_exp": 36210,
+      "weapon_exp": 12800
+    },
+    "34": {
+      "hero_exp": 39310,
+      "weapon_exp": 13800
+    },
+    "35": {
+      "hero_exp": 42610,
+      "weapon_exp": 14800
+    },
+    "36": {
+      "hero_exp": 46110,
+      "weapon_exp": 15800
+    },
+    "37": {
+      "hero_exp": 49810,
+      "weapon_exp": 16800
+    },
+    "38": {
+      "hero_exp": 53710,
+      "weapon_exp": 17800
+    },
+    "39": {
+      "hero_exp": 57810,
+      "weapon_exp": 18800
+    },
+    "40": {
+      "hero_exp": 62110,
+      "weapon_exp": 19800
+    },
+    "41": {
+      "hero_exp": 66610,
+      "weapon_exp": 22800
+    },
+    "42": {
+      "hero_exp": 71310,
+      "weapon_exp": 25800
+    },
+    "43": {
+      "hero_exp": 76210,
+      "weapon_exp": 28800
+    },
+    "44": {
+      "hero_exp": 81310,
+      "weapon_exp": 31800
+    },
+    "45": {
+      "hero_exp": 86610,
+      "weapon_exp": 34800
+    },
+    "46": {
+      "hero_exp": 92110,
+      "weapon_exp": 37800
+    },
+    "47": {
+      "hero_exp": 97810,
+      "weapon_exp": 40800
+    },
+    "48": {
+      "hero_exp": 103710,
+      "weapon_exp": 43800
+    },
+    "49": {
+      "hero_exp": 109810,
+      "weapon_exp": 46800
+    },
+    "50": {
+      "hero_exp": 116110,
+      "weapon_exp": 49800
+    },
+    "51": {
+      "hero_exp": 122910,
+      "weapon_exp": 54800
+    },
+    "52": {
+      "hero_exp": 130210,
+      "weapon_exp": 59800
+    },
+    "53": {
+      "hero_exp": 138010,
+      "weapon_exp": 64800
+    },
+    "54": {
+      "hero_exp": 146310,
+      "weapon_exp": 69800
+    },
+    "55": {
+      "hero_exp": 155110,
+      "weapon_exp": 74800
+    },
+    "56": {
+      "hero_exp": 164410,
+      "weapon_exp": 79800
+    },
+    "57": {
+      "hero_exp": 174210,
+      "weapon_exp": 84800
+    },
+    "58": {
+      "hero_exp": 184510,
+      "weapon_exp": 89800
+    },
+    "59": {
+      "hero_exp": 195310,
+      "weapon_exp": 94800
+    },
+    "60": {
+      "hero_exp": 206610,
+      "weapon_exp": 99800
+    },
+    "61": {
+      "hero_exp": 218910,
+      "weapon_exp": 104800
+    },
+    "62": {
+      "hero_exp": 232210,
+      "weapon_exp": 109800
+    },
+    "63": {
+      "hero_exp": 246510,
+      "weapon_exp": 114800
+    },
+    "64": {
+      "hero_exp": 261810,
+      "weapon_exp": 119800
+    },
+    "65": {
+      "hero_exp": 278110,
+      "weapon_exp": 124800
+    },
+    "66": {
+      "hero_exp": 295410,
+      "weapon_exp": 129800
+    },
+    "67": {
+      "hero_exp": 313710,
+      "weapon_exp": 134800
+    },
+    "68": {
+      "hero_exp": 333010,
+      "weapon_exp": 139800
+    },
+    "69": {
+      "hero_exp": 353310,
+      "weapon_exp": 144800
+    },
+    "70": {
+      "hero_exp": 374610,
+      "weapon_exp": 149800
+    },
+    "71": {
+      "hero_exp": 398910,
+      "weapon_exp": 154800
+    },
+    "72": {
+      "hero_exp": 426210,
+      "weapon_exp": 159800
+    },
+    "73": {
+      "hero_exp": 456510,
+      "weapon_exp": 164800
+    },
+    "74": {
+      "hero_exp": 489810,
+      "weapon_exp": 169800
+    },
+    "75": {
+      "hero_exp": 526110,
+      "weapon_exp": 174800
+    },
+    "76": {
+      "hero_exp": 565410,
+      "weapon_exp": 179800
+    },
+    "77": {
+      "hero_exp": 607710,
+      "weapon_exp": 184800
+    },
+    "78": {
+      "hero_exp": 653010,
+      "weapon_exp": 189800
+    },
+    "79": {
+      "hero_exp": 701310,
+      "weapon_exp": 194800
+    },
+    "80": {
+      "hero_exp": 752610,
+      "weapon_exp": 199800
+    },
+    "81": {
+      "hero_exp": 806910,
+      "weapon_exp": 0
+    },
+    "82": {
+      "hero_exp": 866210,
+      "weapon_exp": 0
+    },
+    "83": {
+      "hero_exp": 930510,
+      "weapon_exp": 0
+    },
+    "84": {
+      "hero_exp": 999810,
+      "weapon_exp": 0
+    },
+    "85": {
+      "hero_exp": 1074110,
+      "weapon_exp": 0
+    },
+    "86": {
+      "hero_exp": 1153410,
+      "weapon_exp": 0
+    },
+    "87": {
+      "hero_exp": 1237710,
+      "weapon_exp": 0
+    },
+    "88": {
+      "hero_exp": 1327010,
+      "weapon_exp": 0
+    },
+    "89": {
+      "hero_exp": 1421310,
+      "weapon_exp": 0
+    },
+    "90": {
+      "hero_exp": 1520610,
+      "weapon_exp": 0
+    },
+    "91": {
+      "hero_exp": 1627910,
+      "weapon_exp": 0
+    },
+    "92": {
+      "hero_exp": 1743210,
+      "weapon_exp": 0
+    },
+    "93": {
+      "hero_exp": 1866510,
+      "weapon_exp": 0
+    },
+    "94": {
+      "hero_exp": 1997810,
+      "weapon_exp": 0
+    },
+    "95": {
+      "hero_exp": 2137110,
+      "weapon_exp": 0
+    },
+    "96": {
+      "hero_exp": 2284410,
+      "weapon_exp": 0
+    },
+    "97": {
+      "hero_exp": 2439710,
+      "weapon_exp": 0
+    },
+    "98": {
+      "hero_exp": 2603010,
+      "weapon_exp": 0
+    },
+    "99": {
+      "hero_exp": 2774310,
+      "weapon_exp": 0
+    },
+    "100": {
+      "hero_exp": 2953610,
+      "weapon_exp": 0
+    }
+  },
+  "level_source_sha256": "4389d28d06157b99ea68b097dc2357513265ad82accb3b606181773bc11fa7e5"
 }

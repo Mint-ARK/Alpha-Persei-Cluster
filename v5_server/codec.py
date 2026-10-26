@@ -31,6 +31,15 @@ def _ensure_schema():
     global _SCHEMA_READY
     if not _SCHEMA_READY:
         ds.ensure_schema()
+        # p54 uses team_hrl.hero_info_net_rec, not the same-named p32 full hero.
+        # Keep the p32 schema intact and resolve only battle-entry references.
+        ds.SCHEMA["p54_team_hero_info_net_rec"] = {
+            1: {"name": "hero_id", "number": 1, "type": "uint32", "label": "required", "ref": None},
+            2: {"name": "owner_id", "number": 2, "type": "uint64", "label": "optional", "ref": None},
+            3: {"name": "hero_type", "number": 3, "type": "uint32", "label": "required", "ref": None},
+        }
+        if "enter_battle_common_info" in ds.SCHEMA:
+            ds.SCHEMA["enter_battle_common_info"][1]["ref"] = "p54_team_hero_info_net_rec"
         # 补充芯片协议 (50006, 50007, 50016, 50017)
         ds.SCHEMA.setdefault("cs_50006", {
             1: {"name": "kernel_id", "number": 1, "type": "uint32", "label": "required", "ref": None},

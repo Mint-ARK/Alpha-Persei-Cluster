@@ -1,0 +1,99 @@
+{
+  "_sources": {
+    "activities_311": {
+      "path": "v5_server\\tools\\diff_lua_decompiled_311\\ActivityCumulativeSignCfg.lua",
+      "sha256": "2cb1e58b185f4827b843436b34e6743117226ec50f8543c2bf557460247f1ca0"
+    },
+    "rewards_311": {
+      "path": "v5_server\\tools\\diff_lua_decompiled_311\\SignCfg.lua",
+      "sha256": "aa6957c9339827e3312fa11ac9566d72ceba7d6cd9936276e8a42640e5b7d4de"
+    },
+    "rewards_321": {
+      "path": "archive\\sign_chain_20261023\\SignCfg_321.lua",
+      "sha256": "bf790b268ed868a11956c0005d0348b6a566b37e424f806e1b6a5e96636adf42"
+    }
+  },
+  "activity_sign_ids": {
+    "4400101": [
+      30001,
+      30002,
+      30003,
+      30004,
+      30005,
+      30006,
+      30007
+    ]
+  },
+  "profiles": {
+    "311": {
+      "theme_id": 44,
+      "activities": {
+        "4400101": [
+          [
+            38,
+            20
+          ],
+          [
+            20002,
+            20
+          ],
+          [
+            24,
+            80
+          ],
+          [
+            38,
+            20
+          ],
+          [
+            20002,
+            30
+          ],
+          [
+            24,
+            100
+          ],
+          [
+            32,
+            2000
+          ]
+        ]
+      }
+    },
+    "321": {
+      "theme_id": 44,
+      "activities": {
+        "4400101": [
+          [
+            38,
+            20
+          ],
+          [
+            20003,
+            20
+          ],
+          [
+            24,
+            80
+          ],
+          [
+            38,
+            20
+          ],
+          [
+            20003,
+            30
+          ],
+          [
+            24,
+            100
+          ],
+          [
+            32,
+            2000
+          ]
+        ]
+      }
+    }
+  }
+}

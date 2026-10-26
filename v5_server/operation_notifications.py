@@ -8,6 +8,7 @@ format, infer asset ownership or rerun a committed operation.
 FIELDS = (
     "touched_items", "removed_equips", "removed_weapons",
     "deleted_servants", "pending_frames", "touched_chat_stickers",
+    "touched_heroes", "added_equips", "added_weapons",
 )
 DELETION_FIELDS = ("removed_equips", "removed_weapons", "deleted_servants")
 

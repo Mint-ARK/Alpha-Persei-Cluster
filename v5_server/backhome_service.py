@@ -394,15 +394,18 @@ class BackHomeService:
         ctx.uid = uid
         hid = int(data.get("hero_id") or 0)
         furs = data.get("furniture") or []
-        if not isinstance(furs, list):
-            furs = [furs]
-        if ctx.db and hid:
-            ctx.db.gift_furniture_to_hero(uid, hid, furs)
-            _emit_dorm_action(ctx, uid, "furniture")
-            first_fur = furs[0] if furs else {}
-            _emit_dorm_gift(ctx, uid, hid,
-                            furniture_id=int((first_fur or {}).get("furniture_id") or (first_fur or {}).get("id") or 0))
-        return {"hero_id": hid, "furniture": furs}
+        if not ctx.db or not hid:
+            raise OperationError(2, "缺少家具赠送角色或数据库")
+        try:
+            result = ctx.db.gift_furniture_to_hero(uid, hid, furs)
+        except ValueError as exc:
+            raise OperationError(2, str(exc))
+        if not result or not result.get("furniture"):
+            raise OperationError(2, "未成功赠送家具")
+        _emit_dorm_action(ctx, uid, "furniture")
+        _emit_dorm_gift(ctx, uid, result["hero_id"],
+                        furniture_id=result["furniture"][0]["id"], archive_id=result["hero_id"])
+        return result
 
     def gift_food_to_hero(self, ctx, uid, data=None):
         """58138 [Fix by Gemini 3.7-flash] 给英雄喂食（恢复疲劳度至 120）："""
@@ -1463,9 +1466,9 @@ def _emit_dorm_action(ctx, uid, action_type, times=1, attribute_index=None, pers
              attribute_index=attribute_index, personality=personality)
 
 
-def _emit_dorm_gift(ctx, uid, hero_id, furniture_id=0):
-    """广播家园赠送 → oath_service.on_dorm_gift（誓约条件 410001）。"""
-    bus.emit(Events.DORM_GIFT, ctx, uid, hero_id=hero_id, furniture_id=furniture_id)
+def _emit_dorm_gift(ctx, uid, hero_id, furniture_id=0, archive_id=None):
+    """广播赠送成功；archive_id明确后宅档案身份，供誓约条件410001匹配形态。"""
+    bus.emit(Events.DORM_GIFT, ctx, uid, hero_id=hero_id, furniture_id=furniture_id, archive_id=archive_id)
 
 
 SILENT_STUB_CMDS = {

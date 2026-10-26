@@ -124,7 +124,12 @@ def _get_collect_picture_cfg():
                 with open(meta_path, "r", encoding="utf-8") as f:
                     meta = json.load(f)
                 pic_info = meta.get("pic_info", {})
-                _COLLECT_PICTURE_CFG_CACHE = {int(k): v for k, v in pic_info.items()}
+                _COLLECT_PICTURE_CFG_CACHE = {
+                    int(k): dict(v, params=v.get('params', v.get('parameters', [])),
+                                 unlock_condition=int(v.get('unlock_condition') or 0),
+                                 wedding_role_id=int(v.get('wedding_role_id') or 0))
+                    for k, v in pic_info.items()
+                }
                 return _COLLECT_PICTURE_CFG_CACHE
             except Exception as e:
                 logger.error(f"读 illustrated_meta.json 失败: {e}")
@@ -132,6 +137,17 @@ def _get_collect_picture_cfg():
         else:
             _COLLECT_PICTURE_CFG_CACHE = {}
     return _COLLECT_PICTURE_CFG_CACHE
+
+
+_VALID_MONSTER_IDS_CACHE = None
+
+
+def _get_valid_monster_ids():
+    global _VALID_MONSTER_IDS_CACHE
+    if _VALID_MONSTER_IDS_CACHE is None:
+        from enemy_kill_service import config
+        _VALID_MONSTER_IDS_CACHE = {int(mid) for mid in config()['monsters']}
+    return _VALID_MONSTER_IDS_CACHE
 
 
 # ================= 核心图鉴驱动逻辑 =================
@@ -158,21 +174,21 @@ def trigger_story_unlock(db, uid, story_id):
     story_id = int(story_id)
     if not story_id:
         return [], []
+    from oath_service import OATH_HERO_CFG
+    oath_ids = {sid for hero in OATH_HERO_CFG.values() for sid in hero['plot_levels']}
+    if story_id in oath_ids:
+        from illustrated_story_service import read_oath_stories
+        if story_id not in read_oath_stories(db, uid):
+            return [], []
 
     # 1. 剧情入库与去重
     plot_row = db.query("SELECT complete_flag FROM illustrated WHERE uid=? AND kind='plot' AND item_id=?", (uid, story_id))
     new_plots = []
     if not plot_row:
-        try:
-            db.execute(
-                "INSERT OR REPLACE INTO illustrated (uid, kind, item_id, is_view, complete_flag) VALUES (?, 'plot', ?, 1, 1)",
-                (uid, story_id)
-            )
-        except Exception:
-            db.execute(
-                "INSERT OR REPLACE INTO illustrated (uid, kind, item_id, is_view) VALUES (?, 'plot', ?, 1)",
-                (uid, story_id)
-            )
+        db.execute(
+            "INSERT INTO illustrated (uid, kind, item_id, is_view, complete_flag) VALUES (?, 'plot', ?, 1, 1)",
+            (uid, story_id)
+        )
         db.execute(
             "INSERT OR REPLACE INTO story_unlock (uid, story_id, unlock_flag) VALUES (?, ?, 1)",
             (uid, story_id)
@@ -202,16 +218,10 @@ def trigger_story_unlock(db, uid, story_id):
         )
         if not pic_row:
             # 真正首次解锁插画！初始未领取(is_receive=0)，未查看(is_view=0)，complete_flag=1
-            try:
-                db.execute(
-                    "INSERT INTO illustrated (uid, kind, item_id, is_receive, is_view, complete_flag) VALUES (?, 'inbetweening', ?, 0, 0, 1)",
-                    (uid, pid_int)
-                )
-            except Exception:
-                db.execute(
-                    "INSERT INTO illustrated (uid, kind, item_id, is_receive, is_view) VALUES (?, 'inbetweening', ?, 0, 0)",
-                    (uid, pid_int)
-                )
+            db.execute(
+                "INSERT INTO illustrated (uid, kind, item_id, is_receive, is_view, complete_flag) VALUES (?, 'inbetweening', ?, 0, 0, 1)",
+                (uid, pid_int)
+            )
             new_pics.append({"id": pid_int, "is_receive": 0, "is_view": 0})
         else:
             cflag = pic_row[0].get("complete_flag")
@@ -232,13 +242,18 @@ def trigger_story_unlock(db, uid, story_id):
 def trigger_monster_kill(db, uid, monster_id, times=1):
     """视骸击杀记录与增量推送"""
     mid_int = int(monster_id)
-    if not mid_int:
+    if not mid_int or type(times) is not int or not 0<times<=0x7fffffff:
+        return None
+    valid_ids = _get_valid_monster_ids()
+    if mid_int not in valid_ids:
         return None
 
     row = db.query("SELECT times, is_view FROM illustrated WHERE uid=? AND kind='enemy' AND item_id=?", (uid, mid_int))
     if row:
         old_times = int(row[0]["times"] or 0)
         new_times = old_times + times
+        if new_times>0xffffffff:
+            raise ValueError('Monster illustrated counter exceeds uint32')
         db.execute(
             "UPDATE illustrated SET times=? WHERE uid=? AND kind='enemy' AND item_id=?",
             (new_times, uid, mid_int)
@@ -338,6 +353,11 @@ class IllustratedSyncService:
 
     @classmethod
     def sync_all_from_db(cls, db, uid):
+        with db.transaction():
+            return cls._sync_all_from_db(db, uid)
+
+    @classmethod
+    def _sync_all_from_db(cls, db, uid):
         summary = {
             "plots_added": 0, "pics_added": 0,
             "plots_locked": 0, "pics_locked": 0,
@@ -388,37 +408,9 @@ class IllustratedSyncService:
 
         cleared_stages = {int(cr["id"]) for cr in (cleared_stages_rows or [])}
 
-        archive_stories = set()
-        arch_rows = []
-        try:
-            arch_rows = db.query("SELECT video_list, super_heart_link_list FROM hero_archive WHERE uid=?", (uid,))
-        except Exception:
-            try:
-                arch_rows = db.query("SELECT video_list FROM hero_archive WHERE uid=?", (uid,))
-            except Exception:
-                arch_rows = []
-        for ar in (arch_rows or []):
-            try:
-                v_list = json.loads(ar.get("video_list") or "[]")
-                for s in v_list:
-                    archive_stories.add(int(s))
-            except Exception:
-                pass
-            try:
-                super_list = json.loads(ar.get("super_heart_link_list") or "[]")
-                for s in super_list:
-                    if isinstance(s, dict) and "plot_id" in s:
-                        archive_stories.add(int(s["plot_id"]))
-            except Exception:
-                pass
-
-        oath_heroes = set()
-        try:
-            oath_rows = db.query("SELECT hero_id FROM hero_oath WHERE uid=? AND oath=1", (uid,))
-            for o_r in (oath_rows or []):
-                oath_heroes.add(int(o_r["hero_id"]))
-        except Exception:
-            pass
+        from illustrated_story_service import read_archive_stories, read_oath_stories
+        archive_stories = read_archive_stories(db, uid)
+        oath_stories = read_oath_stories(db, uid)
 
         # 3. 关卡产出的故事与直属插画
         stage_stories = set()
@@ -432,7 +424,8 @@ class IllustratedSyncService:
                     stage_direct_pics.add(int(p_id))
 
         # 合法剧情回顾集合
-        legit_plots = stage_stories | archive_stories
+        from birthday_service import read_unlocked_stories
+        legit_plots = stage_stories | archive_stories | oath_stories | read_unlocked_stories(db, uid)
 
         # 4. 派生合法插画集合 (Type 1 ~ 6 官方规则)
         legit_pics = set()
@@ -460,9 +453,9 @@ class IllustratedSyncService:
                         is_legit = True
                 elif t == 4:
                     wed = p.get("wedding_role_id", 0)
-                    if wed and wed in oath_heroes:
-                        is_legit = True
-                    elif param0 and (param0 in archive_stories or param0 in legit_plots):
+                    if wed:
+                        is_legit = p.get('unlock_condition') == 800 and param0 in oath_stories
+                    elif p.get('unlock_condition') == 800 and param0 in legit_plots:
                         is_legit = True
                 elif t == 5:
                     if param0 and param0 in legit_plots:
@@ -490,63 +483,39 @@ class IllustratedSyncService:
                     legit_pics.add(int(pic_id))
             legit_pics.update(stage_direct_pics)
 
-        # 5. 剧情对齐
+        # 5. 剧情对齐：资格与查看记录分开；必要索引写入失败须回滚整次同步。
         missing_plots = legit_plots - set(existing_plots.keys())
         if missing_plots:
-            try:
-                plot_records = [(uid, "plot", pid, 0, 1) for pid in missing_plots]
-                db.executemany("INSERT OR IGNORE INTO illustrated (uid, kind, item_id, is_view, complete_flag) VALUES (?, ?, ?, ?, ?)", plot_records)
-            except Exception:
-                plot_records = [(uid, "plot", pid, 0) for pid in missing_plots]
-                db.executemany("INSERT OR IGNORE INTO illustrated (uid, kind, item_id, is_view) VALUES (?, ?, ?, ?)", plot_records)
-            story_records = [(uid, pid, 1) for pid in missing_plots]
-            db.executemany("INSERT OR IGNORE INTO story_unlock (uid, story_id, unlock_flag) VALUES (?, ?, ?)", story_records)
-            summary["plots_added"] = len(missing_plots)
+            records = [(uid, 'plot', pid, 0, 1) for pid in missing_plots]
+            db.executemany('INSERT OR IGNORE INTO illustrated (uid,kind,item_id,is_view,complete_flag) VALUES (?,?,?,?,?)', records)
+            db.executemany('INSERT OR IGNORE INTO story_unlock (uid,story_id,unlock_flag) VALUES (?,?,?)',
+                           [(uid, pid, 1) for pid in missing_plots])
+            summary['plots_added'] = len(missing_plots)
             for pid in missing_plots:
                 existing_plots[pid] = 1
-
         for pid, cflag in existing_plots.items():
             if pid not in legit_plots and cflag != 0:
-                try:
-                    db.execute("UPDATE illustrated SET complete_flag=0, is_view=0 WHERE uid=? AND kind='plot' AND item_id=?", (uid, pid))
-                    summary["plots_locked"] += 1
-                except Exception:
-                    pass
+                db.execute("UPDATE illustrated SET complete_flag=0 WHERE uid=? AND kind='plot' AND item_id=?", (uid, pid))
+                summary['plots_locked'] += 1
             elif pid in legit_plots and cflag == 0:
-                try:
-                    db.execute("UPDATE illustrated SET complete_flag=1 WHERE uid=? AND kind='plot' AND item_id=?", (uid, pid))
-                    summary["plots_unlocked"] += 1
-                except Exception:
-                    pass
+                db.execute("UPDATE illustrated SET complete_flag=1 WHERE uid=? AND kind='plot' AND item_id=?", (uid, pid))
+                summary['plots_unlocked'] += 1
 
-        # 6. 插画对齐
+        # 6. 插画对齐：关闭资格时保留 is_receive/is_view，重新开放也不能再次领奖。
         missing_pics = legit_pics - set(existing_pics.keys())
         if missing_pics:
-            try:
-                pic_records = [(uid, "inbetweening", pic_id, 0, 0, 1) for pic_id in missing_pics]
-                db.executemany("INSERT OR IGNORE INTO illustrated (uid, kind, item_id, is_receive, is_view, complete_flag) VALUES (?, ?, ?, ?, ?, ?)", pic_records)
-            except Exception:
-                pic_records = [(uid, "inbetweening", pic_id, 0, 0) for pic_id in missing_pics]
-                db.executemany("INSERT OR IGNORE INTO illustrated (uid, kind, item_id, is_receive, is_view) VALUES (?, ?, ?, ?, ?)", pic_records)
-            summary["pics_added"] = len(missing_pics)
+            records = [(uid, 'inbetweening', pid, 0, 0, 1) for pid in missing_pics]
+            db.executemany('INSERT OR IGNORE INTO illustrated (uid,kind,item_id,is_receive,is_view,complete_flag) VALUES (?,?,?,?,?,?)', records)
+            summary['pics_added'] = len(missing_pics)
             for pid in missing_pics:
                 existing_pics[pid] = (0, 0, 1)
-
         for pid, (rec, view, cflag) in existing_pics.items():
-            if pid not in legit_pics:
-                if cflag != 0 or rec != 0:
-                    try:
-                        db.execute("UPDATE illustrated SET complete_flag=0, is_receive=0, is_view=0 WHERE uid=? AND kind='inbetweening' AND item_id=?", (uid, pid))
-                        summary["pics_locked"] += 1
-                    except Exception:
-                        pass
-            else:
-                if cflag == 0:
-                    try:
-                        db.execute("UPDATE illustrated SET complete_flag=1 WHERE uid=? AND kind='inbetweening' AND item_id=?", (uid, pid))
-                        summary["pics_unlocked"] += 1
-                    except Exception:
-                        pass
+            if pid not in legit_pics and cflag != 0:
+                db.execute("UPDATE illustrated SET complete_flag=0 WHERE uid=? AND kind='inbetweening' AND item_id=?", (uid, pid))
+                summary['pics_locked'] += 1
+            elif pid in legit_pics and cflag == 0:
+                db.execute("UPDATE illustrated SET complete_flag=1 WHERE uid=? AND kind='inbetweening' AND item_id=?", (uid, pid))
+                summary['pics_unlocked'] += 1
 
         # 7. 钥从对齐
         servants = db.query("SELECT prefab_id FROM servant WHERE uid=?", (uid,))
@@ -614,6 +583,8 @@ class IllustratedSyncService:
                     )
                 summary["equips_synced"] += 1
 
+        from worldview_service import ensure_entries
+        summary.update(ensure_entries(db, uid))
         return summary
 
 
@@ -701,7 +672,9 @@ def on_monster_kill(ctx, uid, monster_id=0, count=1, **kwargs):
     """击杀怪物/视骸敌人：累加图鉴击杀计数并下发 sc_52009"""
     if not monster_id:
         return
-    diff = trigger_monster_kill(ctx.db, uid, monster_id, times=count)
+    diff = kwargs.get('recorded_enemy_info')
+    if diff is None:
+        diff = trigger_monster_kill(ctx.db, uid, monster_id, times=count)
     if diff:
         try:
             p09 = encode("sc_52009", {"enemy_info": [diff]})

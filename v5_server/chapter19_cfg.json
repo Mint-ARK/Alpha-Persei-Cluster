@@ -1,0 +1,2052 @@
+{
+  "source_sha256": {
+    "decompiled_v2/x64/game/config/chaptermapcfg.lua": "e4d3bbcfab96531239ab860f9b305b8b745100033140749acbad0343a3af4c95",
+    "decompiled_v2/x64/game/config/chapterlocationcfg.lua": "0245e96673f91bbf25542f5fb6d095c61902cbbaf1bc56309face0781136011b",
+    "decompiled_v2/x64/game/config/stagearchivecfg.lua": "b17af5a6775978a7dd42692183785e7ede34f542d850654f250872ca27e38a68",
+    "decompiled_v2/x64/game/config/gamesetting.lua": "b319e751fcbd59b8ebd54316f231fe6174c51f1462ace55833a3ec2792dd6dce"
+  },
+  "maps": {
+    "1": {
+      "chapter_id": 10119,
+      "day": 0,
+      "location_list": [
+        1,
+        2,
+        3
+      ]
+    },
+    "2": {
+      "chapter_id": 10119,
+      "day": 1,
+      "location_list": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        101,
+        102
+      ]
+    },
+    "3": {
+      "chapter_id": 10119,
+      "day": 1,
+      "location_list": [
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    "4": {
+      "chapter_id": 10119,
+      "day": 2,
+      "location_list": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        103,
+        104,
+        105
+      ]
+    },
+    "5": {
+      "chapter_id": 10119,
+      "day": 2,
+      "location_list": [
+        24
+      ]
+    },
+    "6": {
+      "chapter_id": 10119,
+      "day": 3,
+      "location_list": [
+        25,
+        26,
+        27,
+        106,
+        107,
+        108,
+        109
+      ]
+    },
+    "7": {
+      "chapter_id": 10119,
+      "day": 3,
+      "location_list": []
+    },
+    "8": {
+      "chapter_id": 10119,
+      "day": 4,
+      "location_list": [
+        28,
+        29,
+        110,
+        111,
+        112,
+        113
+      ]
+    },
+    "9": {
+      "chapter_id": 10119,
+      "day": 4,
+      "location_list": [
+        30,
+        31
+      ]
+    },
+    "10": {
+      "chapter_id": 10119,
+      "day": 5,
+      "location_list": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        114,
+        115,
+        116
+      ]
+    },
+    "11": {
+      "chapter_id": 10119,
+      "day": 5,
+      "location_list": [
+        37
+      ]
+    },
+    "12": {
+      "chapter_id": 10119,
+      "day": 6,
+      "location_list": [
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        117,
+        118
+      ]
+    },
+    "13": {
+      "chapter_id": 10119,
+      "day": 6,
+      "location_list": []
+    },
+    "14": {
+      "chapter_id": 10119,
+      "day": 13,
+      "location_list": [
+        44,
+        45,
+        46,
+        119,
+        120
+      ]
+    },
+    "15": {
+      "chapter_id": 10119,
+      "day": 13,
+      "location_list": [
+        47,
+        48
+      ]
+    },
+    "16": {
+      "chapter_id": 10119,
+      "day": 14,
+      "location_list": [
+        49,
+        50,
+        51,
+        52,
+        53,
+        121,
+        122
+      ]
+    },
+    "17": {
+      "chapter_id": 10119,
+      "day": 14,
+      "location_list": []
+    },
+    "18": {
+      "chapter_id": 10119,
+      "day": 15,
+      "location_list": [
+        54,
+        55,
+        56,
+        123,
+        124,
+        125,
+        126
+      ]
+    },
+    "19": {
+      "chapter_id": 10119,
+      "day": 15,
+      "location_list": []
+    },
+    "20": {
+      "chapter_id": 10119,
+      "day": 16,
+      "location_list": [
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+      ]
+    },
+    "21": {
+      "chapter_id": 10119,
+      "day": 16,
+      "location_list": []
+    },
+    "22": {
+      "chapter_id": 10119,
+      "day": 17,
+      "location_list": [
+        63
+      ]
+    }
+  },
+  "locations": {
+    "1": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031900
+      ],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": []
+    },
+    "2": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 1031900,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031928,
+        1031901,
+        1031929
+      ],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": []
+    },
+    "3": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 1031929,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031930,
+        1031902,
+        1031931
+      ],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": []
+    },
+    "4": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 1031931,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031903,
+        1031932
+      ],
+      "sub_stage_list": [
+        1011902
+      ],
+      "event_list": [
+        1011916
+      ],
+      "clue": []
+    },
+    "5": {
+      "type": 1,
+      "show_by_stage_id": 1031932,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [
+        1011901,
+        1011904
+      ],
+      "event_list": [
+        1011920
+      ],
+      "clue": []
+    },
+    "6": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [
+        1011960
+      ],
+      "clue": []
+    },
+    "7": {
+      "type": 1,
+      "show_by_stage_id": 1031933,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031934
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011961,
+        1011949
+      ],
+      "clue": []
+    },
+    "8": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [
+        1011941
+      ],
+      "clue": []
+    },
+    "9": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031935,
+        1031937,
+        1031940,
+        1031942
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011950
+      ],
+      "clue": []
+    },
+    "10": {
+      "type": 1,
+      "show_by_stage_id": 1031933,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031933
+      ],
+      "sub_stage_list": [
+        1011903
+      ],
+      "event_list": [
+        1011948,
+        1011939,
+        1011923
+      ],
+      "clue": []
+    },
+    "11": {
+      "type": 1,
+      "show_by_stage_id": 1031932,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031939,
+        1031943,
+        1031944,
+        1031906
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011969
+      ],
+      "clue": []
+    },
+    "12": {
+      "type": 1,
+      "show_by_stage_id": 1031933,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031938
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011940,
+        1011922
+      ],
+      "clue": []
+    },
+    "13": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190101
+      ]
+    },
+    "14": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190102
+      ]
+    },
+    "101": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190201,
+        3190202
+      ]
+    },
+    "102": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190203,
+        3190204
+      ]
+    },
+    "15": {
+      "type": 1,
+      "show_by_stage_id": 1031936,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031936
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011970,
+        1011924
+      ],
+      "clue": []
+    },
+    "16": {
+      "type": 1,
+      "show_by_stage_id": 1031903,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031905,
+        1031941
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011971
+      ],
+      "clue": []
+    },
+    "17": {
+      "type": 1,
+      "show_by_stage_id": 1031935,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031904
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011972,
+        1011921
+      ],
+      "clue": []
+    },
+    "18": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190103
+      ]
+    },
+    "19": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031945,
+        1031950,
+        1031951,
+        1031953
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011942,
+        1011953
+      ],
+      "clue": []
+    },
+    "20": {
+      "type": 1,
+      "show_by_stage_id": 1031945,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031952
+      ],
+      "sub_stage_list": [
+        1011905
+      ],
+      "event_list": [
+        1011973
+      ],
+      "clue": []
+    },
+    "21": {
+      "type": 1,
+      "show_by_stage_id": 1031945,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031949
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011951,
+        1011926
+      ],
+      "clue": []
+    },
+    "22": {
+      "type": 1,
+      "show_by_stage_id": 1031946,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031946,
+        1031947
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011952
+      ],
+      "clue": []
+    },
+    "23": {
+      "type": 1,
+      "show_by_stage_id": 1031949,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031909
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011954,
+        1011925
+      ],
+      "clue": []
+    },
+    "103": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190205,
+        3190206
+      ]
+    },
+    "104": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190207,
+        3190208
+      ]
+    },
+    "105": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190209,
+        3190210
+      ]
+    },
+    "24": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031907,
+        1031948,
+        1031908
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011974
+      ],
+      "clue": []
+    },
+    "25": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031954,
+        1031955
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011955,
+        1011928
+      ],
+      "clue": []
+    },
+    "26": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [
+        1011906
+      ],
+      "event_list": [
+        1011927
+      ],
+      "clue": []
+    },
+    "27": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [
+        1011962
+      ],
+      "clue": []
+    },
+    "106": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190211,
+        3190212
+      ]
+    },
+    "107": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190213,
+        3190214
+      ]
+    },
+    "108": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190215,
+        3190216
+      ]
+    },
+    "109": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190217,
+        3190218
+      ]
+    },
+    "28": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031956
+      ],
+      "sub_stage_list": [
+        1011907
+      ],
+      "event_list": [
+        1011956,
+        1011918
+      ],
+      "clue": []
+    },
+    "29": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031957,
+        1031911,
+        1031958
+      ],
+      "sub_stage_list": [
+        1011908,
+        1011909
+      ],
+      "event_list": [
+        1011975
+      ],
+      "clue": []
+    },
+    "110": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190219,
+        3190220
+      ]
+    },
+    "111": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190221,
+        3190222
+      ]
+    },
+    "112": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190223,
+        3190224
+      ]
+    },
+    "113": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190225,
+        3190226
+      ]
+    },
+    "30": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031910
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011917
+      ],
+      "clue": []
+    },
+    "31": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031959,
+        1031960,
+        1031912,
+        1031961,
+        1031913
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011976
+      ],
+      "clue": []
+    },
+    "32": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031962,
+        1031963
+      ],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": []
+    },
+    "33": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031964,
+        1031917,
+        1031974
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011943
+      ],
+      "clue": []
+    },
+    "34": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031965,
+        1031914,
+        1031966,
+        1031973
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011977
+      ],
+      "clue": []
+    },
+    "35": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031967,
+        1031915,
+        1031968
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011964
+      ],
+      "clue": []
+    },
+    "36": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031969,
+        1031972
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011963
+      ],
+      "clue": []
+    },
+    "114": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190227,
+        3190228
+      ]
+    },
+    "115": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190229,
+        3190230
+      ]
+    },
+    "116": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190231
+      ]
+    },
+    "37": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031970,
+        1031916,
+        1031971
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011978
+      ],
+      "clue": []
+    },
+    "38": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031918,
+        1031976
+      ],
+      "sub_stage_list": [
+        1011916,
+        1011917,
+        1011918
+      ],
+      "event_list": [
+        1011931,
+        1011944,
+        1011959
+      ],
+      "clue": []
+    },
+    "39": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [
+        1011957,
+        1011929,
+        1011965
+      ],
+      "clue": []
+    },
+    "40": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031975
+      ],
+      "sub_stage_list": [
+        1011910,
+        1011912
+      ],
+      "event_list": [
+        1011979
+      ],
+      "clue": []
+    },
+    "41": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [
+        1011930
+      ],
+      "clue": []
+    },
+    "42": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [
+        1011911
+      ],
+      "event_list": [
+        1011945,
+        1011958,
+        1011966,
+        1011967,
+        1011968
+      ],
+      "clue": []
+    },
+    "43": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031977
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011932,
+        1011946
+      ],
+      "clue": []
+    },
+    "117": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190232
+      ]
+    },
+    "118": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190233
+      ]
+    },
+    "44": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031919,
+        1031978,
+        1031983
+      ],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": []
+    },
+    "45": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031979,
+        1031980,
+        1031981,
+        1031982
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011919
+      ],
+      "clue": []
+    },
+    "46": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [
+        1011914
+      ],
+      "event_list": [
+        1011980
+      ],
+      "clue": []
+    },
+    "119": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190234,
+        3190235
+      ]
+    },
+    "120": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190236,
+        3190237
+      ]
+    },
+    "47": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031920
+      ],
+      "sub_stage_list": [
+        1011913
+      ],
+      "event_list": [
+        1011981
+      ],
+      "clue": []
+    },
+    "48": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031921
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011982
+      ],
+      "clue": []
+    },
+    "49": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031984,
+        1031987,
+        1031988
+      ],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": []
+    },
+    "50": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031986,
+        1031989
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011983
+      ],
+      "clue": []
+    },
+    "51": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031985
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011933
+      ],
+      "clue": []
+    },
+    "52": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031922
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011984
+      ],
+      "clue": []
+    },
+    "53": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190104
+      ]
+    },
+    "121": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190238,
+        3190239
+      ]
+    },
+    "122": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190240,
+        3190241
+      ]
+    },
+    "54": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031990,
+        1031991
+      ],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": []
+    },
+    "55": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031924
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011934
+      ],
+      "clue": []
+    },
+    "56": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031923
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011985
+      ],
+      "clue": []
+    },
+    "123": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190242
+      ]
+    },
+    "124": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190243,
+        3190244
+      ]
+    },
+    "125": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190245
+      ]
+    },
+    "126": {
+      "type": 2,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 1,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": [
+        3190246,
+        3190247
+      ]
+    },
+    "57": {
+      "type": 1,
+      "show_by_stage_id": 1031997,
+      "hide_by_stage_id": 1031926,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031992
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011938
+      ],
+      "clue": []
+    },
+    "58": {
+      "type": 1,
+      "show_by_stage_id": 1031997,
+      "hide_by_stage_id": 1031926,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031994
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011937
+      ],
+      "clue": []
+    },
+    "59": {
+      "type": 1,
+      "show_by_stage_id": 1031997,
+      "hide_by_stage_id": 1031926,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [],
+      "sub_stage_list": [],
+      "event_list": [
+        1011947
+      ],
+      "clue": []
+    },
+    "60": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031993,
+        1031995,
+        1031927
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011986
+      ],
+      "clue": []
+    },
+    "61": {
+      "type": 1,
+      "show_by_stage_id": 1031997,
+      "hide_by_stage_id": 1031926,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031925
+      ],
+      "sub_stage_list": [
+        1011915
+      ],
+      "event_list": [
+        1011935
+      ],
+      "clue": []
+    },
+    "62": {
+      "type": 1,
+      "show_by_stage_id": 1031997,
+      "hide_by_stage_id": 1031926,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031926
+      ],
+      "sub_stage_list": [],
+      "event_list": [
+        1011936
+      ],
+      "clue": []
+    },
+    "63": {
+      "type": 1,
+      "show_by_stage_id": 0,
+      "hide_by_stage_id": 0,
+      "unlock_stage_id": 0,
+      "need_scan": 0,
+      "can_not_click_until_unlock_fog": 0,
+      "stage_list": [
+        1031996,
+        1031997
+      ],
+      "sub_stage_list": [],
+      "event_list": [],
+      "clue": []
+    }
+  },
+  "archives": {
+    "1011916": {
+      "unlock_by_stage_id": 1031932
+    },
+    "1011917": {
+      "unlock_by_stage_id": 0
+    },
+    "1011918": {
+      "unlock_by_stage_id": 0
+    },
+    "1011919": {
+      "unlock_by_stage_id": 0
+    },
+    "1011920": {
+      "unlock_by_stage_id": 1031932
+    },
+    "1011921": {
+      "unlock_by_stage_id": 1031935
+    },
+    "1011922": {
+      "unlock_by_stage_id": 1031933
+    },
+    "1011923": {
+      "unlock_by_stage_id": 1031933
+    },
+    "1011924": {
+      "unlock_by_stage_id": 1031904
+    },
+    "1011925": {
+      "unlock_by_stage_id": 1031949
+    },
+    "1011926": {
+      "unlock_by_stage_id": 1031949
+    },
+    "1011927": {
+      "unlock_by_stage_id": 0
+    },
+    "1011928": {
+      "unlock_by_stage_id": 0
+    },
+    "1011929": {
+      "unlock_by_stage_id": 0
+    },
+    "1011930": {
+      "unlock_by_stage_id": 0
+    },
+    "1011931": {
+      "unlock_by_stage_id": 0
+    },
+    "1011932": {
+      "unlock_by_stage_id": 0
+    },
+    "1011933": {
+      "unlock_by_stage_id": 0
+    },
+    "1011934": {
+      "unlock_by_stage_id": 0
+    },
+    "1011935": {
+      "unlock_by_stage_id": 0
+    },
+    "1011936": {
+      "unlock_by_stage_id": 0
+    },
+    "1011937": {
+      "unlock_by_stage_id": 0
+    },
+    "1011938": {
+      "unlock_by_stage_id": 0
+    },
+    "1011939": {
+      "unlock_by_stage_id": 1031942
+    },
+    "1011940": {
+      "unlock_by_stage_id": 1031943
+    },
+    "1011941": {
+      "unlock_by_stage_id": 1031906
+    },
+    "1011942": {
+      "unlock_by_stage_id": 1031906
+    },
+    "1011943": {
+      "unlock_by_stage_id": 0
+    },
+    "1011944": {
+      "unlock_by_stage_id": 0
+    },
+    "1011945": {
+      "unlock_by_stage_id": 0
+    },
+    "1011946": {
+      "unlock_by_stage_id": 0
+    },
+    "1011947": {
+      "unlock_by_stage_id": 0
+    },
+    "1011948": {
+      "unlock_by_stage_id": 1031933
+    },
+    "1011949": {
+      "unlock_by_stage_id": 1031934
+    },
+    "1011950": {
+      "unlock_by_stage_id": 1031937
+    },
+    "1011951": {
+      "unlock_by_stage_id": 1031945
+    },
+    "1011952": {
+      "unlock_by_stage_id": 1031946
+    },
+    "1011953": {
+      "unlock_by_stage_id": 1031949
+    },
+    "1011954": {
+      "unlock_by_stage_id": 1031952
+    },
+    "1011955": {
+      "unlock_by_stage_id": 0
+    },
+    "1011956": {
+      "unlock_by_stage_id": 0
+    },
+    "1011957": {
+      "unlock_by_stage_id": 0
+    },
+    "1011958": {
+      "unlock_by_stage_id": 0
+    },
+    "1011959": {
+      "unlock_by_stage_id": 0
+    },
+    "1011960": {
+      "unlock_by_stage_id": 1031942
+    },
+    "1011961": {
+      "unlock_by_stage_id": 1031943
+    },
+    "1011962": {
+      "unlock_by_stage_id": 0
+    },
+    "1011963": {
+      "unlock_by_stage_id": 0
+    },
+    "1011964": {
+      "unlock_by_stage_id": 0
+    },
+    "1011965": {
+      "unlock_by_stage_id": 0
+    },
+    "1011966": {
+      "unlock_by_stage_id": 0
+    },
+    "1011967": {
+      "unlock_by_stage_id": 0
+    },
+    "1011968": {
+      "unlock_by_stage_id": 0
+    },
+    "1011969": {
+      "unlock_by_stage_id": 1031932
+    },
+    "1011970": {
+      "unlock_by_stage_id": 1031903
+    },
+    "1011971": {
+      "unlock_by_stage_id": 1031903
+    },
+    "1011972": {
+      "unlock_by_stage_id": 1031903
+    },
+    "1011973": {
+      "unlock_by_stage_id": 1031945
+    },
+    "1011974": {
+      "unlock_by_stage_id": 0
+    },
+    "1011975": {
+      "unlock_by_stage_id": 0
+    },
+    "1011976": {
+      "unlock_by_stage_id": 0
+    },
+    "1011977": {
+      "unlock_by_stage_id": 0
+    },
+    "1011978": {
+      "unlock_by_stage_id": 0
+    },
+    "1011979": {
+      "unlock_by_stage_id": 0
+    },
+    "1011980": {
+      "unlock_by_stage_id": 0
+    },
+    "1011981": {
+      "unlock_by_stage_id": 0
+    },
+    "1011982": {
+      "unlock_by_stage_id": 0
+    },
+    "1011983": {
+      "unlock_by_stage_id": 0
+    },
+    "1011984": {
+      "unlock_by_stage_id": 0
+    },
+    "1011985": {
+      "unlock_by_stage_id": 0
+    },
+    "1011986": {
+      "unlock_by_stage_id": 0
+    },
+    "3190101": {
+      "unlock_by_stage_id": 0
+    },
+    "3190102": {
+      "unlock_by_stage_id": 0
+    },
+    "3190103": {
+      "unlock_by_stage_id": 0
+    },
+    "3190104": {
+      "unlock_by_stage_id": 0
+    },
+    "3190201": {
+      "unlock_by_stage_id": 0
+    },
+    "3190202": {
+      "unlock_by_stage_id": 0
+    },
+    "3190203": {
+      "unlock_by_stage_id": 0
+    },
+    "3190204": {
+      "unlock_by_stage_id": 0
+    },
+    "3190205": {
+      "unlock_by_stage_id": 0
+    },
+    "3190206": {
+      "unlock_by_stage_id": 0
+    },
+    "3190207": {
+      "unlock_by_stage_id": 0
+    },
+    "3190208": {
+      "unlock_by_stage_id": 0
+    },
+    "3190209": {
+      "unlock_by_stage_id": 0
+    },
+    "3190210": {
+      "unlock_by_stage_id": 0
+    },
+    "3190211": {
+      "unlock_by_stage_id": 0
+    },
+    "3190212": {
+      "unlock_by_stage_id": 0
+    },
+    "3190213": {
+      "unlock_by_stage_id": 0
+    },
+    "3190214": {
+      "unlock_by_stage_id": 0
+    },
+    "3190215": {
+      "unlock_by_stage_id": 0
+    },
+    "3190216": {
+      "unlock_by_stage_id": 0
+    },
+    "3190217": {
+      "unlock_by_stage_id": 0
+    },
+    "3190218": {
+      "unlock_by_stage_id": 0
+    },
+    "3190219": {
+      "unlock_by_stage_id": 0
+    },
+    "3190220": {
+      "unlock_by_stage_id": 0
+    },
+    "3190221": {
+      "unlock_by_stage_id": 0
+    },
+    "3190222": {
+      "unlock_by_stage_id": 0
+    },
+    "3190223": {
+      "unlock_by_stage_id": 0
+    },
+    "3190224": {
+      "unlock_by_stage_id": 0
+    },
+    "3190225": {
+      "unlock_by_stage_id": 0
+    },
+    "3190226": {
+      "unlock_by_stage_id": 0
+    },
+    "3190227": {
+      "unlock_by_stage_id": 0
+    },
+    "3190228": {
+      "unlock_by_stage_id": 0
+    },
+    "3190229": {
+      "unlock_by_stage_id": 0
+    },
+    "3190230": {
+      "unlock_by_stage_id": 0
+    },
+    "3190231": {
+      "unlock_by_stage_id": 0
+    },
+    "3190232": {
+      "unlock_by_stage_id": 0
+    },
+    "3190233": {
+      "unlock_by_stage_id": 0
+    },
+    "3190234": {
+      "unlock_by_stage_id": 0
+    },
+    "3190235": {
+      "unlock_by_stage_id": 0
+    },
+    "3190236": {
+      "unlock_by_stage_id": 0
+    },
+    "3190237": {
+      "unlock_by_stage_id": 0
+    },
+    "3190238": {
+      "unlock_by_stage_id": 0
+    },
+    "3190239": {
+      "unlock_by_stage_id": 0
+    },
+    "3190240": {
+      "unlock_by_stage_id": 0
+    },
+    "3190241": {
+      "unlock_by_stage_id": 0
+    },
+    "3190242": {
+      "unlock_by_stage_id": 0
+    },
+    "3190243": {
+      "unlock_by_stage_id": 0
+    },
+    "3190244": {
+      "unlock_by_stage_id": 0
+    },
+    "3190245": {
+      "unlock_by_stage_id": 0
+    },
+    "3190246": {
+      "unlock_by_stage_id": 0
+    },
+    "3190247": {
+      "unlock_by_stage_id": 0
+    }
+  },
+  "settings": {
+    "chapter19_scan_unlock": 1031931,
+    "chapter19_activate": 1031931,
+    "chapter19_exit": 1031927,
+    "chapter19_timeline": 12,
+    "chapter19_fog_dissipation": 1031913
+  }
+}

@@ -193,6 +193,34 @@ def enc_ack_battle_gs_result(code=1):
     return _f_varint2(1, int(code or 1))
 
 
+def parse_record_counters(payload):
+    """Preserve packed and unpacked int32 fields 14/15, including all repeats."""
+    arrays={14:[],15:[]};i=0
+    while i<len(payload):
+        tag,i=rd_varint(payload,i);field,wire=tag>>3,tag&7
+        if not field:
+            raise ValueError('Invalid protobuf field zero')
+        if wire==0:
+            value,i=rd_varint(payload,i)
+            if field in arrays:
+                arrays[field].append(value if value<0x80000000 else (value&0xffffffff)-0x100000000)
+        elif wire==2:
+            size,i=rd_varint(payload,i);end=i+size
+            if end>len(payload):raise ValueError('Truncated battle record payload')
+            if field in arrays:
+                while i<end:
+                    value,i=rd_varint(payload,i)
+                    if i>end:raise ValueError('Packed counter crosses its field boundary')
+                    arrays[field].append(value if value<0x80000000 else (value&0xffffffff)-0x100000000)
+            i=end
+        elif wire in (1,5):
+            i+=8 if wire==1 else 4
+            if i>len(payload):raise ValueError('Truncated fixed-width battle field')
+        else:
+            raise ValueError('Unsupported battle field wire type')
+    return arrays[14],arrays[15]
+
+
 def parse_battle_result(body):
     f = parse_pb_top(body)
     bid = f.get(1, 0)
@@ -212,6 +240,15 @@ def parse_battle_result(body):
         info["qte_count"] = int(info_f.get(8, 0))
         info["resurrect_times"] = int(info_f.get(9, 0))
         info["enemy_dead_num"] = int(info_f.get(11, 0))
+        try:
+            ids,counts=parse_record_counters(info_raw)
+            info['record_data_ids']=ids
+            info['record_data_numbers']=counts
+        except (IndexError,ValueError):
+            # The optional classification cannot invalidate the main result,
+            # and a malformed counter list must never invent a monster kill.
+            info['record_data_ids']=None
+            info['record_data_numbers']=None
     return bid, uuid_v, result, info
 
 
@@ -274,11 +311,20 @@ class BattleServer:
         self._send_kcp(addr, st, KCP_CMD_PUSH, xs_encode_frame(opcode, body, flag, rpc_id), ts=ts)
 
     # ---------- 接收 ----------
+    def _drop_session(self, client_id, expected):
+        """Caller holds _lock; a stale owner must not remove its replacement."""
+        if expected is None or self._conns.get(client_id) is not expected:
+            return False
+        self._conns.pop(client_id, None)
+        self._pong_seq.pop(client_id, None)
+        return True
+
     def _new_session(self, client_id, server_id, addr):
         st = {"conn": server_id, "conv": client_id, "client_id": client_id,
               "ts": 0, "sn": -1, "ack_una": 0, "frame_count": 0, "started": False,
               "sn_peer_base": None, "addr": addr, "last_seen": time.time(),
               "entry_started": time.monotonic(), "entry_pings": 0}
+        self._pong_seq.pop(client_id, None)
         self._conns[client_id] = st
         return st
 
@@ -310,7 +356,7 @@ class BattleServer:
 
         if typ in (FIN, ERR):
             with self._lock:
-                self._conns.pop(cid, None)
+                self._drop_session(cid, st)
             return
 
         if typ != MSG:
@@ -374,6 +420,8 @@ class BattleServer:
             ping_started = time.monotonic()
             ct = parse_ping(f["body"])
             with self._lock:
+                if self._conns.get(st["client_id"]) is not st:
+                    return
                 n = self._pong_seq.get(st["client_id"], 0)
                 self._pong_seq[st["client_id"]] = n + 1
             if self.server_ts:
@@ -473,10 +521,10 @@ class BattleServer:
             time.sleep(60)
             now = time.time()
             with self._lock:
-                dead = [cid for cid, st in self._conns.items()
+                dead = [(cid, st) for cid, st in self._conns.items()
                         if now - st.get("last_seen", now) > SESSION_IDLE_TIMEOUT]
-                for cid in dead:
-                    self._conns.pop(cid, None)
+                for cid, st in dead:
+                    self._drop_session(cid, st)
                 # 结果登记表只留最近 200 条
                 if len(self._results) > 200:
                     for k in list(self._results.keys())[:-200]:

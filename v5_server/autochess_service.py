@@ -29,7 +29,7 @@ import json
 import time
 import random
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 
 from core import Operation, OperationError, operation
 from middleware import DownFrame
@@ -596,6 +596,13 @@ class AutoChessService:
         if not stage_id or stage_id <= 0:
             stage_id = 101
         self._require_phase1_stage(stage_id)
+        from new_player_service import enabled, config
+        if enabled(self.db,uid):
+            stage_rule=config()['autochess'].get(str(stage_id),{})
+            prerequisites={stage_rule.get('prev',0),config()['autochess_areas'].get(str(stage_rule.get('area')),{}).get('prev',0)}-{0}
+            for previous in prerequisites:
+                if not self.db.query('SELECT 1 FROM autochess_stage WHERE uid=? AND stage_id=? AND clear_time>0',(uid,previous)):
+                    raise OperationError(2,'自走棋前置关卡尚未通关')
         stage_cfg = self.get_stage_cfg(stage_id) or {}
         defeat_num = int(stage_cfg.get("defeat_num", 3))
 

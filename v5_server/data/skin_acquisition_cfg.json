@@ -1,0 +1,917 @@
+{
+  "1011": {
+    "hero_id": 1011,
+    "portrait_id": 2110111,
+    "race": 2
+  },
+  "1012": {
+    "hero_id": 1012,
+    "portrait_id": 2110121,
+    "race": 9
+  },
+  "101201": {
+    "hero_id": 1012,
+    "portrait_id": 2110122,
+    "race": 9
+  },
+  "1013": {
+    "hero_id": 1013,
+    "portrait_id": 2110131,
+    "race": 5
+  },
+  "101301": {
+    "hero_id": 1013,
+    "portrait_id": 2110132,
+    "race": 5
+  },
+  "1015": {
+    "hero_id": 1015,
+    "portrait_id": 2110151,
+    "race": 2
+  },
+  "101501": {
+    "hero_id": 1015,
+    "portrait_id": 2110152,
+    "race": 2
+  },
+  "101502": {
+    "hero_id": 1015,
+    "portrait_id": 2110153,
+    "race": 2
+  },
+  "1016": {
+    "hero_id": 1016,
+    "portrait_id": 2110161,
+    "race": 5
+  },
+  "1017": {
+    "hero_id": 1017,
+    "portrait_id": 2110171,
+    "race": 2
+  },
+  "101701": {
+    "hero_id": 1017,
+    "portrait_id": 2110172,
+    "race": 2
+  },
+  "1019": {
+    "hero_id": 1019,
+    "portrait_id": 2110191,
+    "race": 2
+  },
+  "1020": {
+    "hero_id": 1020,
+    "portrait_id": 2110201,
+    "race": 5
+  },
+  "102001": {
+    "hero_id": 1020,
+    "portrait_id": 2110202,
+    "race": 5
+  },
+  "102003": {
+    "hero_id": 1020,
+    "portrait_id": 2110203,
+    "race": 5
+  },
+  "1021": {
+    "hero_id": 1021,
+    "portrait_id": 2110211,
+    "race": 1
+  },
+  "102101": {
+    "hero_id": 1021,
+    "portrait_id": 2110212,
+    "race": 1
+  },
+  "1022": {
+    "hero_id": 1022,
+    "portrait_id": 2110221,
+    "race": 1
+  },
+  "102201": {
+    "hero_id": 1022,
+    "portrait_id": 2110222,
+    "race": 1
+  },
+  "102202": {
+    "hero_id": 1022,
+    "portrait_id": 2110223,
+    "race": 1
+  },
+  "1024": {
+    "hero_id": 1024,
+    "portrait_id": 2110241,
+    "race": 2
+  },
+  "1026": {
+    "hero_id": 1026,
+    "portrait_id": 2110261,
+    "race": 5
+  },
+  "1027": {
+    "hero_id": 1027,
+    "portrait_id": 2110271,
+    "race": 5
+  },
+  "102701": {
+    "hero_id": 1027,
+    "portrait_id": 2110272,
+    "race": 5
+  },
+  "1028": {
+    "hero_id": 1028,
+    "portrait_id": 2110281,
+    "race": 4
+  },
+  "102801": {
+    "hero_id": 1028,
+    "portrait_id": 2110282,
+    "race": 4
+  },
+  "102802": {
+    "hero_id": 1028,
+    "portrait_id": 2110283,
+    "race": 4
+  },
+  "1032": {
+    "hero_id": 1032,
+    "portrait_id": 2110321,
+    "race": 4
+  },
+  "103203": {
+    "hero_id": 1032,
+    "portrait_id": 2110322,
+    "race": 4
+  },
+  "1033": {
+    "hero_id": 1033,
+    "portrait_id": 2110331,
+    "race": 4
+  },
+  "1034": {
+    "hero_id": 1034,
+    "portrait_id": 2110341,
+    "race": 2
+  },
+  "103401": {
+    "hero_id": 1034,
+    "portrait_id": 2110342,
+    "race": 2
+  },
+  "103402": {
+    "hero_id": 1034,
+    "portrait_id": 2110343,
+    "race": 2
+  },
+  "1035": {
+    "hero_id": 1035,
+    "portrait_id": 2110351,
+    "race": 2
+  },
+  "1037": {
+    "hero_id": 1037,
+    "portrait_id": 2110371,
+    "race": 4
+  },
+  "103701": {
+    "hero_id": 1037,
+    "portrait_id": 2110372,
+    "race": 4
+  },
+  "1038": {
+    "hero_id": 1038,
+    "portrait_id": 2110381,
+    "race": 1
+  },
+  "1039": {
+    "hero_id": 1039,
+    "portrait_id": 2110391,
+    "race": 1
+  },
+  "103901": {
+    "hero_id": 1039,
+    "portrait_id": 2110392,
+    "race": 1
+  },
+  "103906": {
+    "hero_id": 1039,
+    "portrait_id": 2110393,
+    "race": 1
+  },
+  "1041": {
+    "hero_id": 1041,
+    "portrait_id": 2110411,
+    "race": 1
+  },
+  "104101": {
+    "hero_id": 1041,
+    "portrait_id": 2110412,
+    "race": 1
+  },
+  "104103": {
+    "hero_id": 1041,
+    "portrait_id": 2110413,
+    "race": 1
+  },
+  "1042": {
+    "hero_id": 1042,
+    "portrait_id": 2110421,
+    "race": 1
+  },
+  "104201": {
+    "hero_id": 1042,
+    "portrait_id": 2110422,
+    "race": 1
+  },
+  "104204": {
+    "hero_id": 1042,
+    "portrait_id": 2110423,
+    "race": 1
+  },
+  "104205": {
+    "hero_id": 1042,
+    "portrait_id": 2110424,
+    "race": 1
+  },
+  "1043": {
+    "hero_id": 1043,
+    "portrait_id": 2110431,
+    "race": 5
+  },
+  "104301": {
+    "hero_id": 1043,
+    "portrait_id": 2110432,
+    "race": 5
+  },
+  "1044": {
+    "hero_id": 1044,
+    "portrait_id": 2110441,
+    "race": 2
+  },
+  "104401": {
+    "hero_id": 1044,
+    "portrait_id": 2110442,
+    "race": 2
+  },
+  "104402": {
+    "hero_id": 1044,
+    "portrait_id": 2110443,
+    "race": 2
+  },
+  "1045": {
+    "hero_id": 1045,
+    "portrait_id": 2110451,
+    "race": 5
+  },
+  "104501": {
+    "hero_id": 1045,
+    "portrait_id": 2110452,
+    "race": 5
+  },
+  "1046": {
+    "hero_id": 1046,
+    "portrait_id": 2110461,
+    "race": 5
+  },
+  "104601": {
+    "hero_id": 1046,
+    "portrait_id": 2110462,
+    "race": 5
+  },
+  "1047": {
+    "hero_id": 1047,
+    "portrait_id": 2110471,
+    "race": 2
+  },
+  "104701": {
+    "hero_id": 1047,
+    "portrait_id": 2110472,
+    "race": 2
+  },
+  "1048": {
+    "hero_id": 1048,
+    "portrait_id": 2110481,
+    "race": 3
+  },
+  "104801": {
+    "hero_id": 1048,
+    "portrait_id": 2110482,
+    "race": 3
+  },
+  "1049": {
+    "hero_id": 1049,
+    "portrait_id": 2110491,
+    "race": 3
+  },
+  "104901": {
+    "hero_id": 1049,
+    "portrait_id": 2110492,
+    "race": 3
+  },
+  "104902": {
+    "hero_id": 1049,
+    "portrait_id": 2110493,
+    "race": 3
+  },
+  "104903": {
+    "hero_id": 1049,
+    "portrait_id": 2110494,
+    "race": 3
+  },
+  "1050": {
+    "hero_id": 1050,
+    "portrait_id": 2110501,
+    "race": 3
+  },
+  "1052": {
+    "hero_id": 1052,
+    "portrait_id": 2110521,
+    "race": 5
+  },
+  "105201": {
+    "hero_id": 1052,
+    "portrait_id": 2110522,
+    "race": 5
+  },
+  "1053": {
+    "hero_id": 1053,
+    "portrait_id": 2110531,
+    "race": 9
+  },
+  "105301": {
+    "hero_id": 1053,
+    "portrait_id": 2110532,
+    "race": 9
+  },
+  "1054": {
+    "hero_id": 1054,
+    "portrait_id": 2110541,
+    "race": 9
+  },
+  "105401": {
+    "hero_id": 1054,
+    "portrait_id": 2110542,
+    "race": 9
+  },
+  "1055": {
+    "hero_id": 1055,
+    "portrait_id": 2110551,
+    "race": 3
+  },
+  "105501": {
+    "hero_id": 1055,
+    "portrait_id": 2110552,
+    "race": 3
+  },
+  "105502": {
+    "hero_id": 1055,
+    "portrait_id": 2110553,
+    "race": 3
+  },
+  "1056": {
+    "hero_id": 1056,
+    "portrait_id": 2110561,
+    "race": 5
+  },
+  "1058": {
+    "hero_id": 1058,
+    "portrait_id": 2110581,
+    "race": 3
+  },
+  "105804": {
+    "hero_id": 1058,
+    "portrait_id": 2110582,
+    "race": 3
+  },
+  "1059": {
+    "hero_id": 1059,
+    "portrait_id": 2110591,
+    "race": 1
+  },
+  "1060": {
+    "hero_id": 1060,
+    "portrait_id": 2110601,
+    "race": 9
+  },
+  "106001": {
+    "hero_id": 1060,
+    "portrait_id": 2110602,
+    "race": 9
+  },
+  "1061": {
+    "hero_id": 1061,
+    "portrait_id": 2110611,
+    "race": 9
+  },
+  "106101": {
+    "hero_id": 1061,
+    "portrait_id": 2110612,
+    "race": 9
+  },
+  "106102": {
+    "hero_id": 1061,
+    "portrait_id": 2110613,
+    "race": 9
+  },
+  "106103": {
+    "hero_id": 1061,
+    "portrait_id": 2110614,
+    "race": 9
+  },
+  "1066": {
+    "hero_id": 1066,
+    "portrait_id": 2110661,
+    "race": 3
+  },
+  "106603": {
+    "hero_id": 1066,
+    "portrait_id": 2110662,
+    "race": 3
+  },
+  "106604": {
+    "hero_id": 1066,
+    "portrait_id": 2110663,
+    "race": 3
+  },
+  "1067": {
+    "hero_id": 1067,
+    "portrait_id": 2110671,
+    "race": 1
+  },
+  "1068": {
+    "hero_id": 1068,
+    "portrait_id": 2110681,
+    "race": 5
+  },
+  "1070": {
+    "hero_id": 1070,
+    "portrait_id": 2110701,
+    "race": 9
+  },
+  "107001": {
+    "hero_id": 1070,
+    "portrait_id": 2110702,
+    "race": 9
+  },
+  "107002": {
+    "hero_id": 1070,
+    "portrait_id": 2110703,
+    "race": 9
+  },
+  "1071": {
+    "hero_id": 1071,
+    "portrait_id": 2110711,
+    "race": 9
+  },
+  "107101": {
+    "hero_id": 1071,
+    "portrait_id": 2110712,
+    "race": 9
+  },
+  "1072": {
+    "hero_id": 1072,
+    "portrait_id": 2110721,
+    "race": 9
+  },
+  "107201": {
+    "hero_id": 1072,
+    "portrait_id": 2110722,
+    "race": 9
+  },
+  "1073": {
+    "hero_id": 1073,
+    "portrait_id": 2110731,
+    "race": 9
+  },
+  "107301": {
+    "hero_id": 1073,
+    "portrait_id": 2110732,
+    "race": 9
+  },
+  "1074": {
+    "hero_id": 1074,
+    "portrait_id": 2110741,
+    "race": 9
+  },
+  "107401": {
+    "hero_id": 1074,
+    "portrait_id": 2110742,
+    "race": 9
+  },
+  "107402": {
+    "hero_id": 1074,
+    "portrait_id": 2110743,
+    "race": 9
+  },
+  "1075": {
+    "hero_id": 1075,
+    "portrait_id": 2110751,
+    "race": 9
+  },
+  "107501": {
+    "hero_id": 1075,
+    "portrait_id": 2110752,
+    "race": 9
+  },
+  "107502": {
+    "hero_id": 1075,
+    "portrait_id": 2110753,
+    "race": 9
+  },
+  "107503": {
+    "hero_id": 1075,
+    "portrait_id": 2110754,
+    "race": 9
+  },
+  "1076": {
+    "hero_id": 1076,
+    "portrait_id": 2110761,
+    "race": 9
+  },
+  "107601": {
+    "hero_id": 1076,
+    "portrait_id": 2110762,
+    "race": 9
+  },
+  "107602": {
+    "hero_id": 1076,
+    "portrait_id": 2110763,
+    "race": 9
+  },
+  "1077": {
+    "hero_id": 1077,
+    "portrait_id": 2110771,
+    "race": 9
+  },
+  "107701": {
+    "hero_id": 1077,
+    "portrait_id": 2110772,
+    "race": 9
+  },
+  "1080": {
+    "hero_id": 1080,
+    "portrait_id": 2110801,
+    "race": 4
+  },
+  "1081": {
+    "hero_id": 1081,
+    "portrait_id": 2110811,
+    "race": 4
+  },
+  "1083": {
+    "hero_id": 1083,
+    "portrait_id": 2110831,
+    "race": 5
+  },
+  "108301": {
+    "hero_id": 1083,
+    "portrait_id": 2110832,
+    "race": 5
+  },
+  "1084": {
+    "hero_id": 1084,
+    "portrait_id": 2110841,
+    "race": 4
+  },
+  "108403": {
+    "hero_id": 1084,
+    "portrait_id": 2110842,
+    "race": 4
+  },
+  "108404": {
+    "hero_id": 1084,
+    "portrait_id": 2110843,
+    "race": 4
+  },
+  "1085": {
+    "hero_id": 1085,
+    "portrait_id": 2110851,
+    "race": 4
+  },
+  "108501": {
+    "hero_id": 1085,
+    "portrait_id": 2110852,
+    "race": 4
+  },
+  "108502": {
+    "hero_id": 1085,
+    "portrait_id": 2110853,
+    "race": 4
+  },
+  "1089": {
+    "hero_id": 1089,
+    "portrait_id": 2110891,
+    "race": 5
+  },
+  "108901": {
+    "hero_id": 1089,
+    "portrait_id": 2110892,
+    "race": 5
+  },
+  "108902": {
+    "hero_id": 1089,
+    "portrait_id": 2110893,
+    "race": 5
+  },
+  "1093": {
+    "hero_id": 1093,
+    "portrait_id": 2110931,
+    "race": 3
+  },
+  "109303": {
+    "hero_id": 1093,
+    "portrait_id": 2110932,
+    "race": 3
+  },
+  "109304": {
+    "hero_id": 1093,
+    "portrait_id": 2110933,
+    "race": 3
+  },
+  "1094": {
+    "hero_id": 1094,
+    "portrait_id": 2110941,
+    "race": 4
+  },
+  "109402": {
+    "hero_id": 1094,
+    "portrait_id": 2110942,
+    "race": 4
+  },
+  "109404": {
+    "hero_id": 1094,
+    "portrait_id": 2110944,
+    "race": 4
+  },
+  "1095": {
+    "hero_id": 1095,
+    "portrait_id": 2110951,
+    "race": 2
+  },
+  "109501": {
+    "hero_id": 1095,
+    "portrait_id": 2110952,
+    "race": 2
+  },
+  "109502": {
+    "hero_id": 1095,
+    "portrait_id": 2110953,
+    "race": 2
+  },
+  "109503": {
+    "hero_id": 1095,
+    "portrait_id": 2110954,
+    "race": 2
+  },
+  "1096": {
+    "hero_id": 1096,
+    "portrait_id": 2110961,
+    "race": 1
+  },
+  "1097": {
+    "hero_id": 1097,
+    "portrait_id": 2110971,
+    "race": 1
+  },
+  "109701": {
+    "hero_id": 1097,
+    "portrait_id": 2110972,
+    "race": 1
+  },
+  "1099": {
+    "hero_id": 1099,
+    "portrait_id": 2110991,
+    "race": 3
+  },
+  "1111": {
+    "hero_id": 1111,
+    "portrait_id": 2111111,
+    "race": 2
+  },
+  "111101": {
+    "hero_id": 1111,
+    "portrait_id": 2111112,
+    "race": 2
+  },
+  "111102": {
+    "hero_id": 1111,
+    "portrait_id": 2111113,
+    "race": 2
+  },
+  "1119": {
+    "hero_id": 1119,
+    "portrait_id": 2111191,
+    "race": 2
+  },
+  "1127": {
+    "hero_id": 1127,
+    "portrait_id": 2111271,
+    "race": 5
+  },
+  "1132": {
+    "hero_id": 1132,
+    "portrait_id": 2111321,
+    "race": 4
+  },
+  "1133": {
+    "hero_id": 1133,
+    "portrait_id": 2111331,
+    "race": 4
+  },
+  "113301": {
+    "hero_id": 1133,
+    "portrait_id": 2111332,
+    "race": 4
+  },
+  "1137": {
+    "hero_id": 1137,
+    "portrait_id": 2111371,
+    "race": 4
+  },
+  "113701": {
+    "hero_id": 1137,
+    "portrait_id": 2111372,
+    "race": 4
+  },
+  "1138": {
+    "hero_id": 1138,
+    "portrait_id": 2111381,
+    "race": 1
+  },
+  "113801": {
+    "hero_id": 1138,
+    "portrait_id": 2111382,
+    "race": 1
+  },
+  "113803": {
+    "hero_id": 1138,
+    "portrait_id": 2111383,
+    "race": 1
+  },
+  "1139": {
+    "hero_id": 1139,
+    "portrait_id": 2111391,
+    "race": 1
+  },
+  "113903": {
+    "hero_id": 1139,
+    "portrait_id": 2111392,
+    "race": 1
+  },
+  "113907": {
+    "hero_id": 1139,
+    "portrait_id": 2111393,
+    "race": 1
+  },
+  "1148": {
+    "hero_id": 1148,
+    "portrait_id": 2111481,
+    "race": 3
+  },
+  "114801": {
+    "hero_id": 1148,
+    "portrait_id": 2111482,
+    "race": 3
+  },
+  "1150": {
+    "hero_id": 1150,
+    "portrait_id": 2111501,
+    "race": 3
+  },
+  "115001": {
+    "hero_id": 1150,
+    "portrait_id": 2111502,
+    "race": 3
+  },
+  "115002": {
+    "hero_id": 1150,
+    "portrait_id": 2111503,
+    "race": 3
+  },
+  "1156": {
+    "hero_id": 1156,
+    "portrait_id": 2111561,
+    "race": 5
+  },
+  "115601": {
+    "hero_id": 1156,
+    "portrait_id": 2111562,
+    "race": 5
+  },
+  "1158": {
+    "hero_id": 1158,
+    "portrait_id": 2111581,
+    "race": 3
+  },
+  "1166": {
+    "hero_id": 1166,
+    "portrait_id": 2111661,
+    "race": 3
+  },
+  "116601": {
+    "hero_id": 1166,
+    "portrait_id": 2111662,
+    "race": 3
+  },
+  "1170": {
+    "hero_id": 1170,
+    "portrait_id": 2111701,
+    "race": 9
+  },
+  "117001": {
+    "hero_id": 1170,
+    "portrait_id": 2111702,
+    "race": 9
+  },
+  "1184": {
+    "hero_id": 1184,
+    "portrait_id": 2111841,
+    "race": 4
+  },
+  "1194": {
+    "hero_id": 1194,
+    "portrait_id": 2111941,
+    "race": 4
+  },
+  "119401": {
+    "hero_id": 1194,
+    "portrait_id": 2111942,
+    "race": 4
+  },
+  "1197": {
+    "hero_id": 1197,
+    "portrait_id": 2111971,
+    "race": 1
+  },
+  "119701": {
+    "hero_id": 1197,
+    "portrait_id": 2111972,
+    "race": 1
+  },
+  "1199": {
+    "hero_id": 1199,
+    "portrait_id": 2111991,
+    "race": 3
+  },
+  "119901": {
+    "hero_id": 1199,
+    "portrait_id": 2111992,
+    "race": 3
+  },
+  "119904": {
+    "hero_id": 1199,
+    "portrait_id": 2111993,
+    "race": 3
+  },
+  "1211": {
+    "hero_id": 1211,
+    "portrait_id": 2112111,
+    "race": 2
+  },
+  "121101": {
+    "hero_id": 1211,
+    "portrait_id": 2112112,
+    "race": 2
+  },
+  "121102": {
+    "hero_id": 1211,
+    "portrait_id": 2112113,
+    "race": 2
+  },
+  "1248": {
+    "hero_id": 1248,
+    "portrait_id": 2112481,
+    "race": 3
+  },
+  "124801": {
+    "hero_id": 1248,
+    "portrait_id": 2112482,
+    "race": 3
+  },
+  "1284": {
+    "hero_id": 1284,
+    "portrait_id": 2112841,
+    "race": 4
+  },
+  "128401": {
+    "hero_id": 1284,
+    "portrait_id": 2112842,
+    "race": 4
+  },
+  "128402": {
+    "hero_id": 1284,
+    "portrait_id": 2112843,
+    "race": 4
+  },
+  "128403": {
+    "hero_id": 1284,
+    "portrait_id": 2112845,
+    "race": 4
+  },
+  "128404": {
+    "hero_id": 1284,
+    "portrait_id": 2112844,
+    "race": 4
+  }
+}

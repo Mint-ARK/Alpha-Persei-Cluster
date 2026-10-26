@@ -16,6 +16,7 @@ from polyhedron_service import PolyhedronRunManager
 import event_bus
 import task_listener
 import illustrated_listener
+import teach_service  # 教学通关通知订阅：持久化完成后同步 47001/47003
 
 # ---------------- BS 结算广播订阅者装配（import 副作用注册监听器） ----------------
 # hero_service：熟练度/胜场/档案经验/角色经验 + proficiency_up 广播（STAGE_PASS 订阅）
@@ -38,6 +39,121 @@ _BackHomeSvc_activate.get_instance()
 # mail_service：统一邮件与信件收藏室领域服务
 from mail_service import MailService as _MailSvc_activate
 _MailSvc_activate.get_instance()
+
+
+class Chapter19Op(Operation):
+    def apply(self, data, ctx):
+        from chapter19_service import service
+        if not self.uid or ctx.db is None:
+            raise OperationError(2, 'Missing chapter19 account')
+        try:
+            if self.cmd == 24030:
+                return service.scan(ctx.db, self.uid, data['map_id'])
+            if self.cmd == 24032:
+                return service.collect(ctx.db, self.uid, data['location_id'])
+            if self.cmd == 24034:
+                service.read_event(ctx.db, self.uid, data['event_id'])
+            elif self.cmd == 24036:
+                service.operate_day(ctx.db, self.uid, data['detector_info'])
+            elif self.cmd == 24038:
+                service.read_clue(ctx.db, self.uid, data['clue_id'])
+            else:
+                raise ValueError('Unknown chapter19 operation')
+        except (ValueError, KeyError, TypeError) as exc:
+            raise OperationError(2, str(exc)) from exc
+
+    def respond(self, result, data, ctx):
+        if self.no_reply:
+            return []
+        payload = ctx.codec_encode(f'sc_{self.sc}', result)
+        if not payload:
+            raise ValueError('Missing chapter19 acknowledgement')
+        return [DownFrame(self.sc, payload)]
+
+
+@operation
+class Chapter19ScanOp(Chapter19Op):
+    cmd, sc = 24030, 24031
+    prepare_response_in_transaction = True
+
+
+@operation
+class Chapter19CollectOp(Chapter19Op):
+    cmd, sc = 24032, 24033
+    prepare_response_in_transaction = True
+
+
+@operation
+class Chapter19ReadEventOp(Chapter19Op):
+    cmd = 24034
+    no_reply = True
+
+
+@operation
+class Chapter19OperateDayOp(Chapter19Op):
+    cmd = 24036
+    no_reply = True
+
+
+@operation
+class Chapter19ReadClueOp(Chapter19Op):
+    cmd = 24038
+    no_reply = True
+
+
+class ChapterV2MapOp(Operation):
+    """Prepare map state and its acknowledgement inside the SQL transaction."""
+    prepare_response_in_transaction = True
+
+    def apply(self, data, ctx):
+        from chapter_v2_map_service import service
+        if not self.uid or ctx.db is None:
+            raise OperationError(2, 'Missing chapter map account')
+        try:
+            if self.cmd == 24062:
+                service.read_event(ctx.db, self.uid, data['event_id'])
+            elif self.cmd == 24064:
+                service.move_location(ctx.db, self.uid, data['new_location'])
+            elif self.cmd == 24066:
+                service.track_event(ctx.db, self.uid, data['event_id'])
+            elif self.cmd == 24068:
+                service.quit_tracking(ctx.db, self.uid, data['map_id'])
+            else:
+                raise ValueError('Unknown chapter map operation')
+        except (ValueError, KeyError, TypeError) as exc:
+            raise OperationError(2, str(exc)) from exc
+        return service.payload(ctx.db, self.uid)
+
+    def respond(self, result, data, ctx):
+        state = ctx.codec_encode('sc_24061', result)
+        ack = ctx.codec_encode(f'sc_{self.sc}', {'result': 0})
+        if not state or not ack:
+            raise ValueError('Missing chapter map response')
+        return [DownFrame(24061, state), DownFrame(self.sc, ack)]
+
+
+@operation
+class ChapterV2ReadEventOp(ChapterV2MapOp):
+    cmd = 24062
+    sc = 24063
+
+
+@operation
+class ChapterV2MoveLocationOp(ChapterV2MapOp):
+    cmd = 24064
+    sc = 24065
+
+
+@operation
+class ChapterV2TrackEventOp(ChapterV2MapOp):
+    cmd = 24066
+    sc = 24067
+
+
+@operation
+class ChapterV2QuitTrackingOp(ChapterV2MapOp):
+    cmd = 24068
+    sc = 24069
 
 
 def _build_18003_frame(ctx, run_data, uid=None):
@@ -177,12 +293,12 @@ USE_NEW_INVENTORY_SERVICE = True
 
 
 def _item_add(ctx, uid, item_id, delta):
-    """加条目（优先委托给 inventory_service，支持异常自动降级走就地旧逻辑）。"""
+    """加条目；统一库存成功返回True，旧逻辑/降级返回None。"""
     if USE_NEW_INVENTORY_SERVICE:
         try:
             import inventory_service
             inventory_service.grant_item(ctx, uid, item_id, delta)
-            return
+            return True  # 告知需要附加记账的调用方：本次实际由统一库存处理。
         except Exception as e:
             if hasattr(ctx, "log"):
                 ctx.log(f"[InventoryService WARN] grant_item 异常: {e}，降级至旧逻辑")
@@ -349,6 +465,12 @@ def _refresh_frames(ctx, uid, hero_id=None, *, strict=False):
         touched = getattr(ctx, "touched_items", None)
         rem_eq = getattr(ctx, "removed_equips", None)
         rem_wl = getattr(ctx, "removed_weapons", None)
+        added_eq = getattr(ctx, 'added_equips', None)
+        added_wl = getattr(ctx, 'added_weapons', None)
+        if added_eq:
+            rem_eq = list(added_eq) + list(rem_eq or [])
+        if added_wl:
+            rem_wl = list(added_wl) + list(rem_wl or [])
         del_servants = getattr(ctx, "deleted_servants", None)
         if del_servants:
             wl_from_del = [{"uid": x["uid"], "item": {"id": x["id"], "num": 0}} for x in del_servants if x.get("id")]
@@ -384,10 +506,15 @@ def _refresh_frames(ctx, uid, hero_id=None, *, strict=False):
             raise
         pass
     # 2. 英雄实时数据帧 (sc_14007)
+    heroes_to_sync = set()
     if hero_id:
+        heroes_to_sync.add(int(hero_id))
+    if hasattr(ctx, 'touched_heroes') and ctx.touched_heroes:
+        heroes_to_sync.update(int(h) for h in ctx.touched_heroes)
+    for hid in sorted(heroes_to_sync):
         try:
             import hero_codec as _hc
-            hf = _hc.build_hero_14007_frame(ctx.db, uid, int(hero_id))
+            hf = _hc.build_hero_14007_frame(ctx.db, uid, hid)
             if hf:
                 out.append(hf)
         except Exception:
@@ -829,7 +956,7 @@ def _is_today(ts):
 
 def _task_rewards(ctx, task_id):
     """读任务配置奖励：task_cfg.reward_json = [[item_id, num], ...]。"""
-    rows = ctx.db.query("SELECT reward_json FROM task_cfg WHERE task_id=?", (int(task_id),))
+    rows = ctx.db.query("SELECT reward_json, task_type FROM task_cfg WHERE task_id=?", (int(task_id),))
     if not rows or not rows[0]["reward_json"]:
         return []
     try:
@@ -837,6 +964,7 @@ def _task_rewards(ctx, task_id):
     except Exception:
         return []
     out = []
+    is_passport_task = int(rows[0].get('task_type') or 0) in (7, 8, 9)
     for rw in raw or []:
         if isinstance(rw, dict):
             iid = rw.get("item_id", rw.get("id"))
@@ -846,7 +974,11 @@ def _task_rewards(ctx, task_id):
         else:
             continue
         try:
-            out.append({"id": int(iid), "num": int(num)})
+            iid, num = int(iid), int(num)
+            # 旧战令任务配置混入额外100辉；经验任务单领/一键领统一剔除。
+            if is_passport_task and iid == 1 and num == 100:
+                continue
+            out.append({"id": iid, "num": num})
         except (TypeError, ValueError):
             continue
     return out
@@ -902,37 +1034,53 @@ class TaskSubmitOp(Operation):
                     )
                     final_rewards.append({"id": 61, "num": gain})
             else:
-                _item_add(ctx, uid, rw["id"], rw["num"])
+                used_inventory = _item_add(ctx, uid, rw["id"], rw["num"])
                 final_rewards.append(rw)
-                if not USE_NEW_INVENTORY_SERVICE:
+                if not used_inventory:
                     if rw["id"] == 22:
                         ctx.db.add_activity_point(uid, 1, rw["num"])
                     elif rw["id"] == 35:
                         ctx.db.add_activity_point(uid, 3, rw["num"])
                     elif rw["id"] == 23:
                         ctx.db.add_activity_point(uid, 2, rw["num"])
-                if rw["id"] == 22:
+                if rw["id"] == 22 and not used_inventory:
                     try:
                         event_bus.bus.emit(event_bus.Events.ACTIVITY_POINT_GAIN, ctx, uid, pt_id=1, amount=rw["num"], item_id=22)
                     except Exception:
                         pass
-                elif rw["id"] == 35:
+                elif rw["id"] == 35 and not used_inventory:
                     try:
                         event_bus.bus.emit(event_bus.Events.ACTIVITY_POINT_GAIN, ctx, uid, pt_id=3, amount=rw["num"], item_id=35)
                     except Exception:
                         pass
-                elif rw["id"] == 23:
+                elif rw["id"] == 23 and not used_inventory:
                     try:
                         event_bus.bus.emit(event_bus.Events.ACTIVITY_POINT_GAIN, ctx, uid, pt_id=2, amount=rw["num"], item_id=23)
                     except Exception:
                         pass
-                elif rw["id"] == 14:
+                elif rw["id"] == 14 and not used_inventory:
                     bp_rows = ctx.db.query("SELECT weekly_gain_exp FROM battlepass WHERE uid=?", (uid,))
                     if bp_rows:
                         cur_wk = int(bp_rows[0]["weekly_gain_exp"] or 0)
                         new_wk = min(15000, cur_wk + rw["num"])
                         ctx.db.execute("UPDATE battlepass SET weekly_gain_exp=? WHERE uid=?", (new_wk, uid))
         ctx.db.claim_task(uid, tid)
+        try:
+            import new_player_service as _fresh
+            if _fresh.enabled(ctx.db, uid):
+                before_tids = {r['task_id'] for r in ctx.db.query("SELECT task_id FROM task WHERE uid=?", (uid,))}
+                _fresh.ensure_tasks(ctx.db, uid)
+                after_tids = {r['task_id'] for r in ctx.db.query("SELECT task_id FROM task WHERE uid=?", (uid,))}
+                new_tids = after_tids - before_tids
+                if new_tids:
+                    p28007 = ctx.codec_encode("sc_28007", {"progress_list": [{"id": nid, "progress": 0, "complete_flag": 0} for nid in sorted(new_tids)]})
+                    if p28007:
+                        if hasattr(ctx, "append_frame"):
+                            ctx.append_frame(DownFrame(28007, p28007))
+                        elif hasattr(ctx, "pending_frames"):
+                            ctx.pending_frames.append(DownFrame(28007, p28007))
+        except Exception:
+            pass
         return {"task_id": tid, "already": False, "rewards": final_rewards, "has_ticket": has_ticket}
 
     def respond(self, result, data, ctx):
@@ -978,7 +1126,9 @@ class TaskOneKeySubmitOp(Operation):
             LEFT JOIN task_cfg c ON t.task_id = c.task_id
             WHERE {" AND ".join(where_clauses)}
         """
-        tasks = ctx.db.query(sql, params)
+        # 与单领共享周期感知判据：一次性任务还须检查永久领奖台账。
+        tasks = [t for t in ctx.db.query(sql, params)
+                 if not ctx.db.is_task_claimed(uid, t['task_id'])]
         claimed_task_types = {int(t["task_type"] or 0) for t in tasks}
 
         # 记录领取任务前的旧活跃度，用于严格对齐客户端 PostSubmitTaskList 仅结算旧达成宝箱的时序
@@ -1011,31 +1161,31 @@ class TaskOneKeySubmitOp(Operation):
                         )
                         merged[61] = merged.get(61, 0) + gain
                 else:
-                    _item_add(ctx, uid, rw["id"], rw["num"])
+                    used_inventory = _item_add(ctx, uid, rw["id"], rw["num"])
                     merged[rw["id"]] = merged.get(rw["id"], 0) + rw["num"]
-                    if not USE_NEW_INVENTORY_SERVICE:
+                    if not used_inventory:
                         if rw["id"] == 22:
                             ctx.db.add_activity_point(uid, 1, rw["num"])
                         elif rw["id"] == 35:
                             ctx.db.add_activity_point(uid, 3, rw["num"])
                         elif rw["id"] == 23:
                             ctx.db.add_activity_point(uid, 2, rw["num"])
-                    if rw["id"] == 22:
+                    if rw["id"] == 22 and not used_inventory:
                         try:
                             event_bus.bus.emit(event_bus.Events.ACTIVITY_POINT_GAIN, ctx, uid, pt_id=1, amount=rw["num"], item_id=22)
                         except Exception:
                             pass
-                    elif rw["id"] == 35:
+                    elif rw["id"] == 35 and not used_inventory:
                         try:
                             event_bus.bus.emit(event_bus.Events.ACTIVITY_POINT_GAIN, ctx, uid, pt_id=3, amount=rw["num"], item_id=35)
                         except Exception:
                             pass
-                    elif rw["id"] == 23:
+                    elif rw["id"] == 23 and not used_inventory:
                         try:
                             event_bus.bus.emit(event_bus.Events.ACTIVITY_POINT_GAIN, ctx, uid, pt_id=2, amount=rw["num"], item_id=23)
                         except Exception:
                             pass
-                    elif rw["id"] == 14:
+                    elif rw["id"] == 14 and not used_inventory:
                         bp_rows = ctx.db.query("SELECT weekly_gain_exp FROM battlepass WHERE uid=?", (uid,))
                         if bp_rows:
                             cur_wk = int(bp_rows[0]["weekly_gain_exp"] or 0)
@@ -1119,6 +1269,19 @@ class TaskOneKeySubmitOp(Operation):
         frames = []
         # 1. 资产与数据原子差量帧前置（sc_17023 贴票/货币等，保证客户端在 28015 回调前已完成资产就绪）
         frames.extend(_refresh_frames(ctx, self.uid))
+        try:
+            import new_player_service as _fresh
+            if _fresh.enabled(ctx.db, self.uid):
+                before_tids = {r['task_id'] for r in ctx.db.query("SELECT task_id FROM task WHERE uid=?", (self.uid,))}
+                _fresh.ensure_tasks(ctx.db, self.uid)
+                after_tids = {r['task_id'] for r in ctx.db.query("SELECT task_id FROM task WHERE uid=?", (self.uid,))}
+                new_tids = after_tids - before_tids
+                if new_tids:
+                    p28007 = ctx.codec_encode("sc_28007", {"progress_list": [{"id": nid, "progress": 0, "complete_flag": 0} for nid in sorted(new_tids)]})
+                    if p28007:
+                        frames.append(DownFrame(28007, p28007))
+        except Exception:
+            pass
 
         # 2. 任务领奖响应严禁下发 sc_28019 全量活跃度帧：
         # 客户端在收到 sc_28015 后会在 OnSubmitTaskList 中读取 reward_list 的活跃度货币 (22/35) 本地调用 AddTaskPoint 增量累加；
@@ -1202,12 +1365,12 @@ def save_draw_state(ctx, uid, pool_group, state, pool_id=0):
 
 def _grant_hero(ctx, uid, hero_id):
     svc = DrawService.get_instance(db=getattr(ctx, "db", None))
-    return svc._grant_hero(uid, hero_id)
+    return svc._grant_hero(uid, hero_id, ctx=ctx)
 
 
 def _insert_servant(ctx, uid, prefab_id):
     svc = DrawService.get_instance(db=getattr(ctx, "db", None))
-    return svc._insert_servant(uid, prefab_id)
+    return svc._insert_servant(uid, prefab_id, ctx=ctx)
 
 
 @operation
@@ -1392,6 +1555,7 @@ class HeroWeaponStrOp(Operation):
 
     cmd = 46016
     sc = 46017
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -1403,13 +1567,15 @@ class HeroWeaponStrOp(Operation):
         return svc.enhance_weapon(ctx, self.uid, hid, material_list=mlist, servant_list=slist)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_46017", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_46017", {"result": 0})
+        if not payload:
+            raise ValueError("必要回执sc_46017为空")
         ctx.log(f"cs_46016 -> 权钥升级 hero={result['hero_id']} 突破阶段={result['cur_break']} +{result['exp_added']}exp -> exp={result['new_exp']}")
         from hero_service import HeroService
         svc = HeroService.get_instance(db=ctx.db)
-        diff_frames = svc.build_diff_frames(ctx, self.uid)
-        hero_frames = svc.build_hero_14007_frame(ctx, self.uid, result.get("hero_id"))
-        return diff_frames + [DownFrame(self.sc, payload)] + hero_frames
+        frames = svc.build_hero_refresh_frames(ctx, self.uid, result["hero_id"], strict=True)
+        return ([f for f in frames if f.cmd != 14007] + [DownFrame(self.sc, payload)]
+                + [f for f in frames if f.cmd == 14007])
 
 
 @operation
@@ -1419,6 +1585,7 @@ class HeroWeaponBreakOp(Operation):
 
     cmd = 46018
     sc = 46019
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -1428,13 +1595,15 @@ class HeroWeaponBreakOp(Operation):
         return svc.break_weapon(ctx, self.uid, hid)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_46019", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_46019", {"result": 0})
+        if not payload:
+            raise ValueError("必要回执sc_46019为空")
         ctx.log(f"cs_46018 -> 权钥突破 hero={result['hero_id']} 阶数={result['new_break']}")
         from hero_service import HeroService
         svc = HeroService.get_instance(db=ctx.db)
-        diff_frames = svc.build_diff_frames(ctx, self.uid)
-        hero_frames = svc.build_hero_14007_frame(ctx, self.uid, result.get("hero_id"))
-        return diff_frames + [DownFrame(self.sc, payload)] + hero_frames
+        frames = svc.build_hero_refresh_frames(ctx, self.uid, result["hero_id"], strict=True)
+        return ([f for f in frames if f.cmd != 14007] + [DownFrame(self.sc, payload)]
+                + [f for f in frames if f.cmd == 14007])
 
 
 @operation
@@ -1444,6 +1613,7 @@ class HeroWeaponQuickOp(Operation):
 
     cmd = 46034
     sc = 46035
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -1452,20 +1622,22 @@ class HeroWeaponQuickOp(Operation):
         hid = int(data.get("hero_id") or 0)
         mlist = data.get("material_list") or []
         slist = data.get("servant_list") or []
-        tlvl = int(data.get("target_level") or 0)
-        btimes = int(data.get("breakthrough_times") or 0)
+        tlvl = data.get("target_level", 0)
+        btimes = data.get("breakthrough_times", 0)
         return svc.quick_upgrade_weapon(ctx, self.uid, hid, material_list=mlist, servant_list=slist, target_level=tlvl, breakthrough_times=btimes)
 
     def respond(self, result, data, ctx):
         refund = result.get("refund_items") or []
-        payload = ctx.codec_encode("sc_46035", {"result": 0, "mat_list": refund}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_46035", {"result": 0, "mat_list": refund})
+        if not payload:
+            raise ValueError("必要回执sc_46035为空")
         tlv = data.get("target_level", 0)
         ctx.log(f"cs_46034 -> 权钥一键升级 hero={result['hero_id']} target_lv={tlv} break={result.get('new_break', 0)}")
         from hero_service import HeroService
         svc = HeroService.get_instance(db=ctx.db)
-        diff_frames = svc.build_diff_frames(ctx, self.uid)
-        hero_frames = svc.build_hero_14007_frame(ctx, self.uid, result.get("hero_id"))
-        return diff_frames + [DownFrame(self.sc, payload)] + hero_frames
+        frames = svc.build_hero_refresh_frames(ctx, self.uid, result["hero_id"], strict=True)
+        return ([f for f in frames if f.cmd != 14007] + [DownFrame(self.sc, payload)]
+                + [f for f in frames if f.cmd == 14007])
 
 
 _SERVANT_GOLD_COSTS = {
@@ -1990,204 +2162,65 @@ class ExchangeItemOp(Operation):
 
 # ---------------- 68152 服装/场景卡池抽卡 ----------------
 
-_SKIN_DRAW_POOLS_CACHE = None
-
 def _get_skin_draw_pools():
-    global _SKIN_DRAW_POOLS_CACHE
-    if _SKIN_DRAW_POOLS_CACHE is None:
-        json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "skin_draw_pool_cfg.json")
-        if os.path.exists(json_path):
-            try:
-                with open(json_path, "r", encoding="utf-8") as f:
-                    _SKIN_DRAW_POOLS_CACHE = json.load(f)
-            except Exception:
-                _SKIN_DRAW_POOLS_CACHE = {}
-        else:
-            _SKIN_DRAW_POOLS_CACHE = {}
-    return _SKIN_DRAW_POOLS_CACHE
+    from skin_draw_service import catalogue
+    return catalogue()
+
+
+def _skin_draw_response(op, result, ctx):
+    """Prepare assets and both draw packets before committing any draw."""
+    frames = []
+    summaries = result['summaries']
+    for skin in {s for summary in summaries for s in summary.get('skins', [])}:
+        hid = _get_skin_hero_map().get(skin)
+        if hid:
+            import hero_codec
+            hero = hero_codec.build_single_hero_frame(ctx.db, op.uid, hid)
+            if hero:
+                frames.append(DownFrame(14007, hero))
+            elif ctx.db.query('SELECT 1 FROM hero WHERE uid=? AND id=? AND unlock=1', (op.uid, hid)):
+                raise ValueError(f'抽取换装角色状态 sc_14007 缺失: {hid}')
+    from skin_draw_service import profile_payload
+    profile = profile_payload(ctx, op.uid, summaries)
+    if profile:
+        frames.append(DownFrame(32009, profile))
+    frames.extend(_refresh_frames(ctx, op.uid, strict=True))
+    oath = result['model'] == 'oath'
+    drops = result['drop_list'] if oath else [d['drop_id'] for d in result['drop_list']]
+    ack = ctx.codec_encode(f'sc_{op.sc}', {'result': 0, 'drop_list': drops})
+    state_cmd = 68185 if oath else 68151
+    state = ctx.codec_encode(f'sc_{state_cmd}', result['snapshot'])
+    if not ack or not state:
+        raise ValueError('抽取回包或进度状态为空')
+    # Oath's ACK callback locally decrements manually opened cards. The full
+    # snapshot follows it, so that callback cannot subtract from the new total.
+    frames.extend([DownFrame(op.sc, ack), DownFrame(state_cmd, state)])
+    pending = ctx.db.query('SELECT skin_id FROM user_skin_draw_pop WHERE uid=? AND claimed=0', (op.uid,))
+    if pending:
+        payload = ctx.codec_encode('sc_68155', {'skin_id': [r['skin_id'] for r in pending]})
+        if not payload:
+            raise ValueError('换装剧情道具提示为空')
+        frames.append(DownFrame(68155, payload))
+    ctx.log(f"cs_{op.cmd} -> 换装/场景池={result['pool_id']} 活动={result['activity_id']} 奖励={drops}")
+    return frames
 
 
 @operation
 class SkinDrawOp(Operation):
-    """[Full Implementation] 服装/场景卡池有限奖池不放回抽取：
-    cs_68152 {activity_id, pool_id, drop_type} → sc_68153 {result, drop_list} + sc_68151 + sc_68155。
-    - drop_type: 1 (单抽) 或 10 (十连抽)
-    - 动态加权不放回抽样 (Weighted Sampling without Replacement)
-    - 十连核心大奖保底
-    - 奖励即时入库（皮肤 -> player_skin_unlocked，场景 -> user_scene，道具 -> item/material/currency）
-    - 重复皮肤自动触发 sc_68155
-    """
-
+    """Versioned finite T0 skin/scene draw, with persisted pity and exact weights."""
     cmd = 68152
     sc = 68153
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        aid = int(data.get("activity_id") or 182211)
-        pool_id = int(data.get("pool_id") or 1001)
-        drop_type = int(data.get("drop_type") or 1)
-        if drop_type not in (1, 10):
-            drop_type = 1
-
-        pools_cfg = _get_skin_draw_pools()
-        pcfg = pools_cfg.get(str(pool_id)) or pools_cfg.get(pool_id)
-        if not pcfg:
-            raise OperationError(404, f"卡池 {pool_id} 不存在")
-
-        # 1. 门票/货币扣减校验
-        cost_info = pcfg.get("cost_ten_times") if drop_type == 10 else pcfg.get("cost_once")
-        ticket_id = cost_info[0] if (cost_info and len(cost_info) >= 1) else 53030
-        req_ticket_num = cost_info[1] if (cost_info and len(cost_info) >= 2) else drop_type
-
-        # 检查门票余额
-        t, have_ticket = _item_balance(ctx, self.uid, ticket_id)
-        if have_ticket >= req_ticket_num:
-            _item_deduct(ctx, self.uid, ticket_id, req_ticket_num)
-        else:
-            need_tickets = req_ticket_num - have_ticket
-            need_currency = need_tickets * 120
-            if have_ticket > 0:
-                _item_deduct(ctx, self.uid, ticket_id, have_ticket)
-            _, have_gem = _item_balance(ctx, self.uid, 1)
-            if have_gem >= need_currency:
-                _item_deduct(ctx, self.uid, 1, need_currency)
-            else:
-                _, have_flower = _item_balance(ctx, self.uid, 32)
-                if have_flower >= need_currency:
-                    _item_deduct(ctx, self.uid, 32, need_currency)
-                else:
-                    raise OperationError(3, f"门票与货币不足：缺少 {need_tickets} 张门票（需 {need_currency} 移转之辉/花）")
-
-        # 2. 读取卡池当前库存
-        pool_state = ctx.db.get_skin_draw_pool_state(self.uid, pool_id)
-        drops_cfg = pcfg.get("drops", {})
-        
-        remain_total = sum(int(item["remain_num"]) for item in pool_state.values())
-        if remain_total <= 0:
-            raise OperationError(2, f"卡池 {pool_id} 奖品已全部抽空")
-
-        actual_draws = min(drop_type, remain_total)
-        chosen_drops = []
-        unlocked_skins = []
-        duplicate_skins = []
-        skin_map = _get_skin_hero_map()
-        now = int(time.time())
-
-        # 执行抽取
-        for draw_i in range(actual_draws):
-            avail_items = [item for item in pool_state.values() if int(item["remain_num"]) > 0]
-            if not avail_items:
-                break
-            
-            total_drawn = sum(int(item["drawn_num"]) for item in pool_state.values())
-            is_guaranteed = ((total_drawn + 1) % 10 == 0)
-            core_avail = [item for item in avail_items if drops_cfg.get(str(item["drop_id"]), {}).get("is_core") == 1]
-
-            if is_guaranteed and core_avail:
-                candidates = core_avail
-            else:
-                candidates = avail_items
-
-            weights = []
-            for item in candidates:
-                did = str(item["drop_id"])
-                w = int(drops_cfg.get(did, {}).get("weight") or 1)
-                r_num = int(item["remain_num"])
-                weights.append(w * r_num)
-
-            tot_w = sum(weights)
-            if tot_w <= 0:
-                selected_item = candidates[0]
-            else:
-                rand_val = _random.uniform(0, tot_w)
-                cum = 0
-                selected_item = candidates[-1]
-                for idx, w in enumerate(weights):
-                    cum += w
-                    if rand_val <= cum:
-                        selected_item = candidates[idx]
-                        break
-
-            chosen_did = int(selected_item["drop_id"])
-            chosen_drops.append(chosen_did)
-
-            pool_state[chosen_did]["remain_num"] -= 1
-            pool_state[chosen_did]["drawn_num"] += 1
-            ctx.db.update_skin_draw_pool_item(
-                self.uid, pool_id, chosen_did,
-                pool_state[chosen_did]["remain_num"],
-                pool_state[chosen_did]["drawn_num"])
-
-            drop_meta = drops_cfg.get(str(chosen_did), {})
-            rewards = drop_meta.get("reward", [])
-            for rew in rewards:
-                rew_id = int(rew[0])
-                rew_num = int(rew[1])
-
-                target_sk = _resolve_skin_id(rew_id, skin_map)
-                if target_sk or (10000 <= rew_id <= 19999 and rew_num == 1):
-                    actual_sk = target_sk or rew_id
-                    owned = ctx.db.query("SELECT skin_id FROM player_skin_unlocked WHERE uid=? AND skin_id=?", (self.uid, actual_sk))
-                    if not owned:
-                        ctx.db.upsert("player_skin_unlocked", self.uid,
-                                      {"skin_id": actual_sk, "unlock_ts": now, "update_ts": now},
-                                      keys=("uid", "skin_id"))
-                        unlocked_skins.append(actual_sk)
-                    else:
-                        duplicate_skins.append(actual_sk)
-                elif (6000 <= rew_id <= 6999) or (rew_id in [6001, 6002, 6003, 6004, 6005, 6006, 6007, 6008, 6009, 6010, 6011, 6012]):
-                    ctx.db.upsert("user_scene", self.uid,
-                                  {"scene_id": rew_id, "lasted_time": 0, "obtain_time": now, "update_ts": now},
-                                  keys=("uid", "scene_id"))
-                else:
-                    if 90000 <= rew_id < 92000:
-                        ctx.db.upsert("chat_sticker", self.uid, {"emoji_id": rew_id}, keys=("uid", "emoji_id"))
-                    _item_add(ctx, self.uid, rew_id, rew_num)
-
-        return {
-            "activity_id": aid,
-            "pool_id": pool_id,
-            "drop_list": chosen_drops,
-            "pool_state": pool_state,
-            "unlocked_skins": unlocked_skins,
-            "duplicate_skins": duplicate_skins
-        }
+        from skin_draw_service import draw, DrawError
+        try:
+            return draw(ctx, self.uid, data, 't0')
+        except DrawError as exc:
+            raise OperationError(exc.code, str(exc)) from exc
 
     def respond(self, result, data, ctx):
-        frames = []
-        payload = ctx.codec_encode("sc_68153", {
-            "result": 0, "drop_list": result["drop_list"]}) or b"\x08\x00"
-        frames.append(DownFrame(self.sc, payload))
-
-        state_list = [{"drop_id": did, "num": s["remain_num"]} for did, s in result["pool_state"].items()]
-        p68151 = ctx.codec_encode("sc_68151", {
-            "activity_id": result["activity_id"],
-            "info": state_list
-        })
-        if p68151:
-            frames.append(DownFrame(68151, p68151))
-
-        if result.get("duplicate_skins"):
-            p68155 = ctx.codec_encode("sc_68155", {
-                "skin_id": result["duplicate_skins"]
-            })
-            if p68155:
-                frames.append(DownFrame(68155, p68155))
-
-        skin_map = _get_skin_hero_map()
-        for sk_id in result.get("unlocked_skins") or []:
-            hid = skin_map.get(sk_id)
-            if hid:
-                try:
-                    import hero_codec as _hc
-                    hf = _hc.build_single_hero_frame(ctx.db, self.uid, hid)
-                    if hf:
-                        frames.append(DownFrame(14007, hf))
-                except Exception:
-                    pass
-
-        frames.extend(_refresh_frames(ctx, self.uid))
-        ctx.log(f"cs_68152 -> 换装卡池抽取 aid={result['activity_id']} pool={result['pool_id']} drops={result['drop_list']}")
-        return frames
+        return _skin_draw_response(self, result, ctx)
 
 
 @operation
@@ -2200,189 +2233,69 @@ class SkinStoryFinishOp(Operation):
     def apply(self, data, ctx):
         aid = int(data.get("activity_id") or 0)
         story_id = int(data.get("story_id") or 0)
-        if aid and story_id:
-            ctx.db.finish_skin_story(self.uid, aid, story_id)
+        from skin_draw_service import version_config
+        allowed = {(int(s['activity_id']), int(s['story_id']))
+                   for main in version_config()['mains'].values() for s in main['stories']}
+        if (aid, story_id) not in allowed:
+            return {"activity_id": aid, "story_id": story_id, "error": 2}
+        ctx.db.finish_skin_story(self.uid, aid, story_id)
+        event_bus.bus.emit(event_bus.Events.STORY_READ, ctx, self.uid,
+                           story_id=story_id, source='skin_draw_story')
         return {"activity_id": aid, "story_id": story_id}
 
     def respond(self, result, data, ctx):
+        if result.get('error'):
+            # sc_68163.result is field 2; the generic legacy error uses field 1.
+            return [DownFrame(self.sc, ctx.codec_encode('sc_68163', {'result': result['error']}))]
         payload = ctx.codec_encode("sc_68163", {"result": 0}) or b"\x10\x00"
         frames = [DownFrame(self.sc, payload)]
         aid = result["activity_id"]
         if aid:
-            finished = ctx.db.get_skin_story_state(self.uid, aid)
-            p68161 = ctx.codec_encode("sc_68161", {
-                "activity_id": aid,
-                "story_stage": 0,
-                "finished_story": finished
-            })
+            from skin_draw_service import story_snapshot
+            p68161 = ctx.codec_encode('sc_68161', story_snapshot(ctx.db, self.uid, aid))
             if p68161:
                 frames.append(DownFrame(68161, p68161))
         ctx.log(f"cs_68162 -> 换装剧情完成 aid={aid} story_id={result['story_id']}")
-        return frames
+        return _refresh_frames(ctx, self.uid) + frames
 
 
 @operation
 class SkinFinishPopOp(Operation):
-    """换装重复弹窗确认/剧情道具领奖：cs_68156 {skin_id} → sc_68157 {result: 0}。"""
-
+    """Claim the configured story item once after a genuine duplicate draw."""
     cmd = 68156
     sc = 68157
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        skin_id = int(data.get("skin_id") or 0)
-        _item_add(ctx, self.uid, 53028, 1000)
-        return {"skin_id": skin_id}
+        from skin_draw_service import finish_pop, DrawError
+        try:
+            return finish_pop(ctx, self.uid, int(data.get('skin_id') or 0))
+        except DrawError as exc:
+            raise OperationError(exc.code, str(exc)) from exc
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_68157", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_68156 -> 换装重复确认 skin_id={result['skin_id']} (发放 53028 记忆结晶*1000)")
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        payload = ctx.codec_encode('sc_68157', {'result': 0})
+        if not payload:
+            raise ValueError('换装剧情道具领取回包为空')
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
 
 
 @operation
 class OathDrawOp(Operation):
-    """誓约换装/场景卡池抽取：cs_68186 {activity_id, pool_id, card_index} → sc_68187 {result: 0, drop_list: [{card_index, drop_id}]} + sc_68185。"""
-
+    """Persist the weighted round target, opened cards and automatic draw progress."""
     cmd = 68186
     sc = 68187
-
-    def validate(self, data, ctx):
-        aid = int(data.get("activity_id") or 0)
-        pool_id = int(data.get("pool_id") or 0)
-        if not pool_id:
-            raise OperationError(406, "未指定誓约卡池 ID")
-        
-        pools = _get_skin_draw_pools()
-        pool_cfg = pools.get(str(pool_id))
-        if not pool_cfg:
-            raise OperationError(406, f"卡池 {pool_id} 配置不存在")
-        
-        cost_info = pool_cfg.get("cost_once") or [53219, 1]
-        cost_item_id, cost_num = cost_info[0], cost_info[1]
-        
-        t, have_ticket = _item_balance(ctx, self.uid, cost_item_id)
-        if have_ticket >= cost_num:
-            _item_deduct(ctx, self.uid, cost_item_id, cost_num)
-        else:
-            need_tickets = cost_num - have_ticket
-            need_currency = need_tickets * 120
-            if have_ticket > 0:
-                _item_deduct(ctx, self.uid, cost_item_id, have_ticket)
-            _, have_gem = _item_balance(ctx, self.uid, 1)
-            if have_gem >= need_currency:
-                _item_deduct(ctx, self.uid, 1, need_currency)
-            else:
-                _, have_flower = _item_balance(ctx, self.uid, 32)
-                if have_flower >= need_currency:
-                    _item_deduct(ctx, self.uid, 32, need_currency)
-                else:
-                    raise OperationError(3, f"门票与货币不足：缺少 {need_tickets} 张门票（需 {need_currency} 移转之辉/花）")
-        
-        return data
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        import random
-        aid = int(data.get("activity_id") or 0)
-        pool_id = int(data.get("pool_id") or 0)
-        card_index = int(data.get("card_index") or 0)
-        if card_index <= 0:
-            card_index = 1
-        
-        pools = _get_skin_draw_pools()
-        pool_cfg = pools.get(str(pool_id))
-        drops_cfg = pool_cfg.get("drops") or {}
-        
-        pool_state = ctx.db.get_skin_draw_pool_state(self.uid, pool_id)
-        avail_drops = [d for d in pool_state.values() if d["remain_num"] > 0]
-        if not avail_drops:
-            raise OperationError(2, f"卡池 {pool_id} 奖品已全部抽空")
-        
-        weights = [int(drops_cfg.get(str(d["drop_id"]), {}).get("weight") or 100) * d["remain_num"] for d in avail_drops]
-        chosen = random.choices(avail_drops, weights=weights, k=1)[0]
-        chosen_drop = chosen["drop_id"]
-        
-        ctx.db.update_skin_draw_pool_item(self.uid, pool_id, chosen_drop,
-                                          chosen["remain_num"] - 1,
-                                          chosen["drawn_num"] + 1)
-        pool_state[chosen_drop]["remain_num"] -= 1
-        pool_state[chosen_drop]["drawn_num"] += 1
-        
-        unlocked_skins = []
-        duplicate_skins = []
-        d_cfg = drops_cfg.get(str(chosen_drop)) or {}
-        rewards = d_cfg.get("reward") or []
-        now = int(time.time())
-        skin_map = _get_skin_hero_map()
-        
-        for rew_id, rew_num in rewards:
-            target_sk = _resolve_skin_id(rew_id, skin_map)
-            if target_sk:
-                existing = ctx.db.query("SELECT skin_id FROM player_skin_unlocked WHERE uid=? AND skin_id=?",
-                                        (self.uid, target_sk))
-                if existing:
-                    duplicate_skins.append(target_sk)
-                else:
-                    unlocked_skins.append(target_sk)
-                    ctx.db.upsert("player_skin_unlocked", self.uid,
-                                  {"skin_id": target_sk, "unlock_ts": now, "update_ts": now},
-                                  keys=("uid", "skin_id"))
-            elif (rew_id >= 6000 and rew_id < 7000):
-                ctx.db.upsert("user_scene", self.uid,
-                              {"scene_id": rew_id, "lasted_time": 0, "obtain_time": now, "update_ts": now},
-                              keys=("uid", "scene_id"))
-            else:
-                if 90000 <= rew_id < 92000:
-                    ctx.db.upsert("chat_sticker", self.uid, {"emoji_id": rew_id}, keys=("uid", "emoji_id"))
-                _item_add(ctx, self.uid, rew_id, rew_num)
-        
-        return {
-            "activity_id": aid,
-            "pool_id": pool_id,
-            "card_index": card_index,
-            "chosen_drop": chosen_drop,
-            "pool_state": pool_state,
-            "unlocked_skins": unlocked_skins,
-            "duplicate_skins": duplicate_skins
-        }
+        from skin_draw_service import draw, DrawError
+        try:
+            return draw(ctx, self.uid, data, 'oath')
+        except DrawError as exc:
+            raise OperationError(exc.code, str(exc)) from exc
 
     def respond(self, result, data, ctx):
-        frames = []
-        payload = ctx.codec_encode("sc_68187", {
-            "result": 0,
-            "drop_list": [{
-                "card_index": result["card_index"],
-                "drop_id": result["chosen_drop"]
-            }]
-        }) or b"\x08\x00"
-        frames.append(DownFrame(self.sc, payload))
-        
-        state_list = [{"drop_id": did, "num": s["remain_num"]} for did, s in result["pool_state"].items()]
-        p68185 = ctx.codec_encode("sc_68185", {
-            "activity_id": result["activity_id"],
-            "info": state_list,
-            "draw_info2": {
-                "last_drop": result["chosen_drop"],
-                "already_drop": [result["chosen_drop"], 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            }
-        })
-        if p68185:
-            frames.append(DownFrame(68185, p68185))
-        
-        skin_map = _get_skin_hero_map()
-        for sk_id in result.get("unlocked_skins") or []:
-            hid = skin_map.get(sk_id)
-            if hid:
-                try:
-                    import hero_codec as _hc
-                    hf = _hc.build_single_hero_frame(ctx.db, self.uid, hid)
-                    if hf:
-                        frames.append(DownFrame(14007, hf))
-                except Exception:
-                    pass
-        
-        frames.extend(_refresh_frames(ctx, self.uid))
-        ctx.log(f"cs_68186 -> 誓约卡池抽取 aid={result['activity_id']} pool={result['pool_id']} card_idx={result['card_index']} drop={result['chosen_drop']}")
-        return frames
+        return _skin_draw_response(self, result, ctx)
 
 
 # ---------------- 邮件与修正者信件系统（30004 / 30006 / 30008 / 30014 / 30018 / 30020 / 30022） ----------------
@@ -2901,6 +2814,7 @@ class OneClickHeroUpOp(Operation):
 
     cmd = 14120
     sc = 14121
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -2917,11 +2831,13 @@ class OneClickHeroUpOp(Operation):
         resp_data = {"result": 0}
         if refund_items:
             resp_data["item_list"] = refund_items
-        payload = ctx.codec_encode("sc_14121", resp_data) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_14121", resp_data)
+        if not payload:
+            raise ValueError("必要回执sc_14121为空")
         ctx.log(f"cs_14120 -> 一键升级+突破 hero={result['hero_id']} → Lv{result['level']} 突破{result['breaks']}次 返还{len(refund_items)}组材料")
         from hero_service import HeroService
         svc = HeroService.get_instance(db=ctx.db)
-        return [DownFrame(self.sc, payload)] + svc.build_hero_refresh_frames(ctx, self.uid, hero_id=result.get("hero_id"))
+        return [DownFrame(self.sc, payload)] + svc.build_hero_refresh_frames(ctx, self.uid, hero_id=result.get("hero_id"), strict=True)
 
 
 @operation
@@ -2940,8 +2856,8 @@ class SkillUpOp(Operation):
         from hero_service import HeroService
         svc = HeroService.get_instance(db=ctx.db)
         hid = int(data.get("hero_id") or 0)
-        sid = data.get("skill_id") or data.get("id")
-        num = int(data.get("num") or 1)
+        sid = data.get("skill_id")
+        num = data.get("num")
         return svc.upgrade_skill(ctx, self.uid, hid, sid, num=num)
 
     def respond(self, result, data, ctx):
@@ -2980,6 +2896,7 @@ class SkillElementOp(Operation):
 
     cmd = 14044
     sc = 14045
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -2987,15 +2904,17 @@ class SkillElementOp(Operation):
         svc = HeroService.get_instance(db=ctx.db)
         hid = int(data.get("hero_id") or 0)
         idx = int(data.get("index") or 0)
-        num = int(data.get("num") or 0)
+        num = data.get("num")
         return svc.enhance_skill_element(ctx, self.uid, hid, idx, num=num)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_14045", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_14045", {"result": 0})
+        if not payload:
+            raise ValueError("必要回执sc_14045为空")
         ctx.log(f"cs_14044 -> 属性强化 index={result['index']} → Lv{result['level']}")
         from hero_service import HeroService
         svc = HeroService.get_instance(db=ctx.db)
-        return svc.build_hero_refresh_frames(ctx, self.uid, hero_id=None) + [DownFrame(self.sc, payload)]
+        return svc.build_hero_refresh_frames(ctx, self.uid, hero_id=None, strict=True) + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -3247,6 +3166,7 @@ class ViewSuperHeartOp(Operation):
 
     cmd = 71114
     sc = 71115
+    prepare_response_in_transaction = True
 
     def validate(self, data, ctx):
         if int(data.get("archive_id") or 0) <= 0 or int(data.get("index") or 0) <= 0:
@@ -3267,7 +3187,9 @@ class ViewSuperHeartOp(Operation):
             raise OperationError(2, str(exc))
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_71115", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_71115", {"result": 0})
+        if not payload:
+            raise ValueError('超级心链阅读回执为空')
         ctx.log(
             f"cs_71114 -> 超心链 archive={result['archive_id']} index={result['index']} story={result['story_id']}"
         )
@@ -3275,7 +3197,7 @@ class ViewSuperHeartOp(Operation):
         _, cfg = ArchiveService.get_instance().get_archive_config(result.get("archive_id"))
         hids = (cfg.get("hero_ids") or []) if cfg else []
         hid = hids[0] if hids else result.get("archive_id")
-        return _refresh_frames(ctx, self.uid, hero_id=hid) + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, hero_id=hid, strict=True) + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -3344,19 +3266,24 @@ class PlayerChangeStoryOp(Operation):
 
     cmd = 12002
     sc = 12003
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
         story_id = int(data.get("story_id") or 0)
         if story_id:
+            from birthday_service import complete_story
+            complete_story(ctx, self.uid, story_id)
             event_bus.bus.emit(event_bus.Events.STORY_READ, ctx, self.uid, story_id=story_id, source="player_change_story")
         return {"story_id": story_id}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_12003", {"result": 0, "story_id": result["story_id"]}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_12003", {"result": 0})
+        if not payload:
+            raise ValueError('剧情观看回执为空')
         ctx.log(f"cs_12002 -> 剧情观看 story_id={result['story_id']}")
         # STORY_READ 的图鉴/誓约监听器可能排入额外推送，必须在本次请求中一并冲刷。
-        return _refresh_frames(ctx, self.uid) + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -3399,6 +3326,7 @@ class ReceiveIllustrationRewardOp(Operation):
 
     cmd = 52004
     sc = 52005
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -3412,10 +3340,20 @@ class ReceiveIllustrationRewardOp(Operation):
         id_list = sorted(list(set(id_list + all_unclaimed_ids)))
 
         _, prew = _load_picture_cfg()
+        pictures = illustrated_listener._get_collect_picture_cfg()
+        wedding_ids = {pid for pid in id_list if pictures.get(pid, {}).get('wedding_role_id')}
+        if wedding_ids:
+            from illustrated_story_service import read_oath_stories
+            oath_stories = read_oath_stories(ctx.db, self.uid)
         total_items = {}
         claimed_ids = []
         for pid in id_list:
             p_int = int(pid)
+            if p_int in wedding_ids:
+                cfg = pictures[p_int]
+                if cfg.get('unlock_condition') != 800 or not cfg.get('params') or cfg['params'][0] not in oath_stories:
+                    ctx.db.execute("UPDATE illustrated SET complete_flag=0 WHERE uid=? AND kind='inbetweening' AND item_id=?", (self.uid, p_int))
+                    continue
             r = ctx.db.query("SELECT is_receive, complete_flag FROM illustrated WHERE uid=? AND kind='inbetweening' AND item_id=?", (self.uid, p_int))
             if r and (r[0]["is_receive"] or 0) == 0:
                 cflag = r[0].get("complete_flag")
@@ -3427,7 +3365,8 @@ class ReceiveIllustrationRewardOp(Operation):
                 )
                 rew = prew.get(p_int, (1, 20))
                 cid, num = rew
-                _item_add(ctx, self.uid, cid, num)
+                from inventory_service import InventoryService
+                InventoryService.grant_item(ctx, self.uid, cid, num, source='illustration_reward')
                 total_items[cid] = total_items.get(cid, 0) + num
                 claimed_ids.append(p_int)
 
@@ -3435,9 +3374,11 @@ class ReceiveIllustrationRewardOp(Operation):
         return {"id_list": claimed_ids, "items": items_out}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_52005", {"result": 0, "item_list": result["items"]}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_52005", {"result": 0, "item_list": result["items"]})
+        if not payload:
+            raise ValueError('插画领取回执为空')
         ctx.log(f"cs_52004 -> 领取插图奖励 id_list={result['id_list']} 获得={result['items']}")
-        return _refresh_frames(ctx, self.uid) + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -3454,16 +3395,19 @@ class ViewIllustrationOp(Operation):
         ctx.uid = self.uid
         item_id = int(data.get("id") or 0)
         kind = self._TYPE_KIND.get(int(data.get("type") or 0))
+        if not item_id or not kind:
+            raise OperationError(2, '无效的图鉴条目或类型')
+        if kind == 'affix':
+            from worldview_service import valid_ids
+            if item_id not in valid_ids():
+                raise OperationError(2, '未知的世界观词条')
+            if not ctx.db.query("SELECT 1 FROM illustrated WHERE uid=? AND kind='affix' AND item_id=?", (self.uid, item_id)):
+                raise OperationError(2, '世界观词条尚未载入')
         if item_id and kind:
             # 带 kind 条件：affix 与 enemy 存在 18 个撞号 item_id，不带会把两类同时点亮
             ctx.db.execute(
                 "UPDATE illustrated SET is_view=1 WHERE uid=? AND kind=? AND item_id=?",
                 (self.uid, kind, item_id)
-            )
-        elif item_id:
-            ctx.db.execute(
-                "UPDATE illustrated SET is_view=1 WHERE uid=? AND item_id=?",
-                (self.uid, item_id)
             )
         return {"id": item_id, "type": data.get("type")}
 
@@ -4153,7 +4097,10 @@ class UnlockRelationNetOp(Operation):
 
     def apply(self, data, ctx):
         svc = TrustService.get_instance()
-        return svc.unlock_relation_net(ctx, self.uid, int(data["id"]), int(data["group_index"]))
+        try:
+            return svc.unlock_relation_net(ctx, self.uid, int(data["id"]), int(data["group_index"]))
+        except ValueError as e:
+            raise OperationError(2, str(e))
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_73017", {"result": 0}) or b"\x08\x00"
@@ -4176,7 +4123,11 @@ class UnlockTrustOp(Operation):
     def apply(self, data, ctx):
         svc = TrustService.get_instance()
         try:
-            return svc.unlock_trust(ctx, self.uid, int(data["hero_id"]))
+            result = svc.unlock_trust(ctx, self.uid, int(data["hero_id"]))
+            # 73021 成功回调会固定重置为 Lv1/exp0，已有交心不能再次进入。
+            if result.get("already"):
+                raise OperationError(2, "该修正者交心已开启")
+            return result
         except ValueError as e:
             raise OperationError(2, str(e))
 
@@ -4208,7 +4159,8 @@ class UpgradeTrustLevelOp(Operation):
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_73015", {"result": 0, "reward_list": result["rewards"]}) or b"\x08\x00"
         ctx.log(f"cs_73014 -> 提升好感度等级 hero={result['hero_id']} → Lv{result['new_level']}")
-        return _refresh_frames(ctx, self.uid, hero_id=result.get("hero_id")) + [DownFrame(self.sc, payload)]
+        # Lua 成功回调自行 level+1/exp=0；提前推送新等级14007会再多升一级。
+        return _refresh_frames(ctx, self.uid) + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -4248,7 +4200,10 @@ class ExChangeTrustItemOp(Operation):
 
     def apply(self, data, ctx):
         svc = TrustService.get_instance()
-        return svc.exchange_trust_item(ctx, self.uid, data.get("use_item_list", []), data.get("reward_item_list", []))
+        try:
+            return svc.exchange_trust_item(ctx, self.uid, data.get("use_item_list", []), data.get("reward_item_list", []))
+        except ValueError as e:
+            raise OperationError(2, str(e))
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_73011", {"result": 0}) or b"\x08\x00"
@@ -4270,7 +4225,10 @@ class RelationStoryRewardOp(Operation):
 
     def apply(self, data, ctx):
         svc = TrustService.get_instance()
-        return svc.claim_relation_story_reward(ctx, self.uid, int(data["id"]))
+        try:
+            return svc.claim_relation_story_reward(ctx, self.uid, int(data["id"]))
+        except ValueError as e:
+            raise OperationError(2, str(e))
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_73023", {"result": 0, "reward_list": result["rewards"]}) or b"\x08\x00"
@@ -4336,7 +4294,8 @@ class OathOp(Operation):
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_14515", {"result": result.get("result", 0), "time": result.get("time", 0)}) or b"\x08\x00"
-        frames = [DownFrame(self.sc, payload)]
+        ack = DownFrame(self.sc, payload)
+        frames = []
         mode = result.get("mode")
         # 无论结缔新誓约、重复进入还是更新合影照片，均推送最新的 14501 保证双端强一致
         if mode in ("oath", "oath_already", "photo"):
@@ -4349,7 +4308,9 @@ class OathOp(Operation):
                 if p14503:
                     frames.append(DownFrame(14503, p14503))
                 frames.extend(_refresh_frames(ctx, self.uid, hero_id=data.get("hero_id")))
-        return frames
+        # Oath callbacks read the current level immediately; photo callbacks use
+        # the request's picture URL and retain their existing ACK order.
+        return [ack] + frames if mode == "photo" else frames + [ack]
 
 
 @operation
@@ -4358,6 +4319,7 @@ class SubmitOathTaskOp(Operation):
 
     cmd = 14512
     sc = 14513
+    prepare_response_in_transaction = True
 
     def validate(self, data, ctx):
         if "id" not in data:
@@ -4366,19 +4328,31 @@ class SubmitOathTaskOp(Operation):
 
     def apply(self, data, ctx):
         svc = OathService.get_instance()
-        return svc.handle_submit_task(ctx, self.uid, data.get("id", []))
+        try:
+            return svc.handle_submit_task(ctx, self.uid, data.get("id", []))
+        except ValueError as exc:
+            raise OperationError(2, str(exc))
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_14513", {"result": result.get("result", 0), "reward_list": result.get("reward_list", [])}) or b"\x08\x00"
-        frames = [DownFrame(self.sc, payload)]
+        payload = ctx.codec_encode("sc_14513", {"result": result.get("result", 0), "reward_list": result.get("reward_list", [])})
+        if not payload:
+            raise ValueError("必要誓约任务回执 sc_14513 为空")
+        frames = []
         # 推送 14503 任务变更与 14501 誓约等级变更
         svc = OathService.get_instance()
         p14501 = svc.build_14501_payload(ctx.db, self.uid)
-        if p14501:
-            frames.append(DownFrame(14501, p14501))
+        if not p14501:
+            raise ValueError("必要誓约状态 sc_14501 为空")
+        frames.append(DownFrame(14501, p14501))
         p14503 = svc.build_14503_payload(ctx.db, self.uid)
-        if p14503:
-            frames.append(DownFrame(14503, p14503))
+        if not p14503:
+            raise ValueError("必要誓约任务状态 sc_14503 为空")
+        frames.append(DownFrame(14503, p14503))
+        if result.get("rights_changed"):
+            from oath_rights_service import build_rights_profile_payload
+            frames.append(DownFrame(32009, build_rights_profile_payload(ctx, self.uid, result["rights_changed"])))
+            frames.extend(_refresh_frames(ctx, self.uid, strict=True))
+        frames.append(DownFrame(self.sc, payload))
         return frames
 
 
@@ -4414,8 +4388,12 @@ class ReadPlotStoryOp(Operation):
 
     cmd = 14510
     sc = 14511
+    prepare_response_in_transaction = True
 
     def validate(self, data, ctx):
+        plot = data.get("oath_plot")
+        if not isinstance(plot, dict) or not plot.get("hero_id") or not plot.get("text_list"):
+            raise OperationError(1, "缺少誓约角色或剧情列表")
         return data
 
     def apply(self, data, ctx):
@@ -4423,16 +4401,20 @@ class ReadPlotStoryOp(Operation):
         plot = data.get("oath_plot") or {}
         hid = int(plot.get("hero_id") or 0)
         t_list = plot.get("text_list") or []
-        return svc.handle_read_plot(ctx, self.uid, hid, t_list)
+        try:
+            return svc.handle_read_plot(ctx, self.uid, hid, t_list)
+        except ValueError as exc:
+            raise OperationError(2, str(exc))
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_14511", {"result": result.get("result", 0)}) or b"\x08\x00"
-        frames = [DownFrame(self.sc, payload)]
+        payload = ctx.codec_encode("sc_14511", {"result": result.get("result", 0)})
+        if not payload:
+            raise ValueError('誓约物语阅读回执为空')
         svc = OathService.get_instance()
         p14501 = svc.build_14501_payload(ctx.db, self.uid)
-        if p14501:
-            frames.append(DownFrame(14501, p14501))
-        return frames
+        if not p14501:
+            raise ValueError('誓约物语已读状态为空')
+        return [DownFrame(14501, p14501)] + _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
 
 
 # ---------------- 芯片系统 (50xxx 统一委托给 ChipService) ----------------
@@ -9231,7 +9213,6 @@ class RogueTeamUnlockSkillTreeOp(Operation):
             p88305 = ctx.codec_encode("sc_88305", {
                 "template_id": out["template_id"],
                 "difficult": out["difficult"],
-                "max_difficult": out["max_difficult"],
                 "collection_list": out["collection_list"],
                 "unlock_collection": out["unlock_collection"],
                 "view_collection": out["view_collection"],
@@ -9302,7 +9283,6 @@ class RogueTeamSettleScoreOp(Operation):
         p88305 = ctx.codec_encode("sc_88305", {
             "template_id": out["template_id"],
             "difficult": 0,
-            "max_difficult": out["max_difficult"],
             "collection_list": out["collection_list"],
             "unlock_collection": out["unlock_collection"],
             "view_collection": out["view_collection"],
@@ -9537,6 +9517,10 @@ def get_operation(cmd):
         def __getattr__(self, item):
             return getattr(self._op, item)
     return _BoundOp(op)
+
+
+# Register after legacy onboarding classes so experimental commands can delegate.
+import onboarding_operations  # noqa: E402,F401
 
 
 

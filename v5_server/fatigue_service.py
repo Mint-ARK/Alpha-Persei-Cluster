@@ -3,7 +3,7 @@
 fatigue_service.py — 体力/吨吨值自然恢复与时间戳精准对账引擎 (Fatigue Recovery Service)
 严格对齐《深空之眼》官方机制：
 - 恢复周期：360 秒（6 分钟）恢复 1 点体力 (GameSetting.fatigue_recovery = 6)
-- 玩家体力上限：按等级计算 (80~100 级为 240 点)
+- 玩家体力上限：按等级计算 (70~100 级为 240 点)
 - 时间戳对账：下发真实的 last_fatigue_recover_time，支持毫秒级秒级余数保留与倒计时平滑推进。
 """
 
@@ -16,15 +16,36 @@ logger = logging.getLogger('fatigue_service')
 
 FATIGUE_CURRENCY_ID = 4
 RECOVER_INTERVAL_SEC = 360  # 6 分钟 = 360 秒
+_LEVEL_UP_REWARDS_CACHE = None
+
+
+def get_level_up_fatigue_reward(old_level, new_level):
+    """Sum client fatigue_upgrade_reward, independently of fatigue capacity."""
+    global _LEVEL_UP_REWARDS_CACHE
+    if _LEVEL_UP_REWARDS_CACHE is None:
+        path = os.path.join(os.path.dirname(__file__), "user_level_rewards.json")
+        with open(path, encoding="utf-8-sig") as stream:
+            raw = json.load(stream)
+        rewards = {int(k): v for k, v in raw.items()}
+        if (not rewards or len(rewards) != len(raw)
+                or set(rewards) != set(range(1, max(rewards) + 1))
+                or rewards.get(1) != 0
+                or any(type(v) is not int or v < 0 for v in rewards.values())):
+            raise ValueError("升级体力奖励配置无效")
+        _LEVEL_UP_REWARDS_CACHE = rewards
+    if (type(old_level) is not int or type(new_level) is not int
+            or not 1 <= old_level <= new_level <= max(_LEVEL_UP_REWARDS_CACHE)):
+        raise ValueError("升级体力奖励等级范围无效")
+    return sum(_LEVEL_UP_REWARDS_CACHE[level] for level in range(old_level + 1, new_level + 1))
 
 
 def get_max_fatigue_by_level(lv):
-    """根据等级计算体力上限（严格对齐 GameLevelSetting.lua：1级为100，每级+2，71级以上封顶240）"""
+    """GameLevelSetting: Lv1=100, +2 per level through Lv69, Lv70+=240."""
     try:
         lv_int = int(lv or 1)
     except Exception:
         lv_int = 1
-    if lv_int >= 71:
+    if lv_int >= 70:
         return 240
     elif lv_int <= 1:
         return 100

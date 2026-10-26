@@ -1,0 +1,4353 @@
+{
+  "sources": {
+    "decompiled_v2/x64/game/config/activitylimiteddrawpoollistcfg.lua": "36a8d56e73651d70e0858ed7e3eec1e20d6efe9e519c4b2e66cb850fe7ac6c40",
+    "decompiled_v2/x64/game/config/activitylimiteddrawpoolcfg.lua": "4cd443e87c74c7422e776f112cf8adc776e90a04efbbfd58a3551954cc890f77",
+    "decompiled_v2/x64/game/config/itemcfg.lua": "139d084ca636e1706de76064aea7caa4bd7867eb5f1c9546c83b1d1209546f99",
+    "decompiled_v2/x64/game/config/skincfg.lua": "3962d5bc213a1cff274a7a6db39521d1fa66e5fa807269a0cab12ac89d960b2e",
+    "decompiled_v2/x64/game/config/activitylimitedskinstorycfg.lua": "4533cee7d5f34b3f9cafc1a418237b286ce317d4742c08d053c6bb9903847d5f",
+    "v5_server/tools/diff_lua_decompiled_311/T0SkinDrawCfg.lua": "438d83e1e69c5064156313f5cd8a8e135e56cdd504f8841d4131265aee2797f9",
+    "decompiled_v2/x64/game/config/weddingskindrawcfg.lua": "a4a6dde09f82b99e41ae8fc27f8533b80b2e716fbb9d5b4bbdedc89489c836b4",
+    "v5_server/tools/diff_lua_decompiled_311/ActivityCfg.lua": "7a9fc66d6880cf96b6481f0bf5575be50e1525aac519798ba3e60fafbfe88500",
+    "decompiled_v2/x64/game/config/activitycfg.lua": "34170d09ef5fd14829933cdc85ba9e1fe45b0072971aa9520366ba2c2b0182fd",
+    "decompiled_v2/x64/game/config/t0skindrawcfg.lua": "04f0b166737c48c14bb53a2802deb97b3ae11fa6bd180ae84ed5d4e72dcc5e66",
+    "decompiled_v2/x64/game/config/shopcfg.lua": "115390fd336126fed78ba7f4a72dbd12a4f288e8fdd66298095de3d360abceec"
+  },
+  "versions": {
+    "229": {
+      "mains": {
+        "4322101": {
+          "pool_list": [
+            1023,
+            1024
+          ],
+          "story_item": 10009,
+          "stories": [
+            {
+              "story_id": 928011001,
+              "activity_id": 4322301,
+              "id": 34,
+              "pre_story_id": 0,
+              "main_activity_id": 4322101
+            },
+            {
+              "story_id": 928021001,
+              "activity_id": 4322301,
+              "id": 35,
+              "pre_story_id": 928011001,
+              "main_activity_id": 4322101
+            },
+            {
+              "story_id": 928031001,
+              "activity_id": 4322301,
+              "id": 36,
+              "pre_story_id": 928021001,
+              "main_activity_id": 4322101
+            },
+            {
+              "story_id": 928041001,
+              "activity_id": 4322301,
+              "id": 37,
+              "pre_story_id": 928031001,
+              "main_activity_id": 4322101
+            }
+          ]
+        },
+        "4342301": {
+          "pool_list": [
+            1025,
+            1026
+          ],
+          "story_item": 0,
+          "stories": []
+        }
+      },
+      "activities": {
+        "4322101": {
+          "theme": 43,
+          "template": 221,
+          "sub_activity_id_list": [
+            4322201,
+            4322202,
+            4322301,
+            4300407,
+            4314601
+          ]
+        },
+        "4322201": {
+          "theme": 43,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "4322202": {
+          "theme": 43,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "4322301": {
+          "theme": 43,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "4300407": {
+          "theme": 43,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "4314601": {
+          "theme": 43,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "4342301": {
+          "theme": 43,
+          "template": 423,
+          "sub_activity_id_list": [
+            4342401,
+            4342402,
+            4314602
+          ]
+        },
+        "4342401": {
+          "theme": 43,
+          "template": 424,
+          "sub_activity_id_list": []
+        },
+        "4342402": {
+          "theme": 43,
+          "template": 424,
+          "sub_activity_id_list": []
+        },
+        "4314602": {
+          "theme": 43,
+          "template": 146,
+          "sub_activity_id_list": []
+        }
+      }
+    },
+    "311": {
+      "mains": {
+        "182211": {
+          "pool_list": [
+            1001,
+            1002
+          ],
+          "story_item": 0,
+          "stories": [
+            {
+              "story_id": 910401011,
+              "activity_id": 182231,
+              "id": 1,
+              "pre_story_id": 0,
+              "main_activity_id": 182211
+            },
+            {
+              "story_id": 910402011,
+              "activity_id": 0,
+              "id": 2,
+              "pre_story_id": 0,
+              "main_activity_id": 182211
+            },
+            {
+              "story_id": 910403011,
+              "activity_id": 182233,
+              "id": 3,
+              "pre_story_id": 0,
+              "main_activity_id": 182211
+            }
+          ]
+        },
+        "272211": {
+          "pool_list": [
+            1003,
+            1004
+          ],
+          "story_item": 0,
+          "stories": [
+            {
+              "story_id": 910401011,
+              "activity_id": 272231,
+              "id": 4,
+              "pre_story_id": 0,
+              "main_activity_id": 272211
+            },
+            {
+              "story_id": 910402011,
+              "activity_id": 0,
+              "id": 5,
+              "pre_story_id": 0,
+              "main_activity_id": 272211
+            },
+            {
+              "story_id": 910403011,
+              "activity_id": 272233,
+              "id": 6,
+              "pre_story_id": 0,
+              "main_activity_id": 272211
+            }
+          ]
+        },
+        "292211": {
+          "pool_list": [
+            1005,
+            1006,
+            1007
+          ],
+          "story_item": 0,
+          "stories": [
+            {
+              "story_id": 921011001,
+              "activity_id": 292231,
+              "id": 7,
+              "pre_story_id": 0,
+              "main_activity_id": 292211
+            },
+            {
+              "story_id": 921021001,
+              "activity_id": 292231,
+              "id": 8,
+              "pre_story_id": 921011001,
+              "main_activity_id": 292211
+            },
+            {
+              "story_id": 921031001,
+              "activity_id": 292231,
+              "id": 9,
+              "pre_story_id": 921021001,
+              "main_activity_id": 292211
+            },
+            {
+              "story_id": 921041001,
+              "activity_id": 292231,
+              "id": 10,
+              "pre_story_id": 921031001,
+              "main_activity_id": 292211
+            }
+          ]
+        },
+        "312211": {
+          "pool_list": [
+            1008,
+            1009
+          ],
+          "story_item": 0,
+          "stories": [
+            {
+              "story_id": 910401011,
+              "activity_id": 312231,
+              "id": 11,
+              "pre_story_id": 0,
+              "main_activity_id": 312211
+            },
+            {
+              "story_id": 910402011,
+              "activity_id": 0,
+              "id": 12,
+              "pre_story_id": 0,
+              "main_activity_id": 312211
+            },
+            {
+              "story_id": 910403011,
+              "activity_id": 312233,
+              "id": 13,
+              "pre_story_id": 0,
+              "main_activity_id": 312211
+            }
+          ]
+        },
+        "332211": {
+          "pool_list": [
+            1010,
+            1011
+          ],
+          "story_item": 0,
+          "stories": [
+            {
+              "story_id": 924011001,
+              "activity_id": 332231,
+              "id": 14,
+              "pre_story_id": 0,
+              "main_activity_id": 332211
+            },
+            {
+              "story_id": 924021001,
+              "activity_id": 332231,
+              "id": 15,
+              "pre_story_id": 924011001,
+              "main_activity_id": 332211
+            },
+            {
+              "story_id": 924031001,
+              "activity_id": 332231,
+              "id": 16,
+              "pre_story_id": 924021001,
+              "main_activity_id": 332211
+            },
+            {
+              "story_id": 924041001,
+              "activity_id": 332231,
+              "id": 17,
+              "pre_story_id": 924031001,
+              "main_activity_id": 332211
+            }
+          ]
+        },
+        "3522101": {
+          "pool_list": [
+            1012,
+            1013,
+            1014
+          ],
+          "story_item": 0,
+          "stories": [
+            {
+              "story_id": 921011001,
+              "activity_id": 3522301,
+              "id": 18,
+              "pre_story_id": 0,
+              "main_activity_id": 3522101
+            },
+            {
+              "story_id": 921021001,
+              "activity_id": 3522301,
+              "id": 19,
+              "pre_story_id": 921011001,
+              "main_activity_id": 3522101
+            },
+            {
+              "story_id": 921031001,
+              "activity_id": 3522301,
+              "id": 20,
+              "pre_story_id": 921021001,
+              "main_activity_id": 3522101
+            },
+            {
+              "story_id": 921041001,
+              "activity_id": 3522301,
+              "id": 21,
+              "pre_story_id": 921031001,
+              "main_activity_id": 3522101
+            }
+          ]
+        },
+        "3722101": {
+          "pool_list": [
+            1015,
+            1016
+          ],
+          "story_item": 10009,
+          "stories": [
+            {
+              "story_id": 928011001,
+              "activity_id": 3722301,
+              "id": 22,
+              "pre_story_id": 0,
+              "main_activity_id": 3722101
+            },
+            {
+              "story_id": 928021001,
+              "activity_id": 3722301,
+              "id": 23,
+              "pre_story_id": 928011001,
+              "main_activity_id": 3722101
+            },
+            {
+              "story_id": 928031001,
+              "activity_id": 3722301,
+              "id": 24,
+              "pre_story_id": 928021001,
+              "main_activity_id": 3722101
+            },
+            {
+              "story_id": 928041001,
+              "activity_id": 3722301,
+              "id": 25,
+              "pre_story_id": 928031001,
+              "main_activity_id": 3722101
+            }
+          ]
+        },
+        "4022101": {
+          "pool_list": [
+            1017,
+            1018
+          ],
+          "story_item": 0,
+          "stories": [
+            {
+              "story_id": 924011001,
+              "activity_id": 4022301,
+              "id": 26,
+              "pre_story_id": 0,
+              "main_activity_id": 4022101
+            },
+            {
+              "story_id": 924021001,
+              "activity_id": 4022301,
+              "id": 27,
+              "pre_story_id": 924011001,
+              "main_activity_id": 4022101
+            },
+            {
+              "story_id": 924031001,
+              "activity_id": 4022301,
+              "id": 28,
+              "pre_story_id": 924021001,
+              "main_activity_id": 4022101
+            },
+            {
+              "story_id": 924041001,
+              "activity_id": 4022301,
+              "id": 29,
+              "pre_story_id": 924031001,
+              "main_activity_id": 4022101
+            }
+          ]
+        },
+        "4042301": {
+          "pool_list": [
+            1019,
+            1020
+          ],
+          "story_item": 0,
+          "stories": []
+        },
+        "4122101": {
+          "pool_list": [
+            1021,
+            1022
+          ],
+          "story_item": 0,
+          "stories": [
+            {
+              "story_id": 936011001,
+              "activity_id": 4122301,
+              "id": 30,
+              "pre_story_id": 0,
+              "main_activity_id": 4122101
+            },
+            {
+              "story_id": 936021001,
+              "activity_id": 4122301,
+              "id": 31,
+              "pre_story_id": 936011001,
+              "main_activity_id": 4122101
+            },
+            {
+              "story_id": 936031001,
+              "activity_id": 4122301,
+              "id": 32,
+              "pre_story_id": 936021001,
+              "main_activity_id": 4122101
+            },
+            {
+              "story_id": 936041001,
+              "activity_id": 4122301,
+              "id": 33,
+              "pre_story_id": 936031001,
+              "main_activity_id": 4122101
+            }
+          ]
+        },
+        "4322101": {
+          "pool_list": [
+            1023,
+            1024
+          ],
+          "story_item": 10009,
+          "stories": [
+            {
+              "story_id": 928011001,
+              "activity_id": 4322301,
+              "id": 34,
+              "pre_story_id": 0,
+              "main_activity_id": 4322101
+            },
+            {
+              "story_id": 928021001,
+              "activity_id": 4322301,
+              "id": 35,
+              "pre_story_id": 928011001,
+              "main_activity_id": 4322101
+            },
+            {
+              "story_id": 928031001,
+              "activity_id": 4322301,
+              "id": 36,
+              "pre_story_id": 928021001,
+              "main_activity_id": 4322101
+            },
+            {
+              "story_id": 928041001,
+              "activity_id": 4322301,
+              "id": 37,
+              "pre_story_id": 928031001,
+              "main_activity_id": 4322101
+            }
+          ]
+        },
+        "4342301": {
+          "pool_list": [
+            1025,
+            1026
+          ],
+          "story_item": 0,
+          "stories": []
+        }
+      },
+      "activities": {
+        "182211": {
+          "theme": 18,
+          "template": 221,
+          "sub_activity_id_list": [
+            182221,
+            182222,
+            180048,
+            181462
+          ]
+        },
+        "182221": {
+          "theme": 18,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "182222": {
+          "theme": 18,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "180048": {
+          "theme": 18,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "181462": {
+          "theme": 18,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "182231": {
+          "theme": 18,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "182233": {
+          "theme": 18,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "272211": {
+          "theme": 27,
+          "template": 221,
+          "sub_activity_id_list": [
+            272221,
+            272222,
+            270046,
+            271462
+          ]
+        },
+        "272221": {
+          "theme": 27,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "272222": {
+          "theme": 27,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "270046": {
+          "theme": 27,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "271462": {
+          "theme": 27,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "272231": {
+          "theme": 27,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "272233": {
+          "theme": 27,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "292211": {
+          "theme": 29,
+          "template": 221,
+          "sub_activity_id_list": [
+            292221,
+            292222,
+            292223,
+            290046,
+            291463,
+            292231
+          ]
+        },
+        "292221": {
+          "theme": 29,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "292222": {
+          "theme": 29,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "292223": {
+          "theme": 29,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "290046": {
+          "theme": 29,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "291463": {
+          "theme": 29,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "292231": {
+          "theme": 29,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "312211": {
+          "theme": 31,
+          "template": 221,
+          "sub_activity_id_list": [
+            312221,
+            312222,
+            310049,
+            311465,
+            312231,
+            312233
+          ]
+        },
+        "312221": {
+          "theme": 31,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "312222": {
+          "theme": 31,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "310049": {
+          "theme": 31,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "311465": {
+          "theme": 31,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "312231": {
+          "theme": 31,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "312233": {
+          "theme": 31,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "332211": {
+          "theme": 33,
+          "template": 221,
+          "sub_activity_id_list": [
+            332221,
+            332222,
+            330041,
+            331461,
+            332231
+          ]
+        },
+        "332221": {
+          "theme": 33,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "332222": {
+          "theme": 33,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "330041": {
+          "theme": 33,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "331461": {
+          "theme": 33,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "332231": {
+          "theme": 33,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "3522101": {
+          "theme": 35,
+          "template": 221,
+          "sub_activity_id_list": [
+            3522201,
+            3522202,
+            3522203,
+            3522301,
+            3500406,
+            3514601
+          ]
+        },
+        "3522201": {
+          "theme": 35,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "3522202": {
+          "theme": 35,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "3522203": {
+          "theme": 35,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "3522301": {
+          "theme": 35,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "3500406": {
+          "theme": 35,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "3514601": {
+          "theme": 35,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "3722101": {
+          "theme": 37,
+          "template": 221,
+          "sub_activity_id_list": [
+            3722201,
+            3722202,
+            3722301,
+            3700407,
+            3714601
+          ]
+        },
+        "3722201": {
+          "theme": 37,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "3722202": {
+          "theme": 37,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "3722301": {
+          "theme": 37,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "3700407": {
+          "theme": 37,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "3714601": {
+          "theme": 37,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "4022101": {
+          "theme": 40,
+          "template": 221,
+          "sub_activity_id_list": [
+            4022201,
+            4022202,
+            4022301,
+            4000410,
+            4014601
+          ]
+        },
+        "4022201": {
+          "theme": 40,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "4022202": {
+          "theme": 40,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "4022301": {
+          "theme": 40,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "4000410": {
+          "theme": 40,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "4014601": {
+          "theme": 40,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "4042301": {
+          "theme": 40,
+          "template": 423,
+          "sub_activity_id_list": [
+            4042401,
+            4042402,
+            4014602
+          ]
+        },
+        "4042401": {
+          "theme": 40,
+          "template": 424,
+          "sub_activity_id_list": []
+        },
+        "4042402": {
+          "theme": 40,
+          "template": 424,
+          "sub_activity_id_list": []
+        },
+        "4014602": {
+          "theme": 40,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "4122101": {
+          "theme": 41,
+          "template": 221,
+          "sub_activity_id_list": [
+            4122201,
+            4122202,
+            4122301,
+            4100402,
+            4114601
+          ]
+        },
+        "4122201": {
+          "theme": 41,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "4122202": {
+          "theme": 41,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "4122301": {
+          "theme": 41,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "4100402": {
+          "theme": 41,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "4114601": {
+          "theme": 41,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "4322101": {
+          "theme": 43,
+          "template": 221,
+          "sub_activity_id_list": [
+            4322201,
+            4322202,
+            4322301,
+            4300407,
+            4314601
+          ]
+        },
+        "4322201": {
+          "theme": 43,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "4322202": {
+          "theme": 43,
+          "template": 222,
+          "sub_activity_id_list": []
+        },
+        "4322301": {
+          "theme": 43,
+          "template": 223,
+          "sub_activity_id_list": []
+        },
+        "4300407": {
+          "theme": 43,
+          "template": 4,
+          "sub_activity_id_list": []
+        },
+        "4314601": {
+          "theme": 43,
+          "template": 146,
+          "sub_activity_id_list": []
+        },
+        "4342301": {
+          "theme": 43,
+          "template": 423,
+          "sub_activity_id_list": [
+            4342401,
+            4342402,
+            4314602
+          ]
+        },
+        "4342401": {
+          "theme": 43,
+          "template": 424,
+          "sub_activity_id_list": []
+        },
+        "4342402": {
+          "theme": 43,
+          "template": 424,
+          "sub_activity_id_list": []
+        },
+        "4314602": {
+          "theme": 43,
+          "template": 146,
+          "sub_activity_id_list": []
+        }
+      }
+    }
+  },
+  "auto_gifts": {
+    "30099": [
+      [
+        104402,
+        1
+      ],
+      [
+        13001,
+        1
+      ]
+    ],
+    "30098": [
+      [
+        104903,
+        1
+      ],
+      [
+        41721,
+        1
+      ]
+    ],
+    "30124": [
+      [
+        109503,
+        1
+      ],
+      [
+        41721,
+        1
+      ]
+    ]
+  },
+  "first_skin_bonuses": {
+    "30098": [
+      41721
+    ],
+    "30124": [
+      41721
+    ]
+  },
+  "ticket_goods": {
+    "300000014": {
+      "goods_id": 300000014,
+      "shop_id": 300,
+      "item_id": 53030,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53030,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "300000013": {
+      "goods_id": 300000013,
+      "shop_id": 300,
+      "item_id": 53030,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53030,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          300000014
+        ]
+      }
+    },
+    "300000012": {
+      "goods_id": 300000012,
+      "shop_id": 300,
+      "item_id": 53030,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53030,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          300000013
+        ]
+      }
+    },
+    "300000011": {
+      "goods_id": 300000011,
+      "shop_id": 300,
+      "item_id": 53030,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53030,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          300000012
+        ]
+      }
+    },
+    "300000010": {
+      "goods_id": 300000010,
+      "shop_id": 300,
+      "item_id": 53030,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53030,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          300000011
+        ]
+      }
+    },
+    "300000009": {
+      "goods_id": 300000009,
+      "shop_id": 300,
+      "item_id": 53030,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53030,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          300000010
+        ]
+      }
+    },
+    "300000008": {
+      "goods_id": 300000008,
+      "shop_id": 300,
+      "item_id": 53030,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53030,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          300000009
+        ]
+      }
+    },
+    "300000007": {
+      "goods_id": 300000007,
+      "shop_id": 300,
+      "item_id": 53030,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53030,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          300000008
+        ]
+      }
+    },
+    "300000006": {
+      "goods_id": 300000006,
+      "shop_id": 300,
+      "item_id": 53030,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53030,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "300000005": {
+      "goods_id": 300000005,
+      "shop_id": 300,
+      "item_id": 53031,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 6,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53031,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "300000004": {
+      "goods_id": 300000004,
+      "shop_id": 300,
+      "item_id": 53031,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53031,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          300000005
+        ]
+      }
+    },
+    "300000003": {
+      "goods_id": 300000003,
+      "shop_id": 300,
+      "item_id": 53031,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53031,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          300000004
+        ]
+      }
+    },
+    "300000002": {
+      "goods_id": 300000002,
+      "shop_id": 300,
+      "item_id": 53031,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 60,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53031,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          300000003
+        ]
+      }
+    },
+    "300000001": {
+      "goods_id": 300000001,
+      "shop_id": 300,
+      "item_id": 53031,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 60,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53031,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "301000014": {
+      "goods_id": 301000014,
+      "shop_id": 301,
+      "item_id": 53109,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53109,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "301000013": {
+      "goods_id": 301000013,
+      "shop_id": 301,
+      "item_id": 53109,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53109,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          301000014
+        ]
+      }
+    },
+    "301000012": {
+      "goods_id": 301000012,
+      "shop_id": 301,
+      "item_id": 53109,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53109,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          301000013
+        ]
+      }
+    },
+    "301000011": {
+      "goods_id": 301000011,
+      "shop_id": 301,
+      "item_id": 53109,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53109,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          301000012
+        ]
+      }
+    },
+    "301000010": {
+      "goods_id": 301000010,
+      "shop_id": 301,
+      "item_id": 53109,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53109,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          301000011
+        ]
+      }
+    },
+    "301000009": {
+      "goods_id": 301000009,
+      "shop_id": 301,
+      "item_id": 53109,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53109,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          301000010
+        ]
+      }
+    },
+    "301000008": {
+      "goods_id": 301000008,
+      "shop_id": 301,
+      "item_id": 53109,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53109,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          301000009
+        ]
+      }
+    },
+    "301000007": {
+      "goods_id": 301000007,
+      "shop_id": 301,
+      "item_id": 53109,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53109,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          301000008
+        ]
+      }
+    },
+    "301000006": {
+      "goods_id": 301000006,
+      "shop_id": 301,
+      "item_id": 53109,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53109,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "301000005": {
+      "goods_id": 301000005,
+      "shop_id": 301,
+      "item_id": 53110,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 6,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53110,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "301000004": {
+      "goods_id": 301000004,
+      "shop_id": 301,
+      "item_id": 53110,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53110,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          301000005
+        ]
+      }
+    },
+    "301000003": {
+      "goods_id": 301000003,
+      "shop_id": 301,
+      "item_id": 53110,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53110,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          301000004
+        ]
+      }
+    },
+    "301000002": {
+      "goods_id": 301000002,
+      "shop_id": 301,
+      "item_id": 53110,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 60,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53110,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          301000003
+        ]
+      }
+    },
+    "301000001": {
+      "goods_id": 301000001,
+      "shop_id": 301,
+      "item_id": 53110,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 60,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53110,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "303000019": {
+      "goods_id": 303000019,
+      "shop_id": 303,
+      "item_id": 53120,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53120,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "303000018": {
+      "goods_id": 303000018,
+      "shop_id": 303,
+      "item_id": 53120,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53120,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000019
+        ]
+      }
+    },
+    "303000017": {
+      "goods_id": 303000017,
+      "shop_id": 303,
+      "item_id": 53120,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53120,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000018
+        ]
+      }
+    },
+    "303000016": {
+      "goods_id": 303000016,
+      "shop_id": 303,
+      "item_id": 53120,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53120,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000017
+        ]
+      }
+    },
+    "303000015": {
+      "goods_id": 303000015,
+      "shop_id": 303,
+      "item_id": 53120,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53120,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000016
+        ]
+      }
+    },
+    "303000014": {
+      "goods_id": 303000014,
+      "shop_id": 303,
+      "item_id": 53120,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53120,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000015
+        ]
+      }
+    },
+    "303000013": {
+      "goods_id": 303000013,
+      "shop_id": 303,
+      "item_id": 53120,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53120,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000014
+        ]
+      }
+    },
+    "303000012": {
+      "goods_id": 303000012,
+      "shop_id": 303,
+      "item_id": 53120,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53120,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          303000013
+        ]
+      }
+    },
+    "303000011": {
+      "goods_id": 303000011,
+      "shop_id": 303,
+      "item_id": 53120,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53120,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "303000005": {
+      "goods_id": 303000005,
+      "shop_id": 303,
+      "item_id": 53121,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 6,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53121,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "303000004": {
+      "goods_id": 303000004,
+      "shop_id": 303,
+      "item_id": 53121,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 18,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53121,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000005
+        ]
+      }
+    },
+    "303000003": {
+      "goods_id": 303000003,
+      "shop_id": 303,
+      "item_id": 53121,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 30,
+      "discount": 50,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53121,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000004
+        ]
+      }
+    },
+    "303000002": {
+      "goods_id": 303000002,
+      "shop_id": 303,
+      "item_id": 53121,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 42,
+      "discount": 70,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53121,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000003
+        ]
+      }
+    },
+    "303000001": {
+      "goods_id": 303000001,
+      "shop_id": 303,
+      "item_id": 53121,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 0,
+      "cheap_cost": 50,
+      "discount": 84,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53121,
+        "cheap_cost_id": 1,
+        "pre_goods_id": []
+      }
+    },
+    "303000010": {
+      "goods_id": 303000010,
+      "shop_id": 303,
+      "item_id": 53124,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 6,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53124,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "303000009": {
+      "goods_id": 303000009,
+      "shop_id": 303,
+      "item_id": 53124,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 18,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53124,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000010
+        ]
+      }
+    },
+    "303000008": {
+      "goods_id": 303000008,
+      "shop_id": 303,
+      "item_id": 53124,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 30,
+      "discount": 50,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53124,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000009
+        ]
+      }
+    },
+    "303000007": {
+      "goods_id": 303000007,
+      "shop_id": 303,
+      "item_id": 53124,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 42,
+      "discount": 70,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53124,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          303000008
+        ]
+      }
+    },
+    "303000006": {
+      "goods_id": 303000006,
+      "shop_id": 303,
+      "item_id": 53124,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 0,
+      "cheap_cost": 50,
+      "discount": 84,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53124,
+        "cheap_cost_id": 1,
+        "pre_goods_id": []
+      }
+    },
+    "306000014": {
+      "goods_id": 306000014,
+      "shop_id": 306,
+      "item_id": 53140,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53140,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "306000013": {
+      "goods_id": 306000013,
+      "shop_id": 306,
+      "item_id": 53140,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53140,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          306000014
+        ]
+      }
+    },
+    "306000012": {
+      "goods_id": 306000012,
+      "shop_id": 306,
+      "item_id": 53140,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53140,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          306000013
+        ]
+      }
+    },
+    "306000011": {
+      "goods_id": 306000011,
+      "shop_id": 306,
+      "item_id": 53140,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53140,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          306000012
+        ]
+      }
+    },
+    "306000010": {
+      "goods_id": 306000010,
+      "shop_id": 306,
+      "item_id": 53140,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53140,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          306000011
+        ]
+      }
+    },
+    "306000009": {
+      "goods_id": 306000009,
+      "shop_id": 306,
+      "item_id": 53140,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53140,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          306000010
+        ]
+      }
+    },
+    "306000008": {
+      "goods_id": 306000008,
+      "shop_id": 306,
+      "item_id": 53140,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53140,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          306000009
+        ]
+      }
+    },
+    "306000007": {
+      "goods_id": 306000007,
+      "shop_id": 306,
+      "item_id": 53140,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53140,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          306000008
+        ]
+      }
+    },
+    "306000006": {
+      "goods_id": 306000006,
+      "shop_id": 306,
+      "item_id": 53140,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53140,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "306000005": {
+      "goods_id": 306000005,
+      "shop_id": 306,
+      "item_id": 53141,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 6,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53141,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "306000004": {
+      "goods_id": 306000004,
+      "shop_id": 306,
+      "item_id": 53141,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53141,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          306000005
+        ]
+      }
+    },
+    "306000003": {
+      "goods_id": 306000003,
+      "shop_id": 306,
+      "item_id": 53141,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53141,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          306000004
+        ]
+      }
+    },
+    "306000002": {
+      "goods_id": 306000002,
+      "shop_id": 306,
+      "item_id": 53141,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 60,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53141,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          306000003
+        ]
+      }
+    },
+    "306000001": {
+      "goods_id": 306000001,
+      "shop_id": 306,
+      "item_id": 53141,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 60,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53141,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "309000014": {
+      "goods_id": 309000014,
+      "shop_id": 309,
+      "item_id": 53156,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53156,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "309000013": {
+      "goods_id": 309000013,
+      "shop_id": 309,
+      "item_id": 53156,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53156,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          309000014
+        ]
+      }
+    },
+    "309000012": {
+      "goods_id": 309000012,
+      "shop_id": 309,
+      "item_id": 53156,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53156,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          309000013
+        ]
+      }
+    },
+    "309000011": {
+      "goods_id": 309000011,
+      "shop_id": 309,
+      "item_id": 53156,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53156,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          309000012
+        ]
+      }
+    },
+    "309000010": {
+      "goods_id": 309000010,
+      "shop_id": 309,
+      "item_id": 53156,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53156,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          309000011
+        ]
+      }
+    },
+    "309000009": {
+      "goods_id": 309000009,
+      "shop_id": 309,
+      "item_id": 53156,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53156,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          309000010
+        ]
+      }
+    },
+    "309000008": {
+      "goods_id": 309000008,
+      "shop_id": 309,
+      "item_id": 53156,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53156,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          309000009
+        ]
+      }
+    },
+    "309000007": {
+      "goods_id": 309000007,
+      "shop_id": 309,
+      "item_id": 53156,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53156,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          309000008
+        ]
+      }
+    },
+    "309000006": {
+      "goods_id": 309000006,
+      "shop_id": 309,
+      "item_id": 53156,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53156,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "309000005": {
+      "goods_id": 309000005,
+      "shop_id": 309,
+      "item_id": 53157,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 8,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53157,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "309000004": {
+      "goods_id": 309000004,
+      "shop_id": 309,
+      "item_id": 53157,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 32,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53157,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          309000005
+        ]
+      }
+    },
+    "309000003": {
+      "goods_id": 309000003,
+      "shop_id": 309,
+      "item_id": 53157,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 64,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53157,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          309000004
+        ]
+      }
+    },
+    "309000002": {
+      "goods_id": 309000002,
+      "shop_id": 309,
+      "item_id": 53157,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 80,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53157,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          309000003
+        ]
+      }
+    },
+    "309000001": {
+      "goods_id": 309000001,
+      "shop_id": 309,
+      "item_id": 53157,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 80,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53157,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "310000019": {
+      "goods_id": 310000019,
+      "shop_id": 310,
+      "item_id": 53180,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53180,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "310000018": {
+      "goods_id": 310000018,
+      "shop_id": 310,
+      "item_id": 53180,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53180,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000019
+        ]
+      }
+    },
+    "310000017": {
+      "goods_id": 310000017,
+      "shop_id": 310,
+      "item_id": 53180,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53180,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000018
+        ]
+      }
+    },
+    "310000016": {
+      "goods_id": 310000016,
+      "shop_id": 310,
+      "item_id": 53180,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53180,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000017
+        ]
+      }
+    },
+    "310000015": {
+      "goods_id": 310000015,
+      "shop_id": 310,
+      "item_id": 53180,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53180,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000016
+        ]
+      }
+    },
+    "310000014": {
+      "goods_id": 310000014,
+      "shop_id": 310,
+      "item_id": 53180,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53180,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000015
+        ]
+      }
+    },
+    "310000013": {
+      "goods_id": 310000013,
+      "shop_id": 310,
+      "item_id": 53180,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53180,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000014
+        ]
+      }
+    },
+    "310000012": {
+      "goods_id": 310000012,
+      "shop_id": 310,
+      "item_id": 53180,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53180,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          310000013
+        ]
+      }
+    },
+    "310000011": {
+      "goods_id": 310000011,
+      "shop_id": 310,
+      "item_id": 53180,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53180,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "310000005": {
+      "goods_id": 310000005,
+      "shop_id": 310,
+      "item_id": 53181,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 6,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53181,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "310000004": {
+      "goods_id": 310000004,
+      "shop_id": 310,
+      "item_id": 53181,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 18,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53181,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000005
+        ]
+      }
+    },
+    "310000003": {
+      "goods_id": 310000003,
+      "shop_id": 310,
+      "item_id": 53181,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 30,
+      "discount": 50,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53181,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000004
+        ]
+      }
+    },
+    "310000002": {
+      "goods_id": 310000002,
+      "shop_id": 310,
+      "item_id": 53181,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 42,
+      "discount": 70,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53181,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000003
+        ]
+      }
+    },
+    "310000001": {
+      "goods_id": 310000001,
+      "shop_id": 310,
+      "item_id": 53181,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 0,
+      "cheap_cost": 50,
+      "discount": 84,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53181,
+        "cheap_cost_id": 1,
+        "pre_goods_id": []
+      }
+    },
+    "310000010": {
+      "goods_id": 310000010,
+      "shop_id": 310,
+      "item_id": 53182,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 6,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53182,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "310000009": {
+      "goods_id": 310000009,
+      "shop_id": 310,
+      "item_id": 53182,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 18,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53182,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000010
+        ]
+      }
+    },
+    "310000008": {
+      "goods_id": 310000008,
+      "shop_id": 310,
+      "item_id": 53182,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 30,
+      "discount": 50,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53182,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000009
+        ]
+      }
+    },
+    "310000007": {
+      "goods_id": 310000007,
+      "shop_id": 310,
+      "item_id": 53182,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 42,
+      "discount": 70,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53182,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          310000008
+        ]
+      }
+    },
+    "310000006": {
+      "goods_id": 310000006,
+      "shop_id": 310,
+      "item_id": 53182,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 0,
+      "cheap_cost": 50,
+      "discount": 84,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53182,
+        "cheap_cost_id": 1,
+        "pre_goods_id": []
+      }
+    },
+    "311000014": {
+      "goods_id": 311000014,
+      "shop_id": 311,
+      "item_id": 53189,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53189,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "311000013": {
+      "goods_id": 311000013,
+      "shop_id": 311,
+      "item_id": 53189,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53189,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          311000014
+        ]
+      }
+    },
+    "311000012": {
+      "goods_id": 311000012,
+      "shop_id": 311,
+      "item_id": 53189,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53189,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          311000013
+        ]
+      }
+    },
+    "311000011": {
+      "goods_id": 311000011,
+      "shop_id": 311,
+      "item_id": 53189,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53189,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          311000012
+        ]
+      }
+    },
+    "311000010": {
+      "goods_id": 311000010,
+      "shop_id": 311,
+      "item_id": 53189,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53189,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          311000011
+        ]
+      }
+    },
+    "311000009": {
+      "goods_id": 311000009,
+      "shop_id": 311,
+      "item_id": 53189,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53189,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          311000010
+        ]
+      }
+    },
+    "311000008": {
+      "goods_id": 311000008,
+      "shop_id": 311,
+      "item_id": 53189,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53189,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          311000009
+        ]
+      }
+    },
+    "311000007": {
+      "goods_id": 311000007,
+      "shop_id": 311,
+      "item_id": 53189,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53189,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          311000008
+        ]
+      }
+    },
+    "311000006": {
+      "goods_id": 311000006,
+      "shop_id": 311,
+      "item_id": 53189,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53189,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "311000005": {
+      "goods_id": 311000005,
+      "shop_id": 311,
+      "item_id": 53190,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 8,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53190,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "311000004": {
+      "goods_id": 311000004,
+      "shop_id": 311,
+      "item_id": 53190,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 32,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53190,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          311000005
+        ]
+      }
+    },
+    "311000003": {
+      "goods_id": 311000003,
+      "shop_id": 311,
+      "item_id": 53190,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 64,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53190,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          311000004
+        ]
+      }
+    },
+    "311000002": {
+      "goods_id": 311000002,
+      "shop_id": 311,
+      "item_id": 53190,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 80,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53190,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          311000003
+        ]
+      }
+    },
+    "311000001": {
+      "goods_id": 311000001,
+      "shop_id": 311,
+      "item_id": 53190,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 80,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53190,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "312000001": {
+      "goods_id": 312000001,
+      "shop_id": 312,
+      "item_id": 53198,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53198,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "312000002": {
+      "goods_id": 312000002,
+      "shop_id": 312,
+      "item_id": 53198,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53198,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          312000001
+        ]
+      }
+    },
+    "312000003": {
+      "goods_id": 312000003,
+      "shop_id": 312,
+      "item_id": 53198,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53198,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          312000002
+        ]
+      }
+    },
+    "312000004": {
+      "goods_id": 312000004,
+      "shop_id": 312,
+      "item_id": 53198,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53198,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          312000003
+        ]
+      }
+    },
+    "312000005": {
+      "goods_id": 312000005,
+      "shop_id": 312,
+      "item_id": 53198,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53198,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          312000004
+        ]
+      }
+    },
+    "312000006": {
+      "goods_id": 312000006,
+      "shop_id": 312,
+      "item_id": 53198,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53198,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          312000005
+        ]
+      }
+    },
+    "312000007": {
+      "goods_id": 312000007,
+      "shop_id": 312,
+      "item_id": 53198,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53198,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          312000006
+        ]
+      }
+    },
+    "312000008": {
+      "goods_id": 312000008,
+      "shop_id": 312,
+      "item_id": 53198,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53198,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          312000007
+        ]
+      }
+    },
+    "312000009": {
+      "goods_id": 312000009,
+      "shop_id": 312,
+      "item_id": 53198,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53198,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "312000010": {
+      "goods_id": 312000010,
+      "shop_id": 312,
+      "item_id": 53199,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 8,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53199,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "312000011": {
+      "goods_id": 312000011,
+      "shop_id": 312,
+      "item_id": 53199,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 32,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53199,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          312000010
+        ]
+      }
+    },
+    "312000012": {
+      "goods_id": 312000012,
+      "shop_id": 312,
+      "item_id": 53199,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 64,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53199,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          312000011
+        ]
+      }
+    },
+    "312000013": {
+      "goods_id": 312000013,
+      "shop_id": 312,
+      "item_id": 53199,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 80,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53199,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          312000012
+        ]
+      }
+    },
+    "312000014": {
+      "goods_id": 312000014,
+      "shop_id": 312,
+      "item_id": 53199,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 80,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53199,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "313000001": {
+      "goods_id": 313000001,
+      "shop_id": 313,
+      "item_id": 53202,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53202,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "313000002": {
+      "goods_id": 313000002,
+      "shop_id": 313,
+      "item_id": 53202,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53202,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          313000001
+        ]
+      }
+    },
+    "313000003": {
+      "goods_id": 313000003,
+      "shop_id": 313,
+      "item_id": 53202,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53202,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          313000002
+        ]
+      }
+    },
+    "313000004": {
+      "goods_id": 313000004,
+      "shop_id": 313,
+      "item_id": 53202,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53202,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          313000003
+        ]
+      }
+    },
+    "313000005": {
+      "goods_id": 313000005,
+      "shop_id": 313,
+      "item_id": 53202,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53202,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          313000004
+        ]
+      }
+    },
+    "313000006": {
+      "goods_id": 313000006,
+      "shop_id": 313,
+      "item_id": 53202,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53202,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          313000005
+        ]
+      }
+    },
+    "313000007": {
+      "goods_id": 313000007,
+      "shop_id": 313,
+      "item_id": 53202,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 60,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53202,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "313000008": {
+      "goods_id": 313000008,
+      "shop_id": 313,
+      "item_id": 53203,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 4,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53203,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "313000009": {
+      "goods_id": 313000009,
+      "shop_id": 313,
+      "item_id": 53203,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 16,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53203,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          313000008
+        ]
+      }
+    },
+    "313000010": {
+      "goods_id": 313000010,
+      "shop_id": 313,
+      "item_id": 53203,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 32,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53203,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          313000009
+        ]
+      }
+    },
+    "313000011": {
+      "goods_id": 313000011,
+      "shop_id": 313,
+      "item_id": 53203,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 40,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53203,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          313000010
+        ]
+      }
+    },
+    "313000012": {
+      "goods_id": 313000012,
+      "shop_id": 313,
+      "item_id": 53203,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 40,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53203,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "314000001": {
+      "goods_id": 314000001,
+      "shop_id": 314,
+      "item_id": 53208,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53208,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "314000002": {
+      "goods_id": 314000002,
+      "shop_id": 314,
+      "item_id": 53208,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53208,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          314000001
+        ]
+      }
+    },
+    "314000003": {
+      "goods_id": 314000003,
+      "shop_id": 314,
+      "item_id": 53208,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53208,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          314000002
+        ]
+      }
+    },
+    "314000004": {
+      "goods_id": 314000004,
+      "shop_id": 314,
+      "item_id": 53208,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53208,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          314000003
+        ]
+      }
+    },
+    "314000005": {
+      "goods_id": 314000005,
+      "shop_id": 314,
+      "item_id": 53208,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53208,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          314000004
+        ]
+      }
+    },
+    "314000006": {
+      "goods_id": 314000006,
+      "shop_id": 314,
+      "item_id": 53208,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53208,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          314000005
+        ]
+      }
+    },
+    "314000007": {
+      "goods_id": 314000007,
+      "shop_id": 314,
+      "item_id": 53208,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53208,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          314000006
+        ]
+      }
+    },
+    "314000008": {
+      "goods_id": 314000008,
+      "shop_id": 314,
+      "item_id": 53208,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53208,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          314000007
+        ]
+      }
+    },
+    "314000009": {
+      "goods_id": 314000009,
+      "shop_id": 314,
+      "item_id": 53208,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53208,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "314000010": {
+      "goods_id": 314000010,
+      "shop_id": 314,
+      "item_id": 53209,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 7,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53209,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "314000011": {
+      "goods_id": 314000011,
+      "shop_id": 314,
+      "item_id": 53209,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 28,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53209,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          314000010
+        ]
+      }
+    },
+    "314000012": {
+      "goods_id": 314000012,
+      "shop_id": 314,
+      "item_id": 53209,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 56,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53209,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          314000011
+        ]
+      }
+    },
+    "314000013": {
+      "goods_id": 314000013,
+      "shop_id": 314,
+      "item_id": 53209,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 70,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 50,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53209,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          314000012
+        ]
+      }
+    },
+    "314000014": {
+      "goods_id": 314000014,
+      "shop_id": 314,
+      "item_id": 53209,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 70,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53209,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "315000001": {
+      "goods_id": 315000001,
+      "shop_id": 315,
+      "item_id": 53216,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53216,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "315000002": {
+      "goods_id": 315000002,
+      "shop_id": 315,
+      "item_id": 53216,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53216,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          315000001
+        ]
+      }
+    },
+    "315000003": {
+      "goods_id": 315000003,
+      "shop_id": 315,
+      "item_id": 53216,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53216,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          315000002
+        ]
+      }
+    },
+    "315000004": {
+      "goods_id": 315000004,
+      "shop_id": 315,
+      "item_id": 53216,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53216,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          315000003
+        ]
+      }
+    },
+    "315000005": {
+      "goods_id": 315000005,
+      "shop_id": 315,
+      "item_id": 53216,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53216,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          315000004
+        ]
+      }
+    },
+    "315000006": {
+      "goods_id": 315000006,
+      "shop_id": 315,
+      "item_id": 53216,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53216,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          315000005
+        ]
+      }
+    },
+    "315000007": {
+      "goods_id": 315000007,
+      "shop_id": 315,
+      "item_id": 53216,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53216,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          315000006
+        ]
+      }
+    },
+    "315000008": {
+      "goods_id": 315000008,
+      "shop_id": 315,
+      "item_id": 53216,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53216,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          315000007
+        ]
+      }
+    },
+    "315000009": {
+      "goods_id": 315000009,
+      "shop_id": 315,
+      "item_id": 53216,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 80,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53216,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "315000010": {
+      "goods_id": 315000010,
+      "shop_id": 315,
+      "item_id": 53217,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 8,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53217,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "315000011": {
+      "goods_id": 315000011,
+      "shop_id": 315,
+      "item_id": 53217,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 32,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53217,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          315000010
+        ]
+      }
+    },
+    "315000012": {
+      "goods_id": 315000012,
+      "shop_id": 315,
+      "item_id": 53217,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 64,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53217,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          315000011
+        ]
+      }
+    },
+    "315000013": {
+      "goods_id": 315000013,
+      "shop_id": 315,
+      "item_id": 53217,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 80,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53217,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          315000012
+        ]
+      }
+    },
+    "315000014": {
+      "goods_id": 315000014,
+      "shop_id": 315,
+      "item_id": 53217,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 80,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53217,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "316000001": {
+      "goods_id": 316000001,
+      "shop_id": 316,
+      "item_id": 53219,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 12,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53219,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "316000002": {
+      "goods_id": 316000002,
+      "shop_id": 316,
+      "item_id": 53219,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 24,
+      "discount": 20,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53219,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          316000001
+        ]
+      }
+    },
+    "316000003": {
+      "goods_id": 316000003,
+      "shop_id": 316,
+      "item_id": 53219,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 36,
+      "discount": 30,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53219,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          316000002
+        ]
+      }
+    },
+    "316000004": {
+      "goods_id": 316000004,
+      "shop_id": 316,
+      "item_id": 53219,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 48,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53219,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          316000003
+        ]
+      }
+    },
+    "316000005": {
+      "goods_id": 316000005,
+      "shop_id": 316,
+      "item_id": 53219,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 72,
+      "discount": 60,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53219,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          316000004
+        ]
+      }
+    },
+    "316000006": {
+      "goods_id": 316000006,
+      "shop_id": 316,
+      "item_id": 53219,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 96,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53219,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          316000005
+        ]
+      }
+    },
+    "316000007": {
+      "goods_id": 316000007,
+      "shop_id": 316,
+      "item_id": 53219,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 120,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 60,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53219,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    },
+    "316000008": {
+      "goods_id": 316000008,
+      "shop_id": 316,
+      "item_id": 53220,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 4,
+      "discount": 10,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53220,
+        "cheap_cost_id": 32,
+        "pre_goods_id": []
+      }
+    },
+    "316000009": {
+      "goods_id": 316000009,
+      "shop_id": 316,
+      "item_id": 53220,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 16,
+      "discount": 40,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53220,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          316000008
+        ]
+      }
+    },
+    "316000010": {
+      "goods_id": 316000010,
+      "shop_id": 316,
+      "item_id": 53220,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 0,
+      "cheap_cost": 32,
+      "discount": 80,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53220,
+        "cheap_cost_id": 32,
+        "pre_goods_id": [
+          316000009
+        ]
+      }
+    },
+    "316000011": {
+      "goods_id": 316000011,
+      "shop_id": 316,
+      "item_id": 53220,
+      "cost_type": 0,
+      "cost_id": 32,
+      "cost": 40,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 10,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53220,
+        "cheap_cost_id": 0,
+        "pre_goods_id": [
+          316000010
+        ]
+      }
+    },
+    "316000012": {
+      "goods_id": 316000012,
+      "shop_id": 316,
+      "item_id": 53220,
+      "cost_type": 0,
+      "cost_id": 1,
+      "cost": 40,
+      "cheap_cost": 0,
+      "discount": 0,
+      "limit_num": 40,
+      "refresh_cycle": 1,
+      "detail": {
+        "give": 1,
+        "description": 53220,
+        "cheap_cost_id": 0,
+        "pre_goods_id": []
+      }
+    }
+  }
+}

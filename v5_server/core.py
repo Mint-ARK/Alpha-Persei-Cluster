@@ -103,7 +103,7 @@ class Connection:
 
     __slots__ = ("uid", "db", "generator", "codec_encode", "codec_decode",
                  "log", "battle_id", "battle_stage", "battle_seq",
-                 "chat_srv", "seq", "_ctx", "send_push")
+                 "chat_srv", "seq", "_ctx", "send_push", "login_ready")
 
     def __init__(self, uid=0, db=None, generator=None, codec_encode=None, codec_decode=None,
                  log=None):
@@ -120,6 +120,7 @@ class Connection:
         self.seq = [0]          # 帧序（登录洪流/推送用，SERVER NET 或 CORE 维护）
         self._ctx = None
         self.send_push = None
+        self.login_ready = False
 
     def to_handler_ctx(self):
         """转 HandlerCtx（middleware handler 用）；懒创建并保持单例。"""
@@ -167,6 +168,8 @@ class Operation:
     # send messages or perform irreversible external work. Legacy operations
     # keep their existing boundary until reviewed individually.
     prepare_response_in_transaction = False
+    # Fire-and-forget client pushes have no acknowledgement/error message schema.
+    no_reply = False
 
     # uid 走线程本地存储 —— OPERATIONS 注册表里存的是**单例实例**，而 server_net 是
     # ThreadingTCPServer 每连接一线程。若 uid 是普通实例属性，两个连接并发时
@@ -777,6 +780,11 @@ class Core:
         if hasattr(ctx, "reset_operation_state"):
             ctx.reset_operation_state()
 
+        from multiplayer_policy import reject_request
+        rejected = reject_request(cs_req, ctx)
+        if rejected is not None:
+            return CoreResponse.from_cs_response(rejected)
+
         # 前置惰性时间戳广播源脉冲（保证所有操作在最新的跨天/跨周/跨月与物理时间下执行）
         if cs_req.uid and ctx.db is not None:
             try:
@@ -785,22 +793,35 @@ class Core:
             except Exception as _lte:
                 ctx.log(f"[core] lazy_timer.pulse 执行异常: {_lte}", "WARN")
 
-        # 此时的摘要属于已完成的pulse，避免后续购买刷新把旧摘要排在新摘要之后。
-        pulse_mail_summaries = self._take_pending_mail_summaries(ctx)
+        # 前置周期已完成；其通知独立于接下来的操作事务，并须先于新操作状态下发。
+        # 提前取走，避免 ACK/无回包出口漏发，或被后续刷新合并到错误的时序。
+        pulse_frames = take_pending_frames(ctx)
 
         # 0. OPERATIONS：操作调度（玩家操作 → 解析/校验/计算/落库/双端响应）
         op = OPERATIONS.get(cs_req.cmd)
         if op is not None:
-            return self._finish_mail_summary_response(
-                self._run_operation(op, cs_req, ctx), ctx, pulse_mail_summaries)
+            return self._finish_pulse_response(
+                self._run_operation(op, cs_req, ctx), ctx, pulse_frames)
         # 1-4. 响应调度（middleware 链）
         resp = _dispatch(cs_req, ctx)
         if getattr(ctx, "log", None):
             n = len(resp.frames) if resp is not None else 0
             src = (getattr(resp, "src", "") or "?") if resp is not None else "no-reply"
             ctx.log(f"cs_{cs_req.cmd} -> 响应 {n} 帧({src})", "DEBUG", module="CORE", cmd=cs_req.cmd, to_console=False)
-        return self._finish_mail_summary_response(
-            CoreResponse.from_cs_response(resp), ctx, pulse_mail_summaries)
+        return self._finish_pulse_response(
+            CoreResponse.from_cs_response(resp), ctx, pulse_frames)
+
+    def _finish_pulse_response(self, response, ctx, pulse_frames):
+        """Deliver committed timer notifications before this request's result."""
+        # 邮件仍沿用新摘要优先规则；其他同协议快照须保留周期→操作的顺序。
+        response = self._finish_mail_summary_response(
+            response, ctx, [f for f in pulse_frames if f.cmd == 30001])
+        frames = [{"sc": f.cmd, "payload": f.payload, "flag": f.flag, "srv": f.srv}
+                  for f in pulse_frames if f.cmd != 30001]
+        if frames:
+            response.frames[:0] = frames
+            response.reply = True
+        return response
 
     def _take_pending_mail_summaries(self, ctx):
         pending = getattr(ctx, "pending_frames", None)
@@ -865,6 +886,14 @@ class Core:
                 raise OperationError(9, f"执行失败: {e}")
             if not op.prepare_response_in_transaction:
                 response = self._prepare_operation_response(op, cs_req, ctx, result, data)
+            after_commit = getattr(op, 'after_commit', None)
+            if after_commit is not None:
+                try:
+                    after_commit(result, data, ctx)
+                except Exception as exc:
+                    # The business transaction is committed. A background job
+                    # must not turn a saved operation into a misleading failure.
+                    ctx.log(f'[after_commit] cs_{cs_req.cmd}: {exc}', 'WARN')
             self._log_operation(op, cs_req, ctx, result=result, data=data)
             clear_instance_deletions(ctx)
             return response
@@ -872,6 +901,8 @@ class Core:
             if not apply_committed:
                 restore_notifications(ctx, notification_checkpoint)
             self._log_operation(op, cs_req, ctx, error=e)
+            if op.no_reply:
+                return CoreResponse([], reply=False, src="dynamic")
             payload = b"\x08" + _mw._varint(e.code & 0xFFFFFFFFFFFFFFFF)
             err_frames = []
             if not apply_committed:
@@ -893,6 +924,8 @@ class Core:
             if not apply_committed:
                 restore_notifications(ctx, notification_checkpoint)
             self._log_operation(op, cs_req, ctx, error=e)
+            if op.no_reply:
+                return CoreResponse([], reply=False, src="dynamic")
             err_frames = []
             if not apply_committed:
                 err_frames.extend(

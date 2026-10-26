@@ -1,0 +1,41 @@
+{
+  "source": "BirthdayCfg / ItemCfg, PC321",
+  "current_id": 4,
+  "episodes": [
+    {
+      "id": 1,
+      "story_id": 910201011,
+      "commemorative_props_id": 70001
+    },
+    {
+      "id": 2,
+      "story_id": 910202011,
+      "commemorative_props_id": 70003
+    },
+    {
+      "id": 3,
+      "story_id": 922031001,
+      "commemorative_props_id": 70005
+    },
+    {
+      "id": 4,
+      "story_id": 931011001,
+      "commemorative_props_id": 70008
+    }
+  ],
+  "current_gifts": [
+    [
+      20027,
+      1
+    ]
+  ],
+  "official_mail": {
+    "id": 6068,
+    "title": "生日快乐！！！！",
+    "sender": "弥弥尔",
+    "desc": "管理员，终于又到了这个日子。虽说你整天都忙这忙那的，但至少今天，你该好好休息休息！吨吨吨吨……哈啊~不知不觉间，你都已经指挥大家这么久啦。你去到了许多地方，解决了许多危机。结识了很多新的伙伴，与她们建立了牵绊，那个为了为你庆生而建立的神秘组织的成员都快超过50人了。听说今年，她们给你准备了一个与众不同的大计划，你绝对想不到！好好期待吧！在这里，就让智慧的弥弥尔大人代所有「HBD」组织的成员对你说一声——生日快乐，管理员！！"
+  },
+  "official_mail_source": {
+    "decompiled_v2/x64/game/config/mailtemplatecfg.lua": "8d38ee0dd7b7a2da2a638fc58d70570f1ee80784d7546c5a8d06113528395651"
+  }
+}

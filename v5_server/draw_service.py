@@ -1187,15 +1187,8 @@ class DrawService:
                     exists = self.db.query("SELECT id FROM hero WHERE uid=? AND id=?", (uid, chosen_hero))
                     if not exists:
                         new_heroes += 1
-                        self.db.execute(
-                            "INSERT INTO hero (uid, id, level, star, exp, skill_list, unlock, update_ts) VALUES (?, ?, 1, 300, 0, '[]', 1, ?)",
-                            (uid, chosen_hero, now)
-                        )
-                        try:
-                            import event_bus
-                            event_bus.bus.emit(event_bus.Events.HERO_UNLOCK, ctx, uid, hero_id=chosen_hero)
-                        except Exception:
-                            pass
+                        from inventory_service import InventoryService
+                        InventoryService.grant_item(ctx, uid, chosen_hero, 1, source='gacha')
                         rec_items.append({"id": chosen_hero, "num": 1})
                     else:
                         dups += 1
@@ -1233,15 +1226,8 @@ class DrawService:
                         exists = self.db.query("SELECT id FROM hero WHERE uid=? AND id=?", (uid, chosen_hero))
                         if not exists:
                             new_heroes += 1
-                            self.db.execute(
-                                "INSERT INTO hero (uid, id, level, star, exp, skill_list, unlock, update_ts) VALUES (?, ?, 1, 200, 0, '[]', 1, ?)",
-                                (uid, chosen_hero, now)
-                            )
-                            try:
-                                import event_bus
-                                event_bus.bus.emit(event_bus.Events.HERO_UNLOCK, ctx, uid, hero_id=chosen_hero)
-                            except Exception:
-                                pass
+                            from inventory_service import InventoryService
+                            InventoryService.grant_item(ctx, uid, chosen_hero, 1, source='gacha')
                             rec_items.append({"id": chosen_hero, "num": 1})
                         else:
                             dups += 1
@@ -1274,15 +1260,8 @@ class DrawService:
                             exists = self.db.query("SELECT id FROM hero WHERE uid=? AND id=?", (uid, chosen_b))
                             if not exists:
                                 new_heroes += 1
-                                self.db.execute(
-                                    "INSERT INTO hero (uid, id, level, star, exp, skill_list, unlock, update_ts) VALUES (?, ?, 1, 100, 0, '[]', 1, ?)",
-                                    (uid, chosen_b, now)
-                                )
-                                try:
-                                    import event_bus
-                                    event_bus.bus.emit(event_bus.Events.HERO_UNLOCK, ctx, uid, hero_id=chosen_b)
-                                except Exception:
-                                    pass
+                                from inventory_service import InventoryService
+                                InventoryService.grant_item(ctx, uid, chosen_b, 1, source='gacha')
                                 rec_items.append({"id": chosen_b, "num": 1})
                             else:
                                 dups += 1
@@ -1315,11 +1294,8 @@ class DrawService:
             items_for_inventory.append((36, total_huimang))
 
         if items_for_inventory:
-            try:
-                import inventory_service
-                inventory_service.grant_items(ctx, uid, items_for_inventory, source="gacha")
-            except Exception as e:
-                logger.error(f"[DrawService] 移交 InventoryService 入库失败: {e}")
+            import inventory_service
+            inventory_service.grant_items(ctx, uid, items_for_inventory, source="gacha")
 
         # 持久化出卡次序与历史记录（保留最近 100 条）
         if self.db is not None and records_to_insert:
@@ -1408,53 +1384,16 @@ class DrawService:
             (uid, item_id, new_cnt, new_cnt)
         )
 
-    def _grant_hero(self, uid, hero_id):
-        star = 300 if hero_id in (STANDARD_S_HEROES + LIMITED_S_HEROES) else 200
-        piece_add = 30 if star >= 300 else 18
-        exists = self.db.query("SELECT id FROM hero WHERE uid=? AND id=?", (uid, hero_id))
-        now = int(time.time())
-        if not exists:
-            self.db.execute(
-                "INSERT INTO hero (uid, id, level, star, exp, skill_list, unlock, update_ts) VALUES (?, ?, 1, ?, 0, '[]', 1, ?)",
-                (uid, hero_id, star, now)
-            )
-            try:
-                import event_bus
-                event_bus.bus.emit(event_bus.Events.HERO_UNLOCK, None, uid, hero_id=hero_id)
-            except Exception:
-                pass
-            return True, False, hero_id, 0
-        else:
-            prow = self.db.query("SELECT num FROM hero_piece WHERE uid=? AND hero_id=?", (uid, hero_id))
-            cur = prow[0]["num"] if prow else 0
-            new_cnt = cur + piece_add
-            self.db.execute(
-                "INSERT INTO hero_piece (uid, hero_id, num) VALUES (?, ?, ?) ON CONFLICT(uid, hero_id) DO UPDATE SET num=excluded.num",
-                (uid, hero_id, new_cnt)
-            )
-            return False, True, hero_id, piece_add
+    def _grant_hero(self, uid, hero_id, ctx=None):
+        from inventory_service import InventoryService
+        summary = InventoryService.grant_item(ctx or self.db, uid, int(hero_id), 1, source='gacha')
+        converted = summary.get('hero_converted') or []
+        return bool(summary.get('hero_unlocked')), bool(converted), int(hero_id), int(converted[0]['pieces']) if converted else 0
 
-    def _insert_servant(self, uid, prefab_id):
-        try:
-            import inventory_service
-            summary = inventory_service.grant_item(None, uid, int(prefab_id), 1, source="gacha")
-            if summary and summary.get("servants"):
-                return summary["servants"][0]["id"]
-        except Exception:
-            pass
-        star = 5 if prefab_id >= 2500000 else (4 if prefab_id >= 2400000 else 3)
-        max_row = self.db.query("SELECT MAX(id) AS m FROM servant WHERE uid=?", (uid,))
-        new_uid = (max_row[0]["m"] or 1000) + 1
-        self.db.execute(
-            "INSERT INTO servant (uid, id, prefab_id, stage, starlevel, is_locked) VALUES (?, ?, ?, 1, ?, 0)",
-            (uid, new_uid, int(prefab_id), star)
-        )
-        try:
-            import event_bus
-            event_bus.bus.emit(event_bus.Events.SERVANT_OBTAIN, None, uid, servant_id=int(prefab_id), count=1)
-        except Exception:
-            pass
-        return new_uid
+    def _insert_servant(self, uid, prefab_id, ctx=None):
+        from inventory_service import InventoryService
+        summary = InventoryService.grant_item(ctx or self.db, uid, int(prefab_id), 1, source='gacha')
+        return summary['servants'][0]['id']
 
     # ==================== GM 与控制台开放接口 ====================
 

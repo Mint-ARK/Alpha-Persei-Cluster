@@ -46,51 +46,53 @@ def on_daily_task_and_bp_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwargs
     if now_ts is None:
         now_ts = int(time.time())
     db = ctx.db
+    from task_cycle_notifications import task_cycle_reset, DAILY_TASK_FILTER
+    with task_cycle_reset(ctx, uid, DAILY_TASK_FILTER, weekly=False):
 
-    from lazy_timer import get_daily_5am_ts
-    next_daily_5am = (cycle_start_ts or get_daily_5am_ts(now_ts)) + 86400
+        from lazy_timer import get_daily_5am_ts
+        next_daily_5am = (cycle_start_ts or get_daily_5am_ts(now_ts)) + 86400
 
-    # 1. 重置日常类任务 (task_type: 6=日常, 7=战令每日, 901=游园街每日, 1101=活动随机每日, 3001=活动每日)
-    db.execute(
-        "UPDATE task SET progress=0, complete_flag=0, claimed_ts=0, expired_ts=? "
-        "WHERE uid=? AND (task_type IN (6, 7, 901, 1101, 3001) OR (task_id BETWEEN 6001 AND 6099) OR (task_id BETWEEN 71000 AND 71999))",
-        (next_daily_5am, uid)
-    )
+        # 1. 重置日常类任务 (task_type: 6=日常, 7=战令每日, 901=游园街每日, 1101=活动随机每日, 3001=活动每日)
+        db.execute(
+            "UPDATE task SET progress=0, complete_flag=0, claimed_ts=0, expired_ts=? "
+            f"WHERE uid=? AND ({DAILY_TASK_FILTER})",
+            (next_daily_5am, uid)
+        )
 
-    # 每日登录任务自动达成 (6001 日常登录, 71001 战令登录)
-    db.execute(
-        "UPDATE task SET progress=1 WHERE uid=? AND task_id IN (6001, 71001)",
-        (uid,)
-    )
+        # 每日登录任务自动达成 (6001 日常登录, 71001 战令登录)
+        db.execute(
+            "UPDATE task SET progress=1 WHERE uid=? AND task_id IN (6001, 71001)",
+            (uid,)
+        )
 
-    # 防御性清除 claim_ledger 中残存的日常/战令每日类任务记录（防止历史脏数据阻塞后续完成）
-    db.execute(
-        "DELETE FROM claim_ledger WHERE uid=? AND kind='task' AND key_id IN ("
-        "SELECT task_id FROM task_cfg WHERE task_type IN (6, 7, 901, 1101, 3001) OR task_id BETWEEN 10000 AND 10015"
-        ")",
-        (uid,)
-    )
+        # 防御性清除 claim_ledger 中残存的日常/战令每日类任务记录（防止历史脏数据阻塞后续完成）
+        db.execute(
+            "DELETE FROM claim_ledger WHERE uid=? AND kind='task' AND key_id IN ("
+            "SELECT task_id FROM task_cfg WHERE task_type IN (6, 7, 901, 1101, 3001) OR task_id BETWEEN 10000 AND 10015"
+            ")",
+            (uid,)
+        )
 
-    # 2. 重置每日活跃度 PT (activity_pt_id=1) 并同步清零每日任务评分货币 (currency id=22)
-    db.execute(
-        "UPDATE activity_pt SET active_point=0, get_id_list='[]' WHERE uid=? AND activity_pt_id=1",
-        (uid,)
-    )
-    db.execute(
-        "UPDATE currency SET num=0 WHERE uid=? AND id=22",
-        (uid,)
-    )
+        # 2. 重置每日活跃度 PT (activity_pt_id=1) 并同步清零每日任务评分货币 (currency id=22)
+        db.execute(
+            "UPDATE activity_pt SET active_point=0, get_id_list='[]' WHERE uid=? AND activity_pt_id=1",
+            (uid,)
+        )
+        db.execute(
+            "UPDATE currency SET num=0 WHERE uid=? AND id=22",
+            (uid,)
+        )
 
-    # 3. 重置后宅英雄每日投喂次数 (feed_times)
-    db.execute("UPDATE backhome_hero SET feed_times=0 WHERE uid=?", (uid,))
+        # 3. 重置后宅英雄每日投喂次数 (feed_times)
+        db.execute("UPDATE backhome_hero SET feed_times=0 WHERE uid=?", (uid,))
 
-    # 4. 更新 game_user 上的遗留时间戳标记
-    db.execute(
-        "UPDATE game_user SET last_daily_task_refresh_ts=? WHERE uid=?",
-        (cycle_start_ts or now_ts, uid)
-    )
-    if hasattr(ctx, 'log'):
-        ctx.log(f"[LazyTimer] 用户 {uid} 触发每日 05:00 跨天重置（日常任务/战令每日/每日活跃度/后宅投喂已清空）")
+        # 4. 更新 game_user 上的遗留时间戳标记
+        db.execute(
+            "UPDATE game_user SET last_daily_task_refresh_ts=? WHERE uid=?",
+            (cycle_start_ts or now_ts, uid)
+        )
+        if hasattr(ctx, 'log'):
+            ctx.log(f"[LazyTimer] 用户 {uid} 触发每日 05:00 跨天重置（日常任务/战令每日/每日活跃度/后宅投喂已清空）")
 
 
 @bus.subscribe(Events.WEEKLY_RESET_MON_5AM)
@@ -101,69 +103,71 @@ def on_weekly_task_and_bp_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwarg
     if now_ts is None:
         now_ts = int(time.time())
     db = ctx.db
+    from task_cycle_notifications import task_cycle_reset, WEEKLY_TASK_FILTER
+    with task_cycle_reset(ctx, uid, WEEKLY_TASK_FILTER, weekly=True):
 
-    from lazy_timer import get_weekly_mon_5am_ts
-    next_wk_mon_5am = (cycle_start_ts or get_weekly_mon_5am_ts(now_ts)) + 7 * 86400
+        from lazy_timer import get_weekly_mon_5am_ts
+        next_wk_mon_5am = (cycle_start_ts or get_weekly_mon_5am_ts(now_ts)) + 7 * 86400
 
-    # 1. 重置周常类任务 (task_type: 5=周常, 8=战令每周, 902=游园街每周)
-    db.execute(
-        "UPDATE task SET progress=0, complete_flag=0, claimed_ts=0, expired_ts=? "
-        "WHERE uid=? AND (task_type IN (5, 8, 902) OR (task_id BETWEEN 5001 AND 5099) OR (task_id BETWEEN 81000 AND 81999))",
-        (next_wk_mon_5am, uid)
-    )
-
-    # 防御性清除 claim_ledger 中残存的周常/战令每周类任务记录
-    db.execute(
-        "DELETE FROM claim_ledger WHERE uid=? AND kind='task' AND key_id IN ("
-        "SELECT task_id FROM task_cfg WHERE task_type IN (5, 8, 902)"
-        ")",
-        (uid,)
-    )
-
-    # 2. 战令本周获取经验清零 (weekly_gain_exp = 0) 并更新战令下次刷新时间戳 (next_refresh_timestamp)
-    db.execute(
-        "UPDATE battlepass SET weekly_gain_exp=0, next_refresh_timestamp=?, update_ts=? WHERE uid=?",
-        (next_wk_mon_5am, now_ts, uid)
-    )
-
-    # 3. 重置每周活跃度 PT (activity_pt_id=3) 并同步清零每周任务评分货币 (currency id=35)
-    db.execute(
-        "UPDATE activity_pt SET active_point=0, get_id_list='[]' WHERE uid=? AND activity_pt_id=3",
-        (uid,)
-    )
-    db.execute(
-        "UPDATE currency SET num=0 WHERE uid=? AND id=35",
-        (uid,)
-    )
-
-    # 4. 重置游园街贴票本周获取积分上限 (weekly_point = 0)
-    db.execute(
-        "UPDATE idol_trainee_rank SET weekly_point=0, update_ts=? WHERE uid=?",
-        (now_ts, uid)
-    )
-
-    # 5. [已关闭] 游园街贴票跨周期（每 4 个星期一）清空重置
-    # 按照最新业务契约：游园贴票（Item 61）在达成第 4 档（400贴票）领取自选碎片时原子扣除 400 点并开启新一轮轮转，
-    # 贴票属于玩家持续累积的代币资产，绝不能在满 4 周时被定时器强制清零。
-    # 原 db.execute("UPDATE currency SET num=0 WHERE uid=? AND id=61") 与 rank_got 清空已永久关闭。
-
-    # 6. 更新 game_user 遗留时间戳标记
-    db.execute(
-        "UPDATE game_user SET last_weekly_task_refresh_ts=? WHERE uid=?",
-        (cycle_start_ts or now_ts, uid)
-    )
-
-    # 7. 重置管理员猫咪探索周常累计天数与宝箱领取状态
-    try:
+        # 1. 重置周常类任务 (task_type: 5=周常, 8=战令每周, 902=游园街每周)
         db.execute(
-            "UPDATE admin_cat_explore_data SET weekly_time=0, weekly_reward_state=0, weekly_scene_open=0, last_weekly_reset_ts=?, update_ts=? WHERE uid=?",
-            (cycle_start_ts or now_ts, now_ts, uid)
+            "UPDATE task SET progress=0, complete_flag=0, claimed_ts=0, expired_ts=? "
+            f"WHERE uid=? AND ({WEEKLY_TASK_FILTER})",
+            (next_wk_mon_5am, uid)
         )
-    except Exception:
-        pass
 
-    if hasattr(ctx, 'log'):
-        ctx.log(f"[LazyTimer] 用户 {uid} 触发每周一 05:00 周常重置（周常任务/战令每周/战令周经验/游园街周积分/猫咪探索周宝箱已清空更新）")
+        # 防御性清除 claim_ledger 中残存的周常/战令每周类任务记录
+        db.execute(
+            "DELETE FROM claim_ledger WHERE uid=? AND kind='task' AND key_id IN ("
+            "SELECT task_id FROM task_cfg WHERE task_type IN (5, 8, 902)"
+            ")",
+            (uid,)
+        )
+
+        # 2. 战令本周获取经验清零 (weekly_gain_exp = 0) 并更新战令下次刷新时间戳 (next_refresh_timestamp)
+        db.execute(
+            "UPDATE battlepass SET weekly_gain_exp=0, next_refresh_timestamp=?, update_ts=? WHERE uid=?",
+            (next_wk_mon_5am, now_ts, uid)
+        )
+
+        # 3. 重置每周活跃度 PT (activity_pt_id=3) 并同步清零每周任务评分货币 (currency id=35)
+        db.execute(
+            "UPDATE activity_pt SET active_point=0, get_id_list='[]' WHERE uid=? AND activity_pt_id=3",
+            (uid,)
+        )
+        db.execute(
+            "UPDATE currency SET num=0 WHERE uid=? AND id=35",
+            (uid,)
+        )
+
+        # 4. 重置游园街贴票本周获取积分上限 (weekly_point = 0)
+        db.execute(
+            "UPDATE idol_trainee_rank SET weekly_point=0, update_ts=? WHERE uid=?",
+            (now_ts, uid)
+        )
+
+        # 5. [已关闭] 游园街贴票跨周期（每 4 个星期一）清空重置
+        # 按照最新业务契约：游园贴票（Item 61）在达成第 4 档（400贴票）领取自选碎片时原子扣除 400 点并开启新一轮轮转，
+        # 贴票属于玩家持续累积的代币资产，绝不能在满 4 周时被定时器强制清零。
+        # 原 db.execute("UPDATE currency SET num=0 WHERE uid=? AND id=61") 与 rank_got 清空已永久关闭。
+
+        # 6. 更新 game_user 遗留时间戳标记
+        db.execute(
+            "UPDATE game_user SET last_weekly_task_refresh_ts=? WHERE uid=?",
+            (cycle_start_ts or now_ts, uid)
+        )
+
+        # 7. 重置管理员猫咪探索周常累计天数与宝箱领取状态
+        try:
+            db.execute(
+                "UPDATE admin_cat_explore_data SET weekly_time=0, weekly_reward_state=0, weekly_scene_open=0, last_weekly_reset_ts=?, update_ts=? WHERE uid=?",
+                (cycle_start_ts or now_ts, now_ts, uid)
+            )
+        except Exception:
+            pass
+
+        if hasattr(ctx, 'log'):
+            ctx.log(f"[LazyTimer] 用户 {uid} 触发每周一 05:00 周常重置（周常任务/战令每周/战令周经验/游园街周积分/猫咪探索周宝箱已清空更新）")
 
 
 # ==================== 4. 梦境再构（Boss Challenge）周期轮换监听器 ====================

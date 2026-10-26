@@ -288,6 +288,34 @@ _HERO_JSON_COLUMNS = {
 }
 
 
+def initial_hero_row(hero_id, star, now_ts=0):
+    """Complete player state for a newly obtained hero, independent of captures."""
+    hid = int(hero_id)
+    return dict(id=hid, level=1, star=int(star), exp=0,
+        skill_list=json.dumps([[sid, 1] for sid in _configured_hero_skills(hid)]),
+        weapon_exp=0, weapon_break=0, weapon_servant_uid=0, servant='[]',
+        using_astrolabe='[]', unlock_astrolabe='[]', using_skin=hid, break_level=0,
+        exclusive_skill_list='[]', weapon_module_level=0, skill_intensify='[]',
+        battle_using_skin=hid, clear_times=0, unlock=1, equip_slot='[]',
+        module_level=0, module_assignment=0, chip_state='[]', update_ts=int(now_ts),
+        is_favorite=0, trust_level=0, trust_exp=0, trust_mood=1,
+        relation_net='[]', battle_win_times=0)
+
+
+def _initial_defaults_for_save(row, *, enabled):
+    """Project missing new-save fields without rewriting legacy save contents."""
+    if enabled:
+        defaults = initial_hero_row(row['id'], row.get('star') or 0)
+        # This wire-only field has no hero table column, so it cannot be
+        # allowed to survive from a captured hero's completed missions.
+        defaults['clear_mission_list'] = []
+        row = dict(row)
+        for key, value in defaults.items():
+            if row.get(key) is None:
+                row[key] = value
+    return row
+
+
 def normalize_hero_db_row(row):
     """Parse JSON TEXT hero columns while preserving missing and SQL NULL values."""
     normalized = dict(row or {})
@@ -718,6 +746,8 @@ def build_hero_payload(db, uid):
     rows = db.query(
         "SELECT * FROM hero WHERE uid=? AND unlock=1 ORDER BY id", (uid,))
     unlocked_by_hero, servant_map = _load_hero_payload_assets(db, uid)
+    from new_player_service import enabled
+    fresh_save = enabled(db, uid)
 
     parts = []
     for r in rows:
@@ -725,7 +755,7 @@ def build_hero_payload(db, uid):
         if not is_hero_payload_candidate(hero_id):
             continue
         exp = load_hero_expanded(hero_id)
-        row = _with_hero_payload_assets(r, unlocked_by_hero, servant_map)
+        row = _with_hero_payload_assets(_initial_defaults_for_save(r, enabled=fresh_save), unlocked_by_hero, servant_map)
         exp = build_hero_net_rec_from_db(row, template=exp)
         blob = encode_expanded(exp)
         parts.append(b"\x0a" + _varint(len(blob)) + blob)
@@ -741,7 +771,8 @@ def build_single_hero_frame(db, uid, hero_id):
     if not rows or not is_hero_payload_candidate(hero_id):
         return None
     unlocked_by_hero, servant_map = _load_hero_payload_assets(db, uid)
-    row = _with_hero_payload_assets(rows[0], unlocked_by_hero, servant_map)
+    from new_player_service import enabled
+    row = _with_hero_payload_assets(_initial_defaults_for_save(rows[0], enabled=enabled(db, uid)), unlocked_by_hero, servant_map)
     exp = build_hero_net_rec_from_db(row, template=load_hero_expanded(hero_id))
     hero_bytes = encode_expanded(exp)
     return b"\x0a" + _varint(len(hero_bytes)) + hero_bytes

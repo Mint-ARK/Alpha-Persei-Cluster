@@ -6,6 +6,7 @@ event_bus.py — V5 服务端全局事件总线（EventBus）
 
 import logging
 import inspect
+import time
 
 logger = logging.getLogger('event_bus')
 
@@ -37,6 +38,7 @@ class Events:
     STAGE_START          = 'stage_start'          # 战斗/关卡开始 (stage_id, heroes, battle_times, is_story)
     STAGE_PASS           = 'stage_pass'           # 关卡/战斗通关或扫荡 (times, stage_id, stage_type, win_stars)
     STAGE_FIRST_CLEAR    = 'stage_first_clear'    # 关卡首次通关 (stage_id, stage_type, first_rewards)
+    TEACH_STAGE_CLEAR    = 'teach_stage_clear'    # 教学进度已保存 (stage_id, stage_type_id, hero_id, clear_times)
     STAGE_FAIL           = 'stage_fail'           # 战斗失败 (stage_id, heroes)
     STAGE_QUIT           = 'stage_quit'           # 战斗中途退出 (stage_id)
     CHAPTER_REWARD_CLAIM = 'chapter_reward_claim' # 领取章节星级奖励 (chapter_id, star_level, rewards)
@@ -62,6 +64,7 @@ class Events:
     DRAW_PERFORM        = 'draw_perform'        # 抽卡执行 (pool_id, draw_count, pool_group)
     DRAW_TEN_RESULT     = 'draw_ten_result'     # 抽卡十连产出 (items, pool_id)
     USER_LOGIN          = 'user_login'          # 玩家登录/跨天重置 (is_first_login)
+    GAME_LOGIN_READY    = 'game_login_ready'    # 登录洪流完成，可向该存档推送主动私聊
     USER_BIRTHDAY       = 'user_birthday'       # 玩家/管理员生日广播 (uid, cur_year)
     PLAYER_BIRTHDAY     = 'user_birthday'       # 兼容旧常量名
     PLAYER_LEVEL_UP     = 'player_level_up'     # 玩家账号等级提升 (old_lv, new_lv, stamina_gain)
@@ -77,6 +80,7 @@ class Events:
     STORY_READ           = 'story_read'           # 剧情阅读/观看 (story_id, archive_id, story_kind, source)
     ARCHIVE_ANECDOTE_READ = 'archive_anecdote_read' # 档案轶事首次阅读 (archive_id, hero_id, rewards)
     HERO_UNLOCK          = 'hero_unlock'          # 解锁/获得新修正者 (hero_id, race)
+    SKIN_UNLOCK          = 'skin_unlock'          # 获得永久换装 (skin_id, hero_id, portrait_id, source)
     SERVANT_OBTAIN       = 'servant_obtain'       # 获得钥从/使魔 (servant_id)
     EQUIP_OBTAIN         = 'equip_obtain'         # 获得刻印/装备 (suit_id, pos)
 
@@ -124,6 +128,7 @@ class Events:
 class EventBus:
     """轻量级全局事件总线，支持同步发布/订阅与异常沙箱隔离。"""
     _handlers = {}
+    CYCLE_RETRY_DELAYS = (5, 30, 120)  # 首次执行之后的三次重试间隔（秒）
 
     def __init__(self):
         # 兼容已有代码对实例属性的访问
@@ -149,6 +154,94 @@ class EventBus:
     def register(cls, event_name, func):
         """函数式注册"""
         cls._handlers.setdefault(event_name, []).append(func)
+
+    @classmethod
+    def emit_cycle(cls, event_name, ctx, uid, *, cycle_start_ts, **kwargs):
+        """周期事件持久记账；每监听器每周期最多首次加三次重试。"""
+        from account_db import savepoint_transaction
+        from operation_notifications import checkpoint_notifications, restore_notifications
+
+        cycle = int(cycle_start_ts)
+        if cycle <= 0:
+            raise ValueError('周期起点必须为正时间戳')
+        # 尝试次数必须先独立提交，不能随外层业务回滚而重新获得预算。
+        in_txn = getattr(ctx.db, '_in_txn', None)
+        if callable(in_txn) and in_txn():
+            return False
+        now = int(time.time() if kwargs.get('now_ts') is None else kwargs['now_ts'])
+        max_attempts = len(cls.CYCLE_RETRY_DELAYS) + 1
+        completed = True
+        for handler in list(cls._handlers.get(event_name, [])):
+            checkpoint = checkpoint_notifications(ctx)
+            reserved = False
+            try:
+                # 模块与限定名在重新注册/进程重启后保持相同，不使用对象地址。
+                key = f'{handler.__module__}:{handler.__qualname__}'
+                with savepoint_transaction(ctx.db):
+                    rows = ctx.db.query(
+                        'SELECT cycle_start_ts FROM user_timer_listener_watermark '
+                        'WHERE uid=? AND event_name=? AND listener_key=?', (uid, event_name, key))
+                    if rows and int(rows[0]['cycle_start_ts']) >= cycle:
+                        continue
+                    retry = ctx.db.query(
+                        'SELECT cycle_start_ts,attempts,next_retry_ts FROM user_timer_listener_retry '
+                        'WHERE uid=? AND event_name=? AND listener_key=?', (uid, event_name, key))
+                    if retry and int(retry[0]['cycle_start_ts']) > cycle:
+                        completed = False
+                        continue  # 时钟回拨不能清掉较新周期的预算。
+                    state = retry[0] if retry and int(retry[0]['cycle_start_ts']) == cycle else {}
+                    attempts = int(state.get('attempts') or 0)
+                    if attempts >= max_attempts or now < int(state.get('next_retry_ts') or 0):
+                        completed = False
+                        continue
+                    attempt = attempts + 1
+                    next_retry = now + cls.CYCLE_RETRY_DELAYS[attempts] if attempt < max_attempts else 0
+                    ctx.db.execute(
+                        'INSERT INTO user_timer_listener_retry '
+                        '(uid,event_name,listener_key,cycle_start_ts,attempts,next_retry_ts,last_error) '
+                        "VALUES(?,?,?,?,?,?,'') ON CONFLICT(uid,event_name,listener_key) DO UPDATE SET "
+                        'cycle_start_ts=excluded.cycle_start_ts,attempts=excluded.attempts,'
+                        "next_retry_ts=excluded.next_retry_ts,last_error=''",
+                        (uid, event_name, key, cycle, attempt, next_retry))
+                # 先占用持久预算；崩溃、业务回滚或提交失败均不会免费重试。
+                reserved = True
+                with savepoint_transaction(ctx.db):
+                    args, call_kwargs = _bind_handler_call(handler, ctx, uid,
+                        dict(kwargs, cycle_start_ts=cycle))
+                    handler(*args, **call_kwargs)
+                    ctx.db.execute(
+                        'INSERT INTO user_timer_listener_watermark '
+                        '(uid,event_name,listener_key,cycle_start_ts) VALUES(?,?,?,?) '
+                        'ON CONFLICT(uid,event_name,listener_key) DO UPDATE '
+                        'SET cycle_start_ts=excluded.cycle_start_ts', (uid, event_name, key, cycle))
+                    ctx.db.execute(
+                        'DELETE FROM user_timer_listener_retry '
+                        'WHERE uid=? AND event_name=? AND listener_key=? AND cycle_start_ts=?',
+                        (uid, event_name, key, cycle))
+            except BaseException as exc:
+                restore_notifications(ctx, checkpoint)
+                if not isinstance(exc, Exception):
+                    raise
+                completed = False
+                name = getattr(handler, '__qualname__', str(handler))
+                if reserved:
+                    try:
+                        ctx.db.execute(
+                            'UPDATE user_timer_listener_retry SET last_error=? '
+                            'WHERE uid=? AND event_name=? AND listener_key=? AND cycle_start_ts=?',
+                            (str(exc)[:500], uid, event_name, key, cycle))
+                    except Exception:
+                        logger.exception('保存周期失败原因失败，已占用的重试预算保持不变')
+                    state_text = (f'{attempt}/{max_attempts}次失败，本周期停止自动重试' if attempt >= max_attempts
+                                  else f'{attempt}/{max_attempts}次失败，最早{next_retry}重试')
+                else:
+                    state_text = '重试预算不可用，未执行业务'
+                msg = f'[EventBus ERROR] 周期 {event_name}/{cycle} 监听器 {name} {state_text}: {exc}'
+                if hasattr(ctx, 'log'):
+                    ctx.log(msg)
+                else:
+                    logger.exception(msg)
+        return completed
 
     @classmethod
     def emit(cls, event_name, ctx=None, uid=0, **kwargs):

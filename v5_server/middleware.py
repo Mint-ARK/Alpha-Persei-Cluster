@@ -159,6 +159,10 @@ class HandlerCtx:
         self._p03_payload = None
         # 操作级道具变动原子追踪集（sc_17023 差量推送）与事件待发帧队列
         self.touched_items = set()
+        self.touched_heroes = set()
+        self.added_equips = []
+        self.added_weapons = []
+        self.touched_chat_stickers = False
         self.removed_equips = []
         self.removed_weapons = []
         self.deleted_servants = []
@@ -190,6 +194,10 @@ class HandlerCtx:
     def reset_operation_state(self):
         """重置单次操作级状态（防止跨请求累积泄漏导致客户端重复删除/Lua崩溃）"""
         self.touched_items.clear()
+        self.touched_heroes.clear()
+        self.added_equips.clear()
+        self.added_weapons.clear()
+        self.touched_chat_stickers = False
         self.removed_equips.clear()
         self.removed_weapons.clear()
         self.deleted_servants.clear()
@@ -366,21 +374,8 @@ def _seven_day_reward(activity_id, nth):
     """七日/限时签到第 nth 次的奖励：ActivityCumulativeSignCfg[id].config_list[nth-1]
     → SignCfg[sign_id].reward（均提取自 x64 Lua：activity_cumulative_sign_cfg.json /
     sign_cfg.json）。返回 (item_id, num) 或 None。"""
-    global _SEVEN_DAY_REWARD
-    if _SEVEN_DAY_REWARD is None:
-        import json as _j7
-        import os as _o7
-        try:
-            base = _o7.path.dirname(_o7.path.abspath(__file__))
-            cl = _j7.load(open(_o7.path.join(base, "activity_cumulative_sign_cfg.json"), encoding="utf-8"))
-            sc = _j7.load(open(_o7.path.join(base, "sign_cfg.json"), encoding="utf-8"))
-            _SEVEN_DAY_REWARD = {int(a): [tuple(sc[str(sid)]) for sid in ids
-                                           if str(sid) in sc or sid in sc]
-                                 for a, ids in cl.items()}
-        except Exception:
-            _SEVEN_DAY_REWARD = {}
-    lst = _SEVEN_DAY_REWARD.get(int(activity_id)) or []
-    return lst[nth - 1] if 1 <= nth <= len(lst) else None
+    from generator import seven_day_reward
+    return seven_day_reward(activity_id, nth)
 
 
 def _item_route_add(ctx, uid, item_id, num):
@@ -765,7 +760,7 @@ def set_battle_server(bs, port, host_ip="127.0.0.1"):
         _BATTLE_IP[0] = str(host_ip)
 
 
-def register_battle_session(bid, uid, dest=0, activity_id=0, battle_times=1, heroes=None, stage_type=0, node_id=0, cooperate_skill=0, mimir_info=None, is_story=False, **kwargs):
+def register_battle_session(bid, uid, dest=0, activity_id=0, battle_times=1, heroes=None, stage_type=0, node_id=0, cooperate_skill=0, mimir_info=None, is_story=False, map_backtrack_token='', **kwargs):
     with _BATTLE_LOCK:
         _BATTLE_SESSIONS[bid] = {"uid": uid, "dest": int(dest or 0),
                                  "activity_id": int(activity_id or 0),
@@ -776,6 +771,7 @@ def register_battle_session(bid, uid, dest=0, activity_id=0, battle_times=1, her
                                  "cooperate_skill": int(cooperate_skill or 0),
                                  "mimir_info": mimir_info if isinstance(mimir_info, dict) else {},
                                  "is_story": bool(is_story),
+                                 "map_backtrack_token": str(map_backtrack_token or ''),
                                  "ts": time.time()}
         # 只留最近 100 场
         if len(_BATTLE_SESSIONS) > 100:
@@ -855,30 +851,31 @@ def _weighted_pick(entries, rng):
     return e[0], e[1]
 
 
-def stage_drop(dest, rng=None):
-    """通用掉落引擎：dest → gain_list [[item,num],..]。
+def stage_drop(dest, rng=None, first_clear=False):
+    """按客户端 DropCfg 契约选择首通 base 或重复 random/weight。
 
-    层级：关卡 drop_lib_id → dropcfg (base 保底 + random 独立概率 + weight 权重抽取)
-          → 无库则 chapter_reward（主线首通/重复在结算处另行叠加）
-          → 再无则 stage_sub.first_reward（库表）
-          → 兜底 [(1,10)]（移转之辉）。
+    None 表示没有掉落库，可使用旧奖励配置；[] 表示该分支没有奖励，
+    不能再用首通配置填充。首通有 base 时不再叠加重复掉落。
     """
     import random as _r
     rng = rng or _r
-    drop_cfg, stage_drop_map, chapter_reward, _, _, _ = _load_battle_cfgs()
+    drop_cfg, stage_drop_map, _, _, _, _ = _load_battle_cfgs()
     lib = stage_drop_map.get(str(dest)) or stage_drop_map.get(dest)
     if lib is not None:
         d = drop_cfg.get(str(lib)) or drop_cfg.get(lib)
         if d:
             gains = []
-            # 1. 基础保底掉落 base_drop: [[item, num, prob], ...]
-            for b_item in (d.get("base") or []):
+            # getRewardFromDropCfg(first_clear): base 属于首通分支。
+            base = (d.get("base") or []) if first_clear else []
+            for b_item in base:
                 if len(b_item) >= 3:
                     iid, num, prob = b_item[0], b_item[1], b_item[2]
                     if prob >= 100 or rng.randint(1, 100) <= prob:
                         gains.append([iid, num])
                 elif len(b_item) >= 2:
                     gains.append([b_item[0], b_item[1]])
+            if base:
+                return gains
             # 2. 独立概率随机掉落 random_drop: [[item, num, prob], ...]
             for r_item in (d.get("random") or []):
                 if len(r_item) >= 3:
@@ -894,11 +891,7 @@ def stage_drop(dest, rng=None):
                 if entries:
                     iid, num = _weighted_pick(entries, rng)
                     gains.append([iid, num])
-            if gains:
-                return gains
-    cr = chapter_reward.get(str(dest)) or chapter_reward.get(dest)
-    if cr and (cr.get("second") or cr.get("first")):
-        return [list(x) for x in (cr.get("second") or cr.get("first"))]
+            return gains
     return None
 
 
@@ -920,10 +913,10 @@ def chapter_bonus(dest, first_clear):
     return []
 
 
-def stage_first_reward_db(db, dest):
+def stage_first_reward_db(db, dest, uid):
     """库内 stage_sub 首通奖励兜底。"""
     try:
-        rows = db.query("SELECT first_reward FROM stage_sub WHERE id=?", (int(dest),))
+        rows = db.query("SELECT first_reward FROM stage_sub WHERE uid=? AND id=?", (uid, int(dest)))
         if rows:
             import json as _jf
             v = _jf.loads(rows[0]["first_reward"] or "[]")
@@ -933,13 +926,12 @@ def stage_first_reward_db(db, dest):
     return []
 
 
-def _stage_progress(db, dest):
-    """当前通关次数（chapter 主线进度表；无行=未通关）。"""
-    try:
-        rows = db.query("SELECT clear_times FROM chapter WHERE id=?", (int(dest),))
-        return int(rows[0]["clear_times"] or 0) if rows else 0
-    except Exception:
+def _stage_progress(db, dest, uid):
+    """与通关写入使用同一账号和物理表；查询失败不能当作首通。"""
+    if db is None:
         return 0
+    from stage_service import StageService
+    return StageService.get_instance(db=db).get_stage_info(uid, int(dest))["clear_times"]
 
 
 _STAGE_THREE_STARS = None
@@ -1010,7 +1002,9 @@ def evaluate_three_star(stage_id, win, b_info, heroes):
             now_prog = 1 if achieve else 0
         elif cond_id == 4:   # X秒内通关
             limit = cond[1] if len(cond) > 1 else 180
-            achieve = (battle_time <= limit)
+            # UDP 132 battle_time is milliseconds; condition parameters are
+            # seconds. Compare without rounding at the exact millisecond edge.
+            achieve = (battle_time <= limit * 1000)
             now_prog = 1 if achieve else 0
         elif cond_id == 9:   # 受到伤害小于 X
             limit = cond[1] if len(cond) > 1 else 0
@@ -1177,8 +1171,8 @@ def rewrite_54003_heroes(hero_ids, tpl):
 
 # ---- 结算辅助与成长计算 ----
 
-def _stage_stamina_cost(db, dest):
-    """获取关卡体力消耗（优先 stage_info_cfg / chapter / stage_sub 库表配置）。"""
+def _stage_stamina_cost(db, dest, uid=None):
+    """主支线仅首次扣配置体力；其他关卡沿用各自配置。"""
     if not dest:
         return 0
     dest_int = int(dest or 0)
@@ -1190,6 +1184,16 @@ def _stage_stamina_cost(db, dest):
         3026001 <= dest_int <= 3028041 or
         dest_int in (1, 2)):
         return 0
+
+    if db is not None and uid is not None:
+        from stage_service import StageService
+        svc = StageService.get_instance(db=db)
+        meta = svc.stages.get(str(dest_int)) or svc.stages.get(dest_int) or {}
+        # ChapterSectionInfoView / SubPlotSectionInfoView: 重打体力为 0。
+        # 依据配置类别，不把资源关或其他玩法的重复挑战一并免费。
+        if meta.get("category") in ("MAIN", "SUB_PLOT"):
+            if _stage_progress(db, dest_int, uid) > 0:
+                return 0
 
     stage_info = _load_battle_cfgs()[3]
     s_info = stage_info.get(str(dest)) or stage_info.get(dest)
@@ -1247,29 +1251,10 @@ def _update_hero_battle_growth(db, uid, heroes, dest=0, times=1):
             pass
 
 
-_USER_LEVEL_SETTINGS = None
-
-
 def _calc_player_level(total_exp):
-    """根据 user_level_setting.json 累加总经验计算玩家真实等级。"""
-    global _USER_LEVEL_SETTINGS
-    if _USER_LEVEL_SETTINGS is None:
-        try:
-            base = os.path.dirname(os.path.abspath(__file__))
-            cfg_p = os.path.join(base, "user_level_setting.json")
-            if os.path.exists(cfg_p):
-                import json as _jb
-                _USER_LEVEL_SETTINGS = {int(k): int(v) for k, v in _jb.load(open(cfg_p, encoding="utf-8")).items()}
-        except Exception:
-            _USER_LEVEL_SETTINGS = {}
-    if not _USER_LEVEL_SETTINGS:
-        return 92
-    lv = 1
-    rem = int(total_exp or 0)
-    while lv in _USER_LEVEL_SETTINGS and rem >= _USER_LEVEL_SETTINGS[lv]:
-        rem -= _USER_LEVEL_SETTINGS[lv]
-        lv += 1
-    return lv
+    """Compatibility entry point sharing InventoryService's authoritative curve."""
+    from inventory_service import InventoryService
+    return InventoryService.calc_player_level(total_exp)
 
 
 def _update_player_battle_growth(ctx_or_db, uid, dest=0, times=1, stamina_cost=10):
@@ -1280,7 +1265,7 @@ def _update_player_battle_growth(ctx_or_db, uid, dest=0, times=1, stamina_cost=1
         return 0
     stage_info = _load_battle_cfgs()[3]
     s_info = (stage_info.get(str(dest)) or stage_info.get(dest) or {}) if dest else {}
-    user_exp_per = int(s_info.get("user_exp") or stamina_cost or 10)
+    user_exp_per = int(s_info['user_exp']) if s_info.get('user_exp') is not None else int(stamina_cost or 10)
     add_exp = user_exp_per * times
     if add_exp <= 0:
         return 0
@@ -1352,6 +1337,8 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
     extra_frames = []
     if not hasattr(ctx, "touched_items") or ctx.touched_items is None:
         ctx.touched_items = set()
+    if not hasattr(ctx, "touched_heroes") or ctx.touched_heroes is None:
+        ctx.touched_heroes = set()
     drops, granted = [], {}
     new_equips = []
     win = (int(result or 0) == 1)
@@ -1369,14 +1356,21 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
     is_polyhedron = (stage_type == 52) or (3035000 <= dest_int <= 3036000) or (dest_int in (5001, 5002, 5003))
     is_rogue_team = (stage_type == 78) or (4100000 <= dest_int <= 4199999) or (100 <= dest_int <= 999)
     is_warchess = (stage_type == 15) or (4040000 <= dest_int <= 4050000)
+    from teach_service import service as teach_service
+    teach_type = teach_service.stage_type(dest_int)
 
     star_achieved, star_list_pb = evaluate_three_star(dest, win, battle_info, heroes)
 
     if win:
-        first_clear = False if sweep else ((_stage_progress(ctx.db, dest) == 0) if dest else False)
+        first_clear = False if sweep else ((_stage_progress(ctx.db, dest, uid) == 0) if dest else False)
+        from stage_service import StageService
+        _stage_meta = StageService.get_instance(db=ctx.db).stages.get(str(dest_int), {})
+        # Snapshot before pass_stage changes the count. Chapter/subplot replays
+        # do not grant player or hero EXP; other battle growth still applies.
+        grant_exp = first_clear or _stage_meta.get('category') not in ('MAIN', 'SUB_PLOT')
 
         # 1. 扣减体力（Fatigue ID 4）：stamina_need * times
-        stamina_per = _stage_stamina_cost(ctx.db, dest) if dest else 0
+        stamina_per = _stage_stamina_cost(ctx.db, dest, uid) if dest else 0
         total_stamina = stamina_per * times
         if total_stamina > 0 and ctx.db is not None:
             try:
@@ -1409,7 +1403,9 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
             _combo_kind = ("dream_boss" if (is_boss_normal or is_boss_advance)
                            else ("mythic_deep" if is_mythic_final else "normal"))
             # stage_kind：完整副本类型枚举（订阅者按需提取；与旧 stage_type 字符串并存，向后兼容）
-            if is_mythic_final:
+            if teach_type:
+                _stage_kind = "hero_teaching" if teach_type == 13 else "base_teaching"
+            elif is_mythic_final:
                 _stage_kind = "black_zone_final"
             elif is_mythic_normal:
                 _stage_kind = "black_zone_normal"
@@ -1437,6 +1433,7 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                      win_stars=star_achieved, heroes=heroes,
                      cooperate_skill=_combo_id, combo_stage_kind=_combo_kind,
                      stage_kind=_stage_kind, stage_type_id=int(stage_type or 0), sweep=bool(sweep),
+                     grant_exp=grant_exp,
                      battle_id=bid, mimir_id=_mimir_id, mimir_chips=_mimir_chips,
                      b_info=battle_info)
             if first_clear:
@@ -1445,11 +1442,8 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
             if total_stamina > 0:
                 bus.emit(Events.STAMINA_COST, ctx, uid, amount=total_stamina)
 
-            # 怪物击杀广播
-            m_type = 2 if (is_boss_normal or is_boss_advance or (3010101 <= dest_int <= 3012399)) else 0
-            m_id = 5024 if m_type == 2 else 0
-            if dest_int > 0:
-                bus.emit(Events.MONSTER_KILL, ctx, uid, monster_id=m_id or 101, count=1*times, race=7, monster_type=m_type)
+            # Enemy counters are committed separately after caching the result,
+            # including losses/quits, with a durable per-battle dedup key.
         except Exception:
             pass
 
@@ -1484,11 +1478,14 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
 
         # 2. 掉落与奖励计算（严格区分初次首通与重复奖励）
         for t in range(times):
-            one = stage_drop(dest, _rs) if dest else None
-            if not one:
-                one = stage_first_reward_db(ctx.db, dest) if dest else None
-            if not one:
-                one = []
+            first_this_run = first_clear and t == 0
+            one = stage_drop(dest, _rs, first_this_run) if dest else None
+            # 只有缺少掉落库时才沿用旧配置；已配置的空奖励必须保持为空。
+            extra_one = []
+            if one is None:
+                one = chapter_bonus(dest, False) if not first_this_run else []
+                if first_this_run:
+                    extra_one = chapter_bonus(dest, True) or stage_first_reward_db(ctx.db, dest, uid)
             
             # 刻印副本保底检测：若达到保底次数且本次掉落中没有 5 星包，则强制追加 5 星包
             if is_equip_stage and max_insure > 0:
@@ -1567,21 +1564,6 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                     converted_one.append([iid, inum])
             one = converted_one
 
-            # 首通差量奖励（仅第 1 倍首通时有效）
-            extra_one = []
-            if t == 0 and first_clear:
-                first_rewards = chapter_bonus(dest, True)
-                if first_rewards:
-                    extra_one = [list(x) for x in first_rewards]
-                else:
-                    db_first = stage_first_reward_db(ctx.db, dest)
-                    if db_first:
-                        extra_one = [list(x) for x in db_first]
-            elif not first_clear:
-                second_rewards = chapter_bonus(dest, False)
-                if second_rewards:
-                    one = [list(x) for x in second_rewards] + one
-
             # 合并相同道具
             merged_gain = {}
             for itm in one:
@@ -1623,8 +1605,33 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
 
         # 4. 关卡进度推进（按实际三星评估入库），结算帧 clear_times 精准对齐本次作战倍数 times
         if dest and not sweep and ctx.db is not None:
-            if not is_mythic_final and not is_boss_normal and not is_boss_advance and not is_equip_seizure and not is_polyhedron:
+            if teach_type:
+                teach_service.pass_stage(ctx, uid, dest_int, stage_type, star_achieved, times=times)
+            elif not is_mythic_final and not is_boss_normal and not is_boss_advance and not is_equip_seizure and not is_polyhedron:
                 _advance_stage(ctx.db, uid, dest, star_achieved=star_achieved)
+                try:
+                    from plot_progress_service import sync_chapter19_tasks
+                    _plot_tasks = sync_chapter19_tasks(ctx.db, uid, stage_id=dest_int)
+                    if _plot_tasks:
+                        from codec import encode as _plot_encode
+                        extra_frames.append(DownFrame(28007, _plot_encode(
+                            'sc_28007', {'progress_list': _plot_tasks})))
+                except Exception as exc:
+                    # Already persisted settlement must not be replayed for a
+                    # derived counter failure; login restores it from chapter.
+                    ctx.log(f'[plot-progress] 章节任务同步失败: {exc}', 'WARN')
+                # Chapter-map conditions consume event IDs, not ordinary 24009 stage IDs.
+                # Project only persisted clears, after StageService has written progress.
+                from chapter_v2_map_service import service as _map_service
+                if _map_service.has_stage(dest_int):
+                    try:
+                        from codec import encode as _map_encode
+                        _map_service.on_stage_clear(ctx.db, uid, dest_int,
+                            (get_battle_session(bid) or {}).get('map_backtrack_token', ''))
+                        extra_frames.append(DownFrame(24061, _map_encode(
+                            'sc_24061', _map_service.payload(ctx.db, uid))))
+                    except Exception as exc:
+                        ctx.log(f'[chapter-map] 通关状态同步失败: {exc}', 'WARN')
             
             # 黑区净化关卡进度专属处理
             if is_mythic_normal:
@@ -1779,7 +1786,7 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
         #    （订阅上方 STAGE_PASS 广播统一驱动，单一数据路径；_update_hero_battle_growth 保留备回滚）
 
         # 6. 玩家经验累加与升级
-        if ctx.db is not None:
+        if ctx.db is not None and grant_exp:
             _update_player_battle_growth(ctx, uid, dest=dest, times=times, stamina_cost=stamina_per)
 
     else:
@@ -1820,6 +1827,17 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                             extra_frames.append(DownFrame(17025, p17025))
                     except Exception:
                         pass
+
+            # 角色差量实时同步帧 sc_14007（通关掉落/首通赠送新角色即时解锁与刷新）
+            if hasattr(ctx, "touched_heroes") and ctx.touched_heroes:
+                try:
+                    import hero_codec as _hc
+                    for hid in sorted(ctx.touched_heroes):
+                        hf = _hc.build_hero_14007_frame(ctx.db, uid, int(hid))
+                        if hf:
+                            extra_frames.append(hf)
+                except Exception as _he:
+                    ctx.log(f"[settle] 角色差分推送异常: {_he}", "WARN")
 
             if dest and dest < 2000000 and not is_mythic_final and not is_boss_normal and not is_boss_advance and not is_core_verification and not is_core_verification_cl and not is_polyhedron:
                 # 24009 章节进度（仅主线/剧情关卡推送）
@@ -2154,7 +2172,20 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
         extra_frames.extend(ctx.pending_frames)
         ctx.pending_frames = []
 
+    from new_player_service import enabled, config
+    if win and enabled(ctx.db,uid) and ctx.generator is not None:
+        fresh_stage=config()['stages'].get(str(dest_int),{})
+        if fresh_stage.get('stage_type')==7:
+            extra_frames.append(DownFrame(41001,ctx.generator.gen_payload(41001,uid=uid,db=ctx.db)))
+        extra_frames.append(DownFrame(59011,ctx.generator.gen_payload(59011,uid=uid,db=ctx.db)))
     return br, extra_frames
+
+
+def _chapter_map_battle_token(ctx, uid, dest):
+    if ctx.db is None:
+        return ''
+    from chapter_v2_map_service import service
+    return service.battle_token(ctx.db, uid, dest)
 
 
 def h_54034(req, ctx):
@@ -2163,7 +2194,8 @@ def h_54034(req, ctx):
     bid = _gen_battle_id(ctx.battle_seq)
     ctx.battle_stage[0] = dest
     ctx.battle_id[0] = bid
-    register_battle_session(bid, req.uid, dest=dest, is_story=True)
+    register_battle_session(bid, req.uid, dest=dest, is_story=True,
+                            map_backtrack_token=_chapter_map_battle_token(ctx, req.uid, dest))
     _p35 = b"\x08\x00" + b"\x10" + _varint(bid)
     ctx.log(f"cs_54034 -> 剧情战斗 battle_id={bid} stage={dest}（会话已登记）")
     return CSResponse([DownFrame(54035, _p35)])
@@ -2173,9 +2205,12 @@ def h_54030(req, ctx):
     """普通战斗入口 → sc_54031 + sc_54003（按出战英雄重写）+ sc_54007（动态 battle_id/ip/port）。
 
     会话登记（uid/dest/倍数/英雄）供 h_54032 结算引擎与 UDP 132 结果对账。
-    自动持久化出战编队至 reserve_team 与 reserve_team_hero。
+    必要报文准备成功后登记会话，并保存关卡现役编队。
     """
     info = _parse_battle_common(req, ctx)
+    from new_player_service import enabled, stage_available
+    if enabled(ctx.db,req.uid) and not stage_available(ctx.db,req.uid,int(info.get('dest') or 0)):
+        raise ValueError('关卡尚未解锁')
 
     # 多维变量 (stage_type == 52 或 dest 处于多维关卡区间) 且 cs_54030 中 heroes 为空时：
     # 必须从当前活跃的 polyhedron_run 中获取 fight_hero_id_list 出战英雄，供 sc_54003 组装！
@@ -2191,11 +2226,30 @@ def h_54030(req, ctx):
             except Exception as e:
                 ctx.log(f"[battle] 多维出战英雄获取异常: {e}")
 
+    # Prepare every required battle packet before publishing a session or team.
+    # An ID-only rewrite of a historical payload cannot supply current progression.
+    if ctx.db is None or not req.uid:
+        raise ValueError('Battle initialization requires an authenticated account')
+    _p03 = battle_payload.build_sc_54003_dynamic(ctx.db, req.uid, info["heroes"])
+    if not isinstance(_p03, (bytes, bytearray, memoryview)) or not _p03:
+        raise ValueError('Dynamic sc_54003 is missing')
+    _p03 = bytes(_p03)
+    next_seq = [ctx.battle_seq[0]]
+    bid = _gen_battle_id(next_seq)
+    battle_ip = _BATTLE_IP[0] or "127.0.0.1"
+    _p07 = ctx.codec_encode("sc_54007", {"battle_start": {
+        "result": 0, "battle_id": bid, "battle_server_ip": battle_ip,
+        "battle_server_port": str(_BATTLE_PORT[0])}}) if ctx.codec_encode else None
+    if not isinstance(_p07, (bytes, bytearray, memoryview)) or not _p07:
+        raise ValueError('Dynamic sc_54007 is missing')
+    _p07 = bytes(_p07)
+
     # 虚构推演 (stage_type == 78 或 dest 处于地图节点 ID 区间 100~999):
     # 自动记录选中节点，并将 dest 映射为真实关卡 ID (param)
     is_rogue_team = (info.get("type") == 78 or (info.get("type") == 0 and 100 <= dest_num <= 999))
     rogue_node_id = 0
-    effective_uid = req.uid or 2174928301
+    effective_uid = req.uid
+    rogue_service = None
     if is_rogue_team:
         try:
             from rogueteam_service import RogueTeamService
@@ -2204,7 +2258,7 @@ def h_54030(req, ctx):
             if not is_valid:
                 ctx.log(f"[battle] 虚构推演节点 {dest_num} 越界 ({reason})，自动纠偏至合法节点 {corr_node}", "WARN")
                 dest_num = corr_node
-            svc.set_selected_node(effective_uid, dest_num)
+            rogue_service = svc
             rogue_node_id = dest_num
             session = svc.get_session_data(effective_uid)
             if session and session.get("map_info"):
@@ -2218,17 +2272,23 @@ def h_54030(req, ctx):
         except Exception as e:
             ctx.log(f"[battle] 虚构推演战斗映射异常: {e}", "WARN")
 
-    bid = _gen_battle_id(ctx.battle_seq)
-    ctx.battle_id[0] = bid
-    ctx.battle_stage[0] = info["dest"]
-    ctx.hero_last_payload[0] = req.payload
     register_battle_session(bid, effective_uid, dest=info["dest"],
                             activity_id=info["activity_id"],
                             battle_times=info["battle_times"], heroes=info["heroes"],
                             stage_type=info.get("type", 0),
                             node_id=rogue_node_id,
                             cooperate_skill=info.get("cooperate_skill", 0),
-                            mimir_info=info.get("mimir_info") or {})
+                            mimir_info=info.get("mimir_info") or {},
+                            map_backtrack_token=_chapter_map_battle_token(ctx, effective_uid, info['dest']))
+    ctx.battle_seq[0] = next_seq[0]
+    ctx.battle_id[0] = bid
+    ctx.battle_stage[0] = info["dest"]
+    ctx.hero_last_payload[0] = req.payload
+    if rogue_service is not None:
+        try:
+            rogue_service.set_selected_node(effective_uid, rogue_node_id)
+        except Exception as exc:
+            ctx.log(f"[battle] 虚构推演节点保存异常: {exc}", "WARN")
 
     # 自动持久化出战编队（旧逻辑，已停用）：reserve_team 预设不再被出战数据污染，
     # 编队记录由下方 TEAM SERVER 关卡现役编队接管（sync_stage_battle_team 保留备回滚）
@@ -2247,7 +2307,6 @@ def h_54030(req, ctx):
         except Exception as e:
             ctx.log(f"[team] 关卡现役编队保存异常: {e}", "WARN")
 
-    _bport = str(_BATTLE_PORT[0]).encode()
     frames = [DownFrame(54031, b"\x08\x00")]
     # 若为虚构推演，先下发 sc_88001 同步 select_node_id，确保客户端 PathGetRogueTeamMapID 100% 命中合法节点
     if is_rogue_team and ctx.codec_encode and ctx.db:
@@ -2261,30 +2320,7 @@ def h_54030(req, ctx):
                     frames.append(DownFrame(88001, p_88001))
         except Exception as _r88:
             ctx.log(f"[battle] 虚构推演 sc_88001 预下发异常: {_r88}", "WARN")
-    # 动态构建出战英雄完整养成与刻印装备帧 (sc_54003)
-    _p03 = None
-    if ctx.db:
-        try:
-            _p03 = battle_payload.build_sc_54003_dynamic(ctx.db, req.uid, info["heroes"])
-        except Exception as e:
-            ctx.log(f"[battle] 动态 sc_54003 构建异常: {e}")
-    if not _p03:
-        _p03_tpl = ctx.battle_03_payload()
-        if _p03_tpl:
-            _p03 = rewrite_54003_heroes(info["heroes"], _p03_tpl)
-    if _p03:
-        frames.append(DownFrame(54003, _p03))
-    _p07 = None
-    battle_ip = _BATTLE_IP[0] or "127.0.0.1"
-    b_ip_bytes = battle_ip.encode()
-    if ctx.codec_encode:
-        _p07 = ctx.codec_encode("sc_54007", {"battle_start": {
-            "result": 0, "battle_id": bid, "battle_server_ip": battle_ip,
-            "battle_server_port": _bport.decode()}})
-    if not _p07:
-        _bs = (b"\x08\x00" + b"\x10" + _varint(bid) + b"\x1a" + _varint(len(b_ip_bytes)) + b_ip_bytes
-               + b"\x22" + _varint(len(_bport)) + _bport)
-        _p07 = b"\x0a" + _varint(len(_bs)) + _bs
+    frames.append(DownFrame(54003, _p03))
     frames.append(DownFrame(54007, _p07))
     ctx.log(f"cs_54030 -> battle_id={bid} dest={info['dest']} heroes={info['heroes']} "
             f"x{info['battle_times']} 战斗服={battle_ip}:{_BATTLE_PORT[0]}")
@@ -2338,7 +2374,24 @@ def h_54032(req, ctx):
     else:
         br, extra = _settle_frames(ctx, req.uid, bid, result, dest, times=times, heroes=heroes, battle_info=b_info, stage_type=stage_type, activity_id=activity_id)
         session["br"] = br
-    _p33 = ctx.codec_encode("sc_54033", {"result": 0, "battle_result": br}) or b"\x08\x00"
+    if ctx.db is not None:
+        from enemy_kill_service import record_battle
+        try:
+            extra.extend(record_battle(ctx, req.uid, bid, result, dest, b_info))
+        except Exception as exc:
+            # br is retained: retrying statistics must not replay rewards.
+            ctx.log(f'[enemy] 统计写入失败，保留结算等待重试 bid={bid}: {exc}', 'WARN')
+            return CSResponse(extra + [DownFrame(54033, _settlement_error_payload(bid, dest))])
+    try:
+        _p33 = ctx.codec_encode("sc_54033", {"result": 0, "battle_result": br})
+        if not isinstance(_p33, (bytes, bytearray, memoryview)) or not _p33:
+            raise ValueError('Missing battle settlement acknowledgement')
+        _p33 = bytes(_p33)
+    except Exception as exc:
+        # Settlement has already run: retain br, send committed state once, and
+        # never reapply rewards merely because receipt encoding failed.
+        ctx.log(f"[settle] 结算回执编码失败，保留结果并返回错误: {exc}", "WARN")
+        return CSResponse(extra + [DownFrame(54033, _settlement_error_payload(bid, dest))])
     ctx.log(f"cs_54032 -> 结算 bid={bid} result={result} dest={dest} 掉落组={len(br['all_drop_list'])} 三星={br.get('star_list')}")
     return CSResponse(extra + [DownFrame(54033, _p33)])
 
@@ -2380,10 +2433,32 @@ def h_43002(req, ctx):
 
 
 def h_54038(req, ctx):
+    """Sweep assets, progress and enemy counters commit together."""
+    from contextlib import nullcontext
+    from operation_notifications import checkpoint_notifications, restore_notifications
+    checkpoint = checkpoint_notifications(ctx)
+    try:
+        with ctx.db.transaction() if ctx.db is not None else nullcontext():
+            return _sweep_settlement(req, ctx)
+    except BaseException:
+        restore_notifications(ctx, checkpoint)
+        raise
+
+
+def _sweep_settlement(req, ctx):
     """扫荡 → sc_54039（f1 result, f2 player_info, f3 battle_result，动态掉落引擎 × battle_times）。"""
     import reserve_codec
     import battle_payload
     info = _parse_battle_common(req, ctx)
+    from new_player_service import enabled, stage_available
+    if enabled(ctx.db,req.uid):
+        if not stage_available(ctx.db,req.uid,int(info.get('dest') or 0)):
+            raise ValueError('关卡尚未解锁')
+        cleared=ctx.db.query('SELECT 1 FROM chapter WHERE uid=? AND id=? AND clear_times>0 UNION ALL '
+                             'SELECT 1 FROM stage_sub WHERE uid=? AND id=? AND clear_times>0',
+                             (req.uid,info['dest'],req.uid,info['dest']))
+        if not cleared:
+            raise ValueError('未通关关卡不能扫荡')
     dest = info["dest"]
     times = max(1, int(info["battle_times"] or 1))
     heroes = info["heroes"]
@@ -2394,12 +2469,17 @@ def h_54038(req, ctx):
     ctx.battle_id[0] = bid
     br, extra = _settle_frames(ctx, req.uid, bid, 1, dest,
                                times=times, heroes=heroes, sweep=True)
+    if ctx.db is not None:
+        from enemy_kill_service import record_battle
+        extra.extend(record_battle(ctx, req.uid, bid, 1, dest, sweep=True, times=times))
     if ctx.db:
         _p39 = battle_payload.build_sc_54039_dynamic(ctx.db, req.uid, br, heroes, codec_encode=ctx.codec_encode)
     elif ctx.codec_encode:
         _p39 = ctx.codec_encode("sc_54039", {"result": 0, "battle_result": br}) or b"\x08\x00"
     else:
         _p39 = b"\x08\x00"
+    if not isinstance(_p39, (bytes, bytearray)) or not _p39:
+        raise ValueError('Missing sweep settlement acknowledgement')
     ctx.log(f"cs_54038 -> 扫荡 dest={dest} x{times} 出战英雄={heroes} 获得掉落组={len(br.get('all_drop_list', []))}")
     return CSResponse(extra + [DownFrame(54039, _p39)])
 
@@ -2696,93 +2776,11 @@ def h_12046(req, ctx):
 
 
 def h_24014(req, ctx):
-    """领取章节累计星数阶段奖励（cs_24014 -> sc_24015 + sc_15009 + sc_17009 + sc_24017）"""
-    data = {}
-    if ctx.codec_decode and req.payload:
-        try:
-            data = ctx.codec_decode(req.payload, "cs_24014") or {}
-        except Exception:
-            data = {}
-    ch_id = int(data.get("id") or 0)
-    treasure_id = int(data.get("treasure_id") or 1)
+    """领取章节星数宝箱；发奖、领取记录及必要响应共同提交。"""
+    from chapter_star_reward_service import claim_and_prepare
+    data = ctx.codec_decode(req.payload, 'cs_24014') if ctx.codec_decode and req.payload else {}
+    return CSResponse(claim_and_prepare(ctx, req.uid, data or {}))
 
-    import json as _j24
-    _cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chapter_star_rewards.json")
-    ch_cfg = {}
-    try:
-        if os.path.exists(_cfg_path):
-            ch_cfg = _j24.load(open(_cfg_path, "r", encoding="utf-8"))
-    except Exception:
-        ch_cfg = {}
-
-    c_info = ch_cfg.get(str(ch_id)) or ch_cfg.get(ch_id) or {}
-    star_needs = c_info.get("star_need") or []
-    reward_keys = {1: "first_reward", 2: "second_reward", 3: "third_reward"}
-    reward_items = c_info.get(reward_keys.get(treasure_id, "first_reward")) or []
-
-    # 1. 校验星数门槛
-    need_stars = star_needs[treasure_id - 1] if 0 <= treasure_id - 1 < len(star_needs) else 9999
-    sec_ids = c_info.get("section_id_list") or []
-    cur_stars = 0
-    if ctx.db and sec_ids:
-        placeholders = ",".join("?" for _ in sec_ids)
-        rows = ctx.db.query(f"SELECT star_list FROM chapter WHERE uid=? AND id IN ({placeholders})", (req.uid, *sec_ids))
-        for r in (rows or []):
-            try:
-                sl = _j24.loads(r.get("star_list") or "[]")
-                cur_stars += sum(1 for x in sl if int(x) == 1)
-            except Exception:
-                pass
-
-    if cur_stars < need_stars:
-        ctx.log(f"cs_24014 -> 领取失败：星数不足 (当前 {cur_stars} < 需求 {need_stars})", "WARN")
-        p15 = ctx.codec_encode("sc_24015", {"result": 1, "reward_list": []}) if ctx.codec_encode else b"\x08\x01"
-        return CSResponse([DownFrame(24015, p15)])
-
-    # 2. 校验是否已领取
-    claimed = ctx.db.query(
-        "SELECT 1 FROM chapter_star_reward WHERE uid=? AND chapter_id=? AND reward_order=?",
-        (req.uid, ch_id, treasure_id)
-    ) if ctx.db else []
-    if claimed:
-        ctx.log(f"cs_24014 -> 领取失败：已领取过 ch={ch_id} order={treasure_id}", "WARN")
-        p15 = ctx.codec_encode("sc_24015", {"result": 1, "reward_list": []}) if ctx.codec_encode else b"\x08\x01"
-        return CSResponse([DownFrame(24015, p15)])
-
-    # 3. 发放奖励入库
-    reward_list_proto = []
-    if ctx.db and reward_items:
-        for it in reward_items:
-            iid, inum = int(it[0]), int(it[1])
-            reward_list_proto.append({"id": iid, "num": inum})
-            _item_route_add(ctx, req.uid, iid, inum)
-
-        ctx.db.execute(
-            "INSERT OR REPLACE INTO chapter_star_reward (uid, chapter_id, reward_order, receive_time) VALUES (?, ?, ?, ?)",
-            (req.uid, ch_id, treasure_id, int(time.time()))
-        )
-
-    p15 = ctx.codec_encode("sc_24015", {"result": 0, "reward_list": reward_list_proto}) if ctx.codec_encode else b"\x08\x00"
-    frames = [DownFrame(24015, p15)]
-
-    if ctx.generator is not None:
-        p09 = ctx.generator.gen_payload(15009, uid=req.uid, db=ctx.db)
-        if p09:
-            frames.append(DownFrame(15009, p09))
-        touched_rw = set(int(r.get("id") or 0) for r in reward_list_proto if r.get("id"))
-        if touched_rw:
-            try:
-                p17023 = ctx.generator.gen_payload(17023, uid=req.uid, db=ctx.db, touched_items=touched_rw)
-                if p17023:
-                    frames.append(DownFrame(17023, p17023))
-            except Exception:
-                pass
-        p24 = ctx.generator.gen_payload(24017, uid=req.uid, db=ctx.db)
-        if p24:
-            frames.append(DownFrame(24017, p24))
-
-    ctx.log(f"cs_24014 -> 领取章节星数奖励成功 ch={ch_id} order={treasure_id} 获得={reward_list_proto}")
-    return CSResponse(frames)
 
 
 # ---------------- 图鉴与剧情系统 (52xxx / 12002 / 12026 / 14104 / 14106 / 14108) ----------------
@@ -2838,7 +2836,7 @@ def h_12002(req, ctx):
                 )
                 unlocked_pics.append({"id": pid_int, "is_receive": 0, "is_view": 0})
 
-    p03 = ctx.codec_encode("sc_12003", {"result": 0, "story_id": story_id}) if ctx.codec_encode else b"\x08\x00"
+    p03 = ctx.codec_encode("sc_12003", {"result": 0}) if ctx.codec_encode else b"\x08\x00"
     frames = [DownFrame(12003, p03)]
 
     # 实时推送插图解锁
@@ -3413,10 +3411,27 @@ def _error_payload(code=1):
     return b"\x08" + _varint(code)
 
 
+def _settlement_error_payload(bid, dest, code=1):
+    """Native p54 error envelope: Lua reads battle_result even on an error.
+
+    QUIT only closes this failed presentation. The cached settlement and SQL
+    outcome remain untouched, and this envelope advertises no new rewards.
+    """
+    bid = max(0, min(int(bid or 0), 2**64 - 1))
+    dest = max(0, min(int(dest or 0), 2**32 - 1))
+    body = (b'\x08' + _varint(bid) + b'\x10\x03\x18' + _varint(dest)
+            + b'\x20' + _varint(int(time.time())) + b'\x28\x00\x30\x01\x40\x00')
+    return b'\x08' + _varint(code or 1) + b'\x12' + _varint(len(body)) + body
+
+
 def _error_response(req, ctx=None, code=1, flag=0, srv=None):
     """契约 §7：库异常/编码失败 → 回对应 sc 的 result=非0 错误帧。
     flag=1 用于 91xxx（Lua 投递必须）；srv 由调用方显式传入（91xxx 连接级）。"""
     sc = _CS2SC.get(req.cmd, req.cmd)
+    if req.cmd == 54032:
+        bid = _pkt_field1_varint({'payload': req.payload}) or (ctx.battle_id[0] if ctx else 0)
+        dest = ctx.battle_stage[0] if ctx else 0
+        return CSResponse([DownFrame(sc, _settlement_error_payload(bid, dest, code), flag=flag, srv=srv)])
     if ctx is not None:
         ctx.log(f"cmd={req.cmd} -> 错误回包 sc_{sc} result={code}", "WARN")
     return CSResponse([DownFrame(sc, _error_payload(code), flag=flag, srv=srv)])
@@ -3817,6 +3832,10 @@ def handle_request(req, ctx=None):
     """
     if ctx is None:
         ctx = HandlerCtx()
+    from multiplayer_policy import reject_request
+    rejected = reject_request(req, ctx)
+    if rejected is not None:
+        return rejected
     # 请求级日志（DEBUG 级别，避免高频 cmd 刷盘）
     ctx.log(f"cs_{req.cmd} idx={req.index} srv={req.server_idx} payload={len(req.payload)}B", "DEBUG", cmd=req.cmd, uid=req.uid)
     # 1. CORE_HANDLERS：核心玩法处理器（库驱动，显式注册）

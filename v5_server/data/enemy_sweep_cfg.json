@@ -1,0 +1,669 @@
+{
+  "policy": "fixed map spawners, each configured activation once; multiplied only by sweep count",
+  "sources": {
+    "C:\\Users\\<user>\\Desktop\\lua解析\\decompiled_v2\\x64\\game\\config\\gamesetting.lua": "b319e751fcbd59b8ebd54316f231fe6174c51f1462ace55833a3ec2792dd6dce",
+    "C:\\Users\\<user>\\Desktop\\lua解析\\decompiled_v2\\x64\\game\\config\\chaptercfg.lua": "e05b431c21e2421ed2c5768842568865e5b5634c2cba3c54692244b5a6a30883",
+    "C:\\Users\\<user>\\Desktop\\lua解析\\decompiled_v2\\x64\\game\\config\\battledailystagecfg.lua": "bf0a35b59095db43cb7ccc2731d6802f91ee2d10f3f59c6ec11571cdd0a680e9",
+    "C:\\Users\\<user>\\Desktop\\lua解析\\decompiled_v2\\x64\\game\\config\\battleenchantmentstagecfg.lua": "94c5bb74ccc157270b40cb02dcd417e2ba8eaa288b66ab091ca45c2f403b5d5a",
+    "C:\\Users\\<user>\\Desktop\\lua解析\\decompiled_v2\\x64\\game\\config\\battleequipstagecfg.lua": "cf93dad2411d1ffbffb913581b3bebbc8bfe10dddfa8cccabb17914b5ec24925",
+    "archive\\enemy_illustration_20261023\\native_config.bytes": "7fc168ed5ba4e9035dab91bcad2a8d9f0b3614c1d4bdbf806ddab645be8c3fc3",
+    "D:\\PC_DATA\\assethash_307_321_a66c600ea8c72f003e03969fdd352250.bytes": "35bc1339644d9940d10e22edf24cd6dd0e5208de917162b27e1e3ba0749eddda",
+    "D:\\AtherGazer\\AetherGazerLauncher\\AetherGazer\\AetherGazer_Data\\StreamingAssets\\Windows\\7\\a\\7a3b3ad1a097f3755431683a60c30913.ys": "23b529bf45cef810475e042b36ddc4524ef8c284495da71bcab298c740d4f518",
+    "D:\\AtherGazer\\AetherGazerLauncher\\AetherGazer\\AetherGazer_Data\\StreamingAssets\\Windows\\5\\8\\588878bd18a15ba2c947ee821d5a7b28.ys": "9fc6b0b70ffaeb54643a38fff14d498339e94192359dc8a9442e4a8e21b95c05",
+    "D:\\AtherGazer\\AetherGazerLauncher\\AetherGazer\\AetherGazer_Data\\StreamingAssets\\Windows\\e\\e\\eeb023db1ebb9886495a73d59f551a97.ys": "6b0b3ec2ab6f71a613c3b6e94d3fc9c866a8058d4397ae1f8e6837474a4d72d8",
+    "D:\\AtherGazer\\AetherGazerLauncher\\AetherGazer\\AetherGazer_Data\\StreamingAssets\\Windows\\4\\9\\4936f16d3c271d80ed4c3de28749cbd6.ys": "7eeb11e95287fb64298d3402dde461c6ad0f2a20bc9ae2b3c59cb62c2d46d91a"
+  },
+  "stages": {
+    "2010101": 32001,
+    "2010102": 32001,
+    "2010103": 32001,
+    "2010104": 32001,
+    "2010105": 32001,
+    "2010201": 32002,
+    "2010202": 32002,
+    "2010203": 32002,
+    "2010204": 32002,
+    "2010205": 32002,
+    "2010206": 32002,
+    "2010301": 32003,
+    "2010302": 32003,
+    "2010303": 32003,
+    "2010304": 32003,
+    "2010305": 32003,
+    "2010401": 32004,
+    "2010402": 32004,
+    "2010403": 32004,
+    "2010404": 32004,
+    "2010405": 32004,
+    "2010501": 32005,
+    "2010502": 32005,
+    "2010503": 32005,
+    "2010504": 32005,
+    "2010505": 32005,
+    "2010601": 2016100,
+    "2010602": 2016200,
+    "2010603": 2016300,
+    "2010604": 2016400,
+    "2010605": 2016500,
+    "2010606": 2016100,
+    "2020011": 30001,
+    "2020012": 30001,
+    "2020013": 30001,
+    "2020014": 30001,
+    "2020015": 30001,
+    "2020021": 30002,
+    "2020022": 30002,
+    "2020023": 30002,
+    "2020024": 30002,
+    "2020025": 30002,
+    "2020031": 30003,
+    "2020032": 30003,
+    "2020033": 30003,
+    "2020034": 30003,
+    "2020035": 30003,
+    "2020041": 30004,
+    "2020042": 30004,
+    "2020043": 30004,
+    "2020044": 30004,
+    "2020045": 30004,
+    "2020051": 30005,
+    "2020052": 30005,
+    "2020053": 30005,
+    "2020054": 30005,
+    "2020055": 30005,
+    "2020061": 30006,
+    "2020062": 30006,
+    "2020063": 30006,
+    "2020064": 30006,
+    "2020065": 30006,
+    "2020071": 30007,
+    "2020072": 30007,
+    "2020073": 30007,
+    "2020074": 30007,
+    "2020075": 30007,
+    "2030011": 31001,
+    "2030012": 31001,
+    "2030013": 31001,
+    "2030021": 31002,
+    "2030022": 31002,
+    "2030023": 31002,
+    "2030031": 31003,
+    "2030032": 31003,
+    "2030033": 31003,
+    "2030041": 31004,
+    "2030042": 31004,
+    "2030043": 31004,
+    "2030051": 31005,
+    "2030052": 31005,
+    "2030053": 31005,
+    "2030061": 31006,
+    "2030062": 31006,
+    "2030063": 31006,
+    "2030071": 31007,
+    "2030072": 31007,
+    "2030073": 31007,
+    "2030081": 31008,
+    "2030082": 31008,
+    "2030083": 31008,
+    "2030091": 31009,
+    "2030092": 31009,
+    "2030093": 31009,
+    "2030101": 31010,
+    "2030102": 31010,
+    "2030103": 31010,
+    "2030111": 31011,
+    "2030112": 31011,
+    "2030113": 31011,
+    "2030121": 31012,
+    "2030122": 31012,
+    "2030123": 31012,
+    "2030131": 31013,
+    "2030132": 31013,
+    "2030133": 31013,
+    "2030141": 31014,
+    "2030142": 31014,
+    "2030143": 31014,
+    "2030151": 31015,
+    "2030152": 31015,
+    "2030153": 31015,
+    "2030161": 31016,
+    "2030162": 31016,
+    "2030163": 31016,
+    "2030171": 31017,
+    "2030172": 31017,
+    "2030173": 31017,
+    "2030181": 31018,
+    "2030182": 31018,
+    "2030183": 31018,
+    "2030191": 31019,
+    "2030192": 31019,
+    "2030193": 31019,
+    "2030201": 31020,
+    "2030202": 31020,
+    "2030203": 31020,
+    "2030211": 31021,
+    "2030212": 31021,
+    "2030213": 31021,
+    "2030221": 31022,
+    "2030222": 31022,
+    "2030223": 31022,
+    "2030231": 31023,
+    "2030232": 31023,
+    "2030233": 31023,
+    "2030241": 31024,
+    "2030242": 31024,
+    "2030243": 31024,
+    "2030251": 31025,
+    "2030252": 31025,
+    "2030253": 31025,
+    "2030261": 31026,
+    "2030262": 31026,
+    "2030263": 31026,
+    "2030271": 31027,
+    "2030272": 31027,
+    "2030273": 31027,
+    "2030281": 31028,
+    "2030282": 31028,
+    "2030283": 31028,
+    "2030291": 31029,
+    "2030292": 31029,
+    "2030293": 31029,
+    "2030301": 31030,
+    "2030302": 31030,
+    "2030303": 31030,
+    "2010701": 32006,
+    "2010702": 32006,
+    "2010703": 32006,
+    "2010704": 32006,
+    "2010705": 32006
+  },
+  "maps": {
+    "32001": {
+      "path": "Map/DailyResources/32001_Trigger",
+      "bundle": "combattle/map/dailyresources.ys",
+      "counts": {
+        "2018": 3,
+        "2021": 3,
+        "2022": 4,
+        "2044": 2,
+        "2045": 3
+      },
+      "total": 15
+    },
+    "32002": {
+      "path": "Map/DailyResources/32002_Trigger",
+      "bundle": "combattle/map/dailyresources.ys",
+      "counts": {
+        "2020": 4,
+        "2025": 6,
+        "2030": 3,
+        "2043": 2
+      },
+      "total": 15
+    },
+    "32003": {
+      "path": "Map/DailyResources/32003_Trigger",
+      "bundle": "combattle/map/dailyresources.ys",
+      "counts": {
+        "2036": 5,
+        "2037": 3,
+        "2038": 7
+      },
+      "total": 15
+    },
+    "32004": {
+      "path": "Map/DailyResources/32004_Trigger",
+      "bundle": "combattle/map/dailyresources.ys",
+      "counts": {
+        "2026": 8,
+        "2027": 7
+      },
+      "total": 15
+    },
+    "32005": {
+      "path": "Map/DailyResources/32005_Trigger",
+      "bundle": "combattle/map/dailyresources.ys",
+      "counts": {
+        "2037": 8,
+        "2038": 7
+      },
+      "total": 15
+    },
+    "32006": {
+      "path": "Map/DailyResources/32006_Trigger",
+      "bundle": "combattle/map/dailyresources.ys",
+      "counts": {
+        "2055": 5,
+        "2056": 5,
+        "2060": 5
+      },
+      "total": 15
+    },
+    "2016400": {
+      "path": "Map/Break/2016400_Trigger",
+      "bundle": "combattle/map/break.ys",
+      "counts": {
+        "2061": 3,
+        "2062": 4,
+        "3016": 1
+      },
+      "total": 8
+    },
+    "2016300": {
+      "path": "Map/Break/2016300_Trigger",
+      "bundle": "combattle/map/break.ys",
+      "counts": {
+        "2059": 3,
+        "2060": 4,
+        "3019": 1
+      },
+      "total": 8
+    },
+    "2016200": {
+      "path": "Map/Break/2016200_Trigger",
+      "bundle": "combattle/map/break.ys",
+      "counts": {
+        "2036": 2,
+        "2057": 3,
+        "2058": 4,
+        "3007": 1
+      },
+      "total": 10
+    },
+    "2016100": {
+      "path": "Map/Break/2016100_Trigger",
+      "bundle": "combattle/map/break.ys",
+      "counts": {
+        "2055": 3,
+        "2056": 4,
+        "3012": 1
+      },
+      "total": 8
+    },
+    "2016500": {
+      "path": "Map/Break/2016500_Trigger",
+      "bundle": "combattle/map/break.ys",
+      "counts": {
+        "2063": 3,
+        "2064": 4,
+        "3013": 1
+      },
+      "total": 8
+    },
+    "31001": {
+      "path": "Map/EquipEnchant/31001_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2018": 4,
+        "2022": 6,
+        "2025": 7
+      },
+      "total": 17
+    },
+    "31002": {
+      "path": "Map/EquipEnchant/31002_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2019": 1,
+        "2020": 4,
+        "2030": 9,
+        "2045": 8
+      },
+      "total": 22
+    },
+    "31003": {
+      "path": "Map/EquipEnchant/31003_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2018": 3,
+        "2020": 4,
+        "2026": 6,
+        "2027": 8
+      },
+      "total": 21
+    },
+    "31004": {
+      "path": "Map/EquipEnchant/31004_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2021": 3,
+        "2022": 4,
+        "2025": 7,
+        "2043": 3,
+        "2045": 4
+      },
+      "total": 21
+    },
+    "31005": {
+      "path": "Map/EquipEnchant/31005_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2029": 3,
+        "2037": 8,
+        "2038": 9
+      },
+      "total": 20
+    },
+    "31006": {
+      "path": "Map/EquipEnchant/31006_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2018": 3,
+        "2019": 4,
+        "2020": 4,
+        "2030": 3,
+        "2044": 3,
+        "2045": 4
+      },
+      "total": 21
+    },
+    "31007": {
+      "path": "Map/EquipEnchant/31007_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2032": 6,
+        "2033": 11,
+        "2036": 4
+      },
+      "total": 21
+    },
+    "31008": {
+      "path": "Map/EquipEnchant/31008_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2025": 4,
+        "2043": 3,
+        "3005": 2
+      },
+      "total": 9
+    },
+    "31009": {
+      "path": "Map/EquipEnchant/31009_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2026": 2,
+        "2027": 2,
+        "3013": 1
+      },
+      "total": 5
+    },
+    "31010": {
+      "path": "Map/EquipEnchant/31010_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "3008": 1,
+        "3009": 1
+      },
+      "total": 2
+    },
+    "31011": {
+      "path": "Map/EquipEnchant/31011_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2037": 2,
+        "2038": 2,
+        "3004": 1
+      },
+      "total": 5
+    },
+    "31012": {
+      "path": "Map/EquipEnchant/31012_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2032": 6,
+        "2033": 11,
+        "2036": 4
+      },
+      "total": 21
+    },
+    "31013": {
+      "path": "Map/EquipEnchant/31013_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2051": 6,
+        "4014": 1
+      },
+      "total": 7
+    },
+    "31014": {
+      "path": "Map/EquipEnchant/31014_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2026": 4,
+        "3019": 1
+      },
+      "total": 5
+    },
+    "31015": {
+      "path": "Map/EquipEnchant/31015_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "4012": 1
+      },
+      "total": 1
+    },
+    "31016": {
+      "path": "Map/EquipEnchant/31016_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2019": 1,
+        "2044": 6
+      },
+      "total": 7
+    },
+    "31017": {
+      "path": "Map/EquipEnchant/31017_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2027": 4,
+        "3012": 1
+      },
+      "total": 5
+    },
+    "31018": {
+      "path": "Map/EquipEnchant/31018_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2026": 17,
+        "2027": 5
+      },
+      "total": 22
+    },
+    "31019": {
+      "path": "Map/EquipEnchant/31019_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2029": 6,
+        "2036": 5,
+        "2037": 8,
+        "2038": 4
+      },
+      "total": 23
+    },
+    "31020": {
+      "path": "Map/EquipEnchant/31020_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2029": 1,
+        "2032": 2,
+        "2033": 4,
+        "3017": 1
+      },
+      "total": 8
+    },
+    "31021": {
+      "path": "Map/EquipEnchant/31021_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2037": 2,
+        "2038": 2,
+        "3016": 1
+      },
+      "total": 5
+    },
+    "31022": {
+      "path": "Map/EquipEnchant/31022_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "5050": 1
+      },
+      "total": 1
+    },
+    "31023": {
+      "path": "Map/EquipEnchant/31023_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2018": 3,
+        "2021": 3,
+        "2022": 8,
+        "2044": 3,
+        "2045": 4
+      },
+      "total": 21
+    },
+    "31024": {
+      "path": "Map/EquipEnchant/31024_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2019": 4,
+        "2020": 4,
+        "2021": 2,
+        "2022": 8,
+        "2030": 4
+      },
+      "total": 22
+    },
+    "31025": {
+      "path": "Map/EquipEnchant/31025_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2036": 2,
+        "2038": 2,
+        "3007": 1
+      },
+      "total": 5
+    },
+    "31026": {
+      "path": "Map/EquipEnchant/31026_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2029": 6,
+        "2036": 5,
+        "2037": 8,
+        "2038": 4
+      },
+      "total": 23
+    },
+    "31027": {
+      "path": "Map/EquipEnchant/31027_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2029": 3,
+        "2036": 4,
+        "2037": 8,
+        "2038": 6
+      },
+      "total": 21
+    },
+    "31028": {
+      "path": "Map/EquipEnchant/31028_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2029": 3,
+        "2032": 4,
+        "2033": 9,
+        "2036": 5
+      },
+      "total": 21
+    },
+    "31029": {
+      "path": "Map/EquipEnchant/31029_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2020": 7,
+        "2025": 11,
+        "2043": 3
+      },
+      "total": 21
+    },
+    "31030": {
+      "path": "Map/EquipEnchant/31030_Trigger",
+      "bundle": "combattle/map/equipenchant.ys",
+      "counts": {
+        "2018": 2,
+        "2022": 2,
+        "3006": 1
+      },
+      "total": 5
+    },
+    "30001": {
+      "path": "Map/Equip/30001_Trigger",
+      "bundle": "combattle/map/equip.ys",
+      "counts": {
+        "2025": 7,
+        "3005": 1
+      },
+      "total": 8
+    },
+    "30002": {
+      "path": "Map/Equip/30002_Trigger",
+      "bundle": "combattle/map/equip.ys",
+      "counts": {
+        "2020": 4,
+        "2030": 3,
+        "3010": 1
+      },
+      "total": 8
+    },
+    "30003": {
+      "path": "Map/Equip/30003_Trigger",
+      "bundle": "combattle/map/equip.ys",
+      "counts": {
+        "2026": 3,
+        "2027": 4,
+        "3019": 1
+      },
+      "total": 8
+    },
+    "30004": {
+      "path": "Map/Equip/30004_Trigger",
+      "bundle": "combattle/map/equip.ys",
+      "counts": {
+        "2018": 3,
+        "2021": 2,
+        "2022": 2,
+        "3006": 1
+      },
+      "total": 8
+    },
+    "30005": {
+      "path": "Map/Equip/30005_Trigger",
+      "bundle": "combattle/map/equip.ys",
+      "counts": {
+        "2037": 3,
+        "2038": 4,
+        "3014": 1
+      },
+      "total": 8
+    },
+    "30006": {
+      "path": "Map/Equip/30006_Trigger",
+      "bundle": "combattle/map/equip.ys",
+      "counts": {
+        "2036": 9,
+        "3007": 1
+      },
+      "total": 10
+    },
+    "30007": {
+      "path": "Map/Equip/30007_Trigger",
+      "bundle": "combattle/map/equip.ys",
+      "counts": {
+        "2032": 3,
+        "2033": 4,
+        "3004": 1
+      },
+      "total": 8
+    }
+  }
+}

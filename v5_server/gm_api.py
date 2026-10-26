@@ -54,7 +54,9 @@ _context = {
 
 def init_gm_api(core=None, game_port=8105, gw_port=8102, host_ip=None):
     """初始化 GM API 全局运行上下文。"""
-    global _context
+    global _context, DEFAULT_UID
+    import generator
+    DEFAULT_UID = generator.DEFAULT_UID
     if core is not None:
         _context["core"] = core
     if game_port:
@@ -99,8 +101,13 @@ def err(code=GMErrorCode.PARAM_INVALID, msg="error", data=None, status_code=200)
     }), status_code
 
 
-def _parse_uid(val, default=DEFAULT_UID):
+_DEFAULT_UID_UNSET = object()
+
+
+def _parse_uid(val, default=_DEFAULT_UID_UNSET):
     """解析并校验 UID。若有效则返回 (uid_int, None)，若非法返回 (None, err_msg)。"""
+    if default is _DEFAULT_UID_UNSET:
+        default = DEFAULT_UID
     if val is None or val == "":
         if default is None:
             return None, "缺少参数 uid"
@@ -268,6 +275,9 @@ def get_overview_status():
         if isinstance(data, dict):
             data["res_version"] = ctx.get("res_version", "229")
             data["res_version_config"] = ctx.get("res_version_config", {})
+            mounted_db = getattr(ctx.get('core'), 'db', None)
+            owner = mounted_db.get_system_config('save.owner_uid') if mounted_db is not None else ''
+            data['save_owner_uid'] = int(owner) if owner else None
         return ok(data)
     except Exception as e:
         return err(GMErrorCode.SERVICE_ERROR, f"获取服务端运行状态失败: {e}")
@@ -585,6 +595,31 @@ def post_modify_account_peripheral():
         return err(GMErrorCode.DB_EXEC_FAILED, f"更新个性化外围失败: {e}")
 
     return ok({"uid": uid, "sign": sign, "avatar_id": avatar, "icon_frame_id": icon_frame}, msg="个性化外围设置成功")
+
+
+@gm_bp.route("/account/modify_birthday", methods=["POST"])
+def post_modify_account_birthday():
+    """GM birthday override, delegated to AccountDB with shared date rules."""
+    req = request.get_json(silent=True)
+    if not isinstance(req, dict):
+        return err(GMErrorCode.PARAM_INVALID, "请求体必须为有效JSON对象")
+    uid, message = _parse_uid(req.get("uid"), default=DEFAULT_UID)
+    if message:
+        return err(GMErrorCode.PARAM_INVALID, message)
+    month, day = req.get("month"), req.get("day")
+    from profile_rules import valid_birthday
+    if not (valid_birthday(month, day) or type(month) is int and type(day) is int and month == day == 0):
+        return err(GMErrorCode.PARAM_INVALID, "请填写有效月日；清除生日须同时为0")
+    db, error_response = _require_user(uid)
+    if error_response:
+        return error_response
+    try:
+        birthday = db.gm_override_birthday(uid, month, day)
+    except LookupError as exc:
+        return err(GMErrorCode.USER_NOT_FOUND, str(exc))
+    except Exception as exc:
+        return err(GMErrorCode.DB_EXEC_FAILED, f"生日保存失败: {exc}")
+    return ok({"uid": uid, "birthday": birthday}, msg="生日已清除" if month == 0 else "生日已更新")
 
 
 # ===========================================================================
@@ -1217,11 +1252,17 @@ def post_unlock_stage_chapter():
     try:
         from stage_service import StageService
         svc = StageService.get_instance(db=db)
-        svc.apply_stage_preset(uid, mode="all_clear")
+        try:
+            chapter_id = svc.resolve_plot_chapter_id(chapter_id)
+        except ValueError as e:
+            return err(GMErrorCode.PARAM_INVALID, str(e))
+        success, message = svc.apply_stage_preset(uid, mode="all_clear", chapter_id=chapter_id)
+        if not success:
+            return err(GMErrorCode.SERVICE_ERROR, message)
     except Exception as e:
         return err(GMErrorCode.SERVICE_ERROR, f"解锁关卡失败: {e}")
 
-    return ok({"uid": uid, "chapter_id": chapter_id}, msg="主线剧情关卡已全部达成满星通关！")
+    return ok({"uid": uid, "chapter_id": chapter_id}, msg=message)
 
 
 @gm_bp.route("/stages/complete_achievements", methods=["POST"])

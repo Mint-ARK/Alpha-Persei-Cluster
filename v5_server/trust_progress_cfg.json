@@ -1,0 +1,4644 @@
+{
+  "source_sha256": {
+    "decompiled_v2/x64/game/config/herotrustcfg.lua": "0239d4adf3a8150a6d4e981e772f9a482598a300cd1838282ec0c3915219722f",
+    "decompiled_v2/x64/game/config/conditioncfg.lua": "ed79f765579f9fbccb0ed52fe7563f6334d6777b9510e575ab970979bd768511",
+    "decompiled_v2/x64/game/config/herorecordcfg.lua": "a7c5c62972d978adfa9c642eabe7be1ab050d02deb3bc6749b387324b02db6f5",
+    "decompiled_v2/x64/game/config/herorelationcfg.lua": "d497d962f87adc62b3ef79d6018747e51d671e29f706c11f564b9421629e790e",
+    "decompiled_v2/x64/game/config/herorelationnetcfg.lua": "d1a69bffb082ad15ef83cb70120403c124982b373dd283f82fe26e4524fe91e3",
+    "decompiled_v2/x64/game/config/gamelevelsetting.lua": "4389d28d06157b99ea68b097dc2357513265ad82accb3b606181773bc11fa7e5",
+    "decompiled_v2/x64/game/config/gamedisplaycfg.lua": "161951916d3d652b26ee81ce8e4a18c33df668460eff00d433103808be33530a",
+    "decompiled_v2/x64/game/config/herorelationupgradecfg.lua": "8f33fa3320b92cf06e4f0bd1864873544122cede35ead312714e4fe99b7ece05",
+    "decompiled_v2/x64/game/config/herorelationupgradeconditioncfg.lua": "a642b812745c80a010f066e8b96e35d096932a0e0eaf6d63b4c567e4ad34a589"
+  },
+  "archive_unlock_exp": 1000,
+  "hero_archives": {
+    "1011": 1011,
+    "1111": 1011,
+    "1211": 1011,
+    "1012": 1012,
+    "1013": 1013,
+    "1015": 1015,
+    "1016": 1016,
+    "1017": 1017,
+    "1019": 1019,
+    "1119": 1019,
+    "1020": 1020,
+    "1021": 1021,
+    "1022": 1022,
+    "1024": 1024,
+    "1026": 1026,
+    "1027": 1027,
+    "1127": 1027,
+    "1028": 1028,
+    "1032": 1032,
+    "1132": 1032,
+    "1033": 1033,
+    "1133": 1033,
+    "1034": 1034,
+    "1035": 1035,
+    "1037": 1037,
+    "1137": 1037,
+    "1038": 1038,
+    "1138": 1038,
+    "1039": 1039,
+    "1139": 1039,
+    "1041": 1041,
+    "1042": 1042,
+    "1043": 1043,
+    "1044": 1044,
+    "1045": 1045,
+    "1046": 1046,
+    "1047": 1047,
+    "1148": 1048,
+    "1048": 1048,
+    "1248": 1048,
+    "1049": 1049,
+    "1050": 1050,
+    "1150": 1050,
+    "1052": 1052,
+    "1053": 1053,
+    "1054": 1054,
+    "1055": 1055,
+    "1056": 1056,
+    "1156": 1056,
+    "1058": 1058,
+    "1158": 1058,
+    "1059": 1059,
+    "1060": 1060,
+    "1061": 1061,
+    "1066": 1066,
+    "1166": 1066,
+    "1067": 1067,
+    "1068": 1068,
+    "1070": 1070,
+    "1170": 1070,
+    "1071": 1071,
+    "1072": 1072,
+    "1073": 1073,
+    "1074": 1074,
+    "1075": 1075,
+    "1076": 1076,
+    "1077": 1077,
+    "1080": 1080,
+    "1081": 1081,
+    "1083": 1083,
+    "1084": 1084,
+    "1184": 1084,
+    "1284": 1084,
+    "1085": 1085,
+    "1089": 1089,
+    "1093": 1093,
+    "1094": 1094,
+    "1194": 1094,
+    "1095": 1095,
+    "1096": 1096,
+    "1097": 1097,
+    "1197": 1097,
+    "1099": 1099,
+    "1199": 1099
+  },
+  "level_conditions": {
+    "1199": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1011": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1028": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1041": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1048": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1066": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1099": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1111": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1127": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1148": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1039": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1139": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1019": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1119": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1081": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1093": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1050": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1150": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1133": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1075": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1049": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1033": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1095": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1022": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1084": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1184": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    },
+    "1284": {
+      "1": [
+        2101,
+        5108
+      ],
+      "2": [
+        5101,
+        5109
+      ],
+      "3": [
+        5102,
+        5110
+      ],
+      "4": [
+        5103,
+        5111
+      ],
+      "5": []
+    }
+  },
+  "conditions": {
+    "2101": {
+      "type": 1008,
+      "params": []
+    },
+    "5101": {
+      "type": 1004,
+      "params": [
+        20
+      ]
+    },
+    "5102": {
+      "type": 1004,
+      "params": [
+        50
+      ]
+    },
+    "5103": {
+      "type": 1004,
+      "params": [
+        100
+      ]
+    },
+    "5108": {
+      "type": 8023,
+      "params": [
+        1
+      ]
+    },
+    "5109": {
+      "type": 8023,
+      "params": [
+        2
+      ]
+    },
+    "5110": {
+      "type": 8023,
+      "params": [
+        3
+      ]
+    },
+    "5111": {
+      "type": 8023,
+      "params": [
+        4
+      ]
+    }
+  },
+  "stories": {
+    "1": {
+      "main_hero_id": 1199,
+      "relate_hero_id": 1093,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "2": {
+      "main_hero_id": 1199,
+      "relate_hero_id": 1050,
+      "story_id": 711990101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "3": {
+      "main_hero_id": 1199,
+      "relate_hero_id": 1184,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "4": {
+      "main_hero_id": 1199,
+      "relate_hero_id": 1026,
+      "story_id": 711990102,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "5": {
+      "main_hero_id": 1199,
+      "relate_hero_id": 1055,
+      "story_id": 711990103,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "6": {
+      "main_hero_id": 1199,
+      "relate_hero_id": 1019,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101101": {
+      "main_hero_id": 1011,
+      "relate_hero_id": 1084,
+      "story_id": 710110101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101102": {
+      "main_hero_id": 1011,
+      "relate_hero_id": 1111,
+      "story_id": 710110102,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101103": {
+      "main_hero_id": 1011,
+      "relate_hero_id": 1019,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101104": {
+      "main_hero_id": 1011,
+      "relate_hero_id": 1048,
+      "story_id": 710110103,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101105": {
+      "main_hero_id": 1011,
+      "relate_hero_id": 1028,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "102801": {
+      "main_hero_id": 1028,
+      "relate_hero_id": 1119,
+      "story_id": 710280101,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "102802": {
+      "main_hero_id": 1028,
+      "relate_hero_id": 1111,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "102803": {
+      "main_hero_id": 1028,
+      "relate_hero_id": 1080,
+      "story_id": 710280102,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "102804": {
+      "main_hero_id": 1028,
+      "relate_hero_id": 1066,
+      "story_id": 710280103,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "102805": {
+      "main_hero_id": 1028,
+      "relate_hero_id": 1048,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104101": {
+      "main_hero_id": 1041,
+      "relate_hero_id": 1038,
+      "story_id": 710410101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104102": {
+      "main_hero_id": 1041,
+      "relate_hero_id": 1067,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104103": {
+      "main_hero_id": 1041,
+      "relate_hero_id": 1042,
+      "story_id": 710410102,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104104": {
+      "main_hero_id": 1041,
+      "relate_hero_id": 1097,
+      "story_id": 710410103,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104105": {
+      "main_hero_id": 1041,
+      "relate_hero_id": 1184,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104801": {
+      "main_hero_id": 1048,
+      "relate_hero_id": 1094,
+      "story_id": 710480103,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104802": {
+      "main_hero_id": 1048,
+      "relate_hero_id": 1013,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104803": {
+      "main_hero_id": 1048,
+      "relate_hero_id": 1084,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104804": {
+      "main_hero_id": 1048,
+      "relate_hero_id": 1019,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104805": {
+      "main_hero_id": 1048,
+      "relate_hero_id": 1028,
+      "story_id": 710480102,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104806": {
+      "main_hero_id": 1048,
+      "relate_hero_id": 1059,
+      "story_id": 710480101,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104807": {
+      "main_hero_id": 1048,
+      "relate_hero_id": 1039,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104808": {
+      "main_hero_id": 1048,
+      "relate_hero_id": 1027,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "106601": {
+      "main_hero_id": 1066,
+      "relate_hero_id": 1037,
+      "story_id": 710660101,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "106602": {
+      "main_hero_id": 1066,
+      "relate_hero_id": 1080,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "106603": {
+      "main_hero_id": 1066,
+      "relate_hero_id": 1096,
+      "story_id": 710660104,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "106604": {
+      "main_hero_id": 1066,
+      "relate_hero_id": 1019,
+      "story_id": 710660103,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "106605": {
+      "main_hero_id": 1066,
+      "relate_hero_id": 1033,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109901": {
+      "main_hero_id": 1099,
+      "relate_hero_id": 1093,
+      "story_id": 710990101,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109902": {
+      "main_hero_id": 1099,
+      "relate_hero_id": 1050,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109903": {
+      "main_hero_id": 1099,
+      "relate_hero_id": 1184,
+      "story_id": 710990102,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109904": {
+      "main_hero_id": 1099,
+      "relate_hero_id": 1026,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109905": {
+      "main_hero_id": 1099,
+      "relate_hero_id": 1055,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109906": {
+      "main_hero_id": 1099,
+      "relate_hero_id": 1019,
+      "story_id": 710990103,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111101": {
+      "main_hero_id": 1111,
+      "relate_hero_id": 1084,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111102": {
+      "main_hero_id": 1111,
+      "relate_hero_id": 1011,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111103": {
+      "main_hero_id": 1111,
+      "relate_hero_id": 1019,
+      "story_id": 711110101,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111104": {
+      "main_hero_id": 1111,
+      "relate_hero_id": 1048,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111105": {
+      "main_hero_id": 1111,
+      "relate_hero_id": 1028,
+      "story_id": 711110102,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "121701": {
+      "main_hero_id": 1127,
+      "relate_hero_id": 1081,
+      "story_id": 710270105,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "121702": {
+      "main_hero_id": 1127,
+      "relate_hero_id": 1056,
+      "story_id": 710270104,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "121703": {
+      "main_hero_id": 1127,
+      "relate_hero_id": 1148,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "121704": {
+      "main_hero_id": 1127,
+      "relate_hero_id": 1139,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "121705": {
+      "main_hero_id": 1127,
+      "relate_hero_id": 1080,
+      "story_id": 710270101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "114801": {
+      "main_hero_id": 1148,
+      "relate_hero_id": 1094,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "114802": {
+      "main_hero_id": 1148,
+      "relate_hero_id": 1013,
+      "story_id": 711480104,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "114803": {
+      "main_hero_id": 1148,
+      "relate_hero_id": 1084,
+      "story_id": 711480101,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "114804": {
+      "main_hero_id": 1148,
+      "relate_hero_id": 1019,
+      "story_id": 711480103,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "114805": {
+      "main_hero_id": 1148,
+      "relate_hero_id": 1028,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "114806": {
+      "main_hero_id": 1148,
+      "relate_hero_id": 1059,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "114807": {
+      "main_hero_id": 1148,
+      "relate_hero_id": 1039,
+      "story_id": 711480102,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "114808": {
+      "main_hero_id": 1148,
+      "relate_hero_id": 1027,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "103901": {
+      "main_hero_id": 1039,
+      "relate_hero_id": 1038,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "103902": {
+      "main_hero_id": 1039,
+      "relate_hero_id": 1084,
+      "story_id": 710390102,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "103903": {
+      "main_hero_id": 1039,
+      "relate_hero_id": 1148,
+      "story_id": 710390101,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "103904": {
+      "main_hero_id": 1039,
+      "relate_hero_id": 1027,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "103905": {
+      "main_hero_id": 1039,
+      "relate_hero_id": 1019,
+      "story_id": 710390103,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "113901": {
+      "main_hero_id": 1139,
+      "relate_hero_id": 1038,
+      "story_id": 711390101,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "113902": {
+      "main_hero_id": 1139,
+      "relate_hero_id": 1084,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "113903": {
+      "main_hero_id": 1139,
+      "relate_hero_id": 1148,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "113904": {
+      "main_hero_id": 1139,
+      "relate_hero_id": 1027,
+      "story_id": 711390102,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "113905": {
+      "main_hero_id": 1139,
+      "relate_hero_id": 1019,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101901": {
+      "main_hero_id": 1019,
+      "relate_hero_id": 1111,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101902": {
+      "main_hero_id": 1019,
+      "relate_hero_id": 1184,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101903": {
+      "main_hero_id": 1019,
+      "relate_hero_id": 1015,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101904": {
+      "main_hero_id": 1019,
+      "relate_hero_id": 1028,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101905": {
+      "main_hero_id": 1019,
+      "relate_hero_id": 1066,
+      "story_id": 710190102,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "101906": {
+      "main_hero_id": 1019,
+      "relate_hero_id": 1039,
+      "story_id": 710190101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111901": {
+      "main_hero_id": 1119,
+      "relate_hero_id": 1111,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111902": {
+      "main_hero_id": 1119,
+      "relate_hero_id": 1184,
+      "story_id": 711190103,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111903": {
+      "main_hero_id": 1119,
+      "relate_hero_id": 1015,
+      "story_id": 711190101,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111904": {
+      "main_hero_id": 1119,
+      "relate_hero_id": 1028,
+      "story_id": 711190102,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111905": {
+      "main_hero_id": 1119,
+      "relate_hero_id": 1066,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "111906": {
+      "main_hero_id": 1119,
+      "relate_hero_id": 1039,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "108101": {
+      "main_hero_id": 1081,
+      "relate_hero_id": 1055,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "108102": {
+      "main_hero_id": 1081,
+      "relate_hero_id": 1056,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "108103": {
+      "main_hero_id": 1081,
+      "relate_hero_id": 1019,
+      "story_id": 710810101,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "108104": {
+      "main_hero_id": 1081,
+      "relate_hero_id": 1039,
+      "story_id": 710810102,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "108105": {
+      "main_hero_id": 1081,
+      "relate_hero_id": 1027,
+      "story_id": 710810103,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109301": {
+      "main_hero_id": 1093,
+      "relate_hero_id": 1199,
+      "story_id": 710930103,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109302": {
+      "main_hero_id": 1093,
+      "relate_hero_id": 1019,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109303": {
+      "main_hero_id": 1093,
+      "relate_hero_id": 1055,
+      "story_id": 710930101,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109304": {
+      "main_hero_id": 1093,
+      "relate_hero_id": 1084,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109305": {
+      "main_hero_id": 1093,
+      "relate_hero_id": 1150,
+      "story_id": 710930102,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "105001": {
+      "main_hero_id": 1050,
+      "relate_hero_id": 1099,
+      "story_id": 710500102,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "105002": {
+      "main_hero_id": 1050,
+      "relate_hero_id": 1284,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "105003": {
+      "main_hero_id": 1050,
+      "relate_hero_id": 1055,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "105004": {
+      "main_hero_id": 1050,
+      "relate_hero_id": 1049,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "105005": {
+      "main_hero_id": 1050,
+      "relate_hero_id": 1093,
+      "story_id": 710500101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "115001": {
+      "main_hero_id": 1150,
+      "relate_hero_id": 1099,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "115002": {
+      "main_hero_id": 1150,
+      "relate_hero_id": 1284,
+      "story_id": 711500103,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "115003": {
+      "main_hero_id": 1150,
+      "relate_hero_id": 1055,
+      "story_id": 711500101,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "115004": {
+      "main_hero_id": 1150,
+      "relate_hero_id": 1049,
+      "story_id": 711500102,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "115005": {
+      "main_hero_id": 1150,
+      "relate_hero_id": 1093,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "113301": {
+      "main_hero_id": 1133,
+      "relate_hero_id": 1061,
+      "story_id": 711330103,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "113302": {
+      "main_hero_id": 1133,
+      "relate_hero_id": 1028,
+      "story_id": 711330101,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "113303": {
+      "main_hero_id": 1133,
+      "relate_hero_id": 1248,
+      "story_id": 711330102,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "113304": {
+      "main_hero_id": 1133,
+      "relate_hero_id": 1019,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "113305": {
+      "main_hero_id": 1133,
+      "relate_hero_id": 1066,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "107501": {
+      "main_hero_id": 1075,
+      "relate_hero_id": 1084,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "107502": {
+      "main_hero_id": 1075,
+      "relate_hero_id": 1072,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "107503": {
+      "main_hero_id": 1075,
+      "relate_hero_id": 1074,
+      "story_id": 710750103,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "107504": {
+      "main_hero_id": 1075,
+      "relate_hero_id": 1061,
+      "story_id": 710750102,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "107505": {
+      "main_hero_id": 1075,
+      "relate_hero_id": 1076,
+      "story_id": 710750101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104901": {
+      "main_hero_id": 1049,
+      "relate_hero_id": 1150,
+      "story_id": 710490103,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104902": {
+      "main_hero_id": 1049,
+      "relate_hero_id": 1055,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104903": {
+      "main_hero_id": 1049,
+      "relate_hero_id": 1093,
+      "story_id": 710490102,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104904": {
+      "main_hero_id": 1049,
+      "relate_hero_id": 1099,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "104905": {
+      "main_hero_id": 1049,
+      "relate_hero_id": 1015,
+      "story_id": 710490101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "103301": {
+      "main_hero_id": 1033,
+      "relate_hero_id": 1061,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "103302": {
+      "main_hero_id": 1033,
+      "relate_hero_id": 1028,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "103303": {
+      "main_hero_id": 1033,
+      "relate_hero_id": 1248,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "103304": {
+      "main_hero_id": 1033,
+      "relate_hero_id": 1019,
+      "story_id": 710330102,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "103305": {
+      "main_hero_id": 1033,
+      "relate_hero_id": 1066,
+      "story_id": 710330101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109501": {
+      "main_hero_id": 1095,
+      "relate_hero_id": 1084,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109502": {
+      "main_hero_id": 1095,
+      "relate_hero_id": 1020,
+      "story_id": 710950103,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109503": {
+      "main_hero_id": 1095,
+      "relate_hero_id": 1012,
+      "story_id": 710950102,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109504": {
+      "main_hero_id": 1095,
+      "relate_hero_id": 1034,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "109505": {
+      "main_hero_id": 1095,
+      "relate_hero_id": 1015,
+      "story_id": 710950101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "102201": {
+      "main_hero_id": 1022,
+      "relate_hero_id": 1038,
+      "story_id": 710220103,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "102202": {
+      "main_hero_id": 1022,
+      "relate_hero_id": 1041,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "102203": {
+      "main_hero_id": 1022,
+      "relate_hero_id": 1097,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "102204": {
+      "main_hero_id": 1022,
+      "relate_hero_id": 1042,
+      "story_id": 710220102,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "102205": {
+      "main_hero_id": 1022,
+      "relate_hero_id": 1021,
+      "story_id": 710220101,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "108401": {
+      "main_hero_id": 1084,
+      "relate_hero_id": 1027,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "108402": {
+      "main_hero_id": 1084,
+      "relate_hero_id": 1248,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "108403": {
+      "main_hero_id": 1084,
+      "relate_hero_id": 1039,
+      "story_id": 710840101,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "108404": {
+      "main_hero_id": 1084,
+      "relate_hero_id": 1047,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "108405": {
+      "main_hero_id": 1084,
+      "relate_hero_id": 1211,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "118401": {
+      "main_hero_id": 1184,
+      "relate_hero_id": 1027,
+      "story_id": 710840103,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "118402": {
+      "main_hero_id": 1184,
+      "relate_hero_id": 1248,
+      "story_id": 710840102,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "118403": {
+      "main_hero_id": 1184,
+      "relate_hero_id": 1039,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "118404": {
+      "main_hero_id": 1184,
+      "relate_hero_id": 1047,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "118405": {
+      "main_hero_id": 1184,
+      "relate_hero_id": 1211,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "128401": {
+      "main_hero_id": 1284,
+      "relate_hero_id": 1027,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 1,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "128402": {
+      "main_hero_id": 1284,
+      "relate_hero_id": 1248,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 2,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "128403": {
+      "main_hero_id": 1284,
+      "relate_hero_id": 1039,
+      "story_id": 0,
+      "condition_id": 0,
+      "tier": 3,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "128404": {
+      "main_hero_id": 1284,
+      "relate_hero_id": 1047,
+      "story_id": 710840104,
+      "condition_id": 0,
+      "tier": 4,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    },
+    "128405": {
+      "main_hero_id": 1284,
+      "relate_hero_id": 1211,
+      "story_id": 710840105,
+      "condition_id": 0,
+      "tier": 5,
+      "rewards": [
+        {
+          "id": 1,
+          "num": 50
+        }
+      ]
+    }
+  },
+  "relation_nodes": {
+    "1": {
+      "id": 1,
+      "hero_id": 1199,
+      "index": 1,
+      "intimate": [
+        1055,
+        1026
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "2": {
+      "id": 2,
+      "hero_id": 1199,
+      "index": 2,
+      "intimate": [
+        1184
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "3": {
+      "id": 3,
+      "hero_id": 1199,
+      "index": 3,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "4": {
+      "id": 4,
+      "hero_id": 1199,
+      "index": 4,
+      "intimate": [
+        1093
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "5": {
+      "id": 5,
+      "hero_id": 1199,
+      "index": 5,
+      "intimate": [
+        1050
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "101101": {
+      "id": 101101,
+      "hero_id": 1011,
+      "index": 1,
+      "intimate": [
+        1028
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "101102": {
+      "id": 101102,
+      "hero_id": 1011,
+      "index": 2,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "101103": {
+      "id": 101103,
+      "hero_id": 1011,
+      "index": 3,
+      "intimate": [
+        1048
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "101104": {
+      "id": 101104,
+      "hero_id": 1011,
+      "index": 4,
+      "intimate": [
+        1111
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "101105": {
+      "id": 101105,
+      "hero_id": 1011,
+      "index": 5,
+      "intimate": [
+        1084
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "102801": {
+      "id": 102801,
+      "hero_id": 1028,
+      "index": 1,
+      "intimate": [
+        1119
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "102802": {
+      "id": 102802,
+      "hero_id": 1028,
+      "index": 2,
+      "intimate": [
+        1111
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "102803": {
+      "id": 102803,
+      "hero_id": 1028,
+      "index": 3,
+      "intimate": [
+        1080
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "102804": {
+      "id": 102804,
+      "hero_id": 1028,
+      "index": 4,
+      "intimate": [
+        1066
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "102805": {
+      "id": 102805,
+      "hero_id": 1028,
+      "index": 5,
+      "intimate": [
+        1048
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "104101": {
+      "id": 104101,
+      "hero_id": 1041,
+      "index": 1,
+      "intimate": [
+        1097
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "104102": {
+      "id": 104102,
+      "hero_id": 1041,
+      "index": 2,
+      "intimate": [
+        1184
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "104103": {
+      "id": 104103,
+      "hero_id": 1041,
+      "index": 3,
+      "intimate": [
+        1042
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "104104": {
+      "id": 104104,
+      "hero_id": 1041,
+      "index": 4,
+      "intimate": [
+        1067
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "104105": {
+      "id": 104105,
+      "hero_id": 1041,
+      "index": 5,
+      "intimate": [
+        1038
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "104801": {
+      "id": 104801,
+      "hero_id": 1048,
+      "index": 1,
+      "intimate": [
+        1094,
+        1013
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "104802": {
+      "id": 104802,
+      "hero_id": 1048,
+      "index": 2,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "104803": {
+      "id": 104803,
+      "hero_id": 1048,
+      "index": 3,
+      "intimate": [
+        1084,
+        1039
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "104804": {
+      "id": 104804,
+      "hero_id": 1048,
+      "index": 4,
+      "intimate": [
+        1059
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "104805": {
+      "id": 104805,
+      "hero_id": 1048,
+      "index": 5,
+      "intimate": [
+        1028,
+        1027
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "106601": {
+      "id": 106601,
+      "hero_id": 1066,
+      "index": 1,
+      "intimate": [
+        1037
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "106602": {
+      "id": 106602,
+      "hero_id": 1066,
+      "index": 2,
+      "intimate": [
+        1080
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "106603": {
+      "id": 106603,
+      "hero_id": 1066,
+      "index": 3,
+      "intimate": [
+        1096
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "106604": {
+      "id": 106604,
+      "hero_id": 1066,
+      "index": 4,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "106605": {
+      "id": 106605,
+      "hero_id": 1066,
+      "index": 5,
+      "intimate": [
+        1033
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "109901": {
+      "id": 109901,
+      "hero_id": 1099,
+      "index": 1,
+      "intimate": [
+        1055,
+        1026
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "109902": {
+      "id": 109902,
+      "hero_id": 1099,
+      "index": 2,
+      "intimate": [
+        1184
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "109903": {
+      "id": 109903,
+      "hero_id": 1099,
+      "index": 3,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "109904": {
+      "id": 109904,
+      "hero_id": 1099,
+      "index": 4,
+      "intimate": [
+        1093
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "109905": {
+      "id": 109905,
+      "hero_id": 1099,
+      "index": 5,
+      "intimate": [
+        1050
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "111101": {
+      "id": 111101,
+      "hero_id": 1111,
+      "index": 1,
+      "intimate": [
+        1028
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "111102": {
+      "id": 111102,
+      "hero_id": 1111,
+      "index": 2,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "111103": {
+      "id": 111103,
+      "hero_id": 1111,
+      "index": 3,
+      "intimate": [
+        1048
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "111104": {
+      "id": 111104,
+      "hero_id": 1111,
+      "index": 4,
+      "intimate": [
+        1011
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "111105": {
+      "id": 111105,
+      "hero_id": 1111,
+      "index": 5,
+      "intimate": [
+        1084
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "112701": {
+      "id": 112701,
+      "hero_id": 1127,
+      "index": 1,
+      "intimate": [
+        1081
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "112702": {
+      "id": 112702,
+      "hero_id": 1127,
+      "index": 2,
+      "intimate": [
+        1056
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "112703": {
+      "id": 112703,
+      "hero_id": 1127,
+      "index": 3,
+      "intimate": [
+        1148
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "112704": {
+      "id": 112704,
+      "hero_id": 1127,
+      "index": 4,
+      "intimate": [
+        1139
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "112705": {
+      "id": 112705,
+      "hero_id": 1127,
+      "index": 5,
+      "intimate": [
+        1080
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "114801": {
+      "id": 114801,
+      "hero_id": 1148,
+      "index": 1,
+      "intimate": [
+        1094,
+        1013
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "114802": {
+      "id": 114802,
+      "hero_id": 1148,
+      "index": 2,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "114803": {
+      "id": 114803,
+      "hero_id": 1148,
+      "index": 3,
+      "intimate": [
+        1084,
+        1039
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "114804": {
+      "id": 114804,
+      "hero_id": 1148,
+      "index": 4,
+      "intimate": [
+        1059
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "114805": {
+      "id": 114805,
+      "hero_id": 1148,
+      "index": 5,
+      "intimate": [
+        1028,
+        1027
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "103901": {
+      "id": 103901,
+      "hero_id": 1039,
+      "index": 1,
+      "intimate": [
+        1038
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "103902": {
+      "id": 103902,
+      "hero_id": 1039,
+      "index": 2,
+      "intimate": [
+        1084
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "103903": {
+      "id": 103903,
+      "hero_id": 1039,
+      "index": 3,
+      "intimate": [
+        1148
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "103904": {
+      "id": 103904,
+      "hero_id": 1039,
+      "index": 4,
+      "intimate": [
+        1027
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "103905": {
+      "id": 103905,
+      "hero_id": 1039,
+      "index": 5,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "113901": {
+      "id": 113901,
+      "hero_id": 1139,
+      "index": 1,
+      "intimate": [
+        1038
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "113902": {
+      "id": 113902,
+      "hero_id": 1139,
+      "index": 2,
+      "intimate": [
+        1084
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "113903": {
+      "id": 113903,
+      "hero_id": 1139,
+      "index": 3,
+      "intimate": [
+        1148
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "113904": {
+      "id": 113904,
+      "hero_id": 1139,
+      "index": 4,
+      "intimate": [
+        1027
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "113905": {
+      "id": 113905,
+      "hero_id": 1139,
+      "index": 5,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "101901": {
+      "id": 101901,
+      "hero_id": 1019,
+      "index": 1,
+      "intimate": [
+        1111
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "101902": {
+      "id": 101902,
+      "hero_id": 1019,
+      "index": 2,
+      "intimate": [
+        1184,
+        1015
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "101903": {
+      "id": 101903,
+      "hero_id": 1019,
+      "index": 3,
+      "intimate": [
+        1028
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "101904": {
+      "id": 101904,
+      "hero_id": 1019,
+      "index": 4,
+      "intimate": [
+        1066
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "101905": {
+      "id": 101905,
+      "hero_id": 1019,
+      "index": 5,
+      "intimate": [
+        1039
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "111901": {
+      "id": 111901,
+      "hero_id": 1119,
+      "index": 1,
+      "intimate": [
+        1111
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "111902": {
+      "id": 111902,
+      "hero_id": 1119,
+      "index": 2,
+      "intimate": [
+        1184,
+        1015
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "111903": {
+      "id": 111903,
+      "hero_id": 1119,
+      "index": 3,
+      "intimate": [
+        1028
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "111904": {
+      "id": 111904,
+      "hero_id": 1119,
+      "index": 4,
+      "intimate": [
+        1066
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "111905": {
+      "id": 111905,
+      "hero_id": 1119,
+      "index": 5,
+      "intimate": [
+        1039
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "108101": {
+      "id": 108101,
+      "hero_id": 1081,
+      "index": 1,
+      "intimate": [
+        1055
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "108102": {
+      "id": 108102,
+      "hero_id": 1081,
+      "index": 2,
+      "intimate": [
+        1056
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "108103": {
+      "id": 108103,
+      "hero_id": 1081,
+      "index": 3,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "108104": {
+      "id": 108104,
+      "hero_id": 1081,
+      "index": 4,
+      "intimate": [
+        1039
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "108105": {
+      "id": 108105,
+      "hero_id": 1081,
+      "index": 5,
+      "intimate": [
+        1027
+      ],
+      "relation_upgrade_group": [
+        8,
+        12,
+        16
+      ]
+    },
+    "109301": {
+      "id": 109301,
+      "hero_id": 1093,
+      "index": 1,
+      "intimate": [
+        1199
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "109302": {
+      "id": 109302,
+      "hero_id": 1093,
+      "index": 2,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "109303": {
+      "id": 109303,
+      "hero_id": 1093,
+      "index": 3,
+      "intimate": [
+        1055
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "109304": {
+      "id": 109304,
+      "hero_id": 1093,
+      "index": 4,
+      "intimate": [
+        1084
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "109305": {
+      "id": 109305,
+      "hero_id": 1093,
+      "index": 5,
+      "intimate": [
+        1150
+      ],
+      "relation_upgrade_group": [
+        8,
+        19,
+        16
+      ]
+    },
+    "105001": {
+      "id": 105001,
+      "hero_id": 1050,
+      "index": 1,
+      "intimate": [
+        1099
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "105002": {
+      "id": 105002,
+      "hero_id": 1050,
+      "index": 2,
+      "intimate": [
+        1284
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "105003": {
+      "id": 105003,
+      "hero_id": 1050,
+      "index": 3,
+      "intimate": [
+        1055
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "105004": {
+      "id": 105004,
+      "hero_id": 1050,
+      "index": 4,
+      "intimate": [
+        1049
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "105005": {
+      "id": 105005,
+      "hero_id": 1050,
+      "index": 5,
+      "intimate": [
+        1093
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    },
+    "115001": {
+      "id": 115001,
+      "hero_id": 1150,
+      "index": 1,
+      "intimate": [
+        1099
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "115002": {
+      "id": 115002,
+      "hero_id": 1150,
+      "index": 2,
+      "intimate": [
+        1284
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "115003": {
+      "id": 115003,
+      "hero_id": 1150,
+      "index": 3,
+      "intimate": [
+        1055
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "115004": {
+      "id": 115004,
+      "hero_id": 1150,
+      "index": 4,
+      "intimate": [
+        1049
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "115005": {
+      "id": 115005,
+      "hero_id": 1150,
+      "index": 5,
+      "intimate": [
+        1093
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    },
+    "113301": {
+      "id": 113301,
+      "hero_id": 1133,
+      "index": 1,
+      "intimate": [
+        1061
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "113302": {
+      "id": 113302,
+      "hero_id": 1133,
+      "index": 2,
+      "intimate": [
+        1028
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "113303": {
+      "id": 113303,
+      "hero_id": 1133,
+      "index": 3,
+      "intimate": [
+        1248
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "113304": {
+      "id": 113304,
+      "hero_id": 1133,
+      "index": 4,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "113305": {
+      "id": 113305,
+      "hero_id": 1133,
+      "index": 5,
+      "intimate": [
+        1066
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    },
+    "107501": {
+      "id": 107501,
+      "hero_id": 1075,
+      "index": 1,
+      "intimate": [
+        1084
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "107502": {
+      "id": 107502,
+      "hero_id": 1075,
+      "index": 2,
+      "intimate": [
+        1072
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "107503": {
+      "id": 107503,
+      "hero_id": 1075,
+      "index": 3,
+      "intimate": [
+        1074
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "107504": {
+      "id": 107504,
+      "hero_id": 1075,
+      "index": 4,
+      "intimate": [
+        1061
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "107505": {
+      "id": 107505,
+      "hero_id": 1075,
+      "index": 5,
+      "intimate": [
+        1076
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    },
+    "104901": {
+      "id": 104901,
+      "hero_id": 1049,
+      "index": 1,
+      "intimate": [
+        1150
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "104902": {
+      "id": 104902,
+      "hero_id": 1049,
+      "index": 2,
+      "intimate": [
+        1055
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "104903": {
+      "id": 104903,
+      "hero_id": 1049,
+      "index": 3,
+      "intimate": [
+        1093
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "104904": {
+      "id": 104904,
+      "hero_id": 1049,
+      "index": 4,
+      "intimate": [
+        1099
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "104905": {
+      "id": 104905,
+      "hero_id": 1049,
+      "index": 5,
+      "intimate": [
+        1015
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    },
+    "103301": {
+      "id": 103301,
+      "hero_id": 1033,
+      "index": 1,
+      "intimate": [
+        1061
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "103302": {
+      "id": 103302,
+      "hero_id": 1033,
+      "index": 2,
+      "intimate": [
+        1028
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "103303": {
+      "id": 103303,
+      "hero_id": 1033,
+      "index": 3,
+      "intimate": [
+        1248
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "103304": {
+      "id": 103304,
+      "hero_id": 1033,
+      "index": 4,
+      "intimate": [
+        1019
+      ],
+      "relation_upgrade_group": [
+        4,
+        11,
+        15
+      ]
+    },
+    "103305": {
+      "id": 103305,
+      "hero_id": 1033,
+      "index": 5,
+      "intimate": [
+        1066
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    },
+    "109501": {
+      "id": 109501,
+      "hero_id": 1095,
+      "index": 1,
+      "intimate": [
+        1084
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "109502": {
+      "id": 109502,
+      "hero_id": 1095,
+      "index": 2,
+      "intimate": [
+        1020
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "109503": {
+      "id": 109503,
+      "hero_id": 1095,
+      "index": 3,
+      "intimate": [
+        1012
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "109504": {
+      "id": 109504,
+      "hero_id": 1095,
+      "index": 4,
+      "intimate": [
+        1034
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "109505": {
+      "id": 109505,
+      "hero_id": 1095,
+      "index": 5,
+      "intimate": [
+        1015
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    },
+    "102201": {
+      "id": 102201,
+      "hero_id": 1022,
+      "index": 1,
+      "intimate": [
+        1038
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "102202": {
+      "id": 102202,
+      "hero_id": 1022,
+      "index": 2,
+      "intimate": [
+        1041
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "102203": {
+      "id": 102203,
+      "hero_id": 1022,
+      "index": 3,
+      "intimate": [
+        1097
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "102204": {
+      "id": 102204,
+      "hero_id": 1022,
+      "index": 4,
+      "intimate": [
+        1042
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "102205": {
+      "id": 102205,
+      "hero_id": 1022,
+      "index": 5,
+      "intimate": [
+        1021
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    },
+    "108401": {
+      "id": 108401,
+      "hero_id": 1084,
+      "index": 1,
+      "intimate": [
+        1027
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "108402": {
+      "id": 108402,
+      "hero_id": 1084,
+      "index": 2,
+      "intimate": [
+        1248
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "108403": {
+      "id": 108403,
+      "hero_id": 1084,
+      "index": 3,
+      "intimate": [
+        1039
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "108404": {
+      "id": 108404,
+      "hero_id": 1084,
+      "index": 4,
+      "intimate": [
+        1047
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "108405": {
+      "id": 108405,
+      "hero_id": 1084,
+      "index": 5,
+      "intimate": [
+        1211
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    },
+    "118401": {
+      "id": 118401,
+      "hero_id": 1184,
+      "index": 1,
+      "intimate": [
+        1027
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "118402": {
+      "id": 118402,
+      "hero_id": 1184,
+      "index": 2,
+      "intimate": [
+        1248
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "118403": {
+      "id": 118403,
+      "hero_id": 1184,
+      "index": 3,
+      "intimate": [
+        1039
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "118404": {
+      "id": 118404,
+      "hero_id": 1184,
+      "index": 4,
+      "intimate": [
+        1047
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "118405": {
+      "id": 118405,
+      "hero_id": 1184,
+      "index": 5,
+      "intimate": [
+        1211
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    },
+    "128401": {
+      "id": 128401,
+      "hero_id": 1284,
+      "index": 1,
+      "intimate": [
+        1027
+      ],
+      "relation_upgrade_group": [
+        1,
+        13,
+        9
+      ]
+    },
+    "128402": {
+      "id": 128402,
+      "hero_id": 1284,
+      "index": 2,
+      "intimate": [
+        1248
+      ],
+      "relation_upgrade_group": [
+        2,
+        6,
+        10
+      ]
+    },
+    "128403": {
+      "id": 128403,
+      "hero_id": 1284,
+      "index": 3,
+      "intimate": [
+        1039
+      ],
+      "relation_upgrade_group": [
+        3,
+        7,
+        14
+      ]
+    },
+    "128404": {
+      "id": 128404,
+      "hero_id": 1284,
+      "index": 4,
+      "intimate": [
+        1047
+      ],
+      "relation_upgrade_group": [
+        4,
+        18,
+        15
+      ]
+    },
+    "128405": {
+      "id": 128405,
+      "hero_id": 1284,
+      "index": 5,
+      "intimate": [
+        1211
+      ],
+      "relation_upgrade_group": [
+        8,
+        18,
+        16
+      ]
+    }
+  },
+  "relation_upgrades": {
+    "1": {
+      "id": 1,
+      "condition_id": 1001,
+      "attr": [
+        [
+          1,
+          10
+        ]
+      ]
+    },
+    "2": {
+      "id": 2,
+      "condition_id": 1002,
+      "attr": [
+        [
+          1,
+          10
+        ]
+      ]
+    },
+    "3": {
+      "id": 3,
+      "condition_id": 1003,
+      "attr": [
+        [
+          1,
+          10
+        ]
+      ]
+    },
+    "4": {
+      "id": 4,
+      "condition_id": 1004,
+      "attr": [
+        [
+          1,
+          10
+        ]
+      ]
+    },
+    "5": {
+      "id": 5,
+      "condition_id": 2001,
+      "attr": [
+        [
+          81,
+          5
+        ]
+      ]
+    },
+    "6": {
+      "id": 6,
+      "condition_id": 2002,
+      "attr": [
+        [
+          81,
+          5
+        ]
+      ]
+    },
+    "7": {
+      "id": 7,
+      "condition_id": 2003,
+      "attr": [
+        [
+          81,
+          5
+        ]
+      ]
+    },
+    "8": {
+      "id": 8,
+      "condition_id": 2004,
+      "attr": [
+        [
+          1,
+          10
+        ]
+      ]
+    },
+    "9": {
+      "id": 9,
+      "condition_id": 3001,
+      "attr": [
+        [
+          82,
+          10
+        ]
+      ]
+    },
+    "10": {
+      "id": 10,
+      "condition_id": 3002,
+      "attr": [
+        [
+          82,
+          10
+        ]
+      ]
+    },
+    "11": {
+      "id": 11,
+      "condition_id": 4001,
+      "attr": [
+        [
+          81,
+          5
+        ]
+      ]
+    },
+    "12": {
+      "id": 12,
+      "condition_id": 4002,
+      "attr": [
+        [
+          81,
+          5
+        ]
+      ]
+    },
+    "13": {
+      "id": 13,
+      "condition_id": 5001,
+      "attr": [
+        [
+          81,
+          5
+        ]
+      ]
+    },
+    "14": {
+      "id": 14,
+      "condition_id": 5002,
+      "attr": [
+        [
+          82,
+          10
+        ]
+      ]
+    },
+    "15": {
+      "id": 15,
+      "condition_id": 6001,
+      "attr": [
+        [
+          82,
+          10
+        ]
+      ]
+    },
+    "16": {
+      "id": 16,
+      "condition_id": 6002,
+      "attr": [
+        [
+          82,
+          10
+        ]
+      ]
+    },
+    "17": {
+      "id": 17,
+      "condition_id": 6003,
+      "attr": [
+        [
+          81,
+          5
+        ]
+      ]
+    },
+    "18": {
+      "id": 18,
+      "condition_id": 4003,
+      "attr": [
+        [
+          81,
+          5
+        ]
+      ]
+    },
+    "19": {
+      "id": 19,
+      "condition_id": 4004,
+      "attr": [
+        [
+          81,
+          5
+        ]
+      ]
+    }
+  },
+  "relation_upgrade_conditions": {
+    "1001": {
+      "id": 1001,
+      "type": 1,
+      "arg": [
+        20
+      ]
+    },
+    "1002": {
+      "id": 1002,
+      "type": 1,
+      "arg": [
+        40
+      ]
+    },
+    "1003": {
+      "id": 1003,
+      "type": 1,
+      "arg": [
+        60
+      ]
+    },
+    "1004": {
+      "id": 1004,
+      "type": 1,
+      "arg": [
+        80
+      ]
+    },
+    "2001": {
+      "id": 2001,
+      "type": 2,
+      "arg": [
+        25
+      ]
+    },
+    "2002": {
+      "id": 2002,
+      "type": 2,
+      "arg": [
+        50
+      ]
+    },
+    "2003": {
+      "id": 2003,
+      "type": 2,
+      "arg": [
+        100
+      ]
+    },
+    "2004": {
+      "id": 2004,
+      "type": 2,
+      "arg": [
+        150
+      ]
+    },
+    "3001": {
+      "id": 3001,
+      "type": 3,
+      "arg": [
+        40
+      ]
+    },
+    "3002": {
+      "id": 3002,
+      "type": 3,
+      "arg": [
+        60
+      ]
+    },
+    "4001": {
+      "id": 4001,
+      "type": 4,
+      "arg": [
+        500
+      ]
+    },
+    "4002": {
+      "id": 4002,
+      "type": 4,
+      "arg": [
+        600
+      ]
+    },
+    "4003": {
+      "id": 4003,
+      "type": 4,
+      "arg": [
+        400
+      ]
+    },
+    "4004": {
+      "id": 4004,
+      "type": 4,
+      "arg": [
+        300
+      ]
+    },
+    "5001": {
+      "id": 5001,
+      "type": 5,
+      "arg": [
+        50
+      ]
+    },
+    "5002": {
+      "id": 5002,
+      "type": 5,
+      "arg": [
+        100
+      ]
+    },
+    "6001": {
+      "id": 6001,
+      "type": 6,
+      "arg": [
+        6
+      ]
+    },
+    "6002": {
+      "id": 6002,
+      "type": 6,
+      "arg": [
+        18
+      ]
+    },
+    "6003": {
+      "id": 6003,
+      "type": 6,
+      "arg": [
+        12
+      ]
+    }
+  }
+}

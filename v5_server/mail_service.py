@@ -346,6 +346,8 @@ class MailService:
         summary = {}
         if all_items_to_add:
             summary = InventoryService.grant_items(ctx or _db, uid, all_items_to_add, source="mail")
+            claimed_attachments = [{'id': iid, 'number': count} for iid, count in
+                                   InventoryService.rewards_after_overflow(all_items_to_add, summary)]
 
         for m_id in success_mail_ids:
             changed = _db.execute(
@@ -354,6 +356,11 @@ class MailService:
             )
             if changed.rowcount != 1:
                 raise ValueError(f"邮件 {m_id} 领取状态发生变化")
+
+        if success_mail_ids:
+            from birthday_service import on_official_mail_claim
+            from types import SimpleNamespace
+            on_official_mail_claim(ctx if ctx is not None else SimpleNamespace(db=_db),uid,success_mail_ids)
 
         touched_heroes = list(set(summary.get("hero_unlocked") or []))
         touched_scene = bool(summary.get("scenes"))

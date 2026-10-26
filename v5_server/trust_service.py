@@ -90,6 +90,14 @@ class TrustService:
         self.combo_skill_level_cfg = {}  # {id: {id, condition_type, index, target, level}}
         self.hero_ultimate_skill = {}    # {hero_id: 奥义技能id}（type=1 条件实时校验）
         self.trust_displace_limit = {}   # {item_id: 每日限次}
+        self.gift_rules = {}
+        self.trust_level_gifts = {}
+        self.hero_favored_gifts = {}
+        self.trust_exchange_ratio = {}
+        self.hero_archives = {}
+        self.trust_level_conditions = {}
+        self.trust_conditions = {}
+        self.current_relation_stories = {}
         self._intimate_index = None      # 「任一修正者」反查索引（懒加载）
 
     def _init_config(self):
@@ -128,6 +136,90 @@ class TrustService:
                             f"{len(self.combo_skill_cfg)}条连携技能")
             except Exception as e:
                 logger.warning(f"[TrustService] 加载 trust_cfg.json 失败，启用静态保底: {e}")
+
+        rules_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "trust_item_cfg.json")
+        with open(rules_path, encoding="utf-8") as f:
+            rules = json.load(f)
+        self.gift_rules = {int(k): v for k, v in rules["items"].items()}
+        self.trust_level_gifts = {int(k): set(v) for k, v in rules["level_gifts"].items()}
+        self.hero_favored_gifts = {int(k): set(v) for k, v in rules["hero_favored_gifts"].items()}
+        self.trust_exchange_ratio = {int(k): int(v) for k, v in rules["exchange_ratio"].items()}
+        self.trust_displace_limit = {int(k): int(v) for k, v in rules["exchange_limits"].items()}
+
+        progress_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "trust_progress_cfg.json")
+        with open(progress_path, encoding="utf-8") as f:
+            progress = json.load(f)
+        self.archive_unlock_exp = int(progress["archive_unlock_exp"])
+        self.hero_archives = {int(k): int(v) for k, v in progress["hero_archives"].items()}
+        self.trust_level_conditions = {int(h): {int(lv): ids for lv, ids in levels.items()}
+                                       for h, levels in progress["level_conditions"].items()}
+        self.trust_conditions = {int(k): v for k, v in progress["conditions"].items()}
+        self.current_relation_stories = {int(k): v for k, v in progress["stories"].items()}
+        self.relation_net_cfg = progress["relation_nodes"]
+        self.relation_upgrade_cfg = progress["relation_upgrades"]
+        self.relation_upgrade_condition_cfg = progress["relation_upgrade_conditions"]
+
+    def _require_owned_hero(self, db, uid, hero_id):
+        rows = db.query("SELECT id, unlock FROM hero WHERE uid=? AND id=?", (uid, hero_id))
+        if not rows or int(rows[0].get("unlock") or 0) != 1:
+            raise ValueError(f"尚未拥有修正者 {hero_id}")
+
+    def _check_trust_condition(self, db, uid, hero_id, condition_id):
+        if int(condition_id) == 0:
+            return True
+        cfg = self.trust_conditions.get(int(condition_id))
+        if not cfg:
+            return False
+        kind = int(cfg["type"])
+        if kind == 1008:
+            from teach_service import service as teaching
+            studies = teaching.hero_stages.get(hero_id)
+            if not studies:
+                return False
+            rows = db.query("SELECT clear_times FROM chapter WHERE uid=? AND id=?", (uid, studies[0]))
+            return bool(rows and int(rows[0]["clear_times"] or 0) > 0)
+        params = cfg.get("params") or []
+        if len(params) != 1:
+            return False
+        target = int(params[0])
+        if kind == 1004:
+            rows = db.query("SELECT clear_times FROM hero WHERE uid=? AND id=?", (uid, hero_id))
+            return bool(rows and int(rows[0]["clear_times"] or 0) >= target)
+        if kind == 8023:
+            archive_id = self.hero_archives.get(hero_id)
+            if archive_id is None:
+                return False
+            rows = db.query("SELECT total_feed_times FROM backhome_hero WHERE uid=? AND archives_id=?", (uid, archive_id))
+            return bool(rows and int(rows[0]["total_feed_times"] or 0) >= target)
+        return False
+
+    @staticmethod
+    def _normalize_trust_items(items, combine=True):
+        """Validate the whole request and combine duplicate IDs before any writes."""
+        if not isinstance(items, list) or not items:
+            raise ValueError("礼物列表不能为空")
+        totals = {}
+        entries = []
+        for item in items:
+            if not isinstance(item, dict):
+                raise ValueError("礼物条目格式非法")
+            values = (item.get("id", item.get("item_id")), item.get("num", item.get("item_num")))
+            parsed = []
+            for value in values:
+                if isinstance(value, bool) or not isinstance(value, (int, str)):
+                    raise ValueError("礼物ID与数量必须为正整数")
+                if isinstance(value, str) and not value.isdecimal():
+                    raise ValueError("礼物ID与数量必须为正整数")
+                number = int(value)
+                if not 0 < number <= 0xFFFFFFFF:
+                    raise ValueError("礼物ID与数量超出范围")
+                parsed.append(number)
+            iid, num = parsed
+            entries.append((iid, num))
+            totals[iid] = totals.get(iid, 0) + num
+            if totals[iid] > 0xFFFFFFFF:
+                raise ValueError("礼物合计数量超出范围")
+        return totals if combine else entries
 
     def _weapon_exp_to_level(self, exp):
         """权钥经验转换为权钥等级 (1~80)"""
@@ -168,25 +260,33 @@ class TrustService:
         hero_id = int(hero_id)
         if not self.is_hero_supported(hero_id):
             raise ValueError(f"角色 {hero_id} 不在二阶好感交心受支持列表中")
+        self._require_owned_hero(ctx.db, uid, hero_id)
 
         # 检查是否已解锁
         t_info = self.get_trust_info(ctx.db, uid, hero_id)
         if t_info and t_info["trust_level"] > 0:
-            return {"hero_id": hero_id, "mood": t_info["trust_mood"], "trust_level": t_info["trust_level"]}
+            return {"hero_id": hero_id, "mood": t_info["trust_mood"],
+                    "trust_level": t_info["trust_level"], "already": True}
 
+        archive_id = self.hero_archives.get(hero_id)
+        if archive_id is None:
+            raise ValueError(f"角色 {hero_id} 缺少档案映射")
+        rows = ctx.db.query("SELECT exp FROM hero_archive WHERE uid=? AND archive_id=?", (uid, archive_id))
+        if not rows or int(rows[0]["exp"] or 0) < self.archive_unlock_exp:
+            raise ValueError("该修正者一阶好感度尚未达到上限")
         mood = random.choice([1, 2, 3])
         ctx.db.execute(
             "UPDATE hero SET trust_level=1, trust_exp=0, trust_mood=? WHERE uid=? AND id=?",
             (mood, uid, hero_id)
         )
         bus.emit(Events.TRUST_MOOD_CHANGE, ctx, uid, hero_id=hero_id, old_mood=0, new_mood=mood, reason="unlock")
-        return {"hero_id": hero_id, "mood": mood, "trust_level": 1}
+        return {"hero_id": hero_id, "mood": mood, "trust_level": 1, "already": False}
 
     def send_trust_item(self, ctx, uid, hero_id, item_list):
         """73012: 赠送好感度礼物（截断式按需扣减，永不因经验满额拦截请求）
 
         官方公式：单件经验 = math.floor(base_exp * mood_rate)，总量截断于阶段上限。
-        批量拉满送礼时只消耗能吃下的数量（剩余空间 // 单件经验），礼物不浪费、
+        批量拉满送礼时只消耗到达上限所需的数量（向上取整），礼物不浪费、
         请求恒回成功——客户端批量进度条/礼物列表渲染不因 result!=0 的拦截而状态错乱。
         """
         from operations import _item_deduct
@@ -200,6 +300,13 @@ class TrustService:
             raise ValueError(f"角色 {hero_id} 尚未解锁交心")
 
         trust_lvl = t_info["trust_level"]
+        requested = self._normalize_trust_items(item_list, combine=False)
+        allowed = self.hero_favored_gifts.get(hero_id, set()) | self.trust_level_gifts.get(trust_lvl, set())
+        for iid, _ in requested:
+            rule = self.gift_rules.get(iid)
+            if (not rule or rule.get("type") != 10 or rule.get("sub_type") not in (1, 2)
+                    or iid not in allowed or int(rule.get("exp") or 0) <= 0):
+                raise ValueError(f"道具 {iid} 不是该修正者当前交心阶段可用的礼物")
         cur_exp = t_info["trust_exp"]
         mood = t_info["trust_mood"] or 1
         rate = self.mood_rates.get(mood, 1.0)
@@ -208,13 +315,8 @@ class TrustService:
         remaining = (cap - cur_exp) if cap > 0 else None
 
         total_exp = 0
-        for it in item_list:
-            iid = int(it.get("id") or it.get("item_id") or 0)
-            num = int(it.get("num") or it.get("item_num") or 0)
-            if not (iid and num > 0):
-                continue
-            # 喜好礼物（50001~50066）基准 20，通用礼物（30012~30015）40~320
-            base_exp = self.gift_exp.get(iid, 20)
+        for iid, num in requested:
+            base_exp = int(self.gift_rules[iid]["exp"])
             single_exp = math.floor(base_exp * rate)
             if single_exp <= 0:
                 continue
@@ -224,7 +326,7 @@ class TrustService:
                 if remaining <= 0:
                     use_n = 0
                 else:
-                    use_n = min(num, max(1, remaining // single_exp))
+                    use_n = min(num, (remaining + single_exp - 1) // single_exp)
             else:
                 use_n = num
             if use_n <= 0:
@@ -256,11 +358,14 @@ class TrustService:
         hero_id = int(hero_id)
         if not self.is_hero_supported(hero_id):
             raise ValueError(f"角色 {hero_id} 不在二阶好感交心受支持列表中")
+        self._require_owned_hero(ctx.db, uid, hero_id)
 
         t_info = self.get_trust_info(ctx.db, uid, hero_id)
         cur_lvl = t_info["trust_level"] if t_info else 0
+        if cur_lvl < 1:
+            raise ValueError(f"角色 {hero_id} 尚未解锁交心")
         if cur_lvl >= 5:
-            return {"hero_id": hero_id, "rewards": [], "new_level": 5}
+            raise ValueError(f"角色 {hero_id} 交心等级已达上限")
 
         cur_exp = t_info["trust_exp"] if t_info else 0
         cap = self.trust_level_caps.get(cur_lvl, 1500)
@@ -268,6 +373,11 @@ class TrustService:
         if cap > 0 and cur_exp < cap:
             raise ValueError(f"角色 {hero_id} 好感度经验未达上限({cur_exp}/{cap})，无法突破")
 
+        required = self.trust_level_conditions.get(hero_id, {}).get(cur_lvl)
+        if not required:
+            raise ValueError("缺少当前交心阶段突破条件")
+        if not all(self._check_trust_condition(ctx.db, uid, hero_id, cid) for cid in required):
+            raise ValueError("交心突破条件尚未完成")
         new_lvl = cur_lvl + 1
         ctx.db.execute(
             "UPDATE hero SET trust_level=?, trust_exp=0 WHERE uid=? AND id=?",
@@ -389,23 +499,15 @@ class TrustService:
         node_id = int(node_id)
         group_index = int(group_index)
 
-        # 1. 优先从 relation_net_cfg 反查真实 hero_id, tier(index), intimate, relation_upgrade_group
+        # 节点身份只由当前配置决定；未知ID不能猜角色或套用默认节点。
         net_node = self.relation_net_cfg.get(str(node_id))
-        if net_node:
-            hero_id = int(net_node["hero_id"])
-            tier = int(net_node["index"])
-            intimate = list(net_node.get("intimate") or [hero_id])
-            upgrade_group = list(net_node.get("relation_upgrade_group") or [])
-        elif node_id > 10000:
-            hero_id = node_id // 100
-            tier = node_id % 100
-            intimate = [hero_id]
-            upgrade_group = []
-        else:
-            hero_id = 1119
-            tier = 1
-            intimate = [hero_id]
-            upgrade_group = []
+        if not net_node:
+            raise ValueError(f"未知关系网节点 {node_id}")
+        hero_id = int(net_node["hero_id"])
+        tier = int(net_node["index"])
+        intimate = list(net_node.get("intimate") or [])
+        upgrade_group = list(net_node.get("relation_upgrade_group") or [])
+        self._require_owned_hero(ctx.db, uid, hero_id)
 
         # 门禁 1: 阶级好感度门禁 (tier 节点要求好感等级 trust_level >= tier)
         t_info = self.get_trust_info(ctx.db, uid, hero_id)
@@ -416,7 +518,7 @@ class TrustService:
         # 门禁 1.5: group_index 合法性门禁（越界值严禁落库——客户端以 Lua 1-based
         # 数组下标索引 relation_upgrade_group，0/越界值会让角色列表页 GetRelationNetAttr
         # 触发 attempt to index a nil value 全页崩溃）
-        if net_node and not (1 <= group_index <= len(upgrade_group)):
+        if not (1 <= group_index <= len(upgrade_group)):
             raise ValueError(f"非法 group_index={group_index} (节点 {node_id} 合法范围 1~{len(upgrade_group)})")
 
         rows = ctx.db.query("SELECT relation_net FROM hero WHERE uid=? AND id=?", (uid, hero_id))
@@ -468,35 +570,39 @@ class TrustService:
         """
         from operations import _item_deduct, _item_add
 
-        # 门禁: 每日限次校验（仅配置了限次的礼物参与判定）
+        costs = self._normalize_trust_items(use_item_list)
+        rewards = self._normalize_trust_items(reward_item_list)
+        # 当前客户端每笔只选择一种目标；来源可以混合、同ID先合并。
+        if len(rewards) != 1:
+            raise ValueError("每次只能置换一种目标礼物")
+        target, amount = next(iter(rewards.items()))
+        rule = self.gift_rules.get(target, {})
+        ratio = self.trust_exchange_ratio.get(target, 0)
+        limit = self.trust_displace_limit.get(target)
+        if (rule.get("type") != 10 or rule.get("sub_type") != 2 or ratio <= 0
+                or limit is None or limit <= 0):
+            raise ValueError(f"不支持置换目标礼物 {target}")
+        for iid in costs:
+            source = self.gift_rules.get(iid, {})
+            if source.get("type") != 10 or source.get("sub_type") != 1:
+                raise ValueError(f"道具 {iid} 不能作为置换材料")
+        if sum(costs.values()) != amount * ratio:
+            raise ValueError("置换材料数量与目标礼物比例不符")
+
         day_key = self._displace_day_key()
         used_map = self._get_displace_used(ctx.db, uid, day_key)
-        for it in reward_item_list:
-            iid = int(it.get("id") or 0)
-            num = int(it.get("num") or 0)
-            limit = self.trust_displace_limit.get(iid)
-            if iid and num > 0 and limit is not None:
-                cur = used_map.get(iid, 0)
-                if cur + num > limit:
-                    raise ValueError(f"礼物 {iid} 今日置换次数已达上限({cur}/{limit})，次日 5 点刷新")
+        cur = used_map.get(target, 0)
+        if cur + amount > limit:
+            raise ValueError(f"礼物 {target} 今日置换次数已达上限({cur}/{limit})，次日 5 点刷新")
 
-        for it in use_item_list:
-            iid = int(it.get("id") or 0)
-            num = int(it.get("num") or 0)
-            if iid and num:
-                _item_deduct(ctx, uid, iid, num)
-        for it in reward_item_list:
-            iid = int(it.get("id") or 0)
-            num = int(it.get("num") or 0)
-            if iid and num:
-                _item_add(ctx, uid, iid, num)
-                # 限次礼物累计当日已用量
-                if self.trust_displace_limit.get(iid) is not None:
-                    ctx.db.execute(
-                        "INSERT INTO trust_displace_counter (uid, item_id, day_key, use) VALUES (?, ?, ?, ?) "
-                        "ON CONFLICT(uid, item_id, day_key) DO UPDATE SET use = use + excluded.use",
-                        (uid, iid, day_key, num)
-                    )
+        for iid, num in costs.items():
+            _item_deduct(ctx, uid, iid, num)
+        _item_add(ctx, uid, target, amount)
+        ctx.db.execute(
+            "INSERT INTO trust_displace_counter (uid, item_id, day_key, use) VALUES (?, ?, ?, ?) "
+            "ON CONFLICT(uid, item_id, day_key) DO UPDATE SET use = use + excluded.use",
+            (uid, target, day_key, amount)
+        )
         return {}
 
     def _displace_day_key(self, now_ts=None):
@@ -657,27 +763,55 @@ class TrustService:
         """通关进度钩子（结算链调用）：按关卡类别推进对应条件计数
         stage_kind: normal=任意关卡(type2) / dream_boss=梦境魇渊Boss(type3) / mythic_deep=黑区净化高难(type4)
         依据 ComboSkillLevelCfg 中该连携涉及的条件行自动精确推进"""
+        if int(combo_skill_id) not in self.combo_skill_cfg or getattr(ctx, "db", None) is None:
+            return
         cond_rows = [r for r in self.combo_skill_level_cfg.values()
                      if int(r.get("level", -1)) >= 1 and int(r["condition_type"]) in (2, 3, 4)]
         kind_map = {3: "dream_boss", 4: "mythic_deep"}
+        changed = False
         for r in cond_rows:
             ctype = int(r["condition_type"])
             if ctype == 2 or kind_map.get(ctype) == stage_kind:
                 self.record_combo_progress(ctx, uid, int(combo_skill_id), int(r["id"]), 1)
+                changed = True
+        if changed:
+            from codec import encode
+            from middleware import DownFrame
+            payload = encode("sc_73003", {"skill": self.build_combo_skill_rec(ctx.db, uid, combo_skill_id)})
+            if not payload:
+                raise ValueError("连携进度更新 sc_73003 编码为空")
+            frame = DownFrame(73003, payload)
+            if hasattr(ctx, "append_frame"):
+                ctx.append_frame(frame)
+            else:
+                if not hasattr(ctx, "pending_frames"):
+                    ctx.pending_frames = []
+                ctx.pending_frames.append(frame)
 
     def claim_relation_story_reward(self, ctx, uid, story_id):
         """73022: 领取关系网羁绊故事奖励（防刷）"""
         from operations import _item_add
 
         story_id = int(story_id)
+        rule = self.current_relation_stories.get(story_id)
+        if not rule or int(rule.get("story_id") or 0) <= 0:
+            raise ValueError("无效的关系剧情")
+        hero_id = int(rule["main_hero_id"])
+        self._require_owned_hero(ctx.db, uid, hero_id)
+        info = self.get_trust_info(ctx.db, uid, hero_id)
+        if not info or info["trust_level"] < int(rule["tier"]):
+            raise ValueError("该关系剧情所在的交心层级尚未开放")
+        if not self._check_trust_condition(ctx.db, uid, hero_id, rule["condition_id"]):
+            raise ValueError("关系剧情条件尚未完成")
+        override = (self.relation_story_cfg.get(str(story_id)) or {}).get("story_reward")
+        if override:
+            rewards = [{"id": int(r[0]), "num": int(r[1])} for r in override]
+        else:
+            rewards = [{"id": int(r["id"]), "num": int(r["num"])} for r in rule["rewards"]]
+        if any(r["id"] <= 0 or r["num"] <= 0 for r in rewards):
+            raise ValueError("关系剧情奖励配置非法")
         if not ctx.db.mark_claimed(uid, "relation_story", story_id):
             return {"id": story_id, "already": True, "rewards": []}
-
-        # 查找配表奖励，若无则保底发放 50 移转之辉
-        rewards = [{"id": 1, "num": 50}]
-        s_cfg = self.relation_story_cfg.get(str(story_id))
-        if s_cfg and s_cfg.get("story_reward"):
-            rewards = [{"id": int(r[0]), "num": int(r[1])} for r in s_cfg["story_reward"] if len(r) >= 2]
 
         for r in rewards:
             _item_add(ctx, uid, r["id"], r["num"])

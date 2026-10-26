@@ -36,6 +36,51 @@ def rebuild(header, payload):
     return struct.pack(">H", len(body)) + body
 
 
+def single_plot_progress_frame(frames):
+    """One authoritative plot snapshot per login, at the full frame's position."""
+    matches = [index for index, row in enumerate(frames) if row[1] == 24009]
+    if not matches:
+        return frames
+    dynamic = [index for index in matches if frames[index][4]]
+    selected = dynamic[-1] if dynamic else matches[-1]
+    result = []
+    for index, row in enumerate(frames):
+        if row[1] != 24009:
+            result.append(row)
+        elif index == selected:
+            # Static first-stage stubs must never replace account progress.
+            seq, cmd, header, blob, _, payload_json = row
+            result.append((seq, cmd, header, blob, 1, payload_json))
+    return result
+
+
+def reconcile_oath_rights_before_login(db, uid, log):
+    """Backfill existing eligible marriages atomically before profile snapshots."""
+    if not uid or db is None:
+        return False
+    try:
+        from oath_rights_service import grant_eligible_rights
+        with db.transaction():
+            result = grant_eligible_rights(db, uid, silent=True)
+        return result["has_rights"]
+    except Exception as exc:
+        log(f"[oath] 登录权益补齐失败: {exc}", "WARN")
+        return False
+
+
+def prepare_skin_draw_login(db, uid, version, generator):
+    from codec import encode
+    from skin_draw_service import login_packets
+    result = []
+    for cmd, data in login_packets(db, uid, version):
+        payload = encode(f'sc_{cmd}', data)
+        if not payload:
+            raise RuntimeError(f'sc_{cmd} 抽取活动进度编码为空')
+        result.append((0, cmd, generator.build_frame(cmd, b'')[:11], payload, 0, None))
+    has_draws = bool(db.query('SELECT 1 FROM user_skin_draw_pool WHERE uid=? AND drawn_num>0 LIMIT 1', (uid,)))
+    return result, has_draws
+
+
 def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
     """发送登录洪流：
     - dynamic=1 帧优先调用 generator 业务生成器动态生成；
@@ -44,9 +89,45 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
     - 自动适配 zlib 压缩（>10KB 或原压缩标记）与 cmd>65535 高位协议标志。"""
     log = log or (lambda *a, **k: None)
     frames = load_login_push(db)
+    original_plot_count = sum(row[1] == 24009 for row in frames)
+    frames = single_plot_progress_frame(frames)
+    if original_plot_count > 1:
+        log(f'[login] sc_24009 合并 {original_plot_count} 帧为一次全量进度', 'INFO')
+    from new_player_service import enabled as _fresh_enabled
+    from multiplayer_policy import blocks_command
+    fresh_save=_fresh_enabled(db,uid)
+    from new_player_login_policy import LoginPolicy
+    login_policy = LoginPolicy(db, uid)
+    login_policy.report(log)
     if not frames:
         log("[login] login_push 表为空，无洪流", "WARN")
         return 0, 0
+    try:
+        from birthday_service import ensure_official_mail
+        if ensure_official_mail(db,uid):
+            log('[birthday] 官方生日邮件已投递', 'INFO')
+    except Exception as exc:
+        log(f'[birthday] 官方生日邮件未完成，下次登录再检查: {exc}', 'WARN')
+    try:
+        from support_cosmetic_service import ensure_support_cosmetic_mails
+        extra_mail_ids = ensure_support_cosmetic_mails(db, uid)
+        if extra_mail_ids:
+            log(f'[support] 装饰补给邮件已补齐: {len(extra_mail_ids)}封', 'INFO')
+    except Exception as exc:
+        log(f'[support] 装饰补给暂未完成，下次登录重试: {exc}', 'WARN')
+    # Progress is account data even when an older login row is static.
+    # Supply missing packets before the login-complete marker as well.
+    present_cmds = {row[1] for row in frames}
+    if fresh_save:
+        missing_fresh=[cmd for cmd in (12009,12011,12111,28001,41001,59011) if cmd not in present_cmds]
+        marker=next((i for i,row in enumerate(frames) if row[1]==10201),len(frames))
+        frames[marker:marker]=[(0,cmd,generator.build_frame(cmd,b'')[:11],b'',1,None) for cmd in missing_fresh]
+    missing_account_pushes = [cmd for cmd in (47001, 47003, 24029, 24061, 30001, 19029) if cmd not in present_cmds]
+    if missing_account_pushes:
+        marker = next((i for i, row in enumerate(frames) if row[1] == 10201), len(frames))
+        additions = [(0, cmd, generator.build_frame(cmd, b"")[:11], b"", 1, None)
+                     for cmd in missing_account_pushes]
+        frames[marker:marker] = additions
     # 一次登录洪流必须只属于一个资源版本。运行中切换只影响下一次洪流，
     # 避免 192 帧发送途中出现 229/311 活动 ID 混发。
     import res_version_manager as _rvm
@@ -72,13 +153,46 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
         except Exception as _lte:
             log(f"[login] 登录前置 lazy_timer 脉冲异常: {_lte}", "WARN")
 
+    oath_rights_profile = reconcile_oath_rights_before_login(db, uid, log)
+    # Replace every historical draw row, including static rows and missing pools.
+    # Insert the whole catalogue after activity topology and before login complete.
+    from skin_draw_service import DRAW_STATE_COMMANDS
+    if any(login_policy.allows(cmd) for cmd in DRAW_STATE_COMMANDS):
+        skin_frames, skin_draw_profile = prepare_skin_draw_login(db, uid, login_res_version, generator)
+        skin_frames = [row for row in skin_frames if login_policy.allows(row[1])]
+    else:
+        # Skip before pool initialization as well as before transmission.
+        skin_frames, skin_draw_profile = [], False
+    frames = [row for row in frames if row[1] not in DRAW_STATE_COMMANDS]
+    marker = next((i for i, row in enumerate(frames) if row[1] == 10201), len(frames))
+    if skin_frames:
+        for cmd in (20007, 20009, 11001):
+            if cmd not in present_cmds:
+                frames.insert(marker, (0, cmd, generator.build_frame(cmd, b'')[:11], b'', 1, None))
+                marker += 1
+    frames[marker:marker] = skin_frames
+    dynamic_profile = oath_rights_profile or skin_draw_profile
+    if dynamic_profile and 32009 not in present_cmds:
+        marker = next((i for i, row in enumerate(frames) if row[1] == 10201), len(frames))
+        frames.insert(marker, (0, 32009, generator.build_frame(32009, b"")[:11], b"", 1, None))
+
     try:
         from codec import encode as _codec_encode
+        _c_enc = _codec_encode
     except Exception:
         _codec_encode = None
 
     try:
         for seq, cmd, header, blob, dynamic, payload_json in frames:
+            if blocks_command(cmd):
+                log(f'[offline] omit sc_{cmd}: multiplayer disabled','INFO')
+                continue
+            if not login_policy.allows(cmd):
+                continue
+            if fresh_save and cmd==10039:
+                # GatewayHandler already supplies the actual endpoint/session.
+                # Never replay or zero this authentication response on game TCP.
+                continue
             if cmd in suppressed_cmds:
                 log(
                     f"[login] version={login_res_version} 跳过不兼容推送 sc_{cmd} "
@@ -89,15 +203,43 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
             gen = None
 
             # 1. dynamic == 1 时优先使用 generator 业务生成器
-            if dynamic and generator is not None:
+            if (fresh_save or dynamic or cmd in (47001, 47003, 24029, 24061, 30001, 11001, 20007, 20009, 52001, 19029) or (cmd == 32009 and dynamic_profile)) and generator is not None:
                 try:
                     gen = generator.gen_payload(
                         cmd, uid=uid, db=db, res_version=login_res_version
                     )
                 except Exception as e:
                     log(f"[login] sc_{cmd} 业务动态生成异常: {e}", "WARN")
-                    if cmd in (13009, 14009, 46011):
+                    if fresh_save or cmd in (13009, 14009, 46011, 47001, 47003, 24009, 24029, 24061, 30001, 11001, 20007, 20009, 52001, 19029) or (cmd == 32009 and dynamic_profile):
                         raise RuntimeError(f"sc_{cmd} 当前资产读取失败，拒绝回退旧录制资产") from e
+            if cmd in (47001, 47003) and gen is None:
+                raise RuntimeError(f"sc_{cmd} 教学进度生成失败")
+            if cmd in (24029, 24061) and gen is None:
+                raise RuntimeError(f'sc_{cmd} 主线地图进度生成失败')
+            if cmd == 24009 and gen is None:
+                raise RuntimeError('sc_24009 主支线进度生成失败，拒绝回退旧录制进度')
+            if cmd == 52001 and gen is None:
+                raise RuntimeError('sc_52001 图鉴进度生成失败')
+            if cmd == 30001 and gen is None:
+                raise RuntimeError('sc_30001 邮件摘要生成失败')
+            if cmd == 19029 and gen is None:
+                raise RuntimeError('sc_19029 本地角色聊天初始化失败，拒绝回退旧好友记录')
+            if cmd == 32009 and dynamic_profile and gen is None:
+                raise RuntimeError("sc_32009 装扮状态生成失败")
+            if cmd in (11001, 20007, 20009) and gen is None:
+                raise RuntimeError(f"sc_{cmd} 抽取活动/票券配置生成失败")
+
+            if fresh_save and gen is None:
+                import schema_default
+                initial=schema_default.default_obj(f'sc_{cmd}')
+                if not login_policy.allows_empty_default(cmd,initial):
+                    keys=','.join(login_policy.empty_omissions[cmd])
+                    log(f'[login-policy] omit sc_{cmd}: no state generator; {keys}=0','INFO')
+                    continue
+                gen=schema_default.build(f'sc_{cmd}')
+                if gen is None:
+                    raise RuntimeError(f'新档 sc_{cmd} 没有可用初始响应')
+                log(f'[new-save] sc_{cmd} 使用字段完整的空初始响应','INFO')
 
             # 2. 非 dynamic 帧（或 generator 未实现该 cmd），走 payload_json 现场 Protobuf 编码
             if gen is None and payload_json and _codec_encode is not None:
@@ -136,6 +278,8 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                 frame = rebuild(header, gen)
                 dyn_hit += 1
             else:
+                if fresh_save:
+                    raise RuntimeError(f'新档 sc_{cmd} 禁止回退录制玩家数据')
                 # 4. 终极兜底：使用原始 blob 组帧
                 if len(header) > 2 and header[2] == 1:
                     if blob and blob[:2] not in (b"\x78\x9c", b"\x78\x01", b"\x78\xda", b"\x78\x5e"):
@@ -154,6 +298,8 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
             # 梦境再构联动补发 45001（普通首领列表）与 45101（进阶首领列表）
             if cmd == 45201 and generator is not None:
                 for extra_cmd in (45001, 45101):
+                    if not login_policy.allows(extra_cmd):
+                        continue
                     try:
                         ext_gen = generator.gen_payload(
                             extra_cmd, uid=uid, db=db, res_version=login_res_version
@@ -171,31 +317,32 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
             if frame_delay:
                 time.sleep(frame_delay)
 
-        # 多维变量联动下发 sc_11003：活动 ID/theme 与资源版本同步，
-        # stop_time 统一使用远期时间，周常刷新另由玩法状态管理。
-        # 多维变量周期 11003 推送
-        try:
-            import weekly_challenge_service as _wcs
-            from codec import encode as _c_enc
-            nxt_mon = _wcs.get_next_monday_5am()
-            version_cfg = _rvm.get_version_config(login_res_version)
-            p11003 = _c_enc("sc_11003", {
-                "activity": {
-                    "activity_id": int(version_cfg["polyhedron_activity_id"]),
-                    "start_time": nxt_mon - 604800,
-                    "stop_time": _rvm.FAR_FUTURE_TIMESTAMP,
-                    "state": 1,
-                    "theme": int(version_cfg["theme_id"]),
-                    "template": 73
-                }
-            })
-            if p11003 and generator is not None:
-                frame_11003 = generator.build_frame(11003, p11003)
-                sock.sendall(frame_11003)
-                sent += 1
-                dyn_hit += 1
-        except Exception as _e:
-            log(f"[login] 多维变量周期 11003 推送异常: {_e}", "WARN")
+        if login_policy.allows(11003):
+            # 多维变量联动下发 sc_11003：活动 ID/theme 与资源版本同步，
+            # stop_time 统一使用远期时间，周常刷新另由玩法状态管理。
+            # 多维变量周期 11003 推送
+            try:
+                import weekly_challenge_service as _wcs
+                from codec import encode as _c_enc
+                nxt_mon = _wcs.get_next_monday_5am()
+                version_cfg = _rvm.get_version_config(login_res_version)
+                p11003 = _c_enc("sc_11003", {
+                    "activity": {
+                        "activity_id": int(version_cfg["polyhedron_activity_id"]),
+                        "start_time": nxt_mon - 604800,
+                        "stop_time": _rvm.FAR_FUTURE_TIMESTAMP,
+                        "state": 1,
+                        "theme": int(version_cfg["theme_id"]),
+                        "template": 73
+                    }
+                })
+                if p11003 and generator is not None:
+                    frame_11003 = generator.build_frame(11003, p11003)
+                    sock.sendall(frame_11003)
+                    sent += 1
+                    dyn_hit += 1
+            except Exception as _e:
+                log(f"[login] 多维变量周期 11003 推送异常: {_e}", "WARN")
 
         # 虚构推演登录状态联动推送：局内 session (sc_88001) 与属性/血量 (sc_88013 / sc_88019)
         try:

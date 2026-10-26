@@ -1698,32 +1698,37 @@
         }
       ],
       "reply": "yes",
-      "notes": "扫描线索位置。成功 result=0 + location_id_list(本次扫描命中的位置 id 列表，客户端逐个更",
-      "src": "template"
+      "notes": "第19章扫描：CORE Chapter19ScanOp按当前地图与持久状态返回24031；重复扫描不覆盖已取得线索。",
+      "src": "core-operation"
     },
     "24032": {
-      "frames": [],
-      "reply": "no",
-      "notes": "占位条目（2026-08-16 协议全量对账）：无 LUA 调用点且历次抓包/日志未观测（C# 侧直发或废弃协议）。cs_24032 在 protocol 描述文件中存在故补齐账面；一旦日志实测出现，须按实发语义升级（查 sc_24033 消费方定回包）。",
-      "src": "placeholder-unobserved"
+      "frames": [
+        {
+          "sc": 24033,
+          "flag": 0
+        }
+      ],
+      "reply": "yes",
+      "notes": "第19章取线索：CORE Chapter19CollectOp返回24033，包含map_id和clue_location；候选等概率首次抽取后持久保存。",
+      "src": "core-operation"
     },
     "24034": {
       "frames": [],
       "reply": "no",
-      "notes": "占位条目（2026-08-16 协议全量对账）：无 LUA 调用点且历次抓包/日志未观测（C# 侧直发或废弃协议）。cs_24034 在 protocol 描述文件中存在故补齐账面；一旦日志实测出现，须按实发语义升级（查 sc_24035 消费方定回包）。",
-      "src": "placeholder-unobserved"
+      "notes": "第19章档案阅读：CORE Chapter19ReadEventOp持久保存event_id。当前Lua使用Push，无对应SC回执。",
+      "src": "core-operation"
     },
     "24036": {
       "frames": [],
       "reply": "no",
-      "notes": "占位条目（2026-08-16 协议全量对账）：无 LUA 调用点且历次抓包/日志未观测（C# 侧直发或废弃协议）。cs_24036 在 protocol 描述文件中存在故补齐账面；一旦日志实测出现，须按实发语义升级（查 sc_24037 消费方定回包）。",
-      "src": "placeholder-unobserved"
+      "notes": "第19章日期操作：CORE Chapter19OperateDayOp保存detector_info。当前Lua使用Push，无对应SC回执。",
+      "src": "core-operation"
     },
     "24038": {
       "frames": [],
       "reply": "no",
-      "notes": "占位条目（2026-08-16 协议全量对账）：无 LUA 调用点且历次抓包/日志未观测（C# 侧直发或废弃协议）。cs_24038 在 protocol 描述文件中存在故补齐账面；一旦日志实测出现，须按实发语义升级（查 sc_24039 消费方定回包）。",
-      "src": "placeholder-unobserved"
+      "notes": "第19章普通线索阅读：CORE Chapter19ReadClueOp保存clue_id。当前Lua使用Push，无对应SC回执。",
+      "src": "core-operation"
     },
     "24040": {
       "frames": [
