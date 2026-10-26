@@ -190,7 +190,7 @@ call "一键安装Windows证书.bat"
 
     # 5. 便携版说明文档
     readme = """======================================================================
-《深空之眼》离线单机仿真服务 · 绿色便携版 (v5.0.0)
+《深空之眼》离线单机仿真服务 · 绿色便携版 (v5.0.2)
 ======================================================================
 
 【极简上手指南】
@@ -312,7 +312,7 @@ def main():
 
     # 4. 构建 Package 1: 绿色免安装版 ZIP
     print("\n[Step 4/5] 正在构建【绿色免安装版压缩包】...")
-    zip_output_name = "AetherGazer_Server_v5.0_Portable.zip"
+    zip_output_name = "AetherGazer_Server_v5.0.2_Portable.zip"
     zip_path = DIST_DIR / zip_output_name
     build_portable_zip(STAGING_DIR, zip_path, inventory)
     zip_size_mb = zip_path.stat().st_size / 1024 / 1024
@@ -322,7 +322,7 @@ def main():
     # 5. 构建 Package 2: Inno Setup 安装包
     print("\n[Step 5/5] 正在构建【Inno Setup 标准安装包】...")
     iss_file = DIST_DIR / "AetherGazer_Server.iss"
-    setup_base_name = "AetherGazer_Server_v5.0_Setup"
+    setup_base_name = "AetherGazer_Server_v5.0.2_Setup"
     generate_inno_setup_script(STAGING_DIR, iss_file, setup_base_name)
     # 安装包使用同一份已经独立验证的载荷，不接受中途增减/修改资源。
     validate_inventory(STAGING_DIR / "v5_server", inventory)
