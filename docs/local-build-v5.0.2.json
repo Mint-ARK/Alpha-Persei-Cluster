@@ -1,0 +1,38 @@
+{
+  "version": "5.0.2",
+  "published": false,
+  "source_commit": "487a9d02fb890e1f9c1a6eb42a0aa122f812c991",
+  "default_save": "account.db",
+  "save_files": [
+    "account.db",
+    "预设_完整开荒.db",
+    "预设_跳过序章.db",
+    "预设_快速体验70级.db"
+  ],
+  "api_profiles_included": false,
+  "issue8_patch_merged": false,
+  "artifacts": [
+    {
+      "name": "AetherGazer_Server_v5.0.2_Portable.zip",
+      "size_bytes": 297749372,
+      "sha256": "2c557259e8fb7e12c26cd2bb887db1aa0474c2b68057d65743d55c5cd530686d"
+    },
+    {
+      "name": "AetherGazer_Server_v5.0.2_Linux_Core.zip",
+      "size_bytes": 175453056,
+      "sha256": "7d1d1e821d515f8d76b68a460341a85786c058c1ae1a21881f110e8674f92524"
+    },
+    {
+      "name": "AetherGazer_Server_v5.0.2_Setup.exe",
+      "size_bytes": 207825358,
+      "sha256": "80e09309f21c4f911135bdf05c6330bbfb551d37778c3b7b67e9656194f60b29"
+    }
+  ],
+  "checks": {
+    "package_integrity": "passed",
+    "windows_embedded_python": "passed",
+    "linux_payload_host_probe": "passed",
+    "linux_shell_syntax": 4,
+    "linux_native_tested": false
+  }
+}
