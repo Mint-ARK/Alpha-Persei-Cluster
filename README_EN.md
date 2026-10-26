@@ -28,6 +28,8 @@
 
 This maintenance release updates runtime flows and packaging integrity. Download the validated portable, installer, or backend package from [v5.0.1](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/tag/v5.0.1). See the [changelog](CHANGELOG.md) and verify downloads with [SHA256SUMS.txt](SHA256SUMS.txt).
 
+**We recommend the portable ZIP (`AetherGazer_Server_v5.0_Portable.zip`), which requires no installation.** After extracting it, choose either CMD by running `启动离线单机服务(控制台).bat`, or the desktop launcher by running `LocalServer.exe` / `启动离线单机服务(GUI界面).bat`. The installer remains optional.
+
 Back up your database, extract to a separate directory, and stop the previous server before starting the update. Distribution certificates are separate from the development environment; mobile devices must install and trust the certificate/profile provided by their current host. Full game resources and external CDN caches are not included.
 
 **Platform and resource support:**
