@@ -13,6 +13,7 @@ import json
 from pathlib import Path, PurePosixPath
 import re
 import shutil
+import sqlite3
 import subprocess
 import sys
 import zipfile
@@ -129,6 +130,10 @@ def collect_runtime_assets(project_root=PROJECT_ROOT, contract=None):
         source = (root / relative_name(rule["source"])).resolve()
         if not source.is_relative_to(root):
             raise PackageContractError(f"资源来源越出工程: {source}")
+        if not source.is_dir() and rule.get("fallback_source"):
+            source = (root / relative_name(rule["fallback_source"])).resolve()
+            if not source.is_relative_to(root):
+                raise PackageContractError(f"资源来源越出工程: {source}")
         if not source.is_dir():
             raise PackageContractError(f"缺少资源目录: {source}")
         candidates = source.rglob("*") if rule["recursive"] else source.iterdir()
@@ -211,6 +216,25 @@ def probe_runtime(target, python_executable=sys.executable):
         raise PackageContractError("包内探针未返回有效结果") from exc
 
 
+def validate_release_database(path):
+    """Read-only gate: no saved API profile/routing may enter a release."""
+    conn = sqlite3.connect(Path(path).resolve().as_uri() + '?mode=ro', uri=True)
+    try:
+        if not conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='server_global_config'").fetchone():
+            return
+        row = conn.execute("SELECT value FROM server_global_config WHERE key='ai.api_profiles.v1'").fetchone()
+        if row:
+            store = json.loads(row[0])
+            if not isinstance(store, dict) or store.get('version') != 1:
+                raise PackageContractError('发布存档AI配置格式无效')
+            if store.get('profiles') or store.get('routes') or store.get('active_id'):
+                raise PackageContractError('发布存档仍含AI配置或凭据，拒绝封包')
+    except (sqlite3.Error, ValueError, TypeError) as exc:
+        raise PackageContractError('发布存档AI凭据检查失败') from exc
+    finally:
+        conn.close()
+
+
 def seal_runtime(target, plan, python_executable=sys.executable):
     """Only a validated payload gets an inventory and can proceed to publication."""
     target = Path(target)
@@ -218,6 +242,7 @@ def seal_runtime(target, plan, python_executable=sys.executable):
     for name in ("account.db", "run_server.bat"):
         if not (target / name).is_file() or (target / name).stat().st_size == 0:
             raise PackageContractError(f"缺少完整发布包必需文件: {name}")
+    validate_release_database(target / 'account.db')
     probe = probe_runtime(target, python_executable)
     inventory = {"version": 1, "probe": probe, "files": {}}
     for path in sorted(target.rglob("*")):

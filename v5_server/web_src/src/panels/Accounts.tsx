@@ -48,17 +48,8 @@ import {
 } from '../lib/api'
 import { useServer } from '../lib/serverContext'
 import { buildLaunchArguments, formatLaunchCommand, type LaunchShell } from '../lib/launchCommand'
-import avatarsCatalog from '../data/avatarsCatalog.json'
+import { PLAYER_AVATARS, avatarAssetPath, type AvatarItem } from '../lib/avatarAssets'
 import stickersCatalog from '../data/stickersCatalog.json'
-
-interface AvatarItem {
-  id: number
-  name: string
-  resource: string
-}
-
-// 静态挂载打包好的 253 款安全头像白名单，杜绝 file:/// 协议下 fetch 跨域失败
-const ALL_SAFE_AVATARS: AvatarItem[] = (avatarsCatalog?.portraits || []) as AvatarItem[]
 
 // 预置 8 大官方背景画卷完整数据，支持离线或连线模式下完整无缝翻页浏览
 const DEFAULT_STICKER_WALLS: StickerWall[] = [
@@ -240,9 +231,10 @@ export default function AccountsPanel() {
 
   // 头像选择器弹窗与白名单列表
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
-  const [avatarsList] = useState<AvatarItem[]>(ALL_SAFE_AVATARS)
+  const avatarsList = PLAYER_AVATARS
   const [avatarKeyword, setAvatarKeyword] = useState('')
   const [avatarSubmitting, setAvatarSubmitting] = useState(false)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
 
   // 贴纸画卷多页翻转切换状态
   const [currentWallIndex, setCurrentWallIndex] = useState(0)
@@ -579,18 +571,27 @@ export default function AccountsPanel() {
 
   // 选择白名单头像并落库
   const handleSelectAvatar = async (avatarItem: AvatarItem) => {
+    if (avatarSubmitting) return
+    setAvatarError(null)
+    setActionError(null)
     setAvatarSubmitting(true)
     const targetUid = activeUid || DEFAULT_ACCOUNT_UID
     try {
       await modifyAccountPeripheral({ uid: targetUid, avatar_id: avatarItem.id })
       setIsAvatarModalOpen(false)
-      showToast(`头像已安全更换为「${avatarItem.name || avatarItem.id}」`)
+      showToast(`头像已更换为「${avatarItem.name}」`)
       await loadProfile(targetUid)
     } catch (e: any) {
+      setAvatarError(`修改头像失败: ${e.message}`)
       setActionError(`修改头像失败: ${e.message}`)
     } finally {
       setAvatarSubmitting(false)
     }
+  }
+
+  const openAvatarPicker = () => {
+    setAvatarError(null)
+    setIsAvatarModalOpen(true)
   }
 
   // 过滤后的白名单头像
@@ -645,10 +646,10 @@ export default function AccountsPanel() {
             {/* 左侧：双层真实头像框 + 档案文本向右微移 */}
             <div className="flex items-center gap-5">
               {/* 复合头像展示区：内层真实头像 + 外层真实头像框 */}
-              <div
-                className="group relative size-20 shrink-0 cursor-pointer select-none"
-                onClick={() => setIsAvatarModalOpen(true)}
-                title="点击更换头像 (受白名单严格保护)"
+              <Button isIconOnly variant="ghost"
+                className="group relative size-20 shrink-0 p-0 cursor-pointer select-none"
+                onPress={openAvatarPicker}
+                aria-label="更换头像"
               >
                 {/* 底层圆形背景与图标：图片缺失或加载中时绝不呈现空白 */}
                 <div className="absolute inset-1.5 flex size-[68px] items-center justify-center rounded-full bg-surface-secondary text-muted shadow-inner border border-separator/60">
@@ -657,9 +658,10 @@ export default function AccountsPanel() {
 
                 {/* 内层头像图片 */}
                 <img
-                  src={resolveAssetUrl(`extracted_assets/avatars/${avatarId}.png`)}
+                  src={resolveAssetUrl(avatarAssetPath(avatarId))}
                   alt="当前头像"
                   className="absolute inset-1.5 size-[68px] rounded-full object-cover shadow-inner transition-transform group-hover:scale-95"
+                  onLoad={e => { e.currentTarget.style.opacity = '1' }}
                   onError={(e) => {
                     ;(e.target as HTMLElement).style.opacity = '0'
                   }}
@@ -677,7 +679,7 @@ export default function AccountsPanel() {
                 <div className="absolute inset-1.5 flex size-[68px] items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
                   <span className="text-[10px] font-medium text-white">更换</span>
                 </div>
-              </div>
+              </Button>
 
               {/* 玩家档案文本区：向右适当微调平移 */}
               <div className="space-y-2">
@@ -839,7 +841,7 @@ export default function AccountsPanel() {
                 size="sm"
                 variant="secondary"
                 className="gap-1.5"
-                onPress={() => setIsAvatarModalOpen(true)}
+                onPress={openAvatarPicker}
               >
                 <ShieldCheck className="size-4 text-accent" />
                 更换头像
@@ -1555,26 +1557,28 @@ export default function AccountsPanel() {
 
       {/* 头像白名单安全选择器模态窗 */}
       <Modal.Root isOpen={isAvatarModalOpen} onOpenChange={setIsAvatarModalOpen}>
-        <Modal.Backdrop className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <Modal.Container className="w-full max-w-2xl max-h-[85vh] flex flex-col pointer-events-none">
-            <Modal.Dialog className="relative w-full pointer-events-auto bg-surface border border-separator rounded-2xl shadow-2xl p-5 flex flex-col max-h-[85vh] overflow-hidden">
-              {/* 右上角绝对定位关闭按钮，杜绝与顶部标题或底部按钮布局冲突 */}
-              <button
-                type="button"
+        <Modal.Backdrop className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-6">
+          <Modal.Container className="w-full !w-[min(1180px,94vw)] !max-w-[min(1180px,94vw)] flex flex-col pointer-events-none">
+            <Modal.Dialog
+              className="relative w-full !w-[min(1180px,94vw)] !max-w-[min(1180px,94vw)] pointer-events-auto bg-surface border border-separator rounded-2xl shadow-2xl p-5 sm:p-6 flex flex-col max-h-[88vh] overflow-hidden"
+              style={{ width: 'min(1180px, 94vw)', maxWidth: 'min(1180px, 94vw)' }}
+            >
+              {/* 右上角绝对定位关闭按钮 */}
+              <Button isIconOnly variant="ghost"
                 className="absolute top-4 right-4 z-20 flex size-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-secondary hover:text-foreground cursor-pointer focus:outline-none"
                 aria-label="关闭"
-                onClick={() => setIsAvatarModalOpen(false)}
+                onPress={() => setIsAvatarModalOpen(false)}
               >
                 <X className="size-4" />
-              </button>
+              </Button>
 
               <Modal.Header className="pb-3 border-b border-separator shrink-0 pr-8">
                 <Modal.Heading className="text-base font-semibold text-foreground flex items-center gap-2">
                   <ShieldCheck className="size-5 text-accent" />
-                  更换头像 (受白名单严格保护)
+                  更换头像
                 </Modal.Heading>
                 <p className="text-xs text-muted mt-1">
-                  已静态挂载 253 款客户端安全头像资源，杜绝越界或未知 ID 引发客户端 LUA 崩溃。
+                  共 {avatarsList.length} 款官方头像，可按名称或 7 位头像 ID 搜索。
                 </p>
               </Modal.Header>
 
@@ -1584,7 +1588,7 @@ export default function AccountsPanel() {
                   <SearchField.Group>
                     <SearchField.SearchIcon />
                     <SearchField.Input
-                      placeholder="输入头像名或 ID 快速过滤 (共 253 款)..."
+                      placeholder={`搜索头像名称或 ID（共 ${avatarsList.length} 款）`}
                       value={avatarKeyword}
                       onChange={(e) => setAvatarKeyword(e.target.value)}
                     />
@@ -1593,70 +1597,79 @@ export default function AccountsPanel() {
                 </SearchField>
               </div>
 
+              {avatarError && <p role="alert" className="mb-3 shrink-0 rounded-xl bg-danger-soft p-3 text-sm text-danger">{avatarError}</p>}
+              {avatarSubmitting && <p role="status" className="mb-2 shrink-0 text-xs text-muted">正在保存头像…</p>}
+
               {/* 白名单头像滚动网格 */}
-              <div className="flex-1 overflow-y-auto p-1 cp-scroll min-h-0">
+              <div className="flex-1 overflow-x-hidden overflow-y-auto p-1 cp-scroll min-h-0">
                 {filteredAvatars.length === 0 ? (
-                  <div className="py-12 text-center text-xs text-muted">
-                    未找到匹配的白名单头像资源
+                  <div className="py-16 text-center text-xs text-muted">
+                    未找到匹配的头像
                   </div>
                 ) : (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-3">
                     {filteredAvatars.map((item) => {
                       const isCurrent = Number(avatarId) === Number(item.id)
                       return (
-                        <div
+                        <button
+                          type="button"
                           key={item.id}
-                          onClick={() => !avatarSubmitting && handleSelectAvatar(item)}
-                          className={`group relative flex flex-col items-center justify-between p-2.5 rounded-xl border transition-all cursor-pointer select-none text-center ${
+                          aria-label={`${item.name}（头像ID ${item.id}）`}
+                          aria-pressed={isCurrent}
+                          disabled={avatarSubmitting || isCurrent}
+                          onClick={() => handleSelectAvatar(item)}
+                          className={`group relative w-full min-w-0 box-border flex flex-col items-center justify-between p-3 rounded-2xl border transition-all text-center select-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                             isCurrent
-                              ? 'border-accent bg-accent/15 ring-2 ring-accent/40 shadow-sm'
-                              : 'border-separator bg-surface-secondary/40 hover:border-accent/40 hover:bg-surface-secondary'
-                          }`}
+                              ? 'border-accent bg-accent/15 ring-2 ring-accent/40 shadow-sm cursor-default'
+                              : 'border-separator/80 bg-surface-secondary/40 hover:border-accent/50 hover:bg-surface-secondary hover:shadow-xs'
+                          } ${avatarSubmitting ? 'opacity-60 pointer-events-none' : ''}`}
+                          style={{ minHeight: '148px' }}
                         >
                           {isCurrent && (
-                            <span className="absolute top-1.5 right-1.5 size-4 rounded-full bg-accent text-white flex items-center justify-center shadow-xs">
-                              <Check className="size-2.5 stroke-[3]" />
+                            <span className="absolute top-2 right-2 size-4.5 rounded-full bg-accent text-white flex items-center justify-center shadow-xs z-10">
+                              <Check className="size-3 stroke-[3]" />
                             </span>
                           )}
 
-                          {/* 圆形头像容器：固定 48px，绝不溢出卡片 */}
-                          <div className="relative size-12 shrink-0 rounded-full overflow-hidden border border-separator/80 bg-surface shadow-xs mt-1">
+                          {/* 圆形头像容器：固定 54px，居中且大方 */}
+                          <div className="relative size-14 shrink-0 rounded-full overflow-hidden border border-separator/80 bg-surface shadow-xs mt-1">
                             {/* 底层占位兜底 */}
                             <div className="absolute inset-0 flex items-center justify-center bg-surface-secondary text-[10px] font-mono text-muted">
                               {item.id}
                             </div>
                             <img
-                              src={resolveAssetUrl(`extracted_assets/avatars/${item.id}.png`)}
+                              src={resolveAssetUrl(avatarAssetPath(item.id))}
                               alt={item.name}
-                              className="relative size-full object-cover transition-transform group-hover:scale-110"
+                              className="relative size-full object-cover transition-transform group-hover:scale-105 duration-200"
+                              onLoad={e => { e.currentTarget.style.opacity = '1' }}
                               onError={(e) => {
                                 ;(e.target as HTMLElement).style.opacity = '0'
                               }}
                             />
                           </div>
 
-                          {/* 文字区：两行紧凑清晰 */}
-                          <div className="w-full mt-2 space-y-0.5 min-w-0">
+                          {/* 文字区：黄金比例排版，长名自然折行，普通名单行居中 */}
+                          <div className="w-full min-w-0 mt-2.5 flex-1 flex flex-col justify-center text-center px-1">
                             <div
-                              className="text-xs font-medium text-foreground truncate px-0.5"
+                              className="text-xs font-medium text-foreground line-clamp-2 break-words leading-snug"
                               title={item.name}
                             >
                               {item.name || `头像 ${item.id}`}
                             </div>
-                            <div className="text-[10px] font-mono text-muted">
+                            <div className="text-[10px] font-mono text-muted tabular-nums mt-1 tracking-tight">
                               {item.id}
                             </div>
                           </div>
-                        </div>
+                        </button>
                       )
                     })}
                   </div>
                 )}
               </div>
 
-              <div className="pt-3 border-t border-separator flex items-center justify-between shrink-0">
+              <div className="pt-3 border-t border-separator flex items-center justify-between shrink-0 mt-1">
                 <span className="text-xs text-muted">
-                  当前显示 {filteredAvatars.length} / {avatarsList.length} 款安全头像
+                  当前显示 {filteredAvatars.length} / {avatarsList.length} 款头像
                 </span>
                 <Button size="sm" variant="secondary" onPress={() => setIsAvatarModalOpen(false)}>
                   关闭

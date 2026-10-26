@@ -15,7 +15,7 @@ import time
 import json
 import shutil
 import re
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify, Response, g, has_request_context
 
 # 确保 v5_server 内部模块导入正常
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -39,8 +39,38 @@ except Exception:
 # 引入只读查询层 (Read Channel)
 from gm_reader import get_reader
 
+_global_get_db = get_db
+_global_get_reader = get_reader
+
+
+def get_db():
+    import gm_save_scope
+    return gm_save_scope.get_db(_global_get_db)
+
+
+def get_reader():
+    import gm_save_scope
+    return gm_save_scope.get_reader(_global_get_reader)
+
 # 创建 GM 统一蓝图
 gm_bp = Blueprint("gm_api", __name__)
+
+
+@gm_bp.before_request
+def _bind_save_request():
+    if request.method == 'OPTIONS':
+        return None
+    import gm_save_scope
+    try:
+        gm_save_scope.bind()
+    except (ValueError, OSError):
+        return err(GMErrorCode.PARAM_INVALID, '存档或账号选择无效，请刷新存档列表')
+
+
+@gm_bp.teardown_request
+def _close_save_request(exc):
+    import gm_save_scope
+    gm_save_scope.close(exc)
 
 # 全局上下文容器（由 server_net.build_https_app 注入）
 _context = {
@@ -107,7 +137,9 @@ _DEFAULT_UID_UNSET = object()
 def _parse_uid(val, default=_DEFAULT_UID_UNSET):
     """解析并校验 UID。若有效则返回 (uid_int, None)，若非法返回 (None, err_msg)。"""
     if default is _DEFAULT_UID_UNSET:
-        default = DEFAULT_UID
+        default = getattr(g, 'gm_save_uid', DEFAULT_UID) if has_request_context() else DEFAULT_UID
+    elif default is not None and has_request_context():
+        default = getattr(g, 'gm_save_uid', default)
     if val is None or val == "":
         if default is None:
             return None, "缺少参数 uid"
@@ -170,19 +202,7 @@ def _get_avatar_whitelist():
     global _AVATAR_WHITELIST
     if _AVATAR_WHITELIST is None:
         wl = set()
-        cat_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            "..", "control_panel_v2", "public", "extracted_assets", "avatars", "avatars_catalog.json"
-        )
-        if os.path.isfile(cat_path):
-            try:
-                with open(cat_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    for item in data.get("portraits", []):
-                        if "id" in item:
-                            wl.add(int(item["id"]))
-            except Exception:
-                pass
+        # Image resource names (e.g. 1011) are not selectable portrait item IDs (2110111).
         dec_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "decorations_catalog.json")
         if os.path.isfile(dec_path):
             try:
@@ -238,7 +258,7 @@ def _cors_headers(resp):
     """全域放行 CORS 跨域通信。"""
     resp.headers["Access-Control-Allow-Origin"] = "*"
     resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+    resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, X-Save-Name"
     return resp
 
 
@@ -248,13 +268,44 @@ def _options_preflight(_subpath):
     resp = Response("", status=200)
     resp.headers["Access-Control-Allow-Origin"] = "*"
     resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+    resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, X-Save-Name"
     return resp
 
 
 # ===========================================================================
 # 1. 状态总览 (/overview)
 # ===========================================================================
+
+@gm_bp.route('/saves', methods=['GET'])
+def get_save_catalog():
+    import gm_save_scope
+    from dataclasses import asdict
+    from save_presets import PRESET_SLOTS
+    return ok(dict(saves=gm_save_scope.catalog(), presets=[dict(key=p.key, title=p.title, options=asdict(p.options))
+                   for p in PRESET_SLOTS.values()]))
+
+
+@gm_bp.route('/saves/create', methods=['POST'])
+def post_create_save():
+    import gm_save_scope
+    try:
+        return ok(gm_save_scope.create(request.get_json(silent=True)), msg='存档预览完成' if
+                  (request.get_json(silent=True) or {}).get('preview') else '新存档已生成并加入选区列表')
+    except (ValueError, TypeError, FileExistsError) as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    except Exception:
+        return err(GMErrorCode.SERVICE_ERROR, '生成未完成，请检查服务端日志和存档列表')
+
+
+@gm_bp.route('/aichat/apis', methods=['GET', 'POST'])
+def manage_save_apis():
+    import ai_api_profiles
+    try:
+        if request.method == 'GET':
+            return ok(ai_api_profiles.view(get_reader()))
+        return ok(ai_api_profiles.update(get_db(), request.get_json(silent=True)), msg='当前存档API配置已更新')
+    except (ValueError, TypeError) as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
 
 @gm_bp.route("/overview/status", methods=["GET"])
 @gm_bp.route("/status", methods=["GET"])  # 兼容旧路径
@@ -263,7 +314,7 @@ def get_overview_status():
     try:
         reader = get_reader()
         ctx = dict(_context)
-        ctx["default_uid"] = DEFAULT_UID
+        ctx["default_uid"] = getattr(g, 'gm_save_uid', DEFAULT_UID)
         ctx["capture_enabled"] = cdn_proxy.is_capture_enabled() if cdn_proxy else False
         try:
             import res_version_manager
@@ -275,7 +326,7 @@ def get_overview_status():
         if isinstance(data, dict):
             data["res_version"] = ctx.get("res_version", "229")
             data["res_version_config"] = ctx.get("res_version_config", {})
-            mounted_db = getattr(ctx.get('core'), 'db', None)
+            mounted_db = get_db()
             owner = mounted_db.get_system_config('save.owner_uid') if mounted_db is not None else ''
             data['save_owner_uid'] = int(owner) if owner else None
         return ok(data)
@@ -553,10 +604,12 @@ def post_modify_account_peripheral():
             if avatar <= 0:
                 return err(GMErrorCode.PARAM_OUT_OF_RANGE, "头像 ID 必须为正整数")
             wl = _get_avatar_whitelist()
-            if wl and avatar not in wl:
+            if not wl:
+                return err(GMErrorCode.SERVICE_ERROR, '头像目录未能加载，请检查服务端资源')
+            if avatar not in wl:
                 return err(
                     GMErrorCode.PARAM_OUT_OF_RANGE,
-                    f"头像 ID [{avatar}] 不在客户端安全资源白名单中，已被阻断以防客户端 LUA 崩溃"
+                    f"头像 ID [{avatar}] 不在当前头像配置中"
                 )
         except (ValueError, TypeError):
             return err(GMErrorCode.PARAM_INVALID, "头像 ID 必须为整数")
@@ -1013,7 +1066,7 @@ def post_send_mail():
             pushed = False
             try:
                 import server_net
-                pushed = bool(server_net.push_mail_notice(uid))
+                pushed = bool(server_net.push_mail_notice(uid, expected_db=db))
             except Exception as _pe:
                 print(f"[GM] 推送邮件通知异常: {_pe}")
 
@@ -1395,41 +1448,54 @@ def get_aichat_stats():
 @gm_bp.route("/aichat/config", methods=["GET"])
 def get_aichat_config():
     """【只读通道·安全脱敏】获取当前大模型配置与脱敏后的 Provider 参数。"""
-    reader = get_reader()
-    data = reader.get_aichat_config_view()
+    import ai_api_profiles, ai_bot_config
+    cfg = ai_api_profiles.resolve(get_reader())
+    data = ai_bot_config.get_masked_config(cfg)
     return ok(data)
 
 
 @gm_bp.route("/aichat/config", methods=["POST"])
 def post_aichat_config():
-    """【写通道·安全解耦】更新大模型参数、Provider、Model 与 API 密钥（写入 .env 绝不污染公共代码）。"""
+    """Compatibility form: update the selected save's default API profile."""
     req = request.get_json(silent=True)
     if not isinstance(req, dict):
         return err(GMErrorCode.PARAM_INVALID, "请求体必须为有效 JSON 对象")
 
-    import ai_bot_config
+    import ai_api_profiles, ai_bot_config
     try:
-        success = ai_bot_config.save_bot_config(req)
-    except Exception:
-        success = False
-    if not success:
-        return err(GMErrorCode.PARAM_INVALID, "保存配置失败，请检查参数格式")
-
-    masked = ai_bot_config.get_masked_config()
-    return ok(masked, msg="大模型参数配置已安全保存")
+        db = get_db()
+        store = ai_api_profiles.load(db)
+        payload = dict(req)
+        if store and store['active_id']:
+            payload['id'] = store['active_id']
+        ai_api_profiles.update(db, payload)
+        return ok(ai_bot_config.get_masked_config(ai_api_profiles.resolve(db)), msg='API配置已保存到当前存档')
+    except ValueError as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
 
 
 @gm_bp.route("/aichat/test_connection", methods=["POST"])
 def post_aichat_test_connection():
     """【诊断通道】探测指定大模型端点的网络连通性与往返延迟。"""
     req = request.get_json(silent=True) or {}
+    if not isinstance(req, dict):
+        return err(GMErrorCode.PARAM_INVALID, '请求体必须为JSON对象')
     provider = req.get("provider")
     if provider is not None and (not isinstance(provider, str) or not provider.strip()):
         return err(GMErrorCode.PARAM_INVALID, "provider 必须为非空文本")
     provider = provider.strip() if isinstance(provider, str) else None
 
     import ai_bot_service
-    res = ai_bot_service.test_llm_connection(provider)
+    import ai_api_profiles
+    try:
+        cfg = ai_api_profiles.resolve(get_reader(), profile_id=req.get('profile_id'))
+    except ValueError as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    if not cfg.get('api_profile_id'):
+        return err(GMErrorCode.PARAM_INVALID, '当前存档尚未配置API，请先保存并选择一组配置')
+    if provider and provider != cfg['provider']:
+        return err(GMErrorCode.PARAM_INVALID, '测试厂商必须与所选API配置一致')
+    res = ai_bot_service.test_llm_connection(provider, cfg=cfg)
     if res.get("success"):
         return ok(res, msg=f"Provider [{res.get('provider')}] 连通性测试成功（耗时 {res.get('latency_ms')} ms）")
     else:
@@ -1449,7 +1515,8 @@ def post_aichat_leaderboards_refresh():
     """【评测榜单】实时触发后台抓取并更新大模型评测榜单缓存。"""
     import ai_bot_leaderboard
     res = ai_bot_leaderboard.refresh_leaderboard_data()
-    return ok(res, msg="评测榜单缓存已更新")
+    message = f"已更新{res['updated_sources']}个来源" if res["success"] else "本次未获取到新榜单数据"
+    return ok(res, msg=message)
 
 
 @gm_bp.route("/aichat/send", methods=["POST"])
@@ -2408,12 +2475,12 @@ def gm_recharge_status():
         return err(GMErrorCode.DB_NOT_READY, "数据库未就绪")
 
     uid = int(request.args.get("uid") or DEFAULT_UID)
-    import recharge_service
-    svc = recharge_service.RechargeService.get_instance(db=db)
-
     recharge_data = db.get_user_recharge(uid)
-    bp_data = db.get_or_create_battlepass(uid) if hasattr(db, "get_or_create_battlepass") else {}
-    newbie_act = db.get_newbie_activity(uid) if hasattr(db, "get_newbie_activity") else {}
+    # Status reads must work on an inactive save opened read-only.
+    newbie_rows = db.query('SELECT * FROM newbie_activity WHERE uid=?', (uid,))
+    newbie_act = newbie_rows[0] if newbie_rows else {}
+    from paid_entitlement_service import status as paid_status
+    rights = paid_status(db, uid)
 
     tot_num = recharge_data.get("total_recharge_num") or 0
     lim_num = recharge_data.get("time_limit_recharge_num") or 0
@@ -2427,10 +2494,11 @@ def gm_recharge_status():
         "time_limit_recharge_num": lim_num,
         "time_limit_recharge_yuan": float(lim_num),
         "battlepass": {
-            "pay_level": int(bp_data.get("pay_level") or 0),
-            "exp_14": db.get_item_num(uid, 14),
+            **rights['battlepass'],
             "bp_reward_status": int(newbie_act.get("bp_reward") or 0)
         },
+        "small_month_card": rights['small_month_card'],
+        "big_month_card": rights['big_month_card'],
         "noob_welfare": {
             "fr_first_gear": int(newbie_act.get("fr_first_gear") or 0),
             "fr_second_gear": int(newbie_act.get("fr_second_gear") or 0),
@@ -2446,6 +2514,35 @@ def gm_recharge_status():
         }
     }
     return ok(data)
+
+
+@gm_bp.route('/recharge/rights', methods=['POST'])
+def gm_recharge_rights():
+    db = get_db()
+    if not db:
+        return err(GMErrorCode.DB_NOT_READY, '数据库未就绪')
+    body = request.get_json(silent=True) or {}
+    if not isinstance(body, dict):
+        return err(GMErrorCode.PARAM_INVALID, '权益参数必须为对象')
+    try:
+        uid = int(body.get('uid') or DEFAULT_UID)
+    except (TypeError, ValueError):
+        return err(GMErrorCode.PARAM_INVALID, 'UID格式无效')
+    if not db.query('SELECT 1 FROM users WHERE uid=?', (uid,)):
+        return err(GMErrorCode.USER_NOT_FOUND, '当前存档中不存在此玩家')
+    from paid_entitlement_service import update_rights
+    try:
+        data = update_rights(db, uid, {k:v for k,v in body.items() if k != 'uid'})
+    except ValueError as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    # A notification failure cannot undo committed gifts or invite a second award.
+    try:
+        from server_net import push_paid_entitlements
+        push_paid_entitlements(uid, expected_db=db)
+    except Exception:
+        import logging
+        logging.getLogger(__name__).exception('权益已保存，在线状态推送失败')
+    return ok(data, msg='权益状态已保存')
 
 
 @gm_bp.route("/recharge/reset", methods=["POST"])
@@ -2472,6 +2569,14 @@ def gm_recharge_reset():
     import recharge_service
     svc = recharge_service.RechargeService.get_instance(db=db)
     res = svc.reset_recharge_data(db, uid, scope=scope)
+
+    if scope in ('all', 'battlepass'):
+        try:
+            from server_net import push_paid_entitlements
+            push_paid_entitlements(uid, expected_db=db)
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception('付费状态已重置，在线推送失败')
 
     return ok(res, msg=f"付费数据重置成功: scope={scope}")
 

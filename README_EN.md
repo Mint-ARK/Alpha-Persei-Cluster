@@ -41,9 +41,9 @@ Back up your database, extract to a separate directory, and stop the previous se
 | **Android and other unlisted platforms** | **Manual configuration required** | Due to limited access to devices and testing environments, the corresponding internal asset manifests have not been configured. Users must configure and import them themselves. |
 
 
-## Source update: 2026-10-26
+## v5.0.2 source and local build update: 2026-10-26
 
-This branch integrates save generation and in-game save selection, UTF-8 launch arguments, activity tasks and shops, first-clear and battle-time fixes, birthday mail, daily AI greetings, and chat-history restoration. Portable archives let Windows users choose the console or desktop launcher; Linux uses the core package. See the [save and AI guide](docs/save_and_ai_guide.md).
+This branch integrates save generation and in-game save selection, UTF-8 launch arguments, activity tasks and shops, first-clear and battle-time fixes, birthday mail, daily AI greetings, and chat-history restoration. Portable archives let Windows users choose the console or desktop launcher; Linux uses the core package. See the [save and AI guide](docs/save_and_ai_guide.md). This update adds per-save API profiles, the Web save manager, paid-entitlement controls and corrected leaderboard sources. Windows and Linux packages are built locally; the Issue #8 patch is not merged.
 
 
 ---

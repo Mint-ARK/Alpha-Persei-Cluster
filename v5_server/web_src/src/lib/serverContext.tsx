@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { resolveMountedUid } from './mountedSave'
 import {
   fetchOverviewStatus,
@@ -6,15 +6,21 @@ import {
   switchResVersion,
   getActiveUid,
   setActiveUid as saveActiveUid,
-  fetchServerZones,
-  updateServerZones,
+  fetchSaveCatalog, getSelectedSave, setSelectedSave, type SaveEntry, type SaveCatalog, getStoredApiBase,
   type OverviewStatusData,
   type ResVersionData,
-  type ServerZoneItem,
-  type ServerZonesData,
 } from './api'
 
 interface ServerContextValue {
+  saves: SaveEntry[]
+  selectedSave: string
+  selectSave: (filename: string) => void
+  refreshSaves: () => Promise<void>
+  saveCatalogLoading: boolean
+  saveCatalogError: string
+  saveCatalogLoaded: boolean
+  savePresets: SaveCatalog['presets']
+  managedSave: SaveEntry | null
   status: OverviewStatusData | null
   loading: boolean
   isOnline: boolean
@@ -32,23 +38,18 @@ interface ServerContextValue {
   operatorName: string
   setOperatorName: (name: string) => void
 
-  // 区服与工作区全局状态
-  serverZones: ServerZoneItem[]
-  defaultZoneId: string
-  activeZoneName: string
-  setDefaultZoneId: (id: string) => void
-  refreshServerZones: () => Promise<void>
-  saveServerZones: (data: ServerZonesData) => Promise<boolean>
 }
 
 const ServerContext = createContext<ServerContextValue | undefined>(undefined)
 
-const DEFAULT_ZONES: ServerZoneItem[] = [
-  { serverId: '1', serverName: '艾因索菲', env: 'prod', newServerFlag: 1 },
-  { serverId: '2', serverName: '蒂卡拉', env: 'prod', newServerFlag: 0 },
-]
-
 export function ServerProvider({ children }: { children: ReactNode }) {
+  const [saves, setSaves] = useState<SaveEntry[]>([])
+  const [savePresets, setSavePresets] = useState<SaveCatalog['presets']>([])
+  const [saveCatalogLoading, setSaveCatalogLoading] = useState(true)
+  const [saveCatalogError, setSaveCatalogError] = useState('')
+  const [saveCatalogLoaded, setSaveCatalogLoaded] = useState(false)
+  const catalogRequest = useRef(0)
+  const [selectedSave, setSelectedSaveState] = useState(getSelectedSave)
   const [status, setStatus] = useState<OverviewStatusData | null>(null)
   const [resVersionInfo, setResVersionInfo] = useState<ResVersionData | null>(null)
   const [resVersionLoading, setResVersionLoading] = useState(false)
@@ -80,58 +81,46 @@ export function ServerProvider({ children }: { children: ReactNode }) {
     setOperatorNameState(op)
   }
 
-  // 区服列表与当前激活区服
-  const [serverZones, setServerZones] = useState<ServerZoneItem[]>(DEFAULT_ZONES)
-  const [defaultZoneId, setDefaultZoneIdState] = useState<string>(() => {
-    return localStorage.getItem('cp_server_id') || '1'
-  })
-
-  const setDefaultZoneId = (id: string) => {
-    localStorage.setItem('cp_server_id', id)
-    setDefaultZoneIdState(id)
-  }
-
-  const currentZone = serverZones.find((z) => z.serverId === defaultZoneId) || serverZones[0]
-  const activeZoneName = currentZone
-    ? `${currentZone.serverName} (S${currentZone.serverId})`
-    : '艾因索菲 (S1)'
+  const managedSave = saves.find(save => save.filename === selectedSave) || null
 
   const setActiveUid = (uid: number) => {
     saveActiveUid(uid)
     setActiveUidState(uid)
   }
 
-  const refreshServerZones = async () => {
-    try {
-      const res = await fetchServerZones()
-      if (res && res.code === 0 && res.data) {
-        if (res.data.zones && res.data.zones.length > 0) {
-          setServerZones(res.data.zones)
-        }
-        if (res.data.default_zone_id && !localStorage.getItem('cp_server_id')) {
-          setDefaultZoneIdState(res.data.default_zone_id)
-        }
-      }
-    } catch (e) {
-      // 离线时不阻断主流程
-    }
+  const selectSave = (filename: string) => {
+    const save = saves.find(row => row.filename === filename)
+    if (!save) return
+    setSelectedSave(filename)
+    setSelectedSaveState(filename)
+    setActiveUid(save.uid)
+    setStatus(null)
   }
 
-  const saveServerZones = async (data: ServerZonesData): Promise<boolean> => {
+  const refreshSaves = async () => {
+    const id = ++catalogRequest.current
+    const base = getStoredApiBase()
+    setSaveCatalogLoading(true)
+    setSaveCatalogError('')
     try {
-      const res = await updateServerZones(data)
-      if (res && res.code === 0) {
-        if (res.data?.zones) {
-          setServerZones(res.data.zones)
-        }
-        if (res.data?.default_zone_id) {
-          setDefaultZoneId(res.data.default_zone_id)
-        }
-        return true
+      const res = await fetchSaveCatalog()
+      if (id !== catalogRequest.current || base !== getStoredApiBase()) return
+      setSaves(res.data.saves)
+      setSavePresets(res.data.presets)
+      setSaveCatalogLoaded(true)
+      const selected = getSelectedSave()
+      const current = res.data.saves.find(row => row.filename === selected)
+      const fallback = current || res.data.saves.find(row => row.mounted) || res.data.saves[0]
+      setSelectedSave(fallback?.filename || '')
+      setSelectedSaveState(fallback?.filename || '')
+      if (fallback) setActiveUid(fallback.uid)
+    } catch (e: any) {
+      if (id === catalogRequest.current && base === getStoredApiBase()) {
+        setSaveCatalogError(e.message || '读取存档列表失败，请重试')
       }
-      return false
-    } catch (e) {
-      return false
+      throw e
+    } finally {
+      if (id === catalogRequest.current && base === getStoredApiBase()) setSaveCatalogLoading(false)
     }
   }
 
@@ -163,9 +152,11 @@ export function ServerProvider({ children }: { children: ReactNode }) {
   }
 
   const refreshStatus = async () => {
+    const requestedSave = getSelectedSave()
     setLoading(true)
     try {
       const res = await fetchOverviewStatus()
+      if (requestedSave !== getSelectedSave()) return
       if (res && res.code === 0) {
         setStatus(res.data)
         setIsOnline(true)
@@ -175,7 +166,6 @@ export function ServerProvider({ children }: { children: ReactNode }) {
         setIsOnline(false)
       }
       await refreshResVersion()
-      await refreshServerZones()
     } catch (e) {
       setIsOnline(false)
     } finally {
@@ -185,14 +175,33 @@ export function ServerProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    refreshStatus()
+    void refreshSaves().catch(() => undefined)
+    void refreshStatus()
     const timer = setInterval(refreshStatus, 15000)
     return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => { if (selectedSave) void refreshStatus() }, [selectedSave])
+
+  useEffect(() => {
+    const reconnect = () => {
+      setSaves([])
+      setSavePresets([])
+      setSaveCatalogLoaded(false)
+      setStatus(null)
+      void refreshSaves().catch(() => undefined)
+      void refreshStatus()
+    }
+    window.addEventListener('gm-api-base-changed', reconnect)
+    return () => window.removeEventListener('gm-api-base-changed', reconnect)
   }, [])
 
   return (
     <ServerContext.Provider
       value={{
+        saves, selectedSave, selectSave, refreshSaves,
+        saveCatalogLoading, saveCatalogError, saveCatalogLoaded, savePresets,
+        managedSave,
         status,
         loading,
         isOnline,
@@ -207,12 +216,6 @@ export function ServerProvider({ children }: { children: ReactNode }) {
         setConsoleName,
         operatorName,
         setOperatorName,
-        serverZones,
-        defaultZoneId,
-        activeZoneName,
-        setDefaultZoneId,
-        refreshServerZones,
-        saveServerZones,
       }}
     >
       {children}

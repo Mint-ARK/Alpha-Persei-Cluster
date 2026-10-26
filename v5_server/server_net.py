@@ -241,6 +241,31 @@ def get_online_uids():
         return list(_online_game_conns.keys())
 
 
+def push_paid_entitlements(uid, expected_db):
+    """Push only into the selected save, even when another save shares its UID."""
+    import generator
+    with _online_conns_lock:
+        conns = [c for c in _online_game_conns.get(int(uid), [])
+                 if getattr(c, 'db', None) is expected_db]
+    packets = [(cmd, generator.gen_payload(cmd, uid=int(uid), db=expected_db))
+               for cmd in (34031, 34023, 34101)]
+    packets.append((17023, generator.gen_payload(17023, uid=int(uid), db=expected_db,
+                                               touched_items={14}, strict=True)))
+    pushed = 0
+    for conn in conns:
+        try:
+            for cmd, payload in packets:
+                if not payload:
+                    raise ValueError(f'权益刷新sc_{cmd}为空')
+                conn.send_push(cmd, payload)
+            pushed += 1
+        except Exception as exc:
+            if hasattr(conn, 'log'):
+                conn.log(f'[PUSH] 权益更新失败: {exc}', 'WARN')
+    push_mail_notice(uid, expected_db=expected_db)
+    return pushed
+
+
 def push_mail_notice(uid, expected_db=None):
     """主动向指定 UID 的在线长连接下发 sc_30001（未读红点摘要通知帧）。
     返回成功下发通知的客户端连接数。

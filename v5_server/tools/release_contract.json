@@ -71,7 +71,14 @@
       ]
     },
     {
+      "source": "v5_server/tools",
+      "target": "tools",
+      "recursive": false,
+      "patterns": ["upgrade_legacy_saves.py"]
+    },
+    {
       "source": "analysis_scripts/协议分析/角色挖掘",
+      "fallback_source": "v5_server/角色挖掘",
       "target": "角色挖掘",
       "recursive": false,
       "patterns": [
@@ -81,6 +88,7 @@
   ],
   "exclude_names": [
     "linux_config.json",
+    "slot_registry.json",
     "test_*",
     "scratch_*",
     "*.retired.json",
@@ -93,9 +101,11 @@
     "*.pdb",
     "*.db",
     "*.db-wal",
-    "*.db-shm"
+    "*.db-shm",
+    "ai_bot_config.json"
   ],
   "required_files": [
+    "tools/upgrade_legacy_saves.py",
     ".env.example",
     "AetherGazer.mobileconfig",
     "account_db.py",
@@ -105,8 +115,9 @@
     "activity_music_catalog.json",
     "activity_point_reward_cfg.json",
     "activity_pt_cfg.json",
-    "ai_bot_config.json",
     "ai_proactive_service.py",
+    "ai_api_profiles.py",
+    "gm_save_scope.py",
     "all_skins_data.json",
     "archive_config.json",
     "assignment_phase.json",
@@ -263,6 +274,7 @@
     "static_resources/android/voice_hash_zh_30700321.bytes": 1
   },
   "optional_dependencies": {
+    "slot_registry.json": "本机存档与端口登记，发布包首次启动时按自身存档生成，不分发开发机登记。",
     "linux_config.json": "Linux 首次安装时生成的本机私有配置和控制台密码摘要，禁止随发布包分发。",
     "db_schema.sql": "当前工程缺少该文件，AccountDB 有内嵌 SCHEMA；文件一旦加入根目录即自动收集。",
     "operation_cfg.json": "旧配置已改名 operation_cfg.retired.json；当前依赖 Core 内置分发，禁止重新启用退休配置。",

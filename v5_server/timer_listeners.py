@@ -103,6 +103,8 @@ def on_weekly_task_and_bp_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwarg
     if now_ts is None:
         now_ts = int(time.time())
     db = ctx.db
+    from paid_entitlement_service import settle
+    settle(ctx, uid, now_ts)
     from task_cycle_notifications import task_cycle_reset, WEEKLY_TASK_FILTER
     with task_cycle_reset(ctx, uid, WEEKLY_TASK_FILTER, weekly=True):
 
@@ -245,3 +247,11 @@ def on_shop_time_tick(ctx, uid, delta_seconds=0, now_ts=None, **kwargs):
 def register_timer_listeners():
     """确保订阅器加载注册（显式调用或 import 时自动注册）"""
     logger.info("[TimerListeners] 全局时间与周期事件订阅器已装配完毕。")
+
+
+@bus.subscribe(Events.TIME_TICK)
+@bus.subscribe(Events.DAILY_RESET_5AM)
+def on_paid_entitlement_tick(ctx, uid, now_ts=None, **kwargs):
+    """Lazy settlement, including offline days, through the request's own save."""
+    from paid_entitlement_service import settle
+    settle(ctx, uid, now_ts)

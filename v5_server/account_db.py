@@ -2427,6 +2427,21 @@ class AccountDB:
             self._local.conn = c
         return c
 
+    @classmethod
+    def open_existing(cls, path, *, readonly=False):
+        """Request-bound access without migrations, seeding or global rebinding."""
+        from pathlib import Path
+        target = Path(path).resolve(strict=True)
+        db = cls.__new__(cls)
+        db.path = str(target)
+        db._local = threading.local()
+        db._ai_chat_lock = threading.Lock()
+        conn = sqlite3.connect(target.as_uri() + ('?mode=ro' if readonly else '?mode=rw'),
+                               uri=True, timeout=5)
+        conn.row_factory = sqlite3.Row
+        db._local.conn = conn
+        return db
+
     def close(self):
         """关闭当前线程的 sqlite 连接。"""
         c = getattr(self._local, "conn", None)
@@ -2678,6 +2693,27 @@ class AccountDB:
         except BaseException:
             db.close()
             raise
+
+    @classmethod
+    def export_sanitized_snapshot(cls, source_path, destination):
+        """Release/test export: remove API profiles in RAM before creating files."""
+        from pathlib import Path
+        source_path = Path(source_path).resolve(strict=True)
+        if source_path == Path(destination).resolve():
+            raise ValueError('脱敏副本不能覆盖源存档')
+        db = cls.new_save_workspace()
+        source = sqlite3.connect(source_path.as_uri() + '?mode=ro', uri=True)
+        try:
+            source.backup(db._conn())
+            db.execute('PRAGMA secure_delete=ON')
+            db.set_system_config('ai.api_profiles.v1', json.dumps(
+                dict(version=1, active_id='', profiles={}, routes={})))
+            # Rebuild pages so old JSON/key bytes cannot survive in free space.
+            db.execute('VACUUM')
+            return db.export_new_save(destination)
+        finally:
+            source.close()
+            db.close()
 
     def export_new_save(self, path):
         """完整新档先留根目录备份，再写入新文件；不允许覆盖任何既有文件。"""
@@ -5610,11 +5646,11 @@ class AccountDB:
         return None
 
     def set_ai_model_routes(self, uid, routes):
-        """Replace only this user's model routes; an empty map restores global defaults."""
-        from ai_bot_config import get_bot_config, validate_model_route
+        """Replace only this user's model routes; an empty map restores this save's default."""
+        from ai_bot_config import get_default_config, validate_model_route
         if not isinstance(routes, dict):
             raise ValueError('角色模型配置必须为字典')
-        providers = get_bot_config().get('providers', {})
+        providers = get_default_config().get('providers', {})
         normalized = {}
         for key, value in routes.items():
             if str(key) == 'default':

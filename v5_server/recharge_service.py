@@ -268,6 +268,8 @@ class RechargeService:
 
         # 2. 月卡购买发货 (恒定观测)
         elif cfg.get("type") == 2:
+            from paid_entitlement_service import before_small_purchase
+            before_small_purchase(db, uid, now_ts)
             card_diamond = int(cfg.get("diamond") or 300) * num
             db.add_currency(uid, 1, card_diamond)
             rewards.append({"id": 1, "num": card_diamond})
@@ -281,7 +283,7 @@ class RechargeService:
                 "monthly_card_num": 1,
                 "monthly_card_timestamp": new_dead,
                 "is_sign": int(m_rows[0].get("is_sign") or 0) if m_rows else 0,
-                "update_ts": now_ts
+                "update_ts": int(m_rows[0].get("update_ts") or 0) if m_rows else 0
             })
             log(f"[PAY] 月卡充值成功: 到账 {card_diamond} 移转之辉, 月卡有效期延长至 {new_dead}")
 
@@ -298,20 +300,13 @@ class RechargeService:
             is_full = goods_id in (202, 212, 222, 261, 262, 263, 9)
             is_upgrade = goods_id in (203, 213, 223, 271, 272, 273)
             target_pay_level = 202 if (is_full or is_upgrade) else 201
-            db.set_battlepass_pay_level(uid, target_pay_level)
+            from paid_entitlement_service import update_rights
+            update_rights(db, uid, {'pay_level': target_pay_level}, now_ts)
             log(f"[PAY] 战令/合约购买成功: pay_level 设置为 {target_pay_level}")
 
             # 若为深度合约或升级，附赠 10 级战令经验 (10,000点) 与专属额外奖励 (BattlePassListCfg[20032])
             if is_full or is_upgrade:
-                db.add_currency(uid, 14, 10000)
-                rewards.append({"id": 14, "num": 10000})
-                db.add_item(uid, 2046, 1)
-                rewards.append({"id": 2046, "num": 1})
-                db.add_item(uid, 41201, 10)
-                rewards.append({"id": 41201, "num": 10})
-                db.add_item(uid, 53193, 5)
-                rewards.append({"id": 53193, "num": 5})
-                log(f"[PAY] 深度合约额外发放: 10级经验(10000) + 头像框2046 + 41201*10 + 53193*5")
+                log("[PAY] 深度合约本期额外赠礼由邮件发放，同期只发一次")
 
             # 联动新手活动战令奖励
             try:
@@ -399,6 +394,8 @@ class RechargeService:
 
         # 2. 战令购买状态重置
         if scope in ("all", "battlepass"):
+            from paid_entitlement_service import ensure_battlepass
+            ensure_battlepass(db, uid)
             db.set_battlepass_pay_level(uid, 0)
             try:
                 db.save_newbie_activity(uid, {"bp_reward": 0, "bp_new": 0})

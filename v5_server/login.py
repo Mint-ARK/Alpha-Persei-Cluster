@@ -115,6 +115,8 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
             log(f'[support] 装饰补给邮件已补齐: {len(extra_mail_ids)}封', 'INFO')
     except Exception as exc:
         log(f'[support] 装饰补给暂未完成，下次登录重试: {exc}', 'WARN')
+    from paid_entitlement_service import settle as settle_paid_rights
+    settle_paid_rights(db, uid, notify=False)
     # Progress is account data even when an older login row is static.
     # Supply missing packets before the login-complete marker as well.
     present_cmds = {row[1] for row in frames}
@@ -122,7 +124,7 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
         missing_fresh=[cmd for cmd in (12009,12011,12111,28001,41001,59011) if cmd not in present_cmds]
         marker=next((i for i,row in enumerate(frames) if row[1]==10201),len(frames))
         frames[marker:marker]=[(0,cmd,generator.build_frame(cmd,b'')[:11],b'',1,None) for cmd in missing_fresh]
-    missing_account_pushes = [cmd for cmd in (47001, 47003, 24029, 24061, 30001, 19029) if cmd not in present_cmds]
+    missing_account_pushes = [cmd for cmd in (47001, 47003, 24029, 24061, 30001, 19029, 34031, 34023, 34101) if cmd not in present_cmds]
     if missing_account_pushes:
         marker = next((i for i, row in enumerate(frames) if row[1] == 10201), len(frames))
         additions = [(0, cmd, generator.build_frame(cmd, b"")[:11], b"", 1, None)
@@ -203,17 +205,19 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
             gen = None
 
             # 1. dynamic == 1 时优先使用 generator 业务生成器
-            if (fresh_save or dynamic or cmd in (47001, 47003, 24029, 24061, 30001, 11001, 20007, 20009, 52001, 19029) or (cmd == 32009 and dynamic_profile)) and generator is not None:
+            if (fresh_save or dynamic or cmd in (47001, 47003, 24029, 24061, 30001, 11001, 20007, 20009, 52001, 19029, 34031, 34023, 34025, 34101) or (cmd == 32009 and dynamic_profile)) and generator is not None:
                 try:
                     gen = generator.gen_payload(
                         cmd, uid=uid, db=db, res_version=login_res_version
                     )
                 except Exception as e:
                     log(f"[login] sc_{cmd} 业务动态生成异常: {e}", "WARN")
-                    if fresh_save or cmd in (13009, 14009, 46011, 47001, 47003, 24009, 24029, 24061, 30001, 11001, 20007, 20009, 52001, 19029) or (cmd == 32009 and dynamic_profile):
+                    if fresh_save or cmd in (13009, 14009, 46011, 47001, 47003, 24009, 24029, 24061, 30001, 11001, 20007, 20009, 52001, 19029, 34031, 34023, 34025, 34101) or (cmd == 32009 and dynamic_profile):
                         raise RuntimeError(f"sc_{cmd} 当前资产读取失败，拒绝回退旧录制资产") from e
             if cmd in (47001, 47003) and gen is None:
                 raise RuntimeError(f"sc_{cmd} 教学进度生成失败")
+            if cmd in (34031, 34023, 34025, 34101) and gen is None:
+                raise RuntimeError(f'sc_{cmd} 权益状态生成失败，拒绝回退录制状态')
             if cmd in (24029, 24061) and gen is None:
                 raise RuntimeError(f'sc_{cmd} 主线地图进度生成失败')
             if cmd == 24009 and gen is None:

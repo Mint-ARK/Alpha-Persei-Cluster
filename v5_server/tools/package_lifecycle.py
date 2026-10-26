@@ -72,32 +72,19 @@ def recycle_or_raise(path: Path):
 
 
 def vacuum_database(src_db: Path, dst_db: Path):
-    """先保留源库及 WAL 副本，只读快照；仅对新暂存库执行 VACUUM。"""
+    """Snapshot the donor, then export a compact API-free copy from RAM."""
+    import sys
+    sys.path.insert(0, str(PROJECT_ROOT / 'v5_server'))
+    from account_db import AccountDB
     src_db = src_db.resolve(strict=True)
     dst_db = dst_db.resolve()
     if src_db == dst_db:
-        raise ValueError("构建数据库不能覆盖源库")
-    backup_dir = PROJECT_ROOT / "db_backup" / f"release_build_{time.time_ns()}"
-    backup_dir.mkdir(parents=True, exist_ok=False)
-    for suffix in ("", "-wal", "-shm"):
-        existing = Path(str(src_db) + suffix)
-        if existing.is_file():
-            shutil.copy2(existing, backup_dir / existing.name)
+        raise ValueError('构建数据库不能覆盖源库')
+    backup = AccountDB.backup_save_file(src_db)
     recycle_or_raise(dst_db)
     dst_db.parent.mkdir(parents=True, exist_ok=True)
-    src_conn = sqlite3.connect(src_db.as_uri() + "?mode=ro", uri=True)
-    dst_conn = sqlite3.connect(str(dst_db))
-    try:
-        src_conn.backup(dst_conn)
-        shutil.copy2(dst_db, backup_dir / "snapshot_before_vacuum.db")
-        dst_conn.execute("VACUUM")
-        dst_conn.commit()
-        if dst_conn.execute("PRAGMA quick_check").fetchone() != ("ok",):
-            raise RuntimeError("发布数据库完整性检查失败")
-    finally:
-        src_conn.close()
-        dst_conn.close()
-    print(f"  [OK] 数据库写前备份: {backup_dir}")
+    AccountDB.export_sanitized_snapshot(src_db, dst_db)
+    print(f'  [OK] 数据库写前备份: {backup}；发布副本API配置已清空')
 
 
 def get_debug_output_dir() -> Path:

@@ -2118,7 +2118,8 @@ class GMReader:
             })
 
         import ai_bot_config
-        bot_cfg = ai_bot_config.get_bot_config()
+        import ai_api_profiles
+        bot_cfg = ai_api_profiles.resolve(self)
 
         return {
             "characters": characters,
@@ -2247,7 +2248,8 @@ class GMReader:
     def get_aichat_config_view(self):
         """【只读通道·脱敏安全】获取脱敏后的 LLM 引擎配置。"""
         import ai_bot_config
-        return ai_bot_config.get_masked_config()
+        import ai_api_profiles
+        return ai_bot_config.get_masked_config(ai_api_profiles.resolve(self))
 
     def get_aichat_stats_view(self, uid=None):
         """获取 AI 修正者模块概览统计指标。"""
@@ -2267,7 +2269,8 @@ class GMReader:
             total_msgs = cur.fetchone()[0]
 
         import ai_bot_config
-        cfg = ai_bot_config.get_bot_config()
+        import ai_api_profiles
+        cfg = ai_api_profiles.resolve(self)
         cur_p = cfg.get("provider", "opencode")
         cur_info = cfg.get("providers", {}).get(cur_p, {})
         model_name = cur_info.get("model", "")

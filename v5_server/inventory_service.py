@@ -456,6 +456,9 @@ class InventoryService:
                         ctx.touched_items.add(4)
 
                 else:
+                    if iid == 14:
+                        from paid_entitlement_service import ensure_battlepass
+                        ensure_battlepass(db, uid, now)
                     db.execute(
                         "INSERT INTO currency (uid, id, num, update_ts) VALUES (?, ?, ?, ?) "
                         "ON CONFLICT(uid, id) DO UPDATE SET num = num + excluded.num, update_ts = excluded.update_ts",
@@ -475,7 +478,7 @@ class InventoryService:
                         }))
 
                     # 战令经验 (14) 联动
-                    elif iid == 14:
+                    elif iid == 14 and source == "battlepass_task":
                         bp_rows = db.query("SELECT weekly_gain_exp FROM battlepass WHERE uid=?", (uid,))
                         if bp_rows:
                             cur_wk = int(bp_rows[0]["weekly_gain_exp"] or 0)

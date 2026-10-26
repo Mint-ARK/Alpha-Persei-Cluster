@@ -1,35 +1,29 @@
 # -*- coding: utf-8 -*-
-"""
-ai_bot_leaderboard.py — 纯第三方大模型评测排行榜聚合与动态更新服务
-
-职责：
-- 聚合第三方权威评测平台（EQ-Bench, LMSYS Arena, OpenRouter, Artificial Analysis 等）
-- 保持客观数据搬运，不附带任何主观倾向
-- 支持全量 CSV 动态表头解析与按评分降序重排（消灭乱序与追加截断缺陷）
-- 接入 LMSYS Arena 完整 40 项天梯天花板
-- 提供 Artificial Analysis 质速指标综合榜及智能榜、速度榜分立天梯
-- 彻底剔除老旧废弃的 AlpacaEval 2.0 榜单
-- 动态重新归一化计算综合平均天梯 (自嗨榜)
-"""
+"""公开榜单与模型目录聚合；来源、缓存时间和刷新结果分别记录。"""
+import csv
+import io
+import math
 import os
 import json
 import re
 import ssl
+import shutil
+import threading
+import time
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ai_leaderboards_cache.json")
+_REFRESH_LOCK = threading.Lock()
 
 
 def _make_ssl_context():
     """构造安全且容错度高的 SSL 上下文，防御 Cloudflare 瞬时 EOF 异常。"""
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    return ctx
+    return ssl.create_default_context()
 
 
-def _fetch_url(url: str, timeout: int = 25, retries: int = 2, headers: dict = None) -> bytes:
+def _fetch_url(url: str, timeout: int = 15, retries: int = 2, headers: dict = None) -> bytes:
     """通用稳健网络拉取器，带重试与自定义 SSL 上下文。"""
     req_headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
@@ -42,7 +36,10 @@ def _fetch_url(url: str, timeout: int = 25, retries: int = 2, headers: dict = No
         try:
             req = urllib.request.Request(url, headers=req_headers)
             with urllib.request.urlopen(req, context=_make_ssl_context(), timeout=timeout) as resp:
-                return resp.read()
+                body = resp.read(8 * 1024 * 1024 + 1)
+                if len(body) > 8 * 1024 * 1024:
+                    raise ValueError("榜单响应超过8MB")
+                return body
         except Exception as e:
             last_err = e
     if last_err:
@@ -50,20 +47,49 @@ def _fetch_url(url: str, timeout: int = 25, retries: int = 2, headers: dict = No
     return b""
 
 
+# 元数据独立于缓存提供，首次安装也有完整的榜单入口。
+_SOURCE_SPECS = [
+    ("eqbench_creative", "EQ-Bench 创意写作", "BookOpen", "https://eqbench.com/creative_writing.html", "Elo", "EQ-Bench 创意写作评测，按源评分排序。"),
+    ("eqbench_longform", "EQ-Bench 长篇叙事", "Scroll", "https://eqbench.com/creative_writing_longform.html", "综合得分", "EQ-Bench 长篇写作评测，按源评分排序。"),
+    ("lmsys_arena", "Arena 文本总榜", "Swords", "https://arena.ai/leaderboard/text", "Arena 分数", "Arena 文本综合对战排名；经 Jina Reader 读取官方页面。"),
+    ("openrouter_rp", "OpenRouter 模型目录", "Drama", "https://openrouter.ai/models", "上架日期", "按上架时间倒序列出模型；此目录没有能力或热度评分。"),
+    ("artificial_analysis", "Artificial Analysis", "Zap", "https://artificialanalysis.ai/leaderboards/models", "暂未接入", "尚未接入实时数据，暂不展示来源无法核实的旧分数。"),
+    ("composite_average", "综合平均天梯（娱乐）", "Sparkles", "", "平均名次", "仅汇总 EQ-Bench 与 Arena 的名次；未上榜按第46名折算，仅供娱乐。"),
+]
+
+
 def get_leaderboard_data() -> dict:
-    """读取并返回当前榜单数据字典。"""
-    if os.path.exists(CACHE_FILE):
-        try:
-            with open(CACHE_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if isinstance(data, dict) and "sources" in data:
-                    return data
-        except Exception:
-            pass
-    return {
-        "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "sources": []
-    }
+    """只读缓存并规范旧格式，不把本次读取时间当成数据更新时间。"""
+    cached = {}
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            candidate = json.load(f)
+        if isinstance(candidate, dict) and isinstance(candidate.get("sources"), list):
+            cached = candidate
+    except (OSError, ValueError):
+        pass
+    previous = {s.get("id"): s for s in cached.get("sources", []) if isinstance(s, dict)}
+    sources = []
+    for sid, name, icon, url, metric, description in _SOURCE_SPECS:
+        old = previous.get(sid, {})
+        items = old.get("items", [])
+        if not isinstance(items, list):
+            items = []
+        # 旧OpenRouter是人工热度分，不能当作新目录数据继续展示。
+        if sid in ("artificial_analysis", "composite_average") or (sid == "openrouter_rp" and cached.get("schema_version") != 2):
+            items = []
+        source = dict(id=sid, name=name, icon=icon, url=url, metric_name=metric,
+                      description=description, columns=["排名", "模型", "厂商", metric, "详情", "操作"],
+                      items=items, updated_at=old.get("updated_at", cached.get("updated_at", "")) if items else "",
+                      status="cached" if items else "empty", error="")
+        if sid == "artificial_analysis":
+            source["status"] = "unavailable"
+        sources.append(source)
+    composite = sources[-1]
+    composite["items"] = _compute_composite_average(sources, max_items=55)
+    composite["status"] = "derived" if composite["items"] else "empty"
+    composite["updated_at"] = cached.get("updated_at", "") if composite["items"] else ""
+    return {"schema_version": 2, "updated_at": cached.get("updated_at", ""), "sources": sources}
 
 
 def _infer_provider(raw_name: str, vendor: str = "") -> str:
@@ -104,16 +130,16 @@ def _infer_provider(raw_name: str, vendor: str = "") -> str:
 
 def _parse_csv_by_headers(csv_text: str, source_type: str = "creative", max_items: int = 50) -> list:
     """基于 CSV 表头动态解析 EQ-Bench 榜单数据，并按评分严格降序重排，消灭追加末尾导致的老数据截断缺陷。"""
-    lines = [line.strip() for line in csv_text.strip().splitlines() if line.strip()]
-    if len(lines) <= 1:
+    rows = list(csv.reader(io.StringIO(csv_text.strip())))
+    if len(rows) <= 1:
         return []
 
-    headers = [h.strip().lower() for h in lines[0].split(",")]
+    headers = [h.strip().lower().lstrip('\ufeff') for h in rows[0]]
     header_map = {name: idx for idx, name in enumerate(headers)}
 
     raw_items = []
-    for line in lines[1:]:
-        parts = [p.strip() for p in line.split(",")]
+    for row in rows[1:]:
+        parts = [p.strip() for p in row]
         if not parts or not parts[0]:
             continue
 
@@ -133,8 +159,8 @@ def _parse_csv_by_headers(csv_text: str, source_type: str = "creative", max_item
         if source_type == "creative":
             try:
                 score_val = float(get_val("elo_score", parts[1] if len(parts) > 1 else "0"))
-            except Exception:
-                pass
+            except (ValueError, TypeError):
+                continue
             sub_score_val = get_val("creative_writing_score", parts[2] if len(parts) > 2 else str(score_val))
             details = {
                 "length": get_val("avg_length", parts[3] if len(parts) > 3 else ""),
@@ -145,8 +171,8 @@ def _parse_csv_by_headers(csv_text: str, source_type: str = "creative", max_item
         elif source_type == "longform":
             try:
                 score_val = float(get_val("overall_score_100", parts[1] if len(parts) > 1 else "0"))
-            except Exception:
-                pass
+            except (ValueError, TypeError):
+                continue
             sub_score_val = f"{score_val} 分"
             details = {
                 "length": get_val("avg_chapter_length", parts[2] if len(parts) > 2 else ""),
@@ -155,6 +181,8 @@ def _parse_csv_by_headers(csv_text: str, source_type: str = "creative", max_item
                 "repetition": get_val("repetition_score", parts[5] if len(parts) > 5 else "")
             }
 
+        if not math.isfinite(score_val):
+            continue
         raw_items.append({
             "model": raw_name,
             "provider": provider,
@@ -197,7 +225,7 @@ def _parse_csv_by_headers(csv_text: str, source_type: str = "creative", max_item
 
 def _fetch_eqbench_live(url: str, var_name: str, source_type: str = "creative", max_items: int = 45) -> list:
     """从 EQ-Bench 在线 JS 脚本解析最新的 CSV 数据并动态绑定表头并重排。"""
-    raw_bytes = _fetch_url(url, timeout=25, retries=2)
+    raw_bytes = _fetch_url(url, timeout=15)
     text = raw_bytes.decode("utf-8", errors="ignore")
 
     pattern = rf'{var_name}\s*=\s*`([^`]+)`'
@@ -209,7 +237,7 @@ def _fetch_eqbench_live(url: str, var_name: str, source_type: str = "creative", 
 
 
 def _fetch_lmsys_arena_live(max_items: int = 40) -> list:
-    """从 LMSYS Arena 官方实时天梯抓取并解析完整 40 项模型，包含真实 Elo、±CI 与实测投票。"""
+    """从 Arena 官方文本总榜读取分数及页面实际提供的指标。"""
     # 策略 1：优先从 Jina Reader 渲染的官方真实天梯提取（支持完整 40+ 款前沿模型）
     try:
         url_jina = "https://r.jina.ai/https://arena.ai/leaderboard/text"
@@ -217,7 +245,7 @@ def _fetch_lmsys_arena_live(max_items: int = 40) -> list:
             "Accept": "text/plain",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
         }
-        raw_bytes = _fetch_url(url_jina, timeout=20, retries=2, headers=jina_headers)
+        raw_bytes = _fetch_url(url_jina, timeout=15, headers=jina_headers)
         text = raw_bytes.decode("utf-8", errors="ignore")
         lines = [l.strip() for l in text.splitlines()]
 
@@ -259,7 +287,7 @@ def _fetch_lmsys_arena_live(max_items: int = 40) -> list:
                     continue
             i += 1
 
-        if len(parsed_models) >= max_items:
+        if parsed_models:
             items = []
             for rank, m in enumerate(parsed_models[:max_items], 1):
                 model_name = m["model"]
@@ -287,73 +315,26 @@ def _fetch_lmsys_arena_live(max_items: int = 40) -> list:
                     "model": model_name,
                     "provider": provider,
                     "score": score_val,
-                    "sub_score": ci_val or "±5",
+                    "sub_score": ci_val,
                     "metric_val": str(int(score_val) if score_val.is_integer() else score_val),
                     "details": {
-                        "ci": ci_val or "±5",
-                        "votes": votes_val or "实测",
+                        "ci": ci_val,
+                        "votes": votes_val,
                         "vendor": vendor,
                         "license": "proprietary"
                     },
                     "tags": tags
                 })
             return items
-    except Exception:
-        pass
-
-    # 策略 2：通过官方镜像 API 抓取
-    url_mirror = "https://api.wulong.dev/arena-ai-leaderboards/v1/leaderboard?name=text"
-    raw_bytes = _fetch_url(url_mirror, timeout=12, retries=2)
-    data = json.loads(raw_bytes.decode("utf-8", errors="ignore"))
-    raw_models = data.get("models", [])
-    if not raw_models:
-        return []
-
-    items = []
-    for rank, m in enumerate(raw_models[:max_items], 1):
-        model_name = m.get("model", "")
-        vendor = m.get("vendor", "")
-        provider = _infer_provider(model_name, vendor)
-        score_val = float(m.get("score", 0))
-        ci_val = m.get("ci", 0)
-        votes_val = m.get("votes", 0)
-
-        tags = []
-        if rank <= 3:
-            tags.append(f"Top {rank}")
-        if votes_val and votes_val > 10000:
-            tags.append("万人实测")
-        low = model_name.lower()
-        if "high" in low or "max" in low:
-            tags.append("旗舰推理")
-        if "flash" in low:
-            tags.append("极速响应")
-        if "fable" in low or "opus" in low:
-            tags.append("前沿拟真")
-
-        votes_str = f"{votes_val:,}" if votes_val else "实测投票"
-        items.append({
-            "rank": rank,
-            "model": model_name,
-            "provider": provider,
-            "score": score_val,
-            "sub_score": f"±{ci_val}",
-            "metric_val": str(int(score_val) if score_val.is_integer() else score_val),
-            "details": {
-                "ci": f"±{ci_val}",
-                "votes": votes_str,
-                "vendor": vendor,
-                "license": m.get("license", "proprietary")
-            },
-            "tags": tags
-        })
-    return items
+    except Exception as exc:
+        raise RuntimeError(f"Arena 官方页面读取失败: {exc}") from exc
+    raise ValueError("Arena 页面未解析出有效排名")
 
 
 def _fetch_openrouter_live(max_items: int = 40) -> list:
     """从 OpenRouter 官方模型端点提取前沿活跃模型并格式化。"""
     url = "https://openrouter.ai/api/v1/models"
-    raw_bytes = _fetch_url(url, timeout=15, retries=2)
+    raw_bytes = _fetch_url(url, timeout=15)
     res_json = json.loads(raw_bytes.decode("utf-8", errors="ignore"))
 
     data_list = res_json.get("data", [])
@@ -375,11 +356,8 @@ def _fetch_openrouter_live(max_items: int = 40) -> list:
         name = m.get("name", m_id)
         ctx = m.get("context_length", 0)
         provider = _infer_provider(m_id)
-        score_val = round(99.5 - (rank - 1) * 0.45, 1)
 
         tags = []
-        if rank <= 3:
-            tags.append(f"Top {rank}")
         if ctx >= 1000000:
             tags.append("1M超长上下文")
         elif ctx >= 200000:
@@ -389,9 +367,9 @@ def _fetch_openrouter_live(max_items: int = 40) -> list:
             "rank": rank,
             "model": m_id,
             "provider": provider,
-            "score": score_val,
-            "sub_score": f"{ctx // 1000}k ctx" if ctx else "热度优选",
-            "metric_val": str(score_val),
+            "score": None,
+            "sub_score": f"{ctx // 1000}k ctx" if ctx else "",
+            "metric_val": datetime.fromtimestamp(int(m.get("created", 0))).strftime("%Y-%m-%d") if m.get("created") else "未提供",
             "details": {
                 "context": f"{ctx:,} tokens" if ctx else "自适应",
                 "name": name,
@@ -501,7 +479,7 @@ def _compute_composite_average(sources: list, max_items: int = 60) -> list:
     """根据所有有效客观榜单（剔除自嗨榜自身与停更的 AlpacaEval），动态归一化计算「综合平均天梯 (娱乐自嗨榜)」。"""
     benchmark_sources = [
         s for s in sources
-        if s.get("id") not in ("composite_average", "alpaca_eval") and s.get("items")
+        if s.get("id") in ("eqbench_creative", "eqbench_longform", "lmsys_arena") and s.get("items")
     ]
     total_benchmarks = len(benchmark_sources)
     if total_benchmarks == 0:
@@ -583,134 +561,57 @@ def _compute_composite_average(sources: list, max_items: int = 60) -> list:
     return results
 
 
+def _save_cache(data: dict) -> None:
+    """写前备份已有缓存，写入临时文件后原子替换。"""
+    if os.path.exists(CACHE_FILE):
+        archive = os.path.join(os.path.dirname(CACHE_FILE), "archive", "ai_leaderboards_cache")
+        os.makedirs(archive, exist_ok=True)
+        shutil.copy2(CACHE_FILE, os.path.join(archive, f"{time.time_ns()}.json"))
+    temporary = CACHE_FILE + f".{time.time_ns()}.tmp"
+    with open(temporary, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False, allow_nan=False)
+    os.replace(temporary, CACHE_FILE)
+
+
 def refresh_leaderboard_data() -> dict:
-    """动态抓取各大权威源最新数据并更新缓存、分立质速指标与自嗨综合天梯。"""
-    current_data = get_leaderboard_data()
-    sources = current_data.get("sources", [])
-    updated_sources = 0
-    errors = []
-
-    # 0. 彻底移除老旧停更的 AlpacaEval 2.0
-    sources = [s for s in sources if s.get("id") != "alpaca_eval"]
-
-    # 1. 尝试更新 EQ-Bench 创意写作
+    """四个独立来源并发、每源最多两次；失败保留旧数据和旧更新时间。"""
+    current = get_leaderboard_data()
+    if not _REFRESH_LOCK.acquire(blocking=False):
+        return dict(success=False, updated_sources=0, errors=["榜单正在刷新，请稍后再试"], data=current)
     try:
-        live_creative = _fetch_eqbench_live(
-            "https://eqbench.com/creative_writing.js",
-            "leaderboardDataCreativeWritingV3",
-            source_type="creative",
-            max_items=45
-        )
-        if live_creative:
-            for s in sources:
-                if s.get("id") == "eqbench_creative":
-                    s["items"] = live_creative
-                    updated_sources += 1
-                    break
-    except Exception as e:
-        errors.append(f"EQ-Bench 创意写作更新失败: {str(e)}")
-
-    # 2. 尝试更新 EQ-Bench 长篇叙事（全量抓取并按整体得分降序排好，保证最新模型靠前）
-    try:
-        live_longform = _fetch_eqbench_live(
-            "https://eqbench.com/creative_writing_longform.js",
-            "leaderboardDataLongformV3",
-            source_type="longform",
-            max_items=45
-        )
-        if live_longform:
-            for s in sources:
-                if s.get("id") == "eqbench_longform":
-                    s["items"] = live_longform
-                    updated_sources += 1
-                    break
-    except Exception as e:
-        errors.append(f"EQ-Bench 长篇叙事更新失败: {str(e)}")
-
-    # 3. 尝试更新 LMSYS Arena 写作天梯（扩展至 40 个前沿模型）
-    try:
-        live_arena = _fetch_lmsys_arena_live(max_items=40)
-        if live_arena:
-            for s in sources:
-                if s.get("id") == "lmsys_arena":
-                    s["items"] = live_arena
-                    updated_sources += 1
-                    break
-    except Exception as e:
-        errors.append(f"LMSYS Arena 更新失败: {str(e)}")
-
-    # 4. 尝试更新 OpenRouter 热门榜单
-    try:
-        live_or = _fetch_openrouter_live(max_items=40)
-        if live_or:
-            for s in sources:
-                if s.get("id") == "openrouter_rp":
-                    s["items"] = live_or
-                    updated_sources += 1
-                    break
-    except Exception as e:
-        errors.append(f"OpenRouter 榜单更新失败: {str(e)}")
-
-    # 5. 生成 AA 智能质量榜 与 AA 极速生成榜（分立状态）
-    try:
-        aa_base = next((s for s in sources if s.get("id") == "artificial_analysis"), None)
-        if aa_base and aa_base.get("items"):
-            q_src, s_src = _build_aa_discrete_boards(aa_base["items"], max_items=40)
-            if q_src and s_src:
-                # 检查 sources 中是否已有分立榜单，若无则按顺序插入在 artificial_analysis 后面
-                has_q = any(s.get("id") == "aa_quality" for s in sources)
-                has_s = any(s.get("id") == "aa_speed" for s in sources)
-
-                if has_q:
-                    for s in sources:
-                        if s.get("id") == "aa_quality":
-                            s["items"] = q_src["items"]
-                            break
-                if has_s:
-                    for s in sources:
-                        if s.get("id") == "aa_speed":
-                            s["items"] = s_src["items"]
-                            break
-
-                if not has_q or not has_s:
-                    new_sources = []
-                    for s in sources:
-                        new_sources.append(s)
-                        if s.get("id") == "artificial_analysis":
-                            if not has_q:
-                                new_sources.append(q_src)
-                            if not has_s:
-                                new_sources.append(s_src)
-                    sources = new_sources
-                updated_sources += 2
-    except Exception as e:
-        errors.append(f"AA 质速指标分立榜单生成失败: {str(e)}")
-
-    # 6. 动态重新计算「综合平均天梯 (娱乐自嗨榜)」
-    try:
-        comp_items = _compute_composite_average(sources, max_items=55)
-        if comp_items:
-            for s in sources:
-                if s.get("id") == "composite_average":
-                    s["items"] = comp_items
-                    s["name"] = "综合平均天梯 (娱乐自嗨榜)"
-                    break
-    except Exception as e:
-        errors.append(f"综合天梯计算失败: {str(e)}")
-
-    current_data["sources"] = sources
-    current_data["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    # 写回持久化缓存
-    try:
-        with open(CACHE_FILE, "w", encoding="utf-8") as f:
-            json.dump(current_data, f, indent=2, ensure_ascii=False)
-    except Exception as e:
-        errors.append(f"写回缓存文件失败: {str(e)}")
-
-    return {
-        "success": True,
-        "updated_sources": updated_sources,
-        "errors": errors,
-        "data": current_data
-    }
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        jobs = {
+            "eqbench_creative": lambda: _fetch_eqbench_live("https://eqbench.com/creative_writing.js", "leaderboardDataCreativeWritingV3", "creative"),
+            "eqbench_longform": lambda: _fetch_eqbench_live("https://eqbench.com/creative_writing_longform.js", "leaderboardDataLongformV3", "longform"),
+            "lmsys_arena": _fetch_lmsys_arena_live,
+            "openrouter_rp": _fetch_openrouter_live,
+        }
+        errors = []
+        updated = 0
+        by_id = {s["id"]: s for s in current["sources"]}
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            futures = {sid: pool.submit(fetch) for sid, fetch in jobs.items()}
+            for sid, future in futures.items():
+                source = by_id[sid]
+                try:
+                    items = future.result()
+                    if not items:
+                        raise ValueError("源未返回有效条目")
+                    source.update(items=items, updated_at=now, status="updated", error="")
+                    updated += 1
+                except Exception as exc:
+                    source["status"] = "cached" if source["items"] else "error"
+                    source["error"] = str(exc)
+                    errors.append(f"{source['name']}: {exc}")
+        if updated:
+            current["updated_at"] = now
+            composite = by_id["composite_average"]
+            composite.update(items=_compute_composite_average(current["sources"], max_items=55),
+                             status="derived", updated_at=now)
+            try:
+                _save_cache(current)
+            except Exception as exc:
+                errors.append(f"缓存保存失败: {exc}")
+        return dict(success=updated > 0, updated_sources=updated, errors=errors, data=current)
+    finally:
+        _REFRESH_LOCK.release()

@@ -16,6 +16,8 @@ import time
 SERVER = Path(__file__).resolve().parent
 SLOTS = SERVER
 NOOB_END_TS = 2461420799  # Protocol deadline; completion policy closes it earlier.
+UID_MAX_DIGITS = 12
+SAVE_NAME_MAX_CHARS = 32
 
 
 @lru_cache(maxsize=1)
@@ -25,17 +27,19 @@ def generation_config():
 
 def validate_uid(value):
     raw = str(value)
-    if not re.fullmatch(r'[1-9][0-9]{0,14}', raw, flags=re.ASCII):
-        raise ValueError('UID须为1—15位正整数，不能有前导零')
+    if not re.fullmatch(rf'[1-9][0-9]{{0,{UID_MAX_DIGITS - 1}}}', raw, flags=re.ASCII):
+        raise ValueError(f'UID须为1—{UID_MAX_DIGITS}位正整数，不能有前导零')
     return int(raw)
 
 
 def save_filename(name):
-    if not isinstance(name, str) or not name or len(name) > 64:
-        raise ValueError('存档名称须为1—64个字符')
+    if not isinstance(name, str) or not name:
+        raise ValueError('存档名称须为1—32个字符（不含.db后缀）')
+    stem = name[:-3] if name.lower().endswith('.db') else name
+    if len(stem) > SAVE_NAME_MAX_CHARS:
+        raise ValueError('存档名称须为1—32个字符（不含.db后缀）')
     if name != name.strip() or name.endswith('.') or any(ord(c) < 32 or c in '<>:"/\\|?*' for c in name):
         raise ValueError('存档名称不能包含路径、系统保留符号或首尾空白')
-    stem = name[:-3] if name.lower().endswith('.db') else name
     if not stem or stem in ('.', '..') or stem.endswith(('.', ' ')):
         raise ValueError('存档名称无效')
     if stem.split('.')[0].upper() in {'CON', 'PRN', 'AUX', 'NUL', *(f'COM{i}' for i in range(1, 10)), *(f'LPT{i}' for i in range(1, 10))}:
@@ -340,6 +344,10 @@ def create_save(name, options=None, *, destination=None, master=None):
             raise ValueError('此UID已被本地存档使用，请换一个UID')
         db, report = build_save_workspace(options, uid, master=master)
         try:
+            # New exported saves start with isolated, empty API settings.
+            # No file/env credentials or donor save profiles are inherited.
+            from ai_api_profiles import CONFIG_KEY
+            db.set_system_config(CONFIG_KEY, json.dumps(dict(version=1, active_id='', profiles={}, routes={})))
             backup = db.export_new_save(path)
         finally:
             db.close()
@@ -350,8 +358,8 @@ def create_save(name, options=None, *, destination=None, master=None):
 def main(argv=None):
     import argparse
     parser = argparse.ArgumentParser(description='按名称创建单账号新档；不覆盖已有文件。')
-    parser.add_argument('--name', required=True, help='存档名称，支持中文；保存到服务端同级目录')
-    parser.add_argument('--uid', help='1—15位正整数；省略时按年月日时分秒生成')
+    parser.add_argument('--name', required=True, help='存档名称1—32字符（不含.db），支持中文；保存到服务端同级目录')
+    parser.add_argument('--uid', help='1—12位正整数；省略时按年月日时分秒生成')
     parser.add_argument('--nick', help='跳过501时使用；留空为管理员；保留501时在游戏内取名')
     parser.add_argument('--level', type=int, default=1, help='初始等级1—100，经验自动计算')
     parser.add_argument('--skip-intro', action=argparse.BooleanOptionalAction, default=False, help='跳过首次501剧情引导')

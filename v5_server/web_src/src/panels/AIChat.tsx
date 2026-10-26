@@ -55,7 +55,7 @@ import {
   fetchAIChatCharacters,
   fetchAIChatCalendar,
   fetchAIChatConfig,
-  saveAIChatConfig,
+  fetchApiProfiles, updateApiProfiles, type ApiProfiles, type ApiProfile,
   testAIChatConnection,
   fetchAIChatHistory,
   sendAIChatMessage,
@@ -237,7 +237,7 @@ interface ProviderPreset {
   defaultBaseUrl: string
   defaultModel: string
   candidateModels: string[]
-  apiKeyEnv: string
+  credentialHint: string
   hint: string
 }
 
@@ -255,7 +255,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
       'gemini-3.6-flash',
       'gemini-3.1-pro',
     ],
-    apiKeyEnv: 'GEMINI_API_KEY',
+    credentialHint: '当前存档独立配置',
     hint: 'Google 原生端点，支持高并发免费额度与极速首字输出。',
   },
   {
@@ -269,7 +269,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
       'deepseek-flash',
       'deepseek-v4-pro',
     ],
-    apiKeyEnv: 'DEEPSEEK_API_KEY',
+    credentialHint: '当前存档独立配置',
     hint: '国内直连，高性价比与强逻辑，文学角色拟真表现极佳。',
   },
   {
@@ -286,7 +286,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
       'qwen2.5:14b',
       'llama3.1:8b',
     ],
-    apiKeyEnv: '免配置 (本地免鉴权)',
+    credentialHint: '免配置 (本地免鉴权)',
     hint: '本地硬件离线推理，零外网依赖、免梯子、免 API Key，私密安全。',
   },
   {
@@ -323,7 +323,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
       'gpt-4o',
       'gpt-4o-mini',
     ],
-    apiKeyEnv: 'OPENAI_API_KEY',
+    credentialHint: '当前存档独立配置',
     hint: 'OpenAI 官方国际 API 端点，强大前沿矩阵（GPT-6 / GPT-5.x / o3 / 4.x）。',
   },
   {
@@ -345,7 +345,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
       'claude-sonnet-4-5-20250929',
       'claude-haiku-4-5-20251001',
     ],
-    apiKeyEnv: 'ANTHROPIC_API_KEY',
+    credentialHint: '当前存档独立配置',
     hint: 'Claude 官方 API 端点，细腻自然的角色情感拟真与文风塑造能力。',
   },
   {
@@ -356,7 +356,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
     defaultBaseUrl: '',
     defaultModel: '',
     candidateModels: [],
-    apiKeyEnv: 'CUSTOM_API_KEY',
+    credentialHint: '当前存档独立配置',
     hint: '兼容所有第三方反代、聚合中转站（NewAPI / OneAPI）或自建网关。',
   },
 ]
@@ -626,6 +626,11 @@ export default function AIChatPanel() {
 
   // 模型配置表单状态
   const [editProvider, setEditProvider] = useState(OFFLINE_CONFIG.provider)
+  const [apiProfiles, setApiProfiles] = useState<ApiProfiles>({ storage: 'database', active_id: '', profiles: [], routes: {} })
+  const [selectedApi, setSelectedApi] = useState('')
+  const [apiName, setApiName] = useState('默认API')
+  const [apiBusy, setApiBusy] = useState(false)
+  const [apiLoadError, setApiLoadError] = useState('')
   const [editModel, setEditModel] = useState(OFFLINE_CONFIG.model)
     const [modelSearch, setModelSearch] = useState('')
 
@@ -643,6 +648,13 @@ export default function AIChatPanel() {
   const [leaderboardProviderFilter, setLeaderboardProviderFilter] = useState<string>('all')
   const [leaderboardSearch, setLeaderboardSearch] = useState<string>('')
   const [isRefreshingLeaderboard, setIsRefreshingLeaderboard] = useState<boolean>(false)
+  const [leaderboardErrors, setLeaderboardErrors] = useState<string[]>([])
+  useEffect(() => {
+    const sources = leaderboardsData?.sources || []
+    if (sources.length && !sources.some(s => s.id === activeLeaderboardSourceId)) {
+      setActiveLeaderboardSourceId(sources[0].id)
+    }
+  }, [leaderboardsData, activeLeaderboardSourceId])
   const [editBaseUrl, setEditBaseUrl] = useState(OFFLINE_CONFIG.base_url)
   const [editApiKey, setEditApiKey] = useState('')
   const [showApiKey, setShowApiKey] = useState(false)
@@ -732,9 +744,19 @@ export default function AIChatPanel() {
         setEditSystemPrefix(d.system_prefix || '')
       }
 
+      const apis = await fetchApiProfiles()
+      if (apis.code !== 0 || !apis.data || !Array.isArray(apis.data.profiles)) {
+        throw new Error(apis.msg || '读取存档API配置失败')
+      }
+      setApiLoadError('')
+      setApiProfiles(apis.data)
+      setSelectedApi(apis.data.active_id)
+      setApiName(apis.data.profiles.find(p => p.id === apis.data.active_id)?.name || '默认API')
+      setEditApiKey('')
+
       loadHistory(selectedChar.char_id)
-    } catch {
-      // 容错回退
+    } catch (error: any) {
+      setApiLoadError(error?.message || '无法读取当前存档的API配置，请刷新重试')
     } finally {
       setIsRefreshing(false)
     }
@@ -914,6 +936,7 @@ export default function AIChatPanel() {
 
   // 服务商预设切换
   const handleSelectPreset = (preset: ProviderPreset) => {
+    if (preset.id !== editProvider) setEditApiKey('')
     setModelSearch('')
     setEditProvider(preset.id)
     if (preset.defaultBaseUrl) {
@@ -926,10 +949,15 @@ export default function AIChatPanel() {
 
   // 连通性测试探针
   const handleTestConnAction = async () => {
+    const saved = apiProfiles.profiles.find(p => p.id === selectedApi)
+    if (!saved || saved.provider !== editProvider || saved.model !== editModel || saved.base_url !== editBaseUrl || editApiKey.trim()) {
+      showToast('请先保存当前API配置，再测试连接', 'warning')
+      return
+    }
     setIsTestingConn(true)
     setConnResult(null)
     try {
-      const res = await testAIChatConnection(editProvider)
+      const res = await testAIChatConnection(editProvider, selectedApi || undefined)
       if (res.code === 0 && res.data) {
         setConnResult({
           success: res.data.success,
@@ -964,12 +992,21 @@ export default function AIChatPanel() {
       const res = await refreshAIChatLeaderboards()
       if (res.code === 0 && res.data?.data) {
         setLeaderboardsData(res.data.data)
-        showToast('已完成第三方权威评测数据抓取与同步', 'success')
+        setLeaderboardErrors(res.data.errors || [])
+        if (!res.data.success) {
+          showToast('本次未获取到新数据，保留原有缓存', 'warning')
+        } else if (res.data.errors?.length) {
+          showToast(`已更新 ${res.data.updated_sources} 个来源，部分来源未完成`, 'warning')
+        } else {
+          showToast(`已更新 ${res.data.updated_sources} 个来源`, 'success')
+        }
       } else {
-        showToast(res.msg || '排行榜数据刷新完成', 'success')
+        setLeaderboardErrors([res.msg || '排行榜刷新失败'])
+        showToast(res.msg || '排行榜刷新失败', 'warning')
       }
     } catch {
-      showToast('网络受限，已使用本地高精缓存快照', 'warning')
+      setLeaderboardErrors(['请求失败，当前展示内容保持不变'])
+      showToast('请求失败，当前展示内容保持不变', 'warning')
     } finally {
       setIsRefreshingLeaderboard(false)
     }
@@ -1018,21 +1055,21 @@ export default function AIChatPanel() {
                 <Trophy className="size-4" />
               </div>
               <h3 className="text-base font-bold tracking-tight text-foreground">
-                全网大模型 Chat & 拟真写作能力排行榜
+                模型评测与目录
               </h3>
               <Chip size="sm" variant="secondary" className="text-[11px] bg-muted/20 text-muted font-normal">
-                客观数据搬运工 · 不吃压力不担责任
+                公开数据
               </Chip>
             </div>
             <p className="text-xs text-muted leading-relaxed">
-              汇集独立评测在情商对话、拟真修辞、长篇耐力与即时响应速率的客观跑分，包含 6 大评测源与全网全景平滑平均天梯。
+              查看写作评测、Arena 文本排名与 OpenRouter 模型目录，各来源单独记录更新时间。
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             {leaderboardsData?.updated_at && (
               <span className="text-[11px] font-mono text-muted">
-                更新时间：{leaderboardsData.updated_at}
+                最近获取新数据：{leaderboardsData.updated_at}
               </span>
             )}
             {(() => {
@@ -1046,7 +1083,7 @@ export default function AIChatPanel() {
                   className="inline-flex items-center gap-1 text-xs text-accent hover:underline px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 transition-colors"
                 >
                   <ExternalLink className="size-3" />
-                  评测官网
+                  来源网站
                 </a>
               )
             })()}
@@ -1062,6 +1099,12 @@ export default function AIChatPanel() {
             </Button>
           </div>
         </div>
+
+        {leaderboardErrors.length > 0 && (
+          <div role="status" className="text-xs text-warning space-y-1">
+            {leaderboardErrors.map((message, index) => <p key={index}>{message}</p>)}
+          </div>
+        )}
 
         {/* 数据源切换 Tab 胶囊 */}
         {leaderboardsData && leaderboardsData.sources && leaderboardsData.sources.length > 0 && (
@@ -1125,15 +1168,14 @@ export default function AIChatPanel() {
                     <AlertTriangle className="size-5 shrink-0 text-amber-500 mt-0.5" />
                     <div className="space-y-1">
                       <div className="font-bold text-sm flex items-center gap-2">
-                        <span>🎲 综合平均天梯 · 娱乐自嗨算法声明</span>
+                        <span>🎲 综合平均天梯 · 娱乐参考</span>
                         <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 uppercase tracking-wider font-mono font-semibold">
                           无任何官方参考价值
                         </span>
                       </div>
                       <p className="text-amber-800/90 dark:text-amber-300/90">
-                        【郑重声明：该榜单纯属开发团队自嗨算法，<strong>无任何权威机构背书与参考价值，咱们只是数据搬运工，不吃压力、不担责任！</strong>】
-                        本榜单汇聚所有出现在其他 6 大榜单中的模型（当前共 {currSrc.items?.length || 0} 款）。
-                        对于未在某榜单出现的模型，算法采用<strong>平滑惩罚位（#46）</strong>折算全景平均名次。各模型实际会话手感千人千面，请以实际体验为准！
+                        汇总 EQ-Bench 与 Arena 中的 {currSrc.items?.length || 0} 款模型，未上榜按第46名折算平均名次。
+                        OpenRouter 目录和未接入的 AA 数据不参与计算。
                       </p>
                     </div>
                   </div>
@@ -1146,6 +1188,11 @@ export default function AIChatPanel() {
                   <div className="space-y-0.5">
                     <span className="font-semibold text-foreground mr-2">【{currSrc.name}】</span>
                     <span className="text-muted">{currSrc.description}</span>
+                    <p className="text-[11px] text-muted mt-1">
+                      {currSrc.updated_at ? `数据获取时间：${currSrc.updated_at}` : '尚无数据'}
+                      {currSrc.status === 'cached' && ' · 本地缓存'}
+                      {currSrc.error && ` · ${currSrc.error}`}
+                    </p>
                   </div>
                   <span className="font-mono text-[11px] text-accent shrink-0 font-medium">
                     核心指标：{currSrc.metric_name}
@@ -1232,11 +1279,11 @@ export default function AIChatPanel() {
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="border-b border-separator/80 bg-surface-secondary/70 text-muted font-medium text-[11px]">
-                          <th className="py-2.5 px-3 w-14 text-center">{isComposite ? '综合' : '排名'}</th>
+                          <th className="py-2.5 px-3 w-14 text-center">{isComposite ? '综合' : currSrc.id === 'openrouter_rp' ? '序号' : '排名'}</th>
                           <th className="py-2.5 px-3">模型名称</th>
                           <th className="py-2.5 px-3 w-24">服务厂商</th>
                           <th className="py-2.5 px-3 w-40">
-                            {isComposite ? '全景加权均名' : `核心跑分 (${currSrc.metric_name})`}
+                            {isComposite ? '平均名次' : currSrc.metric_name}
                           </th>
                           <th className="py-2.5 px-3">
                             {isComposite ? '上榜频次 / 真实在榜均名 / 特色标签' : '专项指标 / 特色标签'}
@@ -1333,7 +1380,7 @@ export default function AIChatPanel() {
                                       <span className="text-[10px] text-muted">{item.sub_score}</span>
                                     )}
                                   </div>
-                                  <div className="h-1.5 w-full bg-separator/50 rounded-full overflow-hidden">
+                                  {item.score != null && <div className="h-1.5 w-full bg-separator/50 rounded-full overflow-hidden">
                                     <div
                                       className={cn(
                                         'h-full rounded-full transition-all',
@@ -1347,7 +1394,7 @@ export default function AIChatPanel() {
                                         width: `${Math.min(100, Math.max(15, (item.score / maxScore) * 100))}%`,
                                       }}
                                     />
-                                  </div>
+                                  </div>}
                                 </div>
                               </td>
 
@@ -1466,7 +1513,7 @@ export default function AIChatPanel() {
                         {filteredItems.length === 0 && (
                           <tr>
                             <td colSpan={6} className="py-8 text-center text-xs text-muted">
-                              未找到符合当前筛选条件的在榜模型
+                              {currSrc.status === 'unavailable' ? '尚未接入实时数据' : currSrc.items.length === 0 ? '尚无榜单数据，请点击重新同步数据' : '未找到符合当前筛选条件的模型'}
                             </td>
                           </tr>
                         )}
@@ -1509,36 +1556,87 @@ export default function AIChatPanel() {
 
   // 保存模型配置
   const handleSaveModelAction = async () => {
+    if (apiBusy) return
+    setApiBusy(true)
     try {
       const payload: any = {
+        name: apiName,
+        ...(selectedApi ? { id: selectedApi } : {}),
         provider: editProvider,
+        type: PROVIDER_PRESETS.find(p => p.id === editProvider)?.type || 'openai',
         model: editModel,
         base_url: editBaseUrl,
         timeout_seconds: parseInt(editTimeout) || 30,
         max_tokens: parseInt(editMaxTokens) || 1024,
-        temperature: parseFloat(editTemp) || 0.7,
+        temperature: Number(editTemp),
         max_history_turns: parseInt(editMaxHistoryTurns) || 10,
         system_prefix: editSystemPrefix,
       }
       if (editApiKey.trim()) {
         payload.api_key = editApiKey.trim()
       }
-      const res = await saveAIChatConfig(payload)
+      const res = await updateApiProfiles(payload)
+      if (res.code !== 0 || !res.data || !Array.isArray(res.data.profiles)) {
+        throw new Error(res.msg || 'API配置保存失败')
+      }
+      setApiLoadError('')
       if (res.code === 0 && res.data) {
-        setModelConfig(res.data)
+        setApiProfiles(res.data)
+        const saved = res.data.profiles.find(p => p.id === selectedApi) || res.data.profiles[res.data.profiles.length - 1]
+        if (saved) setSelectedApi(saved.id)
+        const current = res.data.profiles.find(p => p.id === res.data.active_id)
+        if (current) setModelConfig(current)
       }
       if (res.code === 0) {
         setEditApiKey('')
-        showToast('大模型参数已安全持久化保存至 .env 与受控配置文件')
+        showToast('API配置已保存到当前存档')
       }
     } catch (error: any) {
       showToast(error?.message || '大模型参数保存失败', 'warning')
+    } finally {
+      setApiBusy(false)
     }
+  }
+
+  const chooseApi = (profile?: ApiProfile) => {
+    setConnResult(null)
+    setTestChatReply(null)
+    setSelectedApi(profile?.id || '')
+    setApiName(profile?.name || '新API')
+    setEditApiKey('')
+    setEditProvider(profile?.provider || 'deepseek')
+    setEditModel(profile?.model || 'deepseek-flash')
+    setEditBaseUrl(profile?.base_url || 'https://api.deepseek.com/v1')
+    setEditTimeout(String(profile?.timeout_seconds ?? 30))
+    setEditMaxTokens(String(profile?.max_tokens ?? 1000))
+    setEditTemp(String(profile?.temperature ?? 0.7))
+    setEditMaxHistoryTurns(String(profile?.max_history_turns ?? 10))
+    setEditSystemPrefix(profile?.system_prefix ?? modelConfig.system_prefix ?? '')
+  }
+  const apiAction = async (payload: Record<string, unknown>) => {
+    if (apiBusy) return
+    setApiBusy(true)
+    try {
+      const res = await updateApiProfiles(payload)
+      if (res.code !== 0 || !res.data || !Array.isArray(res.data.profiles)) {
+        throw new Error(res.msg || 'API选择未保存')
+      }
+      setApiLoadError('')
+      setApiProfiles(res.data)
+      if (payload.clear_key) setEditApiKey('')
+      const current = res.data.profiles.find(p => p.id === res.data.active_id)
+      if (current) setModelConfig(current)
+      if (payload.action === 'remove' || payload.action === 'activate') chooseApi(current)
+      showToast(payload.action === 'activate' ? '当前存档默认API已切换，立即生效' : '当前存档API设置已更新')
+    } catch (e: any) { showToast(e.message, 'warning') }
+    finally { setApiBusy(false) }
   }
 
   const activeGreetingCount = (characters || []).filter((c) => c && c.greeting_mode !== 'none').length
   const isQuotaWarning = activeGreetingCount > 3
   const activePreset = PROVIDER_PRESETS.find((p) => p.id === editProvider) || PROVIDER_PRESETS[PROVIDER_PRESETS.length - 1]
+  const editingConfig = apiProfiles.profiles.find(p => p.id === selectedApi)
+  const activeApiConfig = apiProfiles.profiles.find(p => p.id === apiProfiles.active_id)
 
   return (
     <div className="space-y-6">
@@ -2096,6 +2194,60 @@ export default function AIChatPanel() {
       {/* ========================================================================= */}
       {activeTab === 'config' && (
         <div className="space-y-6">
+          <Card className="space-y-4 p-5">
+            <div><h2 className="font-semibold">API 配置管理</h2><p className="text-xs text-muted">在这里新增、编辑密钥并保存到当前存档；下方选择生效配置。编辑其他配置不会自动切换当前默认API。</p></div>
+            <div className="flex flex-wrap items-end gap-3">
+              <Select className="min-w-56 flex-1" selectedKey={selectedApi || 'new'} isDisabled={apiBusy}
+                onSelectionChange={key => chooseApi(apiProfiles.profiles.find(p => p.id === String(key)))}>
+                <Label>正在编辑的配置</Label><Select.Trigger><Select.Value /><Select.Indicator /></Select.Trigger>
+                <Select.Popover><ListBox>{[{ id: 'new', title: '新增配置' },
+                  ...apiProfiles.profiles.map(p => ({ id: p.id, title: p.name + (p.id === apiProfiles.active_id ? ' · 默认' : '') }))].map(p =>
+                    <ListBox.Item key={p.id} id={p.id}>{p.title}</ListBox.Item>)}</ListBox></Select.Popover>
+              </Select>
+              <TextField className="min-w-48 flex-1" value={apiName} isDisabled={apiBusy} onChange={setApiName}><Label>配置名称</Label><Input maxLength={64} /></TextField>
+              <Button isDisabled={apiBusy} onPress={() => chooseApi()}>新增 API</Button>
+              <Button isDisabled={apiBusy || !selectedApi} onPress={() => apiAction({ action: 'remove', id: selectedApi })}>移除配置</Button>
+              <Button isDisabled={apiBusy || !selectedApi} onPress={() => apiAction({ action: 'save', id: selectedApi, clear_key: true })}>清除密钥</Button>
+            </div>
+                {/* 编辑配置的密钥 (API Key) */}
+                <TextField fullWidth value={editApiKey} onChange={setEditApiKey}>
+                  <div className="flex justify-between items-center mb-1">
+                    <Label className="text-xs font-semibold text-foreground">编辑配置的密钥 (API Key)</Label>
+                    <span className="text-[10px] font-mono text-muted">
+                      {editingConfig?.has_api_key ? '已保存（脱敏显示）' : '未保存密钥'}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type={showApiKey ? 'text' : 'password'}
+                      placeholder={editingConfig?.has_api_key ? `留空保持当前配置 (${editingConfig.api_key_masked})` : '请输入您的 API 密钥...'}
+                      className="font-mono text-xs pr-9 rounded-xl"
+                    />
+                    <Button
+                      type="button"
+                      isIconOnly
+                      size="sm"
+                      variant="ghost"
+                      onPress={() => setShowApiKey(!showApiKey)}
+                      className="absolute right-1 top-1 size-7 rounded-lg text-muted hover:text-foreground cursor-pointer"
+                      aria-label="显示或隐藏密钥"
+                    >
+                      {showApiKey ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                    </Button>
+                  </div>
+                  <Description className="text-[11px] text-muted mt-1">
+                    密钥保存在当前存档数据库中。网页只读取掩码；新存档不会继承这些密钥。
+                  </Description>
+                </TextField>
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs text-muted">服务商、接口地址和模型参数在下方编辑；首个配置会自动启用，后续新增配置由下方选择启用。</p>
+              <Button isDisabled={apiBusy || isRefreshing} onPress={handleSaveModelAction}>
+                <ShieldCheck className="size-4" />{apiBusy ? '正在保存…' : '保存 API 配置'}
+              </Button>
+            </div>
+            {apiLoadError && <p role="alert" className="text-sm text-danger">{apiLoadError}</p>}
+          </Card>
           {/* 1. 模型引擎状态总览卡片 */}
           <Card className="p-4 border border-separator/80 bg-surface rounded-2xl shadow-none">
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -2107,9 +2259,9 @@ export default function AIChatPanel() {
                   <div className="flex items-center gap-2">
                     <h2 className="text-base font-bold text-foreground">大模型接入与推理引擎</h2>
                     <Chip size="sm" variant="soft" color="accent" className="font-mono text-xs">
-                      <Chip.Label>{modelConfig?.provider || editProvider}</Chip.Label>
+                      <Chip.Label>{activeApiConfig?.provider || '未配置API'}</Chip.Label>
                     </Chip>
-                    {modelConfig?.has_api_key ? (
+                    {activeApiConfig?.has_api_key ? (
                       <Chip size="sm" variant="soft" color="success" className="text-xs">
                         <Chip.Label>密钥受控保护中</Chip.Label>
                       </Chip>
@@ -2120,9 +2272,9 @@ export default function AIChatPanel() {
                     )}
                   </div>
                   <p className="text-xs text-muted mt-1 flex items-center gap-2">
-                    <span>当前生效模型：<strong className="font-mono text-foreground">{modelConfig?.model || editModel}</strong></span>
+                    <span>当前生效模型：<strong className="font-mono text-foreground">{activeApiConfig?.model || '未配置API'}</strong></span>
                     <span>·</span>
-                    <span className="truncate max-w-[380px]">基址：<span className="font-mono text-muted-foreground">{modelConfig?.base_url || editBaseUrl || '未配置'}</span></span>
+                    <span className="truncate max-w-[380px]">基址：<span className="font-mono text-muted-foreground">{activeApiConfig?.base_url || '未配置'}</span></span>
                   </p>
                 </div>
               </div>
@@ -2154,9 +2306,10 @@ export default function AIChatPanel() {
                   variant="primary"
                   className="gap-1.5 text-xs font-semibold rounded-xl px-4 cursor-pointer"
                   onPress={handleSaveModelAction}
+                  isDisabled={apiBusy || isRefreshing}
                 >
                   <ShieldCheck className="size-4" />
-                  保存大模型参数
+                  保存编辑配置
                 </Button>
               </div>
             </div>
@@ -2174,12 +2327,12 @@ export default function AIChatPanel() {
                       <SlidersHorizontal className="size-4" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold tracking-tight">服务商与网关端点</h3>
-                      <p className="text-xs text-muted">选择服务商模板或自由配置 OpenAI 兼容反代基址与私有密钥</p>
+                      <h3 className="text-sm font-semibold tracking-tight">编辑配置：{apiName}</h3>
+                      <p className="text-xs text-muted">修改上方选中配置的服务商、接口地址与模型；保存后更新该配置</p>
                     </div>
                   </div>
                   <Chip size="sm" variant="soft" color="default" className="text-xs">
-                    <Chip.Label>安全隔离写入 .env</Chip.Label>
+                    <Chip.Label>保存到当前存档</Chip.Label>
                   </Chip>
                 </div>
 
@@ -2227,7 +2380,7 @@ export default function AIChatPanel() {
                 <TextField fullWidth value={editBaseUrl} onChange={setEditBaseUrl}>
                   <div className="flex justify-between items-center mb-1">
                     <Label className="text-xs font-semibold text-foreground">API 基础基址 (Base URL)</Label>
-                    <span className="text-[11px] text-muted font-mono">{activePreset.apiKeyEnv}</span>
+                    <span className="text-[11px] text-muted font-mono">{activePreset.credentialHint}</span>
                   </div>
                   <Input
                     placeholder="例如: https://generativelanguage.googleapis.com/v1beta/openai"
@@ -2238,37 +2391,41 @@ export default function AIChatPanel() {
                   </Description>
                 </TextField>
 
-                {/* API 密钥 (API Key) */}
-                <TextField fullWidth value={editApiKey} onChange={setEditApiKey}>
-                  <div className="flex justify-between items-center mb-1">
-                    <Label className="text-xs font-semibold text-foreground">API 密钥 (API Key)</Label>
-                    <span className="text-[10px] font-mono text-muted">
-                      {modelConfig.has_api_key ? '已配置安全掩码脱敏保护' : '未检测到配置'}
-                    </span>
-                  </div>
-                  <div className="relative">
-                    <Input
-                      type={showApiKey ? 'text' : 'password'}
-                      placeholder={modelConfig.has_api_key ? `留空保持当前配置 (${modelConfig.api_key_masked})` : '请输入您的 API 密钥...'}
-                      className="font-mono text-xs pr-9 rounded-xl"
-                    />
-                    <Button
-                      type="button"
-                      isIconOnly
-                      size="sm"
-                      variant="ghost"
-                      onPress={() => setShowApiKey(!showApiKey)}
-                      className="absolute right-1 top-1 size-7 rounded-lg text-muted hover:text-foreground cursor-pointer"
-                      aria-label="显示或隐藏密钥"
-                    >
-                      {showApiKey ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-                    </Button>
-                  </div>
-                  <Description className="text-[11px] text-muted mt-1">
-                    新填入的密钥将安全写入服务端受控 .env 文件，绝不随客户端或代码提交泄露。
-                  </Description>
-                </TextField>
+                {/* Runtime selection uses saved profiles; credentials are edited above. */}
+                <Select fullWidth selectedKey={apiProfiles.active_id || 'unconfigured'}
+                  isDisabled={apiBusy || !!apiLoadError || apiProfiles.profiles.length === 0}
+                  onSelectionChange={key => {
+                    const id = String(key)
+                    if (id !== 'unconfigured' && id !== apiProfiles.active_id) apiAction({ action: 'activate', id })
+                  }}>
+                  <Label>当前生效的 API 配置（默认）</Label>
+                  <Select.Trigger><Select.Value /><Select.Indicator /></Select.Trigger>
+                  <Select.Popover><ListBox>
+                    {apiProfiles.profiles.length ? apiProfiles.profiles.map(profile => (
+                      <ListBox.Item key={profile.id} id={profile.id} textValue={profile.name}>
+                        <div className="min-w-0 space-y-0.5">
+                          <div className="break-words">{profile.name}</div>
+                          <div className="break-all text-xs text-muted">{profile.provider} · {profile.model} · {profile.api_key_masked || '无密钥'}</div>
+                        </div>
+                      </ListBox.Item>
+                    )) : <ListBox.Item id="unconfigured">请先在上方保存 API 配置</ListBox.Item>}
+                  </ListBox></Select.Popover>
+                  <Description>选择后立即保存到当前存档并载入对应参数。未单独绑定API的角色跟随此配置。</Description>
+                </Select>
 
+                {apiProfiles.profiles.length > 0 && <div className="space-y-2">
+                  <Label>角色 API 绑定</Label>
+                  <Description>单独绑定优先于默认配置；选择“跟随默认”后随上方生效配置切换。</Description>
+            {apiProfiles.profiles.length > 0 && <div className="grid gap-3 md:grid-cols-2">
+              {characters.map(c => <Select key={c.char_id} fullWidth isDisabled={apiBusy}
+                selectedKey={apiProfiles.routes[String(c.char_id)] || 'default'}
+                onSelectionChange={key => apiAction({ action: 'route', char_id: c.char_id, ...(String(key) !== 'default' ? { id: String(key) } : {}) })}>
+                <Label>{c.char_name}的API</Label><Select.Trigger><Select.Value /><Select.Indicator /></Select.Trigger>
+                <Select.Popover><ListBox>{[{ id: 'default', name: '跟随默认' }, ...apiProfiles.profiles].map(p =>
+                  <ListBox.Item key={p.id} id={p.id}>{p.name}</ListBox.Item>)}</ListBox></Select.Popover>
+              </Select>)}
+            </div>}
+                </div>}
                 {/* 模型名称与快捷候选 Chips */}
                 <div className="space-y-1.5">
                   <TextField fullWidth value={editModel} onChange={setEditModel}>

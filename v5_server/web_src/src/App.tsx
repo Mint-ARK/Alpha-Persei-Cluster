@@ -20,7 +20,7 @@ import {
   Users,
   Wrench,
 } from 'lucide-react'
-import { Avatar, Button, Chip, SearchField, Separator, Tabs } from '@heroui/react'
+import { Avatar, Button, Card, Chip, Input, Label, ListBox, SearchField, Select, Separator, Tabs, TextField } from '@heroui/react'
 import { IconBadge, StatusDot } from './components/kit'
 import { ThemeProvider, useTheme } from './lib/theme'
 import AccountsPanel from './panels/Accounts'
@@ -33,9 +33,11 @@ import MailPanel from './panels/Mail'
 import OverviewPanel from './panels/Overview'
 import SettingsPanel from './panels/Settings'
 import ShopPanel from './panels/Shop'
+import SavesPanel from './panels/Saves'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 import { ServerProvider, useServer } from './lib/serverContext'
+import { getStoredApiBase, setStoredApiBase } from './lib/api'
 
 type NavItem = {
   id: string
@@ -50,6 +52,7 @@ type NavItem = {
 const NAV: NavItem[] = [
   { id: 'overview', label: '状态总览', icon: LayoutDashboard, Panel: OverviewPanel },
   { id: 'accounts', label: '账号数据', icon: Users, Panel: AccountsPanel },
+  { id: 'saves', label: '存档管理', icon: Database, Panel: SavesPanel, badge: 'NEW' },
   { id: 'heroes', label: '角色状态', icon: Swords, Panel: HeroesPanel },
   { id: 'inventory', label: '资源背包', icon: Boxes, Panel: InventoryPanel },
   { id: 'mail', label: '邮件系统', icon: Mail, Panel: MailPanel, badge: '1' },
@@ -74,6 +77,7 @@ function TopBar({ onSelectTab }: TopBarProps) {
     switchVersion,
     consoleName,
     operatorName,
+    saves, selectedSave, selectSave, saveCatalogLoading, saveCatalogError,
   } = useServer()
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -157,7 +161,7 @@ function TopBar({ onSelectTab }: TopBarProps) {
       {
         id: 'settings',
         title: '其他设置',
-        desc: '控制台基础设置、测试库备份、服务热重载、战令与充值重置、功勋册、IDE 工具集',
+        desc: '控制台基础设置、存档备份、服务热重载、战令与充值重置、功勋册、IDE 工具集',
         category: '导航',
         tabId: 'settings',
         keywords: ['设置', '配置', '运维', '备份', '热更', '热重载', 'settings', 'config'],
@@ -192,8 +196,8 @@ function TopBar({ onSelectTab }: TopBarProps) {
       },
       {
         id: 'action-backup',
-        title: '备份主数据库',
-        desc: '为当前 SQLite account.db 生成带精确时间戳的快照备份',
+        title: '备份当前存档',
+        desc: '为面板当前选择的存档生成带精确时间戳的备份',
         category: '快捷操作',
         tabId: 'settings',
         keywords: ['备份', '数据库备份', 'backup', 'db', '快照'],
@@ -288,6 +292,18 @@ function TopBar({ onSelectTab }: TopBarProps) {
         <Chip size="sm" variant="soft" color="accent">
           <Chip.Label>当前 UID: {activeUid}</Chip.Label>
         </Chip>
+
+        <Select aria-label="当前管理存档" className="min-w-0 w-56 shrink-0 md:w-72 xl:w-80" selectedKey={selectedSave || null}
+          isDisabled={saveCatalogLoading || saves.length === 0}
+          placeholder={saveCatalogLoading ? '读取存档…' : saveCatalogError ? '存档加载失败' : '暂无存档'}
+          onSelectionChange={key => { if (key !== null) selectSave(String(key)) }}>
+          <Select.Trigger className="h-8 text-xs"><Select.Value className="truncate" /><Select.Indicator /></Select.Trigger>
+          <Select.Popover className="min-w-80 max-w-[min(90vw,36rem)]"><ListBox>{saves.map(save => <ListBox.Item key={save.filename} id={save.filename}
+            textValue={`${save.name} · Lv.${save.level} · ${save.nick}`}>
+              <div className="min-w-0"><div className="whitespace-normal break-words">{save.name}</div>
+                <div className="text-xs text-muted">Lv.{save.level} · {save.nick} · UID {save.uid}</div></div>
+            </ListBox.Item>)}</ListBox></Select.Popover>
+        </Select>
 
         <Chip
           size="sm"
@@ -407,18 +423,19 @@ function TopBar({ onSelectTab }: TopBarProps) {
 }
 
 function Sidebar() {
-  const { isOnline, status, activeZoneName } = useServer()
+  const { isOnline, status, managedSave, resVersionInfo, saveCatalogLoading } = useServer()
+  const workspaceName = managedSave?.name || (saveCatalogLoading ? '读取存档…' : '尚未选择存档')
 
   return (
     <aside className="sticky top-[4.5rem] flex w-[60px] shrink-0 flex-col gap-3 md:w-[232px]">
       <div className="flex items-center gap-2.5 rounded-2xl bg-surface p-2.5 shadow-surface md:p-3">
         <IconBadge icon={Hexagon} tone={isOnline ? 'accent' : 'default'} size="sm" />
         <div className="hidden min-w-0 flex-1 md:block">
-          <div className="truncate text-[13px] font-semibold" title={activeZoneName}>
-            {activeZoneName}
+          <div className="truncate text-[13px] font-semibold" title={workspaceName}>
+            {workspaceName}
           </div>
           <div className="truncate font-mono text-[11px] text-muted">
-            {status?.version ? `${status.version} · 本地单机` : '单机独立沙盒'}
+            {resVersionInfo?.current_version ? `Build ${resVersionInfo.current_version} · 存档工作区` : '存档工作区'}
           </div>
         </div>
       </div>
@@ -477,6 +494,8 @@ function Sidebar() {
 }
 
 function Console() {
+  const { selectedSave, saves, saveCatalogLoading, saveCatalogError, saveCatalogLoaded, refreshSaves } = useServer()
+  const [connectionBase, setConnectionBase] = useState(getStoredApiBase)
   const isStandaloneAgreement =
     typeof window !== 'undefined' &&
     window.location.pathname.toLowerCase().includes('agreement.html')
@@ -540,8 +559,25 @@ function Console() {
         >
           <Sidebar />
 
-          <div className="min-w-0 flex-1 ps-4 sm:ps-6 lg:ps-8">
-            {NAV.map(({ id, Panel, label }) => (
+          <div key={selectedSave} className="min-w-0 flex-1 ps-4 sm:ps-6 lg:ps-8">
+            {saveCatalogLoading && !saveCatalogLoaded && <p role="status" className="text-sm text-muted">正在读取存档列表…</p>}
+            {saveCatalogError && <Card className="mb-5 space-y-4 p-5">
+              <div role="alert"><h2 className="font-semibold">无法读取存档列表</h2><p className="mt-1 text-sm text-muted">{saveCatalogError}</p></div>
+              <div className="flex flex-wrap items-end gap-3">
+                <TextField className="min-w-56 flex-1" value={connectionBase} onChange={setConnectionBase}>
+                  <Label>服务地址</Label><Input placeholder="留空使用当前网页所在服务" />
+                </TextField>
+                <Button isDisabled={saveCatalogLoading} onPress={() => {
+                  if (connectionBase !== getStoredApiBase()) setStoredApiBase(connectionBase)
+                  else void refreshSaves().catch(() => undefined)
+                }}>{saveCatalogLoading ? '读取中…' : '重新连接'}</Button>
+              </div>
+            </Card>}
+            {saveCatalogLoaded && !saves.length && !saveCatalogError && tab !== 'saves' && <Card className="space-y-3 p-5">
+              <h2 className="font-semibold">尚无可管理的存档</h2><p className="text-sm text-muted">可以在存档管理页配置并生成第一个存档。</p>
+              <Button onPress={() => selectTab('saves')}>生成新存档</Button>
+            </Card>}
+            {saveCatalogLoaded && NAV.filter(item => saves.some(save => save.filename === selectedSave) || item.id === 'saves').map(({ id, Panel, label }) => (
               <Tabs.Panel key={id} id={id} className="ms-0 w-full p-0">
                 <ErrorBoundary fallbackTitle={`${label}面板组件异常`}>
                   <Panel />

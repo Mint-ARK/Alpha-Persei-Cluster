@@ -403,6 +403,7 @@ export function getStoredApiBase(): string {
 export function setStoredApiBase(url: string): void {
   if (typeof window === 'undefined') return
   localStorage.setItem(STORAGE_KEY_API_BASE, url.trim().replace(/\/+$/, ''))
+  window.dispatchEvent(new Event('gm-api-base-changed'))
 }
 
 export const DEFAULT_ACCOUNT_UID = 2174928301
@@ -421,6 +422,53 @@ export function setActiveUid(uid: number): void {
   if (typeof window === 'undefined') return
   localStorage.setItem(STORAGE_KEY_ACTIVE_UID, String(uid))
 }
+
+export function getSelectedSave(): string {
+  return localStorage.getItem(`gm_save:${getStoredApiBase()}`) || ''
+}
+
+export function setSelectedSave(filename: string): void {
+  localStorage.setItem(`gm_save:${getStoredApiBase()}`, filename)
+}
+
+export interface SaveEntry {
+  filename: string; name: string; uid: number; nick: string; level: number
+  slot_id: number | null; port: number | null; mounted: boolean
+}
+export interface SaveOptions {
+  uid?: string | null; nick?: string | null; level: number; skip_intro: boolean
+  skip_feature_guides: boolean; clear_through: number | null
+  noob_tasks_ready: boolean; support_mail: boolean
+}
+export interface SaveCatalog {
+  saves: SaveEntry[]
+  presets: { key: string; title: string; options: SaveOptions }[]
+}
+export async function fetchSaveCatalog(): Promise<ApiResponse<SaveCatalog>> {
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 10000)
+  try {
+    const res = await apiRequest<SaveCatalog>('/api/gm/saves', { signal: controller.signal })
+    if (!res.data || !Array.isArray(res.data.saves) || !Array.isArray(res.data.presets)) {
+      throw new Error('服务端未返回有效的存档列表，请重启服务端加载更新后重试')
+    }
+    return res
+  } catch (e: any) {
+    if (controller.signal.aborted) throw new Error('读取存档列表超时，请检查服务地址后重试')
+    if (e.status === 404) throw new Error('当前服务端尚未加载存档管理接口，请重启服务端后重试')
+    throw e
+  } finally {
+    window.clearTimeout(timer)
+  }
+}
+export const createSave = (payload: { name: string; options: SaveOptions; preview?: boolean }) =>
+  apiRequest<any>('/api/gm/saves/create', { method: 'POST', body: JSON.stringify(payload) })
+
+export interface ApiProfile extends AIChatConfigData { id: string; name: string; type: string }
+export interface ApiProfiles { storage: string; active_id: string; profiles: ApiProfile[]; routes: Record<string, string> }
+export const fetchApiProfiles = () => apiRequest<ApiProfiles>('/api/gm/aichat/apis')
+export const updateApiProfiles = (payload: Record<string, unknown>) =>
+  apiRequest<ApiProfiles>('/api/gm/aichat/apis', { method: 'POST', body: JSON.stringify(payload) })
 
 /**
  * 转换前端静态提取资源（头像、物品等）路径：
@@ -466,6 +514,8 @@ export async function apiRequest<T = any>(
     'Content-Type': 'application/json',
     Accept: 'application/json',
   }
+  const save = getSelectedSave()
+  if (save && !path.startsWith('/api/gm/saves')) defaultHeaders['X-Save-Name'] = encodeURIComponent(save)
 
   try {
     const res = await fetch(url, {
@@ -477,7 +527,9 @@ export async function apiRequest<T = any>(
     })
 
     if (!res.ok) {
-      throw new Error(`HTTP Error ${res.status}: ${res.statusText}`)
+      const error = new Error(`HTTP Error ${res.status}: ${res.statusText}`) as Error & { status: number }
+      error.status = res.status
+      throw error
     }
 
     const data = await res.json()
@@ -963,10 +1015,10 @@ export async function saveAIChatConfig(payload: Partial<AIChatConfigData> & { ap
   })
 }
 
-export async function testAIChatConnection(provider?: string): Promise<ApiResponse<any>> {
+export async function testAIChatConnection(provider?: string, profileId?: string): Promise<ApiResponse<any>> {
   return apiRequest('/api/gm/aichat/test_connection', {
     method: 'POST',
-    body: JSON.stringify({ provider }),
+    body: JSON.stringify({ provider, profile_id: profileId }),
   })
 }
 
@@ -1055,6 +1107,22 @@ export interface RechargeStatusData {
     pay_level: number
     exp_14: number
     bp_reward_status: number
+    cycle_start: number
+    cycle_end: number
+    premium_gift_issued: boolean
+  }
+  small_month_card: {
+    long_term: boolean
+    active: boolean
+    paid_until: number
+    signed_today: boolean
+  }
+  big_month_card: {
+    auto_renew: boolean
+    active: boolean
+    cycle_end: number
+    sign_days: number
+    signed_today: boolean
   }
   noob_welfare: {
     fr_first_gear: number
@@ -1091,6 +1159,18 @@ export async function resetRechargeScope(
   return apiRequest('/api/gm/recharge/reset', {
     method: 'POST',
     body: JSON.stringify({ uid, scope }),
+  })
+}
+
+export type PaidRightsPatch = {
+  pay_level?: 0 | 201 | 202
+  small_long_term?: boolean
+  big_auto_renew?: boolean
+}
+
+export async function updatePaidRights(changes: PaidRightsPatch, uid: number = getActiveUid()) {
+  return apiRequest('/api/gm/recharge/rights', {
+    method: 'POST', body: JSON.stringify({ uid, ...changes }),
   })
 }
 
@@ -1358,7 +1438,7 @@ export interface LeaderboardItem {
   rank: number
   model: string
   provider: string
-  score: number
+  score: number | null
   sub_score: string
   metric_val: string
   details?: Record<string, any>
@@ -1374,6 +1454,9 @@ export interface LeaderboardSource {
   description: string
   columns: string[]
   items: LeaderboardItem[]
+  updated_at?: string
+  status?: string
+  error?: string
 }
 
 export interface LeaderboardsData {

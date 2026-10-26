@@ -17,7 +17,6 @@ import {
   X,
   CloudDownload,
   Download,
-  FileDiff,
 } from 'lucide-react'
 import {
   Button,
@@ -667,7 +666,7 @@ export default function OverviewPanel() {
                 variant="secondary"
                 className="text-xs h-7 gap-1 px-2.5 font-medium shrink-0"
                 onPress={handleOpenUpdateModal}
-                title="通过 DoH 穿透探测官方最新版本并下载增量"
+                aria-label="通过 DoH 穿透探测官方最新版本并下载增量"
               >
                 <CloudDownload className="size-3.5 text-accent" />
                 检查更新

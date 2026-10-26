@@ -11,7 +11,6 @@ import {
   Undo2,
   Save,
   Zap,
-  Globe,
 } from 'lucide-react'
 import {
   Button,
@@ -30,6 +29,7 @@ import {
   FieldGrid,
   PageHeader,
   Section,
+  PlainSwitch,
 } from '../components/kit'
 import ModelContributorsChart from '../components/ModelContributorsChart'
 import IDEContributorsGrid from '../components/IDEContributorsGrid'
@@ -39,6 +39,8 @@ import {
   hotReloadServer,
   fetchRechargeStatus,
   resetRechargeScope,
+  updatePaidRights,
+  type PaidRightsPatch,
   getStoredApiBase,
   setStoredApiBase,
   type RechargeStatusData,
@@ -52,27 +54,21 @@ const densityOptions = [
 
 export default function SettingsPanel() {
   const {
+    status,
     resVersionInfo,
     activeUid,
     consoleName,
     setConsoleName,
     operatorName,
     setOperatorName,
-    serverZones,
-    defaultZoneId,
-    setDefaultZoneId,
-    saveServerZones,
+    managedSave,
   } = useServer()
 
   // 基础设置状态与本地持久化
   const [name, setName] = useState(consoleName)
   const [operator, setOperator] = useState(operatorName)
-  const [selectedServer, setSelectedServer] = useState(defaultZoneId)
+  const [apiBase, setApiBase] = useState(getStoredApiBase)
   const [density, setDensity] = useState(() => localStorage.getItem('cp_density') || 'comfortable')
-
-  // 区服自定义名称编辑状态
-  const [zoneNames, setZoneNames] = useState<Record<string, string>>({})
-  const [zoneSaving, setZoneSaving] = useState(false)
 
   useEffect(() => {
     setName(consoleName)
@@ -81,18 +77,6 @@ export default function SettingsPanel() {
   useEffect(() => {
     setOperator(operatorName)
   }, [operatorName])
-
-  useEffect(() => {
-    setSelectedServer(defaultZoneId)
-  }, [defaultZoneId])
-
-  useEffect(() => {
-    const map: Record<string, string> = {}
-    serverZones.forEach((z) => {
-      map[z.serverId] = z.serverName
-    })
-    setZoneNames(map)
-  }, [serverZones])
 
   // Toast 消息
   const [toastMsg, setToastMsg] = useState<{
@@ -108,51 +92,35 @@ export default function SettingsPanel() {
   }
 
   const handleSaveSettings = () => {
+    const address = apiBase.trim().replace(/\/+$/, '')
+    if (address) {
+      try {
+        const url = new URL(address)
+        if (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid protocol')
+      } catch {
+        showToast('danger', '请填写完整的http/https服务地址，或留空使用当前主机')
+        return
+      }
+    }
     setConsoleName(name.trim() || 'V5 控制面板')
     setOperatorName(operator.trim() || 'admin')
-    setDefaultZoneId(selectedServer)
     localStorage.setItem('cp_density', density)
     showToast('success', '偏好设置已成功保存并实时更新顶栏与侧边栏')
+    if (address !== getStoredApiBase()) setStoredApiBase(address)
   }
 
   const handleResetSettings = () => {
     const defName = 'V5 控制面板'
     const defOp = 'admin'
-    const defServer = '1'
     const defDensity = 'comfortable'
     setName(defName)
     setOperator(defOp)
-    setSelectedServer(defServer)
+    setApiBase(getStoredApiBase())
     setDensity(defDensity)
     setConsoleName(defName)
     setOperatorName(defOp)
-    setDefaultZoneId(defServer)
     localStorage.setItem('cp_density', defDensity)
     showToast('info', '偏好设置已恢复为初始默认值')
-  }
-
-  // 保存自定义区服名称到服务端
-  const handleSaveZoneNames = async () => {
-    setZoneSaving(true)
-    try {
-      const updatedZones = serverZones.map((z) => ({
-        ...z,
-        serverName: (zoneNames[z.serverId] || z.serverName).trim() || z.serverName,
-      }))
-      const ok = await saveServerZones({
-        default_zone_id: selectedServer,
-        zones: updatedZones,
-      })
-      if (ok) {
-        showToast('success', '区服名称已成功保存至服务端，客户端选服列表已同步生效！')
-      } else {
-        showToast('danger', '保存区服配置失败，请确认服务端状态')
-      }
-    } catch (e: any) {
-      showToast('danger', e?.message || '保存区服配置网络异常')
-    } finally {
-      setZoneSaving(false)
-    }
   }
 
   // 服务端运维状态
@@ -198,6 +166,25 @@ export default function SettingsPanel() {
   const [rechargeData, setRechargeData] = useState<RechargeStatusData | null>(null)
   const [rechargeLoading, setRechargeLoading] = useState(false)
   const [resettingScope, setResettingScope] = useState<string | null>(null)
+  const [rightsSaving, setRightsSaving] = useState(false)
+
+  const changeRights = async (changes: PaidRightsPatch) => {
+    if (!activeUid || rightsSaving) return
+    setRightsSaving(true)
+    try {
+      const res = await updatePaidRights(changes, activeUid)
+      if (res.code !== 0) throw new Error(res.msg || '权益保存失败')
+      await loadRechargeStatus()
+      showToast('success', '权益状态已保存')
+    } catch (e: any) {
+      showToast('danger', e?.message || '权益保存失败')
+    } finally {
+      setRightsSaving(false)
+    }
+  }
+
+  const displayDeadline = (ts: number | undefined) => ts
+    ? new Date(ts * 1000).toLocaleString('zh-CN', { hour12: false }) : '未购买'
 
   const loadRechargeStatus = useCallback(async () => {
     if (!activeUid) return
@@ -258,7 +245,7 @@ export default function SettingsPanel() {
 
       <PageHeader
         title="系统设置"
-        description="控制台标识偏好、网关区服自定义及服务端运维工具。修改设置后将实时同步至顶栏、侧边栏及游戏客户端选服列表。"
+        description="控制台显示偏好、当前存档工作区与服务端运维工具。"
         actions={
           <>
             <Button size="sm" variant="secondary" className="gap-1.5" onPress={handleResetSettings}>
@@ -274,8 +261,8 @@ export default function SettingsPanel() {
       />
 
       <div className="grid gap-4 lg:grid-cols-5">
-        {/* 基础设置与区服自定义 (占 2 列) */}
-        <Section title="基础设置与区服定义" description="控制台标识、操作员与服务端区服名称调配" className="lg:col-span-2">
+        {/* 基础设置与当前存档 (占 2 列) */}
+        <Section title="基础设置与存档工作区" description="控制台标识、操作员与当前管理存档" className="lg:col-span-2">
           <Card className="h-full p-5">
             <Card.Content className="space-y-4">
               <FieldGrid cols={1}>
@@ -289,26 +276,12 @@ export default function SettingsPanel() {
                   <Input className="font-mono" placeholder="admin（同步显示于顶栏右上角）" />
                 </TextField>
 
-                <Select
-                  fullWidth
-                  selectedKey={selectedServer}
-                  onSelectionChange={(key) => setSelectedServer(String(key))}
-                >
-                  <Label>默认区服</Label>
-                  <Select.Trigger>
-                    <Select.Value />
-                    <Select.Indicator />
-                  </Select.Trigger>
-                  <Select.Popover>
-                    <ListBox>
-                      {serverZones.map((zone) => (
-                        <ListBox.Item key={zone.serverId} id={zone.serverId}>
-                          {zoneNames[zone.serverId] || zone.serverName} (S{zone.serverId})
-                        </ListBox.Item>
-                      ))}
-                    </ListBox>
-                  </Select.Popover>
-                </Select>
+                <TextField fullWidth isReadOnly value={managedSave?.name || '尚未选择存档'}>
+                  <Label>当前管理存档</Label><Input />
+                  <Description className="break-words">{managedSave
+                    ? `${managedSave.nick} · Lv.${managedSave.level} · UID ${managedSave.uid}`
+                    : '请在顶栏选择存档'}</Description>
+                </TextField>
 
                 <Select
                   fullWidth
@@ -332,55 +305,36 @@ export default function SettingsPanel() {
                 </Select>
               </FieldGrid>
 
-              {/* 区服自定义名称行内编辑区域 */}
+              {/* 存档管理统一入口 */}
               <div className="rounded-xl border border-separator/80 bg-default/25 p-3 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-semibold">
-                    <Globe className="size-3.5 text-accent" />
-                    <span>网关区服名称自定义</span>
+                    <Database className="size-3.5 text-accent" />
+                    <span>存档管理</span>
                   </div>
                   <Button
                     size="sm"
                     variant="ghost"
                     className="h-6 gap-1 px-2 text-[11px]"
-                    isDisabled={zoneSaving}
-                    onPress={handleSaveZoneNames}
+                    onPress={() => window.dispatchEvent(new CustomEvent('nav-to-tab', { detail: 'saves' }))}
                   >
-                    <Save className={cn('size-3', zoneSaving && 'animate-spin')} />
-                    保存服名
+                    打开存档管理
                   </Button>
                 </div>
 
-                <div className="space-y-2">
-                  {serverZones.map((zone) => (
-                    <div key={zone.serverId} className="flex items-center gap-2">
-                      <span className="shrink-0 font-mono text-xs text-muted w-10">S{zone.serverId}:</span>
-                      <input
-                        type="text"
-                        value={zoneNames[zone.serverId] ?? zone.serverName}
-                        onChange={(e) => {
-                          const val = e.target.value
-                          setZoneNames((prev) => ({ ...prev, [zone.serverId]: val }))
-                        }}
-                        className="flex-1 rounded-lg border border-separator/80 bg-surface px-2.5 py-1 text-xs text-foreground placeholder:text-muted focus:border-accent focus:outline-none transition-colors"
-                        placeholder={`区服 ${zone.serverId} 名称`}
-                      />
-                    </div>
-                  ))}
-                </div>
                 <div className="text-[11px] leading-relaxed text-muted">
-                  提示：在此处自定义的区服名称将直连写入服务端并在选服接口动态返回，玩家启动游戏进入选服界面时即可看到自定义名称。
+                  顶栏选择需要管理的存档；新建存档和生成参数请进入存档管理页。游戏内也通过选区列表选择对应存档。
                 </div>
               </div>
 
               <TextField
                 fullWidth
-                defaultValue={getStoredApiBase()}
-                onChange={(e: any) => setStoredApiBase(e.target.value)}
+                value={apiBase}
+                onChange={setApiBase}
               >
-                <Label>服务端自定义 API 基础路径</Label>
+                <Label>控制面板服务端地址</Label>
                 <Input className="font-mono" placeholder="留空默认同源相对路径 (自动跟随当前访问主机)" />
-                <Description>仅用于控制台自身的接口请求，留空自动跟随当前页面主机与端口</Description>
+                <Description>用于面板连接游戏服务端，保存设置后应用；留空跟随当前页面地址。AI模型接口与密钥请到“AI修正者”配置。</Description>
               </TextField>
             </Card.Content>
           </Card>
@@ -421,10 +375,10 @@ export default function SettingsPanel() {
                     <span>
                       {rechargeData?.battlepass?.pay_level === 0
                         ? '未开通'
-                        : rechargeData?.battlepass?.pay_level === 1
-                        ? '普通进阶战令'
-                        : rechargeData?.battlepass?.pay_level === 2
-                        ? '典藏进阶战令'
+                        : rechargeData?.battlepass?.pay_level === 201
+                        ? '进阶合约'
+                        : rechargeData?.battlepass?.pay_level === 202
+                        ? '深度合约'
                         : '未就绪'}
                     </span>
                   </div>
@@ -466,8 +420,62 @@ export default function SettingsPanel() {
                   <div>首充领奖1: {rechargeData?.noob_welfare?.fr_first_gear ? '已领' : '未领'}</div>
                   <div>首充领奖2: {rechargeData?.noob_welfare?.fr_second_gear ? '已领' : '未领'}</div>
                   <div>18元签到天数: {rechargeData?.noob_welfare?.fr_now_sign ?? 0} 天</div>
-                  <div>月卡激活标记: {rechargeData?.noob_welfare?.mc_flag ? '激活' : '未激活'}</div>
+                  <div>月卡新手福利标记: {rechargeData?.noob_welfare?.mc_flag ? '已开启' : '未开启'}</div>
                 </div>
+              </div>
+
+              <div className="space-y-4 rounded-xl border border-separator p-4">
+                <Select fullWidth selectedKey={String(rechargeData?.battlepass?.pay_level ?? 0)}
+                  isDisabled={!rechargeData || rightsSaving || rechargeLoading || resettingScope !== null}
+                  onSelectionChange={(key) => {
+                    const tier = Number(key)
+                    if ([0, 201, 202].includes(tier)) changeRights({ pay_level: tier as 0 | 201 | 202 })
+                  }}>
+                  <Label>本期战令档位</Label>
+                  <Select.Trigger><Select.Value /><Select.Indicator /></Select.Trigger>
+                  <Select.Popover><ListBox>
+                    <ListBox.Item id="0">免费合约</ListBox.Item>
+                    <ListBox.Item id="201">进阶合约</ListBox.Item>
+                    <ListBox.Item id="202">深度合约</ListBox.Item>
+                  </ListBox></Select.Popover>
+                  <Description>每周一05:00换期，保留档位；深度赠礼每期一封，切换不会重复发。</Description>
+                </Select>
+                <div className="text-xs text-muted">
+                  本期结束：{displayDeadline(rechargeData?.battlepass?.cycle_end)} · 深度赠礼：
+                  {rechargeData?.battlepass?.premium_gift_issued ? '本期已发' : '本期待发'}
+                </div>
+                <div className="flex items-center justify-between gap-4 border-t border-separator pt-3">
+                  <div className="min-w-0 space-y-1">
+                    <div className="text-sm font-medium">恒定观测 · 长期权益</div>
+                    <div className="text-xs text-muted">每日90移转之辉，关闭长期权益后已购余期仍有效。</div>
+                    <div className="text-xs text-muted">
+                      {rechargeData?.small_month_card?.active ? '生效中' : '未生效'} ·
+                      今日{rechargeData?.small_month_card?.signed_today ? '已领取' : '未领取'}
+                    </div>
+                    <div className="break-words text-xs text-muted">已购到期：{displayDeadline(rechargeData?.small_month_card?.paid_until)}</div>
+                  </div>
+                  <PlainSwitch label="恒定观测长期权益"
+                    isSelected={!!rechargeData?.small_month_card?.long_term}
+                    isDisabled={!rechargeData || rightsSaving || rechargeLoading || resettingScope !== null}
+                    onChange={(value) => changeRights({ small_long_term: value })} />
+                </div>
+                <div className="flex items-center justify-between gap-4 border-t border-separator pt-3">
+                  <div className="min-w-0 space-y-1">
+                    <div className="text-sm font-medium">百宝囊 · 自动续期</div>
+                    <div className="text-xs text-muted">每30天自然轮换；关闭续期保留当前有效期，遗漏奖励通过邮件补发。</div>
+                    <div className="text-xs text-muted">
+                      {rechargeData?.big_month_card?.active ? '生效中' : '未生效'} ·
+                      本期已结算{rechargeData?.big_month_card?.sign_days ?? 0}天 ·
+                      今日{rechargeData?.big_month_card?.signed_today ? '已领取' : '未领取'}
+                    </div>
+                    <div className="break-words text-xs text-muted">本期结束：{displayDeadline(rechargeData?.big_month_card?.cycle_end)}</div>
+                  </div>
+                  <PlainSwitch label="百宝囊自动续期"
+                    isSelected={!!rechargeData?.big_month_card?.auto_renew}
+                    isDisabled={!rechargeData || rightsSaving || rechargeLoading || resettingScope !== null}
+                    onChange={(value) => changeRights({ big_auto_renew: value })} />
+                </div>
+                <p className="text-xs leading-relaxed text-muted">周补给25,000经验；日活前三档追加4,000／5,000／6,000，周活前三档追加10,000／12,000／16,000。新增经验不占战令任务周额度。权益开关不计累充，游戏购买照常计入。</p>
               </div>
             </Card.Content>
 
@@ -537,20 +545,21 @@ export default function SettingsPanel() {
           <Card className="h-full p-5">
             <Card.Content className="gap-0">
               <DataList>
-                <DataRow label="环境标识" value={<span className="font-mono text-xs">sandbox-v5 (离线单机)</span>} />
-                <DataRow label="服务端版本" value={<span className="font-mono text-xs">v5.2.1-sandbox</span>} />
-                <DataRow label="协议版本" value={<span className="font-mono text-xs">v5 / codec-3</span>} />
-                <DataRow label="当前数据源" value={<span className="font-mono text-xs font-semibold text-success">account.db [主数据库 / 离线独占]</span>} />
+                <DataRow label="运行模式" value="单机服务 / 多存档管理" />
+                <DataRow label="服务端版本" value={<span className="font-mono text-xs">{status?.version || '未读取'}</span>} />
+                <DataRow label="游戏服务端口" value={<span className="font-mono text-xs">{status?.network?.game_port || status?.game_port || '—'}</span>} />
+                <DataRow label="当前数据源" value={<span className="inline-block max-w-60 break-all text-right font-mono text-xs font-semibold text-success">{managedSave?.filename || '—'}</span>} />
                 <DataRow
                   label="资源分发版本"
                   value={
                     <span className="font-mono text-xs font-semibold text-accent">
-                      {resVersionInfo?.version_name || 'v3.0.7_229'} (Build {resVersionInfo?.current_version || '229'}) · 在线热切就绪
+                      {resVersionInfo ? `${resVersionInfo.version_name} (Build ${resVersionInfo.current_version})` : '未读取'}
                     </span>
                   }
                 />
-                <DataRow label="数据库体积" value="13.9 MB · 48 张数据表" />
-                <DataRow label="活跃连接" value="单机独占 (1 连接)" />
+                <DataRow label="存档槽位" value={managedSave?.slot_id ?? '未登记'} />
+                <DataRow label="选区网关端口" value={managedSave?.port ?? '未登记'} />
+                <DataRow label="在线玩家" value={status?.online_users ?? '未读取'} />
                 {lastBackupInfo && (
                   <DataRow
                     label="最近快照"

@@ -198,7 +198,7 @@ def call_llm(system_prompt, messages, cfg=None):
         timeout_seconds = 30
 
     if not api_key and provider_name != "ollama":
-        raise ValueError(f"Provider [{provider_name}] 未配置有效 API Key！请在控制台设置或写入 v5_server/.env。")
+        raise ValueError(f"Provider [{provider_name}] 未配置有效 API Key，请在控制台配置当前存档的API。")
 
     if p_type == "anthropic":
         return _call_anthropic(base_url, api_key, model, system_prompt, messages, temp, max_tok, timeout_seconds)

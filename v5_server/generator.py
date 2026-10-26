@@ -1198,54 +1198,27 @@ def gen_payload(cmd, uid=None, db=None, **kw):
             if rw:
                 items.append({"id": rw[0], "num": rw[1]})
         return encode("sc_11011", {"result": 0, "item_list": items})
-    if cmd == 34025:
-        # 月卡签到状态（登录推）：is_sign = 今日已签；reward_list = 可领 90 移转之辉
-        st = _sign_state(db, uid, 34024)
-        return encode("sc_34025", {"result": 0, "is_sign": 1 if st["signed_today"] else 0,
-                                   "reward_list": [{"id": 1, "num": 90}]})
-    if cmd == 34023:
-        # 月卡数据（RechargeData 初始化）：月卡到期时间必须在未来
-        import time as _t
-        now_ts = int(_t.time())
-        st = _sign_state(db, uid, 34024)
-        mc = db.query("SELECT monthly_card_timestamp, is_sign FROM month_card WHERE uid=?", (uid,))
-        # monthly_card_timestamp 可能为 NULL —— 直接和 now_ts 比较会 TypeError
-        _dead = (mc[0]["monthly_card_timestamp"] or 0) if mc else 0
-        dead_ts = _dead if _dead > now_ts else now_ts + 30 * 86400
-        is_s = 1 if st["signed_today"] else 0   # 以 signed_today 为准（含 update_ts 当日判定）
-        return encode("sc_34023", {"monthly_card_num": 1, "monthly_card_timestamp": dead_ts,
-                                   "is_sign": is_s})
-    if cmd == 34101:
-        # 大月卡数据（BigMonthCardData 初始化）
-        import time as _t, json as _j
-        brow = db.query("SELECT * FROM big_month_card WHERE uid=?", (uid,))
-        brow = brow[0] if brow else {}
-        total_times = int(brow.get("total_sign_times") or 0)
-        # is_sign 判断：依据 big_month_card 自身 update_ts 是否落在自然日当天
-        _bts = brow.get("update_ts") or 0
-        _bsigned = False
-        if brow.get("is_sign") == 1 and _bts:
-            _a, _b = _t.localtime(int(_bts)), _t.localtime()
-            _bsigned = (_a.tm_year, _a.tm_mon, _a.tm_mday) == (_b.tm_year, _b.tm_mon, _b.tm_mday)
-        is_s = 1 if _bsigned else 0
-        buy_ts = int(brow.get("buy_timestamp") or 0)
-        try:
-            rec_list = _j.loads(brow.get("total_sign_receive_list") or "[]")
-        except Exception:
-            rec_list = []
-        try:
-            daily_rec = _j.loads(brow.get("daily_record") or "[]")
-        except Exception:
-            daily_rec = []
-        return encode("sc_34101", {
-            "buy_timestamp": buy_ts,
-            "is_sign": is_s,
-            "total_sign_times": total_times,
-            "total_sign_receive_list": [int(x) for x in rec_list],
-            "daily_record": daily_rec,
-            "is_expire_tip": int(brow.get("is_expire_tip") or 0),
-            "template_id": int(brow.get("template_id") or 2)
-        })
+    if cmd in (34025, 34023, 34101):
+        from paid_entitlement_service import status, read_state, _json
+        rights = status(db, uid)
+        if cmd == 34025:
+            card = rights['small_month_card']
+            return encode('sc_34025', {'result': 0, 'is_sign': int(card['signed_today']),
+                'reward_list': [{'id': 1, 'num': 90}] if card['active'] and not card['signed_today'] else []})
+        if cmd == 34023:
+            import res_version_manager
+            card = rights['small_month_card']
+            return encode('sc_34023', {'monthly_card_num': int(card['active']),
+                'monthly_card_timestamp': res_version_manager.FAR_FUTURE_TIMESTAMP if card['long_term'] else card['paid_until'],
+                'is_sign': int(card['signed_today'])})
+        rows = db.query('SELECT * FROM big_month_card WHERE uid=?', (uid,))
+        row = rows[0] if rows else {}
+        return encode('sc_34101', {'buy_timestamp': int(row.get('buy_timestamp') or 0),
+            'is_sign': int(rights['big_month_card']['signed_today']),
+            'total_sign_times': int(row.get('total_sign_times') or 0),
+            'total_sign_receive_list': [int(x) for x in _json(row.get('total_sign_receive_list'), [])],
+            'daily_record': _json(row.get('daily_record'), []),
+            'is_expire_tip': int(row.get('is_expire_tip') or 0), 'template_id': int(row.get('template_id') or 2)})
     if cmd == 59011:
         # 新手活动数据（ActivityNoobData 初始化）
         import json as _j
@@ -1307,21 +1280,22 @@ def gen_payload(cmd, uid=None, db=None, **kw):
         version_cfg = res_version_manager.get_version_config(kw.get("res_version"))
         expected_bp_id = int(version_cfg["battlepass_list_id"])
 
-        b = db.get_or_create_battlepass(uid) if hasattr(db, "get_or_create_battlepass") else {}
+        rows = db.query("SELECT * FROM battlepass WHERE uid=?", (uid,))
+        b = rows[0] if rows else {}
         now_ts = int(_t.time())
         try:
             rec_info = _jm.loads(b.get("receive_info") or "[]")
         except Exception:
             rec_info = []
         start_ts = int(b.get("start_timestamp") or (now_ts - 7 * 86400))
-        # 活动类时间不再沿用 DB 中会过期的赛季时间。
-        end_ts = res_version_manager.FAR_FUTURE_TIMESTAMP
+        # 服务端周周期与领取记录一致，不能再把战令结束时间伪造成2047年。
+        end_ts = int(b.get("end_timestamp") or (get_weekly_mon_5am_ts(now_ts) + 7*86400))
         refresh_ts = int(b.get("next_refresh_timestamp") or 0)
         if refresh_ts <= now_ts:
             refresh_ts = get_weekly_mon_5am_ts(now_ts) + 7 * 86400
         return encode("sc_34031", {
             "battlepass_list_id": expected_bp_id,
-            "pay_level": int(b["pay_level"]) if b.get("pay_level") is not None else 0,
+            "pay_level": int(b.get("pay_level") or 0),
             "is_start": 1,
             "weekly_gain_exp": int(b.get("weekly_gain_exp") or 0),
             "start_timestamp": start_ts,

@@ -292,14 +292,16 @@ def _get_equip_suit_pos_map():
 USE_NEW_INVENTORY_SERVICE = True
 
 
-def _item_add(ctx, uid, item_id, delta):
+def _item_add(ctx, uid, item_id, delta, *, source=""):
     """加条目；统一库存成功返回True，旧逻辑/降级返回None。"""
     if USE_NEW_INVENTORY_SERVICE:
         try:
             import inventory_service
-            inventory_service.grant_item(ctx, uid, item_id, delta)
+            inventory_service.grant_item(ctx, uid, item_id, delta, source=source)
             return True  # 告知需要附加记账的调用方：本次实际由统一库存处理。
         except Exception as e:
+            if int(item_id) == 14:
+                raise  # Battlepass ledger/period failures must roll back, never grant twice via fallback.
             if hasattr(ctx, "log"):
                 ctx.log(f"[InventoryService WARN] grant_item 异常: {e}，降级至旧逻辑")
             else:
@@ -773,44 +775,16 @@ class MonthCardBonusOp(Operation):
 
     cmd = 34024
     sc = 34025
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        uid = self.uid
-        import time as _t
-        import json as _j
-        import generator as _g
-        now = _g.get_game_time()
-        now_ts = int(_t.time())
-
-        # 每日一次守卫：今日已签 → 不再发放（原先无条件发 90，可连点无限刷）
-        st = _g._sign_state(ctx.db, uid, _g._SIGN_MONTHCARD)
-        if st["signed_today"]:
-            return {"already": True, "is_sign": 1, "reward": {"id": 1, "num": 90}}
-
-        _item_add(ctx, uid, 1, 90)   # 90 移转之辉 (currency id 1)
-
-        ctx.db.execute(
-            "INSERT INTO month_card (uid, monthly_card_num, monthly_card_timestamp, is_sign, update_ts) "
-            "VALUES (?, 1, ?, 1, ?) "
-            "ON CONFLICT(uid) DO UPDATE SET is_sign=1, update_ts=excluded.update_ts",
-            (uid, now_ts + 30 * 86400, now_ts)
-        )
-
-        # sign 表累加（原先每次都把 sign_list 覆盖成 [今天]，跨天记录会丢）
-        sl = list(st["sign_list"])
-        if now.tm_mday not in sl:
-            sl.append(now.tm_mday)
-        ctx.db.execute(
-            "INSERT INTO sign (uid, activity_id, year, month, day, sign_list, sign_count, last_sign_ts) "
-            "VALUES (?, 34024, ?, ?, ?, ?, ?, ?) "
-            "ON CONFLICT(uid, activity_id) DO UPDATE SET "
-            "year=excluded.year, month=excluded.month, day=excluded.day, "
-            "sign_list=excluded.sign_list, sign_count=excluded.sign_count, "
-            "last_sign_ts=excluded.last_sign_ts",
-            (uid, now.tm_year, now.tm_mon, now.tm_mday, _j.dumps(sl), len(sl), now_ts)
-        )
-        _record_user_login(ctx, self.uid, now_ts)
-        return {"already": False, "is_sign": 1, "reward": {"id": 1, "num": 90}}
+        from paid_entitlement_service import claim_small
+        try:
+            result = claim_small(ctx, self.uid)
+        except ValueError as exc:
+            raise OperationError(2, str(exc)) from exc
+        _record_user_login(ctx, self.uid, int(time.time()))
+        return result
 
 
     def respond(self, result, data, ctx):
@@ -823,7 +797,7 @@ class MonthCardBonusOp(Operation):
         }) or b"\x08\x00"
         ctx.log("cs_34024 -> 月卡签到%s" % ("（今日已签，空奖励）" if result.get("already")
                                             else "成功，获得 90 移转之辉"))
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -874,6 +848,12 @@ class RequestGSPayOp(Operation):
             p59009 = ctx.codec_encode("sc_59009", svc.build_59009_payload(ctx.db, target_uid))
             if p59009:
                 frames.append(DownFrame(59009, p59009))
+            if result.get('goods_type') in (2, 3) and ctx.generator is not None:
+                for cmd in ((34023, 30001) if result.get('goods_type') == 2 else (30001,)):
+                    payload = ctx.generator.gen_payload(cmd, uid=target_uid, db=ctx.db)
+                    if not payload:
+                        raise ValueError(f'充值权益刷新sc_{cmd}为空')
+                    frames.append(DownFrame(cmd, payload))
             # 实时推送最新货币列表 sc_15009 (确保战令经验 14、移转之花 30 即刻到账生效)
             if ctx.generator is not None:
                 p15009 = ctx.generator.gen_payload(15009, uid=target_uid, db=ctx.db)
@@ -1006,7 +986,7 @@ class TaskSubmitOp(Operation):
             return {"task_id": tid, "already": True, "rewards": []}
 
         # 校验进度是否达成 (progress >= need)
-        cfg_row = ctx.db.query("SELECT need FROM task_cfg WHERE task_id=?", (tid,))
+        cfg_row = ctx.db.query("SELECT need,task_type FROM task_cfg WHERE task_id=?", (tid,))
         need = int(cfg_row[0]["need"]) if (cfg_row and cfg_row[0]["need"] is not None) else 1
         prog = int(t.get("progress") or 0)
         if prog < need:
@@ -1034,7 +1014,8 @@ class TaskSubmitOp(Operation):
                     )
                     final_rewards.append({"id": 61, "num": gain})
             else:
-                used_inventory = _item_add(ctx, uid, rw["id"], rw["num"])
+                used_inventory = _item_add(ctx, uid, rw["id"], rw["num"],
+                    source="battlepass_task" if cfg_row and cfg_row[0].get('task_type') in (7, 8) else "task")
                 final_rewards.append(rw)
                 if not used_inventory:
                     if rw["id"] == 22:
@@ -1161,7 +1142,8 @@ class TaskOneKeySubmitOp(Operation):
                         )
                         merged[61] = merged.get(61, 0) + gain
                 else:
-                    used_inventory = _item_add(ctx, uid, rw["id"], rw["num"])
+                    used_inventory = _item_add(ctx, uid, rw["id"], rw["num"],
+                        source="battlepass_task" if t.get('task_type') in (7, 8) else "task")
                     merged[rw["id"]] = merged.get(rw["id"], 0) + rw["num"]
                     if not used_inventory:
                         if rw["id"] == 22:
@@ -1233,7 +1215,7 @@ class TaskOneKeySubmitOp(Operation):
                 if eval_pt >= int(target_need) and int(target_need) not in got:
                     rws = box_rewards.get(str(target_need), [])
                     for rw in rws:
-                        _item_add(ctx, uid, rw["id"], rw["num"])
+                        _item_add(ctx, uid, rw["id"], rw["num"], source="activity_box")
                         # 移转之辉（ID 1）已由客户端本地 PostSubmitTaskList 逐箱自动回显（如周任务 5 个 200，日任务 5/5/5/10/15）
                         # 此处静默真实入库，sc_28015 回包不再冗余下发，彻底避免 1000 与 5个200 产生视觉冲突
                         if rw["id"] != 1:
@@ -8107,116 +8089,17 @@ class BigMonthCardSignOp(Operation):
 
     cmd = 34110
     sc = 34111
+    prepare_response_in_transaction = True
 
-    # 6 种每日材料签到池配置 (GameSetting.big_monthly_card_reward_daily.value)
-    # 1-based index: (item_id, item_num, max_limit)
-    DAILY_MATERIAL_POOL = {
-        1: (40103, 3, 5),   # 作战记录 x 3 (上限5份)
-        2: (40203, 3, 5),   # 启示录C01 x 3 (上限5份)
-        3: (40803, 4, 5),   # 神力因子 x 4 (上限5份)
-        4: (40701, 1, 5),   # 铸炼结晶 x 1 (上限5份)
-        5: (40504, 5, 5),   # 技能源质 x 5 (上限5份)
-        6: (40603, 2, 5),   # 刻印核心 x 2 (上限5份)
-    }
 
     def apply(self, data, ctx):
-        import random as _rnd
-        uid = self.uid
-        now_ts = int(time.time())
-        brow = ctx.db.query("SELECT * FROM big_month_card WHERE uid=?", (uid,))
-        brow = brow[0] if brow else {}
-
+        from paid_entitlement_service import claim_big
         try:
-            rec_list = json.loads(brow.get("total_sign_receive_list") or "[]")
-        except Exception:
-            rec_list = []
-        try:
-            raw_daily_rec = json.loads(brow.get("daily_record") or "[]")
-        except Exception:
-            raw_daily_rec = []
-
-        # 整理已领材料次数映射: {index: times}
-        rec_map = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
-        for item in raw_daily_rec:
-            if isinstance(item, dict) and "index" in item:
-                rec_map[int(item["index"])] = int(item.get("times", 0))
-
-        # 每日一次守卫：今日已签则幂等返回当前状态，不重复累加天数与发奖
-        _bts = brow.get("update_ts") or 0
-        _bsigned = False
-        if brow.get("is_sign") == 1 and _bts:
-            _a, _b = time.localtime(int(_bts)), time.localtime()
-            _bsigned = (_a.tm_year, _a.tm_mon, _a.tm_mday) == (_b.tm_year, _b.tm_mon, _b.tm_mday)
-
-        if _bsigned:
-            daily_rec = [{"index": k, "times": v} for k, v in sorted(rec_map.items())]
-            return {
-                "already": True,
-                "rewards": [],
-                "daily_record": daily_rec,
-                "is_sign": 1,
-                "total_sign_times": int(brow.get("total_sign_times") or 0),
-                "total_sign_receive_list": rec_list
-            }
-
-        total_times = int(brow.get("total_sign_times") or 0) + 1
-
-        # 找出仍有剩余份额的材料候选池 (times < 5)
-        avail = [idx for idx, cfg in self.DAILY_MATERIAL_POOL.items() if rec_map.get(idx, 0) < cfg[2]]
-
-        rewards = []
-        # 1. 每日随机抽取 1 份签到材料 (若30份全抽完则保底给经验)
-        if avail:
-            chosen_idx = _rnd.choice(avail)
-            rec_map[chosen_idx] = rec_map.get(chosen_idx, 0) + 1
-            mat_id, mat_num, _ = self.DAILY_MATERIAL_POOL[chosen_idx]
-            _item_add(ctx, uid, mat_id, mat_num)
-            rewards.append({"id": mat_id, "num": mat_num})
-        else:
-            _item_add(ctx, uid, 40103, 3)
-            rewards.append({"id": 40103, "num": 3})
-
-        # 2. 每日大月卡基础额外奖励 (100 移转之辉)
-        _item_add(ctx, uid, 1, 100)
-        rewards.append({"id": 1, "num": 100})
-
-        # 3. 累计天数档位奖励（BigMonthCardAccumulationCfg）
-        template_id = int(brow.get("template_id") or 2)
-        milestones = {
-            201: (1, 38, 10),
-            202: (7, 1, 200),
-            203: (14, 19, 10),
-            204: (21, 1, 300)
-        } if template_id == 2 else {
-            101: (1, 1, 200),
-            102: (7, 38, 10),
-            103: (14, 1, 300),
-            104: (21, 19, 10)
-        }
-        for mid, (need_days, iid, inum) in milestones.items():
-            if total_times >= need_days and mid not in rec_list:
-                rec_list.append(mid)
-                _item_add(ctx, uid, iid, inum)
-                rewards.append({"id": iid, "num": inum})
-
-        daily_rec = [{"index": k, "times": v} for k, v in sorted(rec_map.items())]
-
-        ctx.db.execute(
-            "INSERT INTO big_month_card (uid, buy_timestamp, is_sign, total_sign_times, total_sign_receive_list, daily_record, template_id, update_ts) "
-            "VALUES (?, ?, 1, ?, ?, ?, ?, ?) "
-            "ON CONFLICT(uid) DO UPDATE SET is_sign=1, total_sign_times=excluded.total_sign_times, "
-            "total_sign_receive_list=excluded.total_sign_receive_list, daily_record=excluded.daily_record, update_ts=excluded.update_ts",
-            (uid, int(brow.get("buy_timestamp") or now_ts), total_times, json.dumps(rec_list), json.dumps(daily_rec), template_id, now_ts)
-        )
-        _record_user_login(ctx, self.uid, now_ts)
-        return {
-            "already": False,
-            "rewards": rewards,
-            "daily_record": daily_rec,
-            "is_sign": 1,
-            "total_sign_times": total_times,
-            "total_sign_receive_list": rec_list
-        }
+            result = claim_big(ctx, self.uid)
+        except ValueError as exc:
+            raise OperationError(2, str(exc)) from exc
+        _record_user_login(ctx, self.uid, int(time.time()))
+        return result
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_34111", {
@@ -8227,7 +8110,7 @@ class BigMonthCardSignOp(Operation):
             "total_sign_times": result["total_sign_times"],
             "total_sign_receive_list": result["total_sign_receive_list"]
         }) or b"\x08\x00"
-        ctx.log(f"cs_34110 -> 恒定观测(大月卡)签到成功，获得={result['rewards']}")
+        ctx.log(f"cs_34110 -> 百宝囊签到成功，获得={result['rewards']}")
         frames = [DownFrame(self.sc, payload)]
         if ctx.generator is not None:
             try:
@@ -8236,7 +8119,7 @@ class BigMonthCardSignOp(Operation):
                     frames.append(DownFrame(34101, p01))
             except Exception:
                 pass
-        return frames + _refresh_frames(ctx, self.uid)
+        return frames + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation
@@ -8245,17 +8128,14 @@ class BigMonthCardBuyOp(Operation):
 
     cmd = 34114
     sc = 34115
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        uid = self.uid
-        now_ts = int(time.time())
-        ctx.db.execute(
-            "INSERT INTO big_month_card (uid, buy_timestamp, is_sign, total_sign_times, total_sign_receive_list, daily_record, template_id, update_ts) "
-            "VALUES (?, ?, 0, 0, '[]', '[]', 2, ?) "
-            "ON CONFLICT(uid) DO UPDATE SET buy_timestamp=excluded.buy_timestamp, is_sign=0, total_sign_times=0, "
-            "total_sign_receive_list='[]', update_ts=excluded.update_ts",
-            (uid, now_ts, now_ts)
-        )
+        from paid_entitlement_service import buy_big
+        try:
+            buy_big(ctx.db, self.uid)
+        except ValueError as exc:
+            raise OperationError(2, str(exc)) from exc
         return {}
 
     def respond(self, result, data, ctx):
@@ -8269,7 +8149,7 @@ class BigMonthCardBuyOp(Operation):
                     frames.append(DownFrame(34101, p01))
             except Exception:
                 pass
-        return frames + _refresh_frames(ctx, self.uid)
+        return frames + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation
