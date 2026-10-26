@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { resolveMountedUid } from './mountedSave'
 import {
   fetchOverviewStatus,
   fetchResVersion,
@@ -168,12 +169,8 @@ export function ServerProvider({ children }: { children: ReactNode }) {
       if (res && res.code === 0) {
         setStatus(res.data)
         setIsOnline(true)
-        if (
-          res.data.default_uid &&
-          (!localStorage.getItem('gm_active_uid') || localStorage.getItem('gm_active_uid') === '10001')
-        ) {
-          setActiveUid(res.data.default_uid)
-        }
+        const mountedUid = resolveMountedUid(res.data, localStorage.getItem('gm_active_uid'))
+        if (mountedUid !== null) setActiveUid(mountedUid)
       } else {
         setIsOnline(false)
       }

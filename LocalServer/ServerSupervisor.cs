@@ -385,7 +385,7 @@ public sealed class ServerSupervisor : IDisposable
         return pids.ToList();
     }
 
-    public Task<bool> StartServerAsync(string? extraArgs = null)
+    public Task<bool> StartServerAsync(IEnumerable<string>? arguments = null)
     {
         lock (_lock)
         {
@@ -411,28 +411,7 @@ public sealed class ServerSupervisor : IDisposable
             }
 
             string mainPy = Path.Combine(srvDir, "main.py");
-            string arguments = $"\"{mainPy}\"";
-            if (!string.IsNullOrWhiteSpace(extraArgs))
-            {
-                arguments += $" {extraArgs}";
-            }
-
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = pythonExe,
-                Arguments = arguments,
-                WorkingDirectory = srvDir,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                StandardOutputEncoding = Encoding.UTF8,
-                StandardErrorEncoding = Encoding.UTF8
-            };
-
-            // 注入通用 UTF-8 环境
-            startInfo.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
-            startInfo.EnvironmentVariables["PYTHONUTF8"] = "1";
+            var startInfo = ServerProcessStartInfo.Create(pythonExe, mainPy, srvDir, arguments);
 
             try
             {

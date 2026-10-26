@@ -292,11 +292,13 @@ function TopBar({ onSelectTab }: TopBarProps) {
         <Chip
           size="sm"
           variant="soft"
-          color={resVersionInfo?.current_version === '311' ? 'accent' : 'default'}
+          color={resVersionInfo?.current_version !== '229' ? 'accent' : 'default'}
           className="cursor-pointer select-none transition-all hover:opacity-85"
-          title="点击在 Build 229 与 Build 311 之间切换"
+          title={`点击轮换客户端资源分发版本 (当前: Build ${resVersionInfo?.current_version || '229'})`}
           onClick={() => {
-            const next = resVersionInfo?.current_version === '311' ? '229' : '311'
+            const list = resVersionInfo?.supported_versions || ['229', '311', '321']
+            const idx = list.indexOf(resVersionInfo?.current_version || '229')
+            const next = list[(idx + 1) % list.length]
             switchVersion(next)
           }}
         >

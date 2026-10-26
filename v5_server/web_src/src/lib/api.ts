@@ -82,6 +82,7 @@ export interface OverviewStatusData {
   gw_port?: number
   host_ip?: string
   default_uid?: number
+  save_owner_uid?: number | null
   online_users?: number
   total_users?: number
   capture_enabled?: boolean
@@ -143,6 +144,8 @@ export interface StickerWall {
   page_desc?: string
   foreground?: number
   is_active?: boolean
+  is_saved?: boolean
+  is_owned?: boolean
   total_stickers: number
   stickers: StickerItem[]
 }
@@ -157,6 +160,8 @@ export interface AccountProfileData {
   max_fatigue?: number
   fatigue_max?: number
   sign: string
+  birthday?: { month: number; day: number }
+  birthday_invalid?: boolean
   avatar_id?: number
   portrait?: number
   icon_frame_id?: number
@@ -568,6 +573,17 @@ export async function modifyAccountPeripheral(payload: {
   icon_frame_id?: number
 }): Promise<ApiResponse<any>> {
   return apiRequest('/api/gm/account/modify_peripheral', {
+    method: 'POST',
+    body: JSON.stringify({ uid: getActiveUid(), ...payload }),
+  })
+}
+
+export async function modifyAccountBirthday(payload: {
+  uid?: number
+  month: number
+  day: number
+}): Promise<ApiResponse<{ uid: number; birthday: { month: number; day: number } }>> {
+  return apiRequest('/api/gm/account/modify_birthday', {
     method: 'POST',
     body: JSON.stringify({ uid: getActiveUid(), ...payload }),
   })
@@ -1406,6 +1422,87 @@ export async function switchResVersion(version: string): Promise<ApiResponse<Res
   return apiRequest<ResVersionData>('/api/gm/system/res_version', {
     method: 'POST',
     body: JSON.stringify({ version }),
+  })
+}
+
+// ==========================================
+// 12.1 官方上游更新检测与下载同步 (/api/gm/system/check_update)
+// ==========================================
+
+export interface ManifestDiffFile {
+  path: string
+  old_hash?: string
+  old_size?: number
+  new_hash?: string
+  new_size?: number
+  size_diff?: number
+}
+
+export interface DiffSummaryData {
+  added_count: number
+  added_total_bytes: number
+  removed_count: number
+  modified_count: number
+  modified_total_bytes: number
+  total_download_bytes: number
+  total_download_mb: number
+  modified_files: ManifestDiffFile[]
+  added_files: ManifestDiffFile[]
+  removed_files: ManifestDiffFile[]
+}
+
+export interface CheckUpdateData {
+  success: boolean
+  has_update: boolean
+  platform: string
+  local_version: string
+  local_version_name: string
+  remote_version: string
+  remote_version_name: string
+  remote_assethash: string
+  total_local_assets: number
+  total_remote_assets: number
+  diff_summary: DiffSummaryData
+}
+
+export interface UpdateProgressData {
+  status: 'idle' | 'checking' | 'downloading' | 'registering' | 'completed' | 'error'
+  progress_percent: number
+  current_file: string
+  downloaded_files: number
+  total_files: number
+  downloaded_bytes: number
+  total_bytes: number
+  speed_kbps: number
+  message: string
+  error: string | null
+  target_version: string
+  version_name: string
+  diff_summary: DiffSummaryData | null
+}
+
+export async function checkOfficialUpdate(platform = 'pc'): Promise<ApiResponse<CheckUpdateData>> {
+  return apiRequest<CheckUpdateData>(`/api/gm/system/check_update?platform=${platform}`)
+}
+
+export async function startSyncUpdate(params?: {
+  target_version?: string
+  download_diff_assets?: boolean
+  platforms?: string[]
+}): Promise<ApiResponse<{ started: boolean }>> {
+  return apiRequest<{ started: boolean }>('/api/gm/system/sync_update', {
+    method: 'POST',
+    body: JSON.stringify(params || {}),
+  })
+}
+
+export async function fetchUpdateProgress(): Promise<ApiResponse<UpdateProgressData>> {
+  return apiRequest<UpdateProgressData>('/api/gm/system/update_progress')
+}
+
+export async function cancelUpdateTask(): Promise<ApiResponse<{ cancelled: boolean }>> {
+  return apiRequest<{ cancelled: boolean }>('/api/gm/system/cancel_update', {
+    method: 'POST',
   })
 }
 

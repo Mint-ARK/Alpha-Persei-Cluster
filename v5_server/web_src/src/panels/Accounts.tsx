@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import {
   BatteryCharging,
   Ban,
@@ -34,6 +34,7 @@ import {
   fetchAccountProfile,
   modifyAccountBasic,
   modifyAccountPeripheral,
+  modifyAccountBirthday,
   resolveAssetUrl,
   DEFAULT_ACCOUNT_UID,
   fetchPaySwitch,
@@ -46,6 +47,7 @@ import {
   type LaunchConfigData,
 } from '../lib/api'
 import { useServer } from '../lib/serverContext'
+import { buildLaunchArguments, formatLaunchCommand, type LaunchShell } from '../lib/launchCommand'
 import avatarsCatalog from '../data/avatarsCatalog.json'
 import stickersCatalog from '../data/stickersCatalog.json'
 
@@ -212,6 +214,29 @@ export default function AccountsPanel() {
   const [nickInput, setNickInput] = useState('')
   const [editingSign, setEditingSign] = useState(false)
   const [signInput, setSignInput] = useState('')
+  const [editingBirthday, setEditingBirthday] = useState(false)
+  const [birthdayMonth, setBirthdayMonth] = useState(1)
+  const [birthdayDay, setBirthdayDay] = useState(1)
+  const [birthdaySaving, setBirthdaySaving] = useState(false)
+  const accountUid = activeUid || DEFAULT_ACCOUNT_UID
+  const accountUidRef = useRef(accountUid)
+  accountUidRef.current = accountUid
+  const birthdayRequestId = useRef(0)
+  const profileRequestId = useRef(0)
+  const monthDays = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  const accountBirthday = profile?.uid === accountUid ? profile.birthday : undefined
+
+  useEffect(() => {
+    birthdayRequestId.current += 1
+    setEditingBirthday(false)
+    setBirthdaySaving(false)
+  }, [accountUid])
+
+  useEffect(() => () => {
+    birthdayRequestId.current += 1
+    profileRequestId.current += 1
+  }, [])
+
 
   // 头像选择器弹窗与白名单列表
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
@@ -224,6 +249,7 @@ export default function AccountsPanel() {
   const [selectedStickerId, setSelectedStickerId] = useState<number | null>(null)
   const [hoveredStickerId, setHoveredStickerId] = useState<number | null>(null)
   const [showStickerLedger, setShowStickerLedger] = useState(false)
+  const wallPageByUidRef = useRef<Map<number, number>>(new Map())
 
   const wallsList = useMemo<StickerWall[]>(() => {
     if (profile?.sticker_walls && profile.sticker_walls.length > 0) {
@@ -238,7 +264,45 @@ export default function AccountsPanel() {
     return DEFAULT_STICKER_WALLS
   }, [profile])
 
-  const currentWall = wallsList[currentWallIndex] || wallsList[0] || DEFAULT_STICKER_WALLS[0]
+  const rememberedPageId = profile?.uid == null
+    ? undefined
+    : wallPageByUidRef.current.get(profile.uid)
+  const rememberedWallIndex = rememberedPageId == null
+    ? -1
+    : wallsList.findIndex((wall) => wall.page_id === rememberedPageId)
+  const activeWallIndex = wallsList.findIndex((wall) => wall.is_active)
+  const clampedWallIndex = wallsList.length > 0
+    ? Math.min(Math.max(currentWallIndex, 0), wallsList.length - 1)
+    : 0
+  // Resolve from page_id during render as well as in the effect. This avoids one
+  // frame of the old numeric index when the server moves the active wall to front.
+  const visibleWallIndex = wallsList.length > 0
+    ? (rememberedWallIndex >= 0
+      ? rememberedWallIndex
+      : (activeWallIndex >= 0 ? activeWallIndex : clampedWallIndex))
+    : 0
+  const currentWall = wallsList[visibleWallIndex] || wallsList[0] || DEFAULT_STICKER_WALLS[0]
+  const currentWallBackgroundMeta = (stickersCatalog.backgrounds as Record<string, { width?: number; height?: number }>)[String(currentWall.page_id)]
+  const viewportWidth = Number(currentWallBackgroundMeta?.width) || 2048
+  const viewportHeight = Number(currentWallBackgroundMeta?.height) || 1170
+
+  // Profile responses can replace the wall list while the old index is still selected.
+  // Preserve an explicitly browsed page for the same UID; otherwise prefer the server's
+  // active page and clamp to the available list so the slider never points at a blank pane.
+  useEffect(() => {
+    if (profile?.uid == null || wallsList.length === 0) {
+      setCurrentWallIndex(0)
+      setSelectedStickerId(null)
+      setHoveredStickerId(null)
+      return
+    }
+    const nextIndex = rememberedWallIndex >= 0
+      ? rememberedWallIndex
+      : (activeWallIndex >= 0 ? activeWallIndex : clampedWallIndex)
+    setCurrentWallIndex((previous) => previous === nextIndex ? previous : nextIndex)
+    setSelectedStickerId(null)
+    setHoveredStickerId(null)
+  }, [profile?.uid, wallsList, currentWallIndex, rememberedWallIndex, activeWallIndex, clampedWallIndex])
 
   const inspectedStickerId = hoveredStickerId ?? selectedStickerId
   const inspectedSticker = useMemo(() => {
@@ -246,16 +310,32 @@ export default function AccountsPanel() {
     return currentWall.stickers?.find((s: any) => s.id === inspectedStickerId) || null
   }, [currentWall, inspectedStickerId])
 
+  const rememberWall = (index: number) => {
+    const uid = profile?.uid
+    const wall = wallsList[index]
+    if (uid != null && wall) {
+      wallPageByUidRef.current.set(uid, wall.page_id)
+    }
+  }
+
   const handlePrevWall = () => {
     setSelectedStickerId(null)
     setHoveredStickerId(null)
-    setCurrentWallIndex((prev) => (prev > 0 ? prev - 1 : wallsList.length - 1))
+    const nextIndex = wallsList.length > 0
+      ? (visibleWallIndex > 0 ? visibleWallIndex - 1 : wallsList.length - 1)
+      : 0
+    rememberWall(nextIndex)
+    setCurrentWallIndex(nextIndex)
   }
 
   const handleNextWall = () => {
     setSelectedStickerId(null)
     setHoveredStickerId(null)
-    setCurrentWallIndex((prev) => (prev < wallsList.length - 1 ? prev + 1 : 0))
+    const nextIndex = wallsList.length > 0 && visibleWallIndex < wallsList.length - 1
+      ? visibleWallIndex + 1
+      : 0
+    rememberWall(nextIndex)
+    setCurrentWallIndex(nextIndex)
   }
 
   // 启动参数与运行调谐配置状态
@@ -276,6 +356,7 @@ export default function AccountsPanel() {
   const [_launchLoading, setLaunchLoading] = useState(false)
   const [savingLaunch, setSavingLaunch] = useState(false)
   const [copiedCommand, setCopiedCommand] = useState(false)
+  const [launchShell, setLaunchShell] = useState<LaunchShell>('cmd')
 
   const loadLaunchConfig = async () => {
     setLaunchLoading(true)
@@ -317,33 +398,8 @@ export default function AccountsPanel() {
 
   // 动态生成启动命令
   const generatedCommand = useMemo(() => {
-    const parts = ['python main.py']
-    if (launchConfig.host_ip && launchConfig.host_ip.trim()) {
-      parts.push(`--host-ip ${launchConfig.host_ip.trim()}`)
-    }
-    if (launchConfig.https_port && launchConfig.https_port !== 443) {
-      parts.push(`--https-port ${launchConfig.https_port}`)
-    }
-    if (launchConfig.gw_port && launchConfig.gw_port !== 8102) {
-      parts.push(`--gw-port ${launchConfig.gw_port}`)
-    }
-    if (launchConfig.game_port && launchConfig.game_port !== 8105) {
-      parts.push(`--game-port ${launchConfig.game_port}`)
-    }
-    if (launchConfig.db_path && launchConfig.db_path !== 'account.db') {
-      parts.push(`--db "${launchConfig.db_path.trim()}"`)
-    }
-    if (launchConfig.log_level && launchConfig.log_level !== 'INFO') {
-      parts.push(`--log-level ${launchConfig.log_level}`)
-    }
-    if (launchConfig.client_assets_dir && launchConfig.client_assets_dir.trim()) {
-      parts.push(`--client-assets-dir "${launchConfig.client_assets_dir.trim()}"`)
-    }
-    if (launchConfig.replay_enabled && launchConfig.replay_path) {
-      parts.push(`--replay "${launchConfig.replay_path.trim()}"`)
-    }
-    return parts.join(' ')
-  }, [launchConfig])
+    return formatLaunchCommand(buildLaunchArguments(launchConfig), launchShell)
+  }, [launchConfig, launchShell])
 
   const handleCopyCommand = () => {
     if (navigator.clipboard) {
@@ -411,10 +467,13 @@ export default function AccountsPanel() {
   }, [resVersionInfo?.current_version, paySwitchData?.client_platform])
 
   const loadProfile = async (uid = activeUid || DEFAULT_ACCOUNT_UID) => {
+    const requestId = ++profileRequestId.current
+    const isCurrent = () => requestId === profileRequestId.current && accountUidRef.current === uid
     setProfileLoading(true)
     setActionError(null)
     try {
       const res = await fetchAccountProfile(uid)
+      if (!isCurrent()) return
       if (res && res.code === 0 && res.data) {
         setProfile(res.data)
         setNickInput(res.data.nickname || res.data.nick || '海拉')
@@ -424,8 +483,9 @@ export default function AccountsPanel() {
     } catch {
       // 离线或服务未启动时走优雅降级
     } finally {
-      setProfileLoading(false)
+      if (isCurrent()) setProfileLoading(false)
     }
+    if (!isCurrent()) return
 
     // 离线环境优雅降级：与 account_test.db 当前模拟库真实状态严格对齐
     setProfile({
@@ -435,7 +495,7 @@ export default function AccountsPanel() {
       exp: 173830,
       fatigue: 450,
       max_fatigue: 240,
-      sign: 'test txt：HELA',
+      sign: '',
       avatar_id: 2200106,
       icon_frame_id: 2935,
       status: isOnline ? 'online' : 'offline',
@@ -461,7 +521,7 @@ export default function AccountsPanel() {
       sticker_walls: DEFAULT_STICKER_WALLS,
     })
     setNickInput('海拉')
-    setSignInput('test txt：HELA')
+    setSignInput('')
   }
 
   useEffect(() => {
@@ -495,6 +555,25 @@ export default function AccountsPanel() {
       await loadProfile(targetUid)
     } catch (e: any) {
       setActionError(`修改签名失败: ${e.message}`)
+    }
+  }
+
+  const handleSaveBirthday = async (month: number, day: number) => {
+    const targetUid = accountUid
+    const requestId = ++birthdayRequestId.current
+    const isCurrent = () => requestId === birthdayRequestId.current && accountUidRef.current === targetUid
+    setBirthdaySaving(true)
+    setActionError(null)
+    try {
+      await modifyAccountBirthday({ uid: targetUid, month, day })
+      if (!isCurrent()) return
+      setEditingBirthday(false)
+      showToast(month === 0 ? '生日已清除，重新登录游戏后可再次设置' : '生日已更新，重新登录游戏后生效')
+      await loadProfile(targetUid)
+    } catch (e: any) {
+      if (isCurrent()) setActionError(`修改生日失败: ${e.message}`)
+    } finally {
+      if (isCurrent()) setBirthdaySaving(false)
     }
   }
 
@@ -664,14 +743,66 @@ export default function AccountsPanel() {
                   ) : (
                     <>
                       <span className="max-w-md truncate">
-                        {profile?.sign || 'test txt：HELA'}
+                        {profile?.sign || '暂无签名'}
                       </span>
                       <Button
                         size="sm"
                         variant="ghost"
                         isIconOnly
                         aria-label="修改签名"
-                        onPress={() => setEditingSign(true)}
+                        onPress={() => { setSignInput(profile?.sign ?? ''); setEditingSign(true) }}
+                      >
+                        <Edit3 className="size-3" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                  <span>生日</span>
+                  {editingBirthday ? (
+                    <>
+                      <select
+                        aria-label="生日月份"
+                        className="rounded-lg border border-separator bg-surface px-2 py-1 text-foreground"
+                        value={birthdayMonth}
+                        disabled={birthdaySaving}
+                        onChange={(e) => {
+                          const month = Number(e.target.value)
+                          setBirthdayMonth(month)
+                          setBirthdayDay((day) => Math.min(day, monthDays[month - 1]))
+                        }}
+                      >
+                        {Array.from({ length: 12 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}月</option>)}
+                      </select>
+                      <select
+                        aria-label="生日日期"
+                        className="rounded-lg border border-separator bg-surface px-2 py-1 text-foreground"
+                        value={birthdayDay}
+                        disabled={birthdaySaving}
+                        onChange={(e) => setBirthdayDay(Number(e.target.value))}
+                      >
+                        {Array.from({ length: monthDays[birthdayMonth - 1] }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}日</option>)}
+                      </select>
+                      <Button size="sm" variant="secondary" isDisabled={birthdaySaving} onPress={() => handleSaveBirthday(birthdayMonth, birthdayDay)}>
+                        {birthdaySaving ? '保存中…' : '保存生日'}
+                      </Button>
+                      <Button size="sm" variant="ghost" isDisabled={birthdaySaving} onPress={() => setEditingBirthday(false)}>取消</Button>
+                      {(accountBirthday?.month || profile?.birthday_invalid) ? (
+                        <Button size="sm" variant="ghost" isDisabled={birthdaySaving} onPress={() => handleSaveBirthday(0, 0)}>清除生日</Button>
+                      ) : null}
+                    </>
+                  ) : (
+                    <>
+                      <span>{!accountBirthday ? '—' : profile?.birthday_invalid ? '需重新设置' : accountBirthday.month ? `${accountBirthday.month}月${accountBirthday.day}日` : '未设置'}</span>
+                      <Button
+                        size="sm" variant="ghost" isIconOnly aria-label="修改生日"
+                        isDisabled={!accountBirthday || profileLoading || birthdaySaving || !isOnline}
+                        onPress={() => {
+                          setBirthdayMonth(accountBirthday?.month || 1)
+                          setBirthdayDay(accountBirthday?.day || 1)
+                          setEditingBirthday(true)
+                        }}
                       >
                         <Edit3 className="size-3" />
                       </Button>
@@ -815,7 +946,7 @@ export default function AccountsPanel() {
                       <span>上一卷</span>
                     </Button>
                     <span className="text-[11px] font-mono font-medium text-muted px-1.5 whitespace-nowrap">
-                      {currentWallIndex + 1}/{wallsList.length}
+                      {visibleWallIndex + 1}/{wallsList.length}
                     </span>
                     <Button
                       size="sm"
@@ -851,10 +982,11 @@ export default function AccountsPanel() {
             </Card.Header>
 
             <Card.Content className="pt-4 space-y-3">
-              {/* 贴纸墙展示视口：严格 16:9 画幅完整呈现，无黑边边框，支持多画卷平滑翻页 */}
+              {/* 贴纸墙展示视口：按背景目录比例完整呈现，支持多画卷平滑翻页 */}
               <div
                 onClick={() => setSelectedStickerId(null)}
-                className="relative group/viewport w-full aspect-video rounded-xl overflow-hidden border border-separator/60 shadow-md bg-surface-secondary/20 select-none cursor-default"
+                className="relative group/viewport w-full rounded-xl overflow-hidden border border-separator/60 shadow-md bg-surface-secondary/20 select-none cursor-default"
+                style={{ aspectRatio: `${viewportWidth} / ${viewportHeight}` }}
               >
                 {/* 悬浮边缘物理大圆钮：切换至上一画卷 */}
                 <button
@@ -876,14 +1008,14 @@ export default function AccountsPanel() {
                   <ChevronRight className="size-5" />
                 </button>
 
-                {/* 贴纸墙轮播滑块容器：完整 16:9 展示，左右滑动切换各个贴纸墙 */}
+                {/* 贴纸墙轮播滑块容器：完整背景比例展示，左右滑动切换各个贴纸墙 */}
                 <div
                   className="flex h-full w-full transition-transform duration-300 ease-out"
-                  style={{ transform: `translateX(-${currentWallIndex * 100}%)` }}
+                  style={{ transform: `translateX(-${visibleWallIndex * 100}%)` }}
                 >
                   {wallsList.map((wall, wIdx) => (
                     <div
-                      key={wall.page_id || wIdx}
+                      key={`${wall.page_id}-${wIdx}`}
                       className="relative h-full w-full shrink-0 select-none overflow-hidden"
                     >
                       {/* 原生游戏背景画卷：无黑边贴合容器 */}
@@ -893,11 +1025,21 @@ export default function AccountsPanel() {
                         className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
                         onError={(e) => {
                           const target = e.currentTarget
-                          if (!target.src.includes('4007.png')) {
-                            target.src = resolveAssetUrl('extracted_assets/stickers/backgrounds/4007.png')
-                          }
+                          if (target.dataset.fallbackApplied === 'true') return
+                          target.dataset.fallbackApplied = 'true'
+                          target.src = resolveAssetUrl('extracted_assets/stickers/backgrounds/4007.png')
                         }}
                       />
+
+                      {/* 原生前景层：仅渲染当前资产目录中已确认的 11001。 */}
+                      {Number(wall.foreground) === 11001 && (
+                        <img
+                          src={resolveAssetUrl('extracted_assets/stickers/foregrounds/stickerfg_l_11001.png')}
+                          alt=""
+                          aria-hidden="true"
+                          className="absolute inset-0 z-20 h-full w-full object-cover select-none pointer-events-none"
+                        />
+                      )}
 
                       {/* 动态原生贴纸渲染层 */}
                       {(wall.stickers || []).map((stk: any, idx: number) => {
@@ -914,7 +1056,7 @@ export default function AccountsPanel() {
 
                         return (
                           <div
-                            key={stk.id || idx}
+                            key={`${wall.page_id}-${stk.id ?? 'unknown'}-${idx}`}
                             className="absolute group/sticker cursor-pointer select-none transition-transform duration-150"
                             style={{
                               left: `${leftPct}%`,
@@ -1056,9 +1198,9 @@ export default function AccountsPanel() {
                 >
                   {wallsList.map((wall, idx) => (
                     <div
-                      key={wall.page_id || idx}
+                      key={`${wall.page_id}-${idx}`}
                       className={`transition-all duration-200 rounded-full ${
-                        currentWallIndex === idx
+                        visibleWallIndex === idx
                           ? 'h-1.5 w-5 bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]'
                           : 'size-1.5 bg-white/40'
                       }`}
@@ -1082,11 +1224,11 @@ export default function AccountsPanel() {
 
                   {currentWall.stickers.length > 0 ? (
                     <div className="space-y-1.5 max-h-48 overflow-y-auto cp-scroll pr-1">
-                      {currentWall.stickers.map((stk: any) => {
+                      {currentWall.stickers.map((stk: any, idx: number) => {
                         const isSelected = selectedStickerId === stk.id
                         return (
                           <div
-                            key={stk.id}
+                            key={`${currentWall.page_id}-${stk.id ?? 'unknown'}-${idx}`}
                             onClick={() => setSelectedStickerId(isSelected ? null : stk.id)}
                             className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-all cursor-pointer border ${
                               isSelected
@@ -1320,7 +1462,7 @@ export default function AccountsPanel() {
                     className="w-full text-xs rounded-lg border border-separator/80 bg-surface px-2.5 py-1.5 text-foreground focus:outline-none focus:border-accent font-mono"
                   />
                   <div className="text-[11px] text-muted leading-tight">
-                    主账号与玩家全量存档数据库文件，战斗服持续热备挂载
+                    支持中文文件名；切换存档在下次启动时生效
                   </div>
                 </div>
 
@@ -1372,6 +1514,16 @@ export default function AccountsPanel() {
                 端口与DB配置下次启动生效
               </div>
               <div className="flex items-center gap-2">
+                <select
+                  aria-label="启动命令终端"
+                  value={launchShell}
+                  onChange={(e) => { setLaunchShell(e.target.value as LaunchShell); setCopiedCommand(false) }}
+                  className="text-xs rounded-lg border border-separator bg-surface px-2 py-1 text-foreground"
+                >
+                  <option value="cmd">Windows CMD</option>
+                  <option value="powershell">PowerShell</option>
+                  <option value="posix">Linux / macOS</option>
+                </select>
                 <Button
                   size="sm"
                   variant="secondary"

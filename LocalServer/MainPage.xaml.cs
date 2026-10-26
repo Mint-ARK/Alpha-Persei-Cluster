@@ -171,17 +171,18 @@ public sealed partial class MainPage : Page
             string clientPath = TxtClientPath?.Text?.Trim() ?? "";
             if (!string.IsNullOrEmpty(clientPath))
             {
-                argsList.Add($"--client-assets-dir \"{clientPath}\"");
+                argsList.Add("--client-assets-dir");
+                argsList.Add(clientPath);
             }
 
             string resVer = (CmbResVersion?.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "auto";
             if (!string.IsNullOrEmpty(resVer))
             {
-                argsList.Add($"--res-version {resVer}");
+                argsList.Add("--res-version");
+                argsList.Add(resVer);
             }
 
-            string extraArgs = string.Join(" ", argsList);
-            bool started = await ServerSupervisor.Instance.StartServerAsync(extraArgs);
+            bool started = await ServerSupervisor.Instance.StartServerAsync(argsList);
 
             BtnToggleServer.IsEnabled = true;
             UpdateUIState(started);

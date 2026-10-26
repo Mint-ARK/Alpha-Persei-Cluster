@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace LocalServer;
 
@@ -50,11 +51,14 @@ public static class FolderPickerHelper
             var psi = new ProcessStartInfo
             {
                 FileName = "powershell",
-                Arguments = "-NoProfile -Command \"" + script + "\"",
                 RedirectStandardOutput = true,
+                StandardOutputEncoding = Encoding.UTF8,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
+            psi.ArgumentList.Add("-NoProfile");
+            psi.ArgumentList.Add("-Command");
+            psi.ArgumentList.Add(script);
             using var p = Process.Start(psi);
             string? outPath = p?.StandardOutput.ReadToEnd()?.Trim();
             p?.WaitForExit(4000);

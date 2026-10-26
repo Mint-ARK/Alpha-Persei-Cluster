@@ -71,3 +71,9 @@ Thumbs.db
 /archive/
 *.before*
 *.part
+
+# Per-host runtime state
+/v5_server/data/slot_registry.json
+/v5_server/.save-generation.lock
+linux_config.json
+linux_generated/
