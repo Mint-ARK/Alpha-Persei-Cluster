@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   Clock,
   Copy,
-  Layers,
   Maximize2,
   RefreshCw,
   Server,
@@ -15,21 +14,16 @@ import {
   UserCheck,
   Wifi,
   X,
-  CloudDownload,
-  Download,
 } from 'lucide-react'
 import {
   Button,
   Calendar,
   Card,
   Chip,
-  ListBox,
   Modal,
   SearchField,
-  Select,
   Separator,
   Switch,
-  cn,
 } from '@heroui/react'
 import { today, getLocalTimeZone, CalendarDate } from '@internationalized/date'
 import { PageHeader, Section, StatCard, StatusDot, type Tone } from '../components/kit'
@@ -37,13 +31,7 @@ import { useServer } from '../lib/serverContext'
 import {
   fetchOverviewLogs,
   fetchOverviewMetrics,
-  checkOfficialUpdate,
-  startSyncUpdate,
-  fetchUpdateProgress,
-  cancelUpdateTask,
   type ModuleMountStatus,
-  type CheckUpdateData,
-  type UpdateProgressData,
 } from '../lib/api'
 
 interface MetricPoint {
@@ -112,109 +100,7 @@ const fallbackModules: ModuleMountStatus[] = [
 ]
 
 export default function OverviewPanel() {
-  const { status, isOnline, loading, refreshStatus, resVersionInfo, resVersionLoading, switchVersion } = useServer()
-  const [switchingVersion, setSwitchingVersion] = useState<string | null>(null)
-  const [switchNotice, setSwitchNotice] = useState<string>('')
-
-  // 官方上游更新检测与下载状态
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
-  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
-  const [checkResult, setCheckResult] = useState<CheckUpdateData | null>(null)
-  const [checkError, setCheckError] = useState<string | null>(null)
-  const [downloadDiffAssets, setDownloadDiffAssets] = useState(true)
-  const [updateProgress, setUpdateProgress] = useState<UpdateProgressData | null>(null)
-  const [isSyncing, setIsSyncing] = useState(false)
-
-  const handleOpenUpdateModal = async () => {
-    setIsUpdateModalOpen(true)
-    setCheckError(null)
-    setIsCheckingUpdate(true)
-    try {
-      const res = await checkOfficialUpdate('pc')
-      if (res && res.code === 0 && res.data) {
-        setCheckResult(res.data)
-      } else {
-        setCheckError(res?.msg || '检查官方更新失败')
-      }
-    } catch (e: any) {
-      setCheckError(e?.message || '网络连接超时或服务未就绪')
-    } finally {
-      setIsCheckingUpdate(false)
-    }
-  }
-
-  // 轮询下载任务进度
-  useEffect(() => {
-    let timer: any = null
-    if (isSyncing) {
-      timer = setInterval(async () => {
-        try {
-          const res = await fetchUpdateProgress()
-          if (res && res.code === 0 && res.data) {
-            setUpdateProgress(res.data)
-            if (res.data.status === 'completed' || res.data.status === 'error') {
-              setIsSyncing(false)
-              if (res.data.status === 'completed') {
-                refreshStatus()
-              }
-            }
-          }
-        } catch {
-          // ignore
-        }
-      }, 800)
-    }
-    return () => {
-      if (timer) clearInterval(timer)
-    }
-  }, [isSyncing, refreshStatus])
-
-  const handleStartSync = async () => {
-    if (!checkResult) return
-    setIsSyncing(true)
-    setUpdateProgress(null)
-    try {
-      const res = await startSyncUpdate({
-        target_version: checkResult.remote_version,
-        download_diff_assets: downloadDiffAssets,
-        platforms: ['pc', 'android', 'ios'],
-      })
-      if (!res || res.code !== 0) {
-        setCheckError(res?.msg || '启动同步任务失败')
-        setIsSyncing(false)
-      }
-    } catch (e: any) {
-      setCheckError(e?.message || '请求服务异常')
-      setIsSyncing(false)
-    }
-  }
-
-  const handleCancelSync = async () => {
-    try {
-      await cancelUpdateTask()
-      setIsSyncing(false)
-    } catch {
-      // ignore
-    }
-  }
-
-  const handleSwitchVersion = async (targetVer: string) => {
-    if (!isOnline || resVersionLoading || switchingVersion) return
-    if (resVersionInfo?.current_version === targetVer) return
-    setSwitchingVersion(targetVer)
-    try {
-      const ok = await switchVersion(targetVer)
-      if (ok) {
-        setSwitchNotice(`已切换为 ${targetVer} 版本 (下次客户端启动更新生效)`)
-      } else {
-        setSwitchNotice('切换失败，请检查服务状态')
-      }
-      setTimeout(() => setSwitchNotice(''), 4000)
-    } finally {
-      setSwitchingVersion(null)
-    }
-  }
-
+  const { status, isOnline, loading, refreshStatus } = useServer()
   // 1. 顶部四大窗口链路与运行时长计算
   const sdkLink = !isOnline
     ? { state: 'unstarted', desc: '8102 网关 / 443 HTTPS · 未启动' }
@@ -620,7 +506,7 @@ export default function OverviewPanel() {
       />
 
       {/* 1. 上方四窗口 */}
-      <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid auto-rows-fr gap-4 md:grid-cols-3">
         {/* 窗口 1: SDK网关链路状态 */}
         <StatCard
           label="SDK网关链路状态"
@@ -654,103 +540,7 @@ export default function OverviewPanel() {
           deltaNote={!isOnline ? 'server未启动' : '本地连续运行 / 累计时长'}
         />
 
-        {/* 窗口 4: 客户端资源版本分发与热切换 */}
-        <Card className="p-5 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-sm font-semibold tracking-tight text-foreground whitespace-nowrap">
-                客户端资源分发
-              </span>
-              <Button
-                size="sm"
-                variant="secondary"
-                className="text-xs h-7 gap-1 px-2.5 font-medium shrink-0"
-                onPress={handleOpenUpdateModal}
-                aria-label="通过 DoH 穿透探测官方最新版本并下载增量"
-              >
-                <CloudDownload className="size-3.5 text-accent" />
-                检查更新
-              </Button>
-            </div>
 
-            {/* 版本下拉选择控件 (规避横向挤压，无缝适配未来任意扩展版本) */}
-            <div className="mt-3">
-              <Select
-                aria-label="选择客户端资源分发版本"
-                className="w-full"
-                selectedKey={resVersionInfo?.current_version || '229'}
-                onSelectionChange={(key) => {
-                  if (key && String(key) !== resVersionInfo?.current_version) {
-                    handleSwitchVersion(String(key))
-                  }
-                }}
-                isDisabled={!isOnline || resVersionLoading || switchingVersion !== null}
-              >
-                <Select.Trigger className="h-8.5 w-full rounded-xl border border-separator/80 bg-surface-secondary/70 text-xs shadow-none hover:bg-surface-secondary px-3 flex items-center justify-between font-mono">
-                  <div className="flex items-center gap-2 truncate flex-1 min-w-0">
-                    {switchingVersion ? (
-                      <RefreshCw className="size-3.5 animate-spin text-accent shrink-0" />
-                    ) : (
-                      <Layers className="size-3.5 text-accent shrink-0" />
-                    )}
-                    <Select.Value className="truncate" />
-                  </div>
-                  <Select.Indicator className="shrink-0 ml-1.5" />
-                </Select.Trigger>
-                <Select.Popover className="rounded-2xl border border-separator bg-surface shadow-xl p-1 backdrop-blur-md min-w-[220px]">
-                  <ListBox className="space-y-0.5">
-                    {(resVersionInfo?.supported_versions && resVersionInfo.supported_versions.length > 0
-                      ? resVersionInfo.supported_versions
-                      : ['229', '311', '321']
-                    ).map((ver) => {
-                      const detail = resVersionInfo?.details?.[ver]
-                      const verName =
-                        detail?.name ||
-                        (ver === '229'
-                          ? 'v5.2.1 基线'
-                          : ver === '311'
-                          ? 'v5.3'
-                          : ver === '321'
-                          ? 'v5.3.1 最新'
-                          : `Build ${ver}`)
-                      return (
-                        <ListBox.Item
-                          key={ver}
-                          id={ver}
-                          textValue={`Build ${ver} (${verName})`}
-                          className="rounded-xl px-2.5 py-1.5 text-xs flex items-center cursor-pointer hover:bg-surface-secondary transition-colors"
-                        >
-                          <div className="flex items-center gap-2 font-mono">
-                            <span className="font-semibold text-foreground">Build {ver}</span>
-                            <span className="text-[11px] text-muted">({verName})</span>
-                          </div>
-                        </ListBox.Item>
-                      )
-                    })}
-                  </ListBox>
-                </Select.Popover>
-              </Select>
-            </div>
-          </div>
-
-          <div className="mt-2.5">
-            {switchNotice ? (
-              <div className="text-[11px] font-medium text-accent truncate">{switchNotice}</div>
-            ) : (
-              <div className="flex items-center justify-between text-[11px] text-muted">
-                <span className="truncate font-mono" title={resVersionInfo?.asset_hash || ''}>
-                  Hash: {(() => {
-                    const raw = resVersionInfo?.asset_hash || ''
-                    const m = raw.match(/_([0-9a-fA-F]{8})[0-9a-fA-F]+\.bytes$/)
-                    if (m) return `${m[1]}...`
-                    return raw ? `${raw.slice(0, 10)}...` : '3807d27e...'
-                  })()}
-                </span>
-                <span className="shrink-0 text-foreground/70">iOS · PC · Android</span>
-              </div>
-            )}
-          </div>
-        </Card>
       </div>
 
       {/* 2 & 3. 中间行：左侧服务模块挂载矩阵，右侧本月签到日历 */}
@@ -1277,261 +1067,7 @@ export default function OverviewPanel() {
         </Modal.Backdrop>
       </Modal.Root>
 
-      {/* 官方上游更新检测与差异同步模态框 */}
-      <Modal.Root isOpen={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
-        <Modal.Backdrop className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <Modal.Container className="w-full max-w-2xl max-h-[88vh] flex flex-col pointer-events-none">
-            <Modal.Dialog className="w-full pointer-events-auto bg-surface border border-separator rounded-2xl shadow-2xl p-5 flex flex-col max-h-[88vh] overflow-hidden">
-              <Modal.Header className="flex items-center justify-between pb-3 border-b border-separator shrink-0">
-                <div className="flex items-center gap-2.5">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent/15 text-accent">
-                    <CloudDownload className="size-5" />
-                  </span>
-                  <div>
-                    <Modal.Heading className="text-base font-semibold text-foreground flex items-center gap-2">
-                      官方版本更新与增量同步中枢
-                      <Chip size="sm" variant="soft" color="success">
-                        <Chip.Label>DoH 穿透就绪</Chip.Label>
-                      </Chip>
-                    </Modal.Heading>
-                    <div className="text-xs text-muted font-mono mt-0.5">
-                      直连 open.ys4fun.com · 绕过 Windows HOSTS 127.0.0.1 规则
-                    </div>
-                  </div>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  isIconOnly
-                  aria-label="关闭"
-                  onPress={() => setIsUpdateModalOpen(false)}
-                >
-                  <X className="size-4" />
-                </Button>
-              </Modal.Header>
 
-              <Modal.Body className="py-4 space-y-4 flex-1 overflow-y-auto cp-scroll">
-                {isCheckingUpdate ? (
-                  <div className="py-12 flex flex-col items-center justify-center gap-3 text-muted">
-                    <RefreshCw className="size-8 animate-spin text-accent" />
-                    <div className="text-sm font-medium text-foreground">正在探测官方最新版本并比对差异...</div>
-                    <div className="text-xs text-muted font-mono">通过公共 DoH 穿透解析上游并校验 AssetHash</div>
-                  </div>
-                ) : checkError ? (
-                  <div className="rounded-xl border border-danger/30 bg-danger/10 p-4 text-xs text-danger flex items-start gap-3">
-                    <AlertCircle className="size-5 shrink-0 mt-0.5" />
-                    <div className="space-y-1.5 flex-1">
-                      <div className="font-semibold text-sm">更新检测异常</div>
-                      <div>{checkError}</div>
-                      <Button size="sm" variant="secondary" className="mt-2 text-xs" onPress={handleOpenUpdateModal}>
-                        重试检测
-                      </Button>
-                    </div>
-                  </div>
-                ) : checkResult ? (
-                  <div className="space-y-4">
-                    {/* 版本对比卡片 */}
-                    <div className="rounded-xl border border-separator/60 bg-surface-secondary/60 p-3.5 flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <div className="text-xs text-muted">当前服务端生效版本</div>
-                        <div className="text-base font-bold font-mono text-foreground flex items-center gap-2">
-                          Build {checkResult.local_version}
-                          <span className="text-xs font-normal text-muted">({checkResult.local_version_name})</span>
-                        </div>
-                      </div>
-                      <div className="text-xl text-muted font-mono">→</div>
-                      <div className="space-y-0.5 text-right">
-                        <div className="text-xs text-muted">官方上游最新版本</div>
-                        <div className="text-base font-bold font-mono text-accent flex items-center justify-end gap-2">
-                          Build {checkResult.remote_version}
-                          <span className="text-xs font-normal text-accent/80">({checkResult.remote_version_name})</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 状态徽标 */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {checkResult.has_update ? (
-                          <Chip size="sm" variant="soft" color="accent">
-                            <Chip.Label>🎉 发现官方版本增量 (可同步升级)</Chip.Label>
-                          </Chip>
-                        ) : (
-                          <Chip size="sm" variant="soft" color="success">
-                            <Chip.Label>✅ 本地资源版本与官方保持最新一致</Chip.Label>
-                          </Chip>
-                        )}
-                        <span className="text-xs text-muted font-mono">
-                          总计比对资产: {checkResult.total_remote_assets.toLocaleString()} 项
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* 差异三维指标 */}
-                    <div className="grid grid-cols-3 gap-2.5">
-                      <div className="rounded-xl border border-separator/50 bg-surface-secondary/40 p-3 text-center">
-                        <div className="text-xs text-muted">新增 / 移除资产</div>
-                        <div className="text-sm font-semibold font-mono text-foreground mt-1">
-                          +{checkResult.diff_summary.added_count} / -{checkResult.diff_summary.removed_count}
-                        </div>
-                      </div>
-                      <div className="rounded-xl border border-separator/50 bg-surface-secondary/40 p-3 text-center">
-                        <div className="text-xs text-muted">变更核心资产</div>
-                        <div className="text-sm font-semibold font-mono text-accent mt-1">
-                          {checkResult.diff_summary.modified_count} 个
-                        </div>
-                      </div>
-                      <div className="rounded-xl border border-separator/50 bg-surface-secondary/40 p-3 text-center">
-                        <div className="text-xs text-muted">增量下载体积</div>
-                        <div className="text-sm font-semibold font-mono text-success mt-1">
-                          {checkResult.diff_summary.total_download_mb} MB
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 核心变更文件预览列表 */}
-                    {checkResult.diff_summary.modified_count > 0 && (
-                      <div className="space-y-1.5">
-                        <div className="text-xs font-medium text-foreground flex items-center justify-between">
-                          <span>核心变更文件预览 (前 20 项)</span>
-                          <span className="text-[11px] text-muted font-mono">
-                            包含 scripts64, config.ys 等核心配置
-                          </span>
-                        </div>
-                        <div className="max-h-36 overflow-y-auto rounded-xl border border-separator/60 bg-surface-secondary/50 p-2.5 font-mono text-xs text-foreground space-y-1 select-text cp-scroll">
-                          {checkResult.diff_summary.modified_files.slice(0, 20).map((f, idx) => (
-                            <div key={idx} className="flex items-center justify-between text-[11px] hover:bg-surface/60 px-1 py-0.5 rounded">
-                              <span className="truncate max-w-[280px]" title={f.path}>{f.path}</span>
-                              <div className="flex items-center gap-2 shrink-0 text-muted">
-                                <span>{(f.old_size || 0).toLocaleString()}B</span>
-                                <span>→</span>
-                                <span className="text-accent">{(f.new_size || 0).toLocaleString()}B</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 下载选项 */}
-                    <div className="rounded-xl border border-separator/50 bg-surface-secondary/30 p-3 flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <div className="text-xs font-medium text-foreground">同步下载差异美术与脚本资源</div>
-                        <div className="text-[11px] text-muted">
-                          自动下载至各平台独立目录 (D:\PC_DATA)，离线模式下客户端无需再向官方抓包
-                        </div>
-                      </div>
-                      <Switch
-                        isSelected={downloadDiffAssets}
-                        onChange={setDownloadDiffAssets}
-                        isDisabled={isSyncing}
-                        size="sm"
-                      />
-                    </div>
-
-                    {/* 实时下载进度条 (下载中或完成时展示) */}
-                    {(isSyncing || updateProgress?.status === 'downloading' || updateProgress?.status === 'registering' || updateProgress?.status === 'completed') && (
-                      <div className="rounded-xl border border-accent/30 bg-accent/5 p-3.5 space-y-2 animate-in fade-in">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-semibold text-foreground flex items-center gap-1.5">
-                            {updateProgress?.status === 'completed' ? (
-                              <CheckCircle2 className="size-4 text-success" />
-                            ) : (
-                              <RefreshCw className="size-3.5 animate-spin text-accent" />
-                            )}
-                            {updateProgress?.message || '正在同步官方资源...'}
-                          </span>
-                          <span className="font-mono text-accent font-semibold">
-                            {updateProgress?.status === 'completed' ? '100%' : `${(updateProgress?.progress_percent || 0).toFixed(1)}%`}
-                            {updateProgress?.speed_kbps ? ` (${updateProgress.speed_kbps} KB/s)` : ''}
-                          </span>
-                        </div>
-
-                        {/* 进度条轨道 */}
-                        <div className="h-2.5 w-full rounded-full bg-surface-secondary overflow-hidden border border-separator/40">
-                          <div
-                            className={cn(
-                              "h-full transition-all duration-300",
-                              updateProgress?.status === 'completed' ? "bg-success" : "bg-accent"
-                            )}
-                            style={{
-                              width: `${updateProgress?.status === 'completed' ? 100 : (updateProgress?.progress_percent || 0)}%`,
-                            }}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between text-[11px] text-muted font-mono">
-                          <span className="truncate max-w-[260px]">
-                            {updateProgress?.current_file ? `文件: ${updateProgress.current_file}` : ''}
-                          </span>
-                          <span>
-                            {updateProgress?.downloaded_files || 0} / {updateProgress?.total_files || 0} 文件 ·{' '}
-                            {(((updateProgress?.downloaded_bytes || 0) / (1024 * 1024)).toFixed(1))} MB
-                          </span>
-                        </div>
-
-                        {updateProgress?.status === 'completed' && (
-                          <div className="pt-2 flex items-center justify-between">
-                            <span className="text-xs text-success font-medium">
-                              新版本 Build {updateProgress.target_version} 已注册生效！
-                            </span>
-                            <Button
-                              size="sm"
-                              variant="primary"
-                              className="text-xs h-7"
-                              onPress={() => {
-                                handleSwitchVersion(updateProgress.target_version)
-                                setIsUpdateModalOpen(false)
-                              }}
-                            >
-                              立即切换为此版本
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ) : null}
-              </Modal.Body>
-
-              <Modal.Footer className="pt-3 border-t border-separator flex items-center justify-between shrink-0">
-                <Button size="sm" variant="secondary" onPress={() => setIsUpdateModalOpen(false)}>
-                  关闭
-                </Button>
-
-                <div className="flex items-center gap-2">
-                  {isSyncing ? (
-                    <Button size="sm" variant="danger" onPress={handleCancelSync}>
-                      中断取消
-                    </Button>
-                  ) : (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        isDisabled={isCheckingUpdate}
-                        onPress={handleOpenUpdateModal}
-                      >
-                        重新检测
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="primary"
-                        className="gap-1.5"
-                        isDisabled={isCheckingUpdate || !checkResult}
-                        onPress={handleStartSync}
-                      >
-                        <Download className="size-3.5" />
-                        开始同步下载
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </Modal.Footer>
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal.Root>
     </div>
   )
 }

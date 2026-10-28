@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "native-pc-3807d27e1a6e",
+      "platform": "pc",
+      "channel_id": "9",
+      "assethash": "assethash_307_229_3807d27e1a6e26853f1fccfa8b7681d0.bytes",
+      "app_version": "307",
+      "resource_version": "229",
+      "version_name": "v5.2.1",
+      "sha256": "ff8d127bba96160b1f9e1f7d989189862f9cb4eed5d471e3566f636e7f2b095e",
+      "voice_files": {
+        "voice_package_list_307_229.bytes": "11c0071b985e5ac25933bf2eba5546f61ea2ed93eebf139a4c2017d3be6e161c",
+        "voice_hash_ja_30700229.bytes": "8d0d7d0f95abbe16d9bb46b3e57b24c613080ad96593fcb1910e2793f3796db6",
+        "voice_hash_zh_30700229.bytes": "73e413c40aab2a08245ebfac4fb0502d6fc829c1348b722b0a3ea86ae40be873"
+      },
+      "provenance": "bundled-official"
+    },
+    {
+      "id": "native-ios-29e8f745e8ec",
+      "platform": "ios",
+      "channel_id": "7",
+      "assethash": "assethash_307_229_29e8f745e8ec6032937a65a0bfd3a9cf.bytes",
+      "app_version": "307",
+      "resource_version": "229",
+      "version_name": "v5.2.1",
+      "sha256": "86f983d28b51a56b5d49e66688e73d9c463766f27d40867597e9d3a49c67151c",
+      "voice_files": {
+        "voice_package_list_307_229.bytes": "64f207c9d36a34d85a20ddf7be8212ebc1a8ac857ad68fb3e4a34789332b7ae0",
+        "voice_hash_ja_30700229.bytes": "3fe60011563a74e40e18bfa97e9cd6df7dd39b6f5b6e91b114a26f49e902e4be",
+        "voice_hash_zh_30700229.bytes": "73e413c40aab2a08245ebfac4fb0502d6fc829c1348b722b0a3ea86ae40be873"
+      },
+      "provenance": "bundled-official"
+    },
+    {
+      "id": "native-pc-738463f12c9b",
+      "platform": "pc",
+      "channel_id": "9",
+      "assethash": "assethash_307_311_738463f12c9b762e6650822b949bd091.bytes",
+      "app_version": "307",
+      "resource_version": "311",
+      "version_name": "v5.3.0",
+      "sha256": "95836a959460e20aef274f2113ac7c498318e16f997cd192d4481f4ba5f74735",
+      "voice_files": {
+        "voice_package_list_307_311.bytes": "7793b8e532174b30276e4d1f15b6c96379c28ee66dcafeb0352482dbfdd89beb",
+        "voice_hash_ja_30700311.bytes": "05d99f499e51c413fd1797f44a8c28121075ee5fe4628c9ef8011caa675713b6",
+        "voice_hash_zh_30700311.bytes": "590aed39c0ebc0ee958ffcd9defda23771b60245017edc310c803b468803f227"
+      },
+      "provenance": "bundled-official"
+    },
+    {
+      "id": "native-pc-a66c600ea8c7",
+      "platform": "pc",
+      "channel_id": "9",
+      "assethash": "assethash_307_321_a66c600ea8c72f003e03969fdd352250.bytes",
+      "app_version": "307",
+      "resource_version": "321",
+      "version_name": "v5.3.1",
+      "sha256": "35bc1339644d9940d10e22edf24cd6dd0e5208de917162b27e1e3ba0749eddda",
+      "voice_files": {
+        "voice_package_list_307_321.bytes": "91e9b8bac5aaf8ea1de1cd287b2abee261c8023d5e4acf05539f997bc64fabc9",
+        "voice_hash_ja_30700321.bytes": "6546a6c6e405e22c9e5d068c30b2fe9d4bc543a060108a0900ab55086d4132ee",
+        "voice_hash_zh_30700321.bytes": "c3785aa94114cbe0b8394fff74ed241136de84ce1bea869a72d62ee4958c3550"
+      },
+      "provenance": "bundled-official"
+    },
+    {
+      "id": "native-android-da9ef437b47a",
+      "platform": "android",
+      "channel_id": "8",
+      "assethash": "assethash_307_321_da9ef437b47a66311f0e2e89e7318388.bytes",
+      "app_version": "307",
+      "resource_version": "321",
+      "version_name": "v5.3.1",
+      "sha256": "f387666110d18318e9d97e316c78eecd779468fc877a8e3bab724f942f069cb3",
+      "voice_files": {
+        "voice_package_list_307_321.bytes": "001c64ec12e90094ab17b9ab34c81807aadccb579a557d2969cd2389e9afce4c",
+        "voice_hash_ja_30700321.bytes": "63b74ff8e68fcb5a6fead9eed21a56719156af66c90f616fd7189d9cef3f8854",
+        "voice_hash_zh_30700321.bytes": "c3785aa94114cbe0b8394fff74ed241136de84ce1bea869a72d62ee4958c3550"
+      },
+      "provenance": "bundled-official"
+    },
+    {
+      "id": "native-ios-fd5db716ec33",
+      "platform": "ios",
+      "channel_id": "7",
+      "assethash": "assethash_307_321_fd5db716ec33e1924528de483faca2ce.bytes",
+      "app_version": "307",
+      "resource_version": "321",
+      "version_name": "v5.3.1",
+      "sha256": "b1d6ce38b58b8c63e69e39c000c8bb2e25da0932b83cc1ae2adcd25e91500eec",
+      "voice_files": {
+        "voice_package_list_307_321.bytes": "001c64ec12e90094ab17b9ab34c81807aadccb579a557d2969cd2389e9afce4c",
+        "voice_hash_ja_30700321.bytes": "63b74ff8e68fcb5a6fead9eed21a56719156af66c90f616fd7189d9cef3f8854",
+        "voice_hash_zh_30700321.bytes": "c3785aa94114cbe0b8394fff74ed241136de84ce1bea869a72d62ee4958c3550"
+      },
+      "provenance": "bundled-official"
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "platform": "android",
+      "assethash": "assethash_307_229_3807d27e1a6e26853f1fccfa8b7681d0.bytes",
+      "reason": "旧配置与PC共用清单，未取得独立Android原生来源证据；不授予BASE资格"
+    }
+  ]
+}

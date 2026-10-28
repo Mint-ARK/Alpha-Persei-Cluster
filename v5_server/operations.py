@@ -2527,6 +2527,8 @@ def _get_battlepass_cfg():
 
 def _get_battlepass_level(ctx, uid):
     """根据 14 号货币（BATTLEPASS_EXP）计算当前战令等级（1000 exp / 级，上限 70）。"""
+    from paid_entitlement_service import ensure_battlepass
+    ensure_battlepass(ctx.db, uid)
     rows = ctx.db.query("SELECT num FROM currency WHERE uid=? AND id=14", (uid,))
     exp = int(rows[0]["num"]) if rows else 0
     return min(70, exp // 1000)

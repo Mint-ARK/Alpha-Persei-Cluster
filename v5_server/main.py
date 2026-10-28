@@ -113,7 +113,11 @@ def main(argv=None):
     ap.add_argument("--db", default=os.environ.get("ACCOUNT_DB_PATH", "account.db"),
                     help="指定挂载的数据库文件路径或名称 (默认: account.db)")
     ap.add_argument("--res-version", default="auto",
-                    help="指定客户端分发资源版本 (默认: auto 优先自动对齐客户端目录版本, 可选: 229, 311, 321 或已注册版本)")
+                    help="资源选择预设：auto=各渠道默认（Windows可读本机PC清单），或原生构建号；精确方案用--resource-profile")
+    ap.add_argument('--game-version', default='', help='缺少渠道信息时的业务默认版本；游戏连接按渠道及原生BASE独立判定')
+    ap.add_argument('--resource-profile', action='append', default=[], metavar='渠道=方案',
+                    help='可重复指定 pc/ios/android=方案名称或短ID（支持中文）')
+    ap.add_argument('--list-resource-profiles', action='store_true', help='列出原生/派生清单名称与短ID并退出')
     ap.add_argument("--check-update", action="store_true", help="主动检查官方服务器最新版本及差异文件并退出")
     ap.add_argument("--sync-update", action="store_true", help="主动检查并下载官方最新版本资源与清单并退出")
     ap.add_argument("--client-assets-dir", default="",
@@ -124,6 +128,13 @@ def main(argv=None):
     ap.add_argument("--self-check", action="store_true", help="自检并退出")
     args = ap.parse_args(argv)
 
+    if args.list_resource_profiles:
+        import resource_distribution
+        for profile in resource_distribution.get_status()['profiles']:
+            if not profile.get('removed'):
+                print(f"{profile['platform']}={profile['id']}  {profile['label']}  {'可用' if profile['ready'] else '未就绪'}")
+        return 0
+
     if args.check_update:
         import res_version_manager
         res_version_manager.check_and_print_update(sync=False)
@@ -131,8 +142,8 @@ def main(argv=None):
 
     if args.sync_update:
         import res_version_manager
-        res_version_manager.check_and_print_update(sync=True)
-        sys.exit(0)
+        result = res_version_manager.check_and_print_update(sync=True)
+        sys.exit(result or 0)
 
     for name in ("https_port", "http_port", "gw_port", "game_port", "battle_port"):
         minimum = 0 if name in ("http_port", "battle_port") else 1
@@ -180,19 +191,19 @@ def main(argv=None):
     except Exception as _e:
         log(f"多存档管理器初始化异常: {_e}", "WARN", module="SAVE")
 
-    # 装配客户端资源分发版本状态（默认 auto 优先与客户端自动对齐，支持 CLI 显式覆盖与 GM 面板动态切换）
+    # Resource channel selections and global gameplay are independent.
     import res_version_manager
-    target_res_ver = str(args.res_version).strip().lower()
+    import resource_distribution
+    target_res_ver = str(args.res_version).strip()
     client_dir = args.client_assets_dir.strip() if args.client_assets_dir else None
-
-    if target_res_ver == "auto":
-        res_version_manager.apply_auto_client_version(
-            custom_dir=client_dir,
-            fallback_version=res_version_manager.DEFAULT_VERSION
-        )
-    else:
-        res_version_manager.set_current_version(target_res_ver)
-        res_version_manager.detect_client_resource_version(client_dir)
+    game_version = args.game_version.strip()
+    if not game_version and target_res_ver.isdigit():
+        game_version = target_res_ver  # compatibility with existing numeric CMD commands
+    if game_version:
+        changed, reason = res_version_manager.set_current_version(game_version)
+        if not changed:
+            raise ValueError(reason)
+    resource_distribution.configure_startup(target_res_ver, client_dir, args.resource_profile)
 
     # 记录服务启动时间戳
     server_start_ts = int(time.time())
@@ -258,20 +269,11 @@ def main(argv=None):
     # 统一挂接服务端日志器
     log = _logger.log
 
-    # 打印客户端资源版本自适应探测日志
     curr_ver = res_version_manager.get_current_version()
-    curr_cfg = res_version_manager.get_version_config(curr_ver)
+    log(f'业务版本 Build {curr_ver}；资源按各渠道清单选择独立分发', module='VERSION')
     client_info = res_version_manager.get_detected_client_info()
-    if target_res_ver == "auto":
-        if client_info.get("detected"):
-            log(f"客户端版本自动探测成功: 已自适应对齐至 Build {curr_ver} ({client_info.get('matched_file')})", module="VERSION")
-        else:
-            log(f"客户端版本自动探测未命中 ({client_info.get('detail')})，平滑降级至安全默认版本: Build {curr_ver}", module="VERSION")
-    else:
-        if client_info.get("detected") and client_info.get("version") != curr_ver:
-            log(f"CLI 手动指定版本 ({curr_ver}) 与客户端探测版本 ({client_info.get('version')}) 不一致！将遵从 CLI 指定。", "WARN", module="VERSION")
-        else:
-            log(f"启动版本由 CLI 手动指定为: Build {curr_ver}", module="VERSION")
+    if client_info.get('detected'):
+        log(f'PC本机资源提示: {client_info.get("matched_file")}（仅PC渠道）', module='VERSION')
 
     # ---------------- 端口自检与冲突进程自动守护 (PortGuard) ----------------
     def _ensure_ports_clean(target_ports):
@@ -543,8 +545,8 @@ def main(argv=None):
     if args.web_bind.is_loopback:
         web_base = console_base = "反代对外 HTTPS 地址"
     print(f"  - 根证书安装地址   : {web_base}/cert", flush=True)
-    print(f"  - PC 端资源落盘目录 : {cdn_proxy.get_data_dir('pc')}", flush=True)
-    print(f"  - iOS 端资源落盘目录: {cdn_proxy.get_data_dir('ios')}", flush=True)
+    print(f"  - PC 端资源落盘目录 : {cdn_proxy.PLATFORM_DIRS.get('pc') or '未选择，请在Web面板配置'}", flush=True)
+    print(f"  - iOS 端资源落盘目录: {cdn_proxy.PLATFORM_DIRS.get('ios') or '未选择，请在Web面板配置'}", flush=True)
     print(f"  - 官方资源智能抓包 : {'[已开启] (双向流式转发 + 物理分盘落库)' if cdn_proxy.is_capture_enabled() else '[已关闭] (纯本地缓存)'}", flush=True)
     print(f"  - GM 运维控制台    : {console_base}/web/gm_console.html", flush=True)
     print(f"  - 客户端关于与排障 : {web_base}/web/agreement.html", flush=True)

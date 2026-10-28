@@ -34,6 +34,7 @@ import OverviewPanel from './panels/Overview'
 import SettingsPanel from './panels/Settings'
 import ShopPanel from './panels/Shop'
 import SavesPanel from './panels/Saves'
+import ResourcesPanel from './panels/Resources'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 import { ServerProvider, useServer } from './lib/serverContext'
@@ -51,6 +52,7 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { id: 'overview', label: '状态总览', icon: LayoutDashboard, Panel: OverviewPanel },
+  { id: 'resources', label: '资源分发', icon: Boxes, Panel: ResourcesPanel },
   { id: 'accounts', label: '账号数据', icon: Users, Panel: AccountsPanel },
   { id: 'saves', label: '存档管理', icon: Database, Panel: SavesPanel, badge: 'NEW' },
   { id: 'heroes', label: '角色状态', icon: Swords, Panel: HeroesPanel },
@@ -94,6 +96,10 @@ function TopBar({ onSelectTab }: TopBarProps) {
         tabId: 'overview',
         keywords: ['总览', '状态', '概览', '链路', '端口', '日志', '指标', '签到', 'overview'],
         icon: LayoutDashboard,
+      },
+      {
+        id: 'resources', title: '资源分发', desc: 'PC、Android、iPhone清单分发、安装包兼容副本与资源更新',
+        category: '导航', tabId: 'resources', keywords: ['资源分发', 'iOS', 'iPhone', '清单', '307', '308', '331', '版本', '更新'], icon: Boxes,
       },
       {
         id: 'accounts',
@@ -310,7 +316,7 @@ function TopBar({ onSelectTab }: TopBarProps) {
           variant="soft"
           color={resVersionInfo?.current_version !== '229' ? 'accent' : 'default'}
           className="cursor-pointer select-none transition-all hover:opacity-85"
-          title={`点击轮换客户端资源分发版本 (当前: Build ${resVersionInfo?.current_version || '229'})`}
+          title={`缺少渠道信息时的默认业务版本；游戏连接按渠道原生BASE独立判定 (Build ${resVersionInfo?.current_version || '229'})`}
           onClick={() => {
             const list = resVersionInfo?.supported_versions || ['229', '311', '321']
             const idx = list.indexOf(resVersionInfo?.current_version || '229')
@@ -319,7 +325,7 @@ function TopBar({ onSelectTab }: TopBarProps) {
           }}
         >
           <Chip.Label>
-            资源: Build {resVersionInfo?.current_version || '229'}
+            默认业务: Build {resVersionInfo?.current_version || '229'}
             {resVersionLoading ? ' 切换中...' : ''}
           </Chip.Label>
         </Chip>

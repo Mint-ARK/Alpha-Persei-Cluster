@@ -241,19 +241,34 @@ def get_online_uids():
         return list(_online_game_conns.keys())
 
 
+def active_version_for_save(path):
+    if not path:
+        return None
+    expected = os.path.normcase(os.path.abspath(path))
+    with _online_conns_lock:
+        values = {getattr(conn, 'resource_version', None)
+                  for group in _online_game_conns.values() for conn in group
+                  if getattr(getattr(conn, 'db', None), 'path', None)
+                  and os.path.normcase(os.path.abspath(conn.db.path)) == expected
+                  and getattr(conn, 'resource_version', None)}
+    return next(iter(values)) if len(values) == 1 else None
+
+
 def push_paid_entitlements(uid, expected_db):
     """Push only into the selected save, even when another save shares its UID."""
     import generator
     with _online_conns_lock:
         conns = [c for c in _online_game_conns.get(int(uid), [])
                  if getattr(c, 'db', None) is expected_db]
-    packets = [(cmd, generator.gen_payload(cmd, uid=int(uid), db=expected_db))
-               for cmd in (34031, 34023, 34101)]
-    packets.append((17023, generator.gen_payload(17023, uid=int(uid), db=expected_db,
-                                               touched_items={14}, strict=True)))
     pushed = 0
     for conn in conns:
         try:
+            import res_version_manager as versions
+            with versions.connection_version(getattr(conn, 'resource_version', None)):
+                packets = [(cmd, generator.gen_payload(cmd, uid=int(uid), db=expected_db))
+                           for cmd in (34031, 34023, 34101)]
+                packets.append((17023, generator.gen_payload(17023, uid=int(uid), db=expected_db,
+                                                           touched_items={14}, strict=True)))
             for cmd, payload in packets:
                 if not payload:
                     raise ValueError(f'权益刷新sc_{cmd}为空')
@@ -395,6 +410,8 @@ class GameHandler(socketserver.StreamRequestHandler):
         register_game_conn(conn, conn.uid)
         fp = FrameParser("up")
         self.request.settimeout(1.0)
+        import res_version_manager as _versions
+        version_scope = _versions.enter_connection_version()
         try:
             while True:
                 try:
@@ -432,7 +449,7 @@ class GameHandler(socketserver.StreamRequestHandler):
                         f"[TCP:{self.server.game_port}] 本次切帧 {len(frames_in)} 个 buf剩={len(fp.buf)}B "
                         f"cmds={[u['cmd'] for u in frames_in]}", "DEBUG")
                     # 注入客户端活跃心跳脉冲（滑动时间窗口记录在线时长）
-                    if conn.uid:
+                    if conn.uid and conn.resource_version:
                         try:
                             from lazy_timer import lazy_timer
                             lazy_timer.pulse_heartbeat(conn.to_handler_ctx(), conn.uid)
@@ -481,6 +498,22 @@ class GameHandler(socketserver.StreamRequestHandler):
                                     register_game_conn(conn, conn.uid)
                         except Exception:
                             pass
+                        try:
+                            from client_version import resolve
+                            binding = resolve(dec_up)
+                            conn.client_platform = binding['platform']
+                            conn.resource_version = binding['version']
+                            _versions.enter_connection_version(conn.resource_version)
+                            self.server.core.log(
+                                f"[CLIENT-VERSION] uid={conn.uid} platform={conn.client_platform or 'legacy'} "
+                                f"reported={binding['reported'] or '-'} advertised={binding['advertised'] or '-'} "
+                                f"native={conn.resource_version} reason={binding['reason']}", 'INFO')
+                        except (ValueError, OSError) as error:
+                            self.server.core.log(f'[CLIENT-VERSION] 无法绑定登录资源版本: {error}', 'ERROR')
+                            failure = pack_down(10043, self.server.codec_encode('sc_10043', {'result': 2}),
+                                                up['index'], up['server_idx'] + 1)
+                            self.request.sendall(failure)
+                            return
                         d_10043 = {
                             "result": 0,
                             "register_timestamp": 1690000000,
@@ -552,7 +585,10 @@ class GameHandler(socketserver.StreamRequestHandler):
                     lazy_timer.on_disconnect(conn.to_handler_ctx(), conn.uid)
                 except Exception:
                     pass
-            self.server.core.log(f"[TCP:{self.server.game_port}] [{peer}] 连接关闭", "INFO")
+            try:
+                self.server.core.log(f"[TCP:{self.server.game_port}] [{peer}] 连接关闭", "INFO")
+            finally:
+                _versions.leave_connection_version(version_scope)
 
 
 class ThreadedServer(socketserver.ThreadingTCPServer):
@@ -1125,8 +1161,8 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
 
         # 6.01 GM 控制台后端 API：开放 PAY 开关管理 (/api/gm/system/pay_switch 与 /api/gm/pay_switch)
         if path in ("/api/gm/system/pay_switch", "/api/gm/pay_switch"):
-            import res_version_manager
-            curr_ver = res_version_manager.get_current_version()
+            import resource_distribution
+            curr_ver = resource_distribution.get_platform_config('ios')['version']
             db = getattr(core, "db", None)
             if db is None:
                 try:
@@ -1134,7 +1170,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                     db = get_db()
                 except Exception:
                     pass
-            plat = get_latest_client_platform()
+            plat = 'ios'
             is_eligible = (curr_ver == "229" and plat == "ios")
             if request.method == "POST":
                 data = request.get_json(silent=True) or {}
@@ -1658,16 +1694,11 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             return jsonify({"errorCode": "0", "data": {}})
 
         def _check_is_pay_allowed():
-            ua_low = request.headers.get("User-Agent", "").lower()
-            if "ios" in ua_low or "iphone" in ua_low or "ipad" in ua_low or "darwin" in ua_low:
-                record_client_platform("ios")
-            elif "windows" in ua_low or "pc" in ua_low:
-                record_client_platform("pc")
-            elif "android" in ua_low:
-                record_client_platform("android")
-            import res_version_manager
-            curr_ver = res_version_manager.get_current_version()
-            plat = get_latest_client_platform()
+            from client_version import http_platform
+            import resource_distribution
+            plat = http_platform(request)
+            record_client_platform(plat)
+            curr_ver = resource_distribution.get_platform_config(plat)['version']
             db = getattr(core, "db", None)
             if db is None:
                 try:
@@ -1680,9 +1711,10 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
 
         # 7. Mix SDK 登录（/mix-sdk-api/pass/user/login）
         if "mix-sdk-api" in path and path.endswith("/pass/user/login"):
-            ua_low = request.headers.get("User-Agent", "").lower()
-            if "ios" in ua_low or "iphone" in ua_low or "ipad" in ua_low or "darwin" in ua_low:
-                record_client_platform("ios")
+            from client_version import http_platform
+            platform = http_platform(request)
+            record_client_platform(platform)
+            channel_id = {'pc': 9, 'android': 8, 'ios': 7}[platform]
             channel_user_id = "1012030496969579190"
             token = f"{uuid.uuid4().hex[:32]}.{_gen.DEFAULT_UID}"
             is_pay_allowed = _check_is_pay_allowed()
@@ -1693,7 +1725,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                     "createDate": 1760276673000,
                     "modifyDate": int(time.time() * 1000),
                     "gameId": 3,
-                    "channelId": 9,
+                    "channelId": channel_id,
                     "channelUserId": channel_user_id,
                     "token": token,
                     "expireDate": int((time.time() + 86400 * 365) * 1000),
@@ -1856,168 +1888,51 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             chid = str(request.args.get("channelId") or request.form.get("channelId") or req_json.get("channelId") or "")
             ua = request.headers.get("User-Agent", "").lower()
 
-            is_ios = plat == "ios" or chid in ("7", "ios") or "iphone" in ua or "ios" in ua or "darwin" in ua
-            is_android = plat == "android" or "android" in ua
-            cur_plat = "ios" if is_ios else ("android" if is_android else "pc")
+            known_channels = {'9': 'pc', '8': 'android', '7': 'ios'}
+            if plat in ('pc', 'android', 'ios') and chid in known_channels and known_channels[chid] != plat:
+                return jsonify({'errorCode': '1', 'errorMsg': '平台与渠道不匹配', 'data': []})
+            cur_plat = (plat if plat in ('pc', 'android', 'ios') else known_channels.get(chid)
+                        or ('ios' if any(tag in ua for tag in ('iphone', 'ipad', 'darwin'))
+                            else 'android' if 'android' in ua else 'pc'))
+            is_ios, is_android = cur_plat == 'ios', cur_plat == 'android'
+
             record_client_platform(cur_plat)
 
-            # 统一根据 res_version_manager 动态分发所选版本（229 或 311）之资源清单配置
-            import res_version_manager
-            ver_cfg = res_version_manager.get_version_config()
-            cur_ver = ver_cfg["version"]
-            cur_ver_name = ver_cfg["version_name"]
-            chosen_assethash = res_version_manager.get_assethash(platform=cur_plat)
-
+            import resource_distribution
+            explicit_app = (request.args.get('appVersion') or request.form.get('appVersion')
+                            or req_json.get('appVersion'))
+            try:
+                manifests = resource_distribution.distribution_entries(cur_plat, explicit_app)
+            except (ValueError, OSError) as error:
+                return jsonify({'errorCode': '1', 'errorMsg': str(error), 'data': []})
+            now_ms = int(time.time() * 1000)
+            entries = []
+            for manifest in manifests:
+                prefix = manifest['download_path']
+                entries.append(dict(createDate=now_ms, modifyDate=now_ms, sortWeight=0,
+                    type='noInstall', version=manifest['resource_version'], versionName=manifest['version_name'],
+                    matchedAppVersion=manifest['app_version'], forceUpdate=False, fileSize=0,
+                    disDate=now_ms, downloadUrl=f'https://download-eo.ys4fun.com{prefix};https://download.ys4fun.com{prefix}',
+                    extraData=json.dumps({'assethash': manifest['assethash']}), platformType=cur_plat,
+                    enableWhiteList=False, enableFullPub=True, enableGrayPub=True,
+                    assethash=manifest['assethash'], batchId=0))
+            print(f'[SDK] {cur_plat} 渠道{chid or resource_distribution.CHANNELS[cur_plat]} '
+                  f'资源方案: {[m["profile_id"] for m in manifests]}', flush=True)
+            # Keep installation metadata independent of resource profile aliases.
             if is_ios:
-                # 动态自适应 iOS 307 与 308（兼容官方 App Store 308 构建）
-                c_ip = (request.headers.get("X-Real-IP") or
-                        request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or
-                        request.remote_addr or "")
-                detected_app_ver = (
-                    request.args.get("appVersion")
-                    or request.form.get("appVersion")
-                    or req_json.get("appVersion")
-                    or request.args.get("version")
-                    or request.form.get("version")
-                    or req_json.get("version")
-                    or _CLIENT_APP_VERSIONS.get(c_ip)
-                    or "307"
-                )
-                detected_app_ver = str(detected_app_ver).strip()
-
-                now_ms = int(time.time() * 1000)
-                cdn_url = "https://download-eo.ys4fun.com/ios/resources/;https://download.ys4fun.com/ios/resources/"
-
-                # 331 构建条目（突破 App Store 321 内置基线）
-                hash_308_331 = "assethash_308_331_a1b758805b37e09ab0643ab909c95f2d.bytes"
-                hash_307_331 = "assethash_307_331_df5de71cf7e15f54e7baca0338ecc77b.bytes"
-                entry_308_331 = {
-                    "createDate": now_ms, "modifyDate": now_ms, "sortWeight": 0, "type": "noInstall",
-                    "version": "331", "versionName": "v5.3.1", "matchedAppVersion": "308",
-                    "forceUpdate": False, "fileSize": 0, "disDate": now_ms,
-                    "downloadUrl": cdn_url, "extraData": json.dumps({"assethash": hash_308_331}),
-                    "platformType": "ios", "enableWhiteList": False, "enableFullPub": True, "enableGrayPub": True,
-                    "assethash": hash_308_331, "batchId": 0
-                }
-                entry_307_331 = {
-                    "createDate": now_ms, "modifyDate": now_ms, "sortWeight": 0, "type": "noInstall",
-                    "version": "331", "versionName": "v5.3.1", "matchedAppVersion": "307",
-                    "forceUpdate": False, "fileSize": 0, "disDate": now_ms,
-                    "downloadUrl": cdn_url, "extraData": json.dumps({"assethash": hash_307_331}),
-                    "platformType": "ios", "enableWhiteList": False, "enableFullPub": True, "enableGrayPub": True,
-                    "assethash": hash_307_331, "batchId": 0
-                }
-
-                # 229 基线条目（主力机 iPhone 16 Pro 307 保障）
-                hash_307_229 = "assethash_307_229_29e8f745e8ec6032937a65a0bfd3a9cf.bytes"
-                entry_307_229 = {
-                    "createDate": now_ms, "modifyDate": now_ms, "sortWeight": 0, "type": "noInstall",
-                    "version": cur_ver, "versionName": cur_ver_name, "matchedAppVersion": "307",
-                    "forceUpdate": False, "fileSize": 0, "disDate": now_ms,
-                    "downloadUrl": cdn_url, "extraData": json.dumps({"assethash": hash_307_229}),
-                    "platformType": "ios", "enableWhiteList": False, "enableFullPub": True, "enableGrayPub": True,
-                    "assethash": hash_307_229, "batchId": 0
-                }
-
-                install_entry = {
-                    "createDate": now_ms, "modifyDate": now_ms, "sortWeight": 0, "type": "install",
-                    "version": "308", "versionName": "308", "forceUpdate": False, "fileSize": 0,
-                    "disDate": 1751385600000, "downloadUrl": "https://apps.apple.com/cn/app/id1507863649",
-                    "platformType": "ios", "enableWhiteList": False, "enableFullPub": True, "enableGrayPub": False,
-                    "batchId": 9
-                }
-
-                if detected_app_ver == "308":
-                    no_install_list = [entry_308_331, entry_307_331, entry_307_229]
-                    chosen_hash = hash_308_331
-                    chosen_ver = "331"
-                else:
-                    no_install_list = [entry_307_229, entry_308_331, entry_307_331]
-                    chosen_hash = hash_307_229
-                    chosen_ver = cur_ver
-
-                print(f"[SDK] 移动端 (ios) 版本检查响应 -> 下发配置 (client_app_ver={detected_app_ver}, res_ver={chosen_ver}, assethash={chosen_hash})", flush=True)
-
-                return jsonify({
-                    "errorCode": "0",
-                    "data": no_install_list + [install_entry]
-                })
-
-            if is_android:
-                print(f"[SDK] 移动端 (android) 版本检查响应 -> 下发配置 (version={cur_ver}, assethash={chosen_assethash})", flush=True)
-                return jsonify({
-                    "errorCode": "0",
-                    "data": [
-                        {
-                            "createDate": int(time.time() * 1000),
-                            "modifyDate": int(time.time() * 1000),
-                            "sortWeight": 0,
-                            "type": "noInstall",
-                            "version": cur_ver,
-                            "versionName": cur_ver_name,
-                            "matchedAppVersion": "307",
-                            "forceUpdate": False,
-                            "fileSize": 0,
-                            "disDate": int(time.time() * 1000),
-                            "downloadUrl": f"https://download-eo.ys4fun.com/android/resources/;https://download.ys4fun.com/android/resources/",
-                            "extraData": json.dumps({"assethash": chosen_assethash}),
-                            "platformType": "android",
-                            "enableWhiteList": False,
-                            "enableFullPub": True,
-                            "enableGrayPub": True,
-                            "assethash": chosen_assethash,
-                            "batchId": 0
-                        },
-                        {
-                            "createDate": int(time.time() * 1000),
-                            "modifyDate": int(time.time() * 1000),
-                            "sortWeight": 0,
-                            "type": "install",
-                            "version": "307",
-                            "versionName": cur_ver_name,
-                            "forceUpdate": False,
-                            "fileSize": 0,
-                            "disDate": int(time.time() * 1000),
-                            "downloadUrl": "https://download-eo.ys4fun.com/android/resources/",
-                            "extraData": "{\"videoMd5\":\"80ed3ea7f7a1c5314b86c33a0378f65c\",\"videoSize\":\"83636032\",\"videoName\":\"5.2_PV\",\"videoUrl\":\"https://download.ys4fun.com/video/5.2_PV.usm\"}",
-                            "platformType": "android",
-                            "enableWhiteList": False,
-                            "enableFullPub": True,
-                            "enableGrayPub": False,
-                            "batchId": 0
-                        }
-                    ]
-                })
-
-            # PC 平台响应
-            print(f"[SDK] PC 平台版本检查响应 -> 下发配置 (version={cur_ver}, assethash={chosen_assethash})", flush=True)
-            return jsonify({
-                "errorCode": "0",
-                "data": [
-                    {
-                        "createDate": int(time.time() * 1000), "modifyDate": int(time.time() * 1000),
-                        "sortWeight": 0, "type": "noInstall", "version": cur_ver,
-                        "versionName": cur_ver_name, "matchedAppVersion": "307",
-                        "forceUpdate": False, "fileSize": 0, "disDate": int(time.time() * 1000),
-                        "downloadUrl": "https://download-eo.ys4fun.com/pc/resources/;https://download.ys4fun.com/pc/resources/",
-                        "extraData": json.dumps({"assethash": chosen_assethash}),
-                        "platformType": "pc", "enableWhiteList": False,
-                        "enableFullPub": True, "enableGrayPub": True,
-                        "assethash": chosen_assethash,
-                        "batchId": 0
-                    },
-                    {
-                        "createDate": 1785986740964, "modifyDate": 1785986740964,
-                        "sortWeight": 0, "type": "install", "version": "307",
-                        "versionName": cur_ver_name, "forceUpdate": False, "fileSize": 0,
-                        "disDate": 1751385600000,
-                        "downloadUrl": "https://packaging.ys4fun.com/packagepc/prod/307/AetherGazer_zh_cn_ali_prod_307_210_3_windows_limit_sdk_release_W12000000_5FF9A0158EA7C050D03D419F16DB8625.zip",
-                        "extraData": "{\"videoMd5\":\"80ed3ea7f7a1c5314b86c33a0378f65c\",\"videoSize\":\"83636032\",\"videoName\":\"5.2_PV\",\"videoUrl\":\"https://download.ys4fun.com/video/5.2_PV.usm\"}",
-                        "platformType": "pc", "enableWhiteList": False,
-                        "enableFullPub": True, "enableGrayPub": False, "batchId": 8
-                    }
-                ]
-            })
+                install_url = 'https://apps.apple.com/cn/app/id1507863649'
+                install_version = '308'
+            elif is_android:
+                install_url = 'https://download-eo.ys4fun.com/android/resources/'
+                install_version = '307'
+            else:
+                install_url = 'https://packaging.ys4fun.com/packagepc/prod/307/AetherGazer_zh_cn_ali_prod_307_210_3_windows_limit_sdk_release_W12000000_5FF9A0158EA7C050D03D419F16DB8625.zip'
+                install_version = '307'
+            entries.append(dict(createDate=now_ms, modifyDate=now_ms, sortWeight=0, type='install',
+                version=install_version, versionName=install_version, forceUpdate=False, fileSize=0,
+                disDate=now_ms, downloadUrl=install_url, platformType=cur_plat,
+                enableWhiteList=False, enableFullPub=True, enableGrayPub=False, batchId=0))
+            return jsonify({'errorCode': '0', 'data': entries})
 
         # 15. SDK 服务器时间
         if path.endswith("/pass/sys/time"):

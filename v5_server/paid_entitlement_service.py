@@ -70,6 +70,29 @@ def _bp_id():
     return int(get_version_config()['battlepass_list_id'])
 
 
+def project_battlepass_claims(received, source_id, target_id):
+    """Same weekly reward progress, projected onto the client's tier IDs."""
+    if not isinstance(received, list):
+        raise ValueError('战令领取记录格式错误')
+    if int(source_id or 0) == int(target_id):
+        return received
+    global _BP_CFG
+    if _BP_CFG is None:
+        _BP_CFG = json.loads(Path(__file__).with_name('battlepass_cfg.json').read_text('utf-8'))
+    old = _BP_CFG['lists'].get(str(source_id), {})
+    new = _BP_CFG['lists'].get(str(target_id), {})
+    old_tiers = _BP_CFG['types'].get(str(old.get('battlepass_type')), [])
+    new_tiers = _BP_CFG['types'].get(str(new.get('battlepass_type')), [])
+    mapping = {int(a['id']): int(b['id']) for a, b in zip(old_tiers, new_tiers)}
+    result, seen = [], set()
+    for entry in received:
+        mapped = {**entry, 'id': mapping.get(int(entry['id']), int(entry['id']))}
+        key = mapped['id'], int(mapped.get('is_pay') or 0)
+        if key not in seen:
+            result.append(mapped); seen.add(key)
+    return result
+
+
 def _premium_gift(db, uid, state, bp):
     global _BP_CFG
     if int(bp.get('pay_level') or 0) != 202 or state.get('bp_gift_issued'):
@@ -88,10 +111,12 @@ def _ensure_bp(db, uid, state, now):
     week = get_weekly_mon_5am_ts(now)
     bp = _row(db, 'battlepass', uid)
     legacy = 'bp_cycle' not in state
-    reset = not legacy and (int(state['bp_cycle']) < week or state.get('bp_list') != _bp_id())
+    expected_id = _bp_id()
+    reset = not legacy and int(state['bp_cycle']) < week
     if not bp:
         db.get_or_create_battlepass(uid)
         bp = _row(db, 'battlepass', uid)
+    retarget = state.get('bp_list') != expected_id or int(bp.get('battlepass_list_id') or 0) != expected_id
     if legacy:
         # Old depth purchases already granted their extra bundle directly.
         state['bp_gift_issued'] = int(bp.get('pay_level') or 0) == 202
@@ -100,7 +125,11 @@ def _ensure_bp(db, uid, state, now):
         db.execute("UPDATE battlepass SET receive_info='[]',weekly_gain_exp=0 WHERE uid=?", (uid,))
         state['bp_gift_issued'] = False
         state.pop('bp_gift_mail', None)
-    if legacy or reset:
+    if not reset and retarget:
+        received = project_battlepass_claims(_json(bp.get('receive_info'), []),
+            int(bp.get('battlepass_list_id') or expected_id), expected_id)
+        db.execute('UPDATE battlepass SET receive_info=? WHERE uid=?', (json.dumps(received), uid))
+    if legacy or reset or retarget:
         state['bp_cycle'], state['bp_list'] = week, _bp_id()
         db.execute('UPDATE battlepass SET battlepass_list_id=?,start_timestamp=?,end_timestamp=?, '
                    'next_refresh_timestamp=?,is_start=1,update_ts=? WHERE uid=?',

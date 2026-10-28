@@ -46,6 +46,10 @@ Back up your database, extract to a separate directory, and stop the previous se
 This branch integrates save generation and in-game save selection, UTF-8 launch arguments, activity tasks and shops, first-clear and battle-time fixes, birthday mail, daily AI greetings, and chat-history restoration. Portable archives let Windows users choose the console or desktop launcher; Linux uses the core package. See the [save and AI guide](docs/save_and_ai_guide.md). This update adds per-save API profiles, the Web save manager, paid-entitlement controls and corrected leaderboard sources. Windows and Linux packages are built locally; the Issue #8 patch is not merged.
 
 
+## v5.0.2 update: 2026-10-28
+
+Adds per-platform manifest management, an active download queue and shared cache storage. Fixes Build 229 login loading and preserves battlepass progress across resource versions. Packages include account.db and three preset saves with API credentials removed. See the [resource and download guide](docs/resource_download_guide.md).
+
 ---
 
 ## Table of Contents

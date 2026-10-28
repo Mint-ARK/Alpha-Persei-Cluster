@@ -1,7 +1,9 @@
 {
   "storage": {
     "cdn_cache_dir": "./cdn_cache",
-    "notes": "CDN资源落包根目录（支持相对路径如 ./cdn_cache 或自定义绝对路径）"
+    "notes": "CDN资源落包根目录（支持相对路径如 ./cdn_cache 或自定义绝对路径）",
+    "cdn_root_selected": false,
+    "cdn_read_roots": []
   },
   "client": {
     "game_install_dir": "",
@@ -15,7 +17,7 @@
     "on_close_action": "ask"
   },
   "presentation": {
-    "has_completed_initial_splash": true,
+    "has_completed_initial_splash": false,
     "always_play_splash": true
   }
 }

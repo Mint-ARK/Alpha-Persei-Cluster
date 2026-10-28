@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "selections": {
+    "pc": {
+      "selected_id": "auto",
+      "fallback_id": "native-pc-a66c600ea8c7"
+    },
+    "android": {
+      "selected_id": "auto",
+      "fallback_id": "native-android-da9ef437b47a"
+    },
+    "ios": {
+      "selected_id": "auto",
+      "fallback_id": "native-ios-fd5db716ec33"
+    }
+  },
+  "profiles": {
+    "legacy-ios-f4cafc622d84": {
+      "id": "legacy-ios-f4cafc622d84",
+      "platform": "ios",
+      "channel_id": "7",
+      "origin": "derived",
+      "label": "旧兼容 308/331",
+      "app_version": "308",
+      "resource_version": "331",
+      "version_name": "v5.3.1",
+      "assethash": "assethash_308_331_a1b758805b37e09ab0643ab909c95f2d.bytes",
+      "sha256": "f4cafc622d847baef51f3c9242a885761f5dd2cef2b282aec197efca04c17928",
+      "base_id": "native-ios-fd5db716ec33",
+      "legacy_storage": true,
+      "removed": false,
+      "created_at": 0,
+      "bundled_compat": true
+    }
+  },
+  "native_sources": {}
+}

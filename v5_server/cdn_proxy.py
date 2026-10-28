@@ -1,22 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-cdn_proxy.py — 深空之眼 高性能流式 CDN 资源穿透与动态抓包拦截器（Zero-OOM Streaming Engine）
+"""Verified CDN storage and bounded streaming downloads.
 
-核心能力：
-1. 平台数据严格物理隔离（Platform Isolation）：
-   - Windows PC 资源：存储于 D:\\PC_DATA
-   - iOS 移动端资源 ：存储于 D:\\iOS_DATA
-   - Android 安卓资源：存储于 D:\\Android_DATA
-   - 绝不混淆两端不同平台编译的着色器、音视频与资产包！
-2. 流式双向转发（Streaming Pipe）：
-   - 以 64KB 固定缓冲区边从官方 CDN 拉取边向客户端发送，首包延迟 < 10ms，内存占用恒定 < 2MB，支持 19GB+ 海量并发下载；
-3. 双写落盘持久化（On-The-Fly Disk Caching）：
-   - 数据流在流式分发给客户端的同时，通过 .part 临时文件原子落盘到各平台专属目录；
-   - 下次同名资源请求 100% 命中本地极速缓存；
-4. DoH 官方 CDN 真实 IP 穿透 + TLS SNI 握手：
-   - 绕过 Windows 本地 hosts 劫持与 127.0.0.1 环回死锁；
-5. 完整的 HTTP 200 / 206 Partial Content (Range) 支持：
-   - 完美适配 Unity WebRequest 分片、断点续传及多线程下载。
+Missing objects are staged and verified before serving; warm objects reuse
+stat-bound validation and are streamed in fixed-size blocks. Platforms never
+fall back to a shared unqualified manifest.
 """
 import http.client
 import errno
@@ -33,7 +20,10 @@ import sys
 import threading
 import time
 import urllib.request
-from flask import Response
+from flask import Response, request, has_request_context
+from werkzeug.exceptions import RequestedRangeNotSatisfiable
+import cdn_integrity as integrity
+from resource_storage import storage
 
 from logger import log as _logger_log
 import log_sifter
@@ -42,69 +32,36 @@ _SERVER_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_STATIC_DIR = os.path.join(_SERVER_DIR, "static_resources")
 
 def _get_configured_cdn_root() -> str:
-    """从环境变量或 server_config.json 中读取配置的 CDN 根目录。"""
-    if os.environ.get("CDN_CACHE_DIR"):
-        raw_env = os.environ["CDN_CACHE_DIR"].strip()
-        if raw_env and not os.path.isabs(raw_env):
-            return os.path.normpath(os.path.join(_SERVER_DIR, raw_env))
-        return raw_env
-    cfg_path = os.path.join(_SERVER_DIR, "server_config.json")
-    if os.path.isfile(cfg_path):
-        try:
-            with open(cfg_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                val = data.get("storage", {}).get("cdn_cache_dir", "").strip()
-                if val:
-                    if not os.path.isabs(val):
-                        return os.path.normpath(os.path.join(_SERVER_DIR, val))
-                    return val
-        except Exception:
-            pass
-    return ""
+    """Compatibility accessor for the single shared storage authority."""
+    return storage.root
+
 
 def _resolve_platform_dir(platform_name: str, legacy_drive_dir: str = "") -> str:
-    r"""
-    确定平台 CDN 资源存储目录，优先级：
-    1. 平台专属环境变量 CDN_<PLATFORM>_DIR
-    2. 历史专属盘目录 (D:\<PLATFORM>_DATA，若已存在且有内容，最高优先级)
-    3. 全局 CDN 根目录配置 (server_config.json 或 CDN_CACHE_DIR)
-    4. 兜底相对路径: server/cdn_cache/<platform>
-    """
-    env_key = f"CDN_{platform_name.upper()}_DIR"
-    if os.environ.get(env_key):
-        return os.environ[env_key]
-
-    # 优先使用已经沉淀海量完整资源的专属盘 (D:\PC_DATA, D:\iOS_DATA, D:\Android_DATA)
-    if legacy_drive_dir and os.path.exists(legacy_drive_dir):
-        return legacy_drive_dir
-
-    root = _get_configured_cdn_root()
-    if root:
-        return os.path.join(root, platform_name)
-
-    return os.path.join(_SERVER_DIR, "cdn_cache", platform_name)
+    """Explicit config/environment wins; legacy directories are read-only roots."""
+    return storage.directories()[platform_name]
 
 
-PLATFORM_DIRS = {
-    "pc": _resolve_platform_dir("pc", r"D:\PC_DATA"),
-    "ios": _resolve_platform_dir("ios", r"D:\iOS_DATA"),
-    "android": _resolve_platform_dir("android", r"D:\Android_DATA"),
-}
+PLATFORM_DIRS = storage.directories()
+
+
+def _refresh_storage():
+    global PLATFORM_DIRS
+    storage.refresh()
+    PLATFORM_DIRS = storage.directories()
+
+
+from cdn_transfer_control import gate as _transfer_gate
+_transfer_gate.on_acquired = _refresh_storage
+
 
 def set_cdn_base_dir(base_dir: str):
-    """动态更新各平台 CDN 资源根目录（用于 CLI 参数或面板动态注入）。"""
+    """Compatibility writer; obey the same maintenance boundary as Web."""
     global PLATFORM_DIRS
-    if not base_dir:
-        return
-    if not os.path.isabs(base_dir):
-        base_dir = os.path.normpath(os.path.join(_SERVER_DIR, base_dir))
-    for plat in ("pc", "ios", "android"):
-        target = os.path.join(base_dir, plat)
-        PLATFORM_DIRS[plat] = target
-        try:
-            os.makedirs(target, exist_ok=True)
-        except Exception:
-            pass
+    from cdn_transfer_control import gate
+    with gate.maintenance():
+        storage.apply(base_dir)
+        PLATFORM_DIRS = storage.directories()
+
 LOCAL_CHUNK_SIZE = 1048576      # 1 MB 本地高速分块（消除 iOS 40ms Nagle 延迟，瞬间填满 TCP 窗口）
 UPSTREAM_CHUNK_SIZE = 524288   # 512 KB 上游 CDN 拉取分块
 CHUNK_SIZE = LOCAL_CHUNK_SIZE  # 保持向下兼容
@@ -150,45 +107,31 @@ def get_platform_from_path(path: str, headers=None) -> str:
 
 
 def get_data_dir(platform: str = "pc") -> str:
-    """获取指定平台的专属数据存储目录（优先 D:\\<PLATFORM>_DATA，失败降级为 static_resources/<platform>）。"""
+    """Use the selected platform directory; report failures without redirecting writes."""
     plat = platform.lower() if platform else "pc"
     primary_dir = PLATFORM_DIRS.get(plat, PLATFORM_DIRS["pc"])
-    try:
+    if not primary_dir:
+        raise ValueError('尚未选择资源存储位置，请在控制面板选择服务器目录')
+    if not os.path.isdir(primary_dir):
         os.makedirs(primary_dir, exist_ok=True)
-        return primary_dir
-    except Exception:
-        fallback_dir = os.path.join(DEFAULT_STATIC_DIR, plat)
-        os.makedirs(fallback_dir, exist_ok=True)
-        return fallback_dir
+    return primary_dir
 
 
 def sync_initial_manifests():
-    """初始化时将已有的关键资源清单同步至 PC、iOS、Android 对应专属目录。"""
-    try:
-        os.makedirs(DEFAULT_STATIC_DIR, exist_ok=True)
-        for plat, target_dir in PLATFORM_DIRS.items():
-            try:
-                os.makedirs(target_dir, exist_ok=True)
-            except Exception:
+    """Only seed from the explicitly qualified platform directory."""
+    for plat in ('pc', 'ios', 'android'):
+        source = os.path.join(DEFAULT_STATIC_DIR, plat)
+        if not os.path.isdir(source):
+            continue
+        target = get_data_dir(plat)
+        for name in os.listdir(source):
+            if not name.endswith(('.bytes', '.json')):
                 continue
-
-            if os.path.isdir(DEFAULT_STATIC_DIR):
-                for f in os.listdir(DEFAULT_STATIC_DIR):
-                    s_p = os.path.join(DEFAULT_STATIC_DIR, f)
-                    if not os.path.isfile(s_p):
-                        continue
-
-                    # 针对 iOS / PC 特异性清单分流复制
-                    if "29e8f745e8ec6032937a65a0bfd3a9cf" in f and plat != "ios":
-                        continue
-                    if "3807d27e1a6e26853f1fccfa8b7681d0" in f and plat not in ("pc", "android"):
-                        continue
-
-                    d_p = os.path.join(target_dir, f)
-                    if not os.path.exists(d_p):
-                        shutil.copy2(s_p, d_p)
-    except Exception:
-        pass
+            try:
+                spec = integrity.ObjectSpec(name)
+                integrity.copy_verified(integrity.safe_path(source, name), target, spec)
+            except (OSError, ValueError) as error:
+                _logger_log(f'[{plat}] 清单未就绪: {name} ({type(error).__name__})', 'WARN', module='CDN')
 
 
 def is_capture_enabled():
@@ -353,348 +296,254 @@ def create_direct_socket(target_ip, port=443, timeout=30):
     if not _is_public_ipv4(target_ip):
         raise OSError(f"拒绝将官方请求发送到非公网地址: {target_ip}")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    from cdn_transfer_control import current_token
+    token=current_token()
+    detach=token.attach(sock,sock) if token else None
     try:
+        integrity.checkpoint(token)
         sock.bind((_source_ip(), 0))
         sock.settimeout(timeout)
         sock.connect((target_ip, port))
+        integrity.checkpoint(token)
         return sock
     except Exception:
         sock.close()
         raise
+    finally:
+        if detach: detach()
+
+
+def cache_roots(platform):
+    plat = integrity.platform(platform)
+    roots = [os.path.join(DEFAULT_STATIC_DIR, plat), PLATFORM_DIRS.get(plat),
+             os.path.join(_SERVER_DIR, 'cdn_cache', plat)]
+    roots.extend(storage.history(plat))
+    legacy = {'pc': r'D:\PC_DATA', 'ios': r'D:\iOS_DATA', 'android': r'D:\Android_DATA'}
+    if os.name == 'nt':
+        roots.append(legacy[plat])
+    return list(dict.fromkeys(root for root in roots if root))
 
 
 def find_cached_file(filename: str, platform: str = "pc"):
-    r"""在指定平台的专属存储目录与备用目录查找本地已存在的文件。
-    级联多级回退检索池：
-    1. static_resources/<platform>/ （优先下发标准清单与平台特化配置）
-    2. static_resources/ 根目录 (非 .ys 配置文件)
-    3. 平台当前专属主数据目录 (get_data_dir，默认优先指向 D:\<PLATFORM>_DATA)
-    4. 历史专属盘目录 (D:\PC_DATA, D:\iOS_DATA, D:\Android_DATA，严格物理分盘隔离)
-    5. 本地相对缓存目录 server/cdn_cache/<platform>
-    6. 提取差分目录 D:\DIFF_ASSETS_307_229_vs_311
-    """
-    plat = platform.lower() if platform else "pc"
-    candidates = [
-        os.path.join(DEFAULT_STATIC_DIR, plat, filename),
-    ]
-    if not filename.endswith(".ys"):
-        candidates.append(os.path.join(DEFAULT_STATIC_DIR, filename))
-
-    plat_dir = get_data_dir(plat)
-    if plat_dir:
-        candidates.append(os.path.join(plat_dir, filename))
-
-    legacy_map = {
-        "pc": r"D:\PC_DATA",
-        "ios": r"D:\iOS_DATA",
-        "android": r"D:\Android_DATA",
-    }
-    leg = legacy_map.get(plat)
-    if leg:
-        candidates.append(os.path.join(leg, filename))
-
-    candidates.append(os.path.join(_SERVER_DIR, "cdn_cache", plat, filename))
-
-    for c in candidates:
-        if c and os.path.isfile(c) and os.path.getsize(c) > 0:
-            return c
-
-    # 若仍未命中，尝试在 D:\DIFF_ASSETS_307_229_vs_311 中查找
-    diff_root = r"D:\DIFF_ASSETS_307_229_vs_311"
-    if os.path.isdir(diff_root):
-        diff_cand = os.path.join(diff_root, "v229", filename)
-        if os.path.isfile(diff_cand) and os.path.getsize(diff_cand) > 0:
-            return diff_cand
-
+    """Validate legacy objects once; reuse only while their file identity holds."""
+    spec = integrity.ObjectSpec(filename)
+    for root in cache_roots(platform):
+        candidate = integrity.safe_path(root, filename)
+        if integrity.valid_file(candidate, spec):
+            return candidate
     return None
 
 
 def serve_local_stream(file_path, range_header=None):
-    """从本地文件高效流式下发，支持 200 / 206 Partial Content。"""
-    file_size = os.path.getsize(file_path)
-    fn = os.path.basename(file_path)
-    ctype = "application/json" if (fn.endswith(".bytes") or fn.endswith(".json")) else "application/octet-stream"
-
-    # 处理 Range 请求
-    start = 0
-    end = file_size - 1
-    status = 200
-
-    if range_header and range_header.startswith("bytes="):
-        try:
-            parts = range_header.replace("bytes=", "").split("-")
-            if parts[0]:
-                start = int(parts[0])
-            if len(parts) > 1 and parts[1]:
-                end = int(parts[1])
-            if end >= file_size:
-                end = file_size - 1
-            if start <= end and start < file_size:
-                status = 206
-        except Exception:
-            start = 0
-            end = file_size - 1
-            status = 200
-
-    length = end - start + 1
-
-    def _file_gen():
-        with open(file_path, "rb") as f:
-            if start > 0:
-                f.seek(start)
-            remaining = length
-            while remaining > 0:
-                chunk_len = min(LOCAL_CHUNK_SIZE, remaining)
-                data = f.read(chunk_len)
-                if not data:
-                    break
-                remaining -= len(data)
-                yield data
-
-    resp = Response(_file_gen(), status=status, mimetype=ctype)
-    resp.headers["Content-Length"] = str(length)
-    resp.headers["Accept-Ranges"] = "bytes"
-    resp.headers["Access-Control-Allow-Origin"] = "*"
-    if status == 206:
-        resp.headers["Content-Range"] = f"bytes {start}-{end}/{file_size}"
-    return resp
-
-
-def stream_upstream_and_cache(path, host="download-eo.ys4fun.com", query="", headers=None,
-                              range_header=None, log=_logger_log):
-    r"""
-    流式双向转发与边下边存核心引擎（严格平台隔离）：
-    - 边从官方 CDN 流式拉取（64KB chunk），边向客户端发送，同时写入 D:\<PLATFORM>_DATA/<fn>.part
-    - 下载完成后原子重命名为正式文件
-    """
-    fn = os.path.basename(path.split("?")[0])
-    platform = get_platform_from_path(path, headers)
-    target_dir = get_data_dir(platform)
-    final_file = os.path.join(target_dir, fn)
-    part_file = os.path.join(target_dir, f"{fn}.{os.getpid()}_{time.time_ns()}.part")
-
-    ips = resolve_doh(host)
-    ctx = ssl.create_default_context()
-
-    full_path = path + (f"?{query}" if query else "")
-    req_headers = {
-        "Host": host,
-        "User-Agent": "UnityPlayer/2022.3.62f3 (UnityWebRequest/1.0, libcurl/8.5.0-DEV)",
-        "Accept": "*/*",
-        "Accept-Encoding": "identity",
-    }
-    if headers:
-        for k, v in headers.items():
-            if k.lower() not in ("host", "accept-encoding", "content-length"):
-                req_headers[k] = v
-
-    # 若客户端有 Range，透传给官方 CDN 保持一致性
-    if range_header:
-        req_headers["Range"] = range_header
-
-    conn = None
-    u_resp = None
-    last_err = None
-
-    for target_ip in ips:
-        try:
-            conn = http.client.HTTPSConnection(target_ip, 443, context=ctx, timeout=30)
-            sock = create_direct_socket(target_ip, 443, timeout=30)
-            conn.sock = ctx.wrap_socket(sock, server_hostname=host)
-            conn.request("GET", full_path, headers=req_headers)
-            u_resp = conn.getresponse()
-            if u_resp.status in (200, 206):
-                break
-            else:
-                conn.close()
-                conn = None
-        except Exception as e:
-            last_err = e
-            if conn:
-                try:
-                    conn.close()
-                except Exception:
-                    pass
-                conn = None
-            continue
-
-    if not u_resp or u_resp.status not in (200, 206):
-        log(f"穿透连接官方 CDN 失败: {host}{full_path} err={last_err}", "WARN", module="CDN")
-        return Response("Not Found", status=404)
-
-    status_code = u_resp.status
-    content_len_hdr = u_resp.getheader("Content-Length")
-    content_type = u_resp.getheader("Content-Type") or (
-        "application/json" if (fn.endswith(".bytes") or fn.endswith(".json")) else "application/octet-stream"
-    )
-    content_range = u_resp.getheader("Content-Range")
-    etag = u_resp.getheader("ETag")
-
-    expected_len = int(content_len_hdr) if content_len_hdr and content_len_hdr.isdigit() else None
-    # 过程日志写入全量底账文件，不污染控制台
-    log(f"开始流式抓取 ({platform.upper()}): {fn} (status={status_code}, len={content_len_hdr or 'chunked'}B)...", "DEBUG", module="CDN", to_console=False)
-
-    # 根据响应 Content-Range 判断完整性，不能把请求 bytes=0-1023 当成全文件。
-    range_size = None
-    full_range = re.fullmatch(r"bytes 0-(\d+)/(\d+)", content_range or "")
-    if full_range and int(full_range[1]) + 1 == int(full_range[2]):
-        range_size = int(full_range[2])
-    can_cache_full = status_code == 200 or (status_code == 206 and range_size is not None
-                                          and (expected_len is None or expected_len == range_size))
-    hash_match = re.fullmatch(r"([0-9a-fA-F]{32})\.ys", fn)
-    if hash_match is None:
-        hash_match = re.fullmatch(r"assethash_\d+_\d+_([0-9a-fA-F]{32})\.bytes", fn)
-    expected_md5 = hash_match[1].lower() if hash_match else None
-
-    def _stream_gen():
-        total_downloaded = 0
-        part_fp = None
-        reached_eof = False
-        write_ok = True
-        digest = hashlib.md5()
-        if can_cache_full:
+    """Stream an already validated open snapshot, with Werkzeug range handling."""
+    handle = open(file_path, 'rb')
+    try:
+        spec = integrity.ObjectSpec(os.path.basename(file_path))
+        digest = integrity.validate_open_file(handle, spec)
+        stat = os.fstat(handle.fileno())
+        def chunks():
             try:
-                part_fp = open(part_file, "xb")
-            except Exception as e:
-                log(f"无法创建临时落盘文件 {part_file}: {e}", "WARN", module="CDN", to_console=False)
-                part_fp = None
-
+                while True:
+                    data = handle.read(LOCAL_CHUNK_SIZE)
+                    if not data:
+                        break
+                    yield data
+            finally:
+                handle.close()
+        mime = 'application/json' if spec.filename.endswith(('.bytes', '.json')) else 'application/octet-stream'
+        response = Response(chunks(), mimetype=mime)
+        response.content_length = stat.st_size
+        response.last_modified = stat.st_mtime
+        response.set_etag(digest)
+        response.headers['Accept-Ranges'] = 'bytes'
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.call_on_close(handle.close)
+        if has_request_context():
+            environ = dict(request.environ)
+        else:
+            environ = {'REQUEST_METHOD': 'GET'}
+        if range_header:
+            environ['HTTP_RANGE'] = range_header
+        if environ.get('REQUEST_METHOD') == 'HEAD':
+            environ.pop('HTTP_RANGE', None)
         try:
-            while True:
-                chunk = u_resp.read(UPSTREAM_CHUNK_SIZE)
-                if not chunk:
-                    reached_eof = True
-                    break
-                total_downloaded += len(chunk)
-                digest.update(chunk)
-                if part_fp:
-                    try:
-                        part_fp.write(chunk)
-                    except Exception as error:
-                        write_ok = False
-                        log(f"抓取写入失败，保留未完成文件: {part_file}: {error}", "WARN", module="CDN")
-                yield chunk
-        finally:
-            if part_fp:
-                try:
-                    part_fp.flush()
-                    part_fp.close()
-                except Exception:
-                    write_ok = False
-
-            if conn:
-                try:
-                    conn.close()
-                except Exception:
-                    pass
-
-            # 校验并原子重命名
-            if can_cache_full and os.path.isfile(part_file):
-                expected_total = range_size if status_code == 206 else expected_len
-                complete = (reached_eof and write_ok
-                            and (expected_total is None or total_downloaded == expected_total)
-                            and os.path.getsize(part_file) == total_downloaded
-                            and (expected_md5 is None or digest.hexdigest() == expected_md5))
-                if complete:
-                    rename_ok = False
-                    try:
-                        if os.path.exists(final_file):
-                            shutil.copy2(final_file, f"{final_file}.before_capture_{time.time_ns()}")
-                        os.replace(part_file, final_file)
-                        rename_ok = True
-                    except Exception as error:
-                        log(f"抓取发布失败，原件及part保留: {error}", "WARN", module="CDN")
-                    if rename_ok:
-                        # 流程完毕直接在控制台输出单行干净的人机日志
-                        summary = log_sifter.asset_flow_shaper.format_asset_finished(
-                            fn, total_downloaded, platform=platform, status=f"{status_code} OK (已落盘入库)"
-                        )
-                        _logger_log(summary, "INFO", module="CDN")
-                else:
-                    log(f"抓取未完整或校验失败，保留part且不发布: {part_file}", "WARN", module="CDN")
-
-    resp = Response(_stream_gen(), status=status_code, mimetype=content_type)
-    if content_len_hdr:
-        resp.headers["Content-Length"] = content_len_hdr
-    if content_range:
-        resp.headers["Content-Range"] = content_range
-    if etag:
-        resp.headers["ETag"] = etag
-    resp.headers["Accept-Ranges"] = "bytes"
-    resp.headers["Access-Control-Allow-Origin"] = "*"
-    return resp
+            response.make_conditional(environ, accept_ranges=True, complete_length=stat.st_size)
+        except RequestedRangeNotSatisfiable:
+            response.close()
+            return Response(status=416, headers={'Content-Range': f'bytes */{stat.st_size}',
+                                                 'Content-Length': '0', 'Accept-Ranges': 'bytes'})
+        return response
+    except Exception:
+        handle.close()
+        raise
 
 
-def fetch_upstream(host, path, query="", headers=None, method="GET", body=None, timeout=30, log=print):
-    """单次短请求官方接口穿透（供 updateversion/getLatest 等小 JSON 接口使用）。"""
-    ips = resolve_doh(host)
-    ctx = ssl.create_default_context()
+# Exact authorities, not substring matches. Local Host headers fall back to the
+# resource authority in the routing layer; an explicit remote authority must pass.
+TRUSTED_UPSTREAM_HOSTS = frozenset(FALLBACK_IPS)
+_TLS_CONTEXT = None
+_TLS_CONTEXT_LOCK = threading.Lock()
 
-    full_path = path + (f"?{query}" if query else "")
-    req_headers = {
-        "Host": host,
-        "User-Agent": "UnityPlayer/2022.3.62f3 (UnityWebRequest/1.0, libcurl/8.5.0-DEV)",
-        "Accept": "*/*",
-        "Accept-Encoding": "identity",
-    }
-    if headers:
-        for k, v in headers.items():
-            if k.lower() not in ("host", "accept-encoding", "content-length", "range"):
-                req_headers[k] = v
 
-    last_err = None
-    for target_ip in ips:
+def _get_tls_context():
+    global _TLS_CONTEXT
+    with _TLS_CONTEXT_LOCK:
+        if _TLS_CONTEXT is None:
+            _TLS_CONTEXT = ssl.create_default_context()
+        return _TLS_CONTEXT
+
+
+def _upstream_opener(host, path, query='', headers=None, method='GET', body=None):
+    if host not in TRUSTED_UPSTREAM_HOSTS:
+        raise integrity.IntegrityError('Untrusted CDN upstream authority')
+    if not path.startswith('/') or path.startswith('//') or any(c in path + query for c in '\r\n\x00'):
+        raise integrity.IntegrityError('Invalid upstream request target')
+    ips = None
+    def open_response(attempt, timeout):
+        nonlocal ips
+        from cdn_transfer_control import current_token
+        token = current_token()
+        integrity.checkpoint(token)
+        if ips is None:
+            ips = resolve_doh(host)
+        integrity.checkpoint(token)
+        if not ips:
+            raise OSError('No upstream address')
+        # Loading OS trust roots for every tiny asset is costly. Share the
+        # immutable verified context; do not initialize TLS on warm cache hits.
+        context = _get_tls_context()
+        conn = http.client.HTTPSConnection(ips[attempt % len(ips)], 443, context=context, timeout=timeout)
+        raw_socket = None
         try:
-            conn = http.client.HTTPSConnection(target_ip, 443, context=ctx, timeout=timeout)
-            sock = create_direct_socket(target_ip, 443, timeout=timeout)
-            conn.sock = ctx.wrap_socket(sock, server_hostname=host)
-            conn.request(method, full_path, body=body, headers=req_headers)
-            resp = conn.getresponse()
-            status = resp.status
-            resp_headers = dict(resp.getheaders())
-            data = resp.read()
+            raw_socket = create_direct_socket(ips[attempt % len(ips)], 443, timeout=timeout)
+            conn.sock = context.wrap_socket(raw_socket, server_hostname=host, do_handshake_on_connect=False)
+            raw_socket = None
+            if token:
+                conn._cdn_abort_detach = token.attach(conn, conn.sock)
+            integrity.checkpoint(token)
+            conn.sock.do_handshake()
+            integrity.checkpoint(token)
+            request_headers = {'Host': host, 'User-Agent': 'UnityPlayer/2022.3.62f3',
+                               'Accept': '*/*', 'Accept-Encoding': 'identity'}
+            # SDK metadata may use signed request fields. Never forward client
+            # Range, validators, cookies or framing headers to an object GET.
+            if headers and method != 'GET':
+                request_headers.update({k: v for k, v in headers.items()
+                                        if k.lower() in ('content-type', 'user-agent')})
+            conn.request(method, path + ('?' + query if query else ''), body=body, headers=request_headers)
+            return conn, conn.getresponse()
+        except Exception:
             conn.close()
-            return status, resp_headers, data
-        except Exception as e:
-            last_err = e
-            continue
+            if getattr(conn, '_cdn_abort_detach', None):
+                conn._cdn_abort_detach()
+            if raw_socket is not None:
+                raw_socket.close()
+            raise
+    return open_response
 
-    log(f"[CDN_PROXY] 穿透连接 {host} ({full_path}) 失败: {last_err}")
-    return 502, {}, b""
+
+def download_verified(platform, filename, directory=None, *, expected_size=None,
+                      expected_md5=None, host='download-eo.ys4fun.com', cancel=None,
+                      deadline=None, max_attempts=3, force=False, indexed=False,
+                      progress=None, passive=False):
+    """The shared entry point used by runtime, Web, preparation and CLI tools."""
+    integrity.platform(platform)
+    spec = integrity.ObjectSpec(filename, expected_size, expected_md5)
+    from cdn_transfer_control import gate, current_token
+    from contextlib import nullcontext
+    deadline = deadline if deadline is not None else time.monotonic() + 7200
+    while True:
+        session = gate.passive() if passive else nullcontext(current_token()) if current_token() is not None else gate.active(cancel, deadline)
+        token = None
+        try:
+            with session as token:
+                target_directory = directory or get_data_dir(platform)
+                if indexed and (token is None or token._gate is not gate):
+                    raise integrity.IntegrityError('Indexed downloads require the active index session')
+                opener = _upstream_opener(host, f'/{platform}/resources/{filename}')
+                return integrity.ensure_file(spec, target_directory, opener, cancel=token or cancel, deadline=deadline,
+                    max_attempts=max_attempts, force=force, indexed=indexed,
+                    discard_partial=bool(token and token.discard_partials), progress=progress or (token.progress if token else None))
+        except integrity.Cancelled:
+            # A standalone active request yields to foreground traffic, then
+            # retries within its original deadline. Managed groups handle yield.
+            if passive or current_token() is not None or not token or token.reason != 'passive':
+                raise
+            integrity.checkpoint(cancel, deadline)
 
 
-def handle_resource_request(path, host="download-eo.ys4fun.com", query="", headers=None, log=_logger_log):
-    r"""
-    统一资源调度网关（严格平台隔离）：
-    1. 检查 D:\<PLATFORM>_DATA 及 static_resources 本地是否存在完整文件，若存在秒发；
-    2. 若本地不存在且开启抓包器，发起零内存消耗的高性能流式双向管道，边转发边存盘到该平台专属目录。
-    """
-    fn = os.path.basename(path.split("?")[0])
-    platform = get_platform_from_path(path, headers)
-    range_hdr = headers.get("Range") if headers else None
+def stream_upstream_and_cache(path, host='download-eo.ys4fun.com', query='', headers=None,
+                              range_header=None, log=_logger_log):
+    """Compatibility entry: verify a full object, then serve local client ranges."""
+    filename = '<invalid>'
+    try:
+        filename = integrity.basename(path.split('?')[0].rsplit('/', 1)[-1])
+        platform = get_platform_from_path(path, headers)
+        target = download_verified(platform, filename, host=host, passive=True)
+        log(f'[{platform.upper()}] CDN对象已验证: {filename} ({os.path.getsize(target)}B)', 'INFO', module='CDN')
+        return serve_local_stream(target, range_header)
+    except (OSError, ValueError, http.client.HTTPException) as error:
+        log(f'CDN对象未就绪: {filename} ({type(error).__name__}: {error})', 'WARN', module='CDN')
+        return Response('Upstream object unavailable', status=502)
 
-    # 1. 查找本地缓存（优先该平台目录）
-    cached = find_cached_file(fn, platform=platform)
-    is_cached_ready = cached and (
-        (not _CAPTURE_ENABLED)
-        or (fn.endswith(".bytes") or fn.endswith(".json") or os.path.getsize(cached) > 0)
-    )
-    if is_cached_ready:
-        # 对重要配置与清单资产，下发时在控制台展示单行摘要
-        if fn.endswith(".json") or fn.endswith(".bytes"):
-            summary = log_sifter.asset_flow_shaper.format_asset_finished(
-                fn, os.path.getsize(cached), platform=platform, status="200 OK (本地缓存秒发)"
-            )
-            _logger_log(summary, "INFO", module="CDN")
-        return serve_local_stream(cached, range_header=range_hdr)
 
-    # 2. 本地不存在或需要实时抓包，启动流式双向转发
-    if _CAPTURE_ENABLED or _AUTO_CACHE_FALLBACK:
-        upstream_host = host if ("download" in host) else "download-eo.ys4fun.com"
-        return stream_upstream_and_cache(path, host=upstream_host, query=query,
-                                       headers=headers, range_header=range_hdr, log=log)
+def fetch_upstream(host, path, query='', headers=None, method='GET', body=None, timeout=30, log=print):
+    """Bounded small metadata requests. Asset bytes use download_verified instead."""
+    try:
+        opener = _upstream_opener(host, path, query, headers, method, body)
+    except (ValueError, OSError):
+        return 502, {}, b''
+    deadline = time.monotonic() + max(1, min(float(timeout), 90))
+    for attempt in range(3):
+        conn = None
+        try:
+            integrity.checkpoint(deadline=deadline)
+            conn, response = opener(attempt, max(0.1, min(15, deadline - time.monotonic())))
+            response_headers = dict(response.getheaders())
+            if (response.getheader('Content-Encoding') or 'identity').lower() != 'identity':
+                raise integrity.IntegrityError('Unexpected metadata encoding')
+            data = bytearray()
+            read_chunk = getattr(response, 'read1', response.read)
+            while True:
+                integrity.checkpoint(deadline=deadline)
+                chunk = read_chunk(min(65536, integrity.MAX_MANIFEST_BYTES + 1 - len(data)))
+                if not chunk:
+                    break
+                data.extend(chunk)
+                if len(data) > integrity.MAX_MANIFEST_BYTES:
+                    raise integrity.IntegrityError('Metadata exceeds size limit')
+            length = response.getheader('Content-Length')
+            if length is not None and (not length.isdigit() or len(data) != int(length)):
+                raise integrity.IntegrityError('Incomplete metadata response')
+            return response.status, response_headers, bytes(data)
+        except (OSError, ValueError, http.client.HTTPException):
+            pass
+        finally:
+            if conn is not None:
+                conn.close()
+    log('[CDN_PROXY] 上游元数据请求失败（已结束有限重试）')
+    return 502, {}, b''
 
-    # 3. 兜底返回 404
-    if cached:
-        return serve_local_stream(cached, range_header=range_hdr)
-    return Response("Not Found", status=404)
+
+def handle_resource_request(path, host='download-eo.ys4fun.com', query='', headers=None, log=_logger_log):
+    try:
+        filename = integrity.basename(path.split('?')[0].rsplit('/', 1)[-1])
+        platform = get_platform_from_path(path, headers)
+        range_header = headers.get('Range') if headers else None
+        if host not in TRUSTED_UPSTREAM_HOSTS:
+            return Response('Invalid upstream authority', status=400)
+        import resource_distribution
+        handled, managed_path = resource_distribution.resolve_resource(path, platform)
+        if handled:
+            if managed_path is None:
+                return Response('Manifest profile unavailable', status=404)
+            return serve_local_stream(managed_path, range_header)
+        cached = find_cached_file(filename, platform)
+        if cached:
+            return serve_local_stream(cached, range_header)
+        if _CAPTURE_ENABLED or _AUTO_CACHE_FALLBACK:
+            return stream_upstream_and_cache(path, host=host, query=query, headers=headers,
+                                             range_header=range_header, log=log)
+        return Response('Not Found', status=404)
+    except (ValueError, OSError):
+        return Response('Invalid or unavailable resource', status=404)

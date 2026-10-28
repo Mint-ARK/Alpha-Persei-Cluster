@@ -24,6 +24,7 @@ if v5_dir not in sys.path:
     sys.path.insert(0, v5_dir)
 
 import cdn_proxy
+import cdn_integrity as integrity
 
 DEFAULT_RES_DIR = os.path.join(v5_dir, "static_resources")
 HOST = "download-eo.ys4fun.com"
@@ -72,37 +73,15 @@ PLATFORM_MANIFESTS = {
 
 
 def download_single_manifest(platform, fn, output_path, log=print):
-    """从官方 CDN 下载指定平台的清单。"""
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-
-    req_headers = {
-        "Host": HOST,
-        "User-Agent": "UnityPlayer/2022.3.62f3 (UnityWebRequest/1.0, libcurl/8.5.0-DEV)",
-        "Accept": "*/*",
-    }
-    url_path = f"/{platform}/resources/{fn}"
-    ips = cdn_proxy.resolve_doh(HOST)
-
-    for ip in ips:
-        try:
-            sock = cdn_proxy.create_direct_socket(ip, 443, timeout=10)
-            conn = http.client.HTTPSConnection(ip, 443, context=ctx, timeout=10)
-            conn.sock = ctx.wrap_socket(sock, server_hostname=HOST)
-            conn.request("GET", url_path, headers=req_headers)
-            resp = conn.getresponse()
-            if resp.status == 200:
-                data = resp.read()
-                conn.close()
-                if data:
-                    with open(output_path, "wb") as f:
-                        f.write(data)
-                    return True
-            conn.close()
-        except Exception:
-            continue
-    return False
+    """Use the common validated publication path, including TLS verification."""
+    try:
+        if os.path.basename(output_path) != fn:
+            raise integrity.IntegrityError('Manifest target identity mismatch')
+        cdn_proxy.download_verified(platform, fn, os.path.dirname(os.path.abspath(output_path)))
+        return True
+    except (OSError, ValueError, http.client.HTTPException) as error:
+        log(f'[WARN] [{platform}] 清单校验/下载失败: {fn} ({type(error).__name__})')
+        return False
 
 
 def _backup_existing_manifest(path):
@@ -111,10 +90,10 @@ def _backup_existing_manifest(path):
 
 
 def _copy_manifest(source, destination):
-    if os.path.abspath(source) == os.path.abspath(destination):
-        return
-    _backup_existing_manifest(destination)
-    shutil.copy2(source, destination)
+    if os.path.basename(source) != os.path.basename(destination):
+        raise integrity.IntegrityError('Manifest copy identity mismatch')
+    return integrity.copy_verified(source, os.path.dirname(os.path.abspath(destination)),
+                                   integrity.ObjectSpec(os.path.basename(source)))
 
 
 def prepare_manifests(res_dir=None, force_download=False, log=print):
@@ -136,9 +115,9 @@ def prepare_manifests(res_dir=None, force_download=False, log=print):
             target_data = os.path.join(data_dir, fn)
 
             use_local = not force_download or plat == "android"
-            if os.path.isfile(target_static) and os.path.getsize(target_static) > 0 and use_local:
+            if use_local and integrity.valid_file(target_static, integrity.ObjectSpec(fn)):
                 ready += 1
-                if not os.path.isfile(target_data) or os.path.getsize(target_data) == 0:
+                if not integrity.valid_file(target_data, integrity.ObjectSpec(fn)):
                     try:
                         _copy_manifest(target_static, target_data)
                     except Exception:
@@ -149,7 +128,7 @@ def prepare_manifests(res_dir=None, force_download=False, log=print):
                 # 严格只取当前平台，静态目录缺失不代表本地专属盘/缓存也缺失。
                 candidates = (target_data, os.path.join(v5_dir, "cdn_cache", plat, fn))
                 cached = next((path for path in candidates
-                               if os.path.isfile(path) and os.path.getsize(path) > 0), None)
+                               if integrity.valid_file(path, integrity.ObjectSpec(fn))), None)
                 if cached:
                     try:
                         _copy_manifest(cached, target_static)
@@ -157,7 +136,7 @@ def prepare_manifests(res_dir=None, force_download=False, log=print):
                         log(f"[WARN] 复用 [{plat.upper()}] 本地清单失败: {fn} ({error})")
                     else:
                         ready += 1
-                        if not os.path.isfile(target_data) or os.path.getsize(target_data) == 0:
+                        if not integrity.valid_file(target_data, integrity.ObjectSpec(fn)):
                             try:
                                 _copy_manifest(target_static, target_data)
                             except OSError as error:
@@ -170,7 +149,6 @@ def prepare_manifests(res_dir=None, force_download=False, log=print):
                 log(f"[WARN] 未能准备 [ANDROID] 本地清单文件: {fn}（仅告警，不下载；该版本清单未就绪）")
                 continue
 
-            _backup_existing_manifest(target_static)
             ok = download_single_manifest(plat, fn, target_static, log=log)
             if ok:
                 ready += 1

@@ -103,7 +103,7 @@ class Connection:
 
     __slots__ = ("uid", "db", "generator", "codec_encode", "codec_decode",
                  "log", "battle_id", "battle_stage", "battle_seq",
-                 "chat_srv", "seq", "_ctx", "send_push", "login_ready")
+                 "chat_srv", "seq", "_ctx", "send_push", "login_ready", "client_platform", "resource_version")
 
     def __init__(self, uid=0, db=None, generator=None, codec_encode=None, codec_decode=None,
                  log=None):
@@ -121,6 +121,8 @@ class Connection:
         self._ctx = None
         self.send_push = None
         self.login_ready = False
+        self.client_platform = None
+        self.resource_version = None
 
     def to_handler_ctx(self):
         """转 HandlerCtx（middleware handler 用）；懒创建并保持单例。"""
@@ -134,6 +136,8 @@ class Connection:
             self._ctx.battle_seq = self.battle_seq
             self._ctx.chat_srv = self.chat_srv
             self._ctx.send_push = getattr(self, "send_push", None)
+        self._ctx.client_platform = self.client_platform
+        self._ctx.resource_version = self.resource_version
         return self._ctx
 
 
@@ -756,6 +760,11 @@ class Core:
         self.log = log
 
     def dispatch(self, req, conn=None):
+        import res_version_manager as versions
+        with versions.connection_version(getattr(conn, 'resource_version', None)):
+            return self._dispatch(req, conn)
+
+    def _dispatch(self, req, conn=None):
         """核心入口：一个 CoreRequest → CoreResponse。
 
         分发链（操作优先，响应兜底）：

@@ -1287,6 +1287,8 @@ def gen_payload(cmd, uid=None, db=None, **kw):
             rec_info = _jm.loads(b.get("receive_info") or "[]")
         except Exception:
             rec_info = []
+        from paid_entitlement_service import project_battlepass_claims
+        rec_info = project_battlepass_claims(rec_info, int(b.get('battlepass_list_id') or expected_bp_id), expected_bp_id)
         start_ts = int(b.get("start_timestamp") or (now_ts - 7 * 86400))
         # 服务端周周期与领取记录一致，不能再把战令结束时间伪造成2047年。
         end_ts = int(b.get("end_timestamp") or (get_weekly_mon_5am_ts(now_ts) + 7*86400))

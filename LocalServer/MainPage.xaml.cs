@@ -791,36 +791,15 @@ public sealed partial class MainPage : Page
     {
         try
         {
-            DriveInfo? bestDrive = null;
-            long maxSpace = 0;
-
-            foreach (var drive in DriveInfo.GetDrives())
+            string? recommendPath = SharedServerConfig.RecommendRoot();
+            if (recommendPath != null)
             {
-                if (drive.IsReady && drive.DriveType == DriveType.Fixed)
-                {
-                    // 优先挑选非系统盘
-                    bool isSystem = drive.Name.StartsWith("C:", StringComparison.OrdinalIgnoreCase);
-                    long space = drive.AvailableFreeSpace;
-                    if (!isSystem && space > maxSpace)
-                    {
-                        maxSpace = space;
-                        bestDrive = drive;
-                    }
-                    else if (bestDrive == null && space > maxSpace)
-                    {
-                        maxSpace = space;
-                        bestDrive = drive;
-                    }
-                }
-            }
-
-            if (bestDrive != null)
-            {
-                double freeGb = maxSpace / (1024.0 * 1024.0 * 1024.0);
-                string recommendPath = Path.Combine(bestDrive.Name, "AlphaPersei_CDN_Cache");
+                var drive = new DriveInfo(Path.GetPathRoot(recommendPath)!);
+                double freeGb = drive.AvailableFreeSpace / (1024.0 * 1024.0 * 1024.0);
                 TxtCdnDir.Text = recommendPath;
-                TxtCdnDriveResult.Text = $"推荐使用 {bestDrive.Name[..2]} 盘作为缓存目录 (剩余可用空间: {freeGb:F1} GB)";
+                TxtCdnDriveResult.Text = $"推荐使用 {drive.Name[..2]} 盘作为缓存目录 (剩余可用空间: {freeGb:F1} GB)";
             }
+            else TxtCdnDriveResult.Text = "未找到可推荐的非系统盘，请自行选择资源根目录。";
         }
         catch { }
     }
@@ -1034,27 +1013,10 @@ public sealed partial class MainPage : Page
             string? srvDir = ServerSupervisor.Instance.FindServerDir();
             var candidatePaths = new List<string>();
 
-            // 1. 优先读取用户在 LocalAppData 中的自定义覆盖配置 (优先 LocalServer，向后兼容 TwilightStation)
-            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string userConfigPath = Path.Combine(localAppData, "LocalServer", "server_config.json");
-            if (File.Exists(userConfigPath))
-            {
-                candidatePaths.Add(userConfigPath);
-            }
-            string legacyConfigPath = Path.Combine(localAppData, "TwilightStation", "server_config.json");
-            if (File.Exists(legacyConfigPath))
-            {
-                candidatePaths.Add(legacyConfigPath);
-            }
-
-            // 2. 其次读取服务端安装目录自带的默认配置模板
+            // Storage uses the exact same authority as the Python core.
             if (!string.IsNullOrEmpty(srvDir))
             {
-                string srvConfigPath = Path.Combine(srvDir, "server_config.json");
-                if (File.Exists(srvConfigPath) && !candidatePaths.Contains(srvConfigPath))
-                {
-                    candidatePaths.Add(srvConfigPath);
-                }
+                candidatePaths.Add(SharedServerConfig.ConfigPath(srvDir));
             }
 
             foreach (var configPath in candidatePaths)
@@ -1084,7 +1046,10 @@ public sealed partial class MainPage : Page
                         string? cdnDir = cdnDirElem.GetString();
                         if (!string.IsNullOrWhiteSpace(cdnDir))
                         {
-                            TxtCdnDir.Text = cdnDir;
+                            bool factoryDefault = (cdnDir == "./cdn_cache" || cdnDir == "cdn_cache" || cdnDir == ".\\cdn_cache")
+                                && !(storageElem.TryGetProperty("cdn_root_selected", out var chosen) && chosen.ValueKind == JsonValueKind.True);
+                            TxtCdnDir.Text = factoryDefault ? SharedServerConfig.RecommendRoot() ?? ""
+                                : SharedServerConfig.AbsoluteRoot(cdnDir, configPath);
                             TxtCdnDriveResult.Text = "已加载配置文件中的 CDN 缓存目录。";
                             loadedAny = true;
                         }
@@ -1193,80 +1158,31 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private void OnSaveConfigClick(object sender, RoutedEventArgs e)
+    private async void OnSaveConfigClick(object sender, RoutedEventArgs e)
     {
+        if (sender is Button button) button.IsEnabled = false;
         try
         {
             string? srvDir = ServerSupervisor.Instance.FindServerDir();
-            string clientPath = TxtClientPath.Text.Trim();
-            string cdnPath = TxtCdnDir.Text.Trim();
-            string resVer = (CmbResVersion.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "auto";
-            string closeAction = (CmbCloseAction.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "ask";
-            bool alwaysPlay = ToggleAlwaysPlaySplash?.IsOn ?? AppConfigManager.AlwaysPlaySplash;
-            bool hasCompleted = AppConfigManager.HasCompletedInitialSplash;
-
-            string json = $$"""
+            if (string.IsNullOrEmpty(srvDir)) throw new IOException("未找到服务端目录，未写入其他配置文件");
+            var patch = new
             {
-              "storage": {
-                "cdn_cache_dir": "{{cdnPath.Replace("\\", "/")}}",
-                "notes": "CDN资源落包根目录"
-              },
-              "client": {
-                "game_install_dir": "{{clientPath.Replace("\\", "/")}}",
-                "notes": "客户端安装目录"
-              },
-              "network": {
-                "capture_cdn": true,
-                "default_res_version": "{{resVer}}"
-              },
-              "lifecycle": {
-                "on_close_action": "{{closeAction}}"
-              },
-              "presentation": {
-                "has_completed_initial_splash": {{hasCompleted.ToString().ToLowerInvariant()}},
-                "always_play_splash": {{alwaysPlay.ToString().ToLowerInvariant()}}
-              }
-            }
-            """;
-
-            // 优先写入服务端安装目录；若受 UAC / Program Files 权限写保护，平滑降级写入 LocalAppData
-            bool saved = false;
-            if (!string.IsNullOrEmpty(srvDir))
-            {
-                string configPath = Path.Combine(srvDir, "server_config.json");
-                try
-                {
-                    File.WriteAllText(configPath, json, Encoding.UTF8);
-                    TxtSaveResult.Text = "配置已成功保存至 server_config.json。";
-                    OnLogReceived($"[ConfigManager] 参数已持久化至 {configPath}");
-                    saved = true;
+                client = new { game_install_dir = TxtClientPath.Text.Trim() },
+                network = new { default_res_version = (CmbResVersion.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "auto" },
+                lifecycle = new { on_close_action = (CmbCloseAction.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "ask" },
+                presentation = new {
+                    has_completed_initial_splash = AppConfigManager.HasCompletedInitialSplash,
+                    always_play_splash = ToggleAlwaysPlaySplash?.IsOn ?? AppConfigManager.AlwaysPlaySplash
                 }
-                catch (UnauthorizedAccessException)
-                {
-                    // 权限不足，降级处理
-                }
-            }
-
-            if (!saved)
-            {
-                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                string userConfigDir = Path.Combine(localAppData, "LocalServer");
-                Directory.CreateDirectory(userConfigDir);
-                string userConfigPath = Path.Combine(userConfigDir, "server_config.json");
-                File.WriteAllText(userConfigPath, json, Encoding.UTF8);
-
-                TxtSaveResult.Text = "配置已安全保存至用户本地数据区 (LocalAppData)。";
-                OnLogReceived($"[ConfigManager] 服务端目录受系统写保护，配置已平滑降级保存至: {userConfigPath}");
-            }
-
+            };
+            await SharedServerConfig.SaveAsync(srvDir, patch, TxtCdnDir.Text.Trim(), ServerSupervisor.Instance.IsRunning);
+            TxtSaveResult.Text = "配置已合并保存；资源根目录下按 pc / android / ios 分类，旧缓存保留读取。";
+            OnLogReceived($"[ConfigManager] 共享配置已保存至 {SharedServerConfig.ConfigPath(srvDir)}");
             UpdateDashboardResVersionDisplay();
         }
-        catch (Exception ex)
-        {
-            TxtSaveResult.Text = $"保存失败: {ex.Message}";
-        }
+        catch (Exception ex) { TxtSaveResult.Text = $"保存失败: {ex.Message}"; }
+        finally { if (sender is Button buttonAfter) buttonAfter.IsEnabled = true; }
     }
-
     #endregion
 
     #region HOSTS 重定向检测与控制

@@ -77,3 +77,8 @@ Thumbs.db
 /v5_server/.save-generation.lock
 linux_config.json
 linux_generated/
+
+# Host download state
+/v5_server/runtime/
+/v5_server/cdn_cache/
+*.json.lock

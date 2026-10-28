@@ -74,7 +74,12 @@
       "source": "v5_server/tools",
       "target": "tools",
       "recursive": false,
-      "patterns": ["upgrade_legacy_saves.py"]
+      "patterns": [
+        "upgrade_legacy_saves.py",
+        "download_assets.py",
+        "download_pc_assets.py",
+        "download_ios_assets.py"
+      ]
     },
     {
       "source": "analysis_scripts/协议分析/角色挖掘",
@@ -102,9 +107,20 @@
     "*.db",
     "*.db-wal",
     "*.db-shm",
-    "ai_bot_config.json"
+    "ai_bot_config.json",
+    "*.lock"
   ],
   "required_files": [
+    "cdn_transfer_control.py",
+    "resource_storage.py",
+    "client_version.py",
+    "cdn_download_index.py",
+    "cdn_download_queue.py",
+    "tools/download_assets.py",
+    "resource_manifests.py",
+    "native_manifest_sources.json",
+    "cdn_active_downloads.py",
+    "cdn_integrity.py",
     "tools/upgrade_legacy_saves.py",
     ".env.example",
     "AetherGazer.mobileconfig",
@@ -283,6 +299,9 @@
     "avatars_catalog.json": "GM 查询旧可选头像目录，当前不存在并有回退。",
     "items_catalog.json": "GM 查询旧可选目录，当前不存在并有数据库回退。",
     "仓库条目总表.json": "开发目录的旧可选物品总表，运行时有数据库回退。",
-    "ai_leaderboards_cache.json": "运行时缓存，不是发布静态配置。"
+    "ai_leaderboards_cache.json": "运行时缓存，不是发布静态配置。",
+    "resource_distribution.json": "服务器本机的平台资源分发配置；缺省使用内置版本，可由面板生成。",
+    "cdn_download_settings.json": "本机主动下载并发设置，缺省32路，运行时按需生成，不分发开发机设置。",
+    "queue.json": "本机主动下载队列和执行状态，运行时生成，不随存档和发行包分发。"
   }
 }

@@ -19,6 +19,11 @@ res_version_manager.py — 客户端资源版本与两级协议自适应管理�
    - 将清单与增量资源落盘至 static_resources 与各平台专属数据目录 (如 D:\\PC_DATA)，严禁触碰客户端目录。
 """
 import copy
+from contextlib import contextmanager
+from contextvars import ContextVar
+import uuid
+import cdn_integrity as integrity
+import cdn_active_downloads as active_downloads
 import hashlib
 import http.client
 import json
@@ -157,6 +162,7 @@ BUILTIN_VERSION_CONFIGS: Dict[str, Dict[str, Any]] = {
 VERSION_CONFIGS: Dict[str, Dict[str, Any]] = copy.deepcopy(BUILTIN_VERSION_CONFIGS)
 SUPPORTED_VERSIONS: List[str] = list(VERSION_CONFIGS.keys())
 _CURRENT_VERSION: str = DEFAULT_VERSION
+_CONNECTION_VERSION = ContextVar('game_connection_version', default=None)
 _LOCK = threading.Lock()
 _VERSION_CHANGE_LISTENERS = []
 
@@ -186,16 +192,10 @@ def _load_persisted_dynamic_versions():
 
 
 def _save_persisted_dynamic_versions():
-    """将非内置的动态版本序列化到 dynamic_versions.json。"""
-    try:
-        dynamic_only = {}
-        for k, v in VERSION_CONFIGS.items():
-            if k not in BUILTIN_VERSION_CONFIGS:
-                dynamic_only[k] = v
-        with open(DYNAMIC_VERSIONS_PATH, "w", encoding="utf-8") as f:
-            json.dump(dynamic_only, f, ensure_ascii=False, indent=2)
-    except Exception:
-        pass
+    """Persist atomically and propagate failure; never advertise a failed commit."""
+    dynamic_only = {k: v for k, v in VERSION_CONFIGS.items()
+                    if k not in BUILTIN_VERSION_CONFIGS or v != BUILTIN_VERSION_CONFIGS[k]}
+    integrity.publish_json(DYNAMIC_VERSIONS_PATH, dynamic_only)
 
 
 _load_persisted_dynamic_versions()
@@ -215,11 +215,22 @@ def register_version(ver: str, config: Optional[Dict[str, Any]] = None, persist:
                 raise ValueError(f"Build [{ver_str}] 缺少真实版本名称，请先探测客户端清单或同步官方版本元数据")
         cfg = copy.deepcopy(config)
         cfg["version_name"] = normalize_version_name(cfg.get("version_name"))
+        previous = VERSION_CONFIGS.get(ver_str)
+        existed = ver_str in SUPPORTED_VERSIONS
         VERSION_CONFIGS[ver_str] = cfg
-        if ver_str not in SUPPORTED_VERSIONS:
+        if not existed:
             SUPPORTED_VERSIONS.append(ver_str)
-        if persist:
-            _save_persisted_dynamic_versions()
+        try:
+            if persist:
+                _save_persisted_dynamic_versions()
+        except Exception:
+            if previous is None:
+                VERSION_CONFIGS.pop(ver_str, None)
+            else:
+                VERSION_CONFIGS[ver_str] = previous
+            if not existed:
+                SUPPORTED_VERSIONS.remove(ver_str)
+            raise
         return copy.deepcopy(VERSION_CONFIGS[ver_str])
 
 
@@ -283,223 +294,85 @@ def get_detected_client_info() -> dict:
 
 
 def detect_client_resource_version(custom_dir: Optional[str] = None) -> dict:
-    """
-    扫描目标客户端目录下的核心特征版本校验文件。
-    优先检查 AssetHash_Info.bytes（自动计算哈希并解析 buildCode），兼容 assethash_*_*_*.bytes 历史索引。
-    若探测到官方新版（不在已知列表中），自动基于基线模型完成动态注册并准入！
-    """
+    """Read-only PC directory hint. Never register it as all-platform authority."""
     global _DETECTED_CLIENT_INFO
-    target_dir = custom_dir.strip() if custom_dir and isinstance(custom_dir, str) else None
-    if not target_dir:
-        target_dir = os.environ.get(ENV_CLIENT_STREAMING_ASSETS_DIR, "").strip() or DEFAULT_CLIENT_STREAMING_ASSETS_DIR
-
-    result = {
-        "detected": False,
-        "version": None,
-        "matched_file": None,
-        "file_mtime": 0,
-        "file_mtime_str": "",
-        "client_dir": target_dir,
-        "detail": "",
-    }
-
-    if not target_dir or not os.path.isdir(target_dir):
-        result["detail"] = f"客户端 StreamingAssets 目录未配置或不存在: {target_dir or '未配置'}"
-        with _LOCK:
-            _DETECTED_CLIENT_INFO = copy.deepcopy(result)
-        return result
-
-    # 深度寻址：若传入的是游戏根目录，自动下潜寻找真实的资源存储子目录
-    active_dir = target_dir
-    candidates = [
-        target_dir,
-        os.path.join(target_dir, "AetherGazer_Data", "StreamingAssets", "Windows"),
-        os.path.join(target_dir, "StreamingAssets", "Windows"),
-        os.path.join(target_dir, "StreamingAssets"),
-    ]
-    for cd in candidates:
-        if os.path.isdir(cd):
-            if os.path.isfile(os.path.join(cd, "AssetHash_Info.bytes")):
-                active_dir = cd
-                break
+    target = (custom_dir or os.environ.get(ENV_CLIENT_STREAMING_ASSETS_DIR) or DEFAULT_CLIENT_STREAMING_ASSETS_DIR or '').strip()
+    info = dict(detected=False, version=None, matched_file=None, file_mtime=0,
+                file_mtime_str='', client_dir=target, detail='客户端目录未配置或不存在')
+    folders = [target, os.path.join(target, 'AetherGazer_Data', 'StreamingAssets', 'Windows'),
+               os.path.join(target, 'StreamingAssets', 'Windows'), os.path.join(target, 'StreamingAssets')]
+    for folder in folders:
+        if not folder or not os.path.isdir(folder):
+            continue
+        primary = os.path.join(folder, 'AssetHash_Info.bytes')
+        candidates = [primary] if os.path.isfile(primary) else sorted(
+            [os.path.join(folder, name) for name in os.listdir(folder) if ASSETHASH_PATTERN.fullmatch(name)],
+            key=os.path.getmtime, reverse=True)
+        for path in candidates[:1]:
             try:
-                if any(ASSETHASH_PATTERN.match(f) for f in os.listdir(cd)):
-                    active_dir = cd
-                    break
-            except Exception:
-                pass
-
-    # 路径一：优先探测 AssetHash_Info.bytes 官方核心索引
-    info_file = os.path.join(active_dir, "AssetHash_Info.bytes")
-    if os.path.isfile(info_file) and os.path.getsize(info_file) > 0:
-        try:
-            mtime = os.path.getmtime(info_file)
-            mtime_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mtime)) if mtime > 0 else ""
-            with open(info_file, "r", encoding="utf-8") as f:
-                jdata = json.load(f)
-            b_code = str(jdata.get("buildCode", "")).strip()
-            v_name = str(jdata.get("versionName", "")).strip()
-            app_ver = str(jdata.get("appVersion", "307")).strip()
-
-            with open(info_file, "rb") as f:
-                hash_md5 = hashlib.md5(f.read()).hexdigest().lower()
-
-            if b_code:
-                extracted_ver = b_code
-                try:
-                    v_name = normalize_version_name(v_name)
-                except ValueError as error:
-                    result["version"] = extracted_ver
-                    result["detail"] = f"客户端核心索引的版本名称无效: {error}"
-                    with _LOCK:
-                        _DETECTED_CLIENT_INFO = copy.deepcopy(result)
-                    return result
-                result["matched_file"] = f"AssetHash_Info.bytes (MD5: {hash_md5})"
-                result["file_mtime"] = mtime
-                result["file_mtime_str"] = mtime_str
-
-                if extracted_ver not in SUPPORTED_VERSIONS:
-                    b_num = int(extracted_ver) if extracted_ver.isdigit() else 321
-                    baseline = get_baseline_for_build(b_num)
-                    new_cfg = {
-                        "version": extracted_ver,
-                        "version_name": v_name,
-                        "display_name": f"Build {extracted_ver} ({v_name})",
-                        "matched_app_version": app_ver,
-                        "assethash": {
-                            "pc": f"assethash_{app_ver}_{extracted_ver}_{hash_md5}.bytes",
-                            "android": f"assethash_{app_ver}_{extracted_ver}_{hash_md5}.bytes",
-                            "ios": f"assethash_{app_ver}_{extracted_ver}_{hash_md5}.bytes",
-                        },
-                        "voice_package_list": f"voice_package_list_{app_ver}_{extracted_ver}.bytes",
-                        "voice_hashes": {
-                            "ja": f"voice_hash_ja_{app_ver}00{extracted_ver}.bytes",
-                            "zh": f"voice_hash_zh_{app_ver}00{extracted_ver}.bytes",
-                        },
-                        **baseline,
-                    }
-                    register_version(extracted_ver, new_cfg, persist=True)
-
-                result["detected"] = True
-                result["version"] = extracted_ver
-                cfg = VERSION_CONFIGS.get(extracted_ver, {})
-                result["detail"] = (
-                    f"成功通过客户端核心索引识别生效版本 Build {extracted_ver} ({cfg.get('display_name', '')}), "
-                    f"特征MD5: {hash_md5} (修改时间: {mtime_str})"
-                )
-                with _LOCK:
-                    _DETECTED_CLIENT_INFO = copy.deepcopy(result)
-                return result
-        except Exception:
-            pass
-
-    # 路径二：回退扫描 assethash_*_*_*.bytes 索引
-    matched_entries = []
-    try:
-        for fname in os.listdir(active_dir):
-            m = ASSETHASH_PATTERN.match(fname)
-            if m:
-                app_ver, res_ver, hash_str = m.group(1), m.group(2), m.group(3)
-                full_path = os.path.join(active_dir, fname)
-                try:
-                    mtime = os.path.getmtime(full_path)
-                except OSError:
-                    mtime = 0.0
-                matched_entries.append({
-                    "filename": fname,
-                    "full_path": full_path,
-                    "app_ver": app_ver,
-                    "res_ver": res_ver,
-                    "hash": hash_str,
-                    "mtime": mtime,
-                })
-    except Exception as e:
-        result["detail"] = f"扫描客户端资源目录异常: {e}"
-        with _LOCK:
-            _DETECTED_CLIENT_INFO = copy.deepcopy(result)
-        return result
-
-    if not matched_entries:
-        result["detail"] = f"在客户端目录 [{active_dir}] 下未找到合规的 AssetHash_Info.bytes 或 assethash_*_*_*.bytes 索引文件"
-        with _LOCK:
-            _DETECTED_CLIENT_INFO = copy.deepcopy(result)
-        return result
-
-    matched_entries.sort(key=lambda x: x["mtime"], reverse=True)
-    latest_entry = matched_entries[0]
-    extracted_ver = str(latest_entry["res_ver"]).strip()
-    mtime_val = latest_entry["mtime"]
-    mtime_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mtime_val)) if mtime_val > 0 else ""
-
-    result["matched_file"] = latest_entry["filename"]
-    result["file_mtime"] = mtime_val
-    result["file_mtime_str"] = mtime_str
-
-    # 动态版本自愈：若客户端包含新版本，自动调用 register_version 接入
-    if extracted_ver not in SUPPORTED_VERSIONS:
-        try:
-            with open(latest_entry["full_path"], "r", encoding="utf-8") as f:
-                manifest = json.load(f)
-            v_name = normalize_version_name(manifest.get("versionName"))
-        except (OSError, ValueError, AttributeError) as error:
-            result["version"] = extracted_ver
-            result["detail"] = f"Build [{extracted_ver}] 清单缺少可用的版本名称，未自动注册: {error}"
-            with _LOCK:
-                _DETECTED_CLIENT_INFO = copy.deepcopy(result)
-            return result
-        app_ver = latest_entry["app_ver"]
-        b_num = int(extracted_ver) if extracted_ver.isdigit() else 311
-        baseline = get_baseline_for_build(b_num)
-        new_cfg = {
-            "version": extracted_ver,
-            "version_name": v_name,
-            "display_name": f"Build {extracted_ver} (客户端探测并自动接入)",
-            "matched_app_version": app_ver,
-            "assethash": {
-                "pc": latest_entry["filename"],
-                "android": latest_entry["filename"],
-                "ios": latest_entry["filename"],
-            },
-            "voice_package_list": f"voice_package_list_{app_ver}_{extracted_ver}.bytes",
-            "voice_hashes": {
-                "ja": f"voice_hash_ja_{app_ver}00{extracted_ver}.bytes",
-                "zh": f"voice_hash_zh_{app_ver}00{extracted_ver}.bytes",
-            },
-            **baseline,
-        }
-        register_version(extracted_ver, new_cfg, persist=True)
-
-    result["detected"] = True
-    result["version"] = extracted_ver
-    cfg = VERSION_CONFIGS.get(extracted_ver, {})
-    result["detail"] = (
-        f"成功探测并识别到客户端生效版本 Build {extracted_ver} ({cfg.get('display_name', '')}), "
-        f"特征文件: {latest_entry['filename']} (修改时间: {mtime_str})"
-    )
-
+                if os.path.getsize(path) > integrity.MAX_MANIFEST_BYTES:
+                    raise ValueError('客户端清单过大')
+                with open(path, 'rb') as handle:
+                    raw = handle.read(integrity.MAX_MANIFEST_BYTES + 1)
+                data = json.loads(raw)
+                integrity.manifest_items(data)
+                name = normalize_version_name(data.get('versionName'))
+                stamp = os.path.getmtime(path)
+                info.update(detected=True, version=str(data['buildCode']), app_version=str(data['appVersion']),
+                    version_name=name, matched_file=os.path.basename(path), sha256=hashlib.sha256(raw).hexdigest(),
+                    md5=hashlib.md5(raw).hexdigest(), file_mtime=stamp,
+                    file_mtime_str=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stamp)),
+                    detail='PC本机只读探测完成；仅匹配已登记原生清单，不改业务版本')
+                break
+            except (OSError, ValueError, KeyError, TypeError) as error:
+                info['detail'] = str(error)
+        if info['detected']:
+            break
     with _LOCK:
-        _DETECTED_CLIENT_INFO = copy.deepcopy(result)
-    return result
+        _DETECTED_CLIENT_INFO = copy.deepcopy(info)
+    return info
 
 
 def apply_auto_client_version(custom_dir: Optional[str] = None, fallback_version: str = DEFAULT_VERSION) -> Tuple[str, dict]:
-    info = detect_client_resource_version(custom_dir=custom_dir)
-    if info.get("detected") and info.get("version") in SUPPORTED_VERSIONS:
-        target_ver = info["version"]
-        set_current_version(target_ver)
-        return target_ver, info
-    else:
-        if info.get("version"):
-            # 已识别构建但名称无效，保持当前有效配置，不能猜测该构建的版本名称。
-            return get_current_version(), info
-        target_ver = fallback_version if fallback_version in SUPPORTED_VERSIONS else DEFAULT_VERSION
-        set_current_version(target_ver)
-        return target_ver, info
+    # Kept for older callers: automatic local hints no longer mutate the global
+    # gameplay build or inject a PC filename into other platforms.
+    info = detect_client_resource_version(custom_dir)
+    return get_current_version(), info
 
 
 def get_current_version() -> str:
+    bound = _CONNECTION_VERSION.get()
+    if bound is not None:
+        return bound
+    return get_default_version()
+
+
+def get_default_version() -> str:
     with _LOCK:
         return _CURRENT_VERSION
+
+
+def enter_connection_version(version=None):
+    if version is not None:
+        version = str(version)
+        get_version_config(version)
+    return _CONNECTION_VERSION.set(version)
+
+
+def leave_connection_version(token):
+    _CONNECTION_VERSION.reset(token)
+
+
+@contextmanager
+def connection_version(version=None):
+    if version is None:
+        yield
+        return
+    token = enter_connection_version(version)
+    try:
+        yield
+    finally:
+        leave_connection_version(token)
 
 
 def register_version_change_listener(fn):
@@ -596,13 +469,19 @@ def get_voice_package_list(ver: Optional[str] = None) -> str:
 
 # ----------------- 官方上游 DoH 穿透探测引擎 (Upstream DoH Probe) -----------------
 
-def probe_official_latest(platform: str = "pc", channel: str = "9") -> Tuple[bool, dict, str]:
+PLATFORM_CHANNEL_IDS = {"pc": "9", "android": "8", "ios": "7"}
+
+
+def probe_official_latest(platform: str = "pc", channel: Optional[str] = None) -> Tuple[bool, dict, str]:
     """
     通过内置 DoH 域名解析直连官方 upstream open.ys4fun.com，
     完全穿透本地 HOSTS 127.0.0.1 重定向，获取官方最新发布的客户端版本信息。
     """
     import cdn_proxy
     plat = platform.lower()
+    if plat not in PLATFORM_CHANNEL_IDS:
+        return False, {}, f"不支持的平台: {plat}"
+    channel = str(channel) if channel is not None else PLATFORM_CHANNEL_IDS[plat]
     ts_str = str(int(time.time()))
     nonce = "".join(random.choices(string.ascii_letters + string.digits, k=6))
     params = {
@@ -631,84 +510,139 @@ def probe_official_latest(platform: str = "pc", channel: str = "9") -> Tuple[boo
     except Exception as e:
         return False, {}, f"解析官方响应 JSON 异常: {e}"
 
-    if res_json.get("errorCode") not in ("0", 0, None) and res_json.get("code") not in (0, "0", None):
+    if any(res_json.get(key) not in ("0", 0, None) for key in ("errorCode", "code")):
         return False, {}, f"官方返回错误: {res_json.get('msg') or res_json.get('errorCode')}"
 
     data_items = res_json.get("data", [])
-    no_install_item = None
-    install_item = None
+    if not isinstance(data_items, list):
+        return False, {}, "官方版本列表格式无效"
+    candidates = []
     for item in data_items:
-        if item.get("type") == "noInstall":
-            no_install_item = item
-        elif item.get("type") == "install":
-            install_item = item
+        if not isinstance(item, dict) or item.get("platformType", plat) != plat:
+            continue
+        if item.get("channelId") is not None and str(item["channelId"]) != channel:
+            continue
+        assethash_fn = item.get("assethash")
+        try:
+            extra = item.get("extraData") or {}
+            extra = json.loads(extra) if isinstance(extra, str) else extra
+            assethash_fn = assethash_fn or extra.get("assethash")
+        except (ValueError, AttributeError, TypeError):
+            pass
+        match = ASSETHASH_PATTERN.fullmatch(str(assethash_fn or ""))
+        app_version = item.get("matchedAppVersion") or (match[1] if match else None)
+        version = item.get("version") or (match[2] if match else None)
+        candidates.append({
+            "type": str(item.get("type", "")), "platform": plat, "channel_id": channel,
+            "version": str(version or ""), "version_name": str(item.get("versionName") or ""),
+            "app_version": str(app_version or ""), "assethash": assethash_fn or "",
+            "download_url": item.get("downloadUrl") or "", "raw": item,
+        })
 
-    target_item = no_install_item or install_item or (data_items[0] if data_items else None)
-    if not target_item:
-        return False, {}, "官方接口返回版本列表为空"
-
-    version = target_item.get("version")
-    version_name = target_item.get("versionName")
+    # App installation and resource builds are separate axes. Never let the last
+    # 307 entry displace a newer 308 entry just because the response order changed.
+    numeric = lambda value: int(value) if str(value).isdigit() else -1
+    resources = [row for row in candidates if row["type"] == "noInstall" and row["assethash"]]
+    if not resources:
+        return False, {}, "官方接口没有返回可用的资源清单"
+    target = max(resources, key=lambda row: (numeric(row["app_version"]), numeric(row["version"])))
+    if not target["app_version"]:
+        return False, {}, "官方资源清单缺少安装包版本"
     try:
-        version_name = normalize_version_name(version_name)
+        version_name = normalize_version_name(target["version_name"])
     except ValueError as error:
         return False, {}, f"官方版本名称无效: {error}"
-    app_version = target_item.get("matchedAppVersion") or target_item.get("version") or "307"
-    assethash_fn = target_item.get("assethash")
-
-    # 若未直接带 assethash，尝试从 extraData 解析
-    if not assethash_fn and target_item.get("extraData"):
-        try:
-            extra = json.loads(target_item["extraData"])
-            assethash_fn = extra.get("assethash")
-        except Exception:
-            pass
 
     info = {
         "platform": plat,
-        "version": str(version),
+        "channel_id": channel,
+        "version": target["version"],
         "version_name": str(version_name),
-        "app_version": str(app_version),
-        "assethash": assethash_fn,
-        "download_url": target_item.get("downloadUrl"),
-        "raw": target_item,
+        "app_version": target["app_version"],
+        "assethash": target["assethash"],
+        "install_version": max((row["version"] for row in candidates if row["type"] == "install"), key=numeric, default=""),
+        "download_url": target["download_url"],
+        "candidates": [{k: v for k, v in row.items() if k != "raw"} for row in candidates],
+        "raw": target["raw"],
     }
     return True, info, "成功拉取官方最新版本元数据"
 
 
 # ----------------- 资产清单差异比对引擎 (Manifest Diff Engine) -----------------
 
-def _load_manifest_content(platform: str, assethash_filename: str) -> Optional[dict]:
-    """尝试从本地 static_resources 或专属数据目录读取清单，若本地缺失则经由 DoH 直接从官方 CDN 读取。"""
+def _load_manifest_content(platform: str, assethash_filename: str, *, allow_download=True) -> Optional[dict]:
+    """Load only a verified platform object, including remote cache population."""
     import cdn_proxy
-    plat = platform.lower()
-    # 1. 本地查找
-    cached = cdn_proxy.find_cached_file(assethash_filename, platform=plat)
-    if cached and os.path.isfile(cached) and os.path.getsize(cached) > 0:
-        try:
-            with open(cached, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            pass
-
-    # 2. 远端拉取
-    url_path = f"/{plat}/resources/{assethash_filename}"
-    st, hdrs, body = cdn_proxy.fetch_upstream(OFFICIAL_CDN_HOST, url_path, timeout=15)
-    if st == 200 and body:
-        try:
-            # 顺手缓存在本地以加速后续比对
-            plat_static = os.path.join(STATIC_RESOURCES_DIR, plat)
-            os.makedirs(plat_static, exist_ok=True)
-            save_path = os.path.join(plat_static, assethash_filename)
-            with open(save_path, "wb") as f:
-                f.write(body)
-            return json.loads(body.decode("utf-8"))
-        except Exception:
-            pass
-    return None
+    try:
+        integrity.platform(platform)
+        integrity.ObjectSpec(assethash_filename)
+        cached = cdn_proxy.find_cached_file(assethash_filename, platform=platform)
+        if not cached:
+            if not allow_download:
+                return None
+            cached = cdn_proxy.download_verified(platform, assethash_filename,
+                        os.path.join(STATIC_RESOURCES_DIR, platform))
+        with open(cached, 'rb') as handle:
+            return integrity.decode_manifest(handle.read(integrity.MAX_MANIFEST_BYTES + 1), assethash_filename)
+    except (OSError, ValueError, http.client.HTTPException):
+        return None
 
 
-def calculate_manifest_diff(local_ver: Optional[str] = None, remote_ver: Optional[str] = None, platform: str = "pc") -> dict:
+def manifest_download_status(platform, filename):
+    """Only the requested platform's static folder counts as saved here."""
+    integrity.platform(platform)
+    if not isinstance(filename, str) or not re.fullmatch(r'assethash_\d+_\d+_[0-9a-fA-F]{32}\.bytes', filename):
+        return dict(present=False, valid=False)
+    path = integrity.safe_path(os.path.join(STATIC_RESOURCES_DIR, platform), filename)
+    present = os.path.lexists(path)
+    return dict(present=present, valid=present and integrity.valid_file(path, integrity.ObjectSpec(filename)))
+
+
+def download_official_manifest(platform, filename, channel_id=None):
+    """Explicit main-manifest save; never change versions or download assets."""
+    import cdn_proxy
+    plat = integrity.platform(platform)
+    channel = PLATFORM_CHANNEL_IDS[plat]
+    if channel_id is not None and str(channel_id) != channel:
+        raise ValueError('平台与渠道不匹配')
+    if not isinstance(filename, str) or not re.fullmatch(r'assethash_\d+_\d+_[0-9a-fA-F]{32}\.bytes', filename):
+        raise ValueError('请提供官方返回的完整资源清单文件名')
+    folder = os.path.join(STATIC_RESOURCES_DIR, plat)
+    path = integrity.safe_path(folder, filename)
+    def result(downloaded, skipped):
+        return dict(platform=plat, channel_id=channel, filename=filename,
+                    relative_path=f'static_resources/{plat}/{filename}',
+                    downloaded=downloaded, skipped=skipped,
+                    **manifest_download_status(plat, filename))
+    if os.path.lexists(path):
+        return result(False, True)
+    from cdn_transfer_control import gate, current_token
+    if current_token() is None:
+        with gate.active(deadline=time.monotonic()+120):
+            return download_official_manifest(platform, filename, channel_id)
+    success, info, message = probe_official_latest(platform=plat)
+    if not success:
+        raise integrity.IntegrityError(message)
+    if info.get('assethash') != filename or str(info.get('channel_id')) != channel:
+        raise ValueError('官方清单已变化或渠道不匹配，请重新检测')
+    match = ASSETHASH_PATTERN.fullmatch(filename)
+    if (match[1], match[2]) != (str(info.get('app_version')), str(info.get('version'))):
+        raise integrity.IntegrityError('官方元数据与清单身份不一致')
+    # The metadata request above may race another save. Existing files remain
+    # untouched, including invalid files which must not be silently overwritten.
+    if os.path.lexists(path):
+        return result(False, True)
+    cached = cdn_proxy.find_cached_file(filename, platform=plat)
+    if cached:
+        integrity.copy_verified(cached, folder, integrity.ObjectSpec(filename))
+    else:
+        cdn_proxy.download_verified(plat, filename, folder, deadline=time.monotonic()+90, max_attempts=3)
+    if not manifest_download_status(plat, filename)['valid']:
+        raise integrity.IntegrityError('清单保存后校验失败')
+    return result(True, False)
+
+
+def calculate_manifest_diff(local_ver: Optional[str] = None, remote_ver: Optional[str] = None, platform: str = "pc", *, remote_metadata: Optional[dict] = None, allow_download=True) -> dict:
     """
     比对指定本地版本与远端最新版本的 assethash 清单，
     输出详细差异报表（修改/新增/删除文件清单及总下载字节数）。
@@ -720,17 +654,22 @@ def calculate_manifest_diff(local_ver: Optional[str] = None, remote_ver: Optiona
     # 获取本地清单
     local_cfg = get_version_config(local_ver)
     local_hash_fn = local_cfg["assethash"].get(plat, local_cfg["assethash"]["pc"])
-    local_manifest = _load_manifest_content(plat, local_hash_fn)
+    load_options = {} if allow_download else {'allow_download': False}
+    local_manifest = _load_manifest_content(plat, local_hash_fn, **load_options)
 
     # 获取远端版本信息
     remote_info = {}
-    if remote_ver and remote_ver in VERSION_CONFIGS:
+    if remote_metadata is not None:
+        remote_info = remote_metadata
+        remote_hash_fn = remote_info.get("assethash")
+    elif remote_ver and remote_ver in VERSION_CONFIGS:
         rem_cfg = get_version_config(remote_ver)
         remote_hash_fn = rem_cfg["assethash"].get(plat, rem_cfg["assethash"]["pc"])
         remote_info = {
             "version": remote_ver,
             "version_name": rem_cfg.get("version_name", remote_ver),
             "assethash": remote_hash_fn,
+            "app_version": rem_cfg.get("matched_app_version", ""),
         }
     else:
         ok, probed, msg = probe_official_latest(platform=plat)
@@ -744,36 +683,38 @@ def calculate_manifest_diff(local_ver: Optional[str] = None, remote_ver: Optiona
                 "local_version": local_ver,
             }
 
-    remote_manifest = _load_manifest_content(plat, remote_hash_fn)
+    metadata = {
+        "platform": plat, "channel_id": remote_info.get("channel_id", PLATFORM_CHANNEL_IDS.get(plat, "")),
+        "local_version": local_ver,
+        "local_version_name": (local_manifest or {}).get("versionName", local_cfg.get("version_name", "")),
+        "local_app_version": str((local_manifest or {}).get("appVersion") or (ASSETHASH_PATTERN.fullmatch(local_hash_fn)[1] if ASSETHASH_PATTERN.fullmatch(local_hash_fn) else "")),
+        "local_assethash": local_hash_fn,
+        "remote_version": remote_info.get("version"),
+        "remote_version_name": remote_info.get("version_name", ""),
+        "remote_app_version": str(remote_info.get("app_version") or ""),
+        "remote_assethash": remote_hash_fn,
+        "remote_install_version": remote_info.get("install_version", ""),
+        "remote_candidates": remote_info.get("candidates", []),
+    }
+    remote_manifest = _load_manifest_content(plat, remote_hash_fn, **load_options) if remote_hash_fn else None
     if not local_manifest:
         return {
             "success": False,
             "error": f"未能加载本地版本 [{local_ver}] 的清单: {local_hash_fn}",
-            "local_version": local_ver,
+            **metadata,
         }
     if not remote_manifest:
         return {
             "success": False,
             "error": f"未能加载远端清单: {remote_hash_fn}",
-            "local_version": local_ver,
-            "remote_version": remote_info.get("version"),
+            **metadata,
         }
 
-    # 解析 assetHashList
-    def parse_hash_list(h_list: list) -> Dict[str, Tuple[str, int]]:
-        res = {}
-        for line in h_list:
-            parts = line.split("|")
-            if len(parts) >= 3:
-                try:
-                    size = int(parts[2])
-                except ValueError:
-                    size = 0
-                res[parts[0]] = (parts[1], size)
-        return res
-
-    local_map = parse_hash_list(local_manifest.get("assetHashList", []))
-    remote_map = parse_hash_list(remote_manifest.get("assetHashList", []))
+    try:
+        local_map = integrity.manifest_items(local_manifest)
+        remote_map = integrity.manifest_items(remote_manifest)
+    except ValueError as error:
+        return {"success": False, "error": str(error), **metadata}
 
     local_keys = set(local_map.keys())
     remote_keys = set(remote_map.keys())
@@ -813,17 +754,13 @@ def calculate_manifest_diff(local_ver: Optional[str] = None, remote_ver: Optiona
     removed_files = [{"path": k, "old_hash": local_map[k][0], "old_size": local_map[k][1]} for k in sorted(removed_keys)]
 
     rem_ver = remote_info.get("version")
-    has_update = (local_ver != rem_ver) or (len(modified_files) > 0) or (len(added_files) > 0)
+    has_update = (str(local_ver) != str(rem_ver)) or local_hash_fn != remote_hash_fn or bool(modified_files or added_files or removed_files)
 
     return {
         "success": True,
+        "diff_ready": True,
         "has_update": has_update,
-        "platform": plat,
-        "local_version": local_ver,
-        "local_version_name": local_manifest.get("versionName", local_ver),
-        "remote_version": rem_ver,
-        "remote_version_name": remote_info.get("version_name", rem_ver),
-        "remote_assethash": remote_hash_fn,
+        **metadata,
         "total_local_assets": len(local_map),
         "total_remote_assets": len(remote_map),
         "diff_summary": {
@@ -844,250 +781,182 @@ def calculate_manifest_diff(local_ver: Optional[str] = None, remote_ver: Optiona
 # ----------------- 后台更新任务管理器 (Thread-Safe UpdateTaskManager) -----------------
 
 class UpdateTaskManager:
-    """负责跨平台清单下载与增量资产同步的线程安全单例管理器。"""
+    """One worker owns one cancellation token until it has actually terminated."""
 
     def __init__(self):
-        self._lock = threading.Lock()
-        self._thread: Optional[threading.Thread] = None
-        self._cancel_requested = False
-        self._state: Dict[str, Any] = {
-            "status": "idle",  # idle | checking | downloading | registering | completed | error
-            "progress_percent": 0.0,
-            "current_file": "",
-            "downloaded_files": 0,
-            "total_files": 0,
-            "downloaded_bytes": 0,
-            "total_bytes": 0,
-            "speed_kbps": 0.0,
-            "message": "空闲",
-            "error": None,
-            "target_version": "",
-            "version_name": "",
-            "diff_summary": None,
-        }
+        self._lock = threading.RLock()
+        self._thread = None
+        self._cancel = threading.Event()
+        self._state = dict(status='idle', progress_percent=0.0, current_file='',
+                           downloaded_files=0, total_files=0, downloaded_bytes=0,
+                           total_bytes=0, speed_kbps=0.0, message='空闲', error=None,
+                           target_version='', version_name='', diff_summary=None, task_id='',
+                           active_downloads=0)
 
-    def get_progress(self) -> dict:
+    def get_progress(self):
         with self._lock:
-            return copy.deepcopy(self._state)
+            return {**copy.deepcopy(self._state), 'max_concurrency': active_downloads.settings.limit()}
 
     def cancel(self):
         with self._lock:
-            self._cancel_requested = True
-            if self._state["status"] in ("checking", "downloading"):
-                self._state["status"] = "idle"
-                self._state["message"] = "任务已被用户取消"
+            # Registration is a short atomic commit: once started it finishes.
+            if self._state['status'] in ('checking', 'downloading', 'cancelling'):
+                self._cancel.set()
+                self._state.update(status='cancelling', message='正在停止下载，请稍候')
 
-    def is_busy(self) -> bool:
+    def is_busy(self):
         with self._lock:
-            return self._state["status"] in ("checking", "downloading", "registering")
+            return bool(self._thread and self._thread.is_alive()) or self._state['status'] in (
+                'checking', 'downloading', 'registering', 'cancelling')
 
-    def start_sync(
-        self,
-        target_version: Optional[str] = None,
-        download_diff_assets: bool = True,
-        platforms: Tuple[str, ...] = ("pc", "android", "ios"),
-    ) -> Tuple[bool, str]:
+    def start_sync(self, target_version=None, download_diff_assets=True,
+                   platforms=('pc', 'android', 'ios')):
+        if not platforms or len(set(platforms)) != len(platforms) or any(p not in ('pc', 'ios', 'android') for p in platforms):
+            return False, '请选择有效且不重复的资源平台'
         with self._lock:
-            if self._state["status"] in ("checking", "downloading", "registering"):
-                return False, "已有正在执行的版本更新任务"
-
-            self._cancel_requested = False
-            self._state = {
-                "status": "checking",
-                "progress_percent": 0.0,
-                "current_file": "",
-                "downloaded_files": 0,
-                "total_files": 0,
-                "downloaded_bytes": 0,
-                "total_bytes": 0,
-                "speed_kbps": 0.0,
-                "message": "正在探测官方最新版本与差异清单...",
-                "error": None,
-                "target_version": target_version or "",
-                "version_name": "",
-                "diff_summary": None,
-            }
-
-        self._thread = threading.Thread(
-            target=self._run_worker,
-            args=(target_version, download_diff_assets, platforms),
-            daemon=True,
-        )
-        self._thread.start()
-        return True, "版本更新同步任务已在后台启动"
+            if self.is_busy():
+                return False, '已有任务正在执行或停止，请等待结束'
+            self._cancel = threading.Event()
+            self._state.update(status='checking', progress_percent=0.0, current_file='',
+                               downloaded_files=0, total_files=0, downloaded_bytes=0,
+                               total_bytes=0, speed_kbps=0.0, error=None,
+                               message='正在探测官方资源', target_version=target_version or '',
+                               version_name='', diff_summary=None, task_id=uuid.uuid4().hex,
+                               active_downloads=0)
+            self._thread = threading.Thread(target=self._run_worker,
+                args=(target_version, download_diff_assets, tuple(platforms)), daemon=True)
+            self._thread.start()
+        return True, '版本同步任务已启动'
 
     def _update_state(self, **kwargs):
         with self._lock:
             self._state.update(kwargs)
 
     def _run_worker(self, target_version, download_diff_assets, platforms):
-        import cdn_proxy
-        import shutil
-
+        from cdn_transfer_control import gate
         try:
-            self._update_state(status="checking", message="正在通过 DoH 穿透探测官方最新版本...")
+            with gate.active(self._cancel, time.monotonic()+4*3600):
+                self._run_worker_active(target_version, download_diff_assets, platforms)
+        except integrity.Cancelled:
+            self._update_state(status='cancelled', message='已停止或让出给被动下载')
+        except Exception as error:
+            self._update_state(status='error', error=str(error), message='同步失败')
 
-            # 1. 探测各平台最新版本信息
-            plat_manifest_map = {}
+    def _run_worker_active(self, target_version, download_diff_assets, platforms):
+        import cdn_proxy
+        import resource_distribution
+        cancel = self._cancel
+        deadline = time.monotonic() + 4 * 3600
+        try:
+            plans = {}
             target_build = None
-            target_vname = None
-            target_app_ver = "307"
-
             for plat in platforms:
-                if self._cancel_requested:
-                    return
-                ok, p_info, err = probe_official_latest(platform=plat)
+                integrity.checkpoint(cancel, deadline)
+                ok, info, error = probe_official_latest(platform=plat)
                 if not ok:
-                    self._update_state(status="error", error=f"探测平台 [{plat}] 失败: {err}")
-                    return
-                plat_manifest_map[plat] = p_info
-                if not target_build:
-                    target_build = p_info["version"]
-                    target_vname = p_info["version_name"]
-                    target_app_ver = p_info["app_version"]
-
-            if target_version:
-                target_build = str(target_version)
-
-            self._update_state(
-                target_version=target_build,
-                version_name=target_vname,
-                message=f"已锁定目标版本: Build {target_build} ({target_vname})，开始同步清单与资源...",
-            )
-
-            # 2. 计算 PC 端差异
-            diff_res = calculate_manifest_diff(
-                local_ver=get_current_version(),
-                remote_ver=target_build,
-                platform="pc",
-            )
-            diff_summary = diff_res.get("diff_summary", {}) if diff_res.get("success") else None
-            self._update_state(diff_summary=diff_summary)
-
-            # 3. 准备要下载的清单文件列表
-            manifest_files_to_download = []
-            for plat, p_info in plat_manifest_map.items():
-                app_v = p_info["app_version"]
-                b_code = p_info["version"]
-                # assethash
-                if p_info.get("assethash"):
-                    manifest_files_to_download.append((plat, p_info["assethash"]))
-                # voice_package_list
-                v_list = f"voice_package_list_{app_v}_{b_code}.bytes"
-                manifest_files_to_download.append((plat, v_list))
-                # voice_hashes
-                manifest_files_to_download.append((plat, f"voice_hash_zh_{app_v}00{b_code}.bytes"))
-                manifest_files_to_download.append((plat, f"voice_hash_ja_{app_v}00{b_code}.bytes"))
-
-            # 4. 下载所有清单文件并分别落盘到 static_resources 与专属数据目录
-            self._update_state(
-                status="downloading",
-                total_files=len(manifest_files_to_download) + (len(diff_summary.get("modified_files", [])) if download_diff_assets and diff_summary else 0),
-                total_bytes=(diff_summary.get("total_download_bytes", 0) if download_diff_assets and diff_summary else 0) + len(manifest_files_to_download) * 50000,
-                message="正在下载各平台核心版本清单与语音索引...",
-            )
-
-            downloaded_files_count = 0
-            downloaded_bytes_count = 0
-            start_time = time.time()
-
-            for plat, fn in manifest_files_to_download:
-                if self._cancel_requested:
-                    return
-                self._update_state(current_file=f"[{plat.upper()}] {fn}")
-                plat_dir = os.path.join(STATIC_RESOURCES_DIR, plat)
-                os.makedirs(plat_dir, exist_ok=True)
-                dest_static = os.path.join(plat_dir, fn)
-                data_dir = cdn_proxy.get_data_dir(plat)
-                dest_data = os.path.join(data_dir, fn)
-
-                url_path = f"/{plat}/resources/{fn}"
-                st, hdrs, body = cdn_proxy.fetch_upstream(OFFICIAL_CDN_HOST, url_path, timeout=15)
-                if st == 200 and body:
-                    with open(dest_static, "wb") as f:
-                        f.write(body)
-                    try:
-                        shutil.copy2(dest_static, dest_data)
-                    except Exception:
-                        pass
-                    downloaded_bytes_count += len(body)
-                downloaded_files_count += 1
-                elapsed = max(0.1, time.time() - start_time)
-                speed = (downloaded_bytes_count / 1024.0) / elapsed
-                self._update_state(
-                    downloaded_files=downloaded_files_count,
-                    downloaded_bytes=downloaded_bytes_count,
-                    speed_kbps=round(speed, 1),
-                )
-
-            # 5. 若请求下载增量资产，下载 PC 端的修改与新增文件
-            if download_diff_assets and diff_summary:
-                modified_and_added = diff_summary.get("modified_files", []) + diff_summary.get("added_files", [])
-                pc_data_dir = cdn_proxy.get_data_dir("pc")
-
-                for item in modified_and_added:
-                    if self._cancel_requested:
-                        return
-                    new_hash = item.get("new_hash")
-                    new_sz = item.get("new_size", 0)
-                    asset_path = item.get("path", "")
-                    fn_on_cdn = f"{new_hash}.ys"
-                    self._update_state(current_file=f"{asset_path} ({fn_on_cdn})")
-
-                    dest_file = os.path.join(pc_data_dir, fn_on_cdn)
-                    if os.path.isfile(dest_file) and os.path.getsize(dest_file) == new_sz and new_sz > 0:
-                        downloaded_files_count += 1
-                        downloaded_bytes_count += new_sz
-                    else:
-                        url_path = f"/pc/resources/{fn_on_cdn}"
-                        st, hdrs, body = cdn_proxy.fetch_upstream(OFFICIAL_CDN_HOST, url_path, timeout=30)
-                        if st == 200 and body:
-                            with open(dest_file, "wb") as f:
-                                f.write(body)
-                            downloaded_bytes_count += len(body)
-                        downloaded_files_count += 1
-
-                    elapsed = max(0.1, time.time() - start_time)
-                    speed = (downloaded_bytes_count / 1024.0) / elapsed
-                    pct = min(99.0, round((downloaded_files_count / max(1, self._state["total_files"])) * 100, 1))
-                    self._update_state(
-                        downloaded_files=downloaded_files_count,
-                        downloaded_bytes=downloaded_bytes_count,
-                        speed_kbps=round(speed, 1),
-                        progress_percent=pct,
-                        message=f"正在同步增量资源 ({downloaded_files_count}/{self._state['total_files']})",
-                    )
-
-            # 6. 注册新版本到服务中
-            self._update_state(status="registering", message="正在将新版本注册入版本管理中心...")
-            b_int = int(target_build) if target_build.isdigit() else 311
-            baseline = get_baseline_for_build(b_int)
-            new_reg_cfg = {
-                "version": target_build,
-                "version_name": target_vname,
-                "display_name": f"Build {target_build} ({target_vname or '官方更新'})",
-                "matched_app_version": target_app_ver,
-                "assethash": {
-                    "pc": plat_manifest_map.get("pc", {}).get("assethash", f"assethash_{target_app_ver}_{target_build}.bytes"),
-                    "android": plat_manifest_map.get("android", {}).get("assethash", f"assethash_{target_app_ver}_{target_build}.bytes"),
-                    "ios": plat_manifest_map.get("ios", {}).get("assethash", f"assethash_{target_app_ver}_{target_build}.bytes"),
-                },
-                "voice_package_list": f"voice_package_list_{target_app_ver}_{target_build}.bytes",
-                "voice_hashes": {
-                    "ja": f"voice_hash_ja_{target_app_ver}00{target_build}.bytes",
-                    "zh": f"voice_hash_zh_{target_app_ver}00{target_build}.bytes",
-                },
-                **baseline,
-            }
-            register_version(target_build, new_reg_cfg, persist=True)
-
-            self._update_state(
-                status="completed",
-                progress_percent=100.0,
-                message=f"版本 Build {target_build} ({target_vname}) 已成功同步并就绪，可随时切换！",
-            )
-        except Exception as e:
-            self._update_state(status="error", error=f"同步更新异常中断: {e}", message="更新同步失败")
+                    raise integrity.IntegrityError(f'探测平台 [{plat}] 失败: {error}')
+                build = str(info['version'])
+                if target_version and str(target_version) != build:
+                    raise integrity.IntegrityError('请求版本与官方实际资源版本不一致，请重新检测')
+                if target_build is not None and target_build != build:
+                    raise integrity.IntegrityError('各平台资源版本不一致，请分平台同步')
+                target_build = build
+                integrity.ObjectSpec(info['assethash'])
+                manifest_identity = ASSETHASH_PATTERN.fullmatch(info['assethash'])
+                if not manifest_identity or (manifest_identity[1], manifest_identity[2]) != (str(info['app_version']), build):
+                    raise integrity.IntegrityError('官方版本信息与清单身份不一致')
+                plans[plat] = info
+            first = plans[platforms[0]]
+            self._update_state(target_version=target_build, version_name=first['version_name'])
+            diffs = {}
+            asset_jobs = {}
+            for plat in platforms:
+                integrity.checkpoint(cancel, deadline)
+                result = calculate_manifest_diff(
+                    local_ver=resource_distribution.get_platform_config(plat)['version'],
+                    remote_ver=target_build, platform=plat, remote_metadata=plans[plat])
+                integrity.checkpoint(cancel, deadline)
+                if download_diff_assets and not result.get('success'):
+                    raise integrity.IntegrityError(f'[{plat}] 无法得到可信增量清单: {result.get("error", "unknown")}')
+                summary = result.get('diff_summary') or {}
+                diffs[plat] = summary
+                if download_diff_assets:
+                    for entry in summary.get('modified_files', []) + summary.get('added_files', []):
+                        spec = integrity.ObjectSpec(str(entry['new_hash']) + '.ys', entry['new_size'], entry['new_hash'])
+                        key = (plat, spec.filename)
+                        if key in asset_jobs and asset_jobs[key] != spec:
+                            raise integrity.IntegrityError('增量对象规格冲突')
+                        asset_jobs[key] = spec
+            manifest_jobs = []
+            for plat, info in plans.items():
+                app, build = str(info['app_version']), str(info['version'])
+                if not app.isdigit() or not build.isdigit():
+                    raise integrity.IntegrityError('Invalid upstream version fields')
+                for name in (info['assethash'], f'voice_package_list_{app}_{build}.bytes',
+                             f'voice_hash_zh_{app}00{build}.bytes', f'voice_hash_ja_{app}00{build}.bytes'):
+                    manifest_jobs.append((plat, integrity.ObjectSpec(name)))
+            self._update_state(status='downloading', total_files=len(manifest_jobs) + len(asset_jobs),
+                total_bytes=sum(spec.size for spec in asset_jobs.values()),
+                diff_summary=diffs[platforms[0]] if len(platforms) == 1 else diffs,
+                message='正在校验并同步资源')
+            started = time.monotonic()
+            count, byte_count = 0, 0
+            def completed(path, manifest=False):
+                nonlocal count, byte_count
+                count += 1
+                byte_count += os.path.getsize(path)
+                total = self.get_progress()['total_files']
+                manifest_bytes = os.path.getsize(path) if manifest else 0
+                self._update_state(downloaded_files=count, downloaded_bytes=byte_count,
+                    total_bytes=self.get_progress()['total_bytes'] + manifest_bytes,
+                    progress_percent=min(99, round(100 * count / max(1, total), 1)),
+                    speed_kbps=round(byte_count / 1024 / max(0.1, time.monotonic() - started), 1))
+            def manifest_work(item):
+                plat, spec = item
+                integrity.checkpoint(cancel, deadline)
+                self._update_state(current_file=f'[{plat}] {spec.filename}')
+                path = cdn_proxy.download_verified(plat, spec.filename, cancel=cancel, deadline=deadline,
+                                                   force=spec.md5 is None)
+                integrity.copy_verified(path, os.path.join(STATIC_RESOURCES_DIR, plat), spec,
+                                        cancel=cancel, deadline=deadline)
+                return path
+            def asset_work(item):
+                (plat, _), spec = item
+                integrity.checkpoint(cancel, deadline)
+                self._update_state(current_file=f'[{plat}] {spec.filename}')
+                path = cdn_proxy.download_verified(plat, spec.filename, expected_size=spec.size,
+                    expected_md5=spec.md5, cancel=cancel, deadline=deadline)
+                return path
+            def window(active, _limit):
+                self._update_state(active_downloads=active)
+            active_downloads.run_batch(manifest_jobs, manifest_work,
+                lambda path: completed(path, manifest=True), cancel=cancel,
+                deadline=deadline, on_window=window)
+            active_downloads.run_batch(asset_jobs.items(), asset_work, completed,
+                cancel=cancel, deadline=deadline, on_window=window)
+            integrity.checkpoint(cancel, deadline)
+            # Serialize cancel vs commit. A cancellation acknowledged before this
+            # point can never register a new version.
+            with self._lock:
+                integrity.checkpoint(cancel, deadline)
+                self._state.update(status='registering', message='正在提交已验证版本')
+                previous = get_version_config(target_build) if target_build in VERSION_CONFIGS else {}
+                app = str(first['app_version'])
+                config = {**previous, **get_baseline_for_build(int(target_build)), 'version': target_build,
+                    'version_name': first['version_name'],
+                    'display_name': f'Build {target_build} ({first["version_name"]})',
+                    'matched_app_version': app,
+                    'assethash': {**previous.get('assethash', {}), **{p: i['assethash'] for p, i in plans.items()}},
+                    'voice_package_list': f'voice_package_list_{app}_{target_build}.bytes',
+                    'voice_hashes': {lang: f'voice_hash_{lang}_{app}00{target_build}.bytes' for lang in ('ja', 'zh')}}
+                resource_distribution.commit_official_bundles(plans,
+                    lambda: register_version(target_build, config, persist=True))
+                self._state.update(status='completed', progress_percent=100.0,
+                                   message='全部必需资源已验证并完成同步')
+        except integrity.Cancelled:
+            self._update_state(status='cancelled', message='任务已停止，未完成文件保留且不参与分发')
+        except Exception as error:
+            self._update_state(status='error', error=str(error), message='同步失败，未提交新版本')
 
 
 update_task_manager = UpdateTaskManager()
@@ -1097,6 +966,9 @@ update_task_manager = UpdateTaskManager()
 
 def check_and_print_update(sync: bool = False, platform: str = "pc"):
     """供命令行使用的交互式/自省式版本更新检测与下载工具。"""
+    if sync:
+        from tools.download_assets import main as download_main
+        return download_main(['--platform',platform,'--scope','all'])
     curr_ver = get_current_version()
     print("=" * 68)
     print(f"[*] 客户端版本管理单元 — 官方更新检查 (当前生效: Build {curr_ver})")
@@ -1163,7 +1035,7 @@ def check_and_print_update(sync: bool = False, platform: str = "pc"):
         if cf and len(cf) > 35:
             cf = cf[:32] + "..."
         print(f"\r[{st.upper():<10}] {pct:5.1f}% | 文件: {f_cnt} | 已下: {b_mb:6.1f}MB | 速度: {spd:6.1f}KB/s | 当前: {cf:<35}", end="", flush=True)
-        if st in ("completed", "error"):
+        if st in ("completed", "error", "cancelled"):
             print("\n")
             if st == "completed":
                 print(f"[+] {prog['message']}")

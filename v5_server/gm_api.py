@@ -63,6 +63,14 @@ def _bind_save_request():
     import gm_save_scope
     try:
         gm_save_scope.bind()
+        if not request.path.startswith(('/api/gm/system/', '/api/gm/saves')) and request.path != '/api/gm/res_version':
+            import account_db
+            import server_net
+            import res_version_manager as versions
+            path = getattr(g, 'gm_save_path', None) or getattr(account_db._db, 'path', None)
+            current = server_net.active_version_for_save(path)
+            if current:
+                g.gm_version_token = versions.enter_connection_version(current)
     except (ValueError, OSError):
         return err(GMErrorCode.PARAM_INVALID, '存档或账号选择无效，请刷新存档列表')
 
@@ -70,7 +78,13 @@ def _bind_save_request():
 @gm_bp.teardown_request
 def _close_save_request(exc):
     import gm_save_scope
-    gm_save_scope.close(exc)
+    try:
+        gm_save_scope.close(exc)
+    finally:
+        token = g.pop('gm_version_token', None)
+        if token is not None:
+            import res_version_manager as versions
+            versions.leave_connection_version(token)
 
 # 全局上下文容器（由 server_net.build_https_app 注入）
 _context = {
@@ -1979,6 +1993,61 @@ def post_set_res_version():
         return err(GMErrorCode.SERVICE_ERROR, f"切换客户端资源版本异常: {e}")
 
 
+@gm_bp.route("/system/resource_distribution", methods=["GET", "POST"])
+def resource_distribution_config():
+    """Host-wide platform resource configuration; no save/database writes."""
+    try:
+        import resource_distribution
+        if request.method == "POST":
+            return ok(resource_distribution.save_platform(request.get_json(silent=True)),
+                      msg="资源分发已保存，下次客户端版本检查生效")
+        return ok(resource_distribution.get_status())
+    except (ValueError, KeyError, TypeError) as error:
+        return err(GMErrorCode.PARAM_INVALID, str(error))
+    except Exception as error:
+        return err(GMErrorCode.SERVICE_ERROR, f"资源分发配置失败: {error}")
+
+
+@gm_bp.route('/system/resource_manifests/<action>', methods=['POST'])
+def resource_manifest_operation(action):
+    try:
+        import resource_distribution
+        body = request.get_json(silent=True)
+        if not isinstance(body, dict):
+            return err(GMErrorCode.PARAM_INVALID, '请求体必须为JSON对象')
+        if action == 'preview':
+            return ok(resource_distribution.preview_profile(body))
+        if action == 'generate':
+            return ok(resource_distribution.generate_profile(body), msg='副本已生成，尚未应用')
+        if action == 'remove':
+            return ok(resource_distribution.remove_profile(body.get('id')), msg='副本已从分发移除')
+        if action == 'restore':
+            return ok(resource_distribution.restore_profile(body.get('id')), msg='副本已恢复，尚未应用')
+        return err(GMErrorCode.PARAM_INVALID, '未知的清单管理操作')
+    except (ValueError, KeyError, TypeError) as error:
+        return err(GMErrorCode.PARAM_INVALID, str(error))
+    except Exception as error:
+        return err(GMErrorCode.SERVICE_ERROR, f'清单操作失败: {error}')
+
+
+@gm_bp.route("/system/resource_download_settings", methods=["GET", "POST"])
+def resource_download_settings():
+    """Server-local active download window; independent of player databases."""
+    try:
+        import cdn_active_downloads
+        if request.method == 'POST':
+            body = request.get_json(silent=True)
+            if not isinstance(body, dict) or 'max_concurrency' not in body:
+                return err(GMErrorCode.PARAM_INVALID, '请提供主动下载并发数')
+            return ok(cdn_active_downloads.settings.save(body['max_concurrency']),
+                      msg='下载并发已应用并保存')
+        return ok(cdn_active_downloads.settings.status())
+    except ValueError as error:
+        return err(GMErrorCode.PARAM_INVALID, str(error))
+    except Exception as error:
+        return err(GMErrorCode.SERVICE_ERROR, f'下载设置保存失败: {error}')
+
+
 @gm_bp.route("/system/check_update", methods=["GET"])
 @gm_bp.route("/check_update", methods=["GET"])
 def get_check_update():
@@ -1986,12 +2055,46 @@ def get_check_update():
     try:
         import res_version_manager
         plat = request.args.get("platform", "pc")
-        diff_res = res_version_manager.calculate_manifest_diff(platform=plat)
+        import resource_distribution
+        source = resource_distribution.get_platform_config(plat)["version"]
+        diff_res = res_version_manager.calculate_manifest_diff(local_ver=source, platform=plat, allow_download=False)
+        saved = res_version_manager.manifest_download_status(plat, diff_res.get('remote_assethash'))
+        diff_res.update(remote_manifest_present=saved['present'], remote_manifest_valid=saved['valid'])
         if not diff_res.get("success"):
+            # Version metadata is still useful when a manifest cannot be downloaded.
+            if diff_res.get("remote_assethash"):
+                return ok({**diff_res, "success": True, "diff_ready": False,
+                           "diff_error": ('请先下载最新清单，再重新检测差异' if not saved['present'] else diff_res.get("error", "清单差异暂不可用")),
+                           "has_update": diff_res.get("local_assethash") != diff_res.get("remote_assethash"),
+                           "total_local_assets": 0, "total_remote_assets": 0,
+                           "diff_summary": dict(added_count=0, added_total_bytes=0, removed_count=0,
+                                                modified_count=0, modified_total_bytes=0,
+                                                total_download_bytes=0, total_download_mb=0,
+                                                modified_files=[], added_files=[], removed_files=[])})
             return err(GMErrorCode.SERVICE_ERROR, diff_res.get("error", "检查更新失败"))
         return ok(diff_res)
     except Exception as e:
         return err(GMErrorCode.SERVICE_ERROR, f"检查官方更新异常: {e}")
+
+
+@gm_bp.route('/system/download_manifest', methods=['POST'])
+def post_download_manifest():
+    try:
+        import res_version_manager
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict):
+            raise ValueError('请求体必须为JSON对象')
+        platform=data.get('platform')
+        channel=res_version_manager.PLATFORM_CHANNEL_IDS.get(platform)
+        if not channel or (data.get('channel_id') is not None and str(data['channel_id']) != channel):
+            raise ValueError('平台与渠道不匹配')
+        from cdn_download_queue import get_manager
+        return ok(get_manager().enqueue(dict(platform=platform,filename=data.get('assethash'),kind='manifest',download=True)),
+                  msg='清单准备已加入全局下载队列')
+    except ValueError as error:
+        return err(GMErrorCode.PARAM_INVALID, str(error))
+    except Exception as error:
+        return err(GMErrorCode.SERVICE_ERROR, f'下载清单失败: {error}')
 
 
 @gm_bp.route("/system/sync_update", methods=["POST"])
@@ -2001,17 +2104,20 @@ def post_sync_update():
     try:
         import res_version_manager
         data = request.get_json(silent=True) or {}
-        target_ver = data.get("target_version")
-        dl_assets = data.get("download_diff_assets", True)
-        plats = tuple(data.get("platforms", ["pc", "android", "ios"]))
-        ok_flag, msg = res_version_manager.update_task_manager.start_sync(
-            target_version=target_ver,
-            download_diff_assets=dl_assets,
-            platforms=plats,
-        )
-        if not ok_flag:
-            return err(GMErrorCode.SERVICE_ERROR, msg)
-        return ok({"started": True}, msg=msg)
+        from cdn_download_queue import get_manager
+        plats = data.get('platforms', ['pc'])
+        if not isinstance(plats,list) or not 1 <= len(plats) <= 3 or len(set(plats)) != len(plats):
+            raise ValueError('请选择1至3个不同渠道')
+        plans=[]
+        for platform in plats:
+            success,info,message=res_version_manager.probe_official_latest(platform)
+            if not success: raise ValueError(message)
+            if data.get('target_version') and str(data['target_version']) != info['version']:
+                raise ValueError('官方清单已变化，请重新检测')
+            plans.append(dict(platform=platform,filename=info['assethash'],scope='all',download=True,
+                kind='assets' if data.get('download_diff_assets',True) else 'manifest',prepare_manifest=True))
+        ids=[get_manager().enqueue(plan)['task_id'] for plan in plans]
+        return ok(dict(started=True,task_ids=ids),msg='已加入全局下载队列，不改变资源分发选择')
     except Exception as e:
         return err(GMErrorCode.SERVICE_ERROR, f"启动更新下载异常: {e}")
 
@@ -2041,6 +2147,101 @@ def post_cancel_update():
 
 
 # ===========================================================================
+@gm_bp.route('/system/resource_storage', methods=['GET', 'POST'])
+def resource_storage_config():
+    try:
+        from resource_storage import storage
+        if request.method == 'GET':
+            return ok(storage.status())
+        body = request.get_json(silent=True)
+        if not isinstance(body, dict):
+            raise ValueError('请求体必须为JSON对象')
+        from cdn_transfer_control import gate
+        with gate.maintenance():
+            result = storage.apply(body.get('root'))
+            cdn_proxy.PLATFORM_DIRS = storage.directories()
+        return ok(result, msg='资源目录已保存并生效，旧缓存保留读取')
+    except (ValueError, TypeError) as error:
+        return err(GMErrorCode.PARAM_INVALID, str(error))
+    except Exception as error:
+        return err(GMErrorCode.SERVICE_ERROR, f'存储目录操作失败：{error}')
+
+
+@gm_bp.route('/system/resource_storage/browse', methods=['GET'])
+def resource_storage_browse():
+    try:
+        from resource_storage import browse
+        return ok(browse(request.args.get('path')))
+    except (ValueError, OSError) as error:
+        return err(GMErrorCode.PARAM_INVALID, f'无法浏览服务器目录：{error}')
+
+
+@gm_bp.route('/system/download_queue', methods=['GET', 'POST'])
+def resource_download_queue():
+    try:
+        from cdn_download_queue import get_manager
+        manager=get_manager()
+        if request.method=='GET':
+            return ok(manager.status())
+        return ok(manager.enqueue(request.get_json(silent=True)),msg='已加入全局下载队列')
+    except (ValueError,KeyError,TypeError) as error:
+        return err(GMErrorCode.PARAM_INVALID,str(error))
+    except Exception as error:
+        return err(GMErrorCode.SERVICE_ERROR,f'下载队列操作失败: {error}')
+
+
+@gm_bp.route('/system/download_queue/action', methods=['POST'])
+def resource_download_queue_action():
+    try:
+        from cdn_download_queue import get_manager
+        data=request.get_json(silent=True)
+        if not isinstance(data,dict): raise ValueError('请求体必须为JSON对象')
+        return ok(get_manager().action(data.get('action'),data.get('task_id')))
+    except (ValueError,KeyError,TypeError) as error:
+        return err(GMErrorCode.PARAM_INVALID,str(error))
+    except Exception as error:
+        return err(GMErrorCode.SERVICE_ERROR,f'任务操作失败: {error}')
+
+
+@gm_bp.route('/system/download_queue/settings', methods=['POST'])
+def resource_download_queue_settings():
+    try:
+        from cdn_download_queue import get_manager
+        return ok(get_manager().settings(request.get_json(silent=True)))
+    except (ValueError,KeyError,TypeError) as error:
+        return err(GMErrorCode.PARAM_INVALID,str(error))
+    except Exception as error:
+        return err(GMErrorCode.SERVICE_ERROR,f'队列设置失败: {error}')
+
+
+@gm_bp.route('/system/download_queue/catalogue', methods=['GET'])
+def resource_download_queue_catalogue():
+    try:
+        import cdn_proxy
+        from cdn_download_index import MANIFEST_NAME
+        files=[]
+        for platform in ('pc','android','ios'):
+            folder=os.path.join(cdn_proxy.DEFAULT_STATIC_DIR,platform)
+            if not os.path.isdir(folder): continue
+            with os.scandir(folder) as entries:
+                files.extend(dict(platform=platform,filename=e.name) for e in entries
+                             if MANIFEST_NAME.fullmatch(e.name) and e.is_file(follow_symlinks=False))
+        return ok(dict(files=sorted(files,key=lambda row:(row['platform'],row['filename']))))
+    except Exception as error:
+        return err(GMErrorCode.SERVICE_ERROR,f'读取清单目录失败: {error}')
+
+
+@gm_bp.route('/system/download_queue/report/<task_id>',methods=['GET'])
+def resource_download_queue_report(task_id):
+    try:
+        from cdn_download_queue import get_manager
+        return ok(get_manager().report(task_id))
+    except ValueError as error:
+        return err(GMErrorCode.PARAM_INVALID,str(error))
+    except Exception as error:
+        return err(GMErrorCode.SERVICE_ERROR,f'读取任务报告失败: {error}')
+
+
 # 7. 商店系统管理 (/shop)
 # ===========================================================================
 

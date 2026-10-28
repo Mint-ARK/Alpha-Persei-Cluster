@@ -24,6 +24,40 @@ python main.py --replay <素材目录>                 # 遗留素材重放模�
 默认端口：HTTPS 443（需管理员，兼 HTTP:80 拍照直传）、gateway 8102、game 8105、**UDP 战斗服 6105**。
 内置原生 Token 快速登录（秒进游戏无等待）与免验证账密直通。
 
+## 资源清单与渠道选择
+
+Web“资源分发”页分别管理PC（channelId=9）、Android（8）、iOS（7）的清单方案和原生保险方案。总控预设只填写各渠道选项，点击“应用渠道选择”才保存；“生成副本”只入清单库，不自动应用。生成器可填写安装包版本、资源版本和中文名称，并预览最终文件名与MD5。只有已登记且校验通过的原生清单能作为BASE；派生副本只能引用原生BASE，支持移入回收区和恢复。
+
+```powershell
+python main.py --list-resource-profiles
+python main.py --res-version auto --game-version 321
+python main.py --resource-profile "ios=我的229兼容方案" --resource-profile "pc=auto"
+```
+
+`--resource-profile`接受列表中的方案名称或短ID，可重复指定。启动参数只作为本轮进程的渠道选择，Web应用该渠道设置后接管；重启仍带相同参数时会再次按参数选择。旧`--res-version 229/311/321`保留兼容，填写对应渠道的原生版本（缺少时退回其最新原生清单），并在没有显式`--game-version`时沿用原业务版本选择逻辑。
+
+默认读取已保存的渠道选择。自动模式只在Windows尝试匹配本机已登记的PC原生清单，其他渠道和Linux按各自最新完整原生来源选择；本机探测不改写游戏业务版本。语音保留BASE原始字节，不提供手改语音版本入口。使用方法和验收记录见[清单管理说明](docs/manifest_manager_20261028.md)。
+
+## 主动资源下载
+
+Web“资源分发 → 主动下载管理”按渠道和清单建立全局任务。可以选择“必须”（非延迟分组）、“扩展”（清单声明的延迟分组）或“全部”，先分析缓存和预计体积，再确认下载；也可以直接加入下载队列。独立语言包稍后接入。官方检测弹窗只带参数跳转，不再直接下载。
+
+文件并发默认32路，可调1–128；并行任务数独立设置1–8，1即按队列顺序串行执行任务。多个任务共享对象只下载一次。客户端实际回源时优先，主动任务暂停并在恢复前更新索引；本地缓存只读分发不受阻塞。取消任务回收残片，完整缓存保留；服务重启后未完成任务暂停，手动继续按文件恢复。
+
+```powershell
+# 默认把任务交给运行中的本机服务端；使用当前渠道分发方案
+python tools/download_assets.py --platform pc --scope all
+python tools/download_assets.py --platform ios --profile native-ios-列表中的ID --scope extended --analyze
+# 没有服务端时单独运行，仍使用同一全局队列目录和跨进程门控
+python tools/download_assets.py --standalone --platform android --manifest assethash_完整文件名.bytes --scope all
+```
+
+旧PC/iOS下载脚本的命令入口已转交统一CLI；`main.py --sync-update`转交运行中的服务端队列。队列状态位于`runtime/cdn_downloads/`，不属于玩家存档，也不随发行包发布。详见[主动工具链说明](docs/active_download_chain_20261028.md)。
+
+准备官方主清单只保存下载蓝图，不自动切换分发或登记完整原生BASE；独立语音包入口后续接入。
+
+资源分发页右上角“资源存储位置”可浏览服务器目录并选择共享根目录，自动分为pc/android/ios三个平台。Windows默认优先D盘，其次其他非系统盘；Linux默认程序目录下cdn_cache，也可选择挂载目录。与启动壳共用server_config.json的storage配置；切换后旧缓存继续读取，不自动搬迁。传输和索引空闲时可直接保存生效。详见[存储位置说明](docs/resource_storage_20261028.md)。
+
 ## AI配置与旧档升级
 
 AI接口、模型和密钥统一保存在当前存档数据库中。在Web控制面板选择存档，进入“AI修正者 → API配置管理”，保存配置后从下方选择生效API；角色可以单独绑定或跟随本档默认配置。
