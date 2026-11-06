@@ -412,6 +412,12 @@ The management console is built with **React 19 + TypeScript + Tailwind CSS** an
 
 ---
 
+## Contributors
+
+Thanks to [@Rachel08311](https://github.com/Rachel08311) for the Challenge Rogue Team patches, follow-up fixes, and gameplay testing shared in [Issue #8](https://github.com/Mint-ARK/Alpha-Persei-Cluster/issues/8). See [Contributors](CONTRIBUTORS.md) for the full list.
+
+---
+
 ## 10. Disclaimer & Compliance
 
 1. **Non-Commercial Research Purpose**:
