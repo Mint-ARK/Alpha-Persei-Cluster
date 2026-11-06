@@ -24,15 +24,11 @@
 > 📖 **项目杂谈 / 开发者手记**：  
 > 想了解本项目立项背后的心路历程、开发故事与作者的碎碎念？欢迎阅读博文：[《关于LocalServer》- MoriaRuRuka](https://moriaruruka.com/2026/09/24/411/)。
 
-## 2026-11-06 源码更新
+## 当前发行版：v5.0.3（2026-11-06）
 
-整合常驻小游戏、刺桐巷、虚构推演与问题报告修复，更新Linux部署及面板密码保护。详见[本轮源码说明](v5_server/docs/source_update_20261106.md)。内部检查通过，未经游戏实测；本次仅更新源码，发行附件暂未更新。
+本次为控制面板公网密码保护与玩法系统深度修复更新。下载已验证的便携版、安装版或 Linux 核心包，请前往 [v5.0.3 发行页](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/tag/v5.0.3)；变更见 [更新记录](CHANGELOG.md)，下载后可按 [SHA256SUMS_v5.0.3.txt](SHA256SUMS_v5.0.3.txt) 校验。
 
-## 当前发行版：v5.0.1（2026-10-19）
-
-本次为运行链路与封包修复更新。下载已验证的便携版、安装版或独立后端包，请前往 [v5.0.1 发行页](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/tag/v5.0.1)；变更与限制见 [更新记录](CHANGELOG.md)，下载后可按 [SHA256SUMS.txt](SHA256SUMS.txt) 校验。
-
-**推荐下载便携压缩包 `AetherGazer_Server_v5.0_Portable.zip`，无需安装。** 解压后可自由选择启动方式：运行 `启动离线单机服务(控制台).bat` 使用 CMD，或运行 `LocalServer.exe` / `启动离线单机服务(GUI界面).bat` 使用壳程序。安装包可按需选择。
+**推荐下载便携压缩包 `AetherGazer_Server_v5.0.3_Portable.zip`，无需安装。** 解压后可自由选择启动方式：运行 `启动离线单机服务(控制台).bat` 使用 CMD，或运行 `LocalServer.exe` / `启动离线单机服务(GUI界面).bat` 使用壳程序。Linux 用户推荐使用 `AetherGazer_Server_v5.0.3_Linux_Core.zip`，运行 `sh server.sh setup` 按向导配置并强制设定管理员安全口令。
 
 升级前请备份原数据库，将新版解压至独立目录，关闭旧服务后再启动。发布包使用独立的发行证书；移动端需安装并信任本次宿主机提供的证书/描述文件。游戏完整资源与外置 CDN 缓存不随服务端包提供。
 

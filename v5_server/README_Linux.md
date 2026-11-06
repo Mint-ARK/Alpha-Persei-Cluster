@@ -32,13 +32,13 @@ Termux 不保证可用，仍在测试中，所以谨慎操作。
 
 ```sh
 curl -fL --retry 3 \
-> -o AetherGazer_Server_v5.0.2_Linux_Core.zip \
-> https://github.com/Mint-ARK/Alpha-Persei-Cluster/Releases/download/v5.0.2/AetherGazer_Server_v5.0.2_Linux_Core.zip
+> -o AetherGazer_Server_v5.0.3_Linux_Core.zip \
+> https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Linux_Core.zip
 ```
 使用unzip工具解压包：
 
 ```sh
-unzip AetherGazer_Server_v5.0.2_Linux_Core.zip
+unzip AetherGazer_Server_v5.0.3_Linux_Core.zip
 ```
 
 使用sh命令运行向导：
