@@ -42,7 +42,15 @@ def create_launcher_scripts(target_dir: Path):
         write_console_launcher(target_dir / name)
 
 
-def build_release_package(output_zip_name="AetherGazer_Server_v5_Release.zip"):
+def set_unix_zip_metadata(archive):
+    """Keep Linux ZIPs independent of the build host's OEM filename handling."""
+    for entry in archive.infolist():
+        entry.create_system = 3
+        mode = 0o40755 if entry.is_dir() else 0o100755 if entry.filename.endswith('.sh') else 0o100644
+        entry.external_attr = (mode << 16) | (0x10 if entry.is_dir() else 0)
+
+
+def build_release_package(output_zip_name="AetherGazer_Server_v5_Release.zip", *, unix_metadata=False):
     start_time = time.time()
     # 缺协议/配置时，在数据库快照与任何发布操作之前失败。
     plan = collect_runtime_assets(PROJECT_ROOT)
@@ -90,6 +98,8 @@ def build_release_package(output_zip_name="AetherGazer_Server_v5_Release.zip"):
                 abs_p = Path(root) / file
                 rel_p = abs_p.relative_to(TEMP_STAGE)
                 zf.write(abs_p, rel_p)
+        if unix_metadata:
+            set_unix_zip_metadata(zf)
 
     validate_archive(zip_path, inventory)
     zip_size_mb = zip_path.stat().st_size / 1024 / 1024

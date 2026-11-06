@@ -1,6 +1,11 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { resolveMountedUid } from './mountedSave'
 import {
+  checkAuthSession,
+  loginAdmin as apiLoginAdmin,
+  logoutAdmin as apiLogoutAdmin,
+  type AuthSessionData,
+  type AuthLoginResult,
   fetchOverviewStatus,
   fetchResVersion,
   switchResVersion,
@@ -38,6 +43,14 @@ interface ServerContextValue {
   operatorName: string
   setOperatorName: (name: string) => void
 
+  // 管理密码会话认证
+  authEnabled: boolean
+  isAuthenticated: boolean
+  authLoading: boolean
+  authExpiresAt: number | null
+  loginAdmin: (password: string) => Promise<AuthLoginResult>
+  logoutAdmin: () => Promise<void>
+  checkAuth: () => Promise<AuthSessionData>
 }
 
 const ServerContext = createContext<ServerContextValue | undefined>(undefined)
@@ -62,6 +75,56 @@ export function ServerProvider({ children }: { children: ReactNode }) {
   })
   const [lastChecked, setLastChecked] = useState<Date | null>(null)
   const [activeUid, setActiveUidState] = useState<number>(() => getActiveUid())
+
+  // 管理密码公网安全会话状态
+  const [authEnabled, setAuthEnabled] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(true)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [authExpiresAt, setAuthExpiresAt] = useState<number | null>(null)
+
+  const checkAuth = async (): Promise<AuthSessionData> => {
+    setAuthLoading(true)
+    try {
+      const session = await checkAuthSession()
+      setAuthEnabled(session.enabled)
+      setIsAuthenticated(session.enabled ? session.authenticated : true)
+      setAuthExpiresAt(session.expires_at || null)
+      return session
+    } catch {
+      setAuthEnabled(false)
+      setIsAuthenticated(true)
+      return { enabled: false, authenticated: true }
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const loginAdmin = async (password: string): Promise<AuthLoginResult> => {
+    const res = await apiLoginAdmin(password)
+    if (res.ok) {
+      setIsAuthenticated(true)
+      setAuthExpiresAt(res.expires_at || null)
+      void refreshSaves().catch(() => undefined)
+      void refreshStatus().catch(() => undefined)
+    }
+    return res
+  }
+
+  const logoutAdmin = async () => {
+    await apiLogoutAdmin()
+    setIsAuthenticated(false)
+    setAuthExpiresAt(null)
+  }
+
+  useEffect(() => {
+    const onUnauthorized = () => {
+      if (authEnabled) {
+        setIsAuthenticated(false)
+      }
+    }
+    window.addEventListener('admin-auth-unauthorized', onUnauthorized)
+    return () => window.removeEventListener('admin-auth-unauthorized', onUnauthorized)
+  }, [authEnabled])
 
   // 控制台标识与操作员
   const [consoleName, setConsoleNameState] = useState<string>(() => {
@@ -175,11 +238,19 @@ export function ServerProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    void refreshSaves().catch(() => undefined)
-    void refreshStatus()
-    const timer = setInterval(refreshStatus, 15000)
+    checkAuth().then((session) => {
+      if (!session.enabled || session.authenticated) {
+        void refreshSaves().catch(() => undefined)
+        void refreshStatus()
+      }
+    })
+    const timer = setInterval(() => {
+      if (!authEnabled || isAuthenticated) {
+        void refreshStatus()
+      }
+    }, 15000)
     return () => clearInterval(timer)
-  }, [])
+  }, [authEnabled, isAuthenticated])
 
   useEffect(() => { if (selectedSave) void refreshStatus() }, [selectedSave])
 
@@ -216,6 +287,13 @@ export function ServerProvider({ children }: { children: ReactNode }) {
         setConsoleName,
         operatorName,
         setOperatorName,
+        authEnabled,
+        isAuthenticated,
+        authLoading,
+        authExpiresAt,
+        loginAdmin,
+        logoutAdmin,
+        checkAuth,
       }}
     >
       {children}

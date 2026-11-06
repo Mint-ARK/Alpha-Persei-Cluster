@@ -9,6 +9,7 @@ FIELDS = (
     "touched_items", "removed_equips", "removed_weapons",
     "deleted_servants", "pending_frames", "touched_chat_stickers",
     "touched_heroes", "added_equips", "added_weapons",
+    "pending_trust_mood_heroes",
 )
 DELETION_FIELDS = ("removed_equips", "removed_weapons", "deleted_servants")
 

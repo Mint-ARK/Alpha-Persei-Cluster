@@ -11,6 +11,9 @@ import time
 import random as _random
 
 from core import Operation, OperationError, operation
+from boss_challenge_reset import BossResetOperation, BossResetError
+from boss_challenge_team import BossTeamSaveOperation
+from mythic_final_service import MythicMutationOperation
 from middleware import DownFrame
 from polyhedron_service import PolyhedronRunManager
 import event_bus
@@ -189,16 +192,8 @@ def _build_18003_frame(ctx, run_data, uid=None):
 
             if ctx.codec_encode:
                 import weekly_challenge_service as _wcs
-                nxt_mon = _wcs.get_next_monday_5am()
                 p11003 = ctx.codec_encode("sc_11003", {
-                    "activity": {
-                        "activity_id": int(version_cfg["polyhedron_activity_id"]),
-                        "start_time": nxt_mon - 604800,
-                        "stop_time": _rvm.FAR_FUTURE_TIMESTAMP,
-                        "state": 1,
-                        "theme": int(version_cfg["theme_id"]),
-                        "template": 73
-                    }
+                    "activity": _wcs.get_polyhedron_activity(version_cfg["version"])
                 })
                 if p11003:
                     frames.append(DownFrame(11003, p11003))
@@ -293,21 +288,16 @@ USE_NEW_INVENTORY_SERVICE = True
 
 
 def _item_add(ctx, uid, item_id, delta, *, source=""):
-    """加条目；统一库存成功返回True，旧逻辑/降级返回None。"""
-    if USE_NEW_INVENTORY_SERVICE:
-        try:
-            import inventory_service
-            inventory_service.grant_item(ctx, uid, item_id, delta, source=source)
-            return True  # 告知需要附加记账的调用方：本次实际由统一库存处理。
-        except Exception as e:
-            if int(item_id) == 14:
-                raise  # Battlepass ledger/period failures must roll back, never grant twice via fallback.
-            if hasattr(ctx, "log"):
-                ctx.log(f"[InventoryService WARN] grant_item 异常: {e}，降级至旧逻辑")
-            else:
-                logger.warning(f"[InventoryService WARN] grant_item 异常: {e}，降级至旧逻辑")
+    """加条目；统一库存成功返回True，显式旧入口返回None。
 
-    # ================= 🛡️ 旧版就地代码（完全保留保底） =================
+    分支在执行前确定；统一库存异常必须交给调用方事务回滚，不能再发一份。
+    """
+    if USE_NEW_INVENTORY_SERVICE:
+        import inventory_service
+        inventory_service.grant_item(ctx, uid, item_id, delta, source=source)
+        return True  # 告知需要附加记账的调用方：本次实际由统一库存处理。
+
+    # 仅在执行前显式关闭统一库存时使用旧入口，不作异常降级。
     iid = int(item_id)
     delta = int(delta)
     if delta <= 0:
@@ -456,7 +446,7 @@ def _item_deduct(ctx, uid, item_id, num):
     return t
 
 
-def _refresh_frames(ctx, uid, hero_id=None, *, strict=False):
+def _refresh_frames(ctx, uid, hero_id=None, *, strict=False, required_heroes=()):
     """操作后补推数据原子差量刷新帧：sc_14007（单英雄实时数据）+ sc_17023（道具/货币差量原子推送）。
     strict 用于已核对的提交前准备路径：必要差量失败须向外传播，由事务回滚。
     其他调用保持原容错和帧顺序。"""
@@ -508,7 +498,8 @@ def _refresh_frames(ctx, uid, hero_id=None, *, strict=False):
             raise
         pass
     # 2. 英雄实时数据帧 (sc_14007)
-    heroes_to_sync = set()
+    required_hero_ids = {int(h) for h in required_heroes}
+    heroes_to_sync = set(required_hero_ids)
     if hero_id:
         heroes_to_sync.add(int(hero_id))
     if hasattr(ctx, 'touched_heroes') and ctx.touched_heroes:
@@ -519,6 +510,8 @@ def _refresh_frames(ctx, uid, hero_id=None, *, strict=False):
             hf = _hc.build_hero_14007_frame(ctx.db, uid, hid)
             if hf:
                 out.append(hf)
+            elif strict or hid in required_hero_ids:
+                raise ValueError(f"必要角色刷新 sc_14007 为空: {hid}")
         except Exception:
             if strict:
                 raise
@@ -794,10 +787,20 @@ class MonthCardBonusOp(Operation):
             "result": 0,
             "is_sign": 1,
             "reward_list": rewards
-        }) or b"\x08\x00"
+        })
+        if not isinstance(payload, (bytes, bytearray, memoryview)) or not payload:
+            raise ValueError('月卡签到必要回执为空')
+        # The skeleton requires59009. Missing it lets Core insert an all-false
+        # schema payload, clearing unrelated first-purchase rights in the client.
+        # Read existing state only; a card claim must not initialize newbie activity.
+        from recharge_service import RechargeService
+        rows = ctx.db.query('SELECT * FROM newbie_activity WHERE uid=?', (self.uid,))
+        state = ctx.codec_encode('sc_59009', RechargeService.project_59009_payload(rows[0] if rows else {}))
+        if not isinstance(state, (bytes, bytearray, memoryview)) or not state:
+            raise ValueError('月卡签到必要新手权益状态为空')
         ctx.log("cs_34024 -> 月卡签到%s" % ("（今日已签，空奖励）" if result.get("already")
                                             else "成功，获得 90 移转之辉"))
-        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(59009, bytes(state)), DownFrame(self.sc, bytes(payload))]
 
 
 @operation
@@ -806,6 +809,7 @@ class RequestGSPayOp(Operation):
 
     cmd = 34010
     sc = 34011
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         import recharge_service
@@ -819,10 +823,13 @@ class RequestGSPayOp(Operation):
                                    shop_id=shop_id, buy_id=buy_id, log=ctx.log)
 
     def respond(self, result, data, ctx):
+        is_month_card = result.get('goods_type') == 2
         p34011 = ctx.codec_encode("sc_34011", {
             "result": 0,
             "order": result["order"]
         }) or b""
+        if is_month_card and not p34011:
+            raise ValueError('月卡交付必要回执sc_34011为空')
         frames = [DownFrame(self.sc, p34011)]
         try:
             p34009 = ctx.codec_encode("sc_34009", {
@@ -831,8 +838,23 @@ class RequestGSPayOp(Operation):
             })
             if p34009:
                 frames.append(DownFrame(34009, p34009))
+            elif is_month_card:
+                raise ValueError('月卡交付必要通知sc_34009为空')
         except Exception as _e:
+            if is_month_card:
+                raise
             ctx.log(f"[PAY] sc_34009 发货帧组包异常: {_e}", "WARN")
+
+        if is_month_card:
+            # Native34009 calls SignToday() without knowing the purchased expiry.
+            # Follow it with authoritative34023, including the real daily-claim flag.
+            if ctx.generator is None:
+                raise ValueError('月卡交付缺少状态生成器')
+            target_uid = self.uid or getattr(ctx, 'uid', 0)
+            p34023 = ctx.generator.gen_payload(34023, uid=target_uid, db=ctx.db)
+            if not isinstance(p34023, (bytes, bytearray, memoryview)) or not p34023:
+                raise ValueError('月卡交付必要状态sc_34023为空')
+            frames.append(DownFrame(34023, bytes(p34023)))
 
         # 同步推送最新的累充状态 (sc_34007)、首充双倍状态 (sc_34021) 与新手充值状态 (sc_59009)
         try:
@@ -849,7 +871,7 @@ class RequestGSPayOp(Operation):
             if p59009:
                 frames.append(DownFrame(59009, p59009))
             if result.get('goods_type') in (2, 3) and ctx.generator is not None:
-                for cmd in ((34023, 30001) if result.get('goods_type') == 2 else (30001,)):
+                for cmd in (30001,):
                     payload = ctx.generator.gen_payload(cmd, uid=target_uid, db=ctx.db)
                     if not payload:
                         raise ValueError(f'充值权益刷新sc_{cmd}为空')
@@ -974,10 +996,25 @@ class TaskSubmitOp(Operation):
 
     cmd = 28010
     sc = 28011
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         uid = self.uid
         tid = int(data.get("id") or data.get("task_id") or 0)
+        from kadas_race_service import require_claimable
+        from vehicle_ball_service import require_claimable as require_vehicle_claimable
+        require_claimable(ctx.db, uid, [tid])
+        require_vehicle_claimable(ctx.db, uid, [tid])
+        from hodur_service import require_claimable as require_hodur_claimable
+        require_hodur_claimable(ctx.db, uid, [tid])
+        from ash_service import require_claimable as require_ash_claimable
+        require_ash_claimable(ctx.db, uid, [tid])
+        from summer_pub_service import require_claimable as require_pub_claimable
+        require_pub_claimable(ctx.db, uid, [tid])
+        from osiris_service import require_claimable as require_osiris_claimable
+        require_osiris_claimable(ctx.db,uid,[tid])
+        from skuld_service import require_claimable as require_skuld_claimable
+        require_skuld_claimable(ctx.db,uid,[tid])
         t = ctx.db.query("SELECT * FROM task WHERE uid=? AND task_id=?", (uid, tid))
         if not t:
             raise OperationError(406, f"任务 {tid} 不存在")
@@ -1046,6 +1083,8 @@ class TaskSubmitOp(Operation):
                         new_wk = min(15000, cur_wk + rw["num"])
                         ctx.db.execute("UPDATE battlepass SET weekly_gain_exp=? WHERE uid=?", (new_wk, uid))
         ctx.db.claim_task(uid, tid)
+        from sphero_leisure_service import after_task_claim
+        after_task_claim(ctx,uid,[tid])
         try:
             import new_player_service as _fresh
             if _fresh.enabled(ctx.db, uid):
@@ -1066,10 +1105,12 @@ class TaskSubmitOp(Operation):
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_28011", {
-            "result": 0, "reward_list": result["rewards"]}) or b"\x08\x00"
+            "result": 0, "reward_list": result["rewards"]})
+        if not payload:
+            raise ValueError("任务领取必要回执为空")
         ctx.log(f"cs_28010 -> 任务领奖 tid={result['task_id']} already={result['already']} 奖={result['rewards']}")
         # 原子时序前置：优先推送资产差分帧 sc_17023，再回显 sc_28011 业务帧，保证客户端在回调触发时资产已是最新状态
-        return _refresh_frames(ctx, self.uid) + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -1082,6 +1123,7 @@ class TaskOneKeySubmitOp(Operation):
 
     cmd = 28014
     sc = 28015
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         uid = self.uid
@@ -1089,6 +1131,22 @@ class TaskOneKeySubmitOp(Operation):
         ttype = int(data.get("type") or 0)
         if isinstance(ids, (int, str)):
             ids = [ids]
+
+        from kadas_race_service import require_claimable, visible_tasks
+        from vehicle_ball_service import require_claimable as require_vehicle_claimable, visible_tasks as visible_vehicle_tasks
+        from hodur_service import require_claimable as require_hodur_claimable, visible_tasks as visible_hodur_tasks
+        from ash_service import require_claimable as require_ash_claimable, visible_tasks as visible_ash_tasks
+        from summer_pub_service import require_claimable as require_pub_claimable, visible_tasks as visible_pub_tasks
+        from osiris_service import require_claimable as require_osiris_claimable, visible_tasks as visible_osiris_tasks
+        from skuld_service import require_claimable as require_skuld_claimable, visible_tasks as visible_skuld_tasks
+        if ids:
+            require_skuld_claimable(ctx.db,uid,ids)
+            require_osiris_claimable(ctx.db,uid,ids)
+            require_pub_claimable(ctx.db, uid, ids)
+            require_claimable(ctx.db, uid, ids)
+            require_vehicle_claimable(ctx.db, uid, ids)
+            require_hodur_claimable(ctx.db, uid, ids)
+            require_ash_claimable(ctx.db, uid, ids)
 
         where_clauses = ["t.uid=?", "COALESCE(t.claimed_ts, 0) = 0", "t.progress >= COALESCE(c.need, 1)"]
         params = [uid]
@@ -1110,6 +1168,9 @@ class TaskOneKeySubmitOp(Operation):
         # 与单领共享周期感知判据：一次性任务还须检查永久领奖台账。
         tasks = [t for t in ctx.db.query(sql, params)
                  if not ctx.db.is_task_claimed(uid, t['task_id'])]
+        tasks = visible_ash_tasks(ctx.db, uid, visible_hodur_tasks(ctx.db, uid, visible_vehicle_tasks(ctx.db, uid, visible_tasks(ctx.db, uid, tasks))))
+        tasks = visible_osiris_tasks(ctx.db,uid,visible_pub_tasks(ctx.db,uid,tasks))
+        tasks = visible_skuld_tasks(ctx.db,uid,tasks)
         claimed_task_types = {int(t["task_type"] or 0) for t in tasks}
 
         # 记录领取任务前的旧活跃度，用于严格对齐客户端 PostSubmitTaskList 仅结算旧达成宝箱的时序
@@ -1175,6 +1236,9 @@ class TaskOneKeySubmitOp(Operation):
                             ctx.db.execute("UPDATE battlepass SET weekly_gain_exp=? WHERE uid=?", (new_wk, uid))
             ctx.db.claim_task(uid, tid)
             claimed += 1
+
+        from sphero_leisure_service import after_task_claim
+        after_task_claim(ctx,uid,[t['task_id'] for t in tasks])
 
         # 联动一键领取达成的活跃度宝箱 (仅当领取的任务中包含日常 6 / 周常 5 时触发，严禁污染练舞房 901/902 等独立任务)
         target_pt_ids = []
@@ -1245,12 +1309,14 @@ class TaskOneKeySubmitOp(Operation):
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_28015", {
-            "result": 0, "reward_list": result["rewards"]}) or b"\x08\x00"
+            "result": 0, "reward_list": result["rewards"]})
+        if not payload:
+            raise ValueError("任务领取必要回执为空")
         ctx.log(f"cs_28014 -> 一键领取 {result['claimed']} 个任务，合并奖励 {len(result['rewards'])} 项")
 
         frames = []
         # 1. 资产与数据原子差量帧前置（sc_17023 贴票/货币等，保证客户端在 28015 回调前已完成资产就绪）
-        frames.extend(_refresh_frames(ctx, self.uid))
+        frames.extend(_refresh_frames(ctx, self.uid, strict=True))
         try:
             import new_player_service as _fresh
             if _fresh.enabled(ctx.db, self.uid):
@@ -1361,6 +1427,7 @@ class DrawOp(Operation):
 
     cmd = 16010
     sc = 16011
+    prepare_response_in_transaction = True
 
     def validate(self, data, ctx):
         pool_id = int(data.get("pool") or 0)
@@ -1381,25 +1448,19 @@ class DrawOp(Operation):
 
     def respond(self, result, data, ctx):
         if isinstance(result, list):
-            return result + _refresh_frames(ctx, self.uid)
+            return result + _refresh_frames(ctx, self.uid, strict=True)
+        if len(getattr(ctx, 'added_weapons', None) or []) < int(result.get('keyongs') or 0):
+            raise ValueError("抽卡新增钥从实例差量缺失")
         payload = ctx.codec_encode("sc_16011", {
             "result": 0,
             "item": result["item"],
             "first_ssr_draw_flag": result.get("first_ssr_draw_flag", False),
             "newbie_choose_draw_flag": result.get("newbie_choose_draw_flag", True),
             "ssr_draw_times": result.get("ssr_draw_times", 0)
-        }) or b"\x08\x00"
-        frames = [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
-        if int(result.get("keyongs") or 0) > 0:
-            try:
-                import generator
-                servant_payload = generator.gen_payload(46011, uid=self.uid, db=ctx.db)
-                if servant_payload is None:
-                    raise RuntimeError("钥从列表生成失败")
-                frames.append(DownFrame(46011, servant_payload))
-            except Exception as exc:
-                ctx.log(f"[draw] 已提交抽卡的钥从刷新失败: {exc}", "WARN")
-        return frames
+        })
+        if not payload:
+            raise ValueError("抽卡回执为空")
+        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation
@@ -1431,6 +1492,7 @@ class DrawSetPollUpOp(Operation):
 
     cmd = 16016
     sc = 16017
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         pool_id = int(data.get("pool_id") or data.get("poll_id") or data.get("id") or 10002)
@@ -1439,7 +1501,9 @@ class DrawSetPollUpOp(Operation):
         return svc.set_pool_up(self.uid, pool_id, up_id)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_16017", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_16017", {"result": 0})
+        if not payload:
+            raise ValueError("卡池自选回执为空")
         ctx.log(f"cs_16016 -> 设置卡池UP pool={result['pool_id']} (系列:{result['pool_group']}) up={result['up_id']}")
         return [DownFrame(self.sc, payload)]
 
@@ -1471,6 +1535,8 @@ class ServantMergeOp(Operation):
 
     cmd = 46030
     sc = 46031
+
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
@@ -2002,10 +2068,14 @@ class UseItemOp(Operation):
     cmd = 17012
     sc = 17013
 
+    prepare_response_in_transaction = True
+
     def apply(self, data, ctx):
         use_list = data.get("use_item_list") or []
         import inventory_service
         res = inventory_service.use_items(ctx, self.uid, use_list)
+        if int(res.get('result') or 0) != 0:
+            raise OperationError(int(res['result']), '道具使用失败')
         return res
 
     def respond(self, result, data, ctx):
@@ -2014,18 +2084,16 @@ class UseItemOp(Operation):
         payload = ctx.codec_encode("sc_17013", {
             "result": res_code,
             "drop_list": drop_list
-        }) or b"\x08\x00"
+        })
+        if not payload:
+            raise ValueError('道具使用回执为空')
 
         extra_frames = []
-        # 换装/英雄变更帧下发 (sc_14007)
-        for hid in result.get("touched_heroes") or []:
-            try:
-                import hero_codec as _hc
-                hf = _hc.build_single_hero_frame(ctx.db, self.uid, hid)
-                if hf:
-                    extra_frames.append(DownFrame(14007, hf))
-            except Exception:
-                pass
+        # One shared refresh per hero, including skin-derived changes.
+        if result.get("touched_heroes"):
+            if getattr(ctx, 'touched_heroes', None) is None:
+                ctx.touched_heroes = set()
+            ctx.touched_heroes.update(int(h) for h in result["touched_heroes"])
 
         # 场景变更帧下发 (sc_32009)
         if result.get("touched_scene"):
@@ -2039,7 +2107,7 @@ class UseItemOp(Operation):
 
         ctx.log(f"cs_17012 -> 道具使用完成: result={res_code}, drops={len(drop_list)}")
         # 核心标准：原子帧 (_refresh_frames + extra_frames) 必须先于业务主响应帧 (sc_17013) 下发，确保客户端回调时本地内存已完全对齐
-        return _refresh_frames(ctx, self.uid) + extra_frames + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, strict=True) + extra_frames + [DownFrame(self.sc, payload)]
 
 
 
@@ -2346,12 +2414,6 @@ class MailReceiveOp(Operation):
                 # 可以先拥有换装、以后再解锁英雄；此时不伪造角色刷新。
                 if ctx.db.query("SELECT 1 FROM hero WHERE uid=? AND id=? AND unlock=1", (self.uid, hid)):
                     hero_ids.add(hid)
-        for hid in sorted(hero_ids):
-            import hero_codec as _hc
-            hf = _hc.build_single_hero_frame(ctx.db, self.uid, hid)
-            if not hf:
-                raise ValueError(f"必要邮件角色刷新 sc_14007 为空: {hid}")
-            extra_frames.append(DownFrame(14007, hf))
 
         # 场景即时推送 sc_32009
         if result.get("touched_scene"):
@@ -2361,7 +2423,7 @@ class MailReceiveOp(Operation):
                 raise ValueError("必要邮件场景刷新 sc_32009 为空")
             extra_frames.append(DownFrame(32009, p))
 
-        return _refresh_frames(ctx, self.uid, strict=True) + extra_frames + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, strict=True, required_heroes=hero_ids) + extra_frames + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -3314,55 +3376,76 @@ class ReceiveIllustrationRewardOp(Operation):
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
-        id_list = [int(x) for x in (data.get("id_list") or []) if str(x).isdigit()]
-        # 插图领取统一结算：无论点击单个还是全部，均自动拉取当前所有待领取的插画 ID 一并结算（仅限已解锁条目）
-        unclaimed = ctx.db.query(
-            "SELECT item_id FROM illustrated WHERE uid=? AND kind='inbetweening' AND is_receive=0 AND (complete_flag IS NULL OR complete_flag != 0)",
-            (self.uid,)
-        )
-        all_unclaimed_ids = [int(r["item_id"]) for r in unclaimed] if unclaimed else []
-        id_list = sorted(list(set(id_list + all_unclaimed_ids)))
-
+        try:
+            requested = {int(x) for x in (data.get("id_list") or [])}
+        except (TypeError, ValueError, OverflowError):
+            raise OperationError(2, '无效的插画ID')
         _, prew = _load_picture_cfg()
         pictures = illustrated_listener._get_collect_picture_cfg()
-        wedding_ids = {pid for pid in id_list if pictures.get(pid, {}).get('wedding_role_id')}
+        rows = {int(r['item_id']): r for r in ctx.db.query(
+            "SELECT item_id,is_receive,complete_flag,is_view FROM illustrated "
+            "WHERE uid=? AND kind='inbetweening'", (self.uid,))}
+        wedding_ids = {pid for pid in rows if pictures.get(pid, {}).get('wedding_role_id')}
+        oath_stories = set()
         if wedding_ids:
             from illustrated_story_service import read_oath_stories
             oath_stories = read_oath_stories(ctx.db, self.uid)
+
+        def wedding_available(pid):
+            if pid not in wedding_ids:
+                return True
+            cfg = pictures[pid]
+            return (cfg.get('unlock_condition') == 800 and bool(cfg.get('params'))
+                    and cfg['params'][0] in oath_stories)
+
+        # 客户端会把请求中的全部ID标成已领，先整单验证，不能跳过非法条目后回成功。
+        for pid in requested:
+            row = rows.get(pid)
+            if pid not in pictures or row is None:
+                raise OperationError(2, '未知或未解锁的插画')
+            if row['complete_flag'] == 0 or not wedding_available(pid):
+                raise OperationError(2005, '插画奖励条件未达成')
+
+        # 保留点击单个也自动领取所有待领奖插画的行为，并同步实际改变的全部条目。
+        pending = sorted(pid for pid, row in rows.items()
+                         if pid in pictures and not row['is_receive']
+                         and row['complete_flag'] != 0)
         total_items = {}
         claimed_ids = []
-        for pid in id_list:
-            p_int = int(pid)
-            if p_int in wedding_ids:
-                cfg = pictures[p_int]
-                if cfg.get('unlock_condition') != 800 or not cfg.get('params') or cfg['params'][0] not in oath_stories:
-                    ctx.db.execute("UPDATE illustrated SET complete_flag=0 WHERE uid=? AND kind='inbetweening' AND item_id=?", (self.uid, p_int))
-                    continue
-            r = ctx.db.query("SELECT is_receive, complete_flag FROM illustrated WHERE uid=? AND kind='inbetweening' AND item_id=?", (self.uid, p_int))
-            if r and (r[0]["is_receive"] or 0) == 0:
-                cflag = r[0].get("complete_flag")
-                if cflag is not None and cflag == 0:
-                    continue
-                ctx.db.execute(
-                    "UPDATE illustrated SET is_receive=1 WHERE uid=? AND kind='inbetweening' AND item_id=?",
-                    (self.uid, p_int)
-                )
-                rew = prew.get(p_int, (1, 20))
-                cid, num = rew
-                from inventory_service import InventoryService
-                InventoryService.grant_item(ctx, self.uid, cid, num, source='illustration_reward')
-                total_items[cid] = total_items.get(cid, 0) + num
-                claimed_ids.append(p_int)
+        changed = []
+        for pid in pending:
+            if not wedding_available(pid):
+                ctx.db.execute("UPDATE illustrated SET complete_flag=0 WHERE uid=? AND kind='inbetweening' AND item_id=?", (self.uid, pid))
+                continue
+            cursor = ctx.db.execute(
+                "UPDATE illustrated SET is_receive=1 WHERE uid=? AND kind='inbetweening' "
+                "AND item_id=? AND COALESCE(is_receive,0)=0",
+                (self.uid, pid)
+            )
+            if cursor.rowcount != 1:
+                raise OperationError(2013, '插画奖励已经领取')
+            cid, num = prew.get(pid, (1, 20))
+            from inventory_service import InventoryService
+            InventoryService.grant_item(ctx, self.uid, cid, num, source='illustration_reward')
+            total_items[cid] = total_items.get(cid, 0) + num
+            claimed_ids.append(pid)
+            changed.append({'id': pid, 'is_receive': 1, 'is_view': int(rows[pid]['is_view'] or 0)})
 
         items_out = [{"id": cid, "num": n} for cid, n in total_items.items()]
-        return {"id_list": claimed_ids, "items": items_out}
+        return {"id_list": claimed_ids, "items": items_out, "changed": changed}
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_52005", {"result": 0, "item_list": result["items"]})
         if not payload:
             raise ValueError('插画领取回执为空')
+        frames = _refresh_frames(ctx, self.uid, strict=True)
+        if result['changed']:
+            delta = ctx.codec_encode('sc_52011', {'inbetweening_info': result['changed']})
+            if not delta:
+                raise ValueError('插画状态差量为空')
+            frames.append(DownFrame(52011, delta))
         ctx.log(f"cs_52004 -> 领取插图奖励 id_list={result['id_list']} 获得={result['items']}")
-        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
+        return frames + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -3458,40 +3541,46 @@ class HeroRaceCollectRewardOp(Operation):
 
     cmd = 52022
     sc = 52023
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         ctx.uid = self.uid
         req_list = data.get("collect_info_list") or []
         race_cfg = illustrated_listener._get_hero_race_cfg()
         by_race = race_cfg.get("by_race", {})
-
-        # 统计各阵营实际拥有修正者数量
+        # 成功回调会把原请求全部标成已领：先归并请求并验证整单，不能跳过后假成功。
+        if not req_list:
+            raise OperationError(2, '空的阵营收集领奖请求')
+        requests = {}
+        for item in req_list:
+            race_type = int(item.get('race_type') or 0)
+            counts = item.get('cnt_list') or []
+            if str(race_type) not in by_race or not counts:
+                raise OperationError(2, '无效的阵营或收集档位')
+            requests.setdefault(race_type, set()).update(int(c) for c in counts)
+        history = {int(row['race_type']): set(json.loads(row['received_cnt_list'] or '[]'))
+                   for row in ctx.db.query(
+                       'SELECT race_type,received_cnt_list FROM hero_race_collect WHERE uid=?', (self.uid,))}
         race_counts = illustrated_listener.get_hero_race_counts(ctx.db, self.uid)
+        plans = []
+        for race_type, requested in requests.items():
+            tasks = {int(t['need']): t for t in by_race[str(race_type)]}
+            if not requested.issubset(tasks):
+                raise OperationError(2, '不存在的阵营收集档位')
+            claimed_set = history.get(race_type, set())
+            pending = requested - claimed_set
+            if any(need > race_counts.get(race_type, 0) for need in pending):
+                raise OperationError(2005, '阵营收集数量不足')
+            if pending:
+                plans.append((race_type, claimed_set | pending, [tasks[n] for n in sorted(pending)]))
 
         total_items = {}
-        for item in req_list:
-            race_type = int(item.get("race_type") or 0)
-            cnt_list = item.get("cnt_list") or []
-            user_cnt = race_counts.get(race_type, 0)
-
-            # 查询当前已领取的档位
-            r = ctx.db.query("SELECT received_cnt_list FROM hero_race_collect WHERE uid=? AND race_type=?", (self.uid, race_type))
-            claimed_set = set(json.loads(r[0]["received_cnt_list"])) if r and r[0]["received_cnt_list"] else set()
-
-            tasks = by_race.get(str(race_type), [])
-            for c in cnt_list:
-                c_int = int(c)
-                if c_int not in claimed_set and user_cnt >= c_int:
-                    for t in tasks:
-                        if t["need"] == c_int:
-                            claimed_set.add(c_int)
-                            for rw in t.get("reward", []):
-                                cid = rw["id"]
-                                cnum = rw["num"]
-                                _item_add(ctx, self.uid, cid, cnum)
-                                total_items[cid] = total_items.get(cid, 0) + cnum
-                            break
-
+        for race_type, claimed_set, tasks in plans:
+            for task in tasks:
+                for rw in task['reward']:
+                    cid, cnum = rw['id'], rw['num']
+                    _item_add(ctx, self.uid, cid, cnum)
+                    total_items[cid] = total_items.get(cid, 0) + cnum
             ctx.db.execute(
                 "INSERT OR REPLACE INTO hero_race_collect (uid, race_type, received_cnt_list) VALUES (?, ?, ?)",
                 (self.uid, race_type, json.dumps(sorted(list(claimed_set))))
@@ -3501,9 +3590,11 @@ class HeroRaceCollectRewardOp(Operation):
         return {"items": items_out}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_52023", {"result": 0, "item_list": result["items"]}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_52023", {"result": 0, "item_list": result["items"]})
+        if not payload:
+            raise ValueError('阵营收集领奖回执为空')
         ctx.log(f"cs_52022 -> 领取阵营收集奖励 items={result['items']}")
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation
@@ -3861,11 +3952,26 @@ class EquipQuickDressOp(Operation):
         hid = int(data.get("hero_id") or 0)
         uel = data.get("use_equip_list") or []
         from equip_service import EquipService
-        return EquipService.get_instance(db=ctx.db).quick_dress_equips(ctx, self.uid, hid, uel)
+        from operation_notifications import checkpoint_notifications, restore_notifications
+        checkpoint = checkpoint_notifications(ctx)
+        try:
+            return EquipService.get_instance(db=ctx.db).quick_dress_equips(ctx, self.uid, hid, uel)
+        except Exception as exc:
+            restore_notifications(ctx, checkpoint)
+            code = exc.code if isinstance(exc, OperationError) else 9
+            # sc_13027.result是逐项消息，不能套用通用整数错误帧。
+            failed = [{'equip_id': int(item.get('equip_id') or 0), 'result': code}
+                      for item in uel if isinstance(item, dict)]
+            return dict(hero_id=hid, result=failed or [{'equip_id': 0, 'result': code}],
+                        affected_heroes=[], failed=True)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_13027", {"result": result["result"]}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_13027", {"result": result["result"]})
+        if payload is None:
+            raise ValueError('一键穿戴结果编码失败')
         ctx.log(f"cs_13026 -> 一键快速穿戴 hero={result['hero_id']} dressed={len(result['result'])}")
+        if result.get('failed') or not result['result']:
+            return [DownFrame(self.sc, payload)]
         from equip_service import EquipService
         return EquipService.get_instance(db=ctx.db).build_equip_refresh_frames(
             ctx, self.uid, hero_id=result.get("affected_heroes")
@@ -4004,7 +4110,7 @@ class EnchantConfirmOp(Operation):
         eid = int(data.get("equip_id") or 0)
         slot_id = int(data.get("enchant_slot_id") or 1)
         confirm = bool(data.get("confirm"))
-        preview_index = int(data.get("preview_index") or 1)
+        preview_index = int(data.get("preview_index", 1))
         from equip_service import EquipService
         return EquipService.get_instance(db=ctx.db).confirm_enchant(
             ctx, self.uid, eid, slot_id, confirm=confirm, preview_index=preview_index
@@ -4410,6 +4516,8 @@ class ChipUnlockOp(Operation):
     cmd = 50002
     sc = 50003
 
+    prepare_response_in_transaction = True
+
     def validate(self, data, ctx):
         return data
 
@@ -4420,9 +4528,11 @@ class ChipUnlockOp(Operation):
         return ChipService.get_instance(ctx.db).unlock_any_chip(ctx, self.uid, chip_id)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_50003", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_50003", {"result": 0})
+        if not payload:
+            raise ValueError("芯片解锁回执为空")
         ctx.log(f"cs_50002 -> 芯片解锁 cat={result.get('cat')} chip_id={result.get('chip_id')}")
-        return _refresh_frames(ctx, self.uid) + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
 
 
 @operation
@@ -4431,6 +4541,8 @@ class ChipHeroEnableOp(Operation):
 
     cmd = 50018
     sc = 50019
+
+    prepare_response_in_transaction = True
 
     def validate(self, data, ctx):
         return data
@@ -4444,9 +4556,13 @@ class ChipHeroEnableOp(Operation):
         return ChipService.get_instance(ctx.db).enable_hero_chip(ctx, self.uid, hero_id, slot_id, sec_chip)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_50019", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_50019", {"result": 0})
+        if not payload:
+            raise ValueError("角色芯片装配回执为空")
         ctx.log(f"cs_50018 -> 角色芯片装配 hero={result['hero_id']} slot={result['slot_id']} chip={result['secondary']}")
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid, hero_id=result.get("hero_id"))
+        # ChipAction's success callback updates ChipData's requested slot. The
+        # hero snapshot carries no chip state; retain only actual pending deltas.
+        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation
@@ -4456,6 +4572,8 @@ class ChipMimirEnableOp(Operation):
     cmd = 50006
     sc = 50007
 
+    prepare_response_in_transaction = True
+
     def validate(self, data, ctx):
         return data
 
@@ -4463,14 +4581,16 @@ class ChipMimirEnableOp(Operation):
         ctx.uid = self.uid
         kid = int(data.get("kernel_id") or 0)
         sid = int(data.get("secondary_id") or 0)
-        oper = int(data.get("oper") or 1)
+        oper = int(data.get("oper", 1))
         from chip_service import ChipService
         return ChipService.get_instance(ctx.db).enable_mimir_chip(ctx, self.uid, kid, sid, oper)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_50007", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_50007", {"result": 0})
+        if not payload:
+            raise ValueError("芯片操作回执为空")
         ctx.log(f"cs_50006 -> 管理喵芯片装配 kernel={result['kernel_id']} chip={result['secondary_id']} oper={result['oper']} now={result['chips']}")
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation
@@ -4479,6 +4599,8 @@ class ChipMimirResetOp(Operation):
 
     cmd = 50016
     sc = 50017
+
+    prepare_response_in_transaction = True
 
     def validate(self, data, ctx):
         return data
@@ -4490,9 +4612,11 @@ class ChipMimirResetOp(Operation):
         return ChipService.get_instance(ctx.db).reset_mimir_chip(ctx, self.uid, kid)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_50017", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_50017", {"result": 0})
+        if not payload:
+            raise ValueError("芯片操作回执为空")
         ctx.log(f"cs_50016 -> 管理喵芯片清空 kernel={result['kernel_id']}")
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation
@@ -4501,6 +4625,8 @@ class ChipSchemeSaveOp(Operation):
 
     cmd = 50008
     sc = 50009
+
+    prepare_response_in_transaction = True
 
     def validate(self, data, ctx):
         return data
@@ -4518,9 +4644,11 @@ class ChipSchemeSaveOp(Operation):
         return ChipService.get_instance(ctx.db).save_proposal(ctx, self.uid, pid, name, sec)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_50009", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_50009", {"result": 0})
+        if not payload:
+            raise ValueError("芯片操作回执为空")
         ctx.log(f"cs_50008 -> 管理喵方案保存 id={result['id']} name={result['name']} sec={result['secondary']}")
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid, strict=True)
 
 
 @operation
@@ -4575,6 +4703,8 @@ class ChipSchemeEnableOp(Operation):
     cmd = 50014
     sc = 50015
 
+    prepare_response_in_transaction = True
+
     def validate(self, data, ctx):
         return data
 
@@ -4586,9 +4716,11 @@ class ChipSchemeEnableOp(Operation):
         return ChipService.get_instance(ctx.db).apply_proposal(ctx, self.uid, kid, pid)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_50015", {"result": 0}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_50015", {"result": 0})
+        if not payload:
+            raise ValueError("芯片操作回执为空")
         ctx.log(f"cs_50014 -> 管理喵方案应用 kernel={result['kernel_chip_id']} proposal={result['proposal_id']}")
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid, strict=True)
 
 
 # ---------------- 客户端在等但此前无人实现的 cmd（tools/client_expect.py 扫出来的） ----------------
@@ -6034,90 +6166,12 @@ class EquipAutoDecomposeOp(Operation):
 # [2026-09-06 规范化收归] DormLikeOp(58052) 已统一收归至上方 58xxx 家园/后宅/食堂独立区块集中托管。
 
 
+from minigame_point_service import ActivityPointClaimOp as _ActivityPointClaimOp
+
+
 @operation
-class ActivityPointTierRewardOp(Operation):
-    """60054 活动积分档位领奖：cs_60054 {point_reward_id_list} → sc_60055 {result, reward_list}。
-
-    activityaction.lua:519-546。奖励来自 ActivityPointRewardCfg（v5_server/
-    activity_point_reward_cfg.json，1397 条，2026-08-22 从 x64 Lua 提取）。
-    幂等：activity_point_reward(uid, activity_id, reward_id) 已领拒。
-    积分门槛未校验（本地服务宽松；正式还原需活动积分累计表），奖励按配置真实发放。
-    原 cfg 版 grant 原语读不到 items 实际从未发放。
-    """
-
-    cmd = 60054
-    sc = 60055
-
-    _CFG = None
-
-    @classmethod
-    def _cfg(cls):
-        if cls._CFG is None:
-            import os as _os
-            try:
-                cls._CFG = json.load(open(_os.path.join(
-                    _os.path.dirname(_os.path.abspath(__file__)),
-                    "activity_point_reward_cfg.json"), encoding="utf-8"))
-            except Exception:
-                cls._CFG = {}
-        return cls._CFG
-
-    def apply(self, data, ctx):
-        ids = data.get("point_reward_id_list") or []
-        if isinstance(ids, (int, str)):
-            ids = [ids]
-        cfg = self._cfg()
-        rogueteam_claimed = []
-        for rid in ids:
-            try:
-                rid = int(rid)
-            except (TypeError, ValueError):
-                continue
-            c = cfg.get(str(rid)) or cfg.get(rid)
-            if not c:
-                raise OperationError(2, f"未知积分奖励档 {rid}")
-            if ctx.db.query(
-                    "SELECT 1 FROM activity_point_reward WHERE uid=? AND reward_id=?",
-                    (self.uid, rid)):
-                raise OperationError(2, f"积分奖励档 {rid} 已领取")
-            for iid, num in (c.get("reward") or []):
-                _item_add(ctx, self.uid, int(iid), int(num))
-                items.append({"id": int(iid), "num": int(num)})
-            act_id = int(c.get("activity_id") or 0)
-            ctx.db.execute(
-                "INSERT OR REPLACE INTO activity_point_reward (uid, activity_id, reward_id, update_ts) "
-                "VALUES (?,?,?,?)",
-                (self.uid, act_id, rid, int(time.time())))
-            if act_id == 1101:
-                rogueteam_claimed.append(rid)
-
-        if rogueteam_claimed:
-            user_row = ctx.db.get("rogueteam_user", self.uid, "AND template_id=100001")
-            cur_rewarded = json.loads(user_row.get("rewarded_list_json") or "[]") if user_row else []
-            for r in rogueteam_claimed:
-                if r not in cur_rewarded:
-                    cur_rewarded.append(r)
-            ctx.db.upsert("rogueteam_user", self.uid, {
-                "template_id": 100001,
-                "rewarded_list_json": json.dumps(cur_rewarded, ensure_ascii=False),
-                "update_ts": int(time.time())
-            }, keys=("uid", "template_id"))
-
-        return {"items": items, "rogueteam_claimed": rogueteam_claimed}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_60055", {
-            "result": 0, "reward_list": result["items"]}) or b"\x08\x00"
-        ctx.log(f"cs_60054 -> 积分档位领取 {result['items']}")
-        extra_frames = []
-        if result.get("rogueteam_claimed"):
-            p88309 = ctx.codec_encode("sc_88309", {
-                "template_id": 100001,
-                "reward_list": result["rogueteam_claimed"]
-            })
-            if p88309:
-                extra_frames.append(DownFrame(88309, p88309))
-        return [DownFrame(self.sc, payload)] + extra_frames + _refresh_frames(ctx, self.uid)
+class ActivityPointTierRewardOp(_ActivityPointClaimOp):
+    cmd, sc = 60054, 60055
 
 
 # ==============================================================================
@@ -6158,121 +6212,137 @@ class BossChallengeSelectModeOp(Operation):
         return extra + [DownFrame(self.sc, payload)]
 
 
+def _reset_boss_challenge(ctx, uid, kind, target=None):
+    import weekly_challenge_service as weekly
+    if ctx.db is None:
+        raise OperationError(2, '梦境存档不可用')
+    overview, normal, advance = weekly.get_boss_challenge_data(uid, ctx.db, strict=True)
+    if kind and int(overview['mode']) != kind:
+        raise OperationError(2, '当前梦境模式不匹配')
+    if kind == 1 and target not in {int(b['group_id']) for b in normal['boss_challenge_list']}:
+        raise OperationError(2, '当前梦境首领不存在')
+    if kind == 2 and target not in {int(b['id']) for b in advance['boss_list']}:
+        raise OperationError(2, '当前梦境首领不存在')
+    try:
+        if kind == 1:
+            ctx.db.reset_boss_challenge_normal_boss(uid, target)
+        elif kind == 2:
+            ctx.db.reset_boss_challenge_advance_boss(uid, target)
+        else:
+            ctx.db.reset_boss_challenge_advance_all(uid)
+    except BossResetError as exc:
+        raise OperationError(exc.code, str(exc)) from exc
+    return dict(result=0)
+
+
 @operation
-class BossChallengeResetHardModeOp(Operation):
+class BossChallengeResetHardModeOp(BossResetOperation, Operation):
     """cs_45204 {} -> sc_45205 {result: 0} 重置整轮进阶梦境"""
     cmd = 45204
     sc = 45205
 
     def apply(self, data, ctx):
-        if ctx.db and hasattr(ctx.db, "reset_boss_challenge_advance_all"):
-            ctx.db.reset_boss_challenge_advance_all(self.uid)
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_45205", {"result": 0}) or b"\x08\x00"
-        ctx.log("cs_45204 -> 梦境再构重置进阶梦境")
-        extra = []
-        try:
-            import weekly_challenge_service
-            sc_201, _, sc_101 = weekly_challenge_service.get_boss_challenge_data(self.uid, ctx.db)
-            p201 = ctx.codec_encode("sc_45201", sc_201)
-            if p201: extra.append(DownFrame(45201, p201))
-            p101 = ctx.codec_encode("sc_45101", sc_101)
-            if p101: extra.append(DownFrame(45101, p101))
-        except Exception:
-            pass
-        return extra + [DownFrame(self.sc, payload)]
+        return _reset_boss_challenge(ctx, self.uid, 0)
 
 
 @operation
-class BossChallengeResetNormalBossOp(Operation):
+class BossChallengeResetNormalBossOp(BossResetOperation, Operation):
     """cs_45006 {group_id} -> sc_45007 {result: 0} 重置普通梦境指定首领"""
     cmd = 45006
     sc = 45007
 
     def apply(self, data, ctx):
-        gid = int(data.get("group_id") or 0)
-        if ctx.db and hasattr(ctx.db, "reset_boss_challenge_normal_boss"):
-            ctx.db.reset_boss_challenge_normal_boss(self.uid, gid)
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_45007", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_45006 -> 梦境再构重置普通首领 group_id={data.get('group_id')}")
-        extra = []
-        try:
-            import weekly_challenge_service
-            _, sc_001, _ = weekly_challenge_service.get_boss_challenge_data(self.uid, ctx.db)
-            p001 = ctx.codec_encode("sc_45001", sc_001)
-            if p001: extra.append(DownFrame(45001, p001))
-        except Exception:
-            pass
-        return [DownFrame(self.sc, payload)] + extra
+        return _reset_boss_challenge(ctx, self.uid, 1, int(data.get('group_id') or 0))
 
 
 @operation
-class BossChallengeResetHardBossOp(Operation):
+class BossChallengeResetHardBossOp(BossResetOperation, Operation):
     """cs_45106 {boss_id} -> sc_45107 {result: 0} 重置进阶梦境指定首领"""
     cmd = 45106
     sc = 45107
 
     def apply(self, data, ctx):
-        bid = int(data.get("boss_id") or 0)
-        if ctx.db and hasattr(ctx.db, "reset_boss_challenge_advance_boss"):
-            ctx.db.reset_boss_challenge_advance_boss(self.uid, bid)
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_45107", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_45106 -> 梦境再构重置进阶首领 boss_id={data.get('boss_id')}")
-        extra = []
-        try:
-            import weekly_challenge_service
-            _, _, sc_101 = weekly_challenge_service.get_boss_challenge_data(self.uid, ctx.db)
-            p101 = ctx.codec_encode("sc_45101", sc_101)
-            if p101: extra.append(DownFrame(45101, p101))
-        except Exception:
-            pass
-        return [DownFrame(self.sc, payload)] + extra
+        return _reset_boss_challenge(ctx, self.uid, 2, int(data.get('boss_id') or 0))
 
 
 @operation
-class BossChallengeSaveHardTeamOp(Operation):
+class BossChallengeSaveHardTeamOp(BossTeamSaveOperation, Operation):
     """cs_45108 {id, heroes_cfg} -> sc_45109 {result: 0} 保存进阶梦境首领出战阵容"""
     cmd = 45108
     sc = 45109
-
-    def apply(self, data, ctx):
-        boss_id = int(data.get("id") or 0)
-        heroes_cfg = data.get("heroes_cfg") or []
-        if ctx.db and hasattr(ctx.db, "save_boss_challenge_hero_team"):
-            ctx.db.save_boss_challenge_hero_team(self.uid, 2, boss_id, heroes_cfg)
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_45109", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_45108 -> 保存进阶梦境阵容 boss_id={data.get('id')} heroes={data.get('heroes_cfg')}")
-        return [DownFrame(self.sc, payload)]
+    team_kind, target_field = 2, 'id'
 
 
 @operation
-class BossChallengeSaveNormalTeamOp(Operation):
+class BossChallengeSaveNormalTeamOp(BossTeamSaveOperation, Operation):
     """cs_45110 {group_id, heroes_cfg} -> sc_45111 {result: 0} 保存普通梦境首领出战阵容"""
     cmd = 45110
     sc = 45111
+    team_kind, target_field = 1, 'group_id'
 
-    def apply(self, data, ctx):
-        group_id = int(data.get("group_id") or 0)
-        heroes_cfg = data.get("heroes_cfg") or []
-        if ctx.db and hasattr(ctx.db, "save_boss_challenge_hero_team"):
-            ctx.db.save_boss_challenge_hero_team(self.uid, 1, group_id, heroes_cfg)
-        return {"result": 0}
 
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_45111", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_45110 -> 保存普通梦境阵容 group_id={data.get('group_id')} heroes={data.get('heroes_cfg')}")
-        return [DownFrame(self.sc, payload)]
+def _claim_boss_challenge_rewards(ctx, uid, reward_type, value=None):
+    """三种领奖共用当前界面快照、资格和领史；由Core事务包围执行。"""
+    import weekly_challenge_service as weekly
+    if ctx.db is None:
+        raise OperationError(2, "梦境存档不可用")
+    overview, normal, advance = weekly.get_boss_challenge_data(uid, ctx.db, strict=True)
+    if int(overview['mode']) != reward_type:
+        raise OperationError(2, "当前梦境模式不匹配")
+    cat = weekly.get_boss_catalog()
+    if reward_type == 1:
+        area_id = int(normal['area_id'])
+        cfg = cat.get('normal_areas', {}).get(str(area_id))
+        claimed = set(normal['receive_star_list'])
+        # Lua按stage_id覆盖三颗星，再统计==1；不能把同关多条记录相加。
+        stars = {int(row['stage_id']): row['star_list']
+                 for boss in normal['boss_challenge_list'] for row in boss['star_info']}
+        total = sum(bit == 1 for values in stars.values() for bit in values)
+        field, kwargs = 'star', dict(area_id=area_id)
+    else:
+        mode_id = int(advance['advance_id'])
+        cfg = cat.get('advance_modes', {}).get(str(mode_id))
+        claimed = set(advance['receive_point_list'])
+        # 只计当前界面选出的首领；同首领新旧表由快照统一处理，避免重复求和。
+        total = sum(int(boss['max_point']) for boss in advance['boss_list'])
+        field, kwargs = 'point', dict(mode_id=mode_id)
+    if not cfg:
+        raise OperationError(2, "当前梦境奖励配置不存在")
+    tiers = [int(row[field]) for row in cfg.get('rewards', [])]
+    if len(tiers) != len(set(tiers)) or any(tier <= 0 for tier in tiers):
+        raise ValueError('梦境奖励档位配置无效')
+    if value is not None:
+        if value not in tiers:
+            raise OperationError(2, "奖励档位不存在")
+        if value in claimed:
+            raise OperationError(2013, "奖励已领取")
+        if total < value:
+            raise OperationError(2005, "尚未达到奖励条件")
+        selected = [value]
+    else:
+        selected = [tier for tier in tiers if tier <= total and tier not in claimed]
+    merged = {}
+    for tier in selected:
+        for item in weekly.get_boss_challenge_reward_items(reward_type, tier, **kwargs):
+            iid, count = int(item['id']), int(item['num'])
+            if iid <= 0 or count <= 0:
+                raise ValueError('梦境奖励道具配置无效')
+            merged[iid] = merged.get(iid, 0) + count
+    # 标记与发奖同一事务；后续入账/响应准备失败均撤销，无自动重发。
+    for tier in selected:
+        ctx.db.claim_boss_challenge_reward(uid, reward_type, tier)
+    items = [dict(id=iid, num=count) for iid, count in merged.items()]
+    for item in items:
+        _item_add(ctx, uid, item['id'], item['num'])
+    return dict(items=items)
+
+
+def _boss_challenge_reward_frames(ctx, uid, sc, result):
+    payload = ctx.codec_encode('sc_' + str(sc), dict(result=0, item_list=result['items']))
+    if not payload:
+        raise ValueError('梦境领奖确认帧为空')
+    # Lua成功回调维护单档/一键领史，无需重发45001/45101全量覆盖界面。
+    return _refresh_frames(ctx, uid, strict=True) + [DownFrame(sc, payload)]
 
 
 @operation
@@ -6280,40 +6350,13 @@ class BossChallengeClaimStarRewardOp(Operation):
     """cs_45004 {star} -> sc_45005 {result: 0, item_list} 领取普通梦境星级奖励"""
     cmd = 45004
     sc = 45005
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        import weekly_challenge_service
-        star = int(data.get("star") or 0)
-        area_id = 4
-        if ctx.db:
-            try:
-                prog = ctx.db.get_boss_challenge_progress(self.uid)
-                if prog and prog.get("area_id"):
-                    area_id = int(prog["area_id"])
-            except Exception:
-                pass
-        items = weekly_challenge_service.get_boss_challenge_reward_items(1, star, area_id=area_id)
-        for it in items:
-            _item_add(ctx, self.uid, it["id"], it["num"])
-        if ctx.db and hasattr(ctx.db, "claim_boss_challenge_reward"):
-            ctx.db.claim_boss_challenge_reward(self.uid, 1, star)
-        return {"items": items}
+        return _claim_boss_challenge_rewards(ctx, self.uid, 1, int(data.get("star") or 0))
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_45005", {
-            "result": 0,
-            "item_list": result.get("items", [])
-        }) or b"\x08\x00"
-        ctx.log(f"cs_45004 -> 梦境再构领取星级奖励 star={data.get('star')} 奖励={result.get('items')}")
-        extra = []
-        try:
-            import weekly_challenge_service
-            _, sc_001, _ = weekly_challenge_service.get_boss_challenge_data(self.uid, ctx.db)
-            p001 = ctx.codec_encode("sc_45001", sc_001)
-            if p001: extra.append(DownFrame(45001, p001))
-        except Exception:
-            pass
-        return _refresh_frames(ctx, self.uid) + extra + [DownFrame(self.sc, payload)]
+        return _boss_challenge_reward_frames(ctx, self.uid, self.sc, result)
 
 
 @operation
@@ -6321,42 +6364,13 @@ class BossChallengeClaimPointRewardOp(Operation):
     """cs_45102 {point} -> sc_45103 {result: 0, item_list} 领取进阶梦境单档积分奖励"""
     cmd = 45102
     sc = 45103
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        import weekly_challenge_service
-        point = int(data.get("point") or 0)
-        mode_id = 102
-        if ctx.db:
-            try:
-                prog = ctx.db.get_boss_challenge_progress(self.uid)
-                if prog and prog.get("mode") in (101, 102):
-                    mode_id = int(prog["mode"])
-                elif prog and int(prog.get("mode") or 0) == 1:
-                    mode_id = 101
-            except Exception:
-                pass
-        items = weekly_challenge_service.get_boss_challenge_reward_items(2, point, mode_id=mode_id)
-        for it in items:
-            _item_add(ctx, self.uid, it["id"], it["num"])
-        if ctx.db and hasattr(ctx.db, "claim_boss_challenge_reward"):
-            ctx.db.claim_boss_challenge_reward(self.uid, 2, point)
-        return {"items": items}
+        return _claim_boss_challenge_rewards(ctx, self.uid, 2, int(data.get("point") or 0))
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_45103", {
-            "result": 0,
-            "item_list": result.get("items", [])
-        }) or b"\x08\x00"
-        ctx.log(f"cs_45102 -> 梦境再构领取积分奖励 point={data.get('point')} 奖励={result.get('items')}")
-        extra = []
-        try:
-            import weekly_challenge_service
-            _, _, sc_101 = weekly_challenge_service.get_boss_challenge_data(self.uid, ctx.db)
-            p101 = ctx.codec_encode("sc_45101", sc_101)
-            if p101: extra.append(DownFrame(45101, p101))
-        except Exception:
-            pass
-        return _refresh_frames(ctx, self.uid) + extra + [DownFrame(self.sc, payload)]
+        return _boss_challenge_reward_frames(ctx, self.uid, self.sc, result)
 
 
 
@@ -6366,81 +6380,13 @@ class BossChallengeClaimAllPointRewardOp(Operation):
     """cs_45112 {} -> sc_45113 {result: 0, item_list} 一键领取进阶梦境全部可领积分奖励"""
     cmd = 45112
     sc = 45113
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        import weekly_challenge_service
-        cat = weekly_challenge_service.get_boss_catalog()
-        modes = cat.get("advance_modes", {})
-        
-        mode_id = 102
-        if ctx.db:
-            try:
-                prog = ctx.db.get_boss_challenge_progress(self.uid)
-                if prog and prog.get("mode") in (101, 102):
-                    mode_id = int(prog["mode"])
-                elif prog and int(prog.get("mode") or 0) == 1:
-                    mode_id = 101
-            except Exception:
-                pass
-                
-        m_info = modes.get(str(mode_id), modes.get(mode_id, {}))
-        all_rewards = m_info.get("rewards", [])
-        
-        # 计算当前玩家进阶总分（去重求各首领最高分之和）
-        total_score = 0
-        claimed_ids = set()
-        if ctx.db:
-            try:
-                score_rows = ctx.db.query("SELECT boss_id, score FROM boss_challenge_advance WHERE uid=?", (self.uid,))
-                if not score_rows:
-                    score_rows = ctx.db.query("SELECT boss_id, score FROM boss_challenge_scores WHERE uid=?", (self.uid,))
-                b_scores = {}
-                for sr in score_rows:
-                    bid = int(sr.get("boss_id") or 0)
-                    b_scores[bid] = max(b_scores.get(bid, 0), int(sr.get("score") or 0))
-                total_score = sum(b_scores.values())
-                
-                reward_rows = ctx.db.query("SELECT reward_id FROM boss_challenge_claimed_rewards WHERE uid=? AND reward_type=2", (self.uid,))
-                for rr in reward_rows:
-                    claimed_ids.add(int(rr["reward_id"]))
-            except Exception:
-                pass
-                
-        # 汇总所有满足 point <= total_score 且未领取的奖励
-        merged_items = {}
-        new_claimed = []
-        for rew in all_rewards:
-            p_need = int(rew.get("point") or 0)
-            if p_need not in claimed_ids and total_score >= p_need:
-                new_claimed.append(p_need)
-                for d in rew.get("drops", []):
-                    iid, inum = int(d[0]), int(d[1])
-                    merged_items[iid] = merged_items.get(iid, 0) + inum
-
-        out_items = [{"id": k, "num": v} for k, v in merged_items.items()]
-        for it in out_items:
-            _item_add(ctx, self.uid, it["id"], it["num"])
-            
-        if ctx.db and hasattr(ctx.db, "claim_all_boss_challenge_point_rewards") and new_claimed:
-            ctx.db.claim_all_boss_challenge_point_rewards(self.uid, new_claimed)
-            
-        return {"items": out_items}
+        return _claim_boss_challenge_rewards(ctx, self.uid, 2)
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_45113", {
-            "result": 0,
-            "item_list": result.get("items", [])
-        }) or b"\x08\x00"
-        ctx.log(f"cs_45112 -> 梦境再构一键领取积分奖励 奖励={result.get('items')}")
-        extra = []
-        try:
-            import weekly_challenge_service
-            _, _, sc_101 = weekly_challenge_service.get_boss_challenge_data(self.uid, ctx.db)
-            p101 = ctx.codec_encode("sc_45101", sc_101)
-            if p101: extra.append(DownFrame(45101, p101))
-        except Exception:
-            pass
-        return _refresh_frames(ctx, self.uid) + extra + [DownFrame(self.sc, payload)]
+        return _boss_challenge_reward_frames(ctx, self.uid, self.sc, result)
 
 
 @operation
@@ -6504,47 +6450,25 @@ class MythicClaimStarRewardOp(Operation):
     """cs_44012 {star} -> sc_44013 {result: 0, item_list} 领取常规黑区星级奖励"""
     cmd = 44012
     sc = 44013
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        import mythic_affix_cfg
+        from mythic_normal_service import claim
         star = int(data.get("star") or 0)
-        
-        # 默认查询当前玩家选中的黑区难度
-        diff = 10
-        if ctx.db:
-            rows = ctx.db.query("SELECT current_difficulty FROM mythic_public WHERE uid=?", (self.uid,))
-            if rows and rows[0].get("current_difficulty"):
-                diff = int(rows[0]["current_difficulty"])
-                
-        # 奖励模板
-        reward_template = mythic_affix_cfg.MYTHIC_NORMAL_STAR_REWARDS.get(diff, [{"id": 25, "num": 150}, {"id": 40701, "num": 4}])
-        items = [{"id": it["id"], "num": it["num"]} for it in reward_template]
-        
+        items = claim(ctx.db, self.uid, star)
         for it in items:
             _item_add(ctx, self.uid, it["id"], it["num"])
-            
-        if ctx.db and hasattr(ctx.db, "claim_mythic_reward"):
-            ctx.db.claim_mythic_reward(self.uid, star)
-            
         return {"items": items}
 
     def respond(self, result, data, ctx):
-        import weekly_challenge_service
         payload = ctx.codec_encode("sc_44013", {
             "result": 0,
             "item_list": result.get("items", [])
-        }) or b"\x08\x00"
-        ctx.log(f"cs_44012 -> 黑区净化领取星级奖励 star={data.get('star')} 奖励={result.get('items')}")
-        
-        frames = [DownFrame(self.sc, payload)]
-        if ctx.codec_encode and ctx.db:
-            try:
-                _, sc_09, _, _, _ = weekly_challenge_service.get_mythic_data(self.uid, ctx.db)
-                p09 = ctx.codec_encode("sc_44009", sc_09)
-                if p09: frames.append(DownFrame(44009, p09))
-            except Exception:
-                pass
-        return frames + _refresh_frames(ctx, self.uid)
+        })
+        if not isinstance(payload, (bytes, bytearray, memoryview)) or not payload:
+            raise ValueError('常规黑区领奖确认帧为空')
+        # MythicStarBack sets the native reward flag from the request tier.
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, bytes(payload))]
 
 
 @operation
@@ -6591,58 +6515,13 @@ class MythicChangeDifficultyOp(Operation):
 
 
 @operation
-class MythicSelectLevelOp(Operation):
-    """cs_44024 {difficulty_id} -> sc_44025 {result: 0} 选择失序深区热度档位"""
-    cmd = 44024
-    sc = 44025
-
-    def apply(self, data, ctx):
-        diff = int(data.get("difficulty_id") or 30)
-        if ctx.db and hasattr(ctx.db, "set_mythic_final_difficulty"):
-            ctx.db.set_mythic_final_difficulty(self.uid, diff)
-        return {"result": 0, "difficulty_id": diff}
-
-    def respond(self, result, data, ctx):
-        import weekly_challenge_service
-        payload = ctx.codec_encode("sc_44025", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_44024 -> 失序深区选择热度档位 diff={data.get('difficulty_id')}")
-        
-        frames = [DownFrame(self.sc, payload)]
-        if ctx.codec_encode and ctx.db:
-            try:
-                _, _, _, _, sc_23 = weekly_challenge_service.get_mythic_data(self.uid, ctx.db)
-                p23 = ctx.codec_encode("sc_44023", sc_23)
-                if p23: frames.append(DownFrame(44023, p23))
-            except Exception:
-                pass
-        return frames
+class MythicSelectLevelOp(MythicMutationOperation, Operation):
+    cmd, sc = 44024, 44025
 
 
 @operation
-class MythicResetTeamOp(Operation):
-    """cs_44026 {} -> sc_44027 {result: 0} 重置失序深区队伍/放弃挑战"""
-    cmd = 44026
-    sc = 44027
-
-    def apply(self, data, ctx):
-        if ctx.db and hasattr(ctx.db, "reset_mythic_final_team"):
-            ctx.db.reset_mythic_final_team(self.uid)
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        import weekly_challenge_service
-        payload = ctx.codec_encode("sc_44027", {"result": 0}) or b"\x08\x00"
-        ctx.log("cs_44026 -> 失序深区放弃挑战/重置队伍")
-        
-        frames = [DownFrame(self.sc, payload)]
-        if ctx.codec_encode and ctx.db:
-            try:
-                _, _, _, _, sc_23 = weekly_challenge_service.get_mythic_data(self.uid, ctx.db)
-                p23 = ctx.codec_encode("sc_44023", sc_23)
-                if p23: frames.append(DownFrame(44023, p23))
-            except Exception:
-                pass
-        return frames
+class MythicResetTeamOp(MythicMutationOperation, Operation):
+    cmd, sc = 44026, 44027
 
 
 @operation
@@ -6757,261 +6636,71 @@ class MythicReadFinalOp(Operation):
 
 # ----------------- 3. 多维变量 (Polyhedron / Matrix) -----------------
 
+from polyhedron_flow import PolyhedronMutationOperation
+
 @operation
-class PolyhedronStartOp(Operation):
-    """cs_18010 {hero_id_list, beacon_id_list, difficulty} -> sc_18001 + sc_18011 {result: 0} 开始多维探索"""
-    cmd = 18010
-    sc = 18011
-
-    def apply(self, data, ctx):
-        hero_ids = data.get("hero_id_list") or []
-        beacon_ids = data.get("beacon_id_list") or []
-        difficulty = int(data.get("difficulty") or 1)
-        run_data = PolyhedronRunManager.start_run(self.uid, ctx.db, hero_ids, beacon_ids, difficulty)
-        return {"result": 0, "run_data": run_data}
-
-    def respond(self, result, data, ctx):
-        frames = _build_18003_frame(ctx, result.get("run_data"), uid=self.uid)
-        payload = ctx.codec_encode("sc_18011", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_18010 -> 多维变量开启探索 diff={data.get('difficulty')} heroes={data.get('hero_id_list')}")
-        frames.append(DownFrame(self.sc, payload))
-        return frames
+class PolyhedronStartOp(PolyhedronMutationOperation):
+    cmd, sc = 18010, 18011
 
 
 @operation
-class PolyhedronRewardOp(Operation):
-    """cs_18012 {index} -> sc_18001 + sc_18013 {result: 0} 挑选战后珍宝/放弃领金币"""
-    cmd = 18012
-    sc = 18013
-
-    def apply(self, data, ctx):
-        idx = int(data.get("index") if data.get("index") is not None else 0)
-        run_data = PolyhedronRunManager.select_reward(self.uid, ctx.db, idx)
-        end_info = None
-        if run_data and run_data.get("state") == 3:
-            end_info = PolyhedronRunManager.settle_run(self.uid, ctx.db)
-        return {"result": 0, "run_data": run_data, "end_info": end_info}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_18013", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_18012 -> 多维变量选择珍宝奖励 index={data.get('index')}")
-        frames = [DownFrame(self.sc, payload)]
-        end_info = result.get("end_info")
-        if end_info:
-            end_bytes = ctx.codec_encode("sc_18005", {"end_info": end_info})
-            if end_bytes:
-                frames.append(DownFrame(18005, end_bytes))
-        frames += _build_18003_frame(ctx, result.get("run_data"), uid=self.uid)
-        if end_info:
-            frames += _refresh_frames(ctx, self.uid)
-        return frames
+class PolyhedronRewardOp(PolyhedronMutationOperation):
+    cmd, sc = 18012, 18013
 
 
 @operation
-class PolyhedronSelectStageOp(Operation):
-    """cs_18014 {index} -> sc_18001 + sc_18015 {result: 0} 选择节点关卡大门"""
-    cmd = 18014
-    sc = 18015
-
-    def apply(self, data, ctx):
-        idx = int(data.get("index") or 1)
-        run_data = PolyhedronRunManager.select_gate(self.uid, ctx.db, idx)
-        return {"result": 0, "run_data": run_data}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_18015", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_18014 -> 多维变量选择大门 index={data.get('index')}")
-        frames = [DownFrame(self.sc, payload)] + _build_18003_frame(ctx, result.get("run_data"), uid=self.uid)
-        return frames
+class PolyhedronSelectStageOp(PolyhedronMutationOperation):
+    cmd, sc = 18014, 18015
 
 
 @operation
-class PolyhedronResetOp(Operation):
-    """cs_18016 {} -> sc_18001 + sc_18017 {result: 0} 放弃/重置本轮探索"""
-    cmd = 18016
-    sc = 18017
-
-    def apply(self, data, ctx):
-        PolyhedronRunManager.reset_run(self.uid, ctx.db)
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_18017", {"result": 0}) or b"\x08\x00"
-        ctx.log("cs_18016 -> 多维变量放弃/重置探索")
-        frames = [DownFrame(self.sc, payload)] + _build_18003_frame(ctx, None, uid=self.uid)
-        return frames
+class PolyhedronResetOp(PolyhedronMutationOperation):
+    cmd, sc = 18016, 18017
 
 
 @operation
-class PolyhedronSettleQueryOp(Operation):
-    """cs_18018 {} -> sc_18005 + sc_18001 + sc_18019 {result: 0} 结算多维对局"""
-    cmd = 18018
-    sc = 18019
-
-    def apply(self, data, ctx):
-        end_info = PolyhedronRunManager.settle_run(self.uid, ctx.db)
-        return {"result": 0, "end_info": end_info}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_18019", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_18018 -> 多维变量结算 end_info={result.get('end_info')}")
-        frames = [DownFrame(self.sc, payload)]
-        end_info = result.get("end_info") or {"point": 0, "decision_exp": 0, "terminal_exp": 0}
-        end_bytes = ctx.codec_encode("sc_18005", {"end_info": end_info})
-        if end_bytes:
-            frames.append(DownFrame(18005, end_bytes))
-        frames += _build_18003_frame(ctx, None, uid=self.uid)
-        frames += _refresh_frames(ctx, self.uid)
-        return frames
+class PolyhedronSettleQueryOp(PolyhedronMutationOperation):
+    cmd, sc = 18018, 18019
 
 
 @operation
-class PolyhedronEnlistHeroOp(Operation):
-    """cs_18020 {hero_id} -> sc_18001 + sc_18021 {result: 0} 招募多维英雄"""
-    cmd = 18020
-    sc = 18021
-
-    def apply(self, data, ctx):
-        hid = int(data.get("hero_id") or 0)
-        run_data = PolyhedronRunManager.enlist_hero(self.uid, ctx.db, hid)
-        return {"result": 0, "run_data": run_data}
-
-    def respond(self, result, data, ctx):
-        frames = _build_18003_frame(ctx, result.get("run_data"), uid=self.uid)
-        payload = ctx.codec_encode("sc_18021", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_18020 -> 多维变量招募英雄 hero_id={data.get('hero_id')}")
-        frames.append(DownFrame(self.sc, payload))
-        return frames
+class PolyhedronEnlistHeroOp(PolyhedronMutationOperation):
+    cmd, sc = 18020, 18021
 
 
 @operation
-class PolyhedronBuyShopItemOp(Operation):
-    """cs_18022 {index} -> sc_18001 + sc_18023 {result: 0} 多维商店购买"""
-    cmd = 18022
-    sc = 18023
-
-    def apply(self, data, ctx):
-        idx = int(data.get("index") or 1)
-        run_data = PolyhedronRunManager.buy_shop_item(self.uid, ctx.db, idx)
-        return {"result": 0, "run_data": run_data}
-
-    def respond(self, result, data, ctx):
-        frames = _build_18003_frame(ctx, result.get("run_data"), uid=self.uid)
-        payload = ctx.codec_encode("sc_18023", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_18022 -> 多维商店购买道具 index={data.get('index')}")
-        frames.append(DownFrame(self.sc, payload))
-        return frames
+class PolyhedronBuyShopItemOp(PolyhedronMutationOperation):
+    cmd, sc = 18022, 18023
 
 
 @operation
-class PolyhedronRefreshShopOp(Operation):
-    """cs_18024 {} -> sc_18001 + sc_18025 {result: 0} 刷新多维商店"""
-    cmd = 18024
-    sc = 18025
-
-    def apply(self, data, ctx):
-        run_data = PolyhedronRunManager.refresh_shop(self.uid, ctx.db)
-        return {"result": 0, "run_data": run_data}
-
-    def respond(self, result, data, ctx):
-        frames = _build_18003_frame(ctx, result.get("run_data"), uid=self.uid)
-        payload = ctx.codec_encode("sc_18025", {"result": 0}) or b"\x08\x00"
-        ctx.log("cs_18024 -> 多维商店刷新")
-        frames.append(DownFrame(self.sc, payload))
-        return frames
+class PolyhedronRefreshShopOp(PolyhedronMutationOperation):
+    cmd, sc = 18024, 18025
 
 
 @operation
-class PolyhedronShopHealOp(Operation):
-    """cs_18026 {} -> sc_18001 + sc_18027 {result: 0} 多维生命泉水恢复"""
-    cmd = 18026
-    sc = 18027
-
-    def apply(self, data, ctx):
-        run_data = PolyhedronRunManager.recover_shop_blood(self.uid, ctx.db)
-        return {"result": 0, "run_data": run_data}
-
-    def respond(self, result, data, ctx):
-        frames = _build_18003_frame(ctx, result.get("run_data"), uid=self.uid)
-        payload = ctx.codec_encode("sc_18027", {"result": 0}) or b"\x08\x00"
-        ctx.log("cs_18026 -> 多维生命恢复")
-        frames.append(DownFrame(self.sc, payload))
-        return frames
+class PolyhedronShopHealOp(PolyhedronMutationOperation):
+    cmd, sc = 18026, 18027
 
 
 @operation
-class PolyhedronSwitchTeamOp(Operation):
-    """cs_18028 {fight_id_list} -> sc_18001 + sc_18029 {result: 0} 调整多维出战编队"""
-    cmd = 18028
-    sc = 18029
-
-    def apply(self, data, ctx):
-        fight_list = data.get("fight_id_list") or []
-        run_data = PolyhedronRunManager.switch_team(self.uid, ctx.db, fight_list)
-        return {"result": 0, "run_data": run_data}
-
-    def respond(self, result, data, ctx):
-        frames = _build_18003_frame(ctx, result.get("run_data"), uid=self.uid)
-        payload = ctx.codec_encode("sc_18029", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_18028 -> 多维调整出战队伍 {data.get('fight_id_list')}")
-        frames.append(DownFrame(self.sc, payload))
-        return frames
+class PolyhedronSwitchTeamOp(PolyhedronMutationOperation):
+    cmd, sc = 18028, 18029
 
 
 @operation
-class PolyhedronResetRewardOp(Operation):
-    """cs_18030 {} -> sc_18001 + sc_18031 {result: 0} 重置/重骰珍宝"""
-    cmd = 18030
-    sc = 18031
-
-    def apply(self, data, ctx):
-        run_data = PolyhedronRunManager.reroll_reward(self.uid, ctx.db)
-        return {"result": 0, "run_data": run_data}
-
-    def respond(self, result, data, ctx):
-        frames = _build_18003_frame(ctx, result.get("run_data"), uid=self.uid)
-        payload = ctx.codec_encode("sc_18031", {"result": 0}) or b"\x08\x00"
-        ctx.log("cs_18030 -> 多维重置奖励")
-        frames.append(DownFrame(self.sc, payload))
-        return frames
+class PolyhedronResetRewardOp(PolyhedronMutationOperation):
+    cmd, sc = 18030, 18031
 
 
 @operation
-class PolyhedronSetTerminalOp(Operation):
-    """cs_18032 {upgrade_id_list} -> sc_18033 {result: 0} 升级/配置多维终端"""
-    cmd = 18032
-    sc = 18033
-
-    def apply(self, data, ctx):
-        up_list = data.get("upgrade_id_list") or []
-        ctx.db.execute("DELETE FROM polyhedron_terminal WHERE uid = ?", (self.uid,))
-        now_ts = int(time.time())
-        for up_id in up_list:
-            ctx.db.execute("INSERT OR REPLACE INTO polyhedron_terminal (uid, terminal_id, update_ts) VALUES (?, ?, ?)",
-                           (self.uid, int(up_id), now_ts))
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_18033", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_18032 -> 多维终端配置已持久化 {data.get('upgrade_id_list')}")
-        return [DownFrame(self.sc, payload)]
+class PolyhedronSetTerminalOp(PolyhedronMutationOperation):
+    cmd, sc = 18032, 18033
 
 
 @operation
-class PolyhedronRedPointOp(Operation):
-    """cs_18034 {} -> sc_18035 {result: 0} 多维消除新赛季红点"""
-    cmd = 18034
-    sc = 18035
-
-    def apply(self, data, ctx):
-        ctx.db.execute("UPDATE polyhedron_meta SET is_new = 0, update_ts = ? WHERE uid = ?",
-                       (int(time.time()), self.uid))
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_18035", {"result": 0}) or b"\x08\x00"
-        ctx.log("cs_18034 -> 多维消除新赛季红点")
-        return [DownFrame(self.sc, payload)]
+class PolyhedronRedPointOp(PolyhedronMutationOperation):
+    cmd, sc = 18034, 18035
 
 
 @operation
@@ -7019,13 +6708,19 @@ class PolyhedronClaimPolicyRewardOp(Operation):
     """cs_66000 {activity_id, type, level} -> sc_66001 {result: 0, reward_list} 领取多维历程政策奖励"""
     cmd = 66000
     sc = 66001
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         import res_version_manager as _rvm
-        activity_id = int(data.get("activity_id") or _rvm.get_version_config()["polyhedron_activity_id"])
-        ctype = int(data.get("type") or 1)
+        activity_id = int(_rvm.get_version_config(getattr(ctx,"res_version",None))["polyhedron_activity_id"])
+        from hodur_service import require
+        require(not data.get("activity_id") or int(data["activity_id"])==activity_id,"多维活动不匹配")
+        ctype = int(data.get("type") or 0)
         target_level = int(data.get("level") or 1)
+        require(ctype in (1,2),"多维领取类型无效")
         now = int(time.time())
+        from polyhedron_service import PolyhedronRunManager
+        PolyhedronRunManager.check_and_refresh_policy_cycle(self.uid, ctx.db, activity_id=activity_id)
 
         # 20 级常驻多维历程经验阶梯与奖励表 (Activity 0)
         policy_exp_steps = [60, 120, 180, 240, 300, 400, 500, 600, 700, 800, 920, 1040, 1160, 1280, 1400, 1520, 1640, 1760, 1880, 2000]
@@ -7060,8 +6755,8 @@ class PolyhedronClaimPolicyRewardOp(Operation):
             else:
                 break
 
-        claimed_rows = ctx.db.query("SELECT level FROM polyhedron_policy_claimed WHERE uid=? AND activity_id=?",
-                                    (self.uid, activity_id))
+        claimed_rows = ctx.db.query("SELECT level FROM polyhedron_policy_claimed WHERE uid=?",
+                                    (self.uid,))
         already_claimed = {r["level"] for r in claimed_rows}
 
         new_claimed_levels = []
@@ -7071,6 +6766,7 @@ class PolyhedronClaimPolicyRewardOp(Operation):
                     new_claimed_levels.append(lvl)
         else:
             # 单个领取：校验 target_level 在有效范围 1~20 且未被领取，且经验达标
+            require(1<=target_level<=20 and target_level<=max_claimable_level,"多维历程奖励尚未解锁")
             req_exp = policy_exp_steps[target_level - 1] if 1 <= target_level <= len(policy_exp_steps) else 999999
             if 1 <= target_level <= 20 and target_level not in already_claimed and exp_num >= req_exp:
                 new_claimed_levels.append(target_level)
@@ -7094,134 +6790,34 @@ class PolyhedronClaimPolicyRewardOp(Operation):
         return {"items": items}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_66001", {
-            "result": 0,
-            "reward_list": result.get("items", [])
-        }) or b"\x08\x00"
-        ctx.log(f"cs_66000 -> 领取多维历程政策奖励 奖励={result.get('items')}")
-        extra = _refresh_frames(ctx, self.uid) + _build_18003_frame(ctx, None, uid=self.uid)
-        return [DownFrame(self.sc, payload)] + extra
+        from polyhedron_flow import frame,snapshot
+        return (_refresh_frames(ctx,self.uid,strict=True)+[snapshot(ctx,self.uid),
+                frame(ctx,self.sc,dict(result=0,reward_list=result.get('items',[])))])
 
 
 @operation
-class PolyhedronResetTerminalOp(Operation):
-    """cs_66002 {} -> sc_66003 {result: 0} 重置多维终端升级"""
-    cmd = 66002
-    sc = 66003
-
-    def apply(self, data, ctx):
-        ctx.db.execute("DELETE FROM polyhedron_terminal WHERE uid = ?", (self.uid,))
-        ctx.db.execute("UPDATE polyhedron_meta SET reset_times = reset_times + 1, update_ts = ? WHERE uid = ?",
-                       (int(time.time()), self.uid))
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_66003", {"result": 0}) or b"\x08\x00"
-        ctx.log("cs_66002 -> 多维终端重置成功")
-        return [DownFrame(self.sc, payload)]
+class PolyhedronResetTerminalOp(PolyhedronMutationOperation):
+    cmd, sc = 66002, 66003
 
 
 @operation
-class PolyhedronAstrolabeEquipOp(Operation):
-    """cs_66004 {hero_id, astrolabe_id_list} -> sc_66005 {result: 0} 多维英雄加装/调整神格"""
-    cmd = 66004
-    sc = 66005
-
-    def apply(self, data, ctx):
-        hero_id = int(data.get("hero_id") or 0)
-        astros = data.get("astrolabe_id_list") or []
-        a1 = astros[0] if len(astros) > 0 else 0
-        a2 = astros[1] if len(astros) > 1 else 0
-        a3 = astros[2] if len(astros) > 2 else 0
-        if hero_id > 0:
-            ctx.db.upsert("polyhedron_hero", self.uid, {
-                "hero_id": hero_id,
-                "astrolabe_1": a1,
-                "astrolabe_2": a2,
-                "astrolabe_3": a3,
-                "update_ts": int(time.time())
-            }, keys=("uid", "hero_id"))
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_66005", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_66004 -> 多维英雄神格更新 hero_id={data.get('hero_id')} astrolabes={data.get('astrolabe_id_list')}")
-        return [DownFrame(self.sc, payload)]
+class PolyhedronAstrolabeEquipOp(PolyhedronMutationOperation):
+    cmd, sc = 66004, 66005
 
 
 @operation
-class PolyhedronUnlockBeaconOp(Operation):
-    """cs_66034 {beacon_id} -> sc_66035 {result: 0} 解锁多维信标"""
-    cmd = 66034
-    sc = 66035
-
-    def apply(self, data, ctx):
-        beacon_id = int(data.get("beacon_id") or 0)
-        if beacon_id > 0:
-            ctx.db.upsert("polyhedron_beacon", self.uid, {
-                "beacon_id": beacon_id,
-                "update_ts": int(time.time())
-            }, keys=("uid", "beacon_id"))
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_66035", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_66034 -> 多维解锁信标 beacon_id={data.get('beacon_id')}")
-        return [DownFrame(self.sc, payload)]
+class PolyhedronUnlockBeaconOp(PolyhedronMutationOperation):
+    cmd, sc = 66034, 66035
 
 
 @operation
-class PolyhedronUnlockHeroOp(Operation):
-    """cs_66036 {hero_id} -> sc_66037 {result: 0} 消耗映射仪解锁多维初始英雄"""
-    cmd = 66036
-    sc = 66037
-
-    def apply(self, data, ctx):
-        hero_id = int(data.get("hero_id") or 0)
-        if hero_id <= 0:
-            return {"result": 5}  # 错误参数
-        
-        # 检查/扣除 1 个映射仪 (item_id=44)
-        _, have = _item_balance(ctx, self.uid, 44)
-        if have < 1:
-            ctx.log(f"cs_66036 -> 解锁多维英雄失败: 映射仪(44)不足 当前={have}")
-            return {"result": 12}  # 材料不足
-        
-        _item_deduct(ctx, self.uid, 44, 1)
-        
-        # 存入 polyhedron_hero 表持久化
-        ctx.db.upsert("polyhedron_hero", self.uid, {
-            "hero_id": hero_id,
-            "astrolabe_1": 0,
-            "astrolabe_2": 0,
-            "astrolabe_3": 0,
-            "update_ts": int(time.time())
-        }, keys=("uid", "hero_id"))
-        
-        ctx.log(f"cs_66036 -> 多维解锁英雄成功 hero_id={hero_id}, 消耗映射仪×1, 剩余={have-1}")
-        return {"result": 0, "hero_id": hero_id}
-
-    def respond(self, result, data, ctx):
-        res_code = result.get("result", 0)
-        payload = ctx.codec_encode("sc_66037", {"result": res_code}) or b"\x08\x00"
-        if res_code == 0:
-            return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
-        return [DownFrame(self.sc, payload)]
+class PolyhedronUnlockHeroOp(PolyhedronMutationOperation):
+    cmd, sc = 66036, 66037
 
 
 @operation
-class PolyhedronComboSkillOp(Operation):
-    """cs_66038 {cooperate_unique_skill_id} -> sc_66039 {result: 0} 多维设置连携奥义"""
-    cmd = 66038
-    sc = 66039
-
-    def apply(self, data, ctx):
-        return {"result": 0}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_66039", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_66038 -> 多维设置连携奥义 skill_id={data.get('cooperate_unique_skill_id')}")
-        return [DownFrame(self.sc, payload)]
+class PolyhedronComboSkillOp(PolyhedronMutationOperation):
+    cmd, sc = 66038, 66039
 
 
 # ----------------- 4. 迭代校验 (Core Verification) -----------------
@@ -7715,39 +7311,25 @@ class CoreVerificationMode4GetRewardOp(Operation):
     """cs_89804 {activity_id, assignment_id} -> sc_89805 {result: 0, reward_list} Mode 4 领奖"""
     cmd = 89804
     sc = 89805
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        import weekly_challenge_service as _wcs
+        from core_mode4_reward_service import claim
         act_id = int(data.get("activity_id") or 0)
-        ass_id = data.get("assignment_id") or []
-        if isinstance(ass_id, (int, str)):
-            ass_id = [int(ass_id)]
-        
-        cl_cat = _wcs.get_core_verification_cl_catalog()
-        rewards_map = cl_cat.get("rewards", {})
-        granted_items = []
-        for tid in ass_id:
-            r_info = rewards_map.get(str(tid)) or {}
-            items = r_info.get("rewards") or [{"id": 1, "num": 100}]
-            for it in items:
-                _item_add(ctx, self.uid, it["id"], it["num"])
-                granted_items.append(it)
-            if ctx.db and hasattr(ctx.db, "claim_core_verification_cl_task"):
-                ctx.db.claim_core_verification_cl_task(self.uid, act_id, int(tid))
-        
-        if not granted_items:
-            granted_items = [{"id": 1, "num": 100}]
-            for it in granted_items:
-                _item_add(ctx, self.uid, it["id"], it["num"])
-
-        return {"items": granted_items}
+        items = claim(ctx, self.uid, act_id, data.get("assignment_id") or [])
+        for item in items:
+            _item_add(ctx, self.uid, item['id'], item['num'])
+        return {"items": items}
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_89805", {
             "result": 0,
             "reward_list": result.get("items", [])
-        }) or b"\x08\x00"
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        })
+        if not isinstance(payload, (bytes, bytearray, memoryview)) or not payload:
+            raise ValueError('迭代校验Mode4领奖确认帧为空')
+        # Native OnGetRewardCallback updates requested task IDs to completed.
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, bytes(payload))]
 
 
 @operation
@@ -7858,223 +7440,67 @@ class EquipSeizureClaimRewardOp(Operation):
 # 因果观测（WarChess 49xxx 战棋玩法）操作集
 # =========================================================================
 
-@operation
-class WarChessEnterOp(Operation):
-    """请求进入因果观测地图（cs_49002 -> sc_49003）。"""
+class _WarChessOperation(Operation):
+    prepare_response_in_transaction = True
 
+    def apply(self, data, ctx):
+        import warchess_service as chess
+        chess.require(isinstance(data, dict), 'Invalid chess request')
+        if self.cmd == 49002:
+            return chess.enter(ctx, self.uid, data.get('chapter_id'))
+        if self.cmd == 49004:
+            return chess.move(ctx, self.uid, data.get('path', []))
+        if self.cmd == 49006:
+            return chess.interact(ctx, self.uid, data)
+        if self.cmd == 49008:
+            chess.quit(ctx.db, self.uid)
+            return dict(result=0), []
+        if self.cmd == 49016:
+            return chess.fire(ctx, self.uid)
+        if self.cmd == 49024:
+            return chess.switch(ctx, self.uid, data.get('type'))
+        raise OperationError(2, 'Unknown chess operation')
+
+    def respond(self, result, data, ctx):
+        import warchess_service as chess
+        packet, events = result
+        return chess.frames(ctx, self.uid, events, (self.sc, packet))
+
+
+@operation
+class WarChessEnterOp(_WarChessOperation):
     cmd = 49002
     sc = 49003
 
-    def parse(self, req, ctx):
-        d = super().parse(req, ctx)
-        if not isinstance(d, dict):
-            return {"chapter_id": 4040101}
-        return d
-
-    def apply(self, data, ctx):
-        chapter_id = int(data.get("chapter_id") or 4040101)
-        if ctx.db:
-            session = ctx.db.get_or_create_warchess_session(self.uid, chapter_id)
-        else:
-            session = {
-                "pos": {"x": 0.0, "z": 0.0},
-                "direction": 0,
-                "is_fog": False,
-                "fog": [100, 100],
-                "map": [],
-                "bag": {"item": [], "artifact": []},
-                "hp_list": [],
-                "log": [],
-                "event_list": [],
-                "is_viewed_log": False,
-                "guide_pos": [],
-                "event_info": [],
-            }
-        return {"chapter_id": chapter_id, "session": session}
-
-    def respond(self, result, data, ctx):
-        session = result.get("session") or {}
-        payload = ctx.codec_encode("sc_49003", {
-            "result": 0,
-            "map_info": session
-        }) or b"\x08\x00"
-        ctx.log(f"cs_49002 -> 请求进入因果观测地图 章节={result.get('chapter_id')}")
-        return [DownFrame(self.sc, payload)]
-
 
 @operation
-class WarChessMoveOp(Operation):
-    """因果观测角色移动路径同步（cs_49004 -> sc_49005）。"""
-
+class WarChessMoveOp(_WarChessOperation):
     cmd = 49004
     sc = 49005
 
-    def parse(self, req, ctx):
-        d = super().parse(req, ctx)
-        if not isinstance(d, dict):
-            return {"path": []}
-        return d
-
-    def apply(self, data, ctx):
-        path = data.get("path") or []
-        if path and ctx.db:
-            last_pos = path[-1]
-            x = float(last_pos.get("x", 0.0))
-            z = float(last_pos.get("z", 0.0))
-            row = ctx.db.query("SELECT current_chapter FROM warchess_map WHERE uid = ? AND activity_id = 0", (self.uid,))
-            cur_ch = int(row[0]["current_chapter"]) if row else 0
-            if cur_ch > 0:
-                ctx.db.update_warchess_session_pos(self.uid, cur_ch, x, z)
-        return {"success": True}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_49005", {"result": 0}) or b"\x08\x00"
-        return [DownFrame(self.sc, payload)]
-
-
-_WARCHESS_EVENT_INDEX = None
-
-def _get_warchess_event_index():
-    global _WARCHESS_EVENT_INDEX
-    if _WARCHESS_EVENT_INDEX is None:
-        p = os.path.join(os.path.dirname(__file__), "static_resources", "warchess_event_index.json")
-        if os.path.exists(p):
-            try:
-                with open(p, "r", encoding="utf-8") as f:
-                    _WARCHESS_EVENT_INDEX = json.load(f)
-            except Exception:
-                _WARCHESS_EVENT_INDEX = {}
-        else:
-            _WARCHESS_EVENT_INDEX = {}
-    return _WARCHESS_EVENT_INDEX
-
 
 @operation
-class WarChessInteractOp(Operation):
-    """因果观测地块交互/触发事件（cs_49006 -> sc_49007）。"""
-
+class WarChessInteractOp(_WarChessOperation):
     cmd = 49006
     sc = 49007
 
-    def parse(self, req, ctx):
-        d = super().parse(req, ctx)
-        if not isinstance(d, dict):
-            return {"pos": {"x": 0, "z": 0}, "param": 0, "type": 0}
-        return d
-
-    def apply(self, data, ctx):
-        pos = data.get("pos") or {}
-        x = float(pos.get("x", 0.0))
-        z = float(pos.get("z", 0.0))
-        param = int(data.get("param") or 0)
-        itype = int(data.get("type") or 0)
-
-        row = ctx.db.query("SELECT current_chapter FROM warchess_map WHERE uid = ? AND activity_id = 0", (self.uid,)) if ctx.db else None
-        cur_ch = int(row[0]["current_chapter"]) if row else 0
-
-        rewards = []
-        ev_idx = _get_warchess_event_index().get(str(cur_ch), {})
-        tile_info = ev_idx.get(f"{int(x)},{int(z)}")
-        actions = tile_info.get("actions", []) if tile_info else []
-
-        is_box_handled = False
-        # 执行该地块在配置中的所有事件（包括连带开门、开箱等）
-        for act in actions:
-            cmd_id = act[0] if act else 0
-            if cmd_id in (10203, 10204):
-                is_box_handled = True
-                box_id = cmd_id
-                if cur_ch > 0 and ctx.db:
-                    if not ctx.db.is_warchess_box_opened(self.uid, cur_ch, box_id, 0, x, z):
-                        ctx.db.record_warchess_box_opened(self.uid, cur_ch, box_id, 0, x, z)
-                        diamond_num = 100 if box_id == 10204 else 50
-                        _item_add(ctx, self.uid, 1, diamond_num)
-                        _item_add(ctx, self.uid, 2, 5000)
-                        rewards.append({"id": 1, "num": diamond_num})
-                        rewards.append({"id": 2, "num": 5000})
-            elif cmd_id == 10302 and len(act) >= 4:
-                # 连带修改其他地块状态（如击败怪兽后自动开门 / 机关联动）
-                tx, tz, tstatus = act[1], act[2], act[3]
-                if cur_ch > 0 and ctx.db:
-                    ctx.db.update_warchess_grid_state(self.uid, cur_ch, tag=0, x=float(tx), z=float(tz), state=tstatus)
-
-        # 兜底：处理非配置驱动的直接宝箱交互
-        if param in (10203, 10204, 106031) and not is_box_handled:
-            box_id = param
-            if cur_ch > 0 and ctx.db:
-                if not ctx.db.is_warchess_box_opened(self.uid, cur_ch, box_id, 0, x, z):
-                    ctx.db.record_warchess_box_opened(self.uid, cur_ch, box_id, 0, x, z)
-                    diamond_num = 100 if box_id == 10204 else (50 if box_id == 10203 else 20)
-                    _item_add(ctx, self.uid, 1, diamond_num)
-                    _item_add(ctx, self.uid, 2, 5000)
-                    rewards.append({"id": 1, "num": diamond_num})
-                    rewards.append({"id": 2, "num": 5000})
-
-        # 记录神格/圣物与地块自身状态
-        if cur_ch > 0 and ctx.db:
-            if param and 1000 <= param <= 9999:
-                ctx.db.add_warchess_artifact(self.uid, cur_ch, param)
-            ctx.db.update_warchess_grid_state(self.uid, cur_ch, tag=0, x=x, z=z, state=1, attribute=[param] if param else [])
-
-        return {"cur_ch": cur_ch, "pos": (x, z), "param": param, "type": itype, "rewards": rewards}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_49007", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_49006 -> 因果观测地块交互 章节={result.get('cur_ch')} 坐标={result.get('pos')} param={result.get('param')} type={result.get('type')}")
-        frames = [DownFrame(self.sc, payload)]
-        if result.get("rewards"):
-            frames.extend(_refresh_frames(ctx, self.uid))
-        return frames
-
 
 @operation
-class WarChessQuitOp(Operation):
-    """因果观测放弃/退出/完成探索（cs_49008 -> sc_49009）。"""
-
+class WarChessQuitOp(_WarChessOperation):
     cmd = 49008
     sc = 49009
 
-    def apply(self, data, ctx):
-        if ctx.db:
-            ctx.db.clear_warchess_session(self.uid)
-        return {"success": True}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_49009", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_49008 -> 因果观测完成/退出探索")
-        return [DownFrame(self.sc, payload)]
-
 
 @operation
-class WarChessFireOp(Operation):
-    """因果观测玩家开炮（cs_49016 -> sc_49017）。"""
-
+class WarChessFireOp(_WarChessOperation):
     cmd = 49016
     sc = 49017
 
-    def apply(self, data, ctx):
-        return {"success": True}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_49017", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_49016 -> 因果观测玩家开炮")
-        return [DownFrame(self.sc, payload)]
-
 
 @operation
-class WarChessSwitchControlOp(Operation):
-    """因果观测切换控制模式（cs_49024 -> sc_49025）。"""
-
+class WarChessSwitchControlOp(_WarChessOperation):
     cmd = 49024
     sc = 49025
-
-    def apply(self, data, ctx):
-        return {"success": True}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_49025", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_49024 -> 因果观测切换控制模式")
-        return [DownFrame(self.sc, payload)]
 
 
 # ==============================================================================
@@ -8111,17 +7537,20 @@ class BigMonthCardSignOp(Operation):
             "is_sign": result["is_sign"],
             "total_sign_times": result["total_sign_times"],
             "total_sign_receive_list": result["total_sign_receive_list"]
-        }) or b"\x08\x00"
+        })
+        if not payload:
+            raise ValueError("必要百宝囊签到回执 sc_34111 为空")
+        if ctx.generator is None:
+            raise ValueError("百宝囊状态生成器缺失")
+        p01 = ctx.generator.gen_payload(34101, uid=self.uid, db=ctx.db)
+        if not p01:
+            raise ValueError("必要百宝囊状态 sc_34101 为空")
         ctx.log(f"cs_34110 -> 百宝囊签到成功，获得={result['rewards']}")
-        frames = [DownFrame(self.sc, payload)]
-        if ctx.generator is not None:
-            try:
-                p01 = ctx.generator.gen_payload(34101, uid=self.uid, db=ctx.db)
-                if p01:
-                    frames.append(DownFrame(34101, p01))
-            except Exception:
-                pass
-        return frames + _refresh_frames(ctx, self.uid, strict=True)
+        # Assets and pre-claim settlement notifications precede the callback.
+        # Lua compares old receipts in 34111, then needs the final 34101 to
+        # replace its cumulative list (SignAccumulate stops at an owned ID).
+        return _refresh_frames(ctx, self.uid, strict=True) + [
+            DownFrame(self.sc, payload), DownFrame(34101, p01)]
 
 
 @operation
@@ -8251,39 +7680,26 @@ class NoobSignInOp(Operation):
 
     cmd = 59012
     sc = 59013
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        uid = self.uid
-        now_ts = int(time.time())
-        row = ctx.db.query("SELECT * FROM newbie_activity WHERE uid=?", (uid,))
-        r = row[0] if row else {}
-        times = int(r.get("now_sign_times") or 0) + 1
-        newbie_rewards = {
-            1: (38, 5), 2: (2, 20000), 3: (41002, 10), 4: (38, 5),
-            5: (40504, 20), 6: (41301, 20), 7: (1, 500), 8: (38, 5),
-            9: (2, 30000), 10: (41002, 15), 11: (38, 5), 12: (40504, 30),
-            13: (41301, 30), 14: (1, 1000)
-        }
-        rw = newbie_rewards.get(times, (38, 1))
-        _item_add(ctx, uid, rw[0], rw[1])
-        ctx.db.execute(
-            "UPDATE newbie_activity SET now_sign_times=?, last_sign_ts=?, update_ts=? WHERE uid=?",
-            (times, now_ts, now_ts, uid)
-        )
-        return {"rewards": [{"id": rw[0], "num": rw[1]}]}
+        from newbie_sign_reward_service import claim
+        try:
+            rewards = claim(ctx.db, self.uid,
+                            lambda item, num: _item_add(ctx, self.uid, item, num,
+                                                        source='newbie_sign_reward'))
+        except ValueError as exc:
+            raise OperationError(2, str(exc)) from exc
+        return {'rewards': rewards}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_59013", {"result": 0, "reward_list": result["rewards"]}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_59013", {"result": 0, "reward_list": result["rewards"]})
+        if not isinstance(payload, (bytes, bytearray, memoryview)) or not payload:
+            raise ValueError('新手签到必要回执为空')
         ctx.log(f"cs_59012 -> 新手每日签到成功，获得={result['rewards']}")
-        frames = [DownFrame(self.sc, payload)]
-        if ctx.generator is not None:
-            try:
-                p11 = ctx.generator.gen_payload(59011, uid=self.uid, db=ctx.db)
-                if p11:
-                    frames.append(DownFrame(59011, p11))
-            except Exception:
-                pass
-        return frames + _refresh_frames(ctx, self.uid)
+        # Successful Lua callback applies SignIn exactly once. A full59011 also
+        # appends every old level receipt; leave cold restoration to login.
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, bytes(payload))]
 
 
 @operation
@@ -8292,21 +7708,25 @@ class NoobLevelRewardOp(Operation):
 
     cmd = 59004
     sc = 59005
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        uid = self.uid
-        lvl = int(data.get("level") or 10)
-        _item_add(ctx, uid, 1, 200)
-        ctx.db.execute(
-            "INSERT OR REPLACE INTO newbie_level_reward (uid, level, update_ts) VALUES (?, ?, ?)",
-            (uid, lvl, int(time.time()))
-        )
-        return {"rewards": [{"id": 1, "num": 200}]}
+        from newbie_level_reward_service import claim
+        try:
+            rewards = claim(ctx.db, self.uid, data.get('level'),
+                            lambda item, num: _item_add(ctx, self.uid, item, num,
+                                                        source='newbie_level_reward'))
+        except ValueError as exc:
+            raise OperationError(2, str(exc)) from exc
+        return {'rewards': rewards}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_59005", {"result": 0, "reward_list": result["rewards"]}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_59005", {"result": 0, "reward_list": result["rewards"]})
+        if not isinstance(payload, (bytes, bytearray, memoryview)) or not payload:
+            raise ValueError('新手等级奖励必要回执为空')
         ctx.log(f"cs_59004 -> 领取新手等级奖励，获得={result['rewards']}")
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        # Lua appends the claimed level itself; another59011 would append twice.
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, bytes(payload))]
 
 
 @operation
@@ -8315,21 +7735,24 @@ class NoobAccumulateRewardOp(Operation):
 
     cmd = 59014
     sc = 59015
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
-        uid = self.uid
-        ptid = int(data.get("id") or 1)
-        _item_add(ctx, uid, 38, 2)
-        ctx.db.execute(
-            "INSERT OR REPLACE INTO newbie_pt_reward (uid, pt_id, update_ts) VALUES (?, ?, ?)",
-            (uid, ptid, int(time.time()))
-        )
-        return {"rewards": [{"id": 38, "num": 2}]}
+        from newbie_progress_reward_service import claim
+        try:
+            rewards = claim(ctx.db, self.uid, data.get('id'),
+                            lambda item, num: _item_add(ctx, self.uid, item, num,
+                                                        source='newbie_progress_reward'))
+        except ValueError as exc:
+            raise OperationError(2, str(exc)) from exc
+        return {'rewards': rewards}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_59015", {"result": 0, "reward_list": result["rewards"]}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_59015", {"result": 0, "reward_list": result["rewards"]})
+        if not isinstance(payload, (bytes, bytearray, memoryview)) or not payload:
+            raise ValueError('新手累计奖励必要回执为空')
         ctx.log(f"cs_59014 -> 领取新手进度奖励，获得={result['rewards']}")
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, bytes(payload))]
 
 
 @operation
@@ -8442,54 +7865,60 @@ class NoobRechargeRewardOp(Operation):
         return frames + _refresh_frames(ctx, self.uid)
 
 
+class NoobNoticeDismissOp(Operation):
+    """Native ACK clears one local tag; persist it and recover after failed ACKs."""
+    prepare_response_in_transaction = True
+
+    def apply(self, data, ctx):
+        from newbie_notice_service import dismiss
+        dismiss(ctx.db, self.uid, self.cmd)
+        return {}
+
+    def respond(self, result, data, ctx):
+        payload = ctx.codec_encode('sc_' + str(self.sc), {'result': 0})
+        if not isinstance(payload, (bytes, bytearray, memoryview)) or not payload:
+            raise ValueError('新手通知标记必要回执为空')
+        return [DownFrame(self.sc, bytes(payload))]
+
+    def error_recovery_frames(self, ctx):
+        from newbie_notice_service import recovery_payload
+        payload = recovery_payload(ctx, self.uid)
+        return [DownFrame(59009, payload)] if payload else []
+
+
 @operation
-class NoobTag16Op(Operation):
-    """59016 新手首充标记消除。"""
+class NoobTag16Op(NoobNoticeDismissOp):
+    """59016 首次月卡角色奖励的新标记消除（按Lua消费映射）。"""
     cmd = 59016
     sc = 59017
-    def apply(self, data, ctx): return {}
-    def respond(self, result, data, ctx):
-        return [DownFrame(self.sc, ctx.codec_encode("sc_59017", {"result": 0}) or b"\x08\x00")]
 
 
 @operation
-class NoobTag18Op(Operation):
-    """59018 新手首次签到标记消除。"""
+class NoobTag18Op(NoobNoticeDismissOp):
+    """59018 首次月卡签到奖励的新标记消除。"""
     cmd = 59018
     sc = 59019
-    def apply(self, data, ctx): return {}
-    def respond(self, result, data, ctx):
-        return [DownFrame(self.sc, ctx.codec_encode("sc_59019", {"result": 0}) or b"\x08\x00")]
 
 
 @operation
-class NoobTag20Op(Operation):
+class NoobTag20Op(NoobNoticeDismissOp):
     """59020 新手一档标记消除。"""
     cmd = 59020
     sc = 59021
-    def apply(self, data, ctx): return {}
-    def respond(self, result, data, ctx):
-        return [DownFrame(self.sc, ctx.codec_encode("sc_59021", {"result": 0}) or b"\x08\x00")]
 
 
 @operation
-class NoobTag22Op(Operation):
+class NoobTag22Op(NoobNoticeDismissOp):
     """59022 新手二档标记消除。"""
     cmd = 59022
     sc = 59023
-    def apply(self, data, ctx): return {}
-    def respond(self, result, data, ctx):
-        return [DownFrame(self.sc, ctx.codec_encode("sc_59023", {"result": 0}) or b"\x08\x00")]
 
 
 @operation
-class NoobTag24Op(Operation):
+class NoobTag24Op(NoobNoticeDismissOp):
     """59024 新手战令标记消除。"""
     cmd = 59024
     sc = 59025
-    def apply(self, data, ctx): return {}
-    def respond(self, result, data, ctx):
-        return [DownFrame(self.sc, ctx.codec_encode("sc_59025", {"result": 0}) or b"\x08\x00")]
 
 
 @operation
@@ -8568,6 +7997,7 @@ class RegressionFindResOp(Operation):
 
 @operation
 class RogueTeamStartRunOp(Operation):
+    prepare_response_in_transaction = True
     """88100 开启虚构推演：cs_88100 {template_id, difficult, hero_list, affix_pool_id_list} -> sc_88101 {result} + sc_88001/88013/88019/88029"""
     cmd = 88100
     sc = 88101
@@ -8578,7 +8008,13 @@ class RogueTeamStartRunOp(Operation):
         difficult = data.get("difficult", 1)
         hero_list = data.get("hero_list", [])
         affix_pool_id_list = data.get("affix_pool_id_list", [])
-        svc = RogueTeamService.get()
+        # 排查用：确认客户端到底传了几个英雄、每个的 hero_id 是什么
+        # （出现过「选满三人但服务端只收到 1 个有效」的情况）
+        try:
+            ctx.log(f"cs_88100 原始 hero_list={hero_list} affix={affix_pool_id_list}")
+        except Exception:
+            pass
+        svc = RogueTeamService.get(db=ctx.db)
         res, session = svc.start_run(self.uid, template_id, difficult, hero_list, affix_pool_id_list)
         return {"result": res, "session": session}
 
@@ -8601,6 +8037,23 @@ class RogueTeamStartRunOp(Operation):
             p88029 = ctx.codec_encode("sc_88029", {"finish_guide": 1, "template_id": session.get("template_id", 100001)})
             if p88029:
                 frames.append(DownFrame(88029, p88029))
+            # 羁绊活动信息 sc_88315：客户端「队伍」界面右上角的羁绊效果靠它判断有效期。
+            # 之前**从来没下发过**（日志里 88315 出现 0 次），客户端拿不到活动时间
+            # → 羁绊效果一直显示「已超时」。
+            # fetters_id 按周轮换（1~4）：服务端只负责给 id，客户端按 id 显示对应羁绊效果。
+            try:
+                import time as _t
+                _week = int(_t.time() // (7 * 86400))
+                p88315 = ctx.codec_encode("sc_88315", {
+                    "activity_id": 1000,
+                    "next_timestamps": (_week + 1) * 7 * 86400,
+                    "fetters_id": _week % 4 + 1,
+                })
+                if p88315:
+                    frames.append(DownFrame(88315, p88315))
+                    ctx.log(f"sc_88101 -> 下发羁绊活动 sc_88315（本期 id={_week % 4 + 1}）")
+            except Exception as _e:
+                ctx.log(f"sc_88315 下发异常: {_e}", "WARN")
             # 明确清理残留事件弹窗与商店
             p88023 = ctx.codec_encode("sc_88023", {"event_id": 0, "opt_list": [], "trigger_type": 0})
             if p88023:
@@ -8617,6 +8070,7 @@ class RogueTeamStartRunOp(Operation):
 
 @operation
 class RogueTeamHeroRecruitOp(Operation):
+    prepare_response_in_transaction = True
     """88102 修正者招募：cs_88102 {hero_list} -> sc_88103 {result} + sc_88019"""
     cmd = 88102
     sc = 88103
@@ -8624,7 +8078,7 @@ class RogueTeamHeroRecruitOp(Operation):
     def apply(self, data, ctx):
         from rogueteam_service import RogueTeamService
         hero_list = data.get("hero_list", [])
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res, all_heroes, next_ev = svc.hero_recruit(self.uid, hero_list)
         return {"result": res, "heroes": all_heroes, "next_ev": next_ev}
 
@@ -8651,6 +8105,7 @@ class RogueTeamHeroRecruitOp(Operation):
 
 @operation
 class RogueTeamSelectNodeOp(Operation):
+    prepare_response_in_transaction = True
     """88004 选择节点：cs_88004 {node_id} -> sc_88005 {result} + sc_88003 + 节点交互"""
     cmd = 88004
     sc = 88005
@@ -8658,7 +8113,7 @@ class RogueTeamSelectNodeOp(Operation):
     def apply(self, data, ctx):
         from rogueteam_service import RogueTeamService
         node_id = data.get("node_id", 0)
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res, update_info = svc.select_node(self.uid, node_id)
         return {"result": res, "update_info": update_info}
 
@@ -8676,6 +8131,7 @@ class RogueTeamSelectNodeOp(Operation):
                 p88027 = ctx.codec_encode("sc_88027", {"shop_info": u["shop_info"]})
                 if p88027:
                     frames.append(DownFrame(88027, p88027))
+                    ctx.log(f"[rogue调试] 节点{data.get('node_id')} 下发商店 sc_88027 货架数={len((u['shop_info'] or {}).get('goods_list') or [])}")
             if u.get("other_info"):
                 oinfo = u["other_info"]
                 if oinfo.get("event_id"):
@@ -8686,6 +8142,7 @@ class RogueTeamSelectNodeOp(Operation):
                     })
                     if p88023:
                         frames.append(DownFrame(88023, p88023))
+                        ctx.log(f"[rogue调试] 节点{data.get('node_id')} 下发事件弹窗 sc_88023 event_id={oinfo['event_id']} 选项数={len(oinfo.get('opt_list') or [])}")
                 elif oinfo.get("event_type"):
                     p88015 = ctx.codec_encode("sc_88015", {"other_info": oinfo})
                     if p88015:
@@ -8700,33 +8157,13 @@ class RogueTeamSelectNodeOp(Operation):
 
 @operation
 class RogueTeamNextFloorOp(Operation):
-    """88008 前往下一层/离开隐藏层：cs_88008 {sign} -> sc_88009 {result} + sc_88001"""
-    cmd = 88008
-    sc = 88009
-
-    def apply(self, data, ctx):
-        from rogueteam_service import RogueTeamService
-        sign = data.get("sign", 0)
-        svc = RogueTeamService.get()
-        res, session = svc.next_floor(self.uid, sign)
-        return {"result": res, "session": session}
-
-    def respond(self, result, data, ctx):
-        frames = []
-        p88009 = ctx.codec_encode("sc_88009", {"result": result["result"]})
-        if p88009:
-            frames.append(DownFrame(88009, p88009))
-        session = result.get("session")
-        if session and ctx.codec_encode:
-            p88001 = ctx.codec_encode("sc_88001", session)
-            if p88001:
-                frames.append(DownFrame(88001, p88001))
-        ctx.log("cs_88008 -> 进入下一层")
-        return frames
+    cmd, sc = 88008, 88009
+    prepare_response_in_transaction = True
 
 
 @operation
 class RogueTeamChooseEventOptionOp(Operation):
+    prepare_response_in_transaction = True
     """88024 选择奇遇/安全屋事件选项：cs_88024 {opt_id} -> sc_88025 {result} + sc_88023 + sc_88019 + sc_88013 + sc_88021 + sc_88205"""
     cmd = 88024
     sc = 88025
@@ -8734,7 +8171,7 @@ class RogueTeamChooseEventOptionOp(Operation):
     def apply(self, data, ctx):
         from rogueteam_service import RogueTeamService
         opt_id = data.get("opt_id", 0)
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res, extra = svc.choose_event_option(self.uid, opt_id)
         return {"result": res, "extra": extra}
 
@@ -8775,16 +8212,39 @@ class RogueTeamChooseEventOptionOp(Operation):
                 if p88215:
                     frames.append(DownFrame(88215, p88215))
                     ctx.log(f"cs_88024 -> 世界线跃迁，下发 sc_88215 id={extra['world_line_id']}")
+            # 6.5 结局剧情 sc_88217 **不在这里下发**。
+            #     选结局选项时（cs_88024）只负责把结局锁进 pending_ending 并生成终局关卡，
+            #     剧情要等「终局战打完 → 结算面板确认（cs_88008）」再播，顺序和结局 1 一致。
+            #     原来这里见 ending_id 就推 sc_88217，导致结局 2/3/4 在选项阶段就把剧情播掉，
+            #     真正打完终局战反而没有过场（用户实测结局 3 就是「结算正常但少了剧情动画」）。
             if extra.get("ending_id"):
-                p88217 = ctx.codec_encode("sc_88217", {"id": int(extra["ending_id"])})
-                if p88217:
-                    frames.append(DownFrame(88217, p88217))
-                    ctx.log(f"cs_88024 -> 达成结局剧情，下发 sc_88217 id={extra['ending_id']}")
+                ctx.log(f"cs_88024 -> 锁定结局 {extra['ending_id']}（剧情留到终局战后 cs_88008 播）")
             # 7. 地图节点状态更新与下一跳解锁
             if extra.get("map_info"):
                 p88003 = ctx.codec_encode("sc_88003", {"map_info": extra["map_info"], "second_map_info": []})
                 if p88003:
                     frames.append(DownFrame(88003, p88003))
+            # 8. 外接程序/收集品面板读 session 全量状态，选项发奖后补推 sc_88001
+            if extra.get("item_list") or extra.get("attr_list"):
+                try:
+                    from rogueteam_service import RogueTeamService
+                    _sess = RogueTeamService.get(db=ctx.db).get_session_data(self.uid)
+                    if _sess:
+                        p88001 = ctx.codec_encode("sc_88001", _sess)
+                        if p88001:
+                            frames.append(DownFrame(88001, p88001))
+                except Exception as _e:
+                    ctx.log(f"cs_88024 -> 补推 session 异常: {_e}", "WARN")
+                # 见闻值随图鉴解锁增长，补推 sc_88305
+                try:
+                    from rogueteam_service import RogueTeamService as _RTS
+                    _info = _RTS.get(db=ctx.db).get_user_outside_info(self.uid)
+                    if _info:
+                        p88305 = ctx.codec_encode("sc_88305", _info)
+                        if p88305:
+                            frames.append(DownFrame(88305, p88305))
+                except Exception as _e:
+                    ctx.log(f"cs_88024 -> 补推图鉴帧异常: {_e}", "WARN")
             # 8. 切层标识
             if extra.get("is_floor_clear"):
                 p88221 = ctx.codec_encode("sc_88221", {"sign": 1})
@@ -8806,6 +8266,7 @@ class RogueTeamChooseEventOptionOp(Operation):
 
 @operation
 class RogueTeamSyncPlayStateOp(Operation):
+    prepare_response_in_transaction = True
     """88030 游戏内状态同步：cs_88030 {type} -> sc_88031 {result} + sc_88001 + sc_88013 + sc_88019"""
     cmd = 88030
     sc = 88031
@@ -8820,7 +8281,7 @@ class RogueTeamSyncPlayStateOp(Operation):
 
         # 继续推演时同步补发局内最新 session (sc_88001)，确保客户端地图层数与节点状态 100% 顺畅加载
         from rogueteam_service import RogueTeamService
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         sd = svc.get_session_data(self.uid)
         if sd and sd.get("in_game", 0) != 0 and ctx.codec_encode:
             p88001 = ctx.codec_encode("sc_88001", sd)
@@ -8841,6 +8302,7 @@ class RogueTeamSyncPlayStateOp(Operation):
 
 @operation
 class RogueTeamEventCommitOp(Operation):
+    prepare_response_in_transaction = True
     """88200 事件选择提交：cs_88200 {event_id, param_arg} -> sc_88201 {result, window_opt} + sc_88021 + sc_88205 + sc_88013 + sc_88003"""
     cmd = 88200
     sc = 88201
@@ -8849,7 +8311,7 @@ class RogueTeamEventCommitOp(Operation):
         from rogueteam_service import RogueTeamService
         event_id = data.get("event_id", 0)
         param_arg = data.get("param_arg", 0)
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res, extra = svc.commit_event_selection(self.uid, event_id, param_arg)
         # 还有第二次选择（天赋 10399 战功延展）时 window_opt 必须为 0，
         # 否则客户端 ClearUnOperateData() 会把待选窗口清掉
@@ -8875,6 +8337,21 @@ class RogueTeamEventCommitOp(Operation):
                 p88013 = ctx.codec_encode("sc_88013", {"attr_list": extra["attr_list"]})
                 if p88013:
                     frames.append(DownFrame(88013, p88013))
+            # 外接程序/收集品面板读 session 全量状态，奖励发放后必须补推 sc_88001
+            if extra.get("session"):
+                p88001 = ctx.codec_encode("sc_88001", extra["session"])
+                if p88001:
+                    frames.append(DownFrame(88001, p88001))
+            # 见闻值（unlock/view_collection）随图鉴解锁增长，需补推 sc_88305
+            try:
+                from rogueteam_service import RogueTeamService
+                _info = RogueTeamService.get(db=ctx.db).get_user_outside_info(self.uid)
+                if _info:
+                    p88305 = ctx.codec_encode("sc_88305", _info)
+                    if p88305:
+                        frames.append(DownFrame(88305, p88305))
+            except Exception as _e:
+                ctx.log(f"cs_88200 -> 补推图鉴帧异常: {_e}", "WARN")
             if extra.get("map_info"):
                 p88003 = ctx.codec_encode("sc_88003", {"map_info": extra["map_info"], "second_map_info": []})
                 if p88003:
@@ -8896,6 +8373,7 @@ class RogueTeamEventCommitOp(Operation):
 
 @operation
 class RogueTeamEventResetOp(Operation):
+    prepare_response_in_transaction = True
     """88202 三选一刷新（重掷候选）：cs_88202 {event_id=RESET_OPERATE_TYPE} ->
     sc_88015（新候选，必须先发）+ sc_88013（重置次数-1）+ sc_88203 {result}"""
     cmd = 88202
@@ -8903,7 +8381,7 @@ class RogueTeamEventResetOp(Operation):
 
     def apply(self, data, ctx):
         from rogueteam_service import RogueTeamService
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res, extra = svc.reset_operate_data(self.uid, data.get("event_id", 1))
         return {"result": res, "extra": extra}
 
@@ -8928,6 +8406,7 @@ class RogueTeamEventResetOp(Operation):
 
 @operation
 class RogueTeamCloseReplaceNodeOp(Operation):
+    prepare_response_in_transaction = True
     """88208 关闭替换节点：cs_88208 {node_id, node_type} -> sc_88209 {result}"""
     cmd = 88208
     sc = 88209
@@ -8942,6 +8421,7 @@ class RogueTeamCloseReplaceNodeOp(Operation):
 
 @operation
 class RogueTeamDiscardItemOp(Operation):
+    prepare_response_in_transaction = True
     """88212 丢弃道具：cs_88212 {item_id_list} -> sc_88213 {result} + sc_88021"""
     cmd = 88212
     sc = 88213
@@ -8949,7 +8429,7 @@ class RogueTeamDiscardItemOp(Operation):
     def apply(self, data, ctx):
         from rogueteam_service import RogueTeamService
         item_id_list = data.get("item_id_list", [])
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res, extra = svc.discard_items(self.uid, item_id_list)
         return {"result": res, "extra": extra}
 
@@ -8969,24 +8449,13 @@ class RogueTeamDiscardItemOp(Operation):
 
 @operation
 class RogueTeamPlayEndingPlotOp(Operation):
-    """88218 播放结局剧情：cs_88218 {} -> sc_88219 {result}"""
-    cmd = 88218
-    sc = 88219
-
-    def apply(self, data, ctx):
-        from rogueteam_service import RogueTeamService
-        svc = RogueTeamService.get()
-        res = svc.play_ending_plot(self.uid)
-        return {"result": res}
-
-    def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_88219", {"result": result["result"]}) or b"\x08\x00"
-        ctx.log("cs_88218 -> 播放结局剧情")
-        return [DownFrame(self.sc, payload)]
+    cmd, sc = 88218, 88219
+    prepare_response_in_transaction = True
 
 
 @operation
 class RogueTeamShopBuyOp(Operation):
+    prepare_response_in_transaction = True
     """88222 游商购买：cs_88222 {index} -> sc_88223 {result} + sc_88013 + sc_88021 + sc_88027"""
     cmd = 88222
     sc = 88223
@@ -8994,7 +8463,7 @@ class RogueTeamShopBuyOp(Operation):
     def apply(self, data, ctx):
         from rogueteam_service import RogueTeamService
         index = data.get("index", 0)
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res, extra = svc.shop_buy(self.uid, index)
         return {"result": res, "extra": extra}
 
@@ -9013,6 +8482,11 @@ class RogueTeamShopBuyOp(Operation):
                 p88021 = ctx.codec_encode("sc_88021", {"item_list": extra["item_list"]})
                 if p88021:
                     frames.append(DownFrame(88021, p88021))
+            # 获取动效/计数帧：底部收集品、战术数字靠它累加
+            if extra.get("update_list"):
+                p88205 = ctx.codec_encode("sc_88205", {"update_list": extra["update_list"]})
+                if p88205:
+                    frames.append(DownFrame(88205, p88205))
             if extra.get("shop_info"):
                 p88027 = ctx.codec_encode("sc_88027", {"shop_info": extra["shop_info"]})
                 if p88027:
@@ -9041,13 +8515,14 @@ class RogueTeamShopBuyOp(Operation):
 
 @operation
 class RogueTeamShopRefreshOp(Operation):
+    prepare_response_in_transaction = True
     """88224 游商刷新：cs_88224 {} -> sc_88225 {result} + sc_88013 + sc_88027"""
     cmd = 88224
     sc = 88225
 
     def apply(self, data, ctx):
         from rogueteam_service import RogueTeamService
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res, extra = svc.shop_refresh(self.uid)
         return {"result": res, "extra": extra}
 
@@ -9072,6 +8547,7 @@ class RogueTeamShopRefreshOp(Operation):
 
 @operation
 class RogueTeamUnlockSkillTreeOp(Operation):
+    prepare_response_in_transaction = True
     """88300 天赋科技树升级：cs_88300 {template_id, tree_id} -> sc_88301 {result} + sc_88305"""
     cmd = 88300
     sc = 88301
@@ -9080,7 +8556,7 @@ class RogueTeamUnlockSkillTreeOp(Operation):
         from rogueteam_service import RogueTeamService
         template_id = data.get("template_id", 100001)
         tree_id = data.get("tree_id", 0)
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res = svc.unlock_tech_node(self.uid, template_id, tree_id)
         out = svc.get_outside_data(self.uid, template_id)
         return {"result": res, "outside": out}
@@ -9095,6 +8571,7 @@ class RogueTeamUnlockSkillTreeOp(Operation):
             p88305 = ctx.codec_encode("sc_88305", {
                 "template_id": out["template_id"],
                 "difficult": out["difficult"],
+                "max_difficult": out["max_difficult"],
                 "collection_list": out["collection_list"],
                 "unlock_collection": out["unlock_collection"],
                 "view_collection": out["view_collection"],
@@ -9111,77 +8588,13 @@ class RogueTeamUnlockSkillTreeOp(Operation):
 
 @operation
 class RogueTeamSettleScoreOp(Operation):
-    """88306 结算统计请求：cs_88306 {} -> sc_88001 + sc_88217 {id, state} + sc_88307 {result, end_info_list, collection_list, unlock_collection, total_time} + sc_88305"""
-    cmd = 88306
-    sc = 88307
-
-    def apply(self, data, ctx):
-        from rogueteam_service import RogueTeamService
-        svc = RogueTeamService.get()
-        res, settle_info = svc.settle_run(self.uid, is_win=False)
-        return {"result": res, "settle": settle_info}
-
-    def respond(self, result, data, ctx):
-        frames = []
-        settle = result.get("settle", {})
-        ending_id = settle.get("ending_id", 4)
-        
-        # 1. 下发最新局内 session (sc_88001)，同步 activeTemplateID_ 与 floor_state = FAIL
-        from rogueteam_service import RogueTeamService
-        svc = RogueTeamService.get()
-        sd = svc.get_session_data(self.uid)
-        if sd and ctx.codec_encode:
-            p88001 = ctx.codec_encode("sc_88001", sd)
-            if p88001:
-                frames.append(DownFrame(88001, p88001))
-            # 明确清理残留事件弹窗与商店
-            p88023 = ctx.codec_encode("sc_88023", {"event_id": 0, "opt_list": [], "trigger_type": 0})
-            if p88023:
-                frames.append(DownFrame(88023, p88023))
-            p88015 = ctx.codec_encode("sc_88015", {"other_info": {"event_type": 0, "param_list": [], "drop_type": 0}})
-            if p88015:
-                frames.append(DownFrame(88015, p88015))
-            p88027 = ctx.codec_encode("sc_88027", {"shop_info": {"event_type": 0, "param_list": [], "drop_type": 0}})
-            if p88027:
-                frames.append(DownFrame(88027, p88027))
-
-        # 2. 下发结局 ID (sc_88217)
-        p88217 = ctx.codec_encode("sc_88217", {"id": ending_id, "state": 1})
-        if p88217:
-            frames.append(DownFrame(88217, p88217))
-
-        # 3. 下发统计结算数据 (sc_88307)
-        payload = ctx.codec_encode("sc_88307", {
-            "result": settle.get("result", 0),
-            "end_info_list": settle.get("end_info_list", []),
-            "collection_list": settle.get("collection_list", []),
-            "unlock_collection": settle.get("unlock_collection", []),
-            "total_time": settle.get("total_time", 180)
-        }) or b"\x08\x00"
-        frames.append(DownFrame(self.sc, payload))
-
-        # 4. 刷新外围总览（难度重置为 0，切换为开始推演）
-        out = svc.get_outside_data(self.uid)
-        p88305 = ctx.codec_encode("sc_88305", {
-            "template_id": out["template_id"],
-            "difficult": 0,
-            "collection_list": out["collection_list"],
-            "unlock_collection": out["unlock_collection"],
-            "view_collection": out["view_collection"],
-            "tree_list": out["tree_list"],
-            "his_difficult": out["his_difficult"],
-            "his_avg": out["his_avg"],
-            "last_id": out["last_id"]
-        })
-        if p88305:
-            frames.append(DownFrame(88305, p88305))
-
-        ctx.log("cs_88306 -> 虚构推演结算完成（已下发 sc_88001、sc_88217 结局与 sc_88307 结算报告）")
-        return frames + _refresh_frames(ctx, self.uid)
+    cmd, sc = 88306, 88307
+    prepare_response_in_transaction = True
 
 
 @operation
 class RogueTeamViewIllustratedOp(Operation):
+    prepare_response_in_transaction = True
     """88312 查看图鉴条目：cs_88312 {template_id, colllection_id, type} -> sc_88313 {result}"""
     cmd = 88312
     sc = 88313
@@ -9191,7 +8604,7 @@ class RogueTeamViewIllustratedOp(Operation):
         template_id = data.get("template_id", 100001)
         coll_id = data.get("colllection_id") or data.get("collection_id") or 0
         coll_type = data.get("type", 1)
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res = svc.view_collection(self.uid, template_id, coll_id, coll_type)
         return {"result": res}
 
@@ -9203,6 +8616,7 @@ class RogueTeamViewIllustratedOp(Operation):
 
 @operation
 class RogueTeamRecordScoreIdOp(Operation):
+    prepare_response_in_transaction = True
     """88316 记录积分目标：cs_88316 {main_id, id} -> sc_88317 {result}"""
     cmd = 88316
     sc = 88317
@@ -9211,7 +8625,7 @@ class RogueTeamRecordScoreIdOp(Operation):
         from rogueteam_service import RogueTeamService
         main_id = data.get("main_id", 100001)
         score_id = data.get("id", 0)
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=ctx.db)
         res = svc.record_score_id(self.uid, main_id, score_id)
         return {"result": res}
 
@@ -9229,6 +8643,7 @@ class AdminCatSkillLevelUpOp(Operation):
     """67002 猫咪技能升级：cs_67002 {mimir_id, skill_id} -> sc_67003 {result}"""
     cmd = 67002
     sc = 67003
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         from admin_cat_explore_service import AdminCatExploreService
@@ -9239,16 +8654,8 @@ class AdminCatSkillLevelUpOp(Operation):
         return {"result": res}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_67003", {"result": result["result"]}) or b"\x08\x00"
-        ctx.log(f"[探索] 升级猫咪技能: uid={self.uid} mimir={data.get('mimir_id')} skill={data.get('skill_id')} 结果={result['result']}")
-        frames = [DownFrame(self.sc, payload)]
-        if result["result"] == 0:
-            from admin_cat_explore_service import AdminCatExploreService
-            svc = AdminCatExploreService.get_instance()
-            p_67001 = ctx.codec_encode("sc_67001", svc.generate_sc_67001_dict(ctx.db, self.uid))
-            if p_67001:
-                frames.append(DownFrame(67001, p_67001))
-        return frames
+        from admin_cat_response import frames
+        return frames(ctx, self.uid, self.sc, dict(result=result['result']))
 
 
 @operation
@@ -9256,6 +8663,7 @@ class AdminCatExploreOp(Operation):
     """67004 开始探索派遣：cs_67004 {area_id, hour_time, mimir_id} -> sc_67005 {result}"""
     cmd = 67004
     sc = 67005
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         from admin_cat_explore_service import AdminCatExploreService
@@ -9267,16 +8675,20 @@ class AdminCatExploreOp(Operation):
         return {"result": res}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_67005", {"result": result["result"]}) or b"\x08\x00"
+        payload = ctx.codec_encode("sc_67005", {"result": result["result"]})
+        if not isinstance(payload, (bytes, bytearray, memoryview)) or not payload:
+            raise ValueError('管理喵派遣必要确认帧为空')
         ctx.log(f"[探索] 派遣猫咪: uid={self.uid} 区域={data.get('area_id')} 猫咪={data.get('mimir_id')} 时长={data.get('hour_time')}h 结果={result['result']}")
-        frames = [DownFrame(self.sc, payload)]
+        frames = []
         if result["result"] == 0:
             from admin_cat_explore_service import AdminCatExploreService
             svc = AdminCatExploreService.get_instance()
             p_67001 = ctx.codec_encode("sc_67001", svc.generate_sc_67001_dict(ctx.db, self.uid))
-            if p_67001:
-                frames.append(DownFrame(67001, p_67001))
-        return frames
+            if not isinstance(p_67001, (bytes, bytearray, memoryview)) or not p_67001:
+                raise ValueError('管理喵派遣必要状态帧为空')
+            frames.append(DownFrame(67001, bytes(p_67001)))
+        # Native67005 callback fires EXPLORE_UPDATE; it must read the new queue.
+        return _refresh_frames(ctx, self.uid, strict=True) + frames + [DownFrame(self.sc, bytes(payload))]
 
 
 @operation
@@ -9284,30 +8696,22 @@ class AdminCatExploreFinishOp(Operation):
     """67006 结束探索领取挂机收益：cs_67006 {area_id} -> sc_67007 {result, event_id, reward_list}"""
     cmd = 67006
     sc = 67007
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         from admin_cat_explore_service import AdminCatExploreService
         area_id = int(data.get("area_id") or 0)
         svc = AdminCatExploreService.get_instance()
-        res, event_id, reward_list = svc.finish_explore(ctx, self.uid, area_id, force_finish=True)
+        res, event_id, reward_list = svc.finish_explore(ctx, self.uid, area_id, force_finish=False)
         return {"result": res, "event_id": event_id, "reward_list": reward_list}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_67007", {
+        from admin_cat_response import frames
+        return frames(ctx, self.uid, self.sc, {
             "result": result["result"],
             "event_id": result["event_id"],
             "reward_list": result["reward_list"]
         })
-        rew_desc = ", ".join([f"道具{r['id']}x{r['num']}" for r in result.get("reward_list", [])])
-        ctx.log(f"[探索] 结算挂机收益: uid={self.uid} 区域={data.get('area_id')} 奖励: [{rew_desc}] 奇遇={result.get('event_id')} 结果={result['result']}")
-        frames = [DownFrame(self.sc, payload)]
-        if result["result"] == 0:
-            from admin_cat_explore_service import AdminCatExploreService
-            svc = AdminCatExploreService.get_instance()
-            p_67001 = ctx.codec_encode("sc_67001", svc.generate_sc_67001_dict(ctx.db, self.uid))
-            if p_67001:
-                frames.append(DownFrame(67001, p_67001))
-        return frames
 
 
 @operation
@@ -9315,6 +8719,7 @@ class AdminCatGetWeekRewardOp(Operation):
     """67008 领取周末周常累计宝箱：cs_67008 {} -> sc_67009 {result, reward_list}"""
     cmd = 67008
     sc = 67009
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         from admin_cat_explore_service import AdminCatExploreService
@@ -9323,20 +8728,11 @@ class AdminCatGetWeekRewardOp(Operation):
         return {"result": res, "reward_list": reward_list}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_67009", {
+        from admin_cat_response import frames
+        return frames(ctx, self.uid, self.sc, {
             "result": result["result"],
             "reward_list": result["reward_list"]
         })
-        rew_desc = ", ".join([f"道具{r['id']}x{r['num']}" for r in result.get("reward_list", [])])
-        ctx.log(f"[探索] 领取周末周常累计宝箱: uid={self.uid} 奖励: [{rew_desc}] 结果={result['result']}")
-        frames = [DownFrame(self.sc, payload)]
-        if result["result"] == 0:
-            from admin_cat_explore_service import AdminCatExploreService
-            svc = AdminCatExploreService.get_instance()
-            p_67001 = ctx.codec_encode("sc_67001", svc.generate_sc_67001_dict(ctx.db, self.uid))
-            if p_67001:
-                frames.append(DownFrame(67001, p_67001))
-        return frames
 
 
 @operation
@@ -9344,6 +8740,7 @@ class AdminCatUnlockOp(Operation):
     """67010 解锁新猫咪：cs_67010 {mimir_id} -> sc_67011 {result}"""
     cmd = 67010
     sc = 67011
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         from admin_cat_explore_service import AdminCatExploreService
@@ -9353,16 +8750,8 @@ class AdminCatUnlockOp(Operation):
         return {"result": res}
 
     def respond(self, result, data, ctx):
-        payload = ctx.codec_encode("sc_67011", {"result": result["result"]}) or b"\x08\x00"
-        ctx.log(f"[探索] 解锁新猫咪: uid={self.uid} mimir={data.get('mimir_id')} 结果={result['result']}")
-        frames = [DownFrame(self.sc, payload)]
-        if result["result"] == 0:
-            from admin_cat_explore_service import AdminCatExploreService
-            svc = AdminCatExploreService.get_instance()
-            p_67001 = ctx.codec_encode("sc_67001", svc.generate_sc_67001_dict(ctx.db, self.uid))
-            if p_67001:
-                frames.append(DownFrame(67001, p_67001))
-        return frames
+        from admin_cat_response import frames
+        return frames(ctx, self.uid, self.sc, dict(result=result['result']))
 
 
 @operation
@@ -9407,3 +8796,7 @@ import onboarding_operations  # noqa: E402,F401
 
 
 
+
+
+from rogueteam_flow import install_operations as _install_rogue_operations
+_install_rogue_operations(globals())

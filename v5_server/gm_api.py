@@ -330,6 +330,7 @@ def get_overview_status():
         ctx = dict(_context)
         ctx["default_uid"] = getattr(g, 'gm_save_uid', DEFAULT_UID)
         ctx["capture_enabled"] = cdn_proxy.is_capture_enabled() if cdn_proxy else False
+        ctx["cdn_mode"] = cdn_proxy.get_capture_mode() if cdn_proxy else "off"
         try:
             import res_version_manager
             ctx["res_version"] = res_version_manager.get_current_version()
@@ -338,6 +339,7 @@ def get_overview_status():
             pass
         data = reader.get_overview_view(ctx)
         if isinstance(data, dict):
+            data['cdn_mode'] = ctx.get('cdn_mode', 'off')
             data["res_version"] = ctx.get("res_version", "229")
             data["res_version_config"] = ctx.get("res_version_config", {})
             mounted_db = get_db()
@@ -1908,22 +1910,33 @@ def toggle_capture_mode():
     if not cdn_proxy:
         return err(GMErrorCode.SERVICE_ERROR, "cdn_proxy 模块未加载")
 
-    mode = request.args.get("enabled")
-    if mode is None:
-        data = request.get_json(silent=True) or {}
-        mode = data.get("enabled")
-
-    if mode is not None:
-        cdn_proxy.set_capture_enabled(str(mode).lower() in ("1", "true", "yes", "on"))
+    data = request.get_json(silent=True) or {}
+    if not isinstance(data, dict):
+        return err(GMErrorCode.PARAM_INVALID, '请求内容必须为对象')
+    selected = request.args.get("mode")
+    if selected is None:
+        selected = data.get("mode")
+    if selected is not None:
+        try:
+            cdn_proxy.set_capture_mode(selected)
+        except ValueError as error:
+            return err(GMErrorCode.PARAM_INVALID, str(error))
     else:
-        cdn_proxy.set_capture_enabled(not cdn_proxy.is_capture_enabled())
+        enabled = request.args.get("enabled")
+        if enabled is None:
+            enabled = data.get("enabled")
+        if enabled is None:
+            cdn_proxy.set_capture_enabled(not cdn_proxy.is_capture_enabled())
+        else:
+            cdn_proxy.set_capture_enabled(str(enabled).lower() in ("1", "true", "yes", "on"))
 
     is_on = cdn_proxy.is_capture_enabled()
     return jsonify({
         "code": GMErrorCode.SUCCESS,
         "msg": "抓包模式切换成功",
         "capture_enabled": is_on,
-        "data": {"capture_enabled": is_on}
+        "cdn_mode": cdn_proxy.get_capture_mode(),
+        "data": {"capture_enabled": is_on, "cdn_mode": cdn_proxy.get_capture_mode()}
     }), 200
 
 

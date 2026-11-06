@@ -1,0 +1,335 @@
+{
+  "activity_id": 4343601,
+  "parent_activity": 4310001,
+  "limited_activities": [
+    4300401,
+    4300402,
+    4300403,
+    4300404
+  ],
+  "limited_tasks": [
+    150608,
+    150609,
+    150610,
+    150611,
+    50202001,
+    50202002,
+    50202003,
+    50202004,
+    50202005,
+    50202006,
+    50202007,
+    50202008,
+    50202009,
+    50202010,
+    50202011,
+    50202012,
+    50202013,
+    50202014,
+    50202015,
+    50202016,
+    50202017,
+    50202018,
+    50202019,
+    50202020,
+    50202021,
+    50202022,
+    50202023,
+    50202024,
+    50202025,
+    50202026,
+    50202027,
+    50202028,
+    50202029,
+    50202030,
+    50208002
+  ],
+  "stages": {
+    "436100": {
+      "main_activity_id": 4343601,
+      "mode_type": 5,
+      "pre_stage": 0,
+      "sort": 1,
+      "rewards": []
+    },
+    "436101": {
+      "main_activity_id": 4343601,
+      "mode_type": 1,
+      "pre_stage": 436100,
+      "sort": 2,
+      "rewards": [
+        [
+          1,
+          103
+        ]
+      ]
+    },
+    "436102": {
+      "main_activity_id": 4343601,
+      "mode_type": 1,
+      "pre_stage": 436101,
+      "sort": 3,
+      "rewards": [
+        [
+          2,
+          204
+        ],
+        [
+          3,
+          311
+        ]
+      ]
+    },
+    "436103": {
+      "main_activity_id": 4343601,
+      "mode_type": 1,
+      "pre_stage": 436102,
+      "sort": 4,
+      "rewards": [
+        [
+          1,
+          101
+        ],
+        [
+          3,
+          313
+        ]
+      ]
+    },
+    "436104": {
+      "main_activity_id": 4343601,
+      "mode_type": 1,
+      "pre_stage": 436103,
+      "sort": 5,
+      "rewards": [
+        [
+          1,
+          102
+        ]
+      ]
+    },
+    "436105": {
+      "main_activity_id": 4343601,
+      "mode_type": 1,
+      "pre_stage": 436104,
+      "sort": 6,
+      "rewards": [
+        [
+          1,
+          107
+        ]
+      ]
+    },
+    "436106": {
+      "main_activity_id": 4343601,
+      "mode_type": 1,
+      "pre_stage": 436105,
+      "sort": 7,
+      "rewards": [
+        [
+          2,
+          201
+        ]
+      ]
+    },
+    "436107": {
+      "main_activity_id": 4343601,
+      "mode_type": 5,
+      "pre_stage": 436106,
+      "sort": 8,
+      "rewards": []
+    },
+    "436201": {
+      "main_activity_id": 4343601,
+      "mode_type": 2,
+      "pre_stage": 436103,
+      "sort": 9,
+      "rewards": [
+        [
+          1,
+          108
+        ]
+      ]
+    },
+    "436202": {
+      "main_activity_id": 4343601,
+      "mode_type": 2,
+      "pre_stage": 436201,
+      "sort": 10,
+      "rewards": [
+        [
+          2,
+          203
+        ]
+      ]
+    },
+    "436203": {
+      "main_activity_id": 4343601,
+      "mode_type": 2,
+      "pre_stage": 436202,
+      "sort": 11,
+      "rewards": [
+        [
+          1,
+          104
+        ]
+      ]
+    },
+    "436301": {
+      "main_activity_id": 4343601,
+      "mode_type": 3,
+      "pre_stage": 436104,
+      "sort": 12,
+      "rewards": [
+        [
+          2,
+          202
+        ]
+      ]
+    },
+    "436302": {
+      "main_activity_id": 4343601,
+      "mode_type": 3,
+      "pre_stage": 436301,
+      "sort": 13,
+      "rewards": [
+        [
+          2,
+          205
+        ]
+      ]
+    },
+    "436303": {
+      "main_activity_id": 4343601,
+      "mode_type": 3,
+      "pre_stage": 436302,
+      "sort": 14,
+      "rewards": [
+        [
+          1,
+          105
+        ]
+      ]
+    },
+    "436401": {
+      "main_activity_id": 4343601,
+      "mode_type": 4,
+      "pre_stage": 436107,
+      "sort": 1,
+      "rewards": []
+    }
+  },
+  "bodies": {
+    "311": {
+      "cost": 8,
+      "body_type": 1,
+      "sort": 2,
+      "is_unlocked": 1,
+      "weapon_slots": 2,
+      "equip_slots": 1
+    },
+    "312": {
+      "cost": 10,
+      "body_type": 2,
+      "sort": 1,
+      "is_unlocked": 0,
+      "weapon_slots": 2,
+      "equip_slots": 2
+    },
+    "313": {
+      "cost": 7,
+      "body_type": 3,
+      "sort": 3,
+      "is_unlocked": 1,
+      "weapon_slots": 2,
+      "equip_slots": 1
+    }
+  },
+  "options": {
+    "101": {
+      "cost": 3,
+      "item_type": 1,
+      "sort": 1,
+      "is_unlocked": 1
+    },
+    "102": {
+      "cost": 5,
+      "item_type": 1,
+      "sort": 2,
+      "is_unlocked": 1
+    },
+    "103": {
+      "cost": 2,
+      "item_type": 1,
+      "sort": 3,
+      "is_unlocked": 1
+    },
+    "104": {
+      "cost": 4,
+      "item_type": 1,
+      "sort": 4,
+      "is_unlocked": 1
+    },
+    "105": {
+      "cost": 4,
+      "item_type": 1,
+      "sort": 5,
+      "is_unlocked": 1
+    },
+    "106": {
+      "cost": 3,
+      "item_type": 1,
+      "sort": 6,
+      "is_unlocked": 0
+    },
+    "107": {
+      "cost": 4,
+      "item_type": 1,
+      "sort": 7,
+      "is_unlocked": 1
+    },
+    "108": {
+      "cost": 3,
+      "item_type": 1,
+      "sort": 8,
+      "is_unlocked": 1
+    },
+    "201": {
+      "cost": 3,
+      "item_type": 2,
+      "sort": 9,
+      "is_unlocked": 1
+    },
+    "202": {
+      "cost": 2,
+      "item_type": 2,
+      "sort": 10,
+      "is_unlocked": 1
+    },
+    "203": {
+      "cost": 2,
+      "item_type": 2,
+      "sort": 11,
+      "is_unlocked": 1
+    },
+    "204": {
+      "cost": 1,
+      "item_type": 2,
+      "sort": 12,
+      "is_unlocked": 1
+    },
+    "205": {
+      "cost": 3,
+      "item_type": 2,
+      "sort": 13,
+      "is_unlocked": 1
+    }
+  },
+  "sources": {
+    "decompiled_v2/x64/game/config/activitytankcfg.lua": "3e3a5b36a363c51fe6300eff53e56026497bd96c96bf1a2951d79f61e000ceb6",
+    "decompiled_v2/x64/game/config/activitytankbodycfg.lua": "79d1e391f1395e959a45918da7141b5c6bd252a092ee90b7fc96448644187ec3",
+    "decompiled_v2/x64/game/config/activitytankweaponcfg.lua": "f8b6ed4fbabec7cc35a215b93c8c981ed15bbce831494ce852202026852e67a3",
+    "v5_server/data/activity_content_cfg.json": "2bc2b4e43e2f247912b4eaec092ceacd51097f975c0efc53ab2240d5c935a2cc",
+    "v5_server/data/kadas_body_mounts.json": "5d30ac5106fa12076944b24523b66356ada712b76b41a61ef8d0d2dde4a1f976"
+  }
+}

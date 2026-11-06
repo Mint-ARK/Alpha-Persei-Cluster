@@ -1,0 +1,7324 @@
+{
+  "stages": {
+    "3035105": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035105",
+      "background_1": "B06",
+      "id": 3035105
+    },
+    "3035106": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035106",
+      "background_1": "B06",
+      "id": 3035106
+    },
+    "3035107": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035107",
+      "background_1": "B06",
+      "id": 3035107
+    },
+    "3035108": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035108",
+      "background_1": "B06",
+      "id": 3035108
+    },
+    "3035109": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035109",
+      "background_1": "B06",
+      "id": 3035109
+    },
+    "3035110": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035110",
+      "background_1": "B06",
+      "id": 3035110
+    },
+    "3035111": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035111",
+      "background_1": "B06",
+      "id": 3035111
+    },
+    "3035112": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035112",
+      "background_1": "B06",
+      "id": 3035112
+    },
+    "3035199": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035199",
+      "background_1": "B06",
+      "id": 3035199
+    },
+    "3035205": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035205",
+      "background_1": "B06",
+      "id": 3035205
+    },
+    "3035206": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035206",
+      "background_1": "B06",
+      "id": 3035206
+    },
+    "3035207": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035207",
+      "background_1": "B06",
+      "id": 3035207
+    },
+    "3035208": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035208",
+      "background_1": "B06",
+      "id": 3035208
+    },
+    "3035301": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035301",
+      "background_1": "B06",
+      "id": 3035301
+    },
+    "3035302": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035302",
+      "background_1": "B06",
+      "id": 3035302
+    },
+    "3035303": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035303",
+      "background_1": "B06",
+      "id": 3035303
+    },
+    "3035304": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035304",
+      "background_1": "B06",
+      "id": 3035304
+    },
+    "3035401": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035401",
+      "background_1": "B06",
+      "id": 3035401
+    },
+    "3035521": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035521",
+      "background_1": "B06",
+      "id": 3035521
+    },
+    "3035522": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035522",
+      "background_1": "B06",
+      "id": 3035522
+    },
+    "3035523": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035523",
+      "background_1": "B06",
+      "id": 3035523
+    },
+    "3035524": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035524",
+      "background_1": "B06",
+      "id": 3035524
+    },
+    "3035541": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035541",
+      "background_1": "B06",
+      "id": 3035541
+    },
+    "3035542": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035542",
+      "background_1": "B06",
+      "id": 3035542
+    },
+    "3035561": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035561",
+      "background_1": "B06",
+      "id": 3035561
+    },
+    "3035562": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035562",
+      "background_1": "B06",
+      "id": 3035562
+    },
+    "3035601": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3035601",
+      "background_1": "B06",
+      "id": 3035601
+    },
+    "3036105": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036105",
+      "background_1": "B06",
+      "id": 3036105
+    },
+    "3036106": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036106",
+      "background_1": "B06",
+      "id": 3036106
+    },
+    "3036107": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036107",
+      "background_1": "B06",
+      "id": 3036107
+    },
+    "3036108": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036108",
+      "background_1": "B06",
+      "id": 3036108
+    },
+    "3036109": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036109",
+      "background_1": "B06",
+      "id": 3036109
+    },
+    "3036110": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036110",
+      "background_1": "B06",
+      "id": 3036110
+    },
+    "3036111": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036111",
+      "background_1": "B06",
+      "id": 3036111
+    },
+    "3036112": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036112",
+      "background_1": "B06",
+      "id": 3036112
+    },
+    "3036205": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036205",
+      "background_1": "B06",
+      "id": 3036205
+    },
+    "3036206": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036206",
+      "background_1": "B06",
+      "id": 3036206
+    },
+    "3036207": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036207",
+      "background_1": "B06",
+      "id": 3036207
+    },
+    "3036208": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036208",
+      "background_1": "B06",
+      "id": 3036208
+    },
+    "3036301": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036301",
+      "background_1": "B06",
+      "id": 3036301
+    },
+    "3036302": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036302",
+      "background_1": "B06",
+      "id": 3036302
+    },
+    "3036303": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036303",
+      "background_1": "B06",
+      "id": 3036303
+    },
+    "3036304": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036304",
+      "background_1": "B06",
+      "id": 3036304
+    },
+    "3036401": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036401",
+      "background_1": "B06",
+      "id": 3036401
+    },
+    "3036521": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036521",
+      "background_1": "B06",
+      "id": 3036521
+    },
+    "3036522": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036522",
+      "background_1": "B06",
+      "id": 3036522
+    },
+    "3036523": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036523",
+      "background_1": "B06",
+      "id": 3036523
+    },
+    "3036524": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036524",
+      "background_1": "B06",
+      "id": 3036524
+    },
+    "3036541": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036541",
+      "background_1": "B06",
+      "id": 3036541
+    },
+    "3036542": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036542",
+      "background_1": "B06",
+      "id": 3036542
+    },
+    "3036543": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036543",
+      "background_1": "B06",
+      "id": 3036543
+    },
+    "3036561": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036561",
+      "background_1": "B06",
+      "id": 3036561
+    },
+    "3036562": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036562",
+      "background_1": "B06",
+      "id": 3036562
+    },
+    "3036601": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3036601",
+      "background_1": "B06",
+      "id": 3036601
+    },
+    "3037105": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037105",
+      "background_1": "B06",
+      "id": 3037105
+    },
+    "3037106": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037106",
+      "background_1": "B06",
+      "id": 3037106
+    },
+    "3037107": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037107",
+      "background_1": "B06",
+      "id": 3037107
+    },
+    "3037108": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037108",
+      "background_1": "B06",
+      "id": 3037108
+    },
+    "3037109": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037109",
+      "background_1": "B06",
+      "id": 3037109
+    },
+    "3037110": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037110",
+      "background_1": "B06",
+      "id": 3037110
+    },
+    "3037111": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037111",
+      "background_1": "B06",
+      "id": 3037111
+    },
+    "3037112": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037112",
+      "background_1": "B06",
+      "id": 3037112
+    },
+    "3037205": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037205",
+      "background_1": "B06",
+      "id": 3037205
+    },
+    "3037206": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037206",
+      "background_1": "B06",
+      "id": 3037206
+    },
+    "3037207": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037207",
+      "background_1": "B06",
+      "id": 3037207
+    },
+    "3037208": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037208",
+      "background_1": "B06",
+      "id": 3037208
+    },
+    "3037301": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037301",
+      "background_1": "B06",
+      "id": 3037301
+    },
+    "3037302": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037302",
+      "background_1": "B06",
+      "id": 3037302
+    },
+    "3037303": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037303",
+      "background_1": "B06",
+      "id": 3037303
+    },
+    "3037304": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037304",
+      "background_1": "B06",
+      "id": 3037304
+    },
+    "3037401": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037401",
+      "background_1": "B06",
+      "id": 3037401
+    },
+    "3037521": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037521",
+      "background_1": "B06",
+      "id": 3037521
+    },
+    "3037522": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037522",
+      "background_1": "B06",
+      "id": 3037522
+    },
+    "3037523": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037523",
+      "background_1": "B06",
+      "id": 3037523
+    },
+    "3037524": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037524",
+      "background_1": "B06",
+      "id": 3037524
+    },
+    "3037525": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037525",
+      "background_1": "B06",
+      "id": 3037525
+    },
+    "3037541": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037541",
+      "background_1": "B06",
+      "id": 3037541
+    },
+    "3037542": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037542",
+      "background_1": "B06",
+      "id": 3037542
+    },
+    "3037561": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037561",
+      "background_1": "B06",
+      "id": 3037561
+    },
+    "3037562": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037562",
+      "background_1": "B06",
+      "id": 3037562
+    },
+    "3037601": {
+      "monster_level": 80,
+      "ai_level": 1,
+      "map": "3037601",
+      "background_1": "B06",
+      "id": 3037601
+    }
+  },
+  "terminals": {
+    "1001": {
+      "cost": 3,
+      "name": "强化锻炼",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者最大生命值上限提高<color=#FF9500>5%</color>。",
+      "classify": 1,
+      "id": 1001,
+      "icon": "terminal_26",
+      "effect_id": 1001,
+      "pre_id_list": [
+        0,
+        1002,
+        1003
+      ]
+    },
+    "1002": {
+      "cost": 3,
+      "name": "全力以赴",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者攻击力提高<color=#FF9500>3%</color>。",
+      "classify": 1,
+      "id": 1002,
+      "icon": "terminal_24",
+      "effect_id": 1002,
+      "pre_id_list": [
+        1001,
+        1004,
+        1018
+      ]
+    },
+    "1003": {
+      "cost": 3,
+      "name": "防御特训",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者防御力提高<color=#FF9500>5%</color>。",
+      "classify": 1,
+      "id": 1003,
+      "icon": "terminal_25",
+      "effect_id": 1003,
+      "pre_id_list": [
+        1001,
+        1007,
+        1018,
+        9002
+      ]
+    },
+    "1004": {
+      "cost": 3,
+      "name": "极限修正",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者修正系数提高<color=#FF9500>30%</color>。",
+      "classify": 1,
+      "id": 1004,
+      "icon": "terminal_10",
+      "effect_id": 1004,
+      "pre_id_list": [
+        1002,
+        1005,
+        1008,
+        1101,
+        9001
+      ]
+    },
+    "1005": {
+      "cost": 3,
+      "name": "防御特训",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者防御力提高<color=#FF9500>5%</color>。",
+      "classify": 1,
+      "id": 1005,
+      "icon": "terminal_25",
+      "effect_id": 1005,
+      "pre_id_list": [
+        1004,
+        1101,
+        1006
+      ]
+    },
+    "1006": {
+      "cost": 3,
+      "name": "迅捷动量",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者闪避能量恢复速度提高<color=#FF9500>10%</color>。",
+      "classify": 1,
+      "id": 1006,
+      "icon": "terminal_35",
+      "effect_id": 1006,
+      "pre_id_list": [
+        1005,
+        1010,
+        1018
+      ]
+    },
+    "1007": {
+      "cost": 3,
+      "name": "生存本能",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每存在一个敌人，修正者防御力提高<color=#FF9500>2%</color>（上限20%）。",
+      "classify": 1,
+      "id": 1007,
+      "icon": "terminal_25",
+      "effect_id": 1007,
+      "pre_id_list": [
+        1003,
+        1102,
+        1010
+      ]
+    },
+    "1008": {
+      "cost": 3,
+      "name": "斗争本能",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每存在一个敌人，修正者攻击力提高<color=#FF9500>1%</color>（上限10%）。",
+      "classify": 1,
+      "id": 1008,
+      "icon": "terminal_24",
+      "effect_id": 1008,
+      "pre_id_list": [
+        1004,
+        1009,
+        1015
+      ]
+    },
+    "1009": {
+      "cost": 3,
+      "name": "战斗专注",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者会心率提高<color=#FF9500>5%</color>。",
+      "classify": 1,
+      "id": 1009,
+      "icon": "terminal_24",
+      "effect_id": 1009,
+      "pre_id_list": [
+        1008,
+        1016
+      ]
+    },
+    "1010": {
+      "cost": 3,
+      "name": "强化锻炼",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者最大生命值上限提高<color=#FF9500>5%</color>。",
+      "classify": 1,
+      "id": 1010,
+      "icon": "terminal_26",
+      "effect_id": 1010,
+      "pre_id_list": [
+        1006,
+        1007,
+        1013,
+        1015,
+        1101
+      ]
+    },
+    "1011": {
+      "cost": 3,
+      "name": "对敌策略",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者攻击满生命值的敌人时，该次伤害提高<color=#FF9500>40%</color>。",
+      "classify": 1,
+      "id": 1011,
+      "icon": "terminal_24",
+      "effect_id": 1011,
+      "pre_id_list": [
+        1012,
+        1013,
+        1102
+      ]
+    },
+    "1012": {
+      "cost": 3,
+      "name": "瞬时满载",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "处于修正模式时，修正者造成的伤害提高<color=#FF9500>15%</color>。",
+      "classify": 1,
+      "id": 1012,
+      "icon": "terminal_10",
+      "effect_id": 1012,
+      "pre_id_list": [
+        1011,
+        1017
+      ]
+    },
+    "1013": {
+      "cost": 3,
+      "name": "全力以赴",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者攻击力提高<color=#FF9500>3%</color>。",
+      "classify": 1,
+      "id": 1013,
+      "icon": "terminal_24",
+      "effect_id": 1013,
+      "pre_id_list": [
+        1010,
+        1011,
+        1017
+      ]
+    },
+    "1014": {
+      "cost": 3,
+      "name": "潜能爆发",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者会心伤害提高<color=#FF9500>20%</color>。",
+      "classify": 1,
+      "id": 1014,
+      "icon": "terminal_24",
+      "effect_id": 1014,
+      "pre_id_list": [
+        1015,
+        1017,
+        1016,
+        1103
+      ]
+    },
+    "1015": {
+      "cost": 3,
+      "name": "背向奇袭",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "从背面攻击怪物时伤害提高<color=#FF9500>10%</color>。",
+      "classify": 1,
+      "id": 1015,
+      "icon": "terminal_24",
+      "effect_id": 1015,
+      "pre_id_list": [
+        1008,
+        1010,
+        1014
+      ]
+    },
+    "1016": {
+      "cost": 3,
+      "name": "强袭决策",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "当前生命值大于<color=#FF9500>80%</color>时，伤害提高<color=#FF9500>10%</color>。",
+      "classify": 1,
+      "id": 1016,
+      "icon": "terminal_24",
+      "effect_id": 1016,
+      "pre_id_list": [
+        1009,
+        1014,
+        1103
+      ]
+    },
+    "1017": {
+      "cost": 3,
+      "name": "守势决策",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "当前生命值小于<color=#FF9500>40%</color>时，受到的伤害降低<color=#FF9500>10%</color>。",
+      "classify": 1,
+      "id": 1017,
+      "icon": "terminal_25",
+      "effect_id": 1017,
+      "pre_id_list": [
+        1012,
+        1013,
+        1014,
+        1103
+      ]
+    },
+    "1018": {
+      "cost": 3,
+      "name": "灵巧身法",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者闪避能量上限提高<color=#FF9500>40%</color>。",
+      "classify": 1,
+      "id": 1018,
+      "icon": "terminal_35",
+      "effect_id": 1018,
+      "pre_id_list": [
+        1002,
+        1006,
+        1003
+      ]
+    },
+    "1101": {
+      "cost": 9,
+      "name": "后备防线",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "每次开局时，额外获得<color=#FF9500>1</color>点复活点数。",
+      "classify": 1,
+      "id": 1101,
+      "icon": "terminal_101",
+      "effect_id": 1101,
+      "pre_id_list": [
+        1004,
+        1005,
+        1010
+      ]
+    },
+    "1102": {
+      "cost": 9,
+      "name": "体质强化",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "复活后保留的血量提升<color=#FF9500>30%</color>。",
+      "classify": 1,
+      "id": 1102,
+      "icon": "terminal_102",
+      "effect_id": 1102,
+      "pre_id_list": [
+        1007,
+        1011
+      ]
+    },
+    "1103": {
+      "cost": 9,
+      "name": "战局分析",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "修正者每击杀一个敌人，该修正者攻击提高<color=#FF9500>1%</color>（上限10%）。",
+      "classify": 1,
+      "id": 1103,
+      "icon": "terminal_103",
+      "effect_id": 1103,
+      "pre_id_list": [
+        1014,
+        1016,
+        1017
+      ]
+    },
+    "9001": {
+      "cost": 9,
+      "name": "脉络节点",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "修正者每拥有一个记忆珍宝，最大生命值上限提高<color=#FF9500>0.4%</color>，攻击力提高<color=#FF9500>0.4%</color>，防御力提高<color=#FF9500>0.4%</color>。",
+      "classify": 1,
+      "id": 9001,
+      "icon": "terminal_30",
+      "effect_id": 9001,
+      "pre_id_list": [
+        1004,
+        3010
+      ]
+    },
+    "2001": {
+      "cost": 3,
+      "name": "额外储蓄",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每次开局时，额外获得<color=#FF9500>100</color>枚喵喵宝藏币。",
+      "classify": 2,
+      "id": 2001,
+      "icon": "terminal_29",
+      "effect_id": 2001,
+      "pre_id_list": [
+        0,
+        2002,
+        2003,
+        2004
+      ]
+    },
+    "2002": {
+      "cost": 3,
+      "name": "不确定性",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "时空裂隙的出现概率提升<color=#FF9500>10%</color>。",
+      "classify": 2,
+      "id": 2002,
+      "icon": "terminal_28",
+      "effect_id": 2002,
+      "pre_id_list": [
+        2001,
+        2005
+      ]
+    },
+    "2003": {
+      "cost": 3,
+      "name": "医疗保障",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每关结束时，修正者恢复自身<color=#FF9500>3%</color>的血量。",
+      "classify": 2,
+      "id": 2003,
+      "icon": "terminal_34",
+      "effect_id": 2003,
+      "pre_id_list": [
+        2001,
+        2006
+      ]
+    },
+    "2004": {
+      "cost": 3,
+      "name": "有舍有得",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "选择放弃选项时所获得的喵喵宝藏币数量增加<color=#FF9500>80</color>枚。",
+      "classify": 2,
+      "id": 2004,
+      "icon": "terminal_28",
+      "effect_id": 2004,
+      "pre_id_list": [
+        2001,
+        2009,
+        2016,
+        9002
+      ]
+    },
+    "2005": {
+      "cost": 3,
+      "name": "持筹握算",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每关结束时，额外获得<color=#FF9500>20</color>枚喵喵宝藏币。",
+      "classify": 2,
+      "id": 2005,
+      "icon": "terminal_29",
+      "effect_id": 2005,
+      "pre_id_list": [
+        2002,
+        9003,
+        2007,
+        2006
+      ]
+    },
+    "2006": {
+      "cost": 3,
+      "name": "物流传动",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "多维商店刷新次数提升<color=#FF9500>3</color>次。",
+      "classify": 2,
+      "id": 2006,
+      "icon": "terminal_29",
+      "effect_id": 2006,
+      "pre_id_list": [
+        2003,
+        2005,
+        2101
+      ]
+    },
+    "2007": {
+      "cost": 3,
+      "name": "未知可能",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "「兔兔打字机」的属性提升效果提高至<color=#FF9500>10%</color>。",
+      "classify": 2,
+      "id": 2007,
+      "icon": "terminal_28",
+      "effect_id": 2007,
+      "pre_id_list": [
+        2005,
+        2008
+      ]
+    },
+    "2008": {
+      "cost": 3,
+      "name": "迅捷支援",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "队友复活所需的关卡减少<color=#FF9500>1</color>个。",
+      "classify": 2,
+      "id": 2008,
+      "icon": "terminal_34",
+      "effect_id": 2008,
+      "pre_id_list": [
+        2007,
+        2012,
+        2101
+      ]
+    },
+    "2009": {
+      "cost": 3,
+      "name": "会员折扣",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "多维商店第一个商品降价<color=#FF9500>50%</color>。",
+      "classify": 2,
+      "id": 2009,
+      "icon": "terminal_29",
+      "effect_id": 2009,
+      "pre_id_list": [
+        2004,
+        2010
+      ]
+    },
+    "2010": {
+      "cost": 3,
+      "name": "商业口才",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "多维商店额外获得<color=#FF9500>1</color>次免费刷新机会。",
+      "classify": 2,
+      "id": 2010,
+      "icon": "terminal_29",
+      "effect_id": 2010,
+      "pre_id_list": [
+        2009,
+        2101,
+        2011
+      ]
+    },
+    "2011": {
+      "cost": 3,
+      "name": "医疗保障",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每关结束时，修正者恢复自身<color=#FF9500>3%</color>的血量。",
+      "classify": 2,
+      "id": 2011,
+      "icon": "terminal_34",
+      "effect_id": 2011,
+      "pre_id_list": [
+        2010,
+        2012,
+        2103,
+        2013
+      ]
+    },
+    "2012": {
+      "cost": 3,
+      "name": "应敌战略",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "免疫BOSS造成的首次伤害。",
+      "classify": 2,
+      "id": 2012,
+      "icon": "terminal_28",
+      "effect_id": 2012,
+      "pre_id_list": [
+        2008,
+        2011,
+        2103
+      ]
+    },
+    "2013": {
+      "cost": 3,
+      "name": "迅捷支援",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "队友复活所需的关卡减少<color=#FF9500>1</color>个。",
+      "classify": 2,
+      "id": 2013,
+      "icon": "terminal_34",
+      "effect_id": 2013,
+      "pre_id_list": [
+        2017,
+        2102,
+        2015,
+        2011,
+        2014
+      ]
+    },
+    "2014": {
+      "cost": 3,
+      "name": "高机动性",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "修正者移动速度提高<color=#FF9500>15%</color>。",
+      "classify": 2,
+      "id": 2014,
+      "icon": "terminal_27",
+      "effect_id": 2014,
+      "pre_id_list": [
+        2013,
+        2103
+      ]
+    },
+    "2015": {
+      "cost": 3,
+      "name": "通商技巧",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "金币关卡额外获得<color=#FF9500>100</color>枚喵喵宝藏币。",
+      "classify": 2,
+      "id": 2015,
+      "icon": "terminal_29",
+      "effect_id": 2015,
+      "pre_id_list": [
+        2016,
+        2013
+      ]
+    },
+    "2016": {
+      "cost": 3,
+      "name": "深层合作",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "多维商店的商品选项增加<color=#FF9500>1</color>个。",
+      "classify": 2,
+      "id": 2016,
+      "icon": "terminal_29",
+      "effect_id": 2016,
+      "pre_id_list": [
+        2004,
+        2015,
+        2102,
+        2017
+      ]
+    },
+    "2017": {
+      "cost": 3,
+      "name": "持筹握算",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每关结束时，额外获得<color=#FF9500>10</color>枚喵喵宝藏币。",
+      "classify": 2,
+      "id": 2017,
+      "icon": "terminal_29",
+      "effect_id": 2017,
+      "pre_id_list": [
+        2016,
+        2013
+      ]
+    },
+    "2101": {
+      "cost": 9,
+      "name": "生息续存",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "多维商店提供一次免费的回血机会。",
+      "classify": 2,
+      "id": 2101,
+      "icon": "terminal_104",
+      "effect_id": 2101,
+      "pre_id_list": [
+        2006,
+        2008,
+        2010
+      ]
+    },
+    "2102": {
+      "cost": 9,
+      "name": "战后休整",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "战胜BOSS后，额外补充<color=#FF9500>1</color>点复活点数。",
+      "classify": 2,
+      "id": 2102,
+      "icon": "terminal_105",
+      "effect_id": 2102,
+      "pre_id_list": [
+        2016,
+        2013
+      ]
+    },
+    "2103": {
+      "cost": 9,
+      "name": "额外收获",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "战胜BOSS后，将携带的喵喵宝藏币增值<color=#FF9500>10%</color>。",
+      "classify": 2,
+      "id": 2103,
+      "icon": "terminal_106",
+      "effect_id": 2103,
+      "pre_id_list": [
+        2011,
+        2012,
+        2014
+      ]
+    },
+    "9002": {
+      "cost": 9,
+      "name": "脉络节点",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "每关结束时，随机提升修正者一项属性。",
+      "classify": 2,
+      "id": 9002,
+      "icon": "terminal_31",
+      "effect_id": 9002,
+      "pre_id_list": [
+        1003,
+        2004
+      ]
+    },
+    "3001": {
+      "cost": 3,
+      "name": "资源调度",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "信标可携带数+1。",
+      "classify": 3,
+      "id": 3001,
+      "icon": "terminal_36",
+      "effect_id": 3001,
+      "pre_id_list": [
+        0,
+        3002,
+        3009
+      ]
+    },
+    "3002": {
+      "cost": 3,
+      "name": "战场清扫",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "战胜BOSS后，随机提升<color=#FF9500>1</color>个记忆珍宝的等级。",
+      "classify": 3,
+      "id": 3002,
+      "icon": "terminal_33",
+      "effect_id": 3002,
+      "pre_id_list": [
+        3001,
+        3003
+      ]
+    },
+    "3003": {
+      "cost": 3,
+      "name": "命运牵引",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每局游戏中，记忆珍宝奖励可额外重置<color=#FF9500>1</color>次。",
+      "classify": 3,
+      "id": 3003,
+      "icon": "terminal_37",
+      "effect_id": 3003,
+      "pre_id_list": [
+        3002,
+        3102,
+        3004
+      ]
+    },
+    "3004": {
+      "cost": 3,
+      "name": "好运常临",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "获得记忆珍宝时，有<color=#FF9500>10%</color>概率提升1个等级。",
+      "classify": 3,
+      "id": 3004,
+      "icon": "terminal_33",
+      "effect_id": 3004,
+      "pre_id_list": [
+        3003,
+        3005,
+        9003
+      ]
+    },
+    "3005": {
+      "cost": 3,
+      "name": "资源调度",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "信标可携带数+1。",
+      "classify": 3,
+      "id": 3005,
+      "icon": "terminal_36",
+      "effect_id": 3005,
+      "pre_id_list": [
+        3006,
+        3004,
+        3102
+      ]
+    },
+    "3006": {
+      "cost": 3,
+      "name": "命运牵引",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每局游戏中，记忆珍宝奖励可额外重置<color=#FF9500>1</color>次。",
+      "classify": 3,
+      "id": 3006,
+      "icon": "terminal_37",
+      "effect_id": 3006,
+      "pre_id_list": [
+        3103,
+        3007,
+        3005
+      ]
+    },
+    "3007": {
+      "cost": 3,
+      "name": "不确定性",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "时空裂隙的出现概率提升<color=#FF9500>10%</color>。",
+      "classify": 3,
+      "id": 3007,
+      "icon": "terminal_33",
+      "effect_id": 3007,
+      "pre_id_list": [
+        3006,
+        3008
+      ]
+    },
+    "3008": {
+      "cost": 3,
+      "name": "大鉴赏家",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "可升级的记忆珍宝提升<color=#FF9500>1</color>个等级上限。",
+      "classify": 3,
+      "id": 3008,
+      "icon": "terminal_37",
+      "effect_id": 3008,
+      "pre_id_list": [
+        3007,
+        3102,
+        3001
+      ]
+    },
+    "3009": {
+      "cost": 3,
+      "name": "运筹帷幄",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "精英关卡的出现概率提升<color=#FF9500>10%</color>。",
+      "classify": 3,
+      "id": 3009,
+      "icon": "terminal_33",
+      "effect_id": 3009,
+      "pre_id_list": [
+        3012,
+        3010,
+        3001
+      ]
+    },
+    "3010": {
+      "cost": 3,
+      "name": "好运常临",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "获得记忆珍宝时，有<color=#FF9500>10%</color>概率提升1个等级。",
+      "classify": 3,
+      "id": 3010,
+      "icon": "terminal_33",
+      "effect_id": 3010,
+      "pre_id_list": [
+        3009,
+        3011,
+        9001
+      ]
+    },
+    "3011": {
+      "cost": 3,
+      "name": "资源调度",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "信标可携带数+1。",
+      "classify": 3,
+      "id": 3011,
+      "icon": "terminal_36",
+      "effect_id": 3011,
+      "pre_id_list": [
+        3010,
+        3012,
+        3101,
+        3014,
+        3016
+      ]
+    },
+    "3012": {
+      "cost": 3,
+      "name": "命运牵引",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每局游戏中，记忆珍宝奖励可额外重置<color=#FF9500>1</color>次。",
+      "classify": 3,
+      "id": 3012,
+      "icon": "terminal_37",
+      "effect_id": 3012,
+      "pre_id_list": [
+        3009,
+        3013,
+        3101,
+        3011
+      ]
+    },
+    "3013": {
+      "cost": 3,
+      "name": "大鉴赏家",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "可升级的记忆珍宝提升<color=#FF9500>1</color>个等级上限。",
+      "classify": 3,
+      "id": 3013,
+      "icon": "terminal_37",
+      "effect_id": 3013,
+      "pre_id_list": [
+        3012,
+        3101,
+        3014
+      ]
+    },
+    "3014": {
+      "cost": 3,
+      "name": "运筹帷幄",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "精英关卡的出现概率提升<color=#FF9500>10%</color>。",
+      "classify": 3,
+      "id": 3014,
+      "icon": "terminal_33",
+      "effect_id": 3014,
+      "pre_id_list": [
+        3015,
+        3011,
+        3101,
+        3013
+      ]
+    },
+    "3015": {
+      "cost": 3,
+      "name": "命运牵引",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每局游戏中，记忆珍宝奖励可额外重置<color=#FF9500>1</color>次。",
+      "classify": 3,
+      "id": 3015,
+      "icon": "terminal_37",
+      "effect_id": 3015,
+      "pre_id_list": [
+        3014,
+        3103
+      ]
+    },
+    "3016": {
+      "cost": 3,
+      "name": "命运牵引",
+      "hinge": 0,
+      "need_level": 1,
+      "desc": "每局游戏中，记忆珍宝奖励可额外重置<color=#FF9500>1</color>次。",
+      "classify": 3,
+      "id": 3016,
+      "icon": "terminal_37",
+      "effect_id": 3016,
+      "pre_id_list": [
+        3011,
+        3103
+      ]
+    },
+    "3101": {
+      "cost": 9,
+      "name": "战前整备",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "首关的关卡奖励改为获得一个专属记忆珍宝。",
+      "classify": 3,
+      "id": 3101,
+      "icon": "terminal_107",
+      "effect_id": 3101,
+      "pre_id_list": [
+        3011,
+        3012,
+        3013,
+        3014
+      ]
+    },
+    "3102": {
+      "cost": 9,
+      "name": "既定馈赠",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "战胜BOSS后，可额外选择<color=#FF9500>1</color>次记忆珍宝奖励。",
+      "classify": 3,
+      "id": 3102,
+      "icon": "terminal_108",
+      "effect_id": 3102,
+      "pre_id_list": [
+        3003,
+        3008,
+        3005
+      ]
+    },
+    "3103": {
+      "cost": 9,
+      "name": "开拓精神",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "可以在游戏中选择「万象寓于」流派的记忆珍宝。",
+      "classify": 3,
+      "id": 3103,
+      "icon": "terminal_109",
+      "effect_id": 3103,
+      "pre_id_list": [
+        3016,
+        3015,
+        3006
+      ]
+    },
+    "9003": {
+      "cost": 9,
+      "name": "脉络节点",
+      "hinge": 1,
+      "need_level": 1,
+      "desc": "每经过<color=#FF9500>6</color>关，随机提升一个记忆珍宝的等级。",
+      "classify": 3,
+      "id": 9003,
+      "icon": "terminal_32",
+      "effect_id": 9003,
+      "pre_id_list": [
+        2005,
+        3004
+      ]
+    }
+  },
+  "levels": {
+    "1": {
+      "id": 1,
+      "exp": 0,
+      "point": 0,
+      "des": ""
+    },
+    "2": {
+      "id": 2,
+      "exp": 600,
+      "point": 5,
+      "des": ""
+    },
+    "3": {
+      "id": 3,
+      "exp": 1200,
+      "point": 10,
+      "des": ""
+    },
+    "4": {
+      "id": 4,
+      "exp": 1800,
+      "point": 15,
+      "des": ""
+    },
+    "5": {
+      "id": 5,
+      "exp": 2400,
+      "point": 21,
+      "des": "解锁天赋：铁血狩猎"
+    },
+    "6": {
+      "id": 6,
+      "exp": 3000,
+      "point": 26,
+      "des": ""
+    },
+    "7": {
+      "id": 7,
+      "exp": 3800,
+      "point": 31,
+      "des": ""
+    },
+    "8": {
+      "id": 8,
+      "exp": 4600,
+      "point": 36,
+      "des": ""
+    },
+    "9": {
+      "id": 9,
+      "exp": 5400,
+      "point": 41,
+      "des": ""
+    },
+    "10": {
+      "id": 10,
+      "exp": 6200,
+      "point": 47,
+      "des": "解锁天赋：改装能手"
+    },
+    "11": {
+      "id": 11,
+      "exp": 7400,
+      "point": 52,
+      "des": ""
+    },
+    "12": {
+      "id": 12,
+      "exp": 8600,
+      "point": 57,
+      "des": ""
+    },
+    "13": {
+      "id": 13,
+      "exp": 9800,
+      "point": 62,
+      "des": ""
+    },
+    "14": {
+      "id": 14,
+      "exp": 11000,
+      "point": 67,
+      "des": ""
+    },
+    "15": {
+      "id": 15,
+      "exp": 12200,
+      "point": 73,
+      "des": ""
+    },
+    "16": {
+      "id": 16,
+      "exp": 13800,
+      "point": 78,
+      "des": ""
+    },
+    "17": {
+      "id": 17,
+      "exp": 15400,
+      "point": 83,
+      "des": ""
+    },
+    "18": {
+      "id": 18,
+      "exp": 17000,
+      "point": 88,
+      "des": ""
+    },
+    "19": {
+      "id": 19,
+      "exp": 18600,
+      "point": 93,
+      "des": ""
+    },
+    "20": {
+      "id": 20,
+      "exp": 20200,
+      "point": 99,
+      "des": ""
+    },
+    "21": {
+      "id": 21,
+      "exp": 22200,
+      "point": 104,
+      "des": ""
+    },
+    "22": {
+      "id": 22,
+      "exp": 24200,
+      "point": 109,
+      "des": ""
+    },
+    "23": {
+      "id": 23,
+      "exp": 26200,
+      "point": 114,
+      "des": ""
+    },
+    "24": {
+      "id": 24,
+      "exp": 28200,
+      "point": 119,
+      "des": ""
+    },
+    "25": {
+      "id": 25,
+      "exp": 30200,
+      "point": 126,
+      "des": ""
+    },
+    "26": {
+      "id": 26,
+      "exp": 32700,
+      "point": 131,
+      "des": ""
+    },
+    "27": {
+      "id": 27,
+      "exp": 35200,
+      "point": 136,
+      "des": ""
+    },
+    "28": {
+      "id": 28,
+      "exp": 37700,
+      "point": 141,
+      "des": ""
+    },
+    "29": {
+      "id": 29,
+      "exp": 40200,
+      "point": 146,
+      "des": ""
+    },
+    "30": {
+      "id": 30,
+      "exp": 42700,
+      "point": 153,
+      "des": ""
+    },
+    "31": {
+      "id": 31,
+      "exp": 45700,
+      "point": 158,
+      "des": ""
+    },
+    "32": {
+      "id": 32,
+      "exp": 48700,
+      "point": 163,
+      "des": ""
+    },
+    "33": {
+      "id": 33,
+      "exp": 51700,
+      "point": 168,
+      "des": ""
+    },
+    "34": {
+      "id": 34,
+      "exp": 54700,
+      "point": 173,
+      "des": ""
+    },
+    "35": {
+      "id": 35,
+      "exp": 57700,
+      "point": 180,
+      "des": ""
+    },
+    "36": {
+      "id": 36,
+      "exp": 61200,
+      "point": 185,
+      "des": ""
+    },
+    "37": {
+      "id": 37,
+      "exp": 64700,
+      "point": 190,
+      "des": ""
+    },
+    "38": {
+      "id": 38,
+      "exp": 68200,
+      "point": 195,
+      "des": ""
+    },
+    "39": {
+      "id": 39,
+      "exp": 71700,
+      "point": 200,
+      "des": ""
+    },
+    "40": {
+      "id": 40,
+      "exp": 75200,
+      "point": 207,
+      "des": ""
+    },
+    "41": {
+      "id": 41,
+      "exp": 78700,
+      "point": 212,
+      "des": ""
+    },
+    "42": {
+      "id": 42,
+      "exp": 82200,
+      "point": 217,
+      "des": ""
+    },
+    "43": {
+      "id": 43,
+      "exp": 85700,
+      "point": 222,
+      "des": ""
+    },
+    "44": {
+      "id": 44,
+      "exp": 89200,
+      "point": 227,
+      "des": ""
+    },
+    "45": {
+      "id": 45,
+      "exp": 92700,
+      "point": 234,
+      "des": ""
+    },
+    "46": {
+      "id": 46,
+      "exp": 96200,
+      "point": 239,
+      "des": ""
+    },
+    "47": {
+      "id": 47,
+      "exp": 99700,
+      "point": 244,
+      "des": ""
+    },
+    "48": {
+      "id": 48,
+      "exp": 103200,
+      "point": 249,
+      "des": ""
+    },
+    "49": {
+      "id": 49,
+      "exp": 106700,
+      "point": 254,
+      "des": ""
+    },
+    "50": {
+      "id": 50,
+      "exp": 110200,
+      "point": 261,
+      "des": ""
+    }
+  },
+  "settings": {
+    "1": {
+      "id": 1,
+      "value": [
+        [
+          1,
+          5001
+        ],
+        [
+          2,
+          5002
+        ],
+        [
+          3,
+          5003
+        ]
+      ]
+    },
+    "2": {
+      "id": 2,
+      "value": [
+        [
+          1,
+          2001
+        ],
+        [
+          2,
+          2002
+        ],
+        [
+          3,
+          2003
+        ]
+      ]
+    },
+    "3": {
+      "id": 3,
+      "value": [
+        3
+      ]
+    },
+    "4": {
+      "id": 4,
+      "value": [
+        1
+      ]
+    },
+    "5": {
+      "id": 5,
+      "value": [
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
+      ]
+    },
+    "6": {
+      "id": 6,
+      "value": [
+        5
+      ]
+    },
+    "7": {
+      "id": 7,
+      "value": [
+        600
+      ]
+    },
+    "8": {
+      "id": 8,
+      "value": [
+        6
+      ]
+    },
+    "9": {
+      "id": 9,
+      "value": [
+        200
+      ]
+    },
+    "10": {
+      "id": 10,
+      "value": [
+        3
+      ]
+    },
+    "11": {
+      "id": 11,
+      "value": [
+        203
+      ]
+    },
+    "13": {
+      "id": 13,
+      "value": [
+        [
+          4,
+          500
+        ],
+        [
+          5,
+          500
+        ],
+        [
+          6,
+          500
+        ]
+      ]
+    },
+    "14": {
+      "id": 14,
+      "value": [
+        [
+          1,
+          100
+        ],
+        [
+          2,
+          200
+        ],
+        [
+          3,
+          300
+        ]
+      ]
+    },
+    "15": {
+      "id": 15,
+      "value": [
+        203
+      ]
+    },
+    "16": {
+      "id": 16,
+      "value": [
+        9001,
+        9002
+      ]
+    },
+    "17": {
+      "id": 17,
+      "value": [
+        201,
+        202
+      ]
+    },
+    "18": {
+      "id": 18,
+      "value": [
+        [],
+        [
+          3006
+        ]
+      ]
+    },
+    "19": {
+      "id": 19,
+      "value": [
+        3001,
+        3002,
+        3003,
+        3004,
+        3005,
+        3008,
+        3009
+      ]
+    },
+    "20": {
+      "id": 20,
+      "value": [
+        301,
+        302,
+        303
+      ]
+    },
+    "21": {
+      "id": 21,
+      "value": [
+        150
+      ]
+    },
+    "22": {
+      "id": 22,
+      "value": [
+        [
+          1,
+          [
+            [
+              200,
+              10001001
+            ],
+            [
+              200,
+              10001002
+            ],
+            [
+              100,
+              10002001
+            ],
+            [
+              100,
+              10002002
+            ],
+            [
+              100,
+              10002003
+            ],
+            [
+              100,
+              10002004
+            ]
+          ]
+        ],
+        [
+          2,
+          [
+            [
+              200,
+              10001011
+            ],
+            [
+              200,
+              10001012
+            ],
+            [
+              100,
+              10002011
+            ],
+            [
+              100,
+              10002012
+            ],
+            [
+              100,
+              10002013
+            ],
+            [
+              100,
+              10002014
+            ]
+          ]
+        ],
+        [
+          3,
+          [
+            [
+              200,
+              10001021
+            ],
+            [
+              200,
+              10001022
+            ],
+            [
+              100,
+              10002021
+            ],
+            [
+              100,
+              10002022
+            ],
+            [
+              100,
+              10002023
+            ],
+            [
+              100,
+              10002024
+            ]
+          ]
+        ]
+      ]
+    },
+    "23": {
+      "id": 23,
+      "value": [
+        [
+          1,
+          75000
+        ],
+        [
+          2,
+          75000
+        ],
+        [
+          3,
+          75000
+        ],
+        [
+          4,
+          75000
+        ],
+        [
+          5,
+          75000
+        ],
+        [
+          6,
+          320000
+        ],
+        [
+          8,
+          75000
+        ],
+        [
+          9,
+          0
+        ],
+        [
+          1002,
+          85000
+        ],
+        [
+          3002,
+          85000
+        ]
+      ]
+    },
+    "24": {
+      "id": 24,
+      "value": [
+        -40,
+        24000
+      ]
+    },
+    "25": {
+      "id": 25,
+      "value": [
+        [
+          1,
+          5000
+        ],
+        [
+          2,
+          4600
+        ],
+        [
+          3,
+          4250
+        ],
+        [
+          4,
+          4050
+        ],
+        [
+          5,
+          3850
+        ],
+        [
+          6,
+          3650
+        ],
+        [
+          7,
+          3500
+        ],
+        [
+          8,
+          3500
+        ],
+        [
+          9,
+          3500
+        ],
+        [
+          10,
+          3250
+        ],
+        [
+          11,
+          3250
+        ],
+        [
+          12,
+          3000
+        ],
+        [
+          13,
+          2500
+        ]
+      ]
+    },
+    "26": {
+      "id": 26,
+      "value": [
+        [
+          2,
+          [
+            2,
+            10001,
+            10002
+          ]
+        ],
+        [
+          5,
+          [
+            5,
+            10001,
+            10002
+          ]
+        ],
+        [
+          6,
+          [
+            10001,
+            10002
+          ]
+        ],
+        [
+          7,
+          [
+            10001,
+            10002
+          ]
+        ],
+        [
+          9,
+          [
+            2,
+            10001,
+            10002
+          ]
+        ],
+        [
+          10001,
+          [
+            10001,
+            10002
+          ]
+        ],
+        [
+          10002,
+          [
+            10001,
+            10002
+          ]
+        ]
+      ]
+    },
+    "27": {
+      "id": 27,
+      "value": [
+        4
+      ]
+    },
+    "28": {
+      "id": 28,
+      "value": [
+        4
+      ]
+    },
+    "29": {
+      "id": 29,
+      "value": [
+        4
+      ]
+    },
+    "30": {
+      "id": 30,
+      "value": [
+        700
+      ]
+    }
+  },
+  "difficulties": {
+    "1": {
+      "unlock_difficulty": 0,
+      "id": 1,
+      "score": 1000,
+      "params": [
+        [
+          1,
+          157,
+          1,
+          3
+        ]
+      ]
+    },
+    "2": {
+      "unlock_difficulty": 1,
+      "id": 2,
+      "score": 1100,
+      "params": [
+        [
+          2,
+          31,
+          400
+        ]
+      ]
+    },
+    "3": {
+      "unlock_difficulty": 1,
+      "id": 3,
+      "score": 1200,
+      "params": [
+        [
+          2,
+          11,
+          400
+        ]
+      ]
+    },
+    "4": {
+      "unlock_difficulty": 1,
+      "id": 4,
+      "score": 1300,
+      "params": [
+        [
+          1,
+          174,
+          1,
+          0
+        ]
+      ]
+    },
+    "5": {
+      "unlock_difficulty": 1,
+      "id": 5,
+      "score": 1400,
+      "params": [
+        [
+          2,
+          21,
+          200
+        ]
+      ]
+    },
+    "6": {
+      "unlock_difficulty": 1,
+      "id": 6,
+      "score": 1500,
+      "params": [
+        [
+          2,
+          31,
+          300
+        ]
+      ]
+    },
+    "7": {
+      "unlock_difficulty": 6,
+      "id": 7,
+      "score": 1600,
+      "params": [
+        [
+          1,
+          157,
+          2,
+          3
+        ]
+      ]
+    },
+    "8": {
+      "unlock_difficulty": 6,
+      "id": 8,
+      "score": 1700,
+      "params": [
+        [
+          2,
+          21,
+          200
+        ]
+      ]
+    },
+    "9": {
+      "unlock_difficulty": 6,
+      "id": 9,
+      "score": 1800,
+      "params": [
+        [
+          2,
+          11,
+          600
+        ]
+      ]
+    },
+    "10": {
+      "unlock_difficulty": 6,
+      "id": 10,
+      "score": 1900,
+      "params": [
+        [
+          1,
+          127,
+          1,
+          0
+        ]
+      ]
+    },
+    "11": {
+      "unlock_difficulty": 6,
+      "id": 11,
+      "score": 2000,
+      "params": [
+        [
+          2,
+          31,
+          600
+        ]
+      ]
+    },
+    "12": {
+      "unlock_difficulty": 11,
+      "id": 12,
+      "score": 2100,
+      "params": [
+        [
+          1,
+          157,
+          3,
+          3
+        ]
+      ]
+    },
+    "13": {
+      "unlock_difficulty": 11,
+      "id": 13,
+      "score": 2200,
+      "params": [
+        [
+          1,
+          174,
+          2,
+          0
+        ]
+      ]
+    },
+    "14": {
+      "unlock_difficulty": 11,
+      "id": 14,
+      "score": 2300,
+      "params": [
+        [
+          2,
+          21,
+          200
+        ]
+      ]
+    },
+    "15": {
+      "unlock_difficulty": 11,
+      "id": 15,
+      "score": 2400,
+      "params": [
+        [
+          2,
+          11,
+          600
+        ]
+      ]
+    },
+    "16": {
+      "unlock_difficulty": 11,
+      "id": 16,
+      "score": 2500,
+      "params": [
+        [
+          1,
+          127,
+          2,
+          0
+        ]
+      ]
+    },
+    "17": {
+      "unlock_difficulty": 16,
+      "id": 17,
+      "score": 2700,
+      "params": [
+        [
+          2,
+          31,
+          500
+        ]
+      ]
+    },
+    "18": {
+      "unlock_difficulty": 17,
+      "id": 18,
+      "score": 2900,
+      "params": [
+        [
+          2,
+          11,
+          700
+        ]
+      ]
+    },
+    "19": {
+      "unlock_difficulty": 18,
+      "id": 19,
+      "score": 3100,
+      "params": [
+        [
+          1,
+          127,
+          3,
+          0
+        ],
+        [
+          2,
+          31,
+          300
+        ]
+      ]
+    },
+    "20": {
+      "unlock_difficulty": 19,
+      "id": 20,
+      "score": 3300,
+      "params": [
+        [
+          1,
+          70005,
+          1,
+          0
+        ]
+      ]
+    }
+  },
+  "beacons": {
+    "1": {
+      "name": "充实储备",
+      "id": 1,
+      "icon": "beacon_14",
+      "condition": 0,
+      "desc": "每次开局时，额外获得<color=#FF9500>200</color>枚喵喵宝藏币。",
+      "effect_id_list": [
+        117
+      ],
+      "require_terminal_list": []
+    },
+    "2": {
+      "name": "铁血狩猎",
+      "id": 2,
+      "icon": "beacon_1",
+      "condition": 30101,
+      "desc": "修正者最大生命值上限提高<color=#FF9500>20%</color>。",
+      "effect_id_list": [
+        103
+      ],
+      "require_terminal_list": []
+    },
+    "3": {
+      "name": "改装能手",
+      "id": 3,
+      "icon": "beacon_11",
+      "condition": 30102,
+      "desc": "获得记忆珍宝时，有<color=#FF9500>20%</color>概率提升1个等级。",
+      "effect_id_list": [
+        112
+      ],
+      "require_terminal_list": []
+    },
+    "4": {
+      "name": "佣兵赌注",
+      "id": 4,
+      "icon": "beacon_13",
+      "condition": 30103,
+      "desc": "第一层关卡选择过程时额外增加一个关卡选项。",
+      "effect_id_list": [
+        108
+      ],
+      "require_terminal_list": []
+    },
+    "5": {
+      "name": "保守战略",
+      "id": 5,
+      "icon": "beacon_6",
+      "condition": 30104,
+      "desc": "每次开局时，额外获得<color=#FF9500>1</color>点复活点数。",
+      "effect_id_list": [
+        115
+      ],
+      "require_terminal_list": []
+    },
+    "6": {
+      "name": "同调升华",
+      "id": 6,
+      "icon": "beacon_12",
+      "condition": 30105,
+      "desc": "触发神系共鸣的最高效果仅需2位同神系修正者。",
+      "effect_id_list": [
+        113
+      ],
+      "require_terminal_list": []
+    },
+    "7": {
+      "name": "交易策略",
+      "id": 7,
+      "icon": "beacon_7",
+      "condition": 30106,
+      "desc": "多维商店额外获得<color=#FF9500>2</color>次免费刷新机会。",
+      "effect_id_list": [
+        107
+      ],
+      "require_terminal_list": []
+    },
+    "8": {
+      "name": "财富密码",
+      "id": 8,
+      "icon": "beacon_16",
+      "condition": 30107,
+      "desc": "选择放弃选项时所获得的喵喵宝藏币数量增加<color=#FF9500>100</color>枚。",
+      "effect_id_list": [
+        102
+      ],
+      "require_terminal_list": []
+    },
+    "9": {
+      "name": "私有渠道",
+      "id": 9,
+      "icon": "beacon_9",
+      "condition": 30108,
+      "desc": "多维商店的商品选项增加<color=#FF9500>3</color>个。",
+      "effect_id_list": [
+        106
+      ],
+      "require_terminal_list": []
+    },
+    "10": {
+      "name": "孤狼之道",
+      "id": 10,
+      "icon": "beacon_10",
+      "condition": 30109,
+      "desc": "本场战斗中无法招募队友，队长攻击力提高<color=#FF9500>3000</color>点、基础最大生命值上限提高<color=#FF9500>100%</color>。",
+      "effect_id_list": [
+        109,
+        110,
+        111
+      ],
+      "require_terminal_list": []
+    },
+    "11": {
+      "name": "残酷天平",
+      "id": 11,
+      "icon": "beacon_5",
+      "condition": 30110,
+      "desc": "战斗时，我方修正者攻击力提高<color=#FF9500>600</color>点，敌方单位攻击力提高<color=#FF9500>20%</color>。",
+      "effect_id_list": [
+        104,
+        105
+      ],
+      "require_terminal_list": []
+    },
+    "12": {
+      "name": "复仇之证",
+      "id": 12,
+      "icon": "beacon_2",
+      "condition": 30111,
+      "desc": "战斗中，作为队友的修正者被击败时，队长的伤害提高<color=#FF9500>50%</color>，最多可叠加2层。",
+      "effect_id_list": [
+        101
+      ],
+      "require_terminal_list": []
+    },
+    "13": {
+      "name": "赏金猎人",
+      "id": 13,
+      "icon": "beacon_8",
+      "condition": 30112,
+      "desc": "此次多维变量中，获得的多维终端经验、维度偏移经验提高<color=#FF9500>50%</color>。",
+      "effect_id_list": [
+        114
+      ],
+      "require_terminal_list": []
+    },
+    "14": {
+      "name": "灵光一闪",
+      "id": 14,
+      "icon": "beacon_15",
+      "condition": 30113,
+      "desc": "升级珍宝的关卡额外获得一次奖励选择轮次。",
+      "effect_id_list": [
+        116
+      ],
+      "require_terminal_list": []
+    }
+  },
+  "astrolabes": {
+    "10010011": {
+      "id": 10010011,
+      "hero_astrolabe_suit_id": 1001001,
+      "pre_astrolabe_id": 0
+    },
+    "10010012": {
+      "id": 10010012,
+      "hero_astrolabe_suit_id": 1001001,
+      "pre_astrolabe_id": 10010011
+    },
+    "10010013": {
+      "id": 10010013,
+      "hero_astrolabe_suit_id": 1001001,
+      "pre_astrolabe_id": 10010012
+    },
+    "10010021": {
+      "id": 10010021,
+      "hero_astrolabe_suit_id": 1001002,
+      "pre_astrolabe_id": 0
+    },
+    "10010022": {
+      "id": 10010022,
+      "hero_astrolabe_suit_id": 1001002,
+      "pre_astrolabe_id": 10010021
+    },
+    "10010023": {
+      "id": 10010023,
+      "hero_astrolabe_suit_id": 1001002,
+      "pre_astrolabe_id": 10010022
+    },
+    "10010031": {
+      "id": 10010031,
+      "hero_astrolabe_suit_id": 1001003,
+      "pre_astrolabe_id": 0
+    },
+    "10010032": {
+      "id": 10010032,
+      "hero_astrolabe_suit_id": 1001003,
+      "pre_astrolabe_id": 10010031
+    },
+    "10010033": {
+      "id": 10010033,
+      "hero_astrolabe_suit_id": 1001003,
+      "pre_astrolabe_id": 10010032
+    },
+    "10110011": {
+      "id": 10110011,
+      "hero_astrolabe_suit_id": 1011001,
+      "pre_astrolabe_id": 0
+    },
+    "10110012": {
+      "id": 10110012,
+      "hero_astrolabe_suit_id": 1011001,
+      "pre_astrolabe_id": 10110011
+    },
+    "10110013": {
+      "id": 10110013,
+      "hero_astrolabe_suit_id": 1011001,
+      "pre_astrolabe_id": 10110012
+    },
+    "10110021": {
+      "id": 10110021,
+      "hero_astrolabe_suit_id": 1011002,
+      "pre_astrolabe_id": 0
+    },
+    "10110022": {
+      "id": 10110022,
+      "hero_astrolabe_suit_id": 1011002,
+      "pre_astrolabe_id": 10110021
+    },
+    "10110023": {
+      "id": 10110023,
+      "hero_astrolabe_suit_id": 1011002,
+      "pre_astrolabe_id": 10110022
+    },
+    "10110031": {
+      "id": 10110031,
+      "hero_astrolabe_suit_id": 1011003,
+      "pre_astrolabe_id": 0
+    },
+    "10110032": {
+      "id": 10110032,
+      "hero_astrolabe_suit_id": 1011003,
+      "pre_astrolabe_id": 10110031
+    },
+    "10110033": {
+      "id": 10110033,
+      "hero_astrolabe_suit_id": 1011003,
+      "pre_astrolabe_id": 10110032
+    },
+    "10120011": {
+      "id": 10120011,
+      "hero_astrolabe_suit_id": 1012001,
+      "pre_astrolabe_id": 0
+    },
+    "10120012": {
+      "id": 10120012,
+      "hero_astrolabe_suit_id": 1012001,
+      "pre_astrolabe_id": 10120011
+    },
+    "10120013": {
+      "id": 10120013,
+      "hero_astrolabe_suit_id": 1012001,
+      "pre_astrolabe_id": 10120012
+    },
+    "10120021": {
+      "id": 10120021,
+      "hero_astrolabe_suit_id": 1012002,
+      "pre_astrolabe_id": 0
+    },
+    "10120022": {
+      "id": 10120022,
+      "hero_astrolabe_suit_id": 1012002,
+      "pre_astrolabe_id": 10120021
+    },
+    "10120023": {
+      "id": 10120023,
+      "hero_astrolabe_suit_id": 1012002,
+      "pre_astrolabe_id": 10120022
+    },
+    "10120031": {
+      "id": 10120031,
+      "hero_astrolabe_suit_id": 1012003,
+      "pre_astrolabe_id": 0
+    },
+    "10120032": {
+      "id": 10120032,
+      "hero_astrolabe_suit_id": 1012003,
+      "pre_astrolabe_id": 10120031
+    },
+    "10120033": {
+      "id": 10120033,
+      "hero_astrolabe_suit_id": 1012003,
+      "pre_astrolabe_id": 10120032
+    },
+    "10130011": {
+      "id": 10130011,
+      "hero_astrolabe_suit_id": 1013001,
+      "pre_astrolabe_id": 0
+    },
+    "10130012": {
+      "id": 10130012,
+      "hero_astrolabe_suit_id": 1013001,
+      "pre_astrolabe_id": 10130011
+    },
+    "10130013": {
+      "id": 10130013,
+      "hero_astrolabe_suit_id": 1013001,
+      "pre_astrolabe_id": 10130012
+    },
+    "10130021": {
+      "id": 10130021,
+      "hero_astrolabe_suit_id": 1013002,
+      "pre_astrolabe_id": 0
+    },
+    "10130022": {
+      "id": 10130022,
+      "hero_astrolabe_suit_id": 1013002,
+      "pre_astrolabe_id": 10130021
+    },
+    "10130023": {
+      "id": 10130023,
+      "hero_astrolabe_suit_id": 1013002,
+      "pre_astrolabe_id": 10130022
+    },
+    "10130031": {
+      "id": 10130031,
+      "hero_astrolabe_suit_id": 1013003,
+      "pre_astrolabe_id": 0
+    },
+    "10130032": {
+      "id": 10130032,
+      "hero_astrolabe_suit_id": 1013003,
+      "pre_astrolabe_id": 10130031
+    },
+    "10130033": {
+      "id": 10130033,
+      "hero_astrolabe_suit_id": 1013003,
+      "pre_astrolabe_id": 10130032
+    },
+    "10150011": {
+      "id": 10150011,
+      "hero_astrolabe_suit_id": 1015001,
+      "pre_astrolabe_id": 0
+    },
+    "10150012": {
+      "id": 10150012,
+      "hero_astrolabe_suit_id": 1015001,
+      "pre_astrolabe_id": 10150011
+    },
+    "10150013": {
+      "id": 10150013,
+      "hero_astrolabe_suit_id": 1015001,
+      "pre_astrolabe_id": 10150012
+    },
+    "10150021": {
+      "id": 10150021,
+      "hero_astrolabe_suit_id": 1015002,
+      "pre_astrolabe_id": 0
+    },
+    "10150022": {
+      "id": 10150022,
+      "hero_astrolabe_suit_id": 1015002,
+      "pre_astrolabe_id": 10150021
+    },
+    "10150023": {
+      "id": 10150023,
+      "hero_astrolabe_suit_id": 1015002,
+      "pre_astrolabe_id": 10150022
+    },
+    "10150031": {
+      "id": 10150031,
+      "hero_astrolabe_suit_id": 1015003,
+      "pre_astrolabe_id": 0
+    },
+    "10150032": {
+      "id": 10150032,
+      "hero_astrolabe_suit_id": 1015003,
+      "pre_astrolabe_id": 10150031
+    },
+    "10150033": {
+      "id": 10150033,
+      "hero_astrolabe_suit_id": 1015003,
+      "pre_astrolabe_id": 10150032
+    },
+    "10160011": {
+      "id": 10160011,
+      "hero_astrolabe_suit_id": 1016001,
+      "pre_astrolabe_id": 0
+    },
+    "10160012": {
+      "id": 10160012,
+      "hero_astrolabe_suit_id": 1016001,
+      "pre_astrolabe_id": 10160011
+    },
+    "10160013": {
+      "id": 10160013,
+      "hero_astrolabe_suit_id": 1016001,
+      "pre_astrolabe_id": 10160012
+    },
+    "10160021": {
+      "id": 10160021,
+      "hero_astrolabe_suit_id": 1016002,
+      "pre_astrolabe_id": 0
+    },
+    "10160022": {
+      "id": 10160022,
+      "hero_astrolabe_suit_id": 1016002,
+      "pre_astrolabe_id": 10160021
+    },
+    "10160023": {
+      "id": 10160023,
+      "hero_astrolabe_suit_id": 1016002,
+      "pre_astrolabe_id": 10160022
+    },
+    "10160031": {
+      "id": 10160031,
+      "hero_astrolabe_suit_id": 1016003,
+      "pre_astrolabe_id": 0
+    },
+    "10160032": {
+      "id": 10160032,
+      "hero_astrolabe_suit_id": 1016003,
+      "pre_astrolabe_id": 10160031
+    },
+    "10160033": {
+      "id": 10160033,
+      "hero_astrolabe_suit_id": 1016003,
+      "pre_astrolabe_id": 10160032
+    },
+    "10170011": {
+      "id": 10170011,
+      "hero_astrolabe_suit_id": 1017001,
+      "pre_astrolabe_id": 0
+    },
+    "10170012": {
+      "id": 10170012,
+      "hero_astrolabe_suit_id": 1017001,
+      "pre_astrolabe_id": 10170011
+    },
+    "10170013": {
+      "id": 10170013,
+      "hero_astrolabe_suit_id": 1017001,
+      "pre_astrolabe_id": 10170012
+    },
+    "10170021": {
+      "id": 10170021,
+      "hero_astrolabe_suit_id": 1017002,
+      "pre_astrolabe_id": 0
+    },
+    "10170022": {
+      "id": 10170022,
+      "hero_astrolabe_suit_id": 1017002,
+      "pre_astrolabe_id": 10170021
+    },
+    "10170023": {
+      "id": 10170023,
+      "hero_astrolabe_suit_id": 1017002,
+      "pre_astrolabe_id": 10170022
+    },
+    "10170031": {
+      "id": 10170031,
+      "hero_astrolabe_suit_id": 1017003,
+      "pre_astrolabe_id": 0
+    },
+    "10170032": {
+      "id": 10170032,
+      "hero_astrolabe_suit_id": 1017003,
+      "pre_astrolabe_id": 10170031
+    },
+    "10170033": {
+      "id": 10170033,
+      "hero_astrolabe_suit_id": 1017003,
+      "pre_astrolabe_id": 10170032
+    },
+    "10190011": {
+      "id": 10190011,
+      "hero_astrolabe_suit_id": 1019001,
+      "pre_astrolabe_id": 0
+    },
+    "10190012": {
+      "id": 10190012,
+      "hero_astrolabe_suit_id": 1019001,
+      "pre_astrolabe_id": 10190011
+    },
+    "10190013": {
+      "id": 10190013,
+      "hero_astrolabe_suit_id": 1019001,
+      "pre_astrolabe_id": 10190012
+    },
+    "10190021": {
+      "id": 10190021,
+      "hero_astrolabe_suit_id": 1019002,
+      "pre_astrolabe_id": 0
+    },
+    "10190022": {
+      "id": 10190022,
+      "hero_astrolabe_suit_id": 1019002,
+      "pre_astrolabe_id": 10190021
+    },
+    "10190023": {
+      "id": 10190023,
+      "hero_astrolabe_suit_id": 1019002,
+      "pre_astrolabe_id": 10190022
+    },
+    "10190031": {
+      "id": 10190031,
+      "hero_astrolabe_suit_id": 1019003,
+      "pre_astrolabe_id": 0
+    },
+    "10190032": {
+      "id": 10190032,
+      "hero_astrolabe_suit_id": 1019003,
+      "pre_astrolabe_id": 10190031
+    },
+    "10190033": {
+      "id": 10190033,
+      "hero_astrolabe_suit_id": 1019003,
+      "pre_astrolabe_id": 10190032
+    },
+    "10200011": {
+      "id": 10200011,
+      "hero_astrolabe_suit_id": 1020001,
+      "pre_astrolabe_id": 0
+    },
+    "10200012": {
+      "id": 10200012,
+      "hero_astrolabe_suit_id": 1020001,
+      "pre_astrolabe_id": 10200011
+    },
+    "10200013": {
+      "id": 10200013,
+      "hero_astrolabe_suit_id": 1020001,
+      "pre_astrolabe_id": 10200012
+    },
+    "10200021": {
+      "id": 10200021,
+      "hero_astrolabe_suit_id": 1020002,
+      "pre_astrolabe_id": 0
+    },
+    "10200022": {
+      "id": 10200022,
+      "hero_astrolabe_suit_id": 1020002,
+      "pre_astrolabe_id": 10200021
+    },
+    "10200023": {
+      "id": 10200023,
+      "hero_astrolabe_suit_id": 1020002,
+      "pre_astrolabe_id": 10200022
+    },
+    "10200031": {
+      "id": 10200031,
+      "hero_astrolabe_suit_id": 1020003,
+      "pre_astrolabe_id": 0
+    },
+    "10200032": {
+      "id": 10200032,
+      "hero_astrolabe_suit_id": 1020003,
+      "pre_astrolabe_id": 10200031
+    },
+    "10200033": {
+      "id": 10200033,
+      "hero_astrolabe_suit_id": 1020003,
+      "pre_astrolabe_id": 10200032
+    },
+    "10210011": {
+      "id": 10210011,
+      "hero_astrolabe_suit_id": 1021001,
+      "pre_astrolabe_id": 0
+    },
+    "10210012": {
+      "id": 10210012,
+      "hero_astrolabe_suit_id": 1021001,
+      "pre_astrolabe_id": 10210011
+    },
+    "10210013": {
+      "id": 10210013,
+      "hero_astrolabe_suit_id": 1021001,
+      "pre_astrolabe_id": 10210012
+    },
+    "10210021": {
+      "id": 10210021,
+      "hero_astrolabe_suit_id": 1021002,
+      "pre_astrolabe_id": 0
+    },
+    "10210022": {
+      "id": 10210022,
+      "hero_astrolabe_suit_id": 1021002,
+      "pre_astrolabe_id": 10210021
+    },
+    "10210023": {
+      "id": 10210023,
+      "hero_astrolabe_suit_id": 1021002,
+      "pre_astrolabe_id": 10210022
+    },
+    "10210031": {
+      "id": 10210031,
+      "hero_astrolabe_suit_id": 1021003,
+      "pre_astrolabe_id": 0
+    },
+    "10210032": {
+      "id": 10210032,
+      "hero_astrolabe_suit_id": 1021003,
+      "pre_astrolabe_id": 10210031
+    },
+    "10210033": {
+      "id": 10210033,
+      "hero_astrolabe_suit_id": 1021003,
+      "pre_astrolabe_id": 10210032
+    },
+    "10220011": {
+      "id": 10220011,
+      "hero_astrolabe_suit_id": 1022001,
+      "pre_astrolabe_id": 0
+    },
+    "10220012": {
+      "id": 10220012,
+      "hero_astrolabe_suit_id": 1022001,
+      "pre_astrolabe_id": 10220011
+    },
+    "10220013": {
+      "id": 10220013,
+      "hero_astrolabe_suit_id": 1022001,
+      "pre_astrolabe_id": 10220012
+    },
+    "10220021": {
+      "id": 10220021,
+      "hero_astrolabe_suit_id": 1022002,
+      "pre_astrolabe_id": 0
+    },
+    "10220022": {
+      "id": 10220022,
+      "hero_astrolabe_suit_id": 1022002,
+      "pre_astrolabe_id": 10220021
+    },
+    "10220023": {
+      "id": 10220023,
+      "hero_astrolabe_suit_id": 1022002,
+      "pre_astrolabe_id": 10220022
+    },
+    "10220031": {
+      "id": 10220031,
+      "hero_astrolabe_suit_id": 1022003,
+      "pre_astrolabe_id": 0
+    },
+    "10220032": {
+      "id": 10220032,
+      "hero_astrolabe_suit_id": 1022003,
+      "pre_astrolabe_id": 10220031
+    },
+    "10220033": {
+      "id": 10220033,
+      "hero_astrolabe_suit_id": 1022003,
+      "pre_astrolabe_id": 10220032
+    },
+    "10240011": {
+      "id": 10240011,
+      "hero_astrolabe_suit_id": 1024001,
+      "pre_astrolabe_id": 0
+    },
+    "10240012": {
+      "id": 10240012,
+      "hero_astrolabe_suit_id": 1024001,
+      "pre_astrolabe_id": 10240011
+    },
+    "10240013": {
+      "id": 10240013,
+      "hero_astrolabe_suit_id": 1024001,
+      "pre_astrolabe_id": 10240012
+    },
+    "10240021": {
+      "id": 10240021,
+      "hero_astrolabe_suit_id": 1024002,
+      "pre_astrolabe_id": 0
+    },
+    "10240022": {
+      "id": 10240022,
+      "hero_astrolabe_suit_id": 1024002,
+      "pre_astrolabe_id": 10240021
+    },
+    "10240023": {
+      "id": 10240023,
+      "hero_astrolabe_suit_id": 1024002,
+      "pre_astrolabe_id": 10240022
+    },
+    "10240031": {
+      "id": 10240031,
+      "hero_astrolabe_suit_id": 1024003,
+      "pre_astrolabe_id": 0
+    },
+    "10240032": {
+      "id": 10240032,
+      "hero_astrolabe_suit_id": 1024003,
+      "pre_astrolabe_id": 10240031
+    },
+    "10240033": {
+      "id": 10240033,
+      "hero_astrolabe_suit_id": 1024003,
+      "pre_astrolabe_id": 10240032
+    },
+    "10260011": {
+      "id": 10260011,
+      "hero_astrolabe_suit_id": 1026001,
+      "pre_astrolabe_id": 0
+    },
+    "10260012": {
+      "id": 10260012,
+      "hero_astrolabe_suit_id": 1026001,
+      "pre_astrolabe_id": 10260011
+    },
+    "10260013": {
+      "id": 10260013,
+      "hero_astrolabe_suit_id": 1026001,
+      "pre_astrolabe_id": 10260012
+    },
+    "10260021": {
+      "id": 10260021,
+      "hero_astrolabe_suit_id": 1026002,
+      "pre_astrolabe_id": 0
+    },
+    "10260022": {
+      "id": 10260022,
+      "hero_astrolabe_suit_id": 1026002,
+      "pre_astrolabe_id": 10260021
+    },
+    "10260023": {
+      "id": 10260023,
+      "hero_astrolabe_suit_id": 1026002,
+      "pre_astrolabe_id": 10260022
+    },
+    "10260031": {
+      "id": 10260031,
+      "hero_astrolabe_suit_id": 1026003,
+      "pre_astrolabe_id": 0
+    },
+    "10260032": {
+      "id": 10260032,
+      "hero_astrolabe_suit_id": 1026003,
+      "pre_astrolabe_id": 10260031
+    },
+    "10260033": {
+      "id": 10260033,
+      "hero_astrolabe_suit_id": 1026003,
+      "pre_astrolabe_id": 10260032
+    },
+    "10270011": {
+      "id": 10270011,
+      "hero_astrolabe_suit_id": 1027001,
+      "pre_astrolabe_id": 0
+    },
+    "10270012": {
+      "id": 10270012,
+      "hero_astrolabe_suit_id": 1027001,
+      "pre_astrolabe_id": 10270011
+    },
+    "10270013": {
+      "id": 10270013,
+      "hero_astrolabe_suit_id": 1027001,
+      "pre_astrolabe_id": 10270012
+    },
+    "10270021": {
+      "id": 10270021,
+      "hero_astrolabe_suit_id": 1027002,
+      "pre_astrolabe_id": 0
+    },
+    "10270022": {
+      "id": 10270022,
+      "hero_astrolabe_suit_id": 1027002,
+      "pre_astrolabe_id": 10270021
+    },
+    "10270023": {
+      "id": 10270023,
+      "hero_astrolabe_suit_id": 1027002,
+      "pre_astrolabe_id": 10270022
+    },
+    "10270031": {
+      "id": 10270031,
+      "hero_astrolabe_suit_id": 1027003,
+      "pre_astrolabe_id": 0
+    },
+    "10270032": {
+      "id": 10270032,
+      "hero_astrolabe_suit_id": 1027003,
+      "pre_astrolabe_id": 10270031
+    },
+    "10270033": {
+      "id": 10270033,
+      "hero_astrolabe_suit_id": 1027003,
+      "pre_astrolabe_id": 10270032
+    },
+    "10280011": {
+      "id": 10280011,
+      "hero_astrolabe_suit_id": 1028001,
+      "pre_astrolabe_id": 0
+    },
+    "10280012": {
+      "id": 10280012,
+      "hero_astrolabe_suit_id": 1028001,
+      "pre_astrolabe_id": 10280011
+    },
+    "10280013": {
+      "id": 10280013,
+      "hero_astrolabe_suit_id": 1028001,
+      "pre_astrolabe_id": 10280012
+    },
+    "10280021": {
+      "id": 10280021,
+      "hero_astrolabe_suit_id": 1028002,
+      "pre_astrolabe_id": 0
+    },
+    "10280022": {
+      "id": 10280022,
+      "hero_astrolabe_suit_id": 1028002,
+      "pre_astrolabe_id": 10280021
+    },
+    "10280023": {
+      "id": 10280023,
+      "hero_astrolabe_suit_id": 1028002,
+      "pre_astrolabe_id": 10280022
+    },
+    "10280031": {
+      "id": 10280031,
+      "hero_astrolabe_suit_id": 1028003,
+      "pre_astrolabe_id": 0
+    },
+    "10280032": {
+      "id": 10280032,
+      "hero_astrolabe_suit_id": 1028003,
+      "pre_astrolabe_id": 10280031
+    },
+    "10280033": {
+      "id": 10280033,
+      "hero_astrolabe_suit_id": 1028003,
+      "pre_astrolabe_id": 10280032
+    },
+    "10320011": {
+      "id": 10320011,
+      "hero_astrolabe_suit_id": 1032001,
+      "pre_astrolabe_id": 0
+    },
+    "10320012": {
+      "id": 10320012,
+      "hero_astrolabe_suit_id": 1032001,
+      "pre_astrolabe_id": 10320011
+    },
+    "10320013": {
+      "id": 10320013,
+      "hero_astrolabe_suit_id": 1032001,
+      "pre_astrolabe_id": 10320012
+    },
+    "10320021": {
+      "id": 10320021,
+      "hero_astrolabe_suit_id": 1032002,
+      "pre_astrolabe_id": 0
+    },
+    "10320022": {
+      "id": 10320022,
+      "hero_astrolabe_suit_id": 1032002,
+      "pre_astrolabe_id": 10320021
+    },
+    "10320023": {
+      "id": 10320023,
+      "hero_astrolabe_suit_id": 1032002,
+      "pre_astrolabe_id": 10320022
+    },
+    "10320031": {
+      "id": 10320031,
+      "hero_astrolabe_suit_id": 1032003,
+      "pre_astrolabe_id": 0
+    },
+    "10320032": {
+      "id": 10320032,
+      "hero_astrolabe_suit_id": 1032003,
+      "pre_astrolabe_id": 10320031
+    },
+    "10320033": {
+      "id": 10320033,
+      "hero_astrolabe_suit_id": 1032003,
+      "pre_astrolabe_id": 10320032
+    },
+    "10330011": {
+      "id": 10330011,
+      "hero_astrolabe_suit_id": 1033001,
+      "pre_astrolabe_id": 0
+    },
+    "10330012": {
+      "id": 10330012,
+      "hero_astrolabe_suit_id": 1033001,
+      "pre_astrolabe_id": 10330011
+    },
+    "10330013": {
+      "id": 10330013,
+      "hero_astrolabe_suit_id": 1033001,
+      "pre_astrolabe_id": 10330012
+    },
+    "10330021": {
+      "id": 10330021,
+      "hero_astrolabe_suit_id": 1033002,
+      "pre_astrolabe_id": 0
+    },
+    "10330022": {
+      "id": 10330022,
+      "hero_astrolabe_suit_id": 1033002,
+      "pre_astrolabe_id": 10330021
+    },
+    "10330023": {
+      "id": 10330023,
+      "hero_astrolabe_suit_id": 1033002,
+      "pre_astrolabe_id": 10330022
+    },
+    "10330031": {
+      "id": 10330031,
+      "hero_astrolabe_suit_id": 1033003,
+      "pre_astrolabe_id": 0
+    },
+    "10330032": {
+      "id": 10330032,
+      "hero_astrolabe_suit_id": 1033003,
+      "pre_astrolabe_id": 10330031
+    },
+    "10330033": {
+      "id": 10330033,
+      "hero_astrolabe_suit_id": 1033003,
+      "pre_astrolabe_id": 10330032
+    },
+    "10340011": {
+      "id": 10340011,
+      "hero_astrolabe_suit_id": 1034001,
+      "pre_astrolabe_id": 0
+    },
+    "10340012": {
+      "id": 10340012,
+      "hero_astrolabe_suit_id": 1034001,
+      "pre_astrolabe_id": 10340011
+    },
+    "10340013": {
+      "id": 10340013,
+      "hero_astrolabe_suit_id": 1034001,
+      "pre_astrolabe_id": 10340012
+    },
+    "10340021": {
+      "id": 10340021,
+      "hero_astrolabe_suit_id": 1034002,
+      "pre_astrolabe_id": 0
+    },
+    "10340022": {
+      "id": 10340022,
+      "hero_astrolabe_suit_id": 1034002,
+      "pre_astrolabe_id": 10340021
+    },
+    "10340023": {
+      "id": 10340023,
+      "hero_astrolabe_suit_id": 1034002,
+      "pre_astrolabe_id": 10340022
+    },
+    "10340031": {
+      "id": 10340031,
+      "hero_astrolabe_suit_id": 1034003,
+      "pre_astrolabe_id": 0
+    },
+    "10340032": {
+      "id": 10340032,
+      "hero_astrolabe_suit_id": 1034003,
+      "pre_astrolabe_id": 10340031
+    },
+    "10340033": {
+      "id": 10340033,
+      "hero_astrolabe_suit_id": 1034003,
+      "pre_astrolabe_id": 10340032
+    },
+    "10350011": {
+      "id": 10350011,
+      "hero_astrolabe_suit_id": 1035001,
+      "pre_astrolabe_id": 0
+    },
+    "10350012": {
+      "id": 10350012,
+      "hero_astrolabe_suit_id": 1035001,
+      "pre_astrolabe_id": 10350011
+    },
+    "10350013": {
+      "id": 10350013,
+      "hero_astrolabe_suit_id": 1035001,
+      "pre_astrolabe_id": 10350012
+    },
+    "10350021": {
+      "id": 10350021,
+      "hero_astrolabe_suit_id": 1035002,
+      "pre_astrolabe_id": 0
+    },
+    "10350022": {
+      "id": 10350022,
+      "hero_astrolabe_suit_id": 1035002,
+      "pre_astrolabe_id": 10350021
+    },
+    "10350023": {
+      "id": 10350023,
+      "hero_astrolabe_suit_id": 1035002,
+      "pre_astrolabe_id": 10350022
+    },
+    "10350031": {
+      "id": 10350031,
+      "hero_astrolabe_suit_id": 1035003,
+      "pre_astrolabe_id": 0
+    },
+    "10350032": {
+      "id": 10350032,
+      "hero_astrolabe_suit_id": 1035003,
+      "pre_astrolabe_id": 10350031
+    },
+    "10350033": {
+      "id": 10350033,
+      "hero_astrolabe_suit_id": 1035003,
+      "pre_astrolabe_id": 10350032
+    },
+    "10370011": {
+      "id": 10370011,
+      "hero_astrolabe_suit_id": 1037001,
+      "pre_astrolabe_id": 0
+    },
+    "10370012": {
+      "id": 10370012,
+      "hero_astrolabe_suit_id": 1037001,
+      "pre_astrolabe_id": 10370011
+    },
+    "10370013": {
+      "id": 10370013,
+      "hero_astrolabe_suit_id": 1037001,
+      "pre_astrolabe_id": 10370012
+    },
+    "10370021": {
+      "id": 10370021,
+      "hero_astrolabe_suit_id": 1037002,
+      "pre_astrolabe_id": 0
+    },
+    "10370022": {
+      "id": 10370022,
+      "hero_astrolabe_suit_id": 1037002,
+      "pre_astrolabe_id": 10370021
+    },
+    "10370023": {
+      "id": 10370023,
+      "hero_astrolabe_suit_id": 1037002,
+      "pre_astrolabe_id": 10370022
+    },
+    "10370031": {
+      "id": 10370031,
+      "hero_astrolabe_suit_id": 1037003,
+      "pre_astrolabe_id": 0
+    },
+    "10370032": {
+      "id": 10370032,
+      "hero_astrolabe_suit_id": 1037003,
+      "pre_astrolabe_id": 10370031
+    },
+    "10370033": {
+      "id": 10370033,
+      "hero_astrolabe_suit_id": 1037003,
+      "pre_astrolabe_id": 10370032
+    },
+    "10380011": {
+      "id": 10380011,
+      "hero_astrolabe_suit_id": 1038001,
+      "pre_astrolabe_id": 0
+    },
+    "10380012": {
+      "id": 10380012,
+      "hero_astrolabe_suit_id": 1038001,
+      "pre_astrolabe_id": 10380011
+    },
+    "10380013": {
+      "id": 10380013,
+      "hero_astrolabe_suit_id": 1038001,
+      "pre_astrolabe_id": 10380012
+    },
+    "10380021": {
+      "id": 10380021,
+      "hero_astrolabe_suit_id": 1038002,
+      "pre_astrolabe_id": 0
+    },
+    "10380022": {
+      "id": 10380022,
+      "hero_astrolabe_suit_id": 1038002,
+      "pre_astrolabe_id": 10380021
+    },
+    "10380023": {
+      "id": 10380023,
+      "hero_astrolabe_suit_id": 1038002,
+      "pre_astrolabe_id": 10380022
+    },
+    "10380031": {
+      "id": 10380031,
+      "hero_astrolabe_suit_id": 1038003,
+      "pre_astrolabe_id": 0
+    },
+    "10380032": {
+      "id": 10380032,
+      "hero_astrolabe_suit_id": 1038003,
+      "pre_astrolabe_id": 10380031
+    },
+    "10380033": {
+      "id": 10380033,
+      "hero_astrolabe_suit_id": 1038003,
+      "pre_astrolabe_id": 10380032
+    },
+    "10390011": {
+      "id": 10390011,
+      "hero_astrolabe_suit_id": 1039001,
+      "pre_astrolabe_id": 0
+    },
+    "10390012": {
+      "id": 10390012,
+      "hero_astrolabe_suit_id": 1039001,
+      "pre_astrolabe_id": 10390011
+    },
+    "10390013": {
+      "id": 10390013,
+      "hero_astrolabe_suit_id": 1039001,
+      "pre_astrolabe_id": 10390012
+    },
+    "10390021": {
+      "id": 10390021,
+      "hero_astrolabe_suit_id": 1039002,
+      "pre_astrolabe_id": 0
+    },
+    "10390022": {
+      "id": 10390022,
+      "hero_astrolabe_suit_id": 1039002,
+      "pre_astrolabe_id": 10390021
+    },
+    "10390023": {
+      "id": 10390023,
+      "hero_astrolabe_suit_id": 1039002,
+      "pre_astrolabe_id": 10390022
+    },
+    "10390031": {
+      "id": 10390031,
+      "hero_astrolabe_suit_id": 1039003,
+      "pre_astrolabe_id": 0
+    },
+    "10390032": {
+      "id": 10390032,
+      "hero_astrolabe_suit_id": 1039003,
+      "pre_astrolabe_id": 10390031
+    },
+    "10390033": {
+      "id": 10390033,
+      "hero_astrolabe_suit_id": 1039003,
+      "pre_astrolabe_id": 10390032
+    },
+    "10410011": {
+      "id": 10410011,
+      "hero_astrolabe_suit_id": 1041001,
+      "pre_astrolabe_id": 0
+    },
+    "10410012": {
+      "id": 10410012,
+      "hero_astrolabe_suit_id": 1041001,
+      "pre_astrolabe_id": 10410011
+    },
+    "10410013": {
+      "id": 10410013,
+      "hero_astrolabe_suit_id": 1041001,
+      "pre_astrolabe_id": 10410012
+    },
+    "10410021": {
+      "id": 10410021,
+      "hero_astrolabe_suit_id": 1041002,
+      "pre_astrolabe_id": 0
+    },
+    "10410022": {
+      "id": 10410022,
+      "hero_astrolabe_suit_id": 1041002,
+      "pre_astrolabe_id": 10410021
+    },
+    "10410023": {
+      "id": 10410023,
+      "hero_astrolabe_suit_id": 1041002,
+      "pre_astrolabe_id": 10410022
+    },
+    "10410031": {
+      "id": 10410031,
+      "hero_astrolabe_suit_id": 1041003,
+      "pre_astrolabe_id": 0
+    },
+    "10410032": {
+      "id": 10410032,
+      "hero_astrolabe_suit_id": 1041003,
+      "pre_astrolabe_id": 10410031
+    },
+    "10410033": {
+      "id": 10410033,
+      "hero_astrolabe_suit_id": 1041003,
+      "pre_astrolabe_id": 10410032
+    },
+    "10420011": {
+      "id": 10420011,
+      "hero_astrolabe_suit_id": 1042001,
+      "pre_astrolabe_id": 0
+    },
+    "10420012": {
+      "id": 10420012,
+      "hero_astrolabe_suit_id": 1042001,
+      "pre_astrolabe_id": 10420011
+    },
+    "10420013": {
+      "id": 10420013,
+      "hero_astrolabe_suit_id": 1042001,
+      "pre_astrolabe_id": 10420012
+    },
+    "10420021": {
+      "id": 10420021,
+      "hero_astrolabe_suit_id": 1042002,
+      "pre_astrolabe_id": 0
+    },
+    "10420022": {
+      "id": 10420022,
+      "hero_astrolabe_suit_id": 1042002,
+      "pre_astrolabe_id": 10420021
+    },
+    "10420023": {
+      "id": 10420023,
+      "hero_astrolabe_suit_id": 1042002,
+      "pre_astrolabe_id": 10420022
+    },
+    "10420031": {
+      "id": 10420031,
+      "hero_astrolabe_suit_id": 1042003,
+      "pre_astrolabe_id": 0
+    },
+    "10420032": {
+      "id": 10420032,
+      "hero_astrolabe_suit_id": 1042003,
+      "pre_astrolabe_id": 10420031
+    },
+    "10420033": {
+      "id": 10420033,
+      "hero_astrolabe_suit_id": 1042003,
+      "pre_astrolabe_id": 10420032
+    },
+    "10430011": {
+      "id": 10430011,
+      "hero_astrolabe_suit_id": 1043001,
+      "pre_astrolabe_id": 0
+    },
+    "10430012": {
+      "id": 10430012,
+      "hero_astrolabe_suit_id": 1043001,
+      "pre_astrolabe_id": 10430011
+    },
+    "10430013": {
+      "id": 10430013,
+      "hero_astrolabe_suit_id": 1043001,
+      "pre_astrolabe_id": 10430012
+    },
+    "10430021": {
+      "id": 10430021,
+      "hero_astrolabe_suit_id": 1043002,
+      "pre_astrolabe_id": 0
+    },
+    "10430022": {
+      "id": 10430022,
+      "hero_astrolabe_suit_id": 1043002,
+      "pre_astrolabe_id": 10430021
+    },
+    "10430023": {
+      "id": 10430023,
+      "hero_astrolabe_suit_id": 1043002,
+      "pre_astrolabe_id": 10430022
+    },
+    "10430031": {
+      "id": 10430031,
+      "hero_astrolabe_suit_id": 1043003,
+      "pre_astrolabe_id": 0
+    },
+    "10430032": {
+      "id": 10430032,
+      "hero_astrolabe_suit_id": 1043003,
+      "pre_astrolabe_id": 10430031
+    },
+    "10430033": {
+      "id": 10430033,
+      "hero_astrolabe_suit_id": 1043003,
+      "pre_astrolabe_id": 10430032
+    },
+    "10440011": {
+      "id": 10440011,
+      "hero_astrolabe_suit_id": 1044001,
+      "pre_astrolabe_id": 0
+    },
+    "10440012": {
+      "id": 10440012,
+      "hero_astrolabe_suit_id": 1044001,
+      "pre_astrolabe_id": 10440011
+    },
+    "10440013": {
+      "id": 10440013,
+      "hero_astrolabe_suit_id": 1044001,
+      "pre_astrolabe_id": 10440012
+    },
+    "10440021": {
+      "id": 10440021,
+      "hero_astrolabe_suit_id": 1044002,
+      "pre_astrolabe_id": 0
+    },
+    "10440022": {
+      "id": 10440022,
+      "hero_astrolabe_suit_id": 1044002,
+      "pre_astrolabe_id": 10440021
+    },
+    "10440023": {
+      "id": 10440023,
+      "hero_astrolabe_suit_id": 1044002,
+      "pre_astrolabe_id": 10440022
+    },
+    "10440031": {
+      "id": 10440031,
+      "hero_astrolabe_suit_id": 1044003,
+      "pre_astrolabe_id": 0
+    },
+    "10440032": {
+      "id": 10440032,
+      "hero_astrolabe_suit_id": 1044003,
+      "pre_astrolabe_id": 10440031
+    },
+    "10440033": {
+      "id": 10440033,
+      "hero_astrolabe_suit_id": 1044003,
+      "pre_astrolabe_id": 10440032
+    },
+    "10450011": {
+      "id": 10450011,
+      "hero_astrolabe_suit_id": 1045001,
+      "pre_astrolabe_id": 0
+    },
+    "10450012": {
+      "id": 10450012,
+      "hero_astrolabe_suit_id": 1045001,
+      "pre_astrolabe_id": 10450011
+    },
+    "10450013": {
+      "id": 10450013,
+      "hero_astrolabe_suit_id": 1045001,
+      "pre_astrolabe_id": 10450012
+    },
+    "10450021": {
+      "id": 10450021,
+      "hero_astrolabe_suit_id": 1045002,
+      "pre_astrolabe_id": 0
+    },
+    "10450022": {
+      "id": 10450022,
+      "hero_astrolabe_suit_id": 1045002,
+      "pre_astrolabe_id": 10450021
+    },
+    "10450023": {
+      "id": 10450023,
+      "hero_astrolabe_suit_id": 1045002,
+      "pre_astrolabe_id": 10450022
+    },
+    "10450031": {
+      "id": 10450031,
+      "hero_astrolabe_suit_id": 1045003,
+      "pre_astrolabe_id": 0
+    },
+    "10450032": {
+      "id": 10450032,
+      "hero_astrolabe_suit_id": 1045003,
+      "pre_astrolabe_id": 10450031
+    },
+    "10450033": {
+      "id": 10450033,
+      "hero_astrolabe_suit_id": 1045003,
+      "pre_astrolabe_id": 10450032
+    },
+    "10460011": {
+      "id": 10460011,
+      "hero_astrolabe_suit_id": 1046001,
+      "pre_astrolabe_id": 0
+    },
+    "10460012": {
+      "id": 10460012,
+      "hero_astrolabe_suit_id": 1046001,
+      "pre_astrolabe_id": 10460011
+    },
+    "10460013": {
+      "id": 10460013,
+      "hero_astrolabe_suit_id": 1046001,
+      "pre_astrolabe_id": 10460012
+    },
+    "10460021": {
+      "id": 10460021,
+      "hero_astrolabe_suit_id": 1046002,
+      "pre_astrolabe_id": 0
+    },
+    "10460022": {
+      "id": 10460022,
+      "hero_astrolabe_suit_id": 1046002,
+      "pre_astrolabe_id": 10460021
+    },
+    "10460023": {
+      "id": 10460023,
+      "hero_astrolabe_suit_id": 1046002,
+      "pre_astrolabe_id": 10460022
+    },
+    "10460031": {
+      "id": 10460031,
+      "hero_astrolabe_suit_id": 1046003,
+      "pre_astrolabe_id": 0
+    },
+    "10460032": {
+      "id": 10460032,
+      "hero_astrolabe_suit_id": 1046003,
+      "pre_astrolabe_id": 10460031
+    },
+    "10460033": {
+      "id": 10460033,
+      "hero_astrolabe_suit_id": 1046003,
+      "pre_astrolabe_id": 10460032
+    },
+    "10470011": {
+      "id": 10470011,
+      "hero_astrolabe_suit_id": 1047001,
+      "pre_astrolabe_id": 0
+    },
+    "10470012": {
+      "id": 10470012,
+      "hero_astrolabe_suit_id": 1047001,
+      "pre_astrolabe_id": 10470011
+    },
+    "10470013": {
+      "id": 10470013,
+      "hero_astrolabe_suit_id": 1047001,
+      "pre_astrolabe_id": 10470012
+    },
+    "10470021": {
+      "id": 10470021,
+      "hero_astrolabe_suit_id": 1047002,
+      "pre_astrolabe_id": 0
+    },
+    "10470022": {
+      "id": 10470022,
+      "hero_astrolabe_suit_id": 1047002,
+      "pre_astrolabe_id": 10470021
+    },
+    "10470023": {
+      "id": 10470023,
+      "hero_astrolabe_suit_id": 1047002,
+      "pre_astrolabe_id": 10470022
+    },
+    "10470031": {
+      "id": 10470031,
+      "hero_astrolabe_suit_id": 1047003,
+      "pre_astrolabe_id": 0
+    },
+    "10470032": {
+      "id": 10470032,
+      "hero_astrolabe_suit_id": 1047003,
+      "pre_astrolabe_id": 10470031
+    },
+    "10470033": {
+      "id": 10470033,
+      "hero_astrolabe_suit_id": 1047003,
+      "pre_astrolabe_id": 10470032
+    },
+    "10480011": {
+      "id": 10480011,
+      "hero_astrolabe_suit_id": 1048001,
+      "pre_astrolabe_id": 0
+    },
+    "10480012": {
+      "id": 10480012,
+      "hero_astrolabe_suit_id": 1048001,
+      "pre_astrolabe_id": 10480011
+    },
+    "10480013": {
+      "id": 10480013,
+      "hero_astrolabe_suit_id": 1048001,
+      "pre_astrolabe_id": 10480012
+    },
+    "10480021": {
+      "id": 10480021,
+      "hero_astrolabe_suit_id": 1048002,
+      "pre_astrolabe_id": 0
+    },
+    "10480022": {
+      "id": 10480022,
+      "hero_astrolabe_suit_id": 1048002,
+      "pre_astrolabe_id": 10480021
+    },
+    "10480023": {
+      "id": 10480023,
+      "hero_astrolabe_suit_id": 1048002,
+      "pre_astrolabe_id": 10480022
+    },
+    "10480031": {
+      "id": 10480031,
+      "hero_astrolabe_suit_id": 1048003,
+      "pre_astrolabe_id": 0
+    },
+    "10480032": {
+      "id": 10480032,
+      "hero_astrolabe_suit_id": 1048003,
+      "pre_astrolabe_id": 10480031
+    },
+    "10480033": {
+      "id": 10480033,
+      "hero_astrolabe_suit_id": 1048003,
+      "pre_astrolabe_id": 10480032
+    },
+    "10490011": {
+      "id": 10490011,
+      "hero_astrolabe_suit_id": 1049001,
+      "pre_astrolabe_id": 0
+    },
+    "10490012": {
+      "id": 10490012,
+      "hero_astrolabe_suit_id": 1049001,
+      "pre_astrolabe_id": 10490011
+    },
+    "10490013": {
+      "id": 10490013,
+      "hero_astrolabe_suit_id": 1049001,
+      "pre_astrolabe_id": 10490012
+    },
+    "10490021": {
+      "id": 10490021,
+      "hero_astrolabe_suit_id": 1049002,
+      "pre_astrolabe_id": 0
+    },
+    "10490022": {
+      "id": 10490022,
+      "hero_astrolabe_suit_id": 1049002,
+      "pre_astrolabe_id": 10490021
+    },
+    "10490023": {
+      "id": 10490023,
+      "hero_astrolabe_suit_id": 1049002,
+      "pre_astrolabe_id": 10490022
+    },
+    "10490031": {
+      "id": 10490031,
+      "hero_astrolabe_suit_id": 1049003,
+      "pre_astrolabe_id": 0
+    },
+    "10490032": {
+      "id": 10490032,
+      "hero_astrolabe_suit_id": 1049003,
+      "pre_astrolabe_id": 10490031
+    },
+    "10490033": {
+      "id": 10490033,
+      "hero_astrolabe_suit_id": 1049003,
+      "pre_astrolabe_id": 10490032
+    },
+    "10500011": {
+      "id": 10500011,
+      "hero_astrolabe_suit_id": 1050001,
+      "pre_astrolabe_id": 0
+    },
+    "10500012": {
+      "id": 10500012,
+      "hero_astrolabe_suit_id": 1050001,
+      "pre_astrolabe_id": 10500011
+    },
+    "10500013": {
+      "id": 10500013,
+      "hero_astrolabe_suit_id": 1050001,
+      "pre_astrolabe_id": 10500012
+    },
+    "10500021": {
+      "id": 10500021,
+      "hero_astrolabe_suit_id": 1050002,
+      "pre_astrolabe_id": 0
+    },
+    "10500022": {
+      "id": 10500022,
+      "hero_astrolabe_suit_id": 1050002,
+      "pre_astrolabe_id": 10500021
+    },
+    "10500023": {
+      "id": 10500023,
+      "hero_astrolabe_suit_id": 1050002,
+      "pre_astrolabe_id": 10500022
+    },
+    "10500031": {
+      "id": 10500031,
+      "hero_astrolabe_suit_id": 1050003,
+      "pre_astrolabe_id": 0
+    },
+    "10500032": {
+      "id": 10500032,
+      "hero_astrolabe_suit_id": 1050003,
+      "pre_astrolabe_id": 10500031
+    },
+    "10500033": {
+      "id": 10500033,
+      "hero_astrolabe_suit_id": 1050003,
+      "pre_astrolabe_id": 10500032
+    },
+    "10520011": {
+      "id": 10520011,
+      "hero_astrolabe_suit_id": 1052001,
+      "pre_astrolabe_id": 0
+    },
+    "10520012": {
+      "id": 10520012,
+      "hero_astrolabe_suit_id": 1052001,
+      "pre_astrolabe_id": 10520011
+    },
+    "10520013": {
+      "id": 10520013,
+      "hero_astrolabe_suit_id": 1052001,
+      "pre_astrolabe_id": 10520012
+    },
+    "10520021": {
+      "id": 10520021,
+      "hero_astrolabe_suit_id": 1052002,
+      "pre_astrolabe_id": 0
+    },
+    "10520022": {
+      "id": 10520022,
+      "hero_astrolabe_suit_id": 1052002,
+      "pre_astrolabe_id": 10520021
+    },
+    "10520023": {
+      "id": 10520023,
+      "hero_astrolabe_suit_id": 1052002,
+      "pre_astrolabe_id": 10520022
+    },
+    "10520031": {
+      "id": 10520031,
+      "hero_astrolabe_suit_id": 1052003,
+      "pre_astrolabe_id": 0
+    },
+    "10520032": {
+      "id": 10520032,
+      "hero_astrolabe_suit_id": 1052003,
+      "pre_astrolabe_id": 10520031
+    },
+    "10520033": {
+      "id": 10520033,
+      "hero_astrolabe_suit_id": 1052003,
+      "pre_astrolabe_id": 10520032
+    },
+    "10530011": {
+      "id": 10530011,
+      "hero_astrolabe_suit_id": 1053001,
+      "pre_astrolabe_id": 0
+    },
+    "10530012": {
+      "id": 10530012,
+      "hero_astrolabe_suit_id": 1053001,
+      "pre_astrolabe_id": 10530011
+    },
+    "10530013": {
+      "id": 10530013,
+      "hero_astrolabe_suit_id": 1053001,
+      "pre_astrolabe_id": 10530012
+    },
+    "10530021": {
+      "id": 10530021,
+      "hero_astrolabe_suit_id": 1053002,
+      "pre_astrolabe_id": 0
+    },
+    "10530022": {
+      "id": 10530022,
+      "hero_astrolabe_suit_id": 1053002,
+      "pre_astrolabe_id": 10530021
+    },
+    "10530023": {
+      "id": 10530023,
+      "hero_astrolabe_suit_id": 1053002,
+      "pre_astrolabe_id": 10530022
+    },
+    "10530031": {
+      "id": 10530031,
+      "hero_astrolabe_suit_id": 1053003,
+      "pre_astrolabe_id": 0
+    },
+    "10530032": {
+      "id": 10530032,
+      "hero_astrolabe_suit_id": 1053003,
+      "pre_astrolabe_id": 10530031
+    },
+    "10530033": {
+      "id": 10530033,
+      "hero_astrolabe_suit_id": 1053003,
+      "pre_astrolabe_id": 10530032
+    },
+    "10540011": {
+      "id": 10540011,
+      "hero_astrolabe_suit_id": 1054001,
+      "pre_astrolabe_id": 0
+    },
+    "10540012": {
+      "id": 10540012,
+      "hero_astrolabe_suit_id": 1054001,
+      "pre_astrolabe_id": 10540011
+    },
+    "10540013": {
+      "id": 10540013,
+      "hero_astrolabe_suit_id": 1054001,
+      "pre_astrolabe_id": 10540012
+    },
+    "10540021": {
+      "id": 10540021,
+      "hero_astrolabe_suit_id": 1054002,
+      "pre_astrolabe_id": 0
+    },
+    "10540022": {
+      "id": 10540022,
+      "hero_astrolabe_suit_id": 1054002,
+      "pre_astrolabe_id": 10540021
+    },
+    "10540023": {
+      "id": 10540023,
+      "hero_astrolabe_suit_id": 1054002,
+      "pre_astrolabe_id": 10540022
+    },
+    "10540031": {
+      "id": 10540031,
+      "hero_astrolabe_suit_id": 1054003,
+      "pre_astrolabe_id": 0
+    },
+    "10540032": {
+      "id": 10540032,
+      "hero_astrolabe_suit_id": 1054003,
+      "pre_astrolabe_id": 10540031
+    },
+    "10540033": {
+      "id": 10540033,
+      "hero_astrolabe_suit_id": 1054003,
+      "pre_astrolabe_id": 10540032
+    },
+    "10550011": {
+      "id": 10550011,
+      "hero_astrolabe_suit_id": 1055001,
+      "pre_astrolabe_id": 0
+    },
+    "10550012": {
+      "id": 10550012,
+      "hero_astrolabe_suit_id": 1055001,
+      "pre_astrolabe_id": 10550011
+    },
+    "10550013": {
+      "id": 10550013,
+      "hero_astrolabe_suit_id": 1055001,
+      "pre_astrolabe_id": 10550012
+    },
+    "10550021": {
+      "id": 10550021,
+      "hero_astrolabe_suit_id": 1055002,
+      "pre_astrolabe_id": 0
+    },
+    "10550022": {
+      "id": 10550022,
+      "hero_astrolabe_suit_id": 1055002,
+      "pre_astrolabe_id": 10550021
+    },
+    "10550023": {
+      "id": 10550023,
+      "hero_astrolabe_suit_id": 1055002,
+      "pre_astrolabe_id": 10550022
+    },
+    "10550031": {
+      "id": 10550031,
+      "hero_astrolabe_suit_id": 1055003,
+      "pre_astrolabe_id": 0
+    },
+    "10550032": {
+      "id": 10550032,
+      "hero_astrolabe_suit_id": 1055003,
+      "pre_astrolabe_id": 10550031
+    },
+    "10550033": {
+      "id": 10550033,
+      "hero_astrolabe_suit_id": 1055003,
+      "pre_astrolabe_id": 10550032
+    },
+    "10560011": {
+      "id": 10560011,
+      "hero_astrolabe_suit_id": 1056001,
+      "pre_astrolabe_id": 0
+    },
+    "10560012": {
+      "id": 10560012,
+      "hero_astrolabe_suit_id": 1056001,
+      "pre_astrolabe_id": 10560011
+    },
+    "10560013": {
+      "id": 10560013,
+      "hero_astrolabe_suit_id": 1056001,
+      "pre_astrolabe_id": 10560012
+    },
+    "10560021": {
+      "id": 10560021,
+      "hero_astrolabe_suit_id": 1056002,
+      "pre_astrolabe_id": 0
+    },
+    "10560022": {
+      "id": 10560022,
+      "hero_astrolabe_suit_id": 1056002,
+      "pre_astrolabe_id": 10560021
+    },
+    "10560023": {
+      "id": 10560023,
+      "hero_astrolabe_suit_id": 1056002,
+      "pre_astrolabe_id": 10560022
+    },
+    "10560031": {
+      "id": 10560031,
+      "hero_astrolabe_suit_id": 1056003,
+      "pre_astrolabe_id": 0
+    },
+    "10560032": {
+      "id": 10560032,
+      "hero_astrolabe_suit_id": 1056003,
+      "pre_astrolabe_id": 10560031
+    },
+    "10560033": {
+      "id": 10560033,
+      "hero_astrolabe_suit_id": 1056003,
+      "pre_astrolabe_id": 10560032
+    },
+    "10580011": {
+      "id": 10580011,
+      "hero_astrolabe_suit_id": 1058001,
+      "pre_astrolabe_id": 0
+    },
+    "10580012": {
+      "id": 10580012,
+      "hero_astrolabe_suit_id": 1058001,
+      "pre_astrolabe_id": 10580011
+    },
+    "10580013": {
+      "id": 10580013,
+      "hero_astrolabe_suit_id": 1058001,
+      "pre_astrolabe_id": 10580012
+    },
+    "10580021": {
+      "id": 10580021,
+      "hero_astrolabe_suit_id": 1058002,
+      "pre_astrolabe_id": 0
+    },
+    "10580022": {
+      "id": 10580022,
+      "hero_astrolabe_suit_id": 1058002,
+      "pre_astrolabe_id": 10580021
+    },
+    "10580023": {
+      "id": 10580023,
+      "hero_astrolabe_suit_id": 1058002,
+      "pre_astrolabe_id": 10580022
+    },
+    "10580031": {
+      "id": 10580031,
+      "hero_astrolabe_suit_id": 1058003,
+      "pre_astrolabe_id": 0
+    },
+    "10580032": {
+      "id": 10580032,
+      "hero_astrolabe_suit_id": 1058003,
+      "pre_astrolabe_id": 10580031
+    },
+    "10580033": {
+      "id": 10580033,
+      "hero_astrolabe_suit_id": 1058003,
+      "pre_astrolabe_id": 10580032
+    },
+    "10590011": {
+      "id": 10590011,
+      "hero_astrolabe_suit_id": 1059001,
+      "pre_astrolabe_id": 0
+    },
+    "10590012": {
+      "id": 10590012,
+      "hero_astrolabe_suit_id": 1059001,
+      "pre_astrolabe_id": 10590011
+    },
+    "10590013": {
+      "id": 10590013,
+      "hero_astrolabe_suit_id": 1059001,
+      "pre_astrolabe_id": 10590012
+    },
+    "10590021": {
+      "id": 10590021,
+      "hero_astrolabe_suit_id": 1059002,
+      "pre_astrolabe_id": 0
+    },
+    "10590022": {
+      "id": 10590022,
+      "hero_astrolabe_suit_id": 1059002,
+      "pre_astrolabe_id": 10590021
+    },
+    "10590023": {
+      "id": 10590023,
+      "hero_astrolabe_suit_id": 1059002,
+      "pre_astrolabe_id": 10590022
+    },
+    "10590031": {
+      "id": 10590031,
+      "hero_astrolabe_suit_id": 1059003,
+      "pre_astrolabe_id": 0
+    },
+    "10590032": {
+      "id": 10590032,
+      "hero_astrolabe_suit_id": 1059003,
+      "pre_astrolabe_id": 10590031
+    },
+    "10590033": {
+      "id": 10590033,
+      "hero_astrolabe_suit_id": 1059003,
+      "pre_astrolabe_id": 10590032
+    },
+    "10600011": {
+      "id": 10600011,
+      "hero_astrolabe_suit_id": 1060001,
+      "pre_astrolabe_id": 0
+    },
+    "10600012": {
+      "id": 10600012,
+      "hero_astrolabe_suit_id": 1060001,
+      "pre_astrolabe_id": 10600011
+    },
+    "10600013": {
+      "id": 10600013,
+      "hero_astrolabe_suit_id": 1060001,
+      "pre_astrolabe_id": 10600012
+    },
+    "10600021": {
+      "id": 10600021,
+      "hero_astrolabe_suit_id": 1060002,
+      "pre_astrolabe_id": 0
+    },
+    "10600022": {
+      "id": 10600022,
+      "hero_astrolabe_suit_id": 1060002,
+      "pre_astrolabe_id": 10600021
+    },
+    "10600023": {
+      "id": 10600023,
+      "hero_astrolabe_suit_id": 1060002,
+      "pre_astrolabe_id": 10600022
+    },
+    "10600031": {
+      "id": 10600031,
+      "hero_astrolabe_suit_id": 1060003,
+      "pre_astrolabe_id": 0
+    },
+    "10600032": {
+      "id": 10600032,
+      "hero_astrolabe_suit_id": 1060003,
+      "pre_astrolabe_id": 10600031
+    },
+    "10600033": {
+      "id": 10600033,
+      "hero_astrolabe_suit_id": 1060003,
+      "pre_astrolabe_id": 10600032
+    },
+    "10610011": {
+      "id": 10610011,
+      "hero_astrolabe_suit_id": 1061001,
+      "pre_astrolabe_id": 0
+    },
+    "10610012": {
+      "id": 10610012,
+      "hero_astrolabe_suit_id": 1061001,
+      "pre_astrolabe_id": 10610011
+    },
+    "10610013": {
+      "id": 10610013,
+      "hero_astrolabe_suit_id": 1061001,
+      "pre_astrolabe_id": 10610012
+    },
+    "10610021": {
+      "id": 10610021,
+      "hero_astrolabe_suit_id": 1061002,
+      "pre_astrolabe_id": 0
+    },
+    "10610022": {
+      "id": 10610022,
+      "hero_astrolabe_suit_id": 1061002,
+      "pre_astrolabe_id": 10610021
+    },
+    "10610023": {
+      "id": 10610023,
+      "hero_astrolabe_suit_id": 1061002,
+      "pre_astrolabe_id": 10610022
+    },
+    "10610031": {
+      "id": 10610031,
+      "hero_astrolabe_suit_id": 1061003,
+      "pre_astrolabe_id": 0
+    },
+    "10610032": {
+      "id": 10610032,
+      "hero_astrolabe_suit_id": 1061003,
+      "pre_astrolabe_id": 10610031
+    },
+    "10610033": {
+      "id": 10610033,
+      "hero_astrolabe_suit_id": 1061003,
+      "pre_astrolabe_id": 10610032
+    },
+    "10660011": {
+      "id": 10660011,
+      "hero_astrolabe_suit_id": 1066001,
+      "pre_astrolabe_id": 0
+    },
+    "10660012": {
+      "id": 10660012,
+      "hero_astrolabe_suit_id": 1066001,
+      "pre_astrolabe_id": 10660011
+    },
+    "10660013": {
+      "id": 10660013,
+      "hero_astrolabe_suit_id": 1066001,
+      "pre_astrolabe_id": 10660012
+    },
+    "10660021": {
+      "id": 10660021,
+      "hero_astrolabe_suit_id": 1066002,
+      "pre_astrolabe_id": 0
+    },
+    "10660022": {
+      "id": 10660022,
+      "hero_astrolabe_suit_id": 1066002,
+      "pre_astrolabe_id": 10660021
+    },
+    "10660023": {
+      "id": 10660023,
+      "hero_astrolabe_suit_id": 1066002,
+      "pre_astrolabe_id": 10660022
+    },
+    "10660031": {
+      "id": 10660031,
+      "hero_astrolabe_suit_id": 1066003,
+      "pre_astrolabe_id": 0
+    },
+    "10660032": {
+      "id": 10660032,
+      "hero_astrolabe_suit_id": 1066003,
+      "pre_astrolabe_id": 10660031
+    },
+    "10660033": {
+      "id": 10660033,
+      "hero_astrolabe_suit_id": 1066003,
+      "pre_astrolabe_id": 10660032
+    },
+    "10670011": {
+      "id": 10670011,
+      "hero_astrolabe_suit_id": 1067001,
+      "pre_astrolabe_id": 0
+    },
+    "10670012": {
+      "id": 10670012,
+      "hero_astrolabe_suit_id": 1067001,
+      "pre_astrolabe_id": 10670011
+    },
+    "10670013": {
+      "id": 10670013,
+      "hero_astrolabe_suit_id": 1067001,
+      "pre_astrolabe_id": 10670012
+    },
+    "10670021": {
+      "id": 10670021,
+      "hero_astrolabe_suit_id": 1067002,
+      "pre_astrolabe_id": 0
+    },
+    "10670022": {
+      "id": 10670022,
+      "hero_astrolabe_suit_id": 1067002,
+      "pre_astrolabe_id": 10670021
+    },
+    "10670023": {
+      "id": 10670023,
+      "hero_astrolabe_suit_id": 1067002,
+      "pre_astrolabe_id": 10670022
+    },
+    "10670031": {
+      "id": 10670031,
+      "hero_astrolabe_suit_id": 1067003,
+      "pre_astrolabe_id": 0
+    },
+    "10670032": {
+      "id": 10670032,
+      "hero_astrolabe_suit_id": 1067003,
+      "pre_astrolabe_id": 10670031
+    },
+    "10670033": {
+      "id": 10670033,
+      "hero_astrolabe_suit_id": 1067003,
+      "pre_astrolabe_id": 10670032
+    },
+    "10680011": {
+      "id": 10680011,
+      "hero_astrolabe_suit_id": 1068001,
+      "pre_astrolabe_id": 0
+    },
+    "10680012": {
+      "id": 10680012,
+      "hero_astrolabe_suit_id": 1068001,
+      "pre_astrolabe_id": 10680011
+    },
+    "10680013": {
+      "id": 10680013,
+      "hero_astrolabe_suit_id": 1068001,
+      "pre_astrolabe_id": 10680012
+    },
+    "10680021": {
+      "id": 10680021,
+      "hero_astrolabe_suit_id": 1068002,
+      "pre_astrolabe_id": 0
+    },
+    "10680022": {
+      "id": 10680022,
+      "hero_astrolabe_suit_id": 1068002,
+      "pre_astrolabe_id": 10680021
+    },
+    "10680023": {
+      "id": 10680023,
+      "hero_astrolabe_suit_id": 1068002,
+      "pre_astrolabe_id": 10680022
+    },
+    "10680031": {
+      "id": 10680031,
+      "hero_astrolabe_suit_id": 1068003,
+      "pre_astrolabe_id": 0
+    },
+    "10680032": {
+      "id": 10680032,
+      "hero_astrolabe_suit_id": 1068003,
+      "pre_astrolabe_id": 10680031
+    },
+    "10680033": {
+      "id": 10680033,
+      "hero_astrolabe_suit_id": 1068003,
+      "pre_astrolabe_id": 10680032
+    },
+    "10700011": {
+      "id": 10700011,
+      "hero_astrolabe_suit_id": 1070001,
+      "pre_astrolabe_id": 0
+    },
+    "10700012": {
+      "id": 10700012,
+      "hero_astrolabe_suit_id": 1070001,
+      "pre_astrolabe_id": 10700011
+    },
+    "10700013": {
+      "id": 10700013,
+      "hero_astrolabe_suit_id": 1070001,
+      "pre_astrolabe_id": 10700012
+    },
+    "10700021": {
+      "id": 10700021,
+      "hero_astrolabe_suit_id": 1070002,
+      "pre_astrolabe_id": 0
+    },
+    "10700022": {
+      "id": 10700022,
+      "hero_astrolabe_suit_id": 1070002,
+      "pre_astrolabe_id": 10700021
+    },
+    "10700023": {
+      "id": 10700023,
+      "hero_astrolabe_suit_id": 1070002,
+      "pre_astrolabe_id": 10700022
+    },
+    "10700031": {
+      "id": 10700031,
+      "hero_astrolabe_suit_id": 1070003,
+      "pre_astrolabe_id": 0
+    },
+    "10700032": {
+      "id": 10700032,
+      "hero_astrolabe_suit_id": 1070003,
+      "pre_astrolabe_id": 10700031
+    },
+    "10700033": {
+      "id": 10700033,
+      "hero_astrolabe_suit_id": 1070003,
+      "pre_astrolabe_id": 10700032
+    },
+    "10710011": {
+      "id": 10710011,
+      "hero_astrolabe_suit_id": 1071001,
+      "pre_astrolabe_id": 0
+    },
+    "10710012": {
+      "id": 10710012,
+      "hero_astrolabe_suit_id": 1071001,
+      "pre_astrolabe_id": 10710011
+    },
+    "10710013": {
+      "id": 10710013,
+      "hero_astrolabe_suit_id": 1071001,
+      "pre_astrolabe_id": 10710012
+    },
+    "10710021": {
+      "id": 10710021,
+      "hero_astrolabe_suit_id": 1071002,
+      "pre_astrolabe_id": 0
+    },
+    "10710022": {
+      "id": 10710022,
+      "hero_astrolabe_suit_id": 1071002,
+      "pre_astrolabe_id": 10710021
+    },
+    "10710023": {
+      "id": 10710023,
+      "hero_astrolabe_suit_id": 1071002,
+      "pre_astrolabe_id": 10710022
+    },
+    "10710031": {
+      "id": 10710031,
+      "hero_astrolabe_suit_id": 1071003,
+      "pre_astrolabe_id": 0
+    },
+    "10710032": {
+      "id": 10710032,
+      "hero_astrolabe_suit_id": 1071003,
+      "pre_astrolabe_id": 10710031
+    },
+    "10710033": {
+      "id": 10710033,
+      "hero_astrolabe_suit_id": 1071003,
+      "pre_astrolabe_id": 10710032
+    },
+    "10720011": {
+      "id": 10720011,
+      "hero_astrolabe_suit_id": 1072001,
+      "pre_astrolabe_id": 0
+    },
+    "10720012": {
+      "id": 10720012,
+      "hero_astrolabe_suit_id": 1072001,
+      "pre_astrolabe_id": 10720011
+    },
+    "10720013": {
+      "id": 10720013,
+      "hero_astrolabe_suit_id": 1072001,
+      "pre_astrolabe_id": 10720012
+    },
+    "10720021": {
+      "id": 10720021,
+      "hero_astrolabe_suit_id": 1072002,
+      "pre_astrolabe_id": 0
+    },
+    "10720022": {
+      "id": 10720022,
+      "hero_astrolabe_suit_id": 1072002,
+      "pre_astrolabe_id": 10720021
+    },
+    "10720023": {
+      "id": 10720023,
+      "hero_astrolabe_suit_id": 1072002,
+      "pre_astrolabe_id": 10720022
+    },
+    "10720031": {
+      "id": 10720031,
+      "hero_astrolabe_suit_id": 1072003,
+      "pre_astrolabe_id": 0
+    },
+    "10720032": {
+      "id": 10720032,
+      "hero_astrolabe_suit_id": 1072003,
+      "pre_astrolabe_id": 10720031
+    },
+    "10720033": {
+      "id": 10720033,
+      "hero_astrolabe_suit_id": 1072003,
+      "pre_astrolabe_id": 10720032
+    },
+    "10730011": {
+      "id": 10730011,
+      "hero_astrolabe_suit_id": 1073001,
+      "pre_astrolabe_id": 0
+    },
+    "10730012": {
+      "id": 10730012,
+      "hero_astrolabe_suit_id": 1073001,
+      "pre_astrolabe_id": 10730011
+    },
+    "10730013": {
+      "id": 10730013,
+      "hero_astrolabe_suit_id": 1073001,
+      "pre_astrolabe_id": 10730012
+    },
+    "10730021": {
+      "id": 10730021,
+      "hero_astrolabe_suit_id": 1073002,
+      "pre_astrolabe_id": 0
+    },
+    "10730022": {
+      "id": 10730022,
+      "hero_astrolabe_suit_id": 1073002,
+      "pre_astrolabe_id": 10730021
+    },
+    "10730023": {
+      "id": 10730023,
+      "hero_astrolabe_suit_id": 1073002,
+      "pre_astrolabe_id": 10730022
+    },
+    "10730031": {
+      "id": 10730031,
+      "hero_astrolabe_suit_id": 1073003,
+      "pre_astrolabe_id": 0
+    },
+    "10730032": {
+      "id": 10730032,
+      "hero_astrolabe_suit_id": 1073003,
+      "pre_astrolabe_id": 10730031
+    },
+    "10730033": {
+      "id": 10730033,
+      "hero_astrolabe_suit_id": 1073003,
+      "pre_astrolabe_id": 10730032
+    },
+    "10740011": {
+      "id": 10740011,
+      "hero_astrolabe_suit_id": 1074001,
+      "pre_astrolabe_id": 0
+    },
+    "10740012": {
+      "id": 10740012,
+      "hero_astrolabe_suit_id": 1074001,
+      "pre_astrolabe_id": 10740011
+    },
+    "10740013": {
+      "id": 10740013,
+      "hero_astrolabe_suit_id": 1074001,
+      "pre_astrolabe_id": 10740012
+    },
+    "10740021": {
+      "id": 10740021,
+      "hero_astrolabe_suit_id": 1074002,
+      "pre_astrolabe_id": 0
+    },
+    "10740022": {
+      "id": 10740022,
+      "hero_astrolabe_suit_id": 1074002,
+      "pre_astrolabe_id": 10740021
+    },
+    "10740023": {
+      "id": 10740023,
+      "hero_astrolabe_suit_id": 1074002,
+      "pre_astrolabe_id": 10740022
+    },
+    "10740031": {
+      "id": 10740031,
+      "hero_astrolabe_suit_id": 1074003,
+      "pre_astrolabe_id": 0
+    },
+    "10740032": {
+      "id": 10740032,
+      "hero_astrolabe_suit_id": 1074003,
+      "pre_astrolabe_id": 10740031
+    },
+    "10740033": {
+      "id": 10740033,
+      "hero_astrolabe_suit_id": 1074003,
+      "pre_astrolabe_id": 10740032
+    },
+    "10750011": {
+      "id": 10750011,
+      "hero_astrolabe_suit_id": 1075001,
+      "pre_astrolabe_id": 0
+    },
+    "10750012": {
+      "id": 10750012,
+      "hero_astrolabe_suit_id": 1075001,
+      "pre_astrolabe_id": 10750011
+    },
+    "10750013": {
+      "id": 10750013,
+      "hero_astrolabe_suit_id": 1075001,
+      "pre_astrolabe_id": 10750012
+    },
+    "10750021": {
+      "id": 10750021,
+      "hero_astrolabe_suit_id": 1075002,
+      "pre_astrolabe_id": 0
+    },
+    "10750022": {
+      "id": 10750022,
+      "hero_astrolabe_suit_id": 1075002,
+      "pre_astrolabe_id": 10750021
+    },
+    "10750023": {
+      "id": 10750023,
+      "hero_astrolabe_suit_id": 1075002,
+      "pre_astrolabe_id": 10750022
+    },
+    "10750031": {
+      "id": 10750031,
+      "hero_astrolabe_suit_id": 1075003,
+      "pre_astrolabe_id": 0
+    },
+    "10750032": {
+      "id": 10750032,
+      "hero_astrolabe_suit_id": 1075003,
+      "pre_astrolabe_id": 10750031
+    },
+    "10750033": {
+      "id": 10750033,
+      "hero_astrolabe_suit_id": 1075003,
+      "pre_astrolabe_id": 10750032
+    },
+    "10760011": {
+      "id": 10760011,
+      "hero_astrolabe_suit_id": 1076001,
+      "pre_astrolabe_id": 0
+    },
+    "10760012": {
+      "id": 10760012,
+      "hero_astrolabe_suit_id": 1076001,
+      "pre_astrolabe_id": 10760011
+    },
+    "10760013": {
+      "id": 10760013,
+      "hero_astrolabe_suit_id": 1076001,
+      "pre_astrolabe_id": 10760012
+    },
+    "10760021": {
+      "id": 10760021,
+      "hero_astrolabe_suit_id": 1076002,
+      "pre_astrolabe_id": 0
+    },
+    "10760022": {
+      "id": 10760022,
+      "hero_astrolabe_suit_id": 1076002,
+      "pre_astrolabe_id": 10760021
+    },
+    "10760023": {
+      "id": 10760023,
+      "hero_astrolabe_suit_id": 1076002,
+      "pre_astrolabe_id": 10760022
+    },
+    "10760031": {
+      "id": 10760031,
+      "hero_astrolabe_suit_id": 1076003,
+      "pre_astrolabe_id": 0
+    },
+    "10760032": {
+      "id": 10760032,
+      "hero_astrolabe_suit_id": 1076003,
+      "pre_astrolabe_id": 10760031
+    },
+    "10760033": {
+      "id": 10760033,
+      "hero_astrolabe_suit_id": 1076003,
+      "pre_astrolabe_id": 10760032
+    },
+    "10770011": {
+      "id": 10770011,
+      "hero_astrolabe_suit_id": 1077001,
+      "pre_astrolabe_id": 0
+    },
+    "10770012": {
+      "id": 10770012,
+      "hero_astrolabe_suit_id": 1077001,
+      "pre_astrolabe_id": 10770011
+    },
+    "10770013": {
+      "id": 10770013,
+      "hero_astrolabe_suit_id": 1077001,
+      "pre_astrolabe_id": 10770012
+    },
+    "10770021": {
+      "id": 10770021,
+      "hero_astrolabe_suit_id": 1077002,
+      "pre_astrolabe_id": 0
+    },
+    "10770022": {
+      "id": 10770022,
+      "hero_astrolabe_suit_id": 1077002,
+      "pre_astrolabe_id": 10770021
+    },
+    "10770023": {
+      "id": 10770023,
+      "hero_astrolabe_suit_id": 1077002,
+      "pre_astrolabe_id": 10770022
+    },
+    "10770031": {
+      "id": 10770031,
+      "hero_astrolabe_suit_id": 1077003,
+      "pre_astrolabe_id": 0
+    },
+    "10770032": {
+      "id": 10770032,
+      "hero_astrolabe_suit_id": 1077003,
+      "pre_astrolabe_id": 10770031
+    },
+    "10770033": {
+      "id": 10770033,
+      "hero_astrolabe_suit_id": 1077003,
+      "pre_astrolabe_id": 10770032
+    },
+    "10800011": {
+      "id": 10800011,
+      "hero_astrolabe_suit_id": 1080001,
+      "pre_astrolabe_id": 0
+    },
+    "10800012": {
+      "id": 10800012,
+      "hero_astrolabe_suit_id": 1080001,
+      "pre_astrolabe_id": 10800011
+    },
+    "10800013": {
+      "id": 10800013,
+      "hero_astrolabe_suit_id": 1080001,
+      "pre_astrolabe_id": 10800012
+    },
+    "10800021": {
+      "id": 10800021,
+      "hero_astrolabe_suit_id": 1080002,
+      "pre_astrolabe_id": 0
+    },
+    "10800022": {
+      "id": 10800022,
+      "hero_astrolabe_suit_id": 1080002,
+      "pre_astrolabe_id": 10800021
+    },
+    "10800023": {
+      "id": 10800023,
+      "hero_astrolabe_suit_id": 1080002,
+      "pre_astrolabe_id": 10800022
+    },
+    "10800031": {
+      "id": 10800031,
+      "hero_astrolabe_suit_id": 1080003,
+      "pre_astrolabe_id": 0
+    },
+    "10800032": {
+      "id": 10800032,
+      "hero_astrolabe_suit_id": 1080003,
+      "pre_astrolabe_id": 10800031
+    },
+    "10800033": {
+      "id": 10800033,
+      "hero_astrolabe_suit_id": 1080003,
+      "pre_astrolabe_id": 10800032
+    },
+    "10810011": {
+      "id": 10810011,
+      "hero_astrolabe_suit_id": 1081001,
+      "pre_astrolabe_id": 0
+    },
+    "10810012": {
+      "id": 10810012,
+      "hero_astrolabe_suit_id": 1081001,
+      "pre_astrolabe_id": 10810011
+    },
+    "10810013": {
+      "id": 10810013,
+      "hero_astrolabe_suit_id": 1081001,
+      "pre_astrolabe_id": 10810012
+    },
+    "10810021": {
+      "id": 10810021,
+      "hero_astrolabe_suit_id": 1081002,
+      "pre_astrolabe_id": 0
+    },
+    "10810022": {
+      "id": 10810022,
+      "hero_astrolabe_suit_id": 1081002,
+      "pre_astrolabe_id": 10810021
+    },
+    "10810023": {
+      "id": 10810023,
+      "hero_astrolabe_suit_id": 1081002,
+      "pre_astrolabe_id": 10810022
+    },
+    "10810031": {
+      "id": 10810031,
+      "hero_astrolabe_suit_id": 1081003,
+      "pre_astrolabe_id": 0
+    },
+    "10810032": {
+      "id": 10810032,
+      "hero_astrolabe_suit_id": 1081003,
+      "pre_astrolabe_id": 10810031
+    },
+    "10810033": {
+      "id": 10810033,
+      "hero_astrolabe_suit_id": 1081003,
+      "pre_astrolabe_id": 10810032
+    },
+    "10830011": {
+      "id": 10830011,
+      "hero_astrolabe_suit_id": 1083001,
+      "pre_astrolabe_id": 0
+    },
+    "10830012": {
+      "id": 10830012,
+      "hero_astrolabe_suit_id": 1083001,
+      "pre_astrolabe_id": 10830011
+    },
+    "10830013": {
+      "id": 10830013,
+      "hero_astrolabe_suit_id": 1083001,
+      "pre_astrolabe_id": 10830012
+    },
+    "10830021": {
+      "id": 10830021,
+      "hero_astrolabe_suit_id": 1083002,
+      "pre_astrolabe_id": 0
+    },
+    "10830022": {
+      "id": 10830022,
+      "hero_astrolabe_suit_id": 1083002,
+      "pre_astrolabe_id": 10830021
+    },
+    "10830023": {
+      "id": 10830023,
+      "hero_astrolabe_suit_id": 1083002,
+      "pre_astrolabe_id": 10830022
+    },
+    "10830031": {
+      "id": 10830031,
+      "hero_astrolabe_suit_id": 1083003,
+      "pre_astrolabe_id": 0
+    },
+    "10830032": {
+      "id": 10830032,
+      "hero_astrolabe_suit_id": 1083003,
+      "pre_astrolabe_id": 10830031
+    },
+    "10830033": {
+      "id": 10830033,
+      "hero_astrolabe_suit_id": 1083003,
+      "pre_astrolabe_id": 10830032
+    },
+    "10840011": {
+      "id": 10840011,
+      "hero_astrolabe_suit_id": 1084001,
+      "pre_astrolabe_id": 0
+    },
+    "10840012": {
+      "id": 10840012,
+      "hero_astrolabe_suit_id": 1084001,
+      "pre_astrolabe_id": 10840011
+    },
+    "10840013": {
+      "id": 10840013,
+      "hero_astrolabe_suit_id": 1084001,
+      "pre_astrolabe_id": 10840012
+    },
+    "10840021": {
+      "id": 10840021,
+      "hero_astrolabe_suit_id": 1084002,
+      "pre_astrolabe_id": 0
+    },
+    "10840022": {
+      "id": 10840022,
+      "hero_astrolabe_suit_id": 1084002,
+      "pre_astrolabe_id": 10840021
+    },
+    "10840023": {
+      "id": 10840023,
+      "hero_astrolabe_suit_id": 1084002,
+      "pre_astrolabe_id": 10840022
+    },
+    "10840031": {
+      "id": 10840031,
+      "hero_astrolabe_suit_id": 1084003,
+      "pre_astrolabe_id": 0
+    },
+    "10840032": {
+      "id": 10840032,
+      "hero_astrolabe_suit_id": 1084003,
+      "pre_astrolabe_id": 10840031
+    },
+    "10840033": {
+      "id": 10840033,
+      "hero_astrolabe_suit_id": 1084003,
+      "pre_astrolabe_id": 10840032
+    },
+    "10850011": {
+      "id": 10850011,
+      "hero_astrolabe_suit_id": 1085001,
+      "pre_astrolabe_id": 0
+    },
+    "10850012": {
+      "id": 10850012,
+      "hero_astrolabe_suit_id": 1085001,
+      "pre_astrolabe_id": 10850011
+    },
+    "10850013": {
+      "id": 10850013,
+      "hero_astrolabe_suit_id": 1085001,
+      "pre_astrolabe_id": 10850012
+    },
+    "10850021": {
+      "id": 10850021,
+      "hero_astrolabe_suit_id": 1085002,
+      "pre_astrolabe_id": 0
+    },
+    "10850022": {
+      "id": 10850022,
+      "hero_astrolabe_suit_id": 1085002,
+      "pre_astrolabe_id": 10850021
+    },
+    "10850023": {
+      "id": 10850023,
+      "hero_astrolabe_suit_id": 1085002,
+      "pre_astrolabe_id": 10850022
+    },
+    "10850031": {
+      "id": 10850031,
+      "hero_astrolabe_suit_id": 1085003,
+      "pre_astrolabe_id": 0
+    },
+    "10850032": {
+      "id": 10850032,
+      "hero_astrolabe_suit_id": 1085003,
+      "pre_astrolabe_id": 10850031
+    },
+    "10850033": {
+      "id": 10850033,
+      "hero_astrolabe_suit_id": 1085003,
+      "pre_astrolabe_id": 10850032
+    },
+    "10890011": {
+      "id": 10890011,
+      "hero_astrolabe_suit_id": 1089001,
+      "pre_astrolabe_id": 0
+    },
+    "10890012": {
+      "id": 10890012,
+      "hero_astrolabe_suit_id": 1089001,
+      "pre_astrolabe_id": 10890011
+    },
+    "10890013": {
+      "id": 10890013,
+      "hero_astrolabe_suit_id": 1089001,
+      "pre_astrolabe_id": 10890012
+    },
+    "10890021": {
+      "id": 10890021,
+      "hero_astrolabe_suit_id": 1089002,
+      "pre_astrolabe_id": 0
+    },
+    "10890022": {
+      "id": 10890022,
+      "hero_astrolabe_suit_id": 1089002,
+      "pre_astrolabe_id": 10890021
+    },
+    "10890023": {
+      "id": 10890023,
+      "hero_astrolabe_suit_id": 1089002,
+      "pre_astrolabe_id": 10890022
+    },
+    "10890031": {
+      "id": 10890031,
+      "hero_astrolabe_suit_id": 1089003,
+      "pre_astrolabe_id": 0
+    },
+    "10890032": {
+      "id": 10890032,
+      "hero_astrolabe_suit_id": 1089003,
+      "pre_astrolabe_id": 10890031
+    },
+    "10890033": {
+      "id": 10890033,
+      "hero_astrolabe_suit_id": 1089003,
+      "pre_astrolabe_id": 10890032
+    },
+    "10930011": {
+      "id": 10930011,
+      "hero_astrolabe_suit_id": 1093001,
+      "pre_astrolabe_id": 0
+    },
+    "10930012": {
+      "id": 10930012,
+      "hero_astrolabe_suit_id": 1093001,
+      "pre_astrolabe_id": 10930011
+    },
+    "10930013": {
+      "id": 10930013,
+      "hero_astrolabe_suit_id": 1093001,
+      "pre_astrolabe_id": 10930012
+    },
+    "10930021": {
+      "id": 10930021,
+      "hero_astrolabe_suit_id": 1093002,
+      "pre_astrolabe_id": 0
+    },
+    "10930022": {
+      "id": 10930022,
+      "hero_astrolabe_suit_id": 1093002,
+      "pre_astrolabe_id": 10930021
+    },
+    "10930023": {
+      "id": 10930023,
+      "hero_astrolabe_suit_id": 1093002,
+      "pre_astrolabe_id": 10930022
+    },
+    "10930031": {
+      "id": 10930031,
+      "hero_astrolabe_suit_id": 1093003,
+      "pre_astrolabe_id": 0
+    },
+    "10930032": {
+      "id": 10930032,
+      "hero_astrolabe_suit_id": 1093003,
+      "pre_astrolabe_id": 10930031
+    },
+    "10930033": {
+      "id": 10930033,
+      "hero_astrolabe_suit_id": 1093003,
+      "pre_astrolabe_id": 10930032
+    },
+    "10940011": {
+      "id": 10940011,
+      "hero_astrolabe_suit_id": 1094001,
+      "pre_astrolabe_id": 0
+    },
+    "10940012": {
+      "id": 10940012,
+      "hero_astrolabe_suit_id": 1094001,
+      "pre_astrolabe_id": 10940011
+    },
+    "10940013": {
+      "id": 10940013,
+      "hero_astrolabe_suit_id": 1094001,
+      "pre_astrolabe_id": 10940012
+    },
+    "10940021": {
+      "id": 10940021,
+      "hero_astrolabe_suit_id": 1094002,
+      "pre_astrolabe_id": 0
+    },
+    "10940022": {
+      "id": 10940022,
+      "hero_astrolabe_suit_id": 1094002,
+      "pre_astrolabe_id": 10940021
+    },
+    "10940023": {
+      "id": 10940023,
+      "hero_astrolabe_suit_id": 1094002,
+      "pre_astrolabe_id": 10940022
+    },
+    "10940031": {
+      "id": 10940031,
+      "hero_astrolabe_suit_id": 1094003,
+      "pre_astrolabe_id": 0
+    },
+    "10940032": {
+      "id": 10940032,
+      "hero_astrolabe_suit_id": 1094003,
+      "pre_astrolabe_id": 10940031
+    },
+    "10940033": {
+      "id": 10940033,
+      "hero_astrolabe_suit_id": 1094003,
+      "pre_astrolabe_id": 10940032
+    },
+    "10950011": {
+      "id": 10950011,
+      "hero_astrolabe_suit_id": 1095001,
+      "pre_astrolabe_id": 0
+    },
+    "10950012": {
+      "id": 10950012,
+      "hero_astrolabe_suit_id": 1095001,
+      "pre_astrolabe_id": 10950011
+    },
+    "10950013": {
+      "id": 10950013,
+      "hero_astrolabe_suit_id": 1095001,
+      "pre_astrolabe_id": 10950012
+    },
+    "10950021": {
+      "id": 10950021,
+      "hero_astrolabe_suit_id": 1095002,
+      "pre_astrolabe_id": 0
+    },
+    "10950022": {
+      "id": 10950022,
+      "hero_astrolabe_suit_id": 1095002,
+      "pre_astrolabe_id": 10950021
+    },
+    "10950023": {
+      "id": 10950023,
+      "hero_astrolabe_suit_id": 1095002,
+      "pre_astrolabe_id": 10950022
+    },
+    "10950031": {
+      "id": 10950031,
+      "hero_astrolabe_suit_id": 1095003,
+      "pre_astrolabe_id": 0
+    },
+    "10950032": {
+      "id": 10950032,
+      "hero_astrolabe_suit_id": 1095003,
+      "pre_astrolabe_id": 10950031
+    },
+    "10950033": {
+      "id": 10950033,
+      "hero_astrolabe_suit_id": 1095003,
+      "pre_astrolabe_id": 10950032
+    },
+    "10960011": {
+      "id": 10960011,
+      "hero_astrolabe_suit_id": 1096001,
+      "pre_astrolabe_id": 0
+    },
+    "10960012": {
+      "id": 10960012,
+      "hero_astrolabe_suit_id": 1096001,
+      "pre_astrolabe_id": 10960011
+    },
+    "10960013": {
+      "id": 10960013,
+      "hero_astrolabe_suit_id": 1096001,
+      "pre_astrolabe_id": 10960012
+    },
+    "10960021": {
+      "id": 10960021,
+      "hero_astrolabe_suit_id": 1096002,
+      "pre_astrolabe_id": 0
+    },
+    "10960022": {
+      "id": 10960022,
+      "hero_astrolabe_suit_id": 1096002,
+      "pre_astrolabe_id": 10960021
+    },
+    "10960023": {
+      "id": 10960023,
+      "hero_astrolabe_suit_id": 1096002,
+      "pre_astrolabe_id": 10960022
+    },
+    "10960031": {
+      "id": 10960031,
+      "hero_astrolabe_suit_id": 1096003,
+      "pre_astrolabe_id": 0
+    },
+    "10960032": {
+      "id": 10960032,
+      "hero_astrolabe_suit_id": 1096003,
+      "pre_astrolabe_id": 10960031
+    },
+    "10960033": {
+      "id": 10960033,
+      "hero_astrolabe_suit_id": 1096003,
+      "pre_astrolabe_id": 10960032
+    },
+    "10970011": {
+      "id": 10970011,
+      "hero_astrolabe_suit_id": 1097001,
+      "pre_astrolabe_id": 0
+    },
+    "10970012": {
+      "id": 10970012,
+      "hero_astrolabe_suit_id": 1097001,
+      "pre_astrolabe_id": 10970011
+    },
+    "10970013": {
+      "id": 10970013,
+      "hero_astrolabe_suit_id": 1097001,
+      "pre_astrolabe_id": 10970012
+    },
+    "10970021": {
+      "id": 10970021,
+      "hero_astrolabe_suit_id": 1097002,
+      "pre_astrolabe_id": 0
+    },
+    "10970022": {
+      "id": 10970022,
+      "hero_astrolabe_suit_id": 1097002,
+      "pre_astrolabe_id": 10970021
+    },
+    "10970023": {
+      "id": 10970023,
+      "hero_astrolabe_suit_id": 1097002,
+      "pre_astrolabe_id": 10970022
+    },
+    "10970031": {
+      "id": 10970031,
+      "hero_astrolabe_suit_id": 1097003,
+      "pre_astrolabe_id": 0
+    },
+    "10970032": {
+      "id": 10970032,
+      "hero_astrolabe_suit_id": 1097003,
+      "pre_astrolabe_id": 10970031
+    },
+    "10970033": {
+      "id": 10970033,
+      "hero_astrolabe_suit_id": 1097003,
+      "pre_astrolabe_id": 10970032
+    },
+    "10990011": {
+      "id": 10990011,
+      "hero_astrolabe_suit_id": 1099001,
+      "pre_astrolabe_id": 0
+    },
+    "10990012": {
+      "id": 10990012,
+      "hero_astrolabe_suit_id": 1099001,
+      "pre_astrolabe_id": 10990011
+    },
+    "10990013": {
+      "id": 10990013,
+      "hero_astrolabe_suit_id": 1099001,
+      "pre_astrolabe_id": 10990012
+    },
+    "10990021": {
+      "id": 10990021,
+      "hero_astrolabe_suit_id": 1099002,
+      "pre_astrolabe_id": 0
+    },
+    "10990022": {
+      "id": 10990022,
+      "hero_astrolabe_suit_id": 1099002,
+      "pre_astrolabe_id": 10990021
+    },
+    "10990023": {
+      "id": 10990023,
+      "hero_astrolabe_suit_id": 1099002,
+      "pre_astrolabe_id": 10990022
+    },
+    "10990031": {
+      "id": 10990031,
+      "hero_astrolabe_suit_id": 1099003,
+      "pre_astrolabe_id": 0
+    },
+    "10990032": {
+      "id": 10990032,
+      "hero_astrolabe_suit_id": 1099003,
+      "pre_astrolabe_id": 10990031
+    },
+    "10990033": {
+      "id": 10990033,
+      "hero_astrolabe_suit_id": 1099003,
+      "pre_astrolabe_id": 10990032
+    },
+    "11110011": {
+      "id": 11110011,
+      "hero_astrolabe_suit_id": 1111001,
+      "pre_astrolabe_id": 0
+    },
+    "11110012": {
+      "id": 11110012,
+      "hero_astrolabe_suit_id": 1111001,
+      "pre_astrolabe_id": 11110011
+    },
+    "11110013": {
+      "id": 11110013,
+      "hero_astrolabe_suit_id": 1111001,
+      "pre_astrolabe_id": 11110012
+    },
+    "11110021": {
+      "id": 11110021,
+      "hero_astrolabe_suit_id": 1111002,
+      "pre_astrolabe_id": 0
+    },
+    "11110022": {
+      "id": 11110022,
+      "hero_astrolabe_suit_id": 1111002,
+      "pre_astrolabe_id": 11110021
+    },
+    "11110023": {
+      "id": 11110023,
+      "hero_astrolabe_suit_id": 1111002,
+      "pre_astrolabe_id": 11110022
+    },
+    "11110031": {
+      "id": 11110031,
+      "hero_astrolabe_suit_id": 1111003,
+      "pre_astrolabe_id": 0
+    },
+    "11110032": {
+      "id": 11110032,
+      "hero_astrolabe_suit_id": 1111003,
+      "pre_astrolabe_id": 11110031
+    },
+    "11110033": {
+      "id": 11110033,
+      "hero_astrolabe_suit_id": 1111003,
+      "pre_astrolabe_id": 11110032
+    },
+    "11190011": {
+      "id": 11190011,
+      "hero_astrolabe_suit_id": 1119001,
+      "pre_astrolabe_id": 0
+    },
+    "11190012": {
+      "id": 11190012,
+      "hero_astrolabe_suit_id": 1119001,
+      "pre_astrolabe_id": 11190011
+    },
+    "11190013": {
+      "id": 11190013,
+      "hero_astrolabe_suit_id": 1119001,
+      "pre_astrolabe_id": 11190012
+    },
+    "11190021": {
+      "id": 11190021,
+      "hero_astrolabe_suit_id": 1119002,
+      "pre_astrolabe_id": 0
+    },
+    "11190022": {
+      "id": 11190022,
+      "hero_astrolabe_suit_id": 1119002,
+      "pre_astrolabe_id": 11190021
+    },
+    "11190023": {
+      "id": 11190023,
+      "hero_astrolabe_suit_id": 1119002,
+      "pre_astrolabe_id": 11190022
+    },
+    "11190031": {
+      "id": 11190031,
+      "hero_astrolabe_suit_id": 1119003,
+      "pre_astrolabe_id": 0
+    },
+    "11190032": {
+      "id": 11190032,
+      "hero_astrolabe_suit_id": 1119003,
+      "pre_astrolabe_id": 11190031
+    },
+    "11190033": {
+      "id": 11190033,
+      "hero_astrolabe_suit_id": 1119003,
+      "pre_astrolabe_id": 11190032
+    },
+    "11270011": {
+      "id": 11270011,
+      "hero_astrolabe_suit_id": 1127001,
+      "pre_astrolabe_id": 0
+    },
+    "11270012": {
+      "id": 11270012,
+      "hero_astrolabe_suit_id": 1127001,
+      "pre_astrolabe_id": 11270011
+    },
+    "11270013": {
+      "id": 11270013,
+      "hero_astrolabe_suit_id": 1127001,
+      "pre_astrolabe_id": 11270012
+    },
+    "11270021": {
+      "id": 11270021,
+      "hero_astrolabe_suit_id": 1127002,
+      "pre_astrolabe_id": 0
+    },
+    "11270022": {
+      "id": 11270022,
+      "hero_astrolabe_suit_id": 1127002,
+      "pre_astrolabe_id": 11270021
+    },
+    "11270023": {
+      "id": 11270023,
+      "hero_astrolabe_suit_id": 1127002,
+      "pre_astrolabe_id": 11270022
+    },
+    "11270031": {
+      "id": 11270031,
+      "hero_astrolabe_suit_id": 1127003,
+      "pre_astrolabe_id": 0
+    },
+    "11270032": {
+      "id": 11270032,
+      "hero_astrolabe_suit_id": 1127003,
+      "pre_astrolabe_id": 11270031
+    },
+    "11270033": {
+      "id": 11270033,
+      "hero_astrolabe_suit_id": 1127003,
+      "pre_astrolabe_id": 11270032
+    },
+    "11320011": {
+      "id": 11320011,
+      "hero_astrolabe_suit_id": 1132001,
+      "pre_astrolabe_id": 0
+    },
+    "11320012": {
+      "id": 11320012,
+      "hero_astrolabe_suit_id": 1132001,
+      "pre_astrolabe_id": 11320011
+    },
+    "11320013": {
+      "id": 11320013,
+      "hero_astrolabe_suit_id": 1132001,
+      "pre_astrolabe_id": 11320012
+    },
+    "11320021": {
+      "id": 11320021,
+      "hero_astrolabe_suit_id": 1132002,
+      "pre_astrolabe_id": 0
+    },
+    "11320022": {
+      "id": 11320022,
+      "hero_astrolabe_suit_id": 1132002,
+      "pre_astrolabe_id": 11320021
+    },
+    "11320023": {
+      "id": 11320023,
+      "hero_astrolabe_suit_id": 1132002,
+      "pre_astrolabe_id": 11320022
+    },
+    "11320031": {
+      "id": 11320031,
+      "hero_astrolabe_suit_id": 1132003,
+      "pre_astrolabe_id": 0
+    },
+    "11320032": {
+      "id": 11320032,
+      "hero_astrolabe_suit_id": 1132003,
+      "pre_astrolabe_id": 11320031
+    },
+    "11320033": {
+      "id": 11320033,
+      "hero_astrolabe_suit_id": 1132003,
+      "pre_astrolabe_id": 11320032
+    },
+    "11330011": {
+      "id": 11330011,
+      "hero_astrolabe_suit_id": 1133001,
+      "pre_astrolabe_id": 0
+    },
+    "11330012": {
+      "id": 11330012,
+      "hero_astrolabe_suit_id": 1133001,
+      "pre_astrolabe_id": 11330011
+    },
+    "11330013": {
+      "id": 11330013,
+      "hero_astrolabe_suit_id": 1133001,
+      "pre_astrolabe_id": 11330012
+    },
+    "11330021": {
+      "id": 11330021,
+      "hero_astrolabe_suit_id": 1133002,
+      "pre_astrolabe_id": 0
+    },
+    "11330022": {
+      "id": 11330022,
+      "hero_astrolabe_suit_id": 1133002,
+      "pre_astrolabe_id": 11330021
+    },
+    "11330023": {
+      "id": 11330023,
+      "hero_astrolabe_suit_id": 1133002,
+      "pre_astrolabe_id": 11330022
+    },
+    "11330031": {
+      "id": 11330031,
+      "hero_astrolabe_suit_id": 1133003,
+      "pre_astrolabe_id": 0
+    },
+    "11330032": {
+      "id": 11330032,
+      "hero_astrolabe_suit_id": 1133003,
+      "pre_astrolabe_id": 11330031
+    },
+    "11330033": {
+      "id": 11330033,
+      "hero_astrolabe_suit_id": 1133003,
+      "pre_astrolabe_id": 11330032
+    },
+    "11370011": {
+      "id": 11370011,
+      "hero_astrolabe_suit_id": 1137001,
+      "pre_astrolabe_id": 0
+    },
+    "11370012": {
+      "id": 11370012,
+      "hero_astrolabe_suit_id": 1137001,
+      "pre_astrolabe_id": 11370011
+    },
+    "11370013": {
+      "id": 11370013,
+      "hero_astrolabe_suit_id": 1137001,
+      "pre_astrolabe_id": 11370012
+    },
+    "11370021": {
+      "id": 11370021,
+      "hero_astrolabe_suit_id": 1137002,
+      "pre_astrolabe_id": 0
+    },
+    "11370022": {
+      "id": 11370022,
+      "hero_astrolabe_suit_id": 1137002,
+      "pre_astrolabe_id": 11370021
+    },
+    "11370023": {
+      "id": 11370023,
+      "hero_astrolabe_suit_id": 1137002,
+      "pre_astrolabe_id": 11370022
+    },
+    "11370031": {
+      "id": 11370031,
+      "hero_astrolabe_suit_id": 1137003,
+      "pre_astrolabe_id": 0
+    },
+    "11370032": {
+      "id": 11370032,
+      "hero_astrolabe_suit_id": 1137003,
+      "pre_astrolabe_id": 11370031
+    },
+    "11370033": {
+      "id": 11370033,
+      "hero_astrolabe_suit_id": 1137003,
+      "pre_astrolabe_id": 11370032
+    },
+    "11380011": {
+      "id": 11380011,
+      "hero_astrolabe_suit_id": 1138001,
+      "pre_astrolabe_id": 0
+    },
+    "11380012": {
+      "id": 11380012,
+      "hero_astrolabe_suit_id": 1138001,
+      "pre_astrolabe_id": 11380011
+    },
+    "11380013": {
+      "id": 11380013,
+      "hero_astrolabe_suit_id": 1138001,
+      "pre_astrolabe_id": 11380012
+    },
+    "11380021": {
+      "id": 11380021,
+      "hero_astrolabe_suit_id": 1138002,
+      "pre_astrolabe_id": 0
+    },
+    "11380022": {
+      "id": 11380022,
+      "hero_astrolabe_suit_id": 1138002,
+      "pre_astrolabe_id": 11380021
+    },
+    "11380023": {
+      "id": 11380023,
+      "hero_astrolabe_suit_id": 1138002,
+      "pre_astrolabe_id": 11380022
+    },
+    "11380031": {
+      "id": 11380031,
+      "hero_astrolabe_suit_id": 1138003,
+      "pre_astrolabe_id": 0
+    },
+    "11380032": {
+      "id": 11380032,
+      "hero_astrolabe_suit_id": 1138003,
+      "pre_astrolabe_id": 11380031
+    },
+    "11380033": {
+      "id": 11380033,
+      "hero_astrolabe_suit_id": 1138003,
+      "pre_astrolabe_id": 11380032
+    },
+    "11390011": {
+      "id": 11390011,
+      "hero_astrolabe_suit_id": 1139001,
+      "pre_astrolabe_id": 0
+    },
+    "11390012": {
+      "id": 11390012,
+      "hero_astrolabe_suit_id": 1139001,
+      "pre_astrolabe_id": 11390011
+    },
+    "11390013": {
+      "id": 11390013,
+      "hero_astrolabe_suit_id": 1139001,
+      "pre_astrolabe_id": 11390012
+    },
+    "11390021": {
+      "id": 11390021,
+      "hero_astrolabe_suit_id": 1139002,
+      "pre_astrolabe_id": 0
+    },
+    "11390022": {
+      "id": 11390022,
+      "hero_astrolabe_suit_id": 1139002,
+      "pre_astrolabe_id": 11390021
+    },
+    "11390023": {
+      "id": 11390023,
+      "hero_astrolabe_suit_id": 1139002,
+      "pre_astrolabe_id": 11390022
+    },
+    "11390031": {
+      "id": 11390031,
+      "hero_astrolabe_suit_id": 1139003,
+      "pre_astrolabe_id": 0
+    },
+    "11390032": {
+      "id": 11390032,
+      "hero_astrolabe_suit_id": 1139003,
+      "pre_astrolabe_id": 11390031
+    },
+    "11390033": {
+      "id": 11390033,
+      "hero_astrolabe_suit_id": 1139003,
+      "pre_astrolabe_id": 11390032
+    },
+    "11480011": {
+      "id": 11480011,
+      "hero_astrolabe_suit_id": 1148001,
+      "pre_astrolabe_id": 0
+    },
+    "11480012": {
+      "id": 11480012,
+      "hero_astrolabe_suit_id": 1148001,
+      "pre_astrolabe_id": 11480011
+    },
+    "11480013": {
+      "id": 11480013,
+      "hero_astrolabe_suit_id": 1148001,
+      "pre_astrolabe_id": 11480012
+    },
+    "11480021": {
+      "id": 11480021,
+      "hero_astrolabe_suit_id": 1148002,
+      "pre_astrolabe_id": 0
+    },
+    "11480022": {
+      "id": 11480022,
+      "hero_astrolabe_suit_id": 1148002,
+      "pre_astrolabe_id": 11480021
+    },
+    "11480023": {
+      "id": 11480023,
+      "hero_astrolabe_suit_id": 1148002,
+      "pre_astrolabe_id": 11480022
+    },
+    "11480031": {
+      "id": 11480031,
+      "hero_astrolabe_suit_id": 1148003,
+      "pre_astrolabe_id": 0
+    },
+    "11480032": {
+      "id": 11480032,
+      "hero_astrolabe_suit_id": 1148003,
+      "pre_astrolabe_id": 11480031
+    },
+    "11480033": {
+      "id": 11480033,
+      "hero_astrolabe_suit_id": 1148003,
+      "pre_astrolabe_id": 11480032
+    },
+    "11500011": {
+      "id": 11500011,
+      "hero_astrolabe_suit_id": 1150001,
+      "pre_astrolabe_id": 0
+    },
+    "11500012": {
+      "id": 11500012,
+      "hero_astrolabe_suit_id": 1150001,
+      "pre_astrolabe_id": 11500011
+    },
+    "11500013": {
+      "id": 11500013,
+      "hero_astrolabe_suit_id": 1150001,
+      "pre_astrolabe_id": 11500012
+    },
+    "11500021": {
+      "id": 11500021,
+      "hero_astrolabe_suit_id": 1150002,
+      "pre_astrolabe_id": 0
+    },
+    "11500022": {
+      "id": 11500022,
+      "hero_astrolabe_suit_id": 1150002,
+      "pre_astrolabe_id": 11500021
+    },
+    "11500023": {
+      "id": 11500023,
+      "hero_astrolabe_suit_id": 1150002,
+      "pre_astrolabe_id": 11500022
+    },
+    "11500031": {
+      "id": 11500031,
+      "hero_astrolabe_suit_id": 1150003,
+      "pre_astrolabe_id": 0
+    },
+    "11500032": {
+      "id": 11500032,
+      "hero_astrolabe_suit_id": 1150003,
+      "pre_astrolabe_id": 11500031
+    },
+    "11500033": {
+      "id": 11500033,
+      "hero_astrolabe_suit_id": 1150003,
+      "pre_astrolabe_id": 11500032
+    },
+    "11560011": {
+      "id": 11560011,
+      "hero_astrolabe_suit_id": 1156001,
+      "pre_astrolabe_id": 0
+    },
+    "11560012": {
+      "id": 11560012,
+      "hero_astrolabe_suit_id": 1156001,
+      "pre_astrolabe_id": 11560011
+    },
+    "11560013": {
+      "id": 11560013,
+      "hero_astrolabe_suit_id": 1156001,
+      "pre_astrolabe_id": 11560012
+    },
+    "11560021": {
+      "id": 11560021,
+      "hero_astrolabe_suit_id": 1156002,
+      "pre_astrolabe_id": 0
+    },
+    "11560022": {
+      "id": 11560022,
+      "hero_astrolabe_suit_id": 1156002,
+      "pre_astrolabe_id": 11560021
+    },
+    "11560023": {
+      "id": 11560023,
+      "hero_astrolabe_suit_id": 1156002,
+      "pre_astrolabe_id": 11560022
+    },
+    "11560031": {
+      "id": 11560031,
+      "hero_astrolabe_suit_id": 1156003,
+      "pre_astrolabe_id": 0
+    },
+    "11560032": {
+      "id": 11560032,
+      "hero_astrolabe_suit_id": 1156003,
+      "pre_astrolabe_id": 11560031
+    },
+    "11560033": {
+      "id": 11560033,
+      "hero_astrolabe_suit_id": 1156003,
+      "pre_astrolabe_id": 11560032
+    },
+    "11580011": {
+      "id": 11580011,
+      "hero_astrolabe_suit_id": 1158001,
+      "pre_astrolabe_id": 0
+    },
+    "11580012": {
+      "id": 11580012,
+      "hero_astrolabe_suit_id": 1158001,
+      "pre_astrolabe_id": 11580011
+    },
+    "11580013": {
+      "id": 11580013,
+      "hero_astrolabe_suit_id": 1158001,
+      "pre_astrolabe_id": 11580012
+    },
+    "11580021": {
+      "id": 11580021,
+      "hero_astrolabe_suit_id": 1158002,
+      "pre_astrolabe_id": 0
+    },
+    "11580022": {
+      "id": 11580022,
+      "hero_astrolabe_suit_id": 1158002,
+      "pre_astrolabe_id": 11580021
+    },
+    "11580023": {
+      "id": 11580023,
+      "hero_astrolabe_suit_id": 1158002,
+      "pre_astrolabe_id": 11580022
+    },
+    "11580031": {
+      "id": 11580031,
+      "hero_astrolabe_suit_id": 1158003,
+      "pre_astrolabe_id": 0
+    },
+    "11580032": {
+      "id": 11580032,
+      "hero_astrolabe_suit_id": 1158003,
+      "pre_astrolabe_id": 11580031
+    },
+    "11580033": {
+      "id": 11580033,
+      "hero_astrolabe_suit_id": 1158003,
+      "pre_astrolabe_id": 11580032
+    },
+    "11660011": {
+      "id": 11660011,
+      "hero_astrolabe_suit_id": 1166001,
+      "pre_astrolabe_id": 0
+    },
+    "11660012": {
+      "id": 11660012,
+      "hero_astrolabe_suit_id": 1166001,
+      "pre_astrolabe_id": 11660011
+    },
+    "11660013": {
+      "id": 11660013,
+      "hero_astrolabe_suit_id": 1166001,
+      "pre_astrolabe_id": 11660012
+    },
+    "11660021": {
+      "id": 11660021,
+      "hero_astrolabe_suit_id": 1166002,
+      "pre_astrolabe_id": 0
+    },
+    "11660022": {
+      "id": 11660022,
+      "hero_astrolabe_suit_id": 1166002,
+      "pre_astrolabe_id": 11660021
+    },
+    "11660023": {
+      "id": 11660023,
+      "hero_astrolabe_suit_id": 1166002,
+      "pre_astrolabe_id": 11660022
+    },
+    "11660031": {
+      "id": 11660031,
+      "hero_astrolabe_suit_id": 1166003,
+      "pre_astrolabe_id": 0
+    },
+    "11660032": {
+      "id": 11660032,
+      "hero_astrolabe_suit_id": 1166003,
+      "pre_astrolabe_id": 11660031
+    },
+    "11660033": {
+      "id": 11660033,
+      "hero_astrolabe_suit_id": 1166003,
+      "pre_astrolabe_id": 11660032
+    },
+    "11700011": {
+      "id": 11700011,
+      "hero_astrolabe_suit_id": 1170001,
+      "pre_astrolabe_id": 0
+    },
+    "11700012": {
+      "id": 11700012,
+      "hero_astrolabe_suit_id": 1170001,
+      "pre_astrolabe_id": 11700011
+    },
+    "11700013": {
+      "id": 11700013,
+      "hero_astrolabe_suit_id": 1170001,
+      "pre_astrolabe_id": 11700012
+    },
+    "11700021": {
+      "id": 11700021,
+      "hero_astrolabe_suit_id": 1170002,
+      "pre_astrolabe_id": 0
+    },
+    "11700022": {
+      "id": 11700022,
+      "hero_astrolabe_suit_id": 1170002,
+      "pre_astrolabe_id": 11700021
+    },
+    "11700023": {
+      "id": 11700023,
+      "hero_astrolabe_suit_id": 1170002,
+      "pre_astrolabe_id": 11700022
+    },
+    "11700031": {
+      "id": 11700031,
+      "hero_astrolabe_suit_id": 1170003,
+      "pre_astrolabe_id": 0
+    },
+    "11700032": {
+      "id": 11700032,
+      "hero_astrolabe_suit_id": 1170003,
+      "pre_astrolabe_id": 11700031
+    },
+    "11700033": {
+      "id": 11700033,
+      "hero_astrolabe_suit_id": 1170003,
+      "pre_astrolabe_id": 11700032
+    },
+    "11840011": {
+      "id": 11840011,
+      "hero_astrolabe_suit_id": 1184001,
+      "pre_astrolabe_id": 0
+    },
+    "11840012": {
+      "id": 11840012,
+      "hero_astrolabe_suit_id": 1184001,
+      "pre_astrolabe_id": 11840011
+    },
+    "11840013": {
+      "id": 11840013,
+      "hero_astrolabe_suit_id": 1184001,
+      "pre_astrolabe_id": 11840012
+    },
+    "11840021": {
+      "id": 11840021,
+      "hero_astrolabe_suit_id": 1184002,
+      "pre_astrolabe_id": 0
+    },
+    "11840022": {
+      "id": 11840022,
+      "hero_astrolabe_suit_id": 1184002,
+      "pre_astrolabe_id": 11840021
+    },
+    "11840023": {
+      "id": 11840023,
+      "hero_astrolabe_suit_id": 1184002,
+      "pre_astrolabe_id": 11840022
+    },
+    "11840031": {
+      "id": 11840031,
+      "hero_astrolabe_suit_id": 1184003,
+      "pre_astrolabe_id": 0
+    },
+    "11840032": {
+      "id": 11840032,
+      "hero_astrolabe_suit_id": 1184003,
+      "pre_astrolabe_id": 11840031
+    },
+    "11840033": {
+      "id": 11840033,
+      "hero_astrolabe_suit_id": 1184003,
+      "pre_astrolabe_id": 11840032
+    },
+    "11940011": {
+      "id": 11940011,
+      "hero_astrolabe_suit_id": 1194001,
+      "pre_astrolabe_id": 0
+    },
+    "11940012": {
+      "id": 11940012,
+      "hero_astrolabe_suit_id": 1194001,
+      "pre_astrolabe_id": 11940011
+    },
+    "11940013": {
+      "id": 11940013,
+      "hero_astrolabe_suit_id": 1194001,
+      "pre_astrolabe_id": 11940012
+    },
+    "11940021": {
+      "id": 11940021,
+      "hero_astrolabe_suit_id": 1194002,
+      "pre_astrolabe_id": 0
+    },
+    "11940022": {
+      "id": 11940022,
+      "hero_astrolabe_suit_id": 1194002,
+      "pre_astrolabe_id": 11940021
+    },
+    "11940023": {
+      "id": 11940023,
+      "hero_astrolabe_suit_id": 1194002,
+      "pre_astrolabe_id": 11940022
+    },
+    "11940031": {
+      "id": 11940031,
+      "hero_astrolabe_suit_id": 1194003,
+      "pre_astrolabe_id": 0
+    },
+    "11940032": {
+      "id": 11940032,
+      "hero_astrolabe_suit_id": 1194003,
+      "pre_astrolabe_id": 11940031
+    },
+    "11940033": {
+      "id": 11940033,
+      "hero_astrolabe_suit_id": 1194003,
+      "pre_astrolabe_id": 11940032
+    },
+    "11970011": {
+      "id": 11970011,
+      "hero_astrolabe_suit_id": 1197001,
+      "pre_astrolabe_id": 0
+    },
+    "11970012": {
+      "id": 11970012,
+      "hero_astrolabe_suit_id": 1197001,
+      "pre_astrolabe_id": 11970011
+    },
+    "11970013": {
+      "id": 11970013,
+      "hero_astrolabe_suit_id": 1197001,
+      "pre_astrolabe_id": 11970012
+    },
+    "11970021": {
+      "id": 11970021,
+      "hero_astrolabe_suit_id": 1197002,
+      "pre_astrolabe_id": 0
+    },
+    "11970022": {
+      "id": 11970022,
+      "hero_astrolabe_suit_id": 1197002,
+      "pre_astrolabe_id": 11970021
+    },
+    "11970023": {
+      "id": 11970023,
+      "hero_astrolabe_suit_id": 1197002,
+      "pre_astrolabe_id": 11970022
+    },
+    "11970031": {
+      "id": 11970031,
+      "hero_astrolabe_suit_id": 1197003,
+      "pre_astrolabe_id": 0
+    },
+    "11970032": {
+      "id": 11970032,
+      "hero_astrolabe_suit_id": 1197003,
+      "pre_astrolabe_id": 11970031
+    },
+    "11970033": {
+      "id": 11970033,
+      "hero_astrolabe_suit_id": 1197003,
+      "pre_astrolabe_id": 11970032
+    },
+    "11990011": {
+      "id": 11990011,
+      "hero_astrolabe_suit_id": 1199001,
+      "pre_astrolabe_id": 0
+    },
+    "11990012": {
+      "id": 11990012,
+      "hero_astrolabe_suit_id": 1199001,
+      "pre_astrolabe_id": 11990011
+    },
+    "11990013": {
+      "id": 11990013,
+      "hero_astrolabe_suit_id": 1199001,
+      "pre_astrolabe_id": 11990012
+    },
+    "11990021": {
+      "id": 11990021,
+      "hero_astrolabe_suit_id": 1199002,
+      "pre_astrolabe_id": 0
+    },
+    "11990022": {
+      "id": 11990022,
+      "hero_astrolabe_suit_id": 1199002,
+      "pre_astrolabe_id": 11990021
+    },
+    "11990023": {
+      "id": 11990023,
+      "hero_astrolabe_suit_id": 1199002,
+      "pre_astrolabe_id": 11990022
+    },
+    "11990031": {
+      "id": 11990031,
+      "hero_astrolabe_suit_id": 1199003,
+      "pre_astrolabe_id": 0
+    },
+    "11990032": {
+      "id": 11990032,
+      "hero_astrolabe_suit_id": 1199003,
+      "pre_astrolabe_id": 11990031
+    },
+    "11990033": {
+      "id": 11990033,
+      "hero_astrolabe_suit_id": 1199003,
+      "pre_astrolabe_id": 11990032
+    },
+    "12110011": {
+      "id": 12110011,
+      "hero_astrolabe_suit_id": 1211001,
+      "pre_astrolabe_id": 0
+    },
+    "12110012": {
+      "id": 12110012,
+      "hero_astrolabe_suit_id": 1211001,
+      "pre_astrolabe_id": 12110011
+    },
+    "12110013": {
+      "id": 12110013,
+      "hero_astrolabe_suit_id": 1211001,
+      "pre_astrolabe_id": 12110012
+    },
+    "12110021": {
+      "id": 12110021,
+      "hero_astrolabe_suit_id": 1211002,
+      "pre_astrolabe_id": 0
+    },
+    "12110022": {
+      "id": 12110022,
+      "hero_astrolabe_suit_id": 1211002,
+      "pre_astrolabe_id": 12110021
+    },
+    "12110023": {
+      "id": 12110023,
+      "hero_astrolabe_suit_id": 1211002,
+      "pre_astrolabe_id": 12110022
+    },
+    "12110031": {
+      "id": 12110031,
+      "hero_astrolabe_suit_id": 1211003,
+      "pre_astrolabe_id": 0
+    },
+    "12110032": {
+      "id": 12110032,
+      "hero_astrolabe_suit_id": 1211003,
+      "pre_astrolabe_id": 12110031
+    },
+    "12110033": {
+      "id": 12110033,
+      "hero_astrolabe_suit_id": 1211003,
+      "pre_astrolabe_id": 12110032
+    },
+    "12480011": {
+      "id": 12480011,
+      "hero_astrolabe_suit_id": 1248001,
+      "pre_astrolabe_id": 0
+    },
+    "12480012": {
+      "id": 12480012,
+      "hero_astrolabe_suit_id": 1248001,
+      "pre_astrolabe_id": 12480011
+    },
+    "12480013": {
+      "id": 12480013,
+      "hero_astrolabe_suit_id": 1248001,
+      "pre_astrolabe_id": 12480012
+    },
+    "12480021": {
+      "id": 12480021,
+      "hero_astrolabe_suit_id": 1248002,
+      "pre_astrolabe_id": 0
+    },
+    "12480022": {
+      "id": 12480022,
+      "hero_astrolabe_suit_id": 1248002,
+      "pre_astrolabe_id": 12480021
+    },
+    "12480023": {
+      "id": 12480023,
+      "hero_astrolabe_suit_id": 1248002,
+      "pre_astrolabe_id": 12480022
+    },
+    "12480031": {
+      "id": 12480031,
+      "hero_astrolabe_suit_id": 1248003,
+      "pre_astrolabe_id": 0
+    },
+    "12480032": {
+      "id": 12480032,
+      "hero_astrolabe_suit_id": 1248003,
+      "pre_astrolabe_id": 12480031
+    },
+    "12480033": {
+      "id": 12480033,
+      "hero_astrolabe_suit_id": 1248003,
+      "pre_astrolabe_id": 12480032
+    },
+    "12840011": {
+      "id": 12840011,
+      "hero_astrolabe_suit_id": 1284001,
+      "pre_astrolabe_id": 0
+    },
+    "12840012": {
+      "id": 12840012,
+      "hero_astrolabe_suit_id": 1284001,
+      "pre_astrolabe_id": 12840011
+    },
+    "12840013": {
+      "id": 12840013,
+      "hero_astrolabe_suit_id": 1284001,
+      "pre_astrolabe_id": 12840012
+    },
+    "12840021": {
+      "id": 12840021,
+      "hero_astrolabe_suit_id": 1284002,
+      "pre_astrolabe_id": 0
+    },
+    "12840022": {
+      "id": 12840022,
+      "hero_astrolabe_suit_id": 1284002,
+      "pre_astrolabe_id": 12840021
+    },
+    "12840023": {
+      "id": 12840023,
+      "hero_astrolabe_suit_id": 1284002,
+      "pre_astrolabe_id": 12840022
+    },
+    "12840031": {
+      "id": 12840031,
+      "hero_astrolabe_suit_id": 1284003,
+      "pre_astrolabe_id": 0
+    },
+    "12840032": {
+      "id": 12840032,
+      "hero_astrolabe_suit_id": 1284003,
+      "pre_astrolabe_id": 12840031
+    },
+    "12840033": {
+      "id": 12840033,
+      "hero_astrolabe_suit_id": 1284003,
+      "pre_astrolabe_id": 12840032
+    }
+  },
+  "combos": {
+    "1": {
+      "id": 1,
+      "cooperate_role_ids": [
+        1027,
+        1080
+      ]
+    },
+    "2": {
+      "id": 2,
+      "cooperate_role_ids": [
+        1084,
+        1011
+      ]
+    },
+    "3": {
+      "id": 3,
+      "cooperate_role_ids": [
+        1066,
+        1037
+      ]
+    },
+    "4": {
+      "id": 4,
+      "cooperate_role_ids": [
+        1099,
+        1093
+      ]
+    },
+    "5": {
+      "id": 5,
+      "cooperate_role_ids": [
+        1084,
+        1148,
+        1039
+      ]
+    },
+    "6": {
+      "id": 6,
+      "cooperate_role_ids": [
+        1199,
+        1050
+      ]
+    },
+    "7": {
+      "id": 7,
+      "cooperate_role_ids": [
+        1059,
+        1032
+      ]
+    },
+    "8": {
+      "id": 8,
+      "cooperate_role_ids": [
+        1035,
+        1026
+      ]
+    },
+    "9": {
+      "id": 9,
+      "cooperate_role_ids": [
+        1039,
+        1019
+      ]
+    },
+    "10": {
+      "id": 10,
+      "cooperate_role_ids": [
+        1011,
+        1111
+      ]
+    },
+    "11": {
+      "id": 11,
+      "cooperate_role_ids": [
+        1058,
+        1026
+      ]
+    },
+    "12": {
+      "id": 12,
+      "cooperate_role_ids": [
+        1038,
+        1139
+      ]
+    },
+    "13": {
+      "id": 13,
+      "cooperate_role_ids": [
+        1148,
+        1013
+      ]
+    },
+    "14": {
+      "id": 14,
+      "cooperate_role_ids": [
+        1093,
+        1050
+      ]
+    },
+    "15": {
+      "id": 15,
+      "cooperate_role_ids": [
+        1019,
+        1066
+      ]
+    },
+    "16": {
+      "id": 16,
+      "cooperate_role_ids": [
+        1019,
+        1111
+      ]
+    },
+    "17": {
+      "id": 17,
+      "cooperate_role_ids": [
+        1058,
+        1035
+      ]
+    },
+    "18": {
+      "id": 18,
+      "cooperate_role_ids": [
+        1199,
+        1184
+      ]
+    },
+    "19": {
+      "id": 19,
+      "cooperate_role_ids": [
+        1138,
+        1096
+      ]
+    },
+    "20": {
+      "id": 20,
+      "cooperate_role_ids": [
+        1094,
+        1048
+      ]
+    },
+    "21": {
+      "id": 21,
+      "cooperate_role_ids": [
+        1081,
+        1027
+      ]
+    },
+    "22": {
+      "id": 22,
+      "cooperate_role_ids": [
+        1080,
+        1127
+      ]
+    },
+    "23": {
+      "id": 23,
+      "cooperate_role_ids": [
+        1056,
+        1081
+      ]
+    },
+    "24": {
+      "id": 24,
+      "cooperate_role_ids": [
+        1119,
+        1184
+      ]
+    },
+    "25": {
+      "id": 25,
+      "cooperate_role_ids": [
+        1042,
+        1097
+      ]
+    },
+    "26": {
+      "id": 26,
+      "cooperate_role_ids": [
+        1067,
+        1068
+      ]
+    },
+    "27": {
+      "id": 27,
+      "cooperate_role_ids": [
+        1038,
+        1041
+      ]
+    },
+    "28": {
+      "id": 28,
+      "cooperate_role_ids": [
+        1033,
+        1066
+      ]
+    },
+    "29": {
+      "id": 29,
+      "cooperate_role_ids": [
+        1093,
+        1017
+      ]
+    },
+    "30": {
+      "id": 30,
+      "cooperate_role_ids": [
+        1016,
+        1058
+      ]
+    },
+    "31": {
+      "id": 31,
+      "cooperate_role_ids": [
+        1016,
+        1052
+      ]
+    },
+    "32": {
+      "id": 32,
+      "cooperate_role_ids": [
+        1024,
+        1035
+      ]
+    },
+    "33": {
+      "id": 33,
+      "cooperate_role_ids": [
+        1048,
+        1028
+      ]
+    },
+    "34": {
+      "id": 34,
+      "cooperate_role_ids": [
+        1028,
+        1111
+      ]
+    },
+    "35": {
+      "id": 35,
+      "cooperate_role_ids": [
+        1132,
+        1058
+      ]
+    },
+    "36": {
+      "id": 36,
+      "cooperate_role_ids": [
+        1071,
+        1068
+      ]
+    },
+    "37": {
+      "id": 37,
+      "cooperate_role_ids": [
+        1070,
+        1075
+      ]
+    },
+    "38": {
+      "id": 38,
+      "cooperate_role_ids": [
+        1075,
+        1076
+      ]
+    },
+    "39": {
+      "id": 39,
+      "cooperate_role_ids": [
+        1076,
+        1072
+      ]
+    },
+    "40": {
+      "id": 40,
+      "cooperate_role_ids": [
+        1072,
+        1074
+      ]
+    },
+    "41": {
+      "id": 41,
+      "cooperate_role_ids": [
+        1055,
+        1199
+      ]
+    },
+    "42": {
+      "id": 42,
+      "cooperate_role_ids": [
+        1055,
+        1049
+      ]
+    },
+    "43": {
+      "id": 43,
+      "cooperate_role_ids": [
+        1158,
+        1132
+      ]
+    },
+    "44": {
+      "id": 44,
+      "cooperate_role_ids": [
+        1074,
+        1060
+      ]
+    },
+    "45": {
+      "id": 45,
+      "cooperate_role_ids": [
+        1076,
+        1061
+      ]
+    },
+    "46": {
+      "id": 46,
+      "cooperate_role_ids": [
+        1199,
+        1150,
+        1093
+      ]
+    },
+    "47": {
+      "id": 47,
+      "cooperate_role_ids": [
+        1150,
+        1199
+      ]
+    },
+    "48": {
+      "id": 48,
+      "cooperate_role_ids": [
+        1119,
+        1015
+      ]
+    },
+    "49": {
+      "id": 49,
+      "cooperate_role_ids": [
+        1015,
+        1095
+      ]
+    },
+    "50": {
+      "id": 50,
+      "cooperate_role_ids": [
+        1119,
+        1028
+      ]
+    },
+    "51": {
+      "id": 51,
+      "cooperate_role_ids": [
+        1284,
+        1138
+      ]
+    },
+    "52": {
+      "id": 52,
+      "cooperate_role_ids": [
+        1081,
+        1055
+      ]
+    },
+    "53": {
+      "id": 53,
+      "cooperate_role_ids": [
+        1042,
+        1197
+      ]
+    },
+    "54": {
+      "id": 54,
+      "cooperate_role_ids": [
+        1033,
+        1094
+      ]
+    },
+    "55": {
+      "id": 55,
+      "cooperate_role_ids": [
+        1049,
+        1150
+      ]
+    },
+    "56": {
+      "id": 56,
+      "cooperate_role_ids": [
+        1022,
+        1042
+      ]
+    },
+    "57": {
+      "id": 57,
+      "cooperate_role_ids": [
+        1021,
+        1041
+      ]
+    },
+    "58": {
+      "id": 58,
+      "cooperate_role_ids": [
+        1020,
+        1156
+      ]
+    },
+    "59": {
+      "id": 59,
+      "cooperate_role_ids": [
+        1052,
+        1024
+      ]
+    },
+    "60": {
+      "id": 60,
+      "cooperate_role_ids": [
+        1095,
+        1111
+      ]
+    },
+    "61": {
+      "id": 61,
+      "cooperate_role_ids": [
+        1089,
+        1020
+      ]
+    },
+    "62": {
+      "id": 62,
+      "cooperate_role_ids": [
+        1248,
+        1028
+      ]
+    },
+    "63": {
+      "id": 63,
+      "cooperate_role_ids": [
+        1061,
+        1133
+      ]
+    },
+    "64": {
+      "id": 64,
+      "cooperate_role_ids": [
+        1059,
+        1067
+      ]
+    },
+    "65": {
+      "id": 65,
+      "cooperate_role_ids": [
+        1034,
+        1015
+      ]
+    },
+    "66": {
+      "id": 66,
+      "cooperate_role_ids": [
+        1012,
+        1060
+      ]
+    },
+    "67": {
+      "id": 67,
+      "cooperate_role_ids": [
+        1073,
+        1074
+      ]
+    },
+    "68": {
+      "id": 68,
+      "cooperate_role_ids": [
+        1248,
+        1150
+      ]
+    },
+    "69": {
+      "id": 69,
+      "cooperate_role_ids": [
+        1211,
+        1284
+      ]
+    },
+    "70": {
+      "id": 70,
+      "cooperate_role_ids": [
+        1045,
+        1046
+      ]
+    },
+    "71": {
+      "id": 71,
+      "cooperate_role_ids": [
+        1111,
+        1089
+      ]
+    },
+    "72": {
+      "id": 72,
+      "cooperate_role_ids": [
+        1022,
+        1047
+      ]
+    },
+    "73": {
+      "id": 73,
+      "cooperate_role_ids": [
+        1013,
+        1083
+      ]
+    },
+    "74": {
+      "id": 74,
+      "cooperate_role_ids": [
+        1043,
+        1055
+      ]
+    },
+    "75": {
+      "id": 75,
+      "cooperate_role_ids": [
+        1044,
+        1211
+      ]
+    },
+    "76": {
+      "id": 76,
+      "cooperate_role_ids": [
+        1111,
+        1211
+      ]
+    },
+    "77": {
+      "id": 77,
+      "cooperate_role_ids": [
+        1133,
+        1194
+      ]
+    },
+    "78": {
+      "id": 78,
+      "cooperate_role_ids": [
+        1137,
+        1248
+      ]
+    },
+    "79": {
+      "id": 79,
+      "cooperate_role_ids": [
+        1053,
+        1070
+      ]
+    },
+    "80": {
+      "id": 80,
+      "cooperate_role_ids": [
+        1061,
+        1075
+      ]
+    },
+    "81": {
+      "id": 81,
+      "cooperate_role_ids": [
+        1053,
+        1170
+      ]
+    },
+    "82": {
+      "id": 82,
+      "cooperate_role_ids": [
+        1054,
+        1170
+      ]
+    },
+    "83": {
+      "id": 83,
+      "cooperate_role_ids": [
+        1054,
+        1077
+      ]
+    },
+    "84": {
+      "id": 84,
+      "cooperate_role_ids": [
+        1166,
+        1211
+      ]
+    },
+    "85": {
+      "id": 85,
+      "cooperate_role_ids": [
+        1034,
+        1095
+      ]
+    }
+  },
+  "conditions": {
+    "30101": {
+      "progress_show": 1,
+      "type": 3002,
+      "id": 30101,
+      "desc": "多维终端等级达到5级",
+      "params": [
+        5
+      ]
+    },
+    "30102": {
+      "progress_show": 1,
+      "type": 3002,
+      "id": 30102,
+      "desc": "多维终端等级达到25级",
+      "params": [
+        25
+      ]
+    },
+    "30103": {
+      "progress_show": 1,
+      "type": 3001,
+      "id": 30103,
+      "desc": "通关多维变量难度5及以上1次",
+      "params": [
+        5,
+        1
+      ]
+    },
+    "30104": {
+      "progress_show": 1,
+      "type": 3001,
+      "id": 30104,
+      "desc": "通关多维变量难度10及以上1次",
+      "params": [
+        10,
+        1
+      ]
+    },
+    "30105": {
+      "progress_show": 1,
+      "type": 3004,
+      "id": 30105,
+      "desc": "难度5以上通关时队长血量不低于80%",
+      "params": [
+        5,
+        800
+      ]
+    },
+    "30106": {
+      "progress_show": 1,
+      "type": 3003,
+      "id": 30106,
+      "desc": "累计获得8000枚喵喵币",
+      "params": [
+        8000
+      ]
+    },
+    "30107": {
+      "progress_show": 1,
+      "type": 3003,
+      "id": 30107,
+      "desc": "累计获得30000枚喵喵币",
+      "params": [
+        30000
+      ]
+    },
+    "30108": {
+      "progress_show": 1,
+      "type": 3008,
+      "id": 30108,
+      "desc": "累计在多维商店中购买20件物品",
+      "params": [
+        20
+      ]
+    },
+    "30109": {
+      "progress_show": 1,
+      "type": 3006,
+      "id": 30109,
+      "desc": "累计使用5个不同角色作为队长通关多维",
+      "params": [
+        5
+      ]
+    },
+    "30110": {
+      "progress_show": 1,
+      "type": 3009,
+      "id": 30110,
+      "desc": "累计在战局内消灭50个敌人",
+      "params": [
+        50
+      ]
+    },
+    "30111": {
+      "progress_show": 1,
+      "type": 3009,
+      "id": 30111,
+      "desc": "累计在战局内消灭500个敌人",
+      "params": [
+        500
+      ]
+    },
+    "30112": {
+      "progress_show": 1,
+      "type": 3007,
+      "id": 30112,
+      "desc": "累计获得结算积分8000000点",
+      "params": [
+        8000000
+      ]
+    },
+    "30113": {
+      "progress_show": 1,
+      "type": 3005,
+      "id": 30113,
+      "desc": "累计进入珍宝升级传送门10次",
+      "params": [
+        10
+      ]
+    }
+  },
+  "sources": {
+    "decompiled_v2/x64/game/config/battlepolyhedronstagecfg.lua": "e0fcc78fe2696ee4b9014cc9f3567abc9e5d3267946b38a457a58d9b2a9bc11e",
+    "decompiled_v2/x64/game/config/polyhedronterminalcfg.lua": "2d96cf586996fe118b5c137259dd827b5c309c005041146327a9123a950fcb5d",
+    "decompiled_v2/x64/game/config/polyhedronterminallevelcfg.lua": "9bdbb8a7d075cc01f0aa5b3fede87b48a53116a1c88c3044ee45dccc81e36396",
+    "decompiled_v2/x64/game/config/polyhedronsettingcfg.lua": "b2ac681ee5bf2c942072a037ef578c6d3b87d4f5b15930631ffe457729ea56cd",
+    "decompiled_v2/x64/game/config/polyhedrondifficultycfg.lua": "65e72f656e90c60fdf45e55697dd141f5cbdb080676f16eb5ea721b74f9f066c",
+    "decompiled_v2/x64/game/config/polyhedronbeaconcfg.lua": "585accb02aa782ddfef36bf0f7c28d3850d51333d4a5a8d13516e19629f19d15",
+    "decompiled_v2/x64/game/config/heroastrolabecfg.lua": "c7258ba0d37cf2b7dd8481dfb7667ced99298623c751ca80ec95e5ee3a22ebd8",
+    "decompiled_v2/x64/game/config/comboskillcfg.lua": "ad93382e1240cf22cd36f0a50c7faca670190fd4c3191e7ec889025f8fc73fb5",
+    "decompiled_v2/x64/game/config/conditioncfg.lua": "ed79f765579f9fbccb0ed52fe7563f6334d6777b9510e575ab970979bd768511"
+  }
+}

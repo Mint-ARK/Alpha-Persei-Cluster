@@ -179,8 +179,7 @@ def on_boss_challenge_daily_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwa
     """梦境再构每日 05:00 重置挑战次数"""
     if not uid or not hasattr(ctx, 'db') or ctx.db is None:
         return
-    db = ctx.db
-    db.execute("UPDATE boss_challenge_progress SET use_times=0, last_daily_ts=? WHERE uid=?", (cycle_start_ts or now_ts, uid))
+    ctx.db.check_and_lazy_refresh_boss_challenge(uid, now_ts)
 
 
 @bus.subscribe(Events.WEEKLY_RESET_THU_5AM)
@@ -190,20 +189,10 @@ def on_boss_challenge_thu_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwarg
         return
     if now_ts is None:
         now_ts = int(time.time())
-    db = ctx.db
-    cycle_id = int((now_ts - 1700000000) // 604800)
-
-    db.execute("DELETE FROM boss_challenge_normal WHERE uid=?", (uid,))
-    db.execute("DELETE FROM boss_challenge_advance WHERE uid=?", (uid,))
-    db.execute("DELETE FROM boss_challenge_scores WHERE uid=?", (uid,))
-    db.execute("DELETE FROM boss_challenge_exchange WHERE uid=?", (uid,))
-    db.execute("DELETE FROM boss_challenge_claimed_rewards WHERE uid=?", (uid,))
-    db.execute(
-        "UPDATE boss_challenge_progress SET cycle_id=?, use_times=0, last_weekly_ts=?, update_ts=? WHERE uid=?",
-        (cycle_id, cycle_start_ts or now_ts, now_ts, uid)
-    )
-    if hasattr(ctx, 'log'):
-        ctx.log(f"[LazyTimer] 用户 {uid} 触发梦境再构周四 05:00 周期轮换（周期 ID: {cycle_id}）")
+    # 与读取路径共用模块水位，惰性刷新已完成时不再清玩家的新进度。
+    changed = ctx.db.check_and_lazy_refresh_boss_challenge(uid, now_ts)
+    if changed and hasattr(ctx, 'log'):
+        ctx.log(f"[LazyTimer] 用户 {uid} 梦境再构周期已刷新")
 
 
 # ==================== 5. 商店限购周期重置监听器 ====================
@@ -247,6 +236,46 @@ def on_shop_time_tick(ctx, uid, delta_seconds=0, now_ts=None, **kwargs):
 def register_timer_listeners():
     """确保订阅器加载注册（显式调用或 import 时自动注册）"""
     logger.info("[TimerListeners] 全局时间与周期事件订阅器已装配完毕。")
+
+
+@bus.subscribe(Events.WEEKLY_RESET_MON_5AM)
+def on_polyhedron_weekly_reset(ctx, uid, now_ts=None, **kwargs):
+    """在线跨周刷新历程，并推送时间、经验和领取状态。"""
+    if not uid or getattr(ctx, 'db', None) is None:
+        return
+    if not ctx.db.query('SELECT 1 FROM polyhedron_meta WHERE uid=? LIMIT 1', (uid,)):
+        return  # 尚未开启玩法的新档不因时间广播收到玩法初始化帧。
+    from account_db import savepoint_transaction
+    from operation_notifications import checkpoint_notifications, restore_notifications
+    from polyhedron_service import PolyhedronRunManager
+    from weekly_challenge_service import get_polyhedron_activity
+    import generator
+    from codec import encode
+    from middleware import DownFrame
+    version = getattr(ctx, 'res_version', None)
+    activity = get_polyhedron_activity(version, now_ts)
+    checkpoint = checkpoint_notifications(ctx)
+    try:
+        with savepoint_transaction(ctx.db):
+            PolyhedronRunManager.check_and_refresh_policy_cycle(
+                uid, ctx.db, activity_id=activity['activity_id'])
+            if hasattr(ctx, 'append_frame') or hasattr(ctx, 'pending_frames'):
+                packets = [(11003, encode('sc_11003', {'activity': activity})),
+                           (17023, generator.gen_payload(17023, uid=uid, db=ctx.db,
+                                                       touched_items=[45], strict=True)),
+                           (18001, generator.gen_payload(18001, uid=uid, db=ctx.db,
+                                                       res_version=version))]
+                for cmd, payload in packets:
+                    if not isinstance(payload, bytes) or not payload:
+                        raise ValueError(f'多维周刷新通知sc_{cmd}生成失败')
+                    frame = DownFrame(cmd, payload)
+                    if hasattr(ctx, 'append_frame'):
+                        ctx.append_frame(frame)
+                    else:
+                        ctx.pending_frames.append(frame)
+    except BaseException:
+        restore_notifications(ctx, checkpoint)
+        raise
 
 
 @bus.subscribe(Events.TIME_TICK)

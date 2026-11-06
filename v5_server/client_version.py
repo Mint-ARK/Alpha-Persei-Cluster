@@ -3,7 +3,9 @@ import res_version_manager as versions
 
 # GameToSDK: 0 Android, 1 iOS (IDFA/iOS-currency branch), 4 PC payment branch.
 PLATFORM_TYPES = {'0': 'android', '1': 'ios', '4': 'pc'}
-CHANNELS = {'7': 'ios', '8': 'android', '9': 'pc'}
+# Only an unambiguous SDK channel may supply a missing platform. Channel 7
+# is shared by Android official and iOS; game platform_type remains authoritative.
+CHANNELS = {'9': 'pc'}
 
 
 def platform_from_login(data):

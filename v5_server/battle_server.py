@@ -193,9 +193,9 @@ def enc_ack_battle_gs_result(code=1):
     return _f_varint2(1, int(code or 1))
 
 
-def parse_record_counters(payload):
-    """Preserve packed and unpacked int32 fields 14/15, including all repeats."""
-    arrays={14:[],15:[]};i=0
+def parse_record_counters(payload, fields=(14,15)):
+    """Preserve packed and unpacked repeated int32 fields (default record 14/15)."""
+    arrays={field:[] for field in fields};i=0
     while i<len(payload):
         tag,i=rd_varint(payload,i);field,wire=tag>>3,tag&7
         if not field:
@@ -218,7 +218,49 @@ def parse_record_counters(payload):
             if i>len(payload):raise ValueError('Truncated fixed-width battle field')
         else:
             raise ValueError('Unsupported battle field wire type')
-    return arrays[14],arrays[15]
+    return tuple(arrays[field] for field in fields)
+
+
+def _character_fields(payload):
+    """Bounded protobuf scan used for repeated native CharResultInfo fields."""
+    i=0
+    while i<len(payload):
+        tag,i=rd_varint(payload,i);field,wire=tag>>3,tag&7
+        if not field:raise ValueError('Invalid battle character field zero')
+        if wire==0:
+            value,i=rd_varint(payload,i)
+            if value>0xffffffffffffffff:raise ValueError('Battle character varint overflow')
+        elif wire==2:
+            size,i=rd_varint(payload,i);end=i+size
+            if end>len(payload):raise ValueError('Truncated battle character field')
+            value=payload[i:end];i=end
+        elif wire in (1,5):
+            size=8 if wire==1 else 4;end=i+size
+            if end>len(payload):raise ValueError('Truncated battle fixed field')
+            value=payload[i:end];i=end
+        else:raise ValueError('Unsupported battle character wire type')
+        yield field,wire,value
+
+
+def parse_battle_characters(payload):
+    """Keep every field-10 character, including explicit/proto3 zero HP."""
+    characters=[]
+    for field,wire,raw in _character_fields(payload):
+        if field!=10:continue
+        if wire!=2:raise ValueError('Battle character must be a message')
+        fields={}
+        for key,kind,value in _character_fields(raw):
+            if key in (1,2,3):
+                if kind!=0 or key in fields:raise ValueError('Invalid/duplicate battle character scalar')
+                fields[key]=value
+        hero=fields.get(1,0);hp=fields.get(2,0);maximum=fields.get(3,0)
+        if hp>=0x8000000000000000:hp-=0x10000000000000000
+        if maximum>=0x8000000000000000:maximum-=0x10000000000000000
+        if not (0<hero<=0x7fffffff and -0x8000000000000000<=hp<=maximum<=0x7fffffffffffffff and maximum>0):
+            raise ValueError('Invalid battle character HP')
+        characters.append(dict(hero_id=hero,hero_blood=hp,hero_max_blood=maximum))
+        if len(characters)>32:raise ValueError('Too many battle characters')
+    return characters
 
 
 def parse_battle_result(body):
@@ -240,6 +282,17 @@ def parse_battle_result(body):
         info["qte_count"] = int(info_f.get(8, 0))
         info["resurrect_times"] = int(info_f.get(9, 0))
         info["enemy_dead_num"] = int(info_f.get(11, 0))
+        try:
+            info['item_ids'],info['item_numbers']=parse_record_counters(info_raw,(12,13))
+        except (IndexError,ValueError):
+            info['item_ids']=None
+            info['item_numbers']=None
+        try:
+            info['characters']=parse_battle_characters(info_raw)
+        except (IndexError,ValueError,TypeError):
+            # Preserve the result for other modes, but HP-dependent modes must
+            # reject this report instead of silently healing the whole team.
+            info['characters']=None
         try:
             ids,counts=parse_record_counters(info_raw)
             info['record_data_ids']=ids

@@ -24,6 +24,7 @@ import json
 import time
 import random
 import logging
+from contextlib import contextmanager
 
 logger = logging.getLogger("equip_service")
 
@@ -53,6 +54,23 @@ EXP_TIERS = [
 BASE_EXP_STAR = [0, 20, 50, 100, 150, 1250, 800, 800]
 
 EQUIP_STRENGTHEN_GOLD_RATIO = 1
+
+# RaceEffectCfg.all，与重构池一致；0表示没有待确认预览。
+RECONSTRUCT_RACES = (1, 2, 3, 4, 5, 9)
+
+
+@contextmanager
+def _equip_growth_write(ctx, db):
+    from account_db import savepoint_transaction
+    from operation_notifications import checkpoint_notifications, restore_notifications
+    checkpoint = checkpoint_notifications(ctx) if ctx is not None else None
+    try:
+        with savepoint_transaction(db):
+            yield
+    except BaseException:
+        if checkpoint is not None:
+            restore_notifications(ctx, checkpoint)
+        raise
 
 RESOLVE_NUM = {5: (41002, 5), 6: (41002, 10), 7: (41002, 10)}
 BREAK_RETURN_MATS = {3: [1001], 4: [1001, 1002], 5: [1001, 1002, 1003, 1004, 1005]}
@@ -304,7 +322,56 @@ class EquipService:
             "gold_cost": gold_cost,
         }
 
+    def _get_equip_break_config(self, db, prefab_id):
+        rows = db.query('SELECT * FROM equip_cfg WHERE prefab_id=?', (prefab_id,))
+        if not rows:
+            raise OperationError(4, '刻印突破配置缺失')
+        cfg = dict(rows[0])
+        try:
+            for key in ('max_level', 'break_cost', 'exp_variant'):
+                cfg[key] = json.loads(cfg[key])
+                if not isinstance(cfg[key], list):
+                    raise ValueError(key)
+            cap = cfg['break_times_max']
+            levels = cfg['max_level']
+            variants = cfg['exp_variant']
+            if type(cap) is not int or cap < 0 or len(levels) <= cap:
+                raise ValueError('break cap')
+            if any(type(v) is not int or v <= 0 for v in levels) or levels != sorted(set(levels)):
+                raise ValueError('max levels')
+            if not variants or type(variants[0]) is not int or not 1 <= variants[0] <= 7:
+                raise ValueError('experience variant')
+            cfg['exp_variant'] = variants[0]
+        except (ValueError, TypeError, KeyError):
+            raise OperationError(4, '刻印突破配置损坏')
+        return cfg
+
+    def _equip_break_cost(self, db, cfg, step):
+        costs = cfg['break_cost']
+        if not 0 <= step < len(costs) or type(costs[step]) is not int or costs[step] <= 0:
+            raise OperationError(4, '刻印突破费用索引缺失')
+        mat_id = costs[step]
+        rows = db.query('SELECT item_list FROM equip_material_cfg WHERE mat_id=?', (mat_id,))
+        if not rows:
+            raise OperationError(4, '刻印突破费用模板缺失')
+        try:
+            items = json.loads(rows[0]['item_list'])
+            if not isinstance(items, list):
+                raise ValueError('cost list')
+            for item in items:
+                if not isinstance(item, list) or len(item) != 2:
+                    raise ValueError('cost item')
+                if type(item[0]) is not int or item[0] <= 0 or type(item[1]) is not int or item[1] < 0:
+                    raise ValueError('cost amount')
+        except (ValueError, TypeError):
+            raise OperationError(4, '刻印突破费用模板损坏')
+        return mat_id, items
+
     def breakthrough_equip(self, ctx, uid, equip_id):
+        with _equip_growth_write(ctx, getattr(ctx, 'db', self.db)):
+            return self._breakthrough_equip(ctx, uid, equip_id)
+
+    def _breakthrough_equip(self, ctx, uid, equip_id):
         """
         刻印突破：cs_13022 -> sc_13023
         - 校验是否达到当前阶数上限
@@ -318,13 +385,10 @@ class EquipService:
             raise OperationError(406, f"刻印 {eid} 不存在")
         eq = eqs[0]
 
-        cfg = self.get_equip_cfg(eq["prefab_id"], db=db)
-        if not cfg:
-            raise OperationError(4, f"刻印配置 {eq['prefab_id']} 缺失")
-
+        cfg = self._get_equip_break_config(db, eq['prefab_id'])
         cur_break = int(eq["now_break_level"] or 0)
         cap = cfg["break_times_max"]
-        if cur_break >= cap:
+        if not 0 <= cur_break < cap:
             raise OperationError(2, f"刻印 {eid} 已达突破上限 ({cap}阶)")
 
         mls = cfg["max_level"]
@@ -334,15 +398,12 @@ class EquipService:
         if cur_exp < need_exp:
             raise OperationError(2, f"刻印经验未满 (需达 Lv{max_lv})，暂不能突破！")
 
-        bcs = cfg["break_cost"]
-        mat_id = bcs[cur_break] if cur_break < len(bcs) else (1001 + cur_break)
+        mat_id, items = self._equip_break_cost(db, cfg, cur_break)
 
         from inventory_service import InventoryService
         inv = InventoryService.get_instance(db=db)
-        mrow = db.query("SELECT item_list FROM equip_material_cfg WHERE mat_id=?", (mat_id,))
-        if mrow:
-            items = json.loads(mrow[0]["item_list"] or "[]")
-            for iid, num in items:
+        for iid, num in items:
+            if num:
                 inv.deduct_item(ctx, uid, int(iid), int(num), db=db)
                 if hasattr(ctx, "touched_items"):
                     ctx.touched_items.add(int(iid))
@@ -359,12 +420,16 @@ class EquipService:
         return {"equip_id": eid, "break_level": new_break, "cost_id": mat_id}
 
     def one_click_enhance(self, ctx, uid, equip_id, target_level=None, break_times=0, mat_list=None, equip_list=None):
+        with _equip_growth_write(ctx, getattr(ctx, 'db', self.db)):
+            return self._one_click_enhance(ctx, uid, equip_id, target_level, break_times, mat_list, equip_list)
+
+    def _one_click_enhance(self, ctx, uid, equip_id, target_level=None, break_times=0, mat_list=None, equip_list=None):
         """
         刻印一键强化+突破：cs_13058 -> sc_13059
         - 步骤：
-          1. 先按 break_times 执行突破，提升等级上限
-          2. 精准充入目标经验，超出部分通过 material_give_back 100% 返还
-          3. 扣除突破材料与强化金币
+          1. 预计算本次经验与每阶段前置、费用和目标上限
+          2. 完整方案通过后扣费、消费素材并返还多余经验材料
+          3. 一次保存累计经验与最终突破阶段
         """
         db = getattr(ctx, "db", self.db)
         eid = int(equip_id)
@@ -373,9 +438,7 @@ class EquipService:
             raise OperationError(406, f"刻印 {eid} 不存在")
         eq = eqs[0]
 
-        cfg = self.get_equip_cfg(eq["prefab_id"], db=db)
-        if not cfg:
-            raise OperationError(4, f"刻印配置 {eq['prefab_id']} 缺失")
+        cfg = self._get_equip_break_config(db, eq['prefab_id'])
 
         from inventory_service import InventoryService
         inv = InventoryService.get_instance(db=db)
@@ -383,60 +446,53 @@ class EquipService:
         max_break = cfg["break_times_max"]
 
         b_times = int(break_times or 0)
-        breaks_done = 0
-        bcs = cfg["break_cost"]
-        for _ in range(b_times):
-            if cur_break >= max_break:
-                break
-            mat_id = bcs[cur_break] if cur_break < len(bcs) else (1001 + cur_break)
-            mrow = db.query("SELECT item_list FROM equip_material_cfg WHERE mat_id=?", (mat_id,))
-            if mrow:
-                items = json.loads(mrow[0]["item_list"] or "[]")
-                for iid, num in items:
-                    inv.deduct_item(ctx, uid, int(iid), int(num), db=db)
-                    if hasattr(ctx, "touched_items"):
-                        ctx.touched_items.add(int(iid))
-            cur_break += 1
-            breaks_done += 1
+        if cur_break < 0 or b_times < 0 or cur_break + b_times > max_break:
+            raise OperationError(2, '刻印突破次数越界')
+        final_break = cur_break + b_times
+        total_cost = {}
+        for step in range(cur_break, final_break):
+            _, items = self._equip_break_cost(db, cfg, step)
+            for iid, num in items:
+                total_cost[iid] = total_cost.get(iid, 0) + num
 
         exp_add = 0
         if mat_list:
             for it in mat_list:
                 iid = int(it.get("item_id") or it.get("id") or 0)
                 num = int(it.get("item_num") or it.get("num") or 0)
-                if num > 0 and iid in EQUIP_EXP_ITEMS:
-                    inv.deduct_item(ctx, uid, iid, num, db=db)
+                if num < 0 or (num > 0 and iid not in EQUIP_EXP_ITEMS):
+                    raise OperationError(2, '刻印经验材料无效')
+                if num > 0:
+                    total_cost[iid] = total_cost.get(iid, 0) + num
                     exp_add += EQUIP_EXP_ITEMS[iid] * num
-                    if hasattr(ctx, "touched_items"):
-                        ctx.touched_items.add(iid)
 
+        foods = []
+        seen_foods = set()
         if equip_list:
             for sub_eid in equip_list:
                 sub_id = int(sub_eid)
-                if sub_id == eid:
-                    continue
+                if sub_id == eid or sub_id in seen_foods:
+                    raise OperationError(2, '刻印经验素材重复或包含目标自身')
+                seen_foods.add(sub_id)
                 sub_row = db.query("SELECT * FROM equip WHERE uid=? AND id=?", (uid, sub_id))
-                if not sub_row:
-                    continue
-                if sub_row and not sub_row[0].get("is_lock") and not sub_row[0].get("hero_id"):
+                if not sub_row or sub_row[0].get('is_lock') or sub_row[0].get('hero_id'):
+                    raise OperationError(2, '刻印经验素材不可消耗')
+                if sub_row:
                     se = sub_row[0]
                     scfg = self.get_equip_cfg(se["prefab_id"], db=db)
-                    star = scfg["starlevel"] if scfg else 5
+                    if not scfg:
+                        raise OperationError(4, '刻印经验素材配置缺失')
+                    star = scfg['starlevel']
                     base_val = BASE_EXP_STAR[star] if star < len(BASE_EXP_STAR) else 100
                     exp_add += base_val + int(se["exp"] or 0)
-                    db.execute("DELETE FROM equip WHERE uid=? AND id=?", (uid, sub_id))
-                    if not hasattr(ctx, "removed_equips") or ctx.removed_equips is None:
-                        ctx.removed_equips = []
-                    ctx.removed_equips.append({
-                        "equip_id": sub_id,
-                        "prefab_id": int(se.get("prefab_id") or 0),
-                        "num": 0,
-                    })
+                    foods.append(se)
 
         mls = cfg["max_level"]
-        cap_lv = mls[min(cur_break, len(mls) - 1)] if mls else 60
+        cap_lv = mls[final_break]
         t_lv = int(target_level or cap_lv)
-        effective_target_lv = min(t_lv, cap_lv)
+        if not 1 <= t_lv <= cap_lv:
+            raise OperationError(2, '刻印目标等级越界')
+        effective_target_lv = t_lv
         variant = cfg["exp_variant"]
         target_cum_exp = self.calc_need_exp(variant, effective_target_lv, db=db)
         cur_exp = int(eq["exp"] or 0)
@@ -453,23 +509,36 @@ class EquipService:
 
             if overflow > 0:
                 refund_mats = material_give_back(overflow)
-                for rm in refund_mats:
-                    inv.add_item(ctx, uid, rm["id"], rm["num"], db=db)
-                    if hasattr(ctx, "touched_items"):
-                        ctx.touched_items.add(rm["id"])
 
             gold_cost = int(actual_exp_add * EQUIP_STRENGTHEN_GOLD_RATIO)
-            if gold_cost > 0:
-                inv.deduct_item(ctx, uid, 2, gold_cost, db=db)
-                if hasattr(ctx, "touched_items"):
-                    ctx.touched_items.add(2)
-                try:
-                    event_bus.bus.emit(event_bus.Events.GOLD_COST, ctx, uid, amount=gold_cost)
-                except Exception:
-                    pass
+
+        for step in range(cur_break, final_break):
+            required = self.calc_need_exp(variant, mls[step], db=db)
+            if new_exp < required:
+                raise OperationError(2, '本次经验不足以完成指定刻印突破')
+        total_cost[2] = total_cost.get(2, 0) + gold_cost
+        for iid, num in total_cost.items():
+            if num > 0 and inv.get_item_balance(db, uid, iid)[1] < num:
+                raise OperationError(3, '刻印强化或突破材料不足')
+        # 方案与所有阶段配置均通过后，才执行扣费、素材消费和经验返还。
+        for iid, num in total_cost.items():
+            if num > 0:
+                inv.deduct_item(ctx, uid, iid, num, db=db)
+        for food in foods:
+            db.execute('DELETE FROM equip WHERE uid=? AND id=?', (uid, food['id']))
+            if not hasattr(ctx, 'removed_equips') or ctx.removed_equips is None:
+                ctx.removed_equips = []
+            ctx.removed_equips.append(dict(equip_id=food['id'], prefab_id=int(food['prefab_id']), num=0))
+        for rm in refund_mats:
+            inv.add_item(ctx, uid, rm['id'], rm['num'], db=db)
+        if gold_cost > 0:
+            try:
+                event_bus.bus.emit(event_bus.Events.GOLD_COST, ctx, uid, amount=gold_cost)
+            except Exception:
+                pass
 
         db.execute("UPDATE equip SET exp=?, now_break_level=?, update_ts=? WHERE uid=? AND id=?",
-                   (new_exp, cur_break, int(time.time()), uid, eid))
+                   (new_exp, final_break, int(time.time()), uid, eid))
 
         try:
             event_bus.bus.emit(event_bus.Events.EQUIP_REFORGE, ctx, uid, equip_id=eid)
@@ -479,8 +548,8 @@ class EquipService:
         return {
             "equip_id": eid,
             "exp": new_exp,
-            "breaks": breaks_done,
-            "break_level": cur_break,
+            "breaks": b_times,
+            "break_level": final_break,
             "refund_mats": refund_mats,
             "gold_cost": gold_cost
         }
@@ -705,15 +774,13 @@ class EquipService:
         db = getattr(ctx, "db", self.db)
         eid = int(equip_id)
         sid = int(slot_id or 1)
-        p_idx = int(preview_index or 1) - 1
+        p_idx = int(1 if preview_index is None else preview_index) - 1
         slots, idx, slot = self._get_enchant_slot(db, uid, eid, sid)
 
         prev_list = slot.get("preview_list") or []
-        chosen_roll = None
-        if 0 <= p_idx < len(prev_list):
-            chosen_roll = prev_list.pop(p_idx)
-        elif prev_list:
-            chosen_roll = prev_list.pop(0)
+        if not 0 <= p_idx < len(prev_list):
+            raise OperationError(2, "赋能预览序号已失效")
+        chosen_roll = prev_list.pop(p_idx)
 
         if confirm and chosen_roll:
             if isinstance(chosen_roll, list):
@@ -788,7 +855,7 @@ class EquipService:
         if hasattr(ctx, "touched_items"):
             ctx.touched_items.update([2, 40701])
 
-        new_race = random.choice([1, 2, 3, 4, 5, 9])
+        new_race = random.choice(RECONSTRUCT_RACES)
         db.execute("UPDATE equip SET race_preview=?, update_ts=? WHERE uid=? AND id=?",
                    (new_race, int(time.time()), uid, eid))
 
@@ -808,6 +875,8 @@ class EquipService:
             raise OperationError(406, f"刻印 {eid} 不存在")
         c_flag = bool(confirm)
         final_race = int(eq[0]["race_preview"] or 0) if c_flag else int(eq[0]["race"] or 0)
+        if c_flag and final_race not in RECONSTRUCT_RACES:
+            raise OperationError(2, "没有有效的待确认神系")
         if c_flag:
             db.execute("UPDATE equip SET race=?, race_preview=0, update_ts=? WHERE uid=? AND id=?",
                        (final_race, int(time.time()), uid, eid))

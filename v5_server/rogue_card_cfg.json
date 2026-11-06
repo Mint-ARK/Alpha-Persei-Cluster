@@ -1,0 +1,832 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "path": "decompiled_v2/x64/game/config/roguecardpostingcfg.lua",
+      "sha256": "68e84c0901e0bd82abb9cba304ed9b03472f5edafe89d1632793b634c4956cb9"
+    },
+    {
+      "path": "decompiled_v2/x64/game/config/roguecardstagecfg.lua",
+      "sha256": "28222e7582ce517d11eb645d95f25dcd0da3ad685bc2bafa658b5ddfd98398e7"
+    },
+    {
+      "path": "decompiled_v2/x64/game/config/roguecarddeckcfg.lua",
+      "sha256": "291b94c61e81b2ca394c4f46818aa6cbd0872b2860b6496a403a1d5c715a184f"
+    },
+    {
+      "path": "decompiled_v2/x64/game/config/roguecarddifficultycfg.lua",
+      "sha256": "9d29f8c9874f2c660c7c6bc413b772fe0b3692e2e7fe9eb587dafd70c0055e2f"
+    },
+    {
+      "path": "decompiled_v2/x64/game/config/roguecarditemcfg.lua",
+      "sha256": "b02afa570c001db2466dbecbebff14b0bca6590f69618ec3d4c24df46ff67e3d"
+    },
+    {
+      "path": "decompiled_v2/x64/game/config/roguecardenhancecfg.lua",
+      "sha256": "6e70f8a2fecb849b43b8e7d72d853aeec683bd30808a882cb6c938d108eac9e4"
+    },
+    {
+      "path": "decompiled_v2/x64/game/config/roguecardbosseffectcfg.lua",
+      "sha256": "e804d26645697542ec935dc36d7ab0fd5b4d5328b11470481bfb68ef41ae15a6"
+    },
+    {
+      "path": "decompiled_v2/x64/game/config/roguecardhandtypecfg.lua",
+      "sha256": "f39ebb16a4ea6c1446afeab7e0998834ac9b085128d17914fe5228d1647d1b81"
+    },
+    {
+      "path": "decompiled_v2/x64/game/config/conditioncfg.lua",
+      "sha256": "ed79f765579f9fbccb0ed52fe7563f6334d6777b9510e575ab970979bd768511"
+    }
+  ],
+  "posts": {
+    "101": {
+      "id": 101,
+      "type": 1,
+      "pre_id": 0,
+      "balatro_id": 101,
+      "story_id1": 0,
+      "story_id2": 939012001
+    },
+    "102": {
+      "id": 102,
+      "type": 1,
+      "pre_id": 101,
+      "balatro_id": 102,
+      "story_id1": 939021001,
+      "story_id2": 939022001
+    },
+    "103": {
+      "id": 103,
+      "type": 1,
+      "pre_id": 102,
+      "balatro_id": 103,
+      "story_id1": 939031001,
+      "story_id2": 939032001
+    },
+    "104": {
+      "id": 104,
+      "type": 1,
+      "pre_id": 103,
+      "balatro_id": 104,
+      "story_id1": 939041001,
+      "story_id2": 939042001
+    },
+    "105": {
+      "id": 105,
+      "type": 1,
+      "pre_id": 104,
+      "balatro_id": 105,
+      "story_id1": 939051001,
+      "story_id2": 939052001
+    },
+    "106": {
+      "id": 106,
+      "type": 1,
+      "pre_id": 105,
+      "balatro_id": 106,
+      "story_id1": 939061001,
+      "story_id2": 939062001
+    },
+    "107": {
+      "id": 107,
+      "type": 1,
+      "pre_id": 106,
+      "balatro_id": 0,
+      "story_id1": 939071001,
+      "story_id2": 0
+    },
+    "201": {
+      "id": 201,
+      "type": 2,
+      "pre_id": 101,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "202": {
+      "id": 202,
+      "type": 2,
+      "pre_id": 102,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "203": {
+      "id": 203,
+      "type": 2,
+      "pre_id": 103,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "204": {
+      "id": 204,
+      "type": 2,
+      "pre_id": 104,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "205": {
+      "id": 205,
+      "type": 2,
+      "pre_id": 105,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "206": {
+      "id": 206,
+      "type": 2,
+      "pre_id": 106,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "207": {
+      "id": 207,
+      "type": 2,
+      "pre_id": 107,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "301": {
+      "id": 301,
+      "type": 3,
+      "pre_id": 101,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "302": {
+      "id": 302,
+      "type": 3,
+      "pre_id": 101,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "303": {
+      "id": 303,
+      "type": 3,
+      "pre_id": 102,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "304": {
+      "id": 304,
+      "type": 3,
+      "pre_id": 102,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "305": {
+      "id": 305,
+      "type": 3,
+      "pre_id": 103,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "306": {
+      "id": 306,
+      "type": 3,
+      "pre_id": 103,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "307": {
+      "id": 307,
+      "type": 3,
+      "pre_id": 104,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "308": {
+      "id": 308,
+      "type": 3,
+      "pre_id": 104,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "309": {
+      "id": 309,
+      "type": 3,
+      "pre_id": 105,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "310": {
+      "id": 310,
+      "type": 3,
+      "pre_id": 105,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "311": {
+      "id": 311,
+      "type": 3,
+      "pre_id": 106,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "312": {
+      "id": 312,
+      "type": 3,
+      "pre_id": 106,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    },
+    "313": {
+      "id": 313,
+      "type": 3,
+      "pre_id": 106,
+      "balatro_id": 0,
+      "story_id1": 0,
+      "story_id2": 0
+    }
+  },
+  "stages": {
+    "101": {
+      "id": 101,
+      "type": 1,
+      "round": 1
+    },
+    "102": {
+      "id": 102,
+      "type": 1,
+      "round": 2
+    },
+    "103": {
+      "id": 103,
+      "type": 1,
+      "round": 2
+    },
+    "104": {
+      "id": 104,
+      "type": 1,
+      "round": 3
+    },
+    "105": {
+      "id": 105,
+      "type": 1,
+      "round": 3
+    },
+    "106": {
+      "id": 106,
+      "type": 3,
+      "round": 6
+    },
+    "201": {
+      "id": 201,
+      "type": 2,
+      "round": 6
+    }
+  },
+  "decks": {
+    "1": {
+      "id": 1,
+      "condition": 0
+    },
+    "2": {
+      "id": 2,
+      "condition": 1270101
+    },
+    "3": {
+      "id": 3,
+      "condition": 1270201
+    },
+    "4": {
+      "id": 4,
+      "condition": 1270202
+    }
+  },
+  "difficulties": {
+    "1": {
+      "id": 1
+    },
+    "2": {
+      "id": 2
+    },
+    "3": {
+      "id": 3
+    },
+    "4": {
+      "id": 4
+    },
+    "5": {
+      "id": 5
+    },
+    "6": {
+      "id": 6
+    }
+  },
+  "cards": {
+    "1": {
+      "id": 1,
+      "type": 1
+    },
+    "2": {
+      "id": 2,
+      "type": 1
+    },
+    "3": {
+      "id": 3,
+      "type": 1
+    },
+    "4": {
+      "id": 4,
+      "type": 1
+    },
+    "5": {
+      "id": 5,
+      "type": 1
+    },
+    "6": {
+      "id": 6,
+      "type": 1
+    },
+    "7": {
+      "id": 7,
+      "type": 1
+    },
+    "8": {
+      "id": 8,
+      "type": 1
+    },
+    "51": {
+      "id": 51,
+      "type": 2
+    },
+    "52": {
+      "id": 52,
+      "type": 2
+    },
+    "53": {
+      "id": 53,
+      "type": 2
+    },
+    "54": {
+      "id": 54,
+      "type": 2
+    },
+    "55": {
+      "id": 55,
+      "type": 2
+    },
+    "61": {
+      "id": 61,
+      "type": 2
+    },
+    "62": {
+      "id": 62,
+      "type": 2
+    },
+    "63": {
+      "id": 63,
+      "type": 2
+    },
+    "64": {
+      "id": 64,
+      "type": 2
+    },
+    "101": {
+      "id": 101,
+      "type": 3
+    },
+    "102": {
+      "id": 102,
+      "type": 3
+    },
+    "103": {
+      "id": 103,
+      "type": 3
+    },
+    "104": {
+      "id": 104,
+      "type": 3
+    },
+    "105": {
+      "id": 105,
+      "type": 3
+    },
+    "106": {
+      "id": 106,
+      "type": 3
+    },
+    "107": {
+      "id": 107,
+      "type": 3
+    },
+    "108": {
+      "id": 108,
+      "type": 3
+    },
+    "109": {
+      "id": 109,
+      "type": 3
+    },
+    "110": {
+      "id": 110,
+      "type": 3
+    },
+    "111": {
+      "id": 111,
+      "type": 3
+    },
+    "112": {
+      "id": 112,
+      "type": 3
+    },
+    "113": {
+      "id": 113,
+      "type": 3
+    },
+    "114": {
+      "id": 114,
+      "type": 3
+    },
+    "115": {
+      "id": 115,
+      "type": 3
+    },
+    "116": {
+      "id": 116,
+      "type": 3
+    },
+    "117": {
+      "id": 117,
+      "type": 3
+    },
+    "118": {
+      "id": 118,
+      "type": 3
+    },
+    "119": {
+      "id": 119,
+      "type": 3
+    },
+    "120": {
+      "id": 120,
+      "type": 3
+    },
+    "121": {
+      "id": 121,
+      "type": 3
+    },
+    "122": {
+      "id": 122,
+      "type": 3
+    },
+    "201": {
+      "id": 201,
+      "type": 3
+    },
+    "202": {
+      "id": 202,
+      "type": 3
+    },
+    "203": {
+      "id": 203,
+      "type": 3
+    },
+    "204": {
+      "id": 204,
+      "type": 3
+    },
+    "205": {
+      "id": 205,
+      "type": 3
+    },
+    "206": {
+      "id": 206,
+      "type": 3
+    },
+    "207": {
+      "id": 207,
+      "type": 3
+    },
+    "208": {
+      "id": 208,
+      "type": 3
+    },
+    "209": {
+      "id": 209,
+      "type": 3
+    },
+    "210": {
+      "id": 210,
+      "type": 3
+    },
+    "211": {
+      "id": 211,
+      "type": 3
+    },
+    "212": {
+      "id": 212,
+      "type": 3
+    },
+    "213": {
+      "id": 213,
+      "type": 3
+    },
+    "214": {
+      "id": 214,
+      "type": 3
+    },
+    "215": {
+      "id": 215,
+      "type": 3
+    },
+    "216": {
+      "id": 216,
+      "type": 3
+    },
+    "217": {
+      "id": 217,
+      "type": 3
+    },
+    "218": {
+      "id": 218,
+      "type": 3
+    },
+    "219": {
+      "id": 219,
+      "type": 3
+    },
+    "220": {
+      "id": 220,
+      "type": 3
+    },
+    "221": {
+      "id": 221,
+      "type": 3
+    },
+    "222": {
+      "id": 222,
+      "type": 3
+    },
+    "223": {
+      "id": 223,
+      "type": 3
+    },
+    "224": {
+      "id": 224,
+      "type": 3
+    },
+    "301": {
+      "id": 301,
+      "type": 3
+    },
+    "302": {
+      "id": 302,
+      "type": 3
+    },
+    "303": {
+      "id": 303,
+      "type": 3
+    },
+    "304": {
+      "id": 304,
+      "type": 3
+    },
+    "305": {
+      "id": 305,
+      "type": 3
+    },
+    "306": {
+      "id": 306,
+      "type": 3
+    },
+    "307": {
+      "id": 307,
+      "type": 3
+    },
+    "308": {
+      "id": 308,
+      "type": 3
+    },
+    "309": {
+      "id": 309,
+      "type": 3
+    },
+    "310": {
+      "id": 310,
+      "type": 3
+    },
+    "311": {
+      "id": 311,
+      "type": 3
+    },
+    "312": {
+      "id": 312,
+      "type": 3
+    },
+    "313": {
+      "id": 313,
+      "type": 3
+    },
+    "314": {
+      "id": 314,
+      "type": 3
+    }
+  },
+  "enhances": {
+    "101": {
+      "id": 101
+    },
+    "102": {
+      "id": 102
+    },
+    "103": {
+      "id": 103
+    },
+    "104": {
+      "id": 104
+    },
+    "105": {
+      "id": 105
+    },
+    "201": {
+      "id": 201
+    },
+    "202": {
+      "id": 202
+    },
+    "203": {
+      "id": 203
+    },
+    "204": {
+      "id": 204
+    },
+    "301": {
+      "id": 301
+    },
+    "302": {
+      "id": 302
+    },
+    "303": {
+      "id": 303
+    },
+    "304": {
+      "id": 304
+    }
+  },
+  "weal_woe": {
+    "101": {
+      "id": 101,
+      "type": 1
+    },
+    "102": {
+      "id": 102,
+      "type": 1
+    },
+    "103": {
+      "id": 103,
+      "type": 1
+    },
+    "104": {
+      "id": 104,
+      "type": 1
+    },
+    "105": {
+      "id": 105,
+      "type": 1
+    },
+    "106": {
+      "id": 106,
+      "type": 1
+    },
+    "107": {
+      "id": 107,
+      "type": 1
+    },
+    "108": {
+      "id": 108,
+      "type": 1
+    },
+    "109": {
+      "id": 109,
+      "type": 1
+    },
+    "110": {
+      "id": 110,
+      "type": 1
+    },
+    "111": {
+      "id": 111,
+      "type": 1
+    },
+    "112": {
+      "id": 112,
+      "type": 1
+    },
+    "113": {
+      "id": 113,
+      "type": 1
+    },
+    "199": {
+      "id": 199,
+      "type": 1
+    },
+    "201": {
+      "id": 201,
+      "type": 2
+    },
+    "202": {
+      "id": 202,
+      "type": 2
+    },
+    "203": {
+      "id": 203,
+      "type": 2
+    },
+    "204": {
+      "id": 204,
+      "type": 2
+    },
+    "205": {
+      "id": 205,
+      "type": 2
+    },
+    "206": {
+      "id": 206,
+      "type": 2
+    },
+    "207": {
+      "id": 207,
+      "type": 2
+    },
+    "208": {
+      "id": 208,
+      "type": 2
+    },
+    "209": {
+      "id": 209,
+      "type": 2
+    },
+    "210": {
+      "id": 210,
+      "type": 2
+    },
+    "299": {
+      "id": 299,
+      "type": 2
+    }
+  },
+  "hand_types": {
+    "1": {
+      "id": 1
+    },
+    "2": {
+      "id": 2
+    },
+    "3": {
+      "id": 3
+    },
+    "4": {
+      "id": 4
+    },
+    "5": {
+      "id": 5
+    },
+    "6": {
+      "id": 6
+    }
+  },
+  "conditions": {
+    "1270101": {
+      "id": 1270101,
+      "type": 12701,
+      "params": [
+        106
+      ]
+    },
+    "1270201": {
+      "id": 1270201,
+      "type": 12702,
+      "params": [
+        2,
+        1
+      ]
+    },
+    "1270202": {
+      "id": 1270202,
+      "type": 12702,
+      "params": [
+        3,
+        1
+      ]
+    }
+  }
+}

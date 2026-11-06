@@ -4,7 +4,7 @@ No player data and no filesystem work at import. A shared OS lock admits passive
 readers; an exclusive lock admits one active execution group. Held marker locks
 advertise waiting passive readers so an active owner can yield across processes.
 """
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 import errno
 import os
 from pathlib import Path
@@ -256,7 +256,7 @@ class PriorityGate:
                 self._condition.notify_all()
 
     @contextmanager
-    def passive(self):
+    def passive(self, *, bind_token=True):
         lease = None
         with self._condition:
             if self._passive == 0:
@@ -281,7 +281,7 @@ class PriorityGate:
                 self.on_acquired()
             token = TransferToken()
             # Passive scopes are deliberately not reusable as active sessions.
-            with bind(token):
+            with bind(token) if bind_token else nullcontext():
                 yield token
         finally:
             if lease:

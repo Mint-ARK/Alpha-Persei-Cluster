@@ -1,0 +1,4428 @@
+{
+  "activity": {
+    "hero_prefab_id": "9084_tpose",
+    "certificate_cost_id": 54057,
+    "hero_id": 1284,
+    "activity_id": 242841,
+    "task_id": 202805,
+    "shop_item_id": 216000001,
+    "refresh_cost": [
+      [
+        1,
+        30
+      ]
+    ],
+    "daily_award": [
+      [
+        53100,
+        80
+      ]
+    ],
+    "affix_unlock": [
+      [
+        9768,
+        1,
+        3
+      ],
+      [
+        9769,
+        1,
+        3
+      ],
+      [
+        9770,
+        1,
+        3
+      ]
+    ],
+    "affix_group_1": [
+      [
+        1000,
+        9759
+      ],
+      [
+        2000,
+        9760
+      ],
+      [
+        3000,
+        9761
+      ]
+    ],
+    "affix_group_2": [
+      [
+        1000,
+        9762
+      ],
+      [
+        2000,
+        9763
+      ],
+      [
+        3000,
+        9764
+      ]
+    ],
+    "affix_group_3": [
+      [
+        1000,
+        9765
+      ],
+      [
+        2000,
+        9766
+      ],
+      [
+        3000,
+        9767
+      ]
+    ],
+    "affix_defense": [
+      9758,
+      100,
+      0
+    ],
+    "close_condition": [
+      112041,
+      112051,
+      112052,
+      112053
+    ]
+  },
+  "schedules": {
+    "2428401": {
+      "score": 25,
+      "name": "回响启示",
+      "select_type": 0,
+      "linkgame_des": "完成1次未通关的回响启示关卡",
+      "type": 1,
+      "server_type": 1,
+      "priority": 1,
+      "activity_id": 242841,
+      "id": 2428401,
+      "pre_condition": [],
+      "remove_condition": [
+        112001
+      ]
+    },
+    "2428402": {
+      "score": 25,
+      "name": "神能训练",
+      "select_type": 0,
+      "linkgame_des": "完成1次神能训练关卡",
+      "type": 1,
+      "server_type": 2,
+      "priority": 2,
+      "activity_id": 242841,
+      "id": 2428402,
+      "pre_condition": [
+        112001
+      ],
+      "remove_condition": []
+    },
+    "2428403": {
+      "score": 25,
+      "name": "意志训练",
+      "select_type": 0,
+      "linkgame_des": "完成1次意志训练关卡",
+      "type": 1,
+      "server_type": 3,
+      "priority": 3,
+      "activity_id": 242841,
+      "id": 2428403,
+      "pre_condition": [
+        112001
+      ],
+      "remove_condition": []
+    },
+    "2428404": {
+      "score": 25,
+      "name": "技巧训练",
+      "select_type": 0,
+      "linkgame_des": "完成1次技巧训练关卡",
+      "type": 1,
+      "server_type": 4,
+      "priority": 4,
+      "activity_id": 242841,
+      "id": 2428404,
+      "pre_condition": [
+        112001
+      ],
+      "remove_condition": []
+    },
+    "2428405": {
+      "score": 100,
+      "name": "侵蚀抵抗",
+      "select_type": 0,
+      "linkgame_des": "完成1次侵蚀抵抗关卡",
+      "type": 1,
+      "server_type": 5,
+      "priority": 5,
+      "activity_id": 242851,
+      "id": 2428405,
+      "pre_condition": [
+        112001
+      ],
+      "remove_condition": []
+    },
+    "2428406": {
+      "score": 25,
+      "name": "演绎行乐",
+      "select_type": 0,
+      "linkgame_des": "完成1次演绎行乐关卡",
+      "type": 2,
+      "server_type": 6,
+      "priority": 1,
+      "activity_id": 242841,
+      "id": 2428406,
+      "pre_condition": [],
+      "remove_condition": [
+        112011
+      ]
+    },
+    "2428407": {
+      "score": 25,
+      "name": "闲暇时刻",
+      "select_type": 0,
+      "linkgame_des": "完成1次闲暇时刻小游戏",
+      "type": 2,
+      "server_type": 7,
+      "priority": 2,
+      "activity_id": 242841,
+      "id": 2428407,
+      "pre_condition": [],
+      "remove_condition": []
+    },
+    "2428408": {
+      "score": 25,
+      "name": "故地重游",
+      "select_type": 0,
+      "linkgame_des": "接取1次故地重游任意等级委托",
+      "type": 3,
+      "server_type": 8,
+      "priority": 1,
+      "activity_id": 242841,
+      "id": 2428408,
+      "pre_condition": [],
+      "remove_condition": []
+    }
+  },
+  "entrusts": {
+    "2428401": {
+      "name": "寻香而至",
+      "time": 480,
+      "id": 2428401,
+      "activity_id": 242841,
+      "task_level": 1,
+      "desc": "在路上闲逛时突然闻到了熟悉的香味，追随香味而去发现源头是一家曾经经常光顾的面包房，刚好顺便买些吧。",
+      "cost": [
+        [
+          40301,
+          10
+        ]
+      ],
+      "reward_list": [
+        [
+          53100,
+          80
+        ]
+      ]
+    },
+    "2428402": {
+      "name": "好机会",
+      "time": 480,
+      "id": 2428402,
+      "activity_id": 242841,
+      "task_level": 1,
+      "desc": "多米尼餐厅此时还没有人排队，趁此机会去试试无需预约的「墨兰德榛果千层酥」套餐吧！",
+      "cost": [
+        [
+          40602,
+          1
+        ]
+      ],
+      "reward_list": [
+        [
+          53100,
+          80
+        ]
+      ]
+    },
+    "2428403": {
+      "name": "半价立省",
+      "time": 480,
+      "id": 2428403,
+      "activity_id": 242841,
+      "task_level": 1,
+      "desc": "曾经去过的饮品店正在进行半价活动，带些饮品回去和大家分享吧。",
+      "cost": [
+        [
+          40301,
+          10
+        ]
+      ],
+      "reward_list": [
+        [
+          53100,
+          80
+        ]
+      ]
+    },
+    "2428404": {
+      "name": "庭院艺术",
+      "time": 480,
+      "id": 2428404,
+      "activity_id": 242841,
+      "task_level": 2,
+      "desc": "圣索菲娅医护中心的庭院里铺满了金色的桂花，堆一个什么图案好呢………",
+      "cost": [
+        [
+          2,
+          800
+        ]
+      ],
+      "reward_list": [
+        [
+          53100,
+          90
+        ]
+      ]
+    },
+    "2428405": {
+      "name": "踏海拾贝",
+      "time": 480,
+      "id": 2428405,
+      "activity_id": 242841,
+      "task_level": 2,
+      "desc": "海浪轻轻拍打着海岸，柔软的沙砾承托着双脚，轻轻拾起贝壳装进口袋。",
+      "cost": [
+        [
+          40411,
+          1
+        ]
+      ],
+      "reward_list": [
+        [
+          53100,
+          90
+        ]
+      ]
+    },
+    "2428406": {
+      "name": "安全降落",
+      "time": 480,
+      "id": 2428406,
+      "activity_id": 242841,
+      "task_level": 3,
+      "desc": "正在修理屋顶的新人工程师因为误触导致吊篮无法落下，帮他从半空中安全到达地面吧。",
+      "cost": [
+        [
+          2,
+          600
+        ]
+      ],
+      "reward_list": [
+        [
+          53100,
+          180
+        ]
+      ]
+    },
+    "2428407": {
+      "name": "阅读倦意",
+      "time": 480,
+      "id": 2428407,
+      "activity_id": 242841,
+      "task_level": 3,
+      "desc": "一群洋溢着笑容的学生结伴走进了墨兰德图书馆，刚好无事，不如有一起去看看书吧。",
+      "cost": [
+        [
+          2,
+          800
+        ]
+      ],
+      "reward_list": [
+        [
+          53100,
+          180
+        ]
+      ]
+    },
+    "2428408": {
+      "name": "警报",
+      "time": 480,
+      "id": 2428408,
+      "activity_id": 242841,
+      "task_level": 4,
+      "desc": "手表又一次响起了警报，空间崩溃警戒系数仍在攀升，是时候动身前往数据平层了。",
+      "cost": [
+        [
+          1,
+          30
+        ]
+      ],
+      "reward_list": [
+        [
+          53100,
+          300
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "activity_hero_challenge_schedule_limit": [
+      4
+    ],
+    "activity_hero_challenge_certificate_time": [
+      60
+    ],
+    "activity_hero_challenge_daily_time": [
+      [
+        53100,
+        100
+      ]
+    ],
+    "activity_hero_challenge_task_condition": [
+      [
+        2,
+        112031
+      ],
+      [
+        3,
+        112032
+      ]
+    ],
+    "activity_hero_challenge_task_refresh_num": [
+      4
+    ],
+    "activity_hero_challenge_task_free_refresh_num": [
+      2
+    ],
+    "activity_hero_challenge_task_line_num": [
+      [
+        1,
+        112061
+      ],
+      [
+        2,
+        112062
+      ],
+      [
+        3,
+        112063
+      ]
+    ],
+    "activity_hero_challenge_task_choose_num": [
+      5
+    ],
+    "activity_hero_challenge_task_refresh_cost": [
+      [
+        1,
+        40
+      ]
+    ],
+    "activity_hero_challenge_boss_daily_max_fight_cnt": [
+      4
+    ],
+    "activity_hero_challenge_schedule_award_point_limit": [
+      100
+    ],
+    "activity_hero_challenge_certificate_cost_id": [
+      54057
+    ],
+    "activity_hero_challenge_train_interval": [
+      [
+        0,
+        30
+      ],
+      [
+        31,
+        60
+      ],
+      [
+        61,
+        100
+      ]
+    ],
+    "activity_hero_challenge_color_cost": [
+      300
+    ],
+    "activity_hero_challenge_barbecue_coin_limit": [
+      200
+    ],
+    "activity_hero_challenge_barbecue_ticket_limit": [
+      16
+    ],
+    "activity_hero_challenge_boss_basescore": [
+      2500000
+    ],
+    "activity_hero_challenge_boss_timescore": [
+      25000,
+      3000000
+    ],
+    "activity_hero_challenge_close_condition": [
+      112041,
+      112051,
+      112052,
+      112053
+    ],
+    "activity_hero_challenge_train_num_1": [
+      [
+        1000,
+        500
+      ],
+      [
+        2000,
+        250
+      ],
+      [
+        3000,
+        200
+      ]
+    ],
+    "activity_hero_challenge_train_num_2": [
+      [
+        1000,
+        500
+      ],
+      [
+        2000,
+        500
+      ],
+      [
+        3000,
+        250
+      ]
+    ],
+    "activity_hero_challenge_train_num_3": [
+      [
+        1000,
+        500
+      ],
+      [
+        2000,
+        500
+      ],
+      [
+        3000,
+        500
+      ]
+    ],
+    "activity_hero_challenge_erosion_num": [
+      30
+    ],
+    "activity_hero_challenge_base_num": [
+      500
+    ],
+    "activity_hero_challenge_max_num": [
+      4
+    ]
+  },
+  "conditions": {
+    "112001": {
+      "progress_show": 0,
+      "type": 11200,
+      "id": 112001,
+      "desc": "通关全部「回响启示」关卡",
+      "params": [
+        242841
+      ]
+    },
+    "112011": {
+      "progress_show": 0,
+      "type": 11201,
+      "id": 112011,
+      "desc": "通关全部「演绎行乐」关卡",
+      "params": [
+        242871
+      ]
+    },
+    "112021": {
+      "progress_show": 0,
+      "type": 11202,
+      "id": 112021,
+      "desc": "「现时无返之途」侵蚀抵抗关卡限时开启",
+      "params": [
+        242851
+      ]
+    },
+    "112031": {
+      "progress_show": 0,
+      "type": 11203,
+      "id": 112031,
+      "desc": "在「协调训练-侵蚀抵抗」中轻量诱导或重量诱导关卡挑战积分达到%d分",
+      "params": [
+        5170221,
+        0
+      ]
+    },
+    "112032": {
+      "progress_show": 0,
+      "type": 11203,
+      "id": 112032,
+      "desc": "在「协调训练-侵蚀抵抗」中重量诱导关卡挑战积分达到%d分",
+      "params": [
+        5170222,
+        0
+      ]
+    },
+    "112041": {
+      "progress_show": 0,
+      "type": 11204,
+      "id": 112041,
+      "desc": "购买商店「旧时墨兰德」中除「砂之时」外的全部商品",
+      "params": [
+        216,
+        [
+          216000002
+        ]
+      ]
+    },
+    "112051": {
+      "progress_show": 0,
+      "type": 11205,
+      "id": 112051,
+      "desc": "完成「来时路」中所有任务",
+      "params": [
+        3002,
+        240045
+      ]
+    },
+    "112052": {
+      "progress_show": 0,
+      "type": 11205,
+      "id": 112052,
+      "desc": "完成「现时无返之途」所有挑战任务",
+      "params": [
+        3002,
+        240046
+      ]
+    },
+    "112053": {
+      "progress_show": 0,
+      "type": 11205,
+      "id": 112053,
+      "desc": "通关活动获取「暗耀·薇儿丹蒂」",
+      "params": [
+        3002,
+        242841
+      ]
+    },
+    "112061": {
+      "progress_show": 0,
+      "type": 11206,
+      "id": 112061,
+      "desc": "累计获得%s个墨兰德流行纪念品",
+      "params": [
+        53100,
+        500
+      ]
+    },
+    "112062": {
+      "progress_show": 0,
+      "type": 11206,
+      "id": 112062,
+      "desc": "累计获得%s个墨兰德流行纪念品",
+      "params": [
+        53100,
+        1000
+      ]
+    },
+    "112063": {
+      "progress_show": 0,
+      "type": 11206,
+      "id": 112063,
+      "desc": "累计获得%s个墨兰德流行纪念品",
+      "params": [
+        53100,
+        2000
+      ]
+    }
+  },
+  "stages": {
+    "5170201": {
+      "monster_level": 10,
+      "name": "回响第一章",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "D02",
+      "map": "5170201",
+      "sub_type": 1,
+      "level": 1,
+      "tips": "协助薇儿丹蒂进行权钥切换训练",
+      "pre_need_unlock_id_list": "",
+      "drop_lib_id": 7310001,
+      "id": 5170201,
+      "next_show_id_list": [
+        5170202
+      ],
+      "next_unlock_id_list": [
+        5170202
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        3000
+      ],
+      "position": [
+        250,
+        -134
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ]
+    },
+    "5170202": {
+      "monster_level": 10,
+      "name": "回响第二章",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "D02",
+      "map": "5170202",
+      "sub_type": 1,
+      "level": 1,
+      "tips": "协助薇儿丹蒂进行权钥切换训练",
+      "drop_lib_id": 7310001,
+      "id": 5170202,
+      "next_show_id_list": [
+        5170203
+      ],
+      "next_unlock_id_list": [
+        5170203
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        3000
+      ],
+      "position": [
+        607,
+        35
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170201
+      ]
+    },
+    "5170203": {
+      "monster_level": 10,
+      "name": "回响第三章",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "D02",
+      "map": "5170203",
+      "sub_type": 1,
+      "level": 1,
+      "tips": "协助薇儿丹蒂进行权钥切换训练",
+      "drop_lib_id": 7310001,
+      "id": 5170203,
+      "next_show_id_list": [
+        5170204
+      ],
+      "next_unlock_id_list": [
+        5170204
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        3000
+      ],
+      "position": [
+        1000,
+        37
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170202
+      ]
+    },
+    "5170204": {
+      "monster_level": 10,
+      "name": "回响第四章",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "D02",
+      "map": "5170204",
+      "sub_type": 1,
+      "level": 1,
+      "tips": "协助薇儿丹蒂进行权钥切换训练",
+      "drop_lib_id": 7310001,
+      "id": 5170204,
+      "next_show_id_list": [
+        5170205
+      ],
+      "next_unlock_id_list": [
+        5170205
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        3000
+      ],
+      "position": [
+        1400,
+        -46
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170203
+      ]
+    },
+    "5170205": {
+      "monster_level": 10,
+      "name": "回响第五章",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "D02",
+      "map": "5170205",
+      "sub_type": 1,
+      "level": 1,
+      "tips": "协助薇儿丹蒂进行权钥切换训练",
+      "drop_lib_id": 7310001,
+      "id": 5170205,
+      "next_show_id_list": [
+        5170206
+      ],
+      "next_unlock_id_list": [
+        5170206
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        3000
+      ],
+      "position": [
+        1779,
+        -46
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170204
+      ]
+    },
+    "5170206": {
+      "monster_level": 10,
+      "name": "回响第六章",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "D02",
+      "map": "5170206",
+      "sub_type": 1,
+      "level": 1,
+      "tips": "协助薇儿丹蒂进行权钥切换训练",
+      "next_show_id_list": "",
+      "next_unlock_id_list": "",
+      "drop_lib_id": 7310001,
+      "id": 5170206,
+      "attribute_factor": [
+        1000,
+        1000,
+        3000
+      ],
+      "position": [
+        2172,
+        -136
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170205
+      ]
+    },
+    "5170211": {
+      "monster_level": 10,
+      "name": "初级神能训练",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "I02",
+      "map": "5170211",
+      "sub_type": 2,
+      "level": 1,
+      "tips": "初级神能训练",
+      "pre_need_unlock_id_list": "",
+      "drop_lib_id": 7310006,
+      "id": 5170211,
+      "next_show_id_list": [
+        5170212
+      ],
+      "next_unlock_id_list": [
+        5170212
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        3000
+      ],
+      "position": [
+        250,
+        -134
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ]
+    },
+    "5170212": {
+      "monster_level": 10,
+      "name": "中级神能训练",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "I03",
+      "map": "5170212",
+      "sub_type": 2,
+      "level": 1,
+      "tips": "中级神能训练",
+      "drop_lib_id": 7310005,
+      "id": 5170212,
+      "next_show_id_list": [
+        5170213
+      ],
+      "next_unlock_id_list": [
+        5170213
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        3000
+      ],
+      "position": [
+        607,
+        35
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170211
+      ]
+    },
+    "5170213": {
+      "monster_level": 10,
+      "name": "高级神能训练",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "I05",
+      "map": "5170213",
+      "sub_type": 2,
+      "level": 1,
+      "tips": "高级神能训练",
+      "next_show_id_list": "",
+      "next_unlock_id_list": "",
+      "drop_lib_id": 7310004,
+      "id": 5170213,
+      "attribute_factor": [
+        1000,
+        1000,
+        3000
+      ],
+      "position": [
+        1000,
+        37
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170212
+      ]
+    },
+    "5170214": {
+      "monster_level": 10,
+      "name": "初级意志训练",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "I02",
+      "map": "5170217",
+      "sub_type": 3,
+      "level": 1,
+      "tips": "初级意志训练",
+      "pre_need_unlock_id_list": "",
+      "drop_lib_id": 7310006,
+      "id": 5170214,
+      "next_show_id_list": [
+        5170215
+      ],
+      "next_unlock_id_list": [
+        5170215
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        5000
+      ],
+      "position": [
+        1400,
+        -46
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ]
+    },
+    "5170215": {
+      "monster_level": 10,
+      "name": "中级意志训练",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "I03",
+      "map": "5170218",
+      "sub_type": 3,
+      "level": 1,
+      "tips": "中级意志训练",
+      "drop_lib_id": 7310005,
+      "id": 5170215,
+      "next_show_id_list": [
+        5170216
+      ],
+      "next_unlock_id_list": [
+        5170216
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        5000
+      ],
+      "position": [
+        1779,
+        -46
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170214
+      ]
+    },
+    "5170216": {
+      "monster_level": 10,
+      "name": "高级意志训练",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "I05",
+      "map": "5170219",
+      "sub_type": 3,
+      "level": 1,
+      "tips": "高级意志训练",
+      "next_show_id_list": "",
+      "next_unlock_id_list": "",
+      "drop_lib_id": 7310004,
+      "id": 5170216,
+      "attribute_factor": [
+        1000,
+        1000,
+        5000
+      ],
+      "position": [
+        2172,
+        -136
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170215
+      ]
+    },
+    "5170217": {
+      "monster_level": 10,
+      "name": "初级技巧训练",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "I02",
+      "map": "5170214",
+      "sub_type": 4,
+      "level": 1,
+      "tips": "初级技巧训练",
+      "pre_need_unlock_id_list": "",
+      "drop_lib_id": 7310006,
+      "id": 5170217,
+      "next_show_id_list": [
+        5170218
+      ],
+      "next_unlock_id_list": [
+        5170218
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        5000
+      ],
+      "position": [
+        2514,
+        35
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ]
+    },
+    "5170218": {
+      "monster_level": 10,
+      "name": "中级技巧训练",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "I03",
+      "map": "5170215",
+      "sub_type": 4,
+      "level": 1,
+      "tips": "中级技巧训练",
+      "drop_lib_id": 7310005,
+      "id": 5170218,
+      "next_show_id_list": [
+        5170219
+      ],
+      "next_unlock_id_list": [
+        5170219
+      ],
+      "attribute_factor": [
+        1000,
+        1000,
+        5000
+      ],
+      "position": [
+        2916,
+        35
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170217
+      ]
+    },
+    "5170219": {
+      "monster_level": 10,
+      "name": "高级技巧训练",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "I05",
+      "map": "5170216",
+      "sub_type": 4,
+      "level": 1,
+      "tips": "高级技巧训练",
+      "next_show_id_list": "",
+      "next_unlock_id_list": "",
+      "drop_lib_id": 7310004,
+      "id": 5170219,
+      "attribute_factor": [
+        1000,
+        1000,
+        5000
+      ],
+      "position": [
+        3309,
+        -134
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ],
+      "pre_need_unlock_id_list": [
+        5170218
+      ]
+    },
+    "5170221": {
+      "monster_level": 10,
+      "name": "轻量诱导",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "B13e",
+      "map": "5170221",
+      "sub_type": 5,
+      "level": 1,
+      "tips": "轻量诱导",
+      "pre_need_unlock_id_list": "",
+      "next_show_id_list": "",
+      "next_unlock_id_list": "",
+      "drop_lib_id": 7310003,
+      "id": 5170221,
+      "attribute_factor": [
+        1000,
+        1000,
+        5000
+      ],
+      "position": [
+        250,
+        -134
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ]
+    },
+    "5170222": {
+      "monster_level": 10,
+      "name": "重量诱导",
+      "type": 66,
+      "ai_level": 4,
+      "background_1": "A07",
+      "map": "5170222",
+      "sub_type": 5,
+      "level": 1,
+      "tips": "重量诱导",
+      "pre_need_unlock_id_list": "",
+      "next_show_id_list": "",
+      "next_unlock_id_list": "",
+      "drop_lib_id": 7310002,
+      "id": 5170222,
+      "attribute_factor": [
+        1000,
+        1000,
+        5000
+      ],
+      "position": [
+        607,
+        35
+      ],
+      "hero_list": [
+        [
+          6105,
+          610501
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "chip_list": [
+        0
+      ]
+    }
+  },
+  "drops": {
+    "7310001": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 7310001,
+      "base_drop": [
+        [
+          53100,
+          200,
+          100
+        ]
+      ]
+    },
+    "7310002": {
+      "base_drop": "",
+      "weight_drop_count": 1,
+      "random_drop": "",
+      "id": 7310002,
+      "weight_drop": [
+        [
+          53100,
+          300,
+          100
+        ]
+      ]
+    },
+    "7310003": {
+      "base_drop": "",
+      "weight_drop_count": 1,
+      "random_drop": "",
+      "id": 7310003,
+      "weight_drop": [
+        [
+          53100,
+          200,
+          100
+        ]
+      ]
+    },
+    "7310004": {
+      "base_drop": "",
+      "weight_drop_count": 1,
+      "random_drop": "",
+      "id": 7310004,
+      "weight_drop": [
+        [
+          53100,
+          120,
+          100
+        ]
+      ]
+    },
+    "7310005": {
+      "base_drop": "",
+      "weight_drop_count": 1,
+      "random_drop": "",
+      "id": 7310005,
+      "weight_drop": [
+        [
+          53100,
+          100,
+          100
+        ]
+      ]
+    },
+    "7310006": {
+      "base_drop": "",
+      "weight_drop_count": 1,
+      "random_drop": "",
+      "id": 7310006,
+      "weight_drop": [
+        [
+          53100,
+          80,
+          100
+        ]
+      ]
+    }
+  },
+  "boss_pool": {
+    "401": {
+      "id": 401,
+      "activity_id": 1004,
+      "total": 3,
+      "reward": [
+        510056,
+        1
+      ]
+    },
+    "402": {
+      "id": 402,
+      "activity_id": 1004,
+      "total": 3,
+      "reward": [
+        520056,
+        1
+      ]
+    },
+    "403": {
+      "id": 403,
+      "activity_id": 1004,
+      "total": 3,
+      "reward": [
+        530056,
+        1
+      ]
+    },
+    "404": {
+      "id": 404,
+      "activity_id": 1004,
+      "total": 3,
+      "reward": [
+        540056,
+        1
+      ]
+    },
+    "405": {
+      "id": 405,
+      "activity_id": 1004,
+      "total": 3,
+      "reward": [
+        550056,
+        1
+      ]
+    },
+    "406": {
+      "id": 406,
+      "activity_id": 1004,
+      "total": 3,
+      "reward": [
+        560056,
+        1
+      ]
+    }
+  },
+  "battle_tasks": {
+    "202801": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160007,
+      "desc": "协调训练模式中任意一项熟练度达到3000",
+      "need": 1,
+      "activity_id": 240045,
+      "system": "",
+      "id": 202801,
+      "phase": 0,
+      "additional_parameter": [
+        3000
+      ],
+      "reward": [
+        [
+          53101,
+          1
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202811": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中神能熟练度达到500",
+      "need": 500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202811,
+      "phase": 0,
+      "additional_parameter": [
+        2
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202812": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中神能熟练度达到1000",
+      "need": 1000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202812,
+      "phase": 0,
+      "additional_parameter": [
+        2
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202813": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中神能熟练度达到1500",
+      "need": 1500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202813,
+      "phase": 0,
+      "additional_parameter": [
+        2
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202814": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中神能熟练度达到2000",
+      "need": 2000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202814,
+      "phase": 0,
+      "additional_parameter": [
+        2
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202815": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中神能熟练度达到2500",
+      "need": 2500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202815,
+      "phase": 0,
+      "additional_parameter": [
+        2
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202816": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中意志熟练度达到500",
+      "need": 500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202816,
+      "phase": 0,
+      "additional_parameter": [
+        3
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202817": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中意志熟练度达到1000",
+      "need": 1000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202817,
+      "phase": 0,
+      "additional_parameter": [
+        3
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202818": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中意志熟练度达到1500",
+      "need": 1500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202818,
+      "phase": 0,
+      "additional_parameter": [
+        3
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202819": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中意志熟练度达到2000",
+      "need": 2000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202819,
+      "phase": 0,
+      "additional_parameter": [
+        3
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202820": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中意志熟练度达到2500",
+      "need": 2500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202820,
+      "phase": 0,
+      "additional_parameter": [
+        3
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202821": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中技巧熟练度达到500",
+      "need": 500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202821,
+      "phase": 0,
+      "additional_parameter": [
+        4
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202822": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中技巧熟练度达到1000",
+      "need": 1000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202822,
+      "phase": 0,
+      "additional_parameter": [
+        4
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202823": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中技巧熟练度达到1500",
+      "need": 1500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202823,
+      "phase": 0,
+      "additional_parameter": [
+        4
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202824": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中技巧熟练度达到2000",
+      "need": 2000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202824,
+      "phase": 0,
+      "additional_parameter": [
+        4
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202825": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中技巧熟练度达到2500",
+      "need": 2500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202825,
+      "phase": 0,
+      "additional_parameter": [
+        4
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202841": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160003,
+      "desc": "轻量诱导关卡挑战积分达到4000000分",
+      "need": 1,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202841,
+      "phase": 0,
+      "additional_parameter": [
+        5170221,
+        4000000
+      ],
+      "reward": [
+        [
+          1,
+          50
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20018
+      ]
+    },
+    "202842": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160003,
+      "desc": "重量诱导关卡挑战积分达到4000000分",
+      "need": 1,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202842,
+      "phase": 0,
+      "additional_parameter": [
+        5170222,
+        4000000
+      ],
+      "reward": [
+        [
+          1,
+          50
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20018
+      ]
+    }
+  },
+  "barbecue": {
+    "2428601": {
+      "activity_id": 242861,
+      "name": "简单",
+      "total_check": 20,
+      "fail_max": 3,
+      "id": 2428601,
+      "difficult": 1,
+      "time_interval": [
+        [
+          0,
+          [
+            19,
+            23
+          ]
+        ],
+        [
+          5,
+          [
+            17,
+            22
+          ]
+        ],
+        [
+          10,
+          [
+            14,
+            20
+          ]
+        ],
+        [
+          15,
+          [
+            12,
+            14
+          ]
+        ]
+      ],
+      "check_hit_length": [
+        [
+          0,
+          [
+            20,
+            27
+          ]
+        ],
+        [
+          10,
+          [
+            17,
+            23
+          ]
+        ]
+      ],
+      "check_speed": [
+        [
+          0,
+          50
+        ],
+        [
+          5,
+          45
+        ],
+        [
+          10,
+          40
+        ]
+      ],
+      "reward_list_coin": [
+        [
+          53100,
+          30
+        ],
+        [
+          53100,
+          30
+        ],
+        [
+          53100,
+          50
+        ],
+        [
+          53100,
+          80
+        ],
+        [
+          53100,
+          100
+        ]
+      ],
+      "reward_list_ticket": [
+        [],
+        [],
+        [],
+        [
+          54057,
+          2
+        ],
+        [
+          54057,
+          4
+        ]
+      ]
+    },
+    "2428602": {
+      "activity_id": 242861,
+      "name": "一般",
+      "total_check": 25,
+      "fail_max": 2,
+      "id": 2428602,
+      "difficult": 2,
+      "time_interval": [
+        [
+          0,
+          [
+            18,
+            22
+          ]
+        ],
+        [
+          5,
+          [
+            16,
+            19
+          ]
+        ],
+        [
+          10,
+          [
+            10,
+            15
+          ]
+        ],
+        [
+          15,
+          [
+            10,
+            12
+          ]
+        ],
+        [
+          20,
+          [
+            8,
+            10
+          ]
+        ]
+      ],
+      "check_hit_length": [
+        [
+          0,
+          [
+            20,
+            25
+          ]
+        ],
+        [
+          10,
+          [
+            16,
+            22
+          ]
+        ],
+        [
+          20,
+          [
+            15,
+            20
+          ]
+        ]
+      ],
+      "check_speed": [
+        [
+          0,
+          45
+        ],
+        [
+          5,
+          40
+        ],
+        [
+          10,
+          37
+        ],
+        [
+          15,
+          33
+        ],
+        [
+          20,
+          28
+        ]
+      ],
+      "reward_list_coin": [
+        [
+          53100,
+          30
+        ],
+        [
+          53100,
+          30
+        ],
+        [
+          53100,
+          50
+        ],
+        [
+          53100,
+          100
+        ],
+        [
+          53100,
+          120
+        ]
+      ],
+      "reward_list_ticket": [
+        [],
+        [],
+        [
+          54057,
+          2
+        ],
+        [
+          54057,
+          4
+        ],
+        [
+          54057,
+          8
+        ]
+      ]
+    },
+    "2428603": {
+      "activity_id": 242861,
+      "name": "困难",
+      "total_check": 30,
+      "fail_max": 1,
+      "id": 2428603,
+      "difficult": 3,
+      "time_interval": [
+        [
+          0,
+          [
+            12,
+            14
+          ]
+        ],
+        [
+          5,
+          [
+            10,
+            13
+          ]
+        ],
+        [
+          10,
+          [
+            8,
+            12
+          ]
+        ],
+        [
+          15,
+          [
+            6,
+            11
+          ]
+        ],
+        [
+          20,
+          [
+            5,
+            10
+          ]
+        ],
+        [
+          30,
+          [
+            4,
+            8
+          ]
+        ]
+      ],
+      "check_hit_length": [
+        [
+          0,
+          [
+            17,
+            23
+          ]
+        ],
+        [
+          10,
+          [
+            16,
+            22
+          ]
+        ],
+        [
+          20,
+          [
+            14,
+            18
+          ]
+        ],
+        [
+          30,
+          [
+            12,
+            18
+          ]
+        ]
+      ],
+      "check_speed": [
+        [
+          0,
+          40
+        ],
+        [
+          5,
+          37
+        ],
+        [
+          6,
+          36
+        ],
+        [
+          7,
+          35
+        ],
+        [
+          8,
+          34
+        ],
+        [
+          10,
+          33
+        ],
+        [
+          11,
+          32
+        ],
+        [
+          12,
+          31
+        ],
+        [
+          13,
+          30
+        ],
+        [
+          14,
+          29
+        ],
+        [
+          15,
+          28
+        ],
+        [
+          16,
+          27
+        ],
+        [
+          17,
+          26
+        ],
+        [
+          18,
+          25
+        ],
+        [
+          19,
+          24
+        ],
+        [
+          20,
+          23
+        ]
+      ],
+      "reward_list_coin": [
+        [
+          53100,
+          30
+        ],
+        [
+          53100,
+          50
+        ],
+        [
+          53100,
+          100
+        ],
+        [
+          53100,
+          120
+        ],
+        [
+          53100,
+          150
+        ]
+      ],
+      "reward_list_ticket": [
+        [],
+        [
+          54057,
+          2
+        ],
+        [
+          54057,
+          4
+        ],
+        [
+          54057,
+          8
+        ],
+        [
+          54057,
+          12
+        ]
+      ]
+    }
+  },
+  "puzzles": {
+    "2428701": {
+      "name": "关卡1",
+      "attempt": 10,
+      "level_id": 2428701,
+      "level_asset_name": "Stage_1",
+      "pre_stage": 0,
+      "tips": "同一条线路中不能存在相同的修正者",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428702": {
+      "name": "关卡2",
+      "attempt": 10,
+      "level_id": 2428702,
+      "level_asset_name": "Stage_2",
+      "pre_stage": 2428701,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428703": {
+      "name": "关卡3",
+      "attempt": 10,
+      "level_id": 2428703,
+      "level_asset_name": "Stage_3",
+      "pre_stage": 2428702,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428704": {
+      "name": "关卡4",
+      "attempt": 10,
+      "level_id": 2428704,
+      "level_asset_name": "Stage_4",
+      "pre_stage": 2428703,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428705": {
+      "name": "关卡5",
+      "attempt": 10,
+      "level_id": 2428705,
+      "level_asset_name": "Stage_5",
+      "pre_stage": 2428704,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428706": {
+      "name": "关卡6",
+      "attempt": 10,
+      "level_id": 2428706,
+      "level_asset_name": "Stage_6",
+      "pre_stage": 2428705,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428707": {
+      "name": "关卡7",
+      "attempt": 10,
+      "level_id": 2428707,
+      "level_asset_name": "Stage_7",
+      "pre_stage": 2428706,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428708": {
+      "name": "关卡8",
+      "attempt": 10,
+      "level_id": 2428708,
+      "level_asset_name": "Stage_8",
+      "pre_stage": 2428707,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428709": {
+      "name": "关卡9",
+      "attempt": 10,
+      "level_id": 2428709,
+      "level_asset_name": "Stage_9",
+      "pre_stage": 2428708,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428710": {
+      "name": "关卡10",
+      "attempt": 10,
+      "level_id": 2428710,
+      "level_asset_name": "Stage_10",
+      "pre_stage": 2428709,
+      "tips": "此类型节点两边视为两条不同的线路",
+      "activity_id": 242871,
+      "tips_icon": "TextureConfig/SPHeroChallenge/heroChallenge_img_linkPointTips01",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428711": {
+      "name": "关卡11",
+      "attempt": 10,
+      "level_id": 2428711,
+      "level_asset_name": "Stage_11",
+      "pre_stage": 2428710,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428712": {
+      "name": "关卡12",
+      "attempt": 10,
+      "level_id": 2428712,
+      "level_asset_name": "Stage_12",
+      "pre_stage": 2428711,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428713": {
+      "name": "关卡13",
+      "attempt": 10,
+      "level_id": 2428713,
+      "level_asset_name": "Stage_13",
+      "pre_stage": 2428712,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428714": {
+      "name": "关卡14",
+      "attempt": 10,
+      "level_id": 2428714,
+      "level_asset_name": "Stage_14",
+      "pre_stage": 2428713,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428715": {
+      "name": "关卡15",
+      "attempt": 10,
+      "level_id": 2428715,
+      "level_asset_name": "Stage_15",
+      "pre_stage": 2428714,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428716": {
+      "name": "关卡16",
+      "attempt": 10,
+      "level_id": 2428716,
+      "level_asset_name": "Stage_16",
+      "pre_stage": 2428715,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428717": {
+      "name": "关卡17",
+      "attempt": 10,
+      "level_id": 2428717,
+      "level_asset_name": "Stage_17",
+      "pre_stage": 2428716,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428718": {
+      "name": "关卡18",
+      "attempt": 10,
+      "level_id": 2428718,
+      "level_asset_name": "Stage_18",
+      "pre_stage": 2428717,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428719": {
+      "name": "关卡19",
+      "attempt": 10,
+      "level_id": 2428719,
+      "level_asset_name": "Stage_19",
+      "pre_stage": 2428718,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    },
+    "2428720": {
+      "name": "关卡20",
+      "attempt": 10,
+      "level_id": 2428720,
+      "level_asset_name": "Stage_20",
+      "pre_stage": 2428719,
+      "tips": "",
+      "activity_id": 242871,
+      "tips_icon": "",
+      "pallete": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "reward": [
+        [
+          53100,
+          60
+        ],
+        [
+          54057,
+          2
+        ]
+      ]
+    }
+  },
+  "own_tasks": {
+    "202801": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160007,
+      "desc": "协调训练模式中任意一项熟练度达到3000",
+      "need": 1,
+      "activity_id": 240045,
+      "system": "",
+      "id": 202801,
+      "phase": 0,
+      "additional_parameter": [
+        3000
+      ],
+      "reward": [
+        [
+          53101,
+          1
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202802": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160008,
+      "desc": "完成闲暇时刻20次",
+      "need": 20,
+      "activity_id": 240045,
+      "system": "",
+      "id": 202802,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          53101,
+          1
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20020
+      ]
+    },
+    "202803": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160004,
+      "desc": "通关全部「演绎行乐」关卡",
+      "need": 1,
+      "activity_id": 240045,
+      "system": "",
+      "id": 202803,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          53101,
+          1
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20019
+      ]
+    },
+    "202804": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得12000「墨兰德流行纪念品」",
+      "need": 12000,
+      "activity_id": 240045,
+      "system": "",
+      "id": 202804,
+      "phase": 0,
+      "additional_parameter": [
+        53100
+      ],
+      "reward": [
+        [
+          53101,
+          1
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20015
+      ]
+    },
+    "202805": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得4个「金色雨花环」",
+      "need": 4,
+      "activity_id": 242841,
+      "system": "",
+      "id": 202805,
+      "phase": 0,
+      "additional_parameter": [
+        53101
+      ],
+      "reward": [
+        [
+          1284,
+          1
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": []
+    },
+    "202811": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中神能熟练度达到500",
+      "need": 500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202811,
+      "phase": 0,
+      "additional_parameter": [
+        2
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202812": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中神能熟练度达到1000",
+      "need": 1000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202812,
+      "phase": 0,
+      "additional_parameter": [
+        2
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202813": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中神能熟练度达到1500",
+      "need": 1500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202813,
+      "phase": 0,
+      "additional_parameter": [
+        2
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202814": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中神能熟练度达到2000",
+      "need": 2000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202814,
+      "phase": 0,
+      "additional_parameter": [
+        2
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202815": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中神能熟练度达到2500",
+      "need": 2500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202815,
+      "phase": 0,
+      "additional_parameter": [
+        2
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202816": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中意志熟练度达到500",
+      "need": 500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202816,
+      "phase": 0,
+      "additional_parameter": [
+        3
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202817": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中意志熟练度达到1000",
+      "need": 1000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202817,
+      "phase": 0,
+      "additional_parameter": [
+        3
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202818": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中意志熟练度达到1500",
+      "need": 1500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202818,
+      "phase": 0,
+      "additional_parameter": [
+        3
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202819": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中意志熟练度达到2000",
+      "need": 2000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202819,
+      "phase": 0,
+      "additional_parameter": [
+        3
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202820": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中意志熟练度达到2500",
+      "need": 2500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202820,
+      "phase": 0,
+      "additional_parameter": [
+        3
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202821": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中技巧熟练度达到500",
+      "need": 500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202821,
+      "phase": 0,
+      "additional_parameter": [
+        4
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202822": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中技巧熟练度达到1000",
+      "need": 1000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202822,
+      "phase": 0,
+      "additional_parameter": [
+        4
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202823": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中技巧熟练度达到1500",
+      "need": 1500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202823,
+      "phase": 0,
+      "additional_parameter": [
+        4
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202824": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中技巧熟练度达到2000",
+      "need": 2000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202824,
+      "phase": 0,
+      "additional_parameter": [
+        4
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202825": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160002,
+      "desc": "协调训练模式中技巧熟练度达到2500",
+      "need": 2500,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202825,
+      "phase": 0,
+      "additional_parameter": [
+        4
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20017
+      ]
+    },
+    "202826": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得1000「墨兰德流行纪念品」",
+      "need": 1000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202826,
+      "phase": 0,
+      "additional_parameter": [
+        53100
+      ],
+      "reward": [
+        [
+          5,
+          1
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20015
+      ]
+    },
+    "202827": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得3000「墨兰德流行纪念品」",
+      "need": 3000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202827,
+      "phase": 0,
+      "additional_parameter": [
+        53100
+      ],
+      "reward": [
+        [
+          38,
+          1
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20015
+      ]
+    },
+    "202828": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得6000「墨兰德流行纪念品」",
+      "need": 6000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202828,
+      "phase": 0,
+      "additional_parameter": [
+        53100
+      ],
+      "reward": [
+        [
+          41301,
+          16
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20015
+      ]
+    },
+    "202829": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得10000「墨兰德流行纪念品」",
+      "need": 10000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202829,
+      "phase": 0,
+      "additional_parameter": [
+        53100
+      ],
+      "reward": [
+        [
+          40701,
+          15
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20015
+      ]
+    },
+    "202830": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得12000「墨兰德流行纪念品」",
+      "need": 12000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202830,
+      "phase": 0,
+      "additional_parameter": [
+        53100
+      ],
+      "reward": [
+        [
+          41302,
+          10
+        ],
+        [
+          8005,
+          1
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20015
+      ]
+    },
+    "202831": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得15000「墨兰德流行纪念品」",
+      "need": 15000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202831,
+      "phase": 0,
+      "additional_parameter": [
+        53100
+      ],
+      "reward": [
+        [
+          41303,
+          5
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20015
+      ]
+    },
+    "202832": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得18000「墨兰德流行纪念品」",
+      "need": 18000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202832,
+      "phase": 0,
+      "additional_parameter": [
+        53100
+      ],
+      "reward": [
+        [
+          40504,
+          10
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20015
+      ]
+    },
+    "202833": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得20000「墨兰德流行纪念品」",
+      "need": 20000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202833,
+      "phase": 0,
+      "additional_parameter": [
+        53100
+      ],
+      "reward": [
+        [
+          40103,
+          30
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20015
+      ]
+    },
+    "202834": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 302,
+      "desc": "累计获得22000「墨兰德流行纪念品」",
+      "need": 22000,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202834,
+      "phase": 0,
+      "additional_parameter": [
+        53100
+      ],
+      "reward": [
+        [
+          40603,
+          10
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20015
+      ]
+    },
+    "202835": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160001,
+      "desc": "故地重游玩法中完成任意委托5次",
+      "need": 5,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202835,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          54057,
+          3
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20021
+      ]
+    },
+    "202836": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160001,
+      "desc": "故地重游玩法中完成任意委托10次",
+      "need": 10,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202836,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          40203,
+          3
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20021
+      ]
+    },
+    "202837": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160001,
+      "desc": "故地重游玩法中完成任意委托20次",
+      "need": 20,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202837,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          40503,
+          10
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20021
+      ]
+    },
+    "202838": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160001,
+      "desc": "故地重游玩法中完成任意委托30次",
+      "need": 30,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202838,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          54057,
+          5
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20021
+      ]
+    },
+    "202839": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160001,
+      "desc": "故地重游玩法中完成任意委托60次",
+      "need": 60,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202839,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          40504,
+          10
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20021
+      ]
+    },
+    "202840": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160001,
+      "desc": "故地重游玩法中完成任意委托100次",
+      "need": 100,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202840,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          40603,
+          5
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20021
+      ]
+    },
+    "202841": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160003,
+      "desc": "轻量诱导关卡挑战积分达到4000000分",
+      "need": 1,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202841,
+      "phase": 0,
+      "additional_parameter": [
+        5170221,
+        4000000
+      ],
+      "reward": [
+        [
+          1,
+          50
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20018
+      ]
+    },
+    "202842": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160003,
+      "desc": "重量诱导关卡挑战积分达到4000000分",
+      "need": 1,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202842,
+      "phase": 0,
+      "additional_parameter": [
+        5170222,
+        4000000
+      ],
+      "reward": [
+        [
+          1,
+          50
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20018
+      ]
+    },
+    "202843": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160006,
+      "desc": "完成5次闲暇时刻小游戏",
+      "need": 5,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202843,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          40603,
+          10
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20020
+      ]
+    },
+    "202844": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160006,
+      "desc": "完成10次闲暇时刻小游戏",
+      "need": 10,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202844,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          40803,
+          5
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20020
+      ]
+    },
+    "202845": {
+      "name": "挑战",
+      "pre_id": 0,
+      "type": 3002,
+      "condition": 160006,
+      "desc": "完成20次闲暇时刻小游戏",
+      "need": 20,
+      "activity_id": 240046,
+      "system": "",
+      "id": 202845,
+      "phase": 0,
+      "additional_parameter": [],
+      "reward": [
+        [
+          40414,
+          3
+        ]
+      ],
+      "unlock_condition": [
+        1,
+        100
+      ],
+      "source": [
+        20020
+      ]
+    }
+  },
+  "shop": {
+    "216000001": {
+      "taken_down": 0,
+      "shop_refresh": 2,
+      "give_back": "",
+      "give": 1,
+      "limit_num": 1,
+      "shop_id": 216,
+      "give_id": 2540012,
+      "activity_id": 0,
+      "tag": 0,
+      "cost_id": 53100,
+      "position": 1,
+      "backhome_tag": 0,
+      "limit_display": 0,
+      "cost": 16000,
+      "shop_sort": 20,
+      "cheap_cost": 0,
+      "cost_type": 0,
+      "goods_id": 216000001,
+      "cheap_cost_id": 0,
+      "is_limit_time_discount": 0,
+      "discount": 0,
+      "refresh_cycle": 1,
+      "position_week_refresh": "",
+      "weight": 0,
+      "pre_goods_id": [],
+      "level_limit": [],
+      "available_limit": [],
+      "open_time": [],
+      "close_time": [],
+      "cheap_open_time": [],
+      "cheap_close_time": []
+    },
+    "216000002": {
+      "taken_down": 0,
+      "shop_refresh": 2,
+      "give_back": "",
+      "give": 10,
+      "limit_num": 100,
+      "shop_id": 216,
+      "give_id": 54057,
+      "activity_id": 0,
+      "tag": 0,
+      "cost_id": 1,
+      "position": 2,
+      "backhome_tag": 0,
+      "limit_display": 0,
+      "cost": 10,
+      "shop_sort": 19,
+      "cheap_cost": 0,
+      "cost_type": 0,
+      "goods_id": 216000002,
+      "cheap_cost_id": 0,
+      "is_limit_time_discount": 0,
+      "discount": 0,
+      "refresh_cycle": 1,
+      "position_week_refresh": "",
+      "weight": 0,
+      "pre_goods_id": [],
+      "level_limit": [],
+      "available_limit": [],
+      "open_time": [],
+      "close_time": [],
+      "cheap_open_time": [],
+      "cheap_close_time": []
+    },
+    "216000003": {
+      "taken_down": 0,
+      "shop_refresh": 2,
+      "give_back": "",
+      "give": 1,
+      "limit_num": 10,
+      "shop_id": 216,
+      "give_id": 41303,
+      "activity_id": 0,
+      "tag": 0,
+      "cost_id": 53100,
+      "position": 3,
+      "backhome_tag": 0,
+      "limit_display": 0,
+      "cost": 200,
+      "shop_sort": 18,
+      "cheap_cost": 0,
+      "cost_type": 0,
+      "goods_id": 216000003,
+      "cheap_cost_id": 0,
+      "is_limit_time_discount": 0,
+      "discount": 0,
+      "refresh_cycle": 1,
+      "position_week_refresh": "",
+      "weight": 0,
+      "pre_goods_id": [],
+      "level_limit": [],
+      "available_limit": [],
+      "open_time": [],
+      "close_time": [],
+      "cheap_open_time": [],
+      "cheap_close_time": []
+    },
+    "216000004": {
+      "taken_down": 0,
+      "shop_refresh": 2,
+      "give_back": "",
+      "give": 1,
+      "limit_num": 25,
+      "shop_id": 216,
+      "give_id": 41302,
+      "activity_id": 0,
+      "tag": 0,
+      "cost_id": 53100,
+      "position": 4,
+      "backhome_tag": 0,
+      "limit_display": 0,
+      "cost": 100,
+      "shop_sort": 17,
+      "cheap_cost": 0,
+      "cost_type": 0,
+      "goods_id": 216000004,
+      "cheap_cost_id": 0,
+      "is_limit_time_discount": 0,
+      "discount": 0,
+      "refresh_cycle": 1,
+      "position_week_refresh": "",
+      "weight": 0,
+      "pre_goods_id": [],
+      "level_limit": [],
+      "available_limit": [],
+      "open_time": [],
+      "close_time": [],
+      "cheap_open_time": [],
+      "cheap_close_time": []
+    },
+    "216000005": {
+      "taken_down": 0,
+      "shop_refresh": 2,
+      "give_back": "",
+      "give": 1,
+      "limit_num": 40,
+      "shop_id": 216,
+      "give_id": 41301,
+      "activity_id": 0,
+      "tag": 0,
+      "cost_id": 53100,
+      "position": 5,
+      "backhome_tag": 0,
+      "limit_display": 0,
+      "cost": 60,
+      "shop_sort": 16,
+      "cheap_cost": 0,
+      "cost_type": 0,
+      "goods_id": 216000005,
+      "cheap_cost_id": 0,
+      "is_limit_time_discount": 0,
+      "discount": 0,
+      "refresh_cycle": 1,
+      "position_week_refresh": "",
+      "weight": 0,
+      "pre_goods_id": [],
+      "level_limit": [],
+      "available_limit": [],
+      "open_time": [],
+      "close_time": [],
+      "cheap_open_time": [],
+      "cheap_close_time": []
+    },
+    "216000006": {
+      "taken_down": 0,
+      "shop_refresh": 2,
+      "give_back": "",
+      "give": 1,
+      "limit_num": 30,
+      "shop_id": 216,
+      "give_id": 40104,
+      "activity_id": 0,
+      "tag": 0,
+      "cost_id": 53100,
+      "position": 6,
+      "backhome_tag": 0,
+      "limit_display": 0,
+      "cost": 40,
+      "shop_sort": 15,
+      "cheap_cost": 0,
+      "cost_type": 0,
+      "goods_id": 216000006,
+      "cheap_cost_id": 0,
+      "is_limit_time_discount": 0,
+      "discount": 0,
+      "refresh_cycle": 1,
+      "position_week_refresh": "",
+      "weight": 0,
+      "pre_goods_id": [],
+      "level_limit": [],
+      "available_limit": [],
+      "open_time": [],
+      "close_time": [],
+      "cheap_open_time": [],
+      "cheap_close_time": []
+    },
+    "216000007": {
+      "taken_down": 0,
+      "shop_refresh": 2,
+      "give_back": "",
+      "give": 1,
+      "limit_num": 20,
+      "shop_id": 216,
+      "give_id": 40603,
+      "activity_id": 0,
+      "tag": 0,
+      "cost_id": 53100,
+      "position": 7,
+      "backhome_tag": 0,
+      "limit_display": 0,
+      "cost": 30,
+      "shop_sort": 14,
+      "cheap_cost": 0,
+      "cost_type": 0,
+      "goods_id": 216000007,
+      "cheap_cost_id": 0,
+      "is_limit_time_discount": 0,
+      "discount": 0,
+      "refresh_cycle": 1,
+      "position_week_refresh": "",
+      "weight": 0,
+      "pre_goods_id": [],
+      "level_limit": [],
+      "available_limit": [],
+      "open_time": [],
+      "close_time": [],
+      "cheap_open_time": [],
+      "cheap_close_time": []
+    },
+    "216000008": {
+      "taken_down": 0,
+      "shop_refresh": 2,
+      "give_back": "",
+      "give": 1,
+      "limit_num": 20,
+      "shop_id": 216,
+      "give_id": 40203,
+      "activity_id": 0,
+      "tag": 0,
+      "cost_id": 53100,
+      "position": 8,
+      "backhome_tag": 0,
+      "limit_display": 0,
+      "cost": 20,
+      "shop_sort": 13,
+      "cheap_cost": 0,
+      "cost_type": 0,
+      "goods_id": 216000008,
+      "cheap_cost_id": 0,
+      "is_limit_time_discount": 0,
+      "discount": 0,
+      "refresh_cycle": 1,
+      "position_week_refresh": "",
+      "weight": 0,
+      "pre_goods_id": [],
+      "level_limit": [],
+      "available_limit": [],
+      "open_time": [],
+      "close_time": [],
+      "cheap_open_time": [],
+      "cheap_close_time": []
+    },
+    "216000009": {
+      "taken_down": 0,
+      "shop_refresh": 2,
+      "give_back": "",
+      "give": 1,
+      "limit_num": 20,
+      "shop_id": 216,
+      "give_id": 40504,
+      "activity_id": 0,
+      "tag": 0,
+      "cost_id": 53100,
+      "position": 9,
+      "backhome_tag": 0,
+      "limit_display": 0,
+      "cost": 20,
+      "shop_sort": 12,
+      "cheap_cost": 0,
+      "cost_type": 0,
+      "goods_id": 216000009,
+      "cheap_cost_id": 0,
+      "is_limit_time_discount": 0,
+      "discount": 0,
+      "refresh_cycle": 1,
+      "position_week_refresh": "",
+      "weight": 0,
+      "pre_goods_id": [],
+      "level_limit": [],
+      "available_limit": [],
+      "open_time": [],
+      "close_time": [],
+      "cheap_open_time": [],
+      "cheap_close_time": []
+    }
+  },
+  "source_sha256": {
+    "decompiled_v2/x64/game/config/activityherochallengeschedulecfg.lua": "55232a006471073d4060a1c2f6fd0c892e0e25c8a5b5284102361987b2027d59",
+    "decompiled_v2/x64/game/config/activityherochallengetaskcfg.lua": "dd72288e62dcf77af3389c4771c3426663519a51d196543b8a9f1ec111e5dd6d",
+    "decompiled_v2/x64/game/config/activityherochallengecfg.lua": "dc4f25ca581e68e9f5cc229a9fe525beb649bf639fa145e0c1b233cd659565d2",
+    "decompiled_v2/x64/game/config/gamesetting.lua": "b319e751fcbd59b8ebd54316f231fe6174c51f1462ace55833a3ec2792dd6dce",
+    "decompiled_v2/x64/game/config/conditioncfg.lua": "ed79f765579f9fbccb0ed52fe7563f6334d6777b9510e575ab970979bd768511",
+    "decompiled_v2/x64/game/config/battleverthandiexclusivecfg.lua": "2333fb75f31f286fb92fc826495d31291573aa955870f23c3804c00df99abfee",
+    "decompiled_v2/x64/game/config/dropcfg.lua": "58001c2766fbce644d2b7f0674fff8e1524b0bda9d851996666814cc0bd87b15",
+    "decompiled_v2/x64/game/config/activityrewardpoolcfg.lua": "6a377433924682ce8aa59f71afc644b7b785c24a7eca819687ad0603a64a889a",
+    "decompiled_v2/x64/game/config/activityrewardpoolitemcfg.lua": "2ef91a19e9cffd0d7eacd5aae423a79e605e814639dc9fa966e1958d2bc2e3ca",
+    "decompiled_v2/x64/game/config/assignmentcfg.lua": "e5455ded9e1976c208b5174c3000252ead0185733d10a872be0eed2fb338d28a",
+    "decompiled_v2/x64/game/config/activityherochallengebarbecuecfg.lua": "a8a644df017b49b8a0f607d707ba6a40a205806555093b1e69f40f91f1eec89a",
+    "decompiled_v2/x64/game/config/activityherochallengecolor.lua": "4df5614effc07a923d4c7ad7076ce910d82b801f60e6b75833bb689cd83a02d0",
+    "decompiled_v2/x64/game/config/shopcfg3.lua": "3f590ec6ca01cd5f5d7ce1d064141e916ebb58c3ab747a3483d307c7dd44c3bf"
+  }
+}

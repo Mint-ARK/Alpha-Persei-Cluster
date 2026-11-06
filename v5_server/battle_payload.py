@@ -388,6 +388,19 @@ def build_sc_54003_dynamic(db_conn, uid, hero_ids):
     return _pb_msg(1, pi)
 
 
+def build_sc_54003_polyhedron(db_conn, uid, hero_ids):
+    """Use native system templates for run recruits, without granting account heroes."""
+    from polyhedron_service import get_poly_cfg
+    cfg = get_poly_cfg()['poly_heroes']
+    standard_ids = []
+    for hero_id in hero_ids:
+        entry = cfg.get(str(hero_id))
+        if not entry or not entry.get('standard_id'):
+            raise ValueError(f'Polyhedron hero {hero_id} has no native system template')
+        standard_ids.append(int(entry['standard_id']))
+    return build_sc_54003_dynamic(db_conn, uid, standard_ids)
+
+
 def build_sc_54039_dynamic(db_conn, uid, br, heroes, codec_encode=None):
     """动态生成 sc_54039 扫荡结算完整下行报文 (f1=result, f2=player_info, f3=battle_result)"""
     body = bytearray()

@@ -1,0 +1,6100 @@
+{
+  "version": 1,
+  "source": "current Lua ChipCfg/ConditionCfg/GameLevelSetting and native spec_char index",
+  "chips": {
+    "1": {
+      "type_id": 1,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 4025,
+      "costs": [],
+      "module_conditions": []
+    },
+    "2": {
+      "type_id": 1,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 4030,
+      "costs": [],
+      "module_conditions": []
+    },
+    "3": {
+      "type_id": 1,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 30114,
+      "costs": [],
+      "module_conditions": []
+    },
+    "4": {
+      "type_id": 1,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 22101,
+      "costs": [],
+      "module_conditions": []
+    },
+    "5": {
+      "type_id": 1,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 4035,
+      "costs": [],
+      "module_conditions": []
+    },
+    "6": {
+      "type_id": 1,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 4001,
+      "costs": [],
+      "module_conditions": []
+    },
+    "101": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 23101,
+      "costs": [],
+      "module_conditions": []
+    },
+    "102": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 2314,
+      "costs": [],
+      "module_conditions": []
+    },
+    "103": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 4040,
+      "costs": [],
+      "module_conditions": []
+    },
+    "104": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 22201,
+      "costs": [],
+      "module_conditions": []
+    },
+    "105": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 2324,
+      "costs": [],
+      "module_conditions": []
+    },
+    "106": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 2325,
+      "costs": [],
+      "module_conditions": []
+    },
+    "107": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 22202,
+      "costs": [],
+      "module_conditions": []
+    },
+    "108": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 4045,
+      "costs": [],
+      "module_conditions": []
+    },
+    "109": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 20220,
+      "costs": [],
+      "module_conditions": []
+    },
+    "110": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 30115,
+      "costs": [],
+      "module_conditions": []
+    },
+    "111": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 2313,
+      "costs": [],
+      "module_conditions": []
+    },
+    "112": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 23103,
+      "costs": [],
+      "module_conditions": []
+    },
+    "113": {
+      "type_id": 2,
+      "spec_char": 0,
+      "role_type_id": 0,
+      "new_condition": 4050,
+      "costs": [],
+      "module_conditions": []
+    },
+    "101101": {
+      "type_id": 3,
+      "spec_char": 1011,
+      "role_type_id": 1,
+      "new_condition": 5101101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1011
+    },
+    "101102": {
+      "type_id": 3,
+      "spec_char": 1011,
+      "role_type_id": 2,
+      "new_condition": 5101102,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1011
+    },
+    "101103": {
+      "type_id": 3,
+      "spec_char": 1011,
+      "role_type_id": 2,
+      "new_condition": 5101102,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1011
+    },
+    "101104": {
+      "type_id": 3,
+      "spec_char": 1011,
+      "role_type_id": 2,
+      "new_condition": 5101102,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1011
+    },
+    "101105": {
+      "type_id": 3,
+      "spec_char": 1011,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1011
+    },
+    "101106": {
+      "type_id": 3,
+      "spec_char": 1011,
+      "role_type_id": 4,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1011
+    },
+    "101107": {
+      "type_id": 3,
+      "spec_char": 1011,
+      "role_type_id": 1,
+      "new_condition": 5101101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1011
+    },
+    "101108": {
+      "type_id": 3,
+      "spec_char": 1011,
+      "role_type_id": 1,
+      "new_condition": 5101101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1011
+    },
+    "101201": {
+      "type_id": 3,
+      "spec_char": 1012,
+      "role_type_id": 1,
+      "new_condition": 5101201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1012
+    },
+    "101202": {
+      "type_id": 3,
+      "spec_char": 1012,
+      "role_type_id": 1,
+      "new_condition": 5101201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1012
+    },
+    "101203": {
+      "type_id": 3,
+      "spec_char": 1012,
+      "role_type_id": 1,
+      "new_condition": 5101201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1012
+    },
+    "101301": {
+      "type_id": 3,
+      "spec_char": 1013,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1013
+    },
+    "101302": {
+      "type_id": 3,
+      "spec_char": 1013,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1013
+    },
+    "101303": {
+      "type_id": 3,
+      "spec_char": 1013,
+      "role_type_id": 1,
+      "new_condition": 5101301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1013
+    },
+    "101304": {
+      "type_id": 3,
+      "spec_char": 1013,
+      "role_type_id": 1,
+      "new_condition": 5101301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1013
+    },
+    "101305": {
+      "type_id": 3,
+      "spec_char": 1013,
+      "role_type_id": 1,
+      "new_condition": 5101301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1013
+    },
+    "101501": {
+      "type_id": 3,
+      "spec_char": 1015,
+      "role_type_id": 1,
+      "new_condition": 5101501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1015
+    },
+    "101502": {
+      "type_id": 3,
+      "spec_char": 1015,
+      "role_type_id": 1,
+      "new_condition": 5101501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1015
+    },
+    "101503": {
+      "type_id": 3,
+      "spec_char": 1015,
+      "role_type_id": 1,
+      "new_condition": 5101501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1015
+    },
+    "101504": {
+      "type_id": 3,
+      "spec_char": 1015,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1015
+    },
+    "101505": {
+      "type_id": 3,
+      "spec_char": 1015,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1015
+    },
+    "101506": {
+      "type_id": 3,
+      "spec_char": 1015,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1015
+    },
+    "101601": {
+      "type_id": 3,
+      "spec_char": 1016,
+      "role_type_id": 1,
+      "new_condition": 5101601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1016
+    },
+    "101602": {
+      "type_id": 3,
+      "spec_char": 1016,
+      "role_type_id": 1,
+      "new_condition": 5101601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1016
+    },
+    "101603": {
+      "type_id": 3,
+      "spec_char": 1016,
+      "role_type_id": 1,
+      "new_condition": 5101601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1016
+    },
+    "101701": {
+      "type_id": 3,
+      "spec_char": 1017,
+      "role_type_id": 1,
+      "new_condition": 5101701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1017
+    },
+    "101702": {
+      "type_id": 3,
+      "spec_char": 1017,
+      "role_type_id": 1,
+      "new_condition": 5101701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1017
+    },
+    "101703": {
+      "type_id": 3,
+      "spec_char": 1017,
+      "role_type_id": 1,
+      "new_condition": 5101701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1017
+    },
+    "101901": {
+      "type_id": 3,
+      "spec_char": 1019,
+      "role_type_id": 2,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1019
+    },
+    "101902": {
+      "type_id": 3,
+      "spec_char": 1019,
+      "role_type_id": 1,
+      "new_condition": 5101901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1019
+    },
+    "101903": {
+      "type_id": 3,
+      "spec_char": 1019,
+      "role_type_id": 1,
+      "new_condition": 5101901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1019
+    },
+    "101904": {
+      "type_id": 3,
+      "spec_char": 1019,
+      "role_type_id": 1,
+      "new_condition": 5101901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1019
+    },
+    "102001": {
+      "type_id": 3,
+      "spec_char": 1020,
+      "role_type_id": 1,
+      "new_condition": 5102001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1020
+    },
+    "102002": {
+      "type_id": 3,
+      "spec_char": 1020,
+      "role_type_id": 1,
+      "new_condition": 5102001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1020
+    },
+    "102003": {
+      "type_id": 3,
+      "spec_char": 1020,
+      "role_type_id": 1,
+      "new_condition": 5102001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1020
+    },
+    "102101": {
+      "type_id": 3,
+      "spec_char": 1021,
+      "role_type_id": 1,
+      "new_condition": 5102101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1021
+    },
+    "102102": {
+      "type_id": 3,
+      "spec_char": 1021,
+      "role_type_id": 1,
+      "new_condition": 5102101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1021
+    },
+    "102103": {
+      "type_id": 3,
+      "spec_char": 1021,
+      "role_type_id": 1,
+      "new_condition": 5102101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1021
+    },
+    "102201": {
+      "type_id": 3,
+      "spec_char": 1022,
+      "role_type_id": 1,
+      "new_condition": 5102201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1022
+    },
+    "102202": {
+      "type_id": 3,
+      "spec_char": 1022,
+      "role_type_id": 1,
+      "new_condition": 5102201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1022
+    },
+    "102203": {
+      "type_id": 3,
+      "spec_char": 1022,
+      "role_type_id": 1,
+      "new_condition": 5102201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1022
+    },
+    "102401": {
+      "type_id": 3,
+      "spec_char": 1024,
+      "role_type_id": 1,
+      "new_condition": 5102401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1024
+    },
+    "102402": {
+      "type_id": 3,
+      "spec_char": 1024,
+      "role_type_id": 1,
+      "new_condition": 5102401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1024
+    },
+    "102403": {
+      "type_id": 3,
+      "spec_char": 1024,
+      "role_type_id": 1,
+      "new_condition": 5102401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1024
+    },
+    "102601": {
+      "type_id": 3,
+      "spec_char": 1026,
+      "role_type_id": 1,
+      "new_condition": 5102601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1026
+    },
+    "102602": {
+      "type_id": 3,
+      "spec_char": 1026,
+      "role_type_id": 1,
+      "new_condition": 5102601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1026
+    },
+    "102603": {
+      "type_id": 3,
+      "spec_char": 1026,
+      "role_type_id": 1,
+      "new_condition": 5102601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1026
+    },
+    "102701": {
+      "type_id": 3,
+      "spec_char": 1027,
+      "role_type_id": 2,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1027
+    },
+    "102702": {
+      "type_id": 3,
+      "spec_char": 1027,
+      "role_type_id": 1,
+      "new_condition": 5102701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1027
+    },
+    "102703": {
+      "type_id": 3,
+      "spec_char": 1027,
+      "role_type_id": 1,
+      "new_condition": 5102701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1027
+    },
+    "102704": {
+      "type_id": 3,
+      "spec_char": 1027,
+      "role_type_id": 1,
+      "new_condition": 5102701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1027
+    },
+    "102801": {
+      "type_id": 3,
+      "spec_char": 1028,
+      "role_type_id": 1,
+      "new_condition": 5102801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1028
+    },
+    "102802": {
+      "type_id": 3,
+      "spec_char": 1028,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          200
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1028
+    },
+    "102803": {
+      "type_id": 3,
+      "spec_char": 1028,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          200
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1028
+    },
+    "102804": {
+      "type_id": 3,
+      "spec_char": 1028,
+      "role_type_id": 1,
+      "new_condition": 5102801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1028
+    },
+    "102805": {
+      "type_id": 3,
+      "spec_char": 1028,
+      "role_type_id": 1,
+      "new_condition": 5102801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1028
+    },
+    "103201": {
+      "type_id": 3,
+      "spec_char": 1032,
+      "role_type_id": 1,
+      "new_condition": 5103201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1032
+    },
+    "103202": {
+      "type_id": 3,
+      "spec_char": 1032,
+      "role_type_id": 3,
+      "new_condition": 5103202,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1032
+    },
+    "103203": {
+      "type_id": 3,
+      "spec_char": 1032,
+      "role_type_id": 1,
+      "new_condition": 5103201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1032
+    },
+    "103204": {
+      "type_id": 3,
+      "spec_char": 1032,
+      "role_type_id": 1,
+      "new_condition": 5103201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1032
+    },
+    "103301": {
+      "type_id": 3,
+      "spec_char": 1033,
+      "role_type_id": 1,
+      "new_condition": 5103301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1033
+    },
+    "103302": {
+      "type_id": 3,
+      "spec_char": 1033,
+      "role_type_id": 1,
+      "new_condition": 5103301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1033
+    },
+    "103303": {
+      "type_id": 3,
+      "spec_char": 1033,
+      "role_type_id": 1,
+      "new_condition": 5103301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1033
+    },
+    "103501": {
+      "type_id": 3,
+      "spec_char": 1035,
+      "role_type_id": 1,
+      "new_condition": 5103501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1035
+    },
+    "103502": {
+      "type_id": 3,
+      "spec_char": 1035,
+      "role_type_id": 1,
+      "new_condition": 5103501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1035
+    },
+    "103503": {
+      "type_id": 3,
+      "spec_char": 1035,
+      "role_type_id": 1,
+      "new_condition": 5103501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1035
+    },
+    "103701": {
+      "type_id": 3,
+      "spec_char": 1037,
+      "role_type_id": 1,
+      "new_condition": 5103701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1037
+    },
+    "103702": {
+      "type_id": 3,
+      "spec_char": 1037,
+      "role_type_id": 1,
+      "new_condition": 5103701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1037
+    },
+    "103703": {
+      "type_id": 3,
+      "spec_char": 1037,
+      "role_type_id": 1,
+      "new_condition": 5103701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1037
+    },
+    "103801": {
+      "type_id": 3,
+      "spec_char": 1038,
+      "role_type_id": 1,
+      "new_condition": 5103801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1038
+    },
+    "103802": {
+      "type_id": 3,
+      "spec_char": 1038,
+      "role_type_id": 1,
+      "new_condition": 5103801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1038
+    },
+    "103803": {
+      "type_id": 3,
+      "spec_char": 1038,
+      "role_type_id": 1,
+      "new_condition": 5103801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1038
+    },
+    "103901": {
+      "type_id": 3,
+      "spec_char": 1039,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          200
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1039
+    },
+    "103902": {
+      "type_id": 3,
+      "spec_char": 1039,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          200
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1039
+    },
+    "103903": {
+      "type_id": 3,
+      "spec_char": 1039,
+      "role_type_id": 1,
+      "new_condition": 5103902,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1039
+    },
+    "103904": {
+      "type_id": 3,
+      "spec_char": 1039,
+      "role_type_id": 1,
+      "new_condition": 5103902,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1039
+    },
+    "103905": {
+      "type_id": 3,
+      "spec_char": 1039,
+      "role_type_id": 1,
+      "new_condition": 5103902,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1039
+    },
+    "104101": {
+      "type_id": 3,
+      "spec_char": 1041,
+      "role_type_id": 4,
+      "new_condition": 5104101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1041
+    },
+    "104102": {
+      "type_id": 3,
+      "spec_char": 1041,
+      "role_type_id": 4,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          300
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1041
+    },
+    "104103": {
+      "type_id": 3,
+      "spec_char": 1041,
+      "role_type_id": 1,
+      "new_condition": 5104102,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1041
+    },
+    "104104": {
+      "type_id": 3,
+      "spec_char": 1041,
+      "role_type_id": 1,
+      "new_condition": 5104102,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1041
+    },
+    "104105": {
+      "type_id": 3,
+      "spec_char": 1041,
+      "role_type_id": 1,
+      "new_condition": 5104102,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1041
+    },
+    "104201": {
+      "type_id": 3,
+      "spec_char": 1042,
+      "role_type_id": 1,
+      "new_condition": 5104201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1042
+    },
+    "104202": {
+      "type_id": 3,
+      "spec_char": 1042,
+      "role_type_id": 4,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          200
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1042
+    },
+    "104203": {
+      "type_id": 3,
+      "spec_char": 1042,
+      "role_type_id": 1,
+      "new_condition": 5104201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1042
+    },
+    "104204": {
+      "type_id": 3,
+      "spec_char": 1042,
+      "role_type_id": 1,
+      "new_condition": 5104201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1042
+    },
+    "104301": {
+      "type_id": 3,
+      "spec_char": 1043,
+      "role_type_id": 1,
+      "new_condition": 5104301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1043
+    },
+    "104302": {
+      "type_id": 3,
+      "spec_char": 1043,
+      "role_type_id": 1,
+      "new_condition": 5104301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1043
+    },
+    "104303": {
+      "type_id": 3,
+      "spec_char": 1043,
+      "role_type_id": 1,
+      "new_condition": 5104301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1043
+    },
+    "104501": {
+      "type_id": 3,
+      "spec_char": 1045,
+      "role_type_id": 1,
+      "new_condition": 5104501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1045
+    },
+    "104502": {
+      "type_id": 3,
+      "spec_char": 1045,
+      "role_type_id": 1,
+      "new_condition": 5104501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1045
+    },
+    "104503": {
+      "type_id": 3,
+      "spec_char": 1045,
+      "role_type_id": 1,
+      "new_condition": 5104501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1045
+    },
+    "104401": {
+      "type_id": 3,
+      "spec_char": 1044,
+      "role_type_id": 1,
+      "new_condition": 5104401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1044
+    },
+    "104402": {
+      "type_id": 3,
+      "spec_char": 1044,
+      "role_type_id": 1,
+      "new_condition": 5104401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1044
+    },
+    "104403": {
+      "type_id": 3,
+      "spec_char": 1044,
+      "role_type_id": 1,
+      "new_condition": 5104401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1044
+    },
+    "104601": {
+      "type_id": 3,
+      "spec_char": 1046,
+      "role_type_id": 1,
+      "new_condition": 5104601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1046
+    },
+    "104602": {
+      "type_id": 3,
+      "spec_char": 1046,
+      "role_type_id": 1,
+      "new_condition": 5104601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1046
+    },
+    "104603": {
+      "type_id": 3,
+      "spec_char": 1046,
+      "role_type_id": 1,
+      "new_condition": 5104601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1046
+    },
+    "104701": {
+      "type_id": 3,
+      "spec_char": 1047,
+      "role_type_id": 1,
+      "new_condition": 5104701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1047
+    },
+    "104702": {
+      "type_id": 3,
+      "spec_char": 1047,
+      "role_type_id": 1,
+      "new_condition": 5104701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1047
+    },
+    "104703": {
+      "type_id": 3,
+      "spec_char": 1047,
+      "role_type_id": 1,
+      "new_condition": 5104701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1047
+    },
+    "104801": {
+      "type_id": 3,
+      "spec_char": 1048,
+      "role_type_id": 1,
+      "new_condition": 5104801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1048
+    },
+    "104802": {
+      "type_id": 3,
+      "spec_char": 1048,
+      "role_type_id": 1,
+      "new_condition": 5104801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1048
+    },
+    "104803": {
+      "type_id": 3,
+      "spec_char": 1048,
+      "role_type_id": 1,
+      "new_condition": 5104801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1048
+    },
+    "104901": {
+      "type_id": 3,
+      "spec_char": 1049,
+      "role_type_id": 1,
+      "new_condition": 5104901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1049
+    },
+    "104902": {
+      "type_id": 3,
+      "spec_char": 1049,
+      "role_type_id": 1,
+      "new_condition": 5104901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1049
+    },
+    "104903": {
+      "type_id": 3,
+      "spec_char": 1049,
+      "role_type_id": 1,
+      "new_condition": 5104901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1049
+    },
+    "105001": {
+      "type_id": 3,
+      "spec_char": 1050,
+      "role_type_id": 1,
+      "new_condition": 5105001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1050
+    },
+    "105002": {
+      "type_id": 3,
+      "spec_char": 1050,
+      "role_type_id": 1,
+      "new_condition": 5105001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1050
+    },
+    "105003": {
+      "type_id": 3,
+      "spec_char": 1050,
+      "role_type_id": 1,
+      "new_condition": 5105001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1050
+    },
+    "105201": {
+      "type_id": 3,
+      "spec_char": 1052,
+      "role_type_id": 4,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          200
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1052
+    },
+    "105202": {
+      "type_id": 3,
+      "spec_char": 1052,
+      "role_type_id": 1,
+      "new_condition": 5105201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1052
+    },
+    "105203": {
+      "type_id": 3,
+      "spec_char": 1052,
+      "role_type_id": 1,
+      "new_condition": 5105201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1052
+    },
+    "105204": {
+      "type_id": 3,
+      "spec_char": 1052,
+      "role_type_id": 1,
+      "new_condition": 5105201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1052
+    },
+    "105301": {
+      "type_id": 3,
+      "spec_char": 1053,
+      "role_type_id": 1,
+      "new_condition": 5105301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1053
+    },
+    "105302": {
+      "type_id": 3,
+      "spec_char": 1053,
+      "role_type_id": 1,
+      "new_condition": 5105301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1053
+    },
+    "105303": {
+      "type_id": 3,
+      "spec_char": 1053,
+      "role_type_id": 1,
+      "new_condition": 5105301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1053
+    },
+    "105401": {
+      "type_id": 3,
+      "spec_char": 1054,
+      "role_type_id": 1,
+      "new_condition": 5105401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1054
+    },
+    "105402": {
+      "type_id": 3,
+      "spec_char": 1054,
+      "role_type_id": 1,
+      "new_condition": 5105401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1054
+    },
+    "105403": {
+      "type_id": 3,
+      "spec_char": 1054,
+      "role_type_id": 1,
+      "new_condition": 5105401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1054
+    },
+    "105404": {
+      "type_id": 3,
+      "spec_char": 1054,
+      "role_type_id": 1,
+      "new_condition": 5105401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1054
+    },
+    "105501": {
+      "type_id": 3,
+      "spec_char": 1055,
+      "role_type_id": 3,
+      "new_condition": 5105501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1055
+    },
+    "105502": {
+      "type_id": 3,
+      "spec_char": 1055,
+      "role_type_id": 3,
+      "new_condition": 5105502,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1055
+    },
+    "105503": {
+      "type_id": 3,
+      "spec_char": 1055,
+      "role_type_id": 1,
+      "new_condition": 5105503,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1055
+    },
+    "105504": {
+      "type_id": 3,
+      "spec_char": 1055,
+      "role_type_id": 1,
+      "new_condition": 5105503,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1055
+    },
+    "105505": {
+      "type_id": 3,
+      "spec_char": 1055,
+      "role_type_id": 1,
+      "new_condition": 5105503,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1055
+    },
+    "105601": {
+      "type_id": 3,
+      "spec_char": 1056,
+      "role_type_id": 1,
+      "new_condition": 5105601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1056
+    },
+    "105602": {
+      "type_id": 3,
+      "spec_char": 1056,
+      "role_type_id": 1,
+      "new_condition": 5105601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1056
+    },
+    "105603": {
+      "type_id": 3,
+      "spec_char": 1056,
+      "role_type_id": 1,
+      "new_condition": 5105601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1056
+    },
+    "105801": {
+      "type_id": 3,
+      "spec_char": 1058,
+      "role_type_id": 4,
+      "new_condition": 5105801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1058
+    },
+    "105802": {
+      "type_id": 3,
+      "spec_char": 1058,
+      "role_type_id": 1,
+      "new_condition": 5105802,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1058
+    },
+    "105803": {
+      "type_id": 3,
+      "spec_char": 1058,
+      "role_type_id": 1,
+      "new_condition": 5105802,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1058
+    },
+    "105804": {
+      "type_id": 3,
+      "spec_char": 1058,
+      "role_type_id": 1,
+      "new_condition": 5105802,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1058
+    },
+    "105901": {
+      "type_id": 3,
+      "spec_char": 1059,
+      "role_type_id": 1,
+      "new_condition": 5105901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1059
+    },
+    "105902": {
+      "type_id": 3,
+      "spec_char": 1059,
+      "role_type_id": 1,
+      "new_condition": 5105901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1059
+    },
+    "105903": {
+      "type_id": 3,
+      "spec_char": 1059,
+      "role_type_id": 1,
+      "new_condition": 5105901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1059
+    },
+    "106001": {
+      "type_id": 3,
+      "spec_char": 1060,
+      "role_type_id": 1,
+      "new_condition": 5106001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1060
+    },
+    "106002": {
+      "type_id": 3,
+      "spec_char": 1060,
+      "role_type_id": 1,
+      "new_condition": 5106001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1060
+    },
+    "106003": {
+      "type_id": 3,
+      "spec_char": 1060,
+      "role_type_id": 1,
+      "new_condition": 5106001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1060
+    },
+    "106101": {
+      "type_id": 3,
+      "spec_char": 1061,
+      "role_type_id": 1,
+      "new_condition": 5106101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1061
+    },
+    "106102": {
+      "type_id": 3,
+      "spec_char": 1061,
+      "role_type_id": 1,
+      "new_condition": 5106101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1061
+    },
+    "106103": {
+      "type_id": 3,
+      "spec_char": 1061,
+      "role_type_id": 1,
+      "new_condition": 5106101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1061
+    },
+    "106601": {
+      "type_id": 3,
+      "spec_char": 1066,
+      "role_type_id": 3,
+      "new_condition": 5106601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1066
+    },
+    "106602": {
+      "type_id": 3,
+      "spec_char": 1066,
+      "role_type_id": 3,
+      "new_condition": 5106601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1066
+    },
+    "106603": {
+      "type_id": 3,
+      "spec_char": 1066,
+      "role_type_id": 3,
+      "new_condition": 5106601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1066
+    },
+    "106604": {
+      "type_id": 3,
+      "spec_char": 1066,
+      "role_type_id": 3,
+      "new_condition": 5106602,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1066
+    },
+    "106605": {
+      "type_id": 3,
+      "spec_char": 1066,
+      "role_type_id": 1,
+      "new_condition": 5106603,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1066
+    },
+    "106606": {
+      "type_id": 3,
+      "spec_char": 1066,
+      "role_type_id": 1,
+      "new_condition": 5106603,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1066
+    },
+    "106607": {
+      "type_id": 3,
+      "spec_char": 1066,
+      "role_type_id": 1,
+      "new_condition": 5106603,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1066
+    },
+    "106701": {
+      "type_id": 3,
+      "spec_char": 1067,
+      "role_type_id": 1,
+      "new_condition": 5106701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1067
+    },
+    "106702": {
+      "type_id": 3,
+      "spec_char": 1067,
+      "role_type_id": 1,
+      "new_condition": 5106701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1067
+    },
+    "106703": {
+      "type_id": 3,
+      "spec_char": 1067,
+      "role_type_id": 1,
+      "new_condition": 5106701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1067
+    },
+    "106801": {
+      "type_id": 3,
+      "spec_char": 1068,
+      "role_type_id": 1,
+      "new_condition": 5106801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1068
+    },
+    "106802": {
+      "type_id": 3,
+      "spec_char": 1068,
+      "role_type_id": 2,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1068
+    },
+    "106803": {
+      "type_id": 3,
+      "spec_char": 1068,
+      "role_type_id": 1,
+      "new_condition": 5106801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1068
+    },
+    "106804": {
+      "type_id": 3,
+      "spec_char": 1068,
+      "role_type_id": 1,
+      "new_condition": 5106801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1068
+    },
+    "107001": {
+      "type_id": 3,
+      "spec_char": 1070,
+      "role_type_id": 1,
+      "new_condition": 5107001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1070
+    },
+    "107002": {
+      "type_id": 3,
+      "spec_char": 1070,
+      "role_type_id": 1,
+      "new_condition": 5107001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1070
+    },
+    "107003": {
+      "type_id": 3,
+      "spec_char": 1070,
+      "role_type_id": 1,
+      "new_condition": 5107001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1070
+    },
+    "107101": {
+      "type_id": 3,
+      "spec_char": 1071,
+      "role_type_id": 1,
+      "new_condition": 5107101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1071
+    },
+    "107102": {
+      "type_id": 3,
+      "spec_char": 1071,
+      "role_type_id": 1,
+      "new_condition": 5107101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1071
+    },
+    "107103": {
+      "type_id": 3,
+      "spec_char": 1071,
+      "role_type_id": 1,
+      "new_condition": 5107101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1071
+    },
+    "107201": {
+      "type_id": 3,
+      "spec_char": 1072,
+      "role_type_id": 1,
+      "new_condition": 5107201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1072
+    },
+    "107202": {
+      "type_id": 3,
+      "spec_char": 1072,
+      "role_type_id": 1,
+      "new_condition": 5107201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1072
+    },
+    "107203": {
+      "type_id": 3,
+      "spec_char": 1072,
+      "role_type_id": 1,
+      "new_condition": 5107201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1072
+    },
+    "107301": {
+      "type_id": 3,
+      "spec_char": 1073,
+      "role_type_id": 1,
+      "new_condition": 5107301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1073
+    },
+    "107302": {
+      "type_id": 3,
+      "spec_char": 1073,
+      "role_type_id": 1,
+      "new_condition": 5107301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1073
+    },
+    "107303": {
+      "type_id": 3,
+      "spec_char": 1073,
+      "role_type_id": 1,
+      "new_condition": 5107301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1073
+    },
+    "107401": {
+      "type_id": 3,
+      "spec_char": 1074,
+      "role_type_id": 1,
+      "new_condition": 5107401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1074
+    },
+    "107402": {
+      "type_id": 3,
+      "spec_char": 1074,
+      "role_type_id": 1,
+      "new_condition": 5107401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1074
+    },
+    "107403": {
+      "type_id": 3,
+      "spec_char": 1074,
+      "role_type_id": 1,
+      "new_condition": 5107401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1074
+    },
+    "107501": {
+      "type_id": 3,
+      "spec_char": 1075,
+      "role_type_id": 1,
+      "new_condition": 5107501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1075
+    },
+    "107502": {
+      "type_id": 3,
+      "spec_char": 1075,
+      "role_type_id": 3,
+      "new_condition": 5107502,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1075
+    },
+    "107503": {
+      "type_id": 3,
+      "spec_char": 1075,
+      "role_type_id": 3,
+      "new_condition": 5107502,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1075
+    },
+    "107504": {
+      "type_id": 3,
+      "spec_char": 1075,
+      "role_type_id": 1,
+      "new_condition": 5107501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1075
+    },
+    "107505": {
+      "type_id": 3,
+      "spec_char": 1075,
+      "role_type_id": 1,
+      "new_condition": 5107501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1075
+    },
+    "107601": {
+      "type_id": 3,
+      "spec_char": 1076,
+      "role_type_id": 1,
+      "new_condition": 5107601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1076
+    },
+    "107602": {
+      "type_id": 3,
+      "spec_char": 1076,
+      "role_type_id": 1,
+      "new_condition": 5107601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1076
+    },
+    "107603": {
+      "type_id": 3,
+      "spec_char": 1076,
+      "role_type_id": 1,
+      "new_condition": 5107601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1076
+    },
+    "107604": {
+      "type_id": 3,
+      "spec_char": 1076,
+      "role_type_id": 3,
+      "new_condition": 5107601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1076
+    },
+    "107605": {
+      "type_id": 3,
+      "spec_char": 1076,
+      "role_type_id": 3,
+      "new_condition": 5107601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1076
+    },
+    "107606": {
+      "type_id": 3,
+      "spec_char": 1076,
+      "role_type_id": 3,
+      "new_condition": 5107601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1076
+    },
+    "107607": {
+      "type_id": 3,
+      "spec_char": 1076,
+      "role_type_id": 4,
+      "new_condition": 5107601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1076
+    },
+    "107608": {
+      "type_id": 3,
+      "spec_char": 1076,
+      "role_type_id": 4,
+      "new_condition": 5107601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1076
+    },
+    "107701": {
+      "type_id": 3,
+      "spec_char": 1077,
+      "role_type_id": 1,
+      "new_condition": 5107701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1077
+    },
+    "107702": {
+      "type_id": 3,
+      "spec_char": 1077,
+      "role_type_id": 1,
+      "new_condition": 5107701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1077
+    },
+    "107703": {
+      "type_id": 3,
+      "spec_char": 1077,
+      "role_type_id": 1,
+      "new_condition": 5107701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1077
+    },
+    "108001": {
+      "type_id": 3,
+      "spec_char": 1080,
+      "role_type_id": 1,
+      "new_condition": 5108001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1080
+    },
+    "108002": {
+      "type_id": 3,
+      "spec_char": 1080,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1080
+    },
+    "108003": {
+      "type_id": 3,
+      "spec_char": 1080,
+      "role_type_id": 1,
+      "new_condition": 5108001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1080
+    },
+    "108004": {
+      "type_id": 3,
+      "spec_char": 1080,
+      "role_type_id": 1,
+      "new_condition": 5108001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1080
+    },
+    "108101": {
+      "type_id": 3,
+      "spec_char": 1081,
+      "role_type_id": 1,
+      "new_condition": 5108101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1081
+    },
+    "108102": {
+      "type_id": 3,
+      "spec_char": 1081,
+      "role_type_id": 1,
+      "new_condition": 5108101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1081
+    },
+    "108103": {
+      "type_id": 3,
+      "spec_char": 1081,
+      "role_type_id": 3,
+      "new_condition": 5108101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1081
+    },
+    "108104": {
+      "type_id": 3,
+      "spec_char": 1081,
+      "role_type_id": 1,
+      "new_condition": 5108101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1081
+    },
+    "108301": {
+      "type_id": 3,
+      "spec_char": 1083,
+      "role_type_id": 1,
+      "new_condition": 5108301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1083
+    },
+    "108302": {
+      "type_id": 3,
+      "spec_char": 1083,
+      "role_type_id": 1,
+      "new_condition": 5108301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1083
+    },
+    "108303": {
+      "type_id": 3,
+      "spec_char": 1083,
+      "role_type_id": 1,
+      "new_condition": 5108301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1083
+    },
+    "108401": {
+      "type_id": 3,
+      "spec_char": 1084,
+      "role_type_id": 1,
+      "new_condition": 5108401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1084
+    },
+    "108402": {
+      "type_id": 3,
+      "spec_char": 1084,
+      "role_type_id": 1,
+      "new_condition": 5108401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1084
+    },
+    "108403": {
+      "type_id": 3,
+      "spec_char": 1084,
+      "role_type_id": 1,
+      "new_condition": 5108401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1084
+    },
+    "108501": {
+      "type_id": 3,
+      "spec_char": 1085,
+      "role_type_id": 1,
+      "new_condition": 5108501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1085
+    },
+    "108502": {
+      "type_id": 3,
+      "spec_char": 1085,
+      "role_type_id": 1,
+      "new_condition": 5108501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1085
+    },
+    "108503": {
+      "type_id": 3,
+      "spec_char": 1085,
+      "role_type_id": 1,
+      "new_condition": 5108501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1085
+    },
+    "108901": {
+      "type_id": 3,
+      "spec_char": 1089,
+      "role_type_id": 1,
+      "new_condition": 5108901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1089
+    },
+    "108902": {
+      "type_id": 3,
+      "spec_char": 1089,
+      "role_type_id": 1,
+      "new_condition": 5108901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1089
+    },
+    "108903": {
+      "type_id": 3,
+      "spec_char": 1089,
+      "role_type_id": 1,
+      "new_condition": 5108901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1089
+    },
+    "109301": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 4,
+      "new_condition": 5109301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109302": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 4,
+      "new_condition": 5109301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109303": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 4,
+      "new_condition": 5109301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109304": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 4,
+      "new_condition": 5109301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109305": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 2,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109306": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 2,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109307": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 2,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109308": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 1,
+      "new_condition": 5109302,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109309": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 1,
+      "new_condition": 5109302,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109310": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 1,
+      "new_condition": 5109302,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109401": {
+      "type_id": 3,
+      "spec_char": 1094,
+      "role_type_id": 4,
+      "new_condition": 5109401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1094
+    },
+    "109402": {
+      "type_id": 3,
+      "spec_char": 1094,
+      "role_type_id": 1,
+      "new_condition": 5109402,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1094
+    },
+    "109403": {
+      "type_id": 3,
+      "spec_char": 1094,
+      "role_type_id": 3,
+      "new_condition": 5109403,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1094
+    },
+    "109404": {
+      "type_id": 3,
+      "spec_char": 1094,
+      "role_type_id": 1,
+      "new_condition": 5109402,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1094
+    },
+    "109405": {
+      "type_id": 3,
+      "spec_char": 1094,
+      "role_type_id": 1,
+      "new_condition": 5109402,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1094
+    },
+    "109501": {
+      "type_id": 3,
+      "spec_char": 1095,
+      "role_type_id": 1,
+      "new_condition": 5109501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1095
+    },
+    "109502": {
+      "type_id": 3,
+      "spec_char": 1095,
+      "role_type_id": 1,
+      "new_condition": 5109501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1095
+    },
+    "109503": {
+      "type_id": 3,
+      "spec_char": 1095,
+      "role_type_id": 1,
+      "new_condition": 5109501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1095
+    },
+    "109601": {
+      "type_id": 3,
+      "spec_char": 1096,
+      "role_type_id": 1,
+      "new_condition": 5109601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1096
+    },
+    "109602": {
+      "type_id": 3,
+      "spec_char": 1096,
+      "role_type_id": 1,
+      "new_condition": 5109601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1096
+    },
+    "109603": {
+      "type_id": 3,
+      "spec_char": 1096,
+      "role_type_id": 1,
+      "new_condition": 5109601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1096
+    },
+    "109701": {
+      "type_id": 3,
+      "spec_char": 1097,
+      "role_type_id": 1,
+      "new_condition": 5109701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1097
+    },
+    "109702": {
+      "type_id": 3,
+      "spec_char": 1097,
+      "role_type_id": 1,
+      "new_condition": 5109701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1097
+    },
+    "109703": {
+      "type_id": 3,
+      "spec_char": 1097,
+      "role_type_id": 1,
+      "new_condition": 5109701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1097
+    },
+    "109901": {
+      "type_id": 3,
+      "spec_char": 1099,
+      "role_type_id": 3,
+      "new_condition": 5109901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1099
+    },
+    "109902": {
+      "type_id": 3,
+      "spec_char": 1099,
+      "role_type_id": 3,
+      "new_condition": 5109901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1099
+    },
+    "109903": {
+      "type_id": 3,
+      "spec_char": 1099,
+      "role_type_id": 1,
+      "new_condition": 5109902,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1099
+    },
+    "109904": {
+      "type_id": 3,
+      "spec_char": 1099,
+      "role_type_id": 1,
+      "new_condition": 5109902,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1099
+    },
+    "109905": {
+      "type_id": 3,
+      "spec_char": 1099,
+      "role_type_id": 1,
+      "new_condition": 5109902,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1099
+    },
+    "111101": {
+      "type_id": 3,
+      "spec_char": 1111,
+      "role_type_id": 1,
+      "new_condition": 5111101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1111
+    },
+    "111102": {
+      "type_id": 3,
+      "spec_char": 1111,
+      "role_type_id": 1,
+      "new_condition": 5111101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1111
+    },
+    "111103": {
+      "type_id": 3,
+      "spec_char": 1111,
+      "role_type_id": 1,
+      "new_condition": 5111101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1111
+    },
+    "111901": {
+      "type_id": 3,
+      "spec_char": 1119,
+      "role_type_id": 1,
+      "new_condition": 5111901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1119
+    },
+    "111902": {
+      "type_id": 3,
+      "spec_char": 1119,
+      "role_type_id": 1,
+      "new_condition": 5111901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1119
+    },
+    "111903": {
+      "type_id": 3,
+      "spec_char": 1119,
+      "role_type_id": 1,
+      "new_condition": 5111901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1119
+    },
+    "112701": {
+      "type_id": 3,
+      "spec_char": 1127,
+      "role_type_id": 1,
+      "new_condition": 5112701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1127
+    },
+    "112702": {
+      "type_id": 3,
+      "spec_char": 1127,
+      "role_type_id": 1,
+      "new_condition": 5112701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1127
+    },
+    "112703": {
+      "type_id": 3,
+      "spec_char": 1127,
+      "role_type_id": 1,
+      "new_condition": 5112701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1127
+    },
+    "113201": {
+      "type_id": 3,
+      "spec_char": 1132,
+      "role_type_id": 2,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1132
+    },
+    "113202": {
+      "type_id": 3,
+      "spec_char": 1132,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          200
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1132
+    },
+    "113203": {
+      "type_id": 3,
+      "spec_char": 1132,
+      "role_type_id": 4,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          200
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1132
+    },
+    "113204": {
+      "type_id": 3,
+      "spec_char": 1132,
+      "role_type_id": 1,
+      "new_condition": 5113201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1132
+    },
+    "113205": {
+      "type_id": 3,
+      "spec_char": 1132,
+      "role_type_id": 1,
+      "new_condition": 5113201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1132
+    },
+    "113206": {
+      "type_id": 3,
+      "spec_char": 1132,
+      "role_type_id": 1,
+      "new_condition": 5113201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1132
+    },
+    "113301": {
+      "type_id": 3,
+      "spec_char": 1133,
+      "role_type_id": 1,
+      "new_condition": 5113301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1133
+    },
+    "113302": {
+      "type_id": 3,
+      "spec_char": 1133,
+      "role_type_id": 1,
+      "new_condition": 5113301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1133
+    },
+    "113303": {
+      "type_id": 3,
+      "spec_char": 1133,
+      "role_type_id": 1,
+      "new_condition": 5113301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1133
+    },
+    "113701": {
+      "type_id": 3,
+      "spec_char": 1137,
+      "role_type_id": 1,
+      "new_condition": 5113701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1137
+    },
+    "113702": {
+      "type_id": 3,
+      "spec_char": 1137,
+      "role_type_id": 1,
+      "new_condition": 5113701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1137
+    },
+    "113703": {
+      "type_id": 3,
+      "spec_char": 1137,
+      "role_type_id": 1,
+      "new_condition": 5113701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1137
+    },
+    "113801": {
+      "type_id": 3,
+      "spec_char": 1138,
+      "role_type_id": 3,
+      "new_condition": 5113801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1138
+    },
+    "113802": {
+      "type_id": 3,
+      "spec_char": 1138,
+      "role_type_id": 3,
+      "new_condition": 5113802,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1138
+    },
+    "113803": {
+      "type_id": 3,
+      "spec_char": 1138,
+      "role_type_id": 3,
+      "new_condition": 5113803,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1138
+    },
+    "113804": {
+      "type_id": 3,
+      "spec_char": 1138,
+      "role_type_id": 1,
+      "new_condition": 5113804,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1138
+    },
+    "113805": {
+      "type_id": 3,
+      "spec_char": 1138,
+      "role_type_id": 1,
+      "new_condition": 5113804,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1138
+    },
+    "113806": {
+      "type_id": 3,
+      "spec_char": 1138,
+      "role_type_id": 1,
+      "new_condition": 5113804,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1138
+    },
+    "113901": {
+      "type_id": 3,
+      "spec_char": 1139,
+      "role_type_id": 3,
+      "new_condition": 5113901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1139
+    },
+    "113902": {
+      "type_id": 3,
+      "spec_char": 1139,
+      "role_type_id": 3,
+      "new_condition": 5113902,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1139
+    },
+    "113903": {
+      "type_id": 3,
+      "spec_char": 1139,
+      "role_type_id": 1,
+      "new_condition": 5113901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1139
+    },
+    "113904": {
+      "type_id": 3,
+      "spec_char": 1139,
+      "role_type_id": 1,
+      "new_condition": 5113901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1139
+    },
+    "113905": {
+      "type_id": 3,
+      "spec_char": 1139,
+      "role_type_id": 1,
+      "new_condition": 5113901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1139
+    },
+    "114801": {
+      "type_id": 3,
+      "spec_char": 1148,
+      "role_type_id": 1,
+      "new_condition": 5114801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1148
+    },
+    "114802": {
+      "type_id": 3,
+      "spec_char": 1148,
+      "role_type_id": 1,
+      "new_condition": 5114801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1148
+    },
+    "114803": {
+      "type_id": 3,
+      "spec_char": 1148,
+      "role_type_id": 1,
+      "new_condition": 5114801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1148
+    },
+    "115001": {
+      "type_id": 3,
+      "spec_char": 1150,
+      "role_type_id": 1,
+      "new_condition": 5115001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1150
+    },
+    "115002": {
+      "type_id": 3,
+      "spec_char": 1150,
+      "role_type_id": 1,
+      "new_condition": 5115001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1150
+    },
+    "115003": {
+      "type_id": 3,
+      "spec_char": 1150,
+      "role_type_id": 1,
+      "new_condition": 5115001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1150
+    },
+    "115601": {
+      "type_id": 3,
+      "spec_char": 1156,
+      "role_type_id": 1,
+      "new_condition": 5115601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1156
+    },
+    "115602": {
+      "type_id": 3,
+      "spec_char": 1156,
+      "role_type_id": 1,
+      "new_condition": 5115601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1156
+    },
+    "115603": {
+      "type_id": 3,
+      "spec_char": 1156,
+      "role_type_id": 1,
+      "new_condition": 5115601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1156
+    },
+    "115801": {
+      "type_id": 3,
+      "spec_char": 1158,
+      "role_type_id": 1,
+      "new_condition": 5115801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1158
+    },
+    "115802": {
+      "type_id": 3,
+      "spec_char": 1158,
+      "role_type_id": 1,
+      "new_condition": 5115801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1158
+    },
+    "115803": {
+      "type_id": 3,
+      "spec_char": 1158,
+      "role_type_id": 1,
+      "new_condition": 5115801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1158
+    },
+    "116601": {
+      "type_id": 3,
+      "spec_char": 1166,
+      "role_type_id": 1,
+      "new_condition": 5116601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1166
+    },
+    "116602": {
+      "type_id": 3,
+      "spec_char": 1166,
+      "role_type_id": 1,
+      "new_condition": 5116601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1166
+    },
+    "116603": {
+      "type_id": 3,
+      "spec_char": 1166,
+      "role_type_id": 1,
+      "new_condition": 5116601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1166
+    },
+    "116611": {
+      "type_id": 3,
+      "spec_char": 1166,
+      "role_type_id": 2,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1166
+    },
+    "116631": {
+      "type_id": 3,
+      "spec_char": 1166,
+      "role_type_id": 4,
+      "new_condition": 5116602,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1166
+    },
+    "117001": {
+      "type_id": 3,
+      "spec_char": 1170,
+      "role_type_id": 1,
+      "new_condition": 5117001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1170
+    },
+    "117002": {
+      "type_id": 3,
+      "spec_char": 1170,
+      "role_type_id": 1,
+      "new_condition": 5117001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1170
+    },
+    "117003": {
+      "type_id": 3,
+      "spec_char": 1170,
+      "role_type_id": 1,
+      "new_condition": 5117001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1170
+    },
+    "118401": {
+      "type_id": 3,
+      "spec_char": 1184,
+      "role_type_id": 3,
+      "new_condition": 5118401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1184
+    },
+    "118402": {
+      "type_id": 3,
+      "spec_char": 1184,
+      "role_type_id": 3,
+      "new_condition": 5118401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1184
+    },
+    "118403": {
+      "type_id": 3,
+      "spec_char": 1184,
+      "role_type_id": 1,
+      "new_condition": 5118402,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1184
+    },
+    "118404": {
+      "type_id": 3,
+      "spec_char": 1184,
+      "role_type_id": 1,
+      "new_condition": 5118402,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1184
+    },
+    "118405": {
+      "type_id": 3,
+      "spec_char": 1184,
+      "role_type_id": 1,
+      "new_condition": 5118402,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1184
+    },
+    "119401": {
+      "type_id": 3,
+      "spec_char": 1194,
+      "role_type_id": 1,
+      "new_condition": 5119401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1194
+    },
+    "119402": {
+      "type_id": 3,
+      "spec_char": 1194,
+      "role_type_id": 1,
+      "new_condition": 5119401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1194
+    },
+    "119403": {
+      "type_id": 3,
+      "spec_char": 1194,
+      "role_type_id": 1,
+      "new_condition": 5119401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1194
+    },
+    "119701": {
+      "type_id": 3,
+      "spec_char": 1197,
+      "role_type_id": 1,
+      "new_condition": 5119701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1197
+    },
+    "119702": {
+      "type_id": 3,
+      "spec_char": 1197,
+      "role_type_id": 1,
+      "new_condition": 5119701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1197
+    },
+    "119703": {
+      "type_id": 3,
+      "spec_char": 1197,
+      "role_type_id": 1,
+      "new_condition": 5119701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1197
+    },
+    "119901": {
+      "type_id": 3,
+      "spec_char": 1199,
+      "role_type_id": 3,
+      "new_condition": 5119901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1199
+    },
+    "119902": {
+      "type_id": 3,
+      "spec_char": 1199,
+      "role_type_id": 2,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1199
+    },
+    "119903": {
+      "type_id": 3,
+      "spec_char": 1199,
+      "role_type_id": 2,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1199
+    },
+    "119904": {
+      "type_id": 3,
+      "spec_char": 1199,
+      "role_type_id": 1,
+      "new_condition": 5119901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1199
+    },
+    "119905": {
+      "type_id": 3,
+      "spec_char": 1199,
+      "role_type_id": 1,
+      "new_condition": 5119901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1199
+    },
+    "119906": {
+      "type_id": 3,
+      "spec_char": 1199,
+      "role_type_id": 1,
+      "new_condition": 5119901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1199
+    },
+    "119907": {
+      "type_id": 3,
+      "spec_char": 1199,
+      "role_type_id": 4,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          200
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1199
+    },
+    "121101": {
+      "type_id": 3,
+      "spec_char": 1211,
+      "role_type_id": 1,
+      "new_condition": 5121101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1211
+    },
+    "121102": {
+      "type_id": 3,
+      "spec_char": 1211,
+      "role_type_id": 1,
+      "new_condition": 5121101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1211
+    },
+    "121103": {
+      "type_id": 3,
+      "spec_char": 1211,
+      "role_type_id": 1,
+      "new_condition": 5121101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1211
+    },
+    "124801": {
+      "type_id": 3,
+      "spec_char": 1248,
+      "role_type_id": 1,
+      "new_condition": 5124801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1248
+    },
+    "124802": {
+      "type_id": 3,
+      "spec_char": 1248,
+      "role_type_id": 1,
+      "new_condition": 5124801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1248
+    },
+    "124803": {
+      "type_id": 3,
+      "spec_char": 1248,
+      "role_type_id": 1,
+      "new_condition": 5124801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1248
+    },
+    "128401": {
+      "type_id": 3,
+      "spec_char": 1284,
+      "role_type_id": 1,
+      "new_condition": 5128401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1284
+    },
+    "128402": {
+      "type_id": 3,
+      "spec_char": 1284,
+      "role_type_id": 1,
+      "new_condition": 5128401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1284
+    },
+    "128403": {
+      "type_id": 3,
+      "spec_char": 1284,
+      "role_type_id": 1,
+      "new_condition": 5128401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1284
+    },
+    "101199": {
+      "type_id": 3,
+      "spec_char": 1011,
+      "role_type_id": 4,
+      "new_condition": 5101101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1011
+    },
+    "101299": {
+      "type_id": 3,
+      "spec_char": 1012,
+      "role_type_id": 4,
+      "new_condition": 5101201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1012
+    },
+    "101399": {
+      "type_id": 3,
+      "spec_char": 1013,
+      "role_type_id": 4,
+      "new_condition": 5101301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1013
+    },
+    "101599": {
+      "type_id": 3,
+      "spec_char": 1015,
+      "role_type_id": 4,
+      "new_condition": 5101501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1015
+    },
+    "101699": {
+      "type_id": 3,
+      "spec_char": 1016,
+      "role_type_id": 4,
+      "new_condition": 5101601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1016
+    },
+    "101799": {
+      "type_id": 3,
+      "spec_char": 1017,
+      "role_type_id": 4,
+      "new_condition": 5101701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1017
+    },
+    "101999": {
+      "type_id": 3,
+      "spec_char": 1019,
+      "role_type_id": 4,
+      "new_condition": 5101901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1019
+    },
+    "102099": {
+      "type_id": 3,
+      "spec_char": 1020,
+      "role_type_id": 4,
+      "new_condition": 5102001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1020
+    },
+    "102199": {
+      "type_id": 3,
+      "spec_char": 1021,
+      "role_type_id": 4,
+      "new_condition": 5102101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1021
+    },
+    "102299": {
+      "type_id": 3,
+      "spec_char": 1022,
+      "role_type_id": 4,
+      "new_condition": 5102201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1022
+    },
+    "102499": {
+      "type_id": 3,
+      "spec_char": 1024,
+      "role_type_id": 4,
+      "new_condition": 5102401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1024
+    },
+    "102699": {
+      "type_id": 3,
+      "spec_char": 1026,
+      "role_type_id": 4,
+      "new_condition": 5102601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1026
+    },
+    "102799": {
+      "type_id": 3,
+      "spec_char": 1027,
+      "role_type_id": 4,
+      "new_condition": 5102701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1027
+    },
+    "102899": {
+      "type_id": 3,
+      "spec_char": 1028,
+      "role_type_id": 4,
+      "new_condition": 5102801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1028
+    },
+    "103299": {
+      "type_id": 3,
+      "spec_char": 1032,
+      "role_type_id": 4,
+      "new_condition": 5103201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1032
+    },
+    "103399": {
+      "type_id": 3,
+      "spec_char": 1033,
+      "role_type_id": 4,
+      "new_condition": 5103301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1033
+    },
+    "103599": {
+      "type_id": 3,
+      "spec_char": 1035,
+      "role_type_id": 4,
+      "new_condition": 5103501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1035
+    },
+    "103799": {
+      "type_id": 3,
+      "spec_char": 1037,
+      "role_type_id": 4,
+      "new_condition": 5103701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1037
+    },
+    "103899": {
+      "type_id": 3,
+      "spec_char": 1038,
+      "role_type_id": 4,
+      "new_condition": 5103801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1038
+    },
+    "103999": {
+      "type_id": 3,
+      "spec_char": 1039,
+      "role_type_id": 4,
+      "new_condition": 5103902,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1039
+    },
+    "104199": {
+      "type_id": 3,
+      "spec_char": 1041,
+      "role_type_id": 4,
+      "new_condition": 5104102,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1041
+    },
+    "104299": {
+      "type_id": 3,
+      "spec_char": 1042,
+      "role_type_id": 4,
+      "new_condition": 5104201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1042
+    },
+    "104399": {
+      "type_id": 3,
+      "spec_char": 1043,
+      "role_type_id": 4,
+      "new_condition": 5104301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1043
+    },
+    "104499": {
+      "type_id": 3,
+      "spec_char": 1044,
+      "role_type_id": 4,
+      "new_condition": 5104401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1044
+    },
+    "104599": {
+      "type_id": 3,
+      "spec_char": 1045,
+      "role_type_id": 4,
+      "new_condition": 5104501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1045
+    },
+    "104699": {
+      "type_id": 3,
+      "spec_char": 1046,
+      "role_type_id": 4,
+      "new_condition": 5104601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1046
+    },
+    "104799": {
+      "type_id": 3,
+      "spec_char": 1047,
+      "role_type_id": 4,
+      "new_condition": 5104701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1047
+    },
+    "104899": {
+      "type_id": 3,
+      "spec_char": 1048,
+      "role_type_id": 4,
+      "new_condition": 5104801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1048
+    },
+    "104999": {
+      "type_id": 3,
+      "spec_char": 1049,
+      "role_type_id": 4,
+      "new_condition": 5104901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1049
+    },
+    "105099": {
+      "type_id": 3,
+      "spec_char": 1050,
+      "role_type_id": 4,
+      "new_condition": 5105001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1050
+    },
+    "105299": {
+      "type_id": 3,
+      "spec_char": 1052,
+      "role_type_id": 4,
+      "new_condition": 5105201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1052
+    },
+    "105399": {
+      "type_id": 3,
+      "spec_char": 1053,
+      "role_type_id": 4,
+      "new_condition": 5105301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1053
+    },
+    "105499": {
+      "type_id": 3,
+      "spec_char": 1054,
+      "role_type_id": 4,
+      "new_condition": 5105401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1054
+    },
+    "105599": {
+      "type_id": 3,
+      "spec_char": 1055,
+      "role_type_id": 4,
+      "new_condition": 5105503,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1055
+    },
+    "105699": {
+      "type_id": 3,
+      "spec_char": 1056,
+      "role_type_id": 4,
+      "new_condition": 5105601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1056
+    },
+    "105899": {
+      "type_id": 3,
+      "spec_char": 1058,
+      "role_type_id": 4,
+      "new_condition": 5105802,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1058
+    },
+    "105999": {
+      "type_id": 3,
+      "spec_char": 1059,
+      "role_type_id": 4,
+      "new_condition": 5105901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1059
+    },
+    "106099": {
+      "type_id": 3,
+      "spec_char": 1060,
+      "role_type_id": 4,
+      "new_condition": 5106001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1060
+    },
+    "106199": {
+      "type_id": 3,
+      "spec_char": 1061,
+      "role_type_id": 4,
+      "new_condition": 5106101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1061
+    },
+    "106699": {
+      "type_id": 3,
+      "spec_char": 1066,
+      "role_type_id": 4,
+      "new_condition": 5106603,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1066
+    },
+    "106799": {
+      "type_id": 3,
+      "spec_char": 1067,
+      "role_type_id": 4,
+      "new_condition": 5106701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1067
+    },
+    "106899": {
+      "type_id": 3,
+      "spec_char": 1068,
+      "role_type_id": 4,
+      "new_condition": 5106801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1068
+    },
+    "107099": {
+      "type_id": 3,
+      "spec_char": 1070,
+      "role_type_id": 4,
+      "new_condition": 5107001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1070
+    },
+    "107199": {
+      "type_id": 3,
+      "spec_char": 1071,
+      "role_type_id": 4,
+      "new_condition": 5107101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1071
+    },
+    "107299": {
+      "type_id": 3,
+      "spec_char": 1072,
+      "role_type_id": 4,
+      "new_condition": 5107201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1072
+    },
+    "107399": {
+      "type_id": 3,
+      "spec_char": 1073,
+      "role_type_id": 4,
+      "new_condition": 5107301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1073
+    },
+    "107499": {
+      "type_id": 3,
+      "spec_char": 1074,
+      "role_type_id": 4,
+      "new_condition": 5107401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1074
+    },
+    "107599": {
+      "type_id": 3,
+      "spec_char": 1075,
+      "role_type_id": 4,
+      "new_condition": 5107501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1075
+    },
+    "107699": {
+      "type_id": 3,
+      "spec_char": 1076,
+      "role_type_id": 4,
+      "new_condition": 5107601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1076
+    },
+    "107799": {
+      "type_id": 3,
+      "spec_char": 1077,
+      "role_type_id": 4,
+      "new_condition": 5107701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1077
+    },
+    "108099": {
+      "type_id": 3,
+      "spec_char": 1080,
+      "role_type_id": 4,
+      "new_condition": 5108001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1080
+    },
+    "108199": {
+      "type_id": 3,
+      "spec_char": 1081,
+      "role_type_id": 4,
+      "new_condition": 5108101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1081
+    },
+    "108399": {
+      "type_id": 3,
+      "spec_char": 1083,
+      "role_type_id": 4,
+      "new_condition": 5108301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1083
+    },
+    "108499": {
+      "type_id": 3,
+      "spec_char": 1084,
+      "role_type_id": 4,
+      "new_condition": 5108401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1084
+    },
+    "108599": {
+      "type_id": 3,
+      "spec_char": 1085,
+      "role_type_id": 4,
+      "new_condition": 5108501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1085
+    },
+    "108999": {
+      "type_id": 3,
+      "spec_char": 1089,
+      "role_type_id": 4,
+      "new_condition": 5108901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1089
+    },
+    "109399": {
+      "type_id": 3,
+      "spec_char": 1093,
+      "role_type_id": 4,
+      "new_condition": 5109302,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1093
+    },
+    "109499": {
+      "type_id": 3,
+      "spec_char": 1094,
+      "role_type_id": 4,
+      "new_condition": 5109402,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1094
+    },
+    "109599": {
+      "type_id": 3,
+      "spec_char": 1095,
+      "role_type_id": 4,
+      "new_condition": 5109501,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1095
+    },
+    "109699": {
+      "type_id": 3,
+      "spec_char": 1096,
+      "role_type_id": 4,
+      "new_condition": 5109601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1096
+    },
+    "109799": {
+      "type_id": 3,
+      "spec_char": 1097,
+      "role_type_id": 4,
+      "new_condition": 5109701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1097
+    },
+    "109999": {
+      "type_id": 3,
+      "spec_char": 1099,
+      "role_type_id": 4,
+      "new_condition": 5109902,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1099
+    },
+    "111199": {
+      "type_id": 3,
+      "spec_char": 1111,
+      "role_type_id": 4,
+      "new_condition": 5111101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1111
+    },
+    "111999": {
+      "type_id": 3,
+      "spec_char": 1119,
+      "role_type_id": 4,
+      "new_condition": 5111901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1119
+    },
+    "112799": {
+      "type_id": 3,
+      "spec_char": 1127,
+      "role_type_id": 4,
+      "new_condition": 5112701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1127
+    },
+    "113299": {
+      "type_id": 3,
+      "spec_char": 1132,
+      "role_type_id": 4,
+      "new_condition": 5113201,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1132
+    },
+    "113399": {
+      "type_id": 3,
+      "spec_char": 1133,
+      "role_type_id": 4,
+      "new_condition": 5113301,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1133
+    },
+    "113799": {
+      "type_id": 3,
+      "spec_char": 1137,
+      "role_type_id": 4,
+      "new_condition": 5113701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1137
+    },
+    "113899": {
+      "type_id": 3,
+      "spec_char": 1138,
+      "role_type_id": 4,
+      "new_condition": 5113804,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1138
+    },
+    "113999": {
+      "type_id": 3,
+      "spec_char": 1139,
+      "role_type_id": 4,
+      "new_condition": 5113901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1139
+    },
+    "114899": {
+      "type_id": 3,
+      "spec_char": 1148,
+      "role_type_id": 4,
+      "new_condition": 5114801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1148
+    },
+    "115099": {
+      "type_id": 3,
+      "spec_char": 1150,
+      "role_type_id": 4,
+      "new_condition": 5115001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1150
+    },
+    "115699": {
+      "type_id": 3,
+      "spec_char": 1156,
+      "role_type_id": 4,
+      "new_condition": 5115601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1156
+    },
+    "115899": {
+      "type_id": 3,
+      "spec_char": 1158,
+      "role_type_id": 4,
+      "new_condition": 5115801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1158
+    },
+    "116699": {
+      "type_id": 3,
+      "spec_char": 1166,
+      "role_type_id": 4,
+      "new_condition": 5116601,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1166
+    },
+    "117099": {
+      "type_id": 3,
+      "spec_char": 1170,
+      "role_type_id": 4,
+      "new_condition": 5117001,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1170
+    },
+    "118499": {
+      "type_id": 3,
+      "spec_char": 1184,
+      "role_type_id": 4,
+      "new_condition": 5118402,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1184
+    },
+    "119499": {
+      "type_id": 3,
+      "spec_char": 1194,
+      "role_type_id": 4,
+      "new_condition": 5119401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1194
+    },
+    "119799": {
+      "type_id": 3,
+      "spec_char": 1197,
+      "role_type_id": 4,
+      "new_condition": 5119701,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1197
+    },
+    "119999": {
+      "type_id": 3,
+      "spec_char": 1199,
+      "role_type_id": 4,
+      "new_condition": 5119901,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1199
+    },
+    "121199": {
+      "type_id": 3,
+      "spec_char": 1211,
+      "role_type_id": 4,
+      "new_condition": 5121101,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1211
+    },
+    "124899": {
+      "type_id": 3,
+      "spec_char": 1248,
+      "role_type_id": 4,
+      "new_condition": 5124801,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1248
+    },
+    "128499": {
+      "type_id": 3,
+      "spec_char": 1284,
+      "role_type_id": 4,
+      "new_condition": 5128401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1284
+    },
+    "103401": {
+      "type_id": 3,
+      "spec_char": 1034,
+      "role_type_id": 1,
+      "new_condition": 5103401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1034
+    },
+    "103402": {
+      "type_id": 3,
+      "spec_char": 1034,
+      "role_type_id": 1,
+      "new_condition": 5103401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1034
+    },
+    "103403": {
+      "type_id": 3,
+      "spec_char": 1034,
+      "role_type_id": 1,
+      "new_condition": 5103401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1034
+    },
+    "103404": {
+      "type_id": 3,
+      "spec_char": 1034,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1034
+    },
+    "103405": {
+      "type_id": 3,
+      "spec_char": 1034,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1034
+    },
+    "103406": {
+      "type_id": 3,
+      "spec_char": 1034,
+      "role_type_id": 3,
+      "new_condition": 0,
+      "costs": [
+        [
+          47,
+          100
+        ]
+      ],
+      "module_conditions": [],
+      "host_id": 1034
+    },
+    "103499": {
+      "type_id": 3,
+      "spec_char": 1034,
+      "role_type_id": 4,
+      "new_condition": 5103401,
+      "costs": [],
+      "module_conditions": [],
+      "host_id": 1034
+    },
+    "128451": {
+      "type_id": 4,
+      "spec_char": 1284,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1612841,
+        1612842,
+        1612843
+      ],
+      "base_id": 128451,
+      "host_id": 1284
+    },
+    "128452": {
+      "type_id": 4,
+      "spec_char": 128451,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1612844,
+        1612845
+      ],
+      "base_id": 128451,
+      "host_id": 1284
+    },
+    "128453": {
+      "type_id": 4,
+      "spec_char": 128451,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1612846,
+        1612847
+      ],
+      "base_id": 128451,
+      "host_id": 1284
+    },
+    "106651": {
+      "type_id": 4,
+      "spec_char": 1066,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610661,
+        1610662,
+        1610663
+      ],
+      "base_id": 106651,
+      "host_id": 1066
+    },
+    "106652": {
+      "type_id": 4,
+      "spec_char": 106651,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610664,
+        1610665
+      ],
+      "base_id": 106651,
+      "host_id": 1066
+    },
+    "106653": {
+      "type_id": 4,
+      "spec_char": 106651,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610666,
+        1610667
+      ],
+      "base_id": 106651,
+      "host_id": 1066
+    },
+    "113951": {
+      "type_id": 4,
+      "spec_char": 1139,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611391,
+        1611392,
+        1611393
+      ],
+      "base_id": 113951,
+      "host_id": 1139
+    },
+    "113952": {
+      "type_id": 4,
+      "spec_char": 113951,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611394,
+        1611395
+      ],
+      "base_id": 113951,
+      "host_id": 1139
+    },
+    "113953": {
+      "type_id": 4,
+      "spec_char": 113951,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611396,
+        1611397
+      ],
+      "base_id": 113951,
+      "host_id": 1139
+    },
+    "101351": {
+      "type_id": 4,
+      "spec_char": 1013,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610131,
+        1610132,
+        1610133
+      ],
+      "base_id": 101351,
+      "host_id": 1013
+    },
+    "101352": {
+      "type_id": 4,
+      "spec_char": 101351,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610134,
+        1610135
+      ],
+      "base_id": 101351,
+      "host_id": 1013
+    },
+    "101353": {
+      "type_id": 4,
+      "spec_char": 101351,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610136,
+        1610137
+      ],
+      "base_id": 101351,
+      "host_id": 1013
+    },
+    "111151": {
+      "type_id": 4,
+      "spec_char": 1111,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611111,
+        1611112,
+        1611113
+      ],
+      "base_id": 111151,
+      "host_id": 1111
+    },
+    "111152": {
+      "type_id": 4,
+      "spec_char": 111151,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611114,
+        1611115
+      ],
+      "base_id": 111151,
+      "host_id": 1111
+    },
+    "111153": {
+      "type_id": 4,
+      "spec_char": 111151,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611116,
+        1611117
+      ],
+      "base_id": 111151,
+      "host_id": 1111
+    },
+    "109451": {
+      "type_id": 4,
+      "spec_char": 1094,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610941,
+        1610942,
+        1610943
+      ],
+      "base_id": 109451,
+      "host_id": 1094
+    },
+    "109452": {
+      "type_id": 4,
+      "spec_char": 109451,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610944,
+        1610945
+      ],
+      "base_id": 109451,
+      "host_id": 1094
+    },
+    "109453": {
+      "type_id": 4,
+      "spec_char": 109451,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610946,
+        1610947
+      ],
+      "base_id": 109451,
+      "host_id": 1094
+    },
+    "113851": {
+      "type_id": 4,
+      "spec_char": 1138,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611381,
+        1611382,
+        1611383
+      ],
+      "base_id": 113851,
+      "host_id": 1138
+    },
+    "113852": {
+      "type_id": 4,
+      "spec_char": 113851,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611384,
+        1611385
+      ],
+      "base_id": 113851,
+      "host_id": 1138
+    },
+    "113853": {
+      "type_id": 4,
+      "spec_char": 113851,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611386,
+        1611387
+      ],
+      "base_id": 113851,
+      "host_id": 1138
+    },
+    "102851": {
+      "type_id": 4,
+      "spec_char": 1028,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610281,
+        1610282,
+        1610283
+      ],
+      "base_id": 102851,
+      "host_id": 1028
+    },
+    "102852": {
+      "type_id": 4,
+      "spec_char": 102851,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610284,
+        1610285
+      ],
+      "base_id": 102851,
+      "host_id": 1028
+    },
+    "102853": {
+      "type_id": 4,
+      "spec_char": 102851,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610286,
+        1610287
+      ],
+      "base_id": 102851,
+      "host_id": 1028
+    },
+    "109351": {
+      "type_id": 4,
+      "spec_char": 1093,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610931,
+        1610932,
+        1610933
+      ],
+      "base_id": 109351,
+      "host_id": 1093
+    },
+    "109352": {
+      "type_id": 4,
+      "spec_char": 109351,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610934,
+        1610935
+      ],
+      "base_id": 109351,
+      "host_id": 1093
+    },
+    "109353": {
+      "type_id": 4,
+      "spec_char": 109351,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610936,
+        1610937
+      ],
+      "base_id": 109351,
+      "host_id": 1093
+    },
+    "119951": {
+      "type_id": 4,
+      "spec_char": 1199,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611991,
+        1611992,
+        1611993
+      ],
+      "base_id": 119951,
+      "host_id": 1199
+    },
+    "119952": {
+      "type_id": 4,
+      "spec_char": 119951,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611994,
+        1611995
+      ],
+      "base_id": 119951,
+      "host_id": 1199
+    },
+    "119953": {
+      "type_id": 4,
+      "spec_char": 119951,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611996,
+        1611997
+      ],
+      "base_id": 119951,
+      "host_id": 1199
+    },
+    "112751": {
+      "type_id": 4,
+      "spec_char": 1127,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611271,
+        1611272,
+        1611273
+      ],
+      "base_id": 112751,
+      "host_id": 1127
+    },
+    "112752": {
+      "type_id": 4,
+      "spec_char": 112751,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611274,
+        1611275
+      ],
+      "base_id": 112751,
+      "host_id": 1127
+    },
+    "112753": {
+      "type_id": 4,
+      "spec_char": 112751,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611276,
+        1611277
+      ],
+      "base_id": 112751,
+      "host_id": 1127
+    },
+    "111951": {
+      "type_id": 4,
+      "spec_char": 1119,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611191,
+        1611192,
+        1611193
+      ],
+      "base_id": 111951,
+      "host_id": 1119
+    },
+    "111952": {
+      "type_id": 4,
+      "spec_char": 111951,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611194,
+        1611195
+      ],
+      "base_id": 111951,
+      "host_id": 1119
+    },
+    "111953": {
+      "type_id": 4,
+      "spec_char": 111951,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1611196,
+        1611197
+      ],
+      "base_id": 111951,
+      "host_id": 1119
+    },
+    "104151": {
+      "type_id": 4,
+      "spec_char": 1041,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610411,
+        1610412,
+        1610413
+      ],
+      "base_id": 104151,
+      "host_id": 1041
+    },
+    "104152": {
+      "type_id": 4,
+      "spec_char": 104151,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610414,
+        1610415
+      ],
+      "base_id": 104151,
+      "host_id": 1041
+    },
+    "104153": {
+      "type_id": 4,
+      "spec_char": 104151,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610416,
+        1610417
+      ],
+      "base_id": 104151,
+      "host_id": 1041
+    },
+    "107051": {
+      "type_id": 4,
+      "spec_char": 1070,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610701,
+        1610702,
+        1610703
+      ],
+      "base_id": 107051,
+      "host_id": 1070
+    },
+    "107052": {
+      "type_id": 4,
+      "spec_char": 107051,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610704,
+        1610705
+      ],
+      "base_id": 107051,
+      "host_id": 1070
+    },
+    "107053": {
+      "type_id": 4,
+      "spec_char": 107051,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610706,
+        1610707
+      ],
+      "base_id": 107051,
+      "host_id": 1070
+    },
+    "104951": {
+      "type_id": 4,
+      "spec_char": 1049,
+      "role_type_id": 5,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610491,
+        1610492,
+        1610493
+      ],
+      "base_id": 104951,
+      "host_id": 1049
+    },
+    "104952": {
+      "type_id": 4,
+      "spec_char": 104951,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610494,
+        1610495
+      ],
+      "base_id": 104951,
+      "host_id": 1049
+    },
+    "104953": {
+      "type_id": 4,
+      "spec_char": 104951,
+      "role_type_id": 6,
+      "new_condition": 0,
+      "costs": [],
+      "module_conditions": [
+        1610496,
+        1610497
+      ],
+      "base_id": 104951,
+      "host_id": 1049
+    }
+  },
+  "conditions": {
+    "1610131": {
+      "type": 1015,
+      "params": [
+        1013,
+        70
+      ]
+    },
+    "1610132": {
+      "type": 1026,
+      "params": [
+        1013,
+        400
+      ]
+    },
+    "1610133": {
+      "type": 1027,
+      "params": [
+        1013,
+        5
+      ]
+    },
+    "1610134": {
+      "type": 1015,
+      "params": [
+        1013,
+        80
+      ]
+    },
+    "1610135": {
+      "type": 1025,
+      "params": [
+        1013,
+        45
+      ]
+    },
+    "1610136": {
+      "type": 1015,
+      "params": [
+        1013,
+        90
+      ]
+    },
+    "1610137": {
+      "type": 1026,
+      "params": [
+        1013,
+        500
+      ]
+    },
+    "1610281": {
+      "type": 1015,
+      "params": [
+        1028,
+        70
+      ]
+    },
+    "1610282": {
+      "type": 1026,
+      "params": [
+        1028,
+        400
+      ]
+    },
+    "1610283": {
+      "type": 1027,
+      "params": [
+        1028,
+        5
+      ]
+    },
+    "1610284": {
+      "type": 1015,
+      "params": [
+        1028,
+        80
+      ]
+    },
+    "1610285": {
+      "type": 1025,
+      "params": [
+        1028,
+        45
+      ]
+    },
+    "1610286": {
+      "type": 1015,
+      "params": [
+        1028,
+        90
+      ]
+    },
+    "1610287": {
+      "type": 1026,
+      "params": [
+        1028,
+        500
+      ]
+    },
+    "1610411": {
+      "type": 1015,
+      "params": [
+        1041,
+        70
+      ]
+    },
+    "1610412": {
+      "type": 1026,
+      "params": [
+        1041,
+        400
+      ]
+    },
+    "1610413": {
+      "type": 1027,
+      "params": [
+        1041,
+        5
+      ]
+    },
+    "1610414": {
+      "type": 1015,
+      "params": [
+        1041,
+        80
+      ]
+    },
+    "1610415": {
+      "type": 1025,
+      "params": [
+        1041,
+        45
+      ]
+    },
+    "1610416": {
+      "type": 1015,
+      "params": [
+        1041,
+        90
+      ]
+    },
+    "1610417": {
+      "type": 1026,
+      "params": [
+        1041,
+        500
+      ]
+    },
+    "1610491": {
+      "type": 1015,
+      "params": [
+        1049,
+        70
+      ]
+    },
+    "1610492": {
+      "type": 1026,
+      "params": [
+        1049,
+        400
+      ]
+    },
+    "1610493": {
+      "type": 1027,
+      "params": [
+        1049,
+        5
+      ]
+    },
+    "1610494": {
+      "type": 1015,
+      "params": [
+        1049,
+        80
+      ]
+    },
+    "1610495": {
+      "type": 1025,
+      "params": [
+        1049,
+        45
+      ]
+    },
+    "1610496": {
+      "type": 1015,
+      "params": [
+        1049,
+        90
+      ]
+    },
+    "1610497": {
+      "type": 1026,
+      "params": [
+        1049,
+        500
+      ]
+    },
+    "1610661": {
+      "type": 1015,
+      "params": [
+        1066,
+        70
+      ]
+    },
+    "1610662": {
+      "type": 1026,
+      "params": [
+        1066,
+        400
+      ]
+    },
+    "1610663": {
+      "type": 1027,
+      "params": [
+        1066,
+        5
+      ]
+    },
+    "1610664": {
+      "type": 1015,
+      "params": [
+        1066,
+        80
+      ]
+    },
+    "1610665": {
+      "type": 1025,
+      "params": [
+        1066,
+        45
+      ]
+    },
+    "1610666": {
+      "type": 1015,
+      "params": [
+        1066,
+        90
+      ]
+    },
+    "1610667": {
+      "type": 1026,
+      "params": [
+        1066,
+        500
+      ]
+    },
+    "1610701": {
+      "type": 1015,
+      "params": [
+        1070,
+        70
+      ]
+    },
+    "1610702": {
+      "type": 1026,
+      "params": [
+        1070,
+        400
+      ]
+    },
+    "1610703": {
+      "type": 1027,
+      "params": [
+        1070,
+        5
+      ]
+    },
+    "1610704": {
+      "type": 1015,
+      "params": [
+        1070,
+        80
+      ]
+    },
+    "1610705": {
+      "type": 1025,
+      "params": [
+        1070,
+        45
+      ]
+    },
+    "1610706": {
+      "type": 1015,
+      "params": [
+        1070,
+        90
+      ]
+    },
+    "1610707": {
+      "type": 1026,
+      "params": [
+        1070,
+        500
+      ]
+    },
+    "1610931": {
+      "type": 1015,
+      "params": [
+        1093,
+        70
+      ]
+    },
+    "1610932": {
+      "type": 1026,
+      "params": [
+        1093,
+        400
+      ]
+    },
+    "1610933": {
+      "type": 1027,
+      "params": [
+        1093,
+        5
+      ]
+    },
+    "1610934": {
+      "type": 1015,
+      "params": [
+        1093,
+        80
+      ]
+    },
+    "1610935": {
+      "type": 1025,
+      "params": [
+        1093,
+        45
+      ]
+    },
+    "1610936": {
+      "type": 1015,
+      "params": [
+        1093,
+        90
+      ]
+    },
+    "1610937": {
+      "type": 1026,
+      "params": [
+        1093,
+        500
+      ]
+    },
+    "1610941": {
+      "type": 1015,
+      "params": [
+        1094,
+        70
+      ]
+    },
+    "1610942": {
+      "type": 1026,
+      "params": [
+        1094,
+        400
+      ]
+    },
+    "1610943": {
+      "type": 1027,
+      "params": [
+        1094,
+        5
+      ]
+    },
+    "1610944": {
+      "type": 1015,
+      "params": [
+        1094,
+        80
+      ]
+    },
+    "1610945": {
+      "type": 1025,
+      "params": [
+        1094,
+        45
+      ]
+    },
+    "1610946": {
+      "type": 1015,
+      "params": [
+        1094,
+        90
+      ]
+    },
+    "1610947": {
+      "type": 1026,
+      "params": [
+        1094,
+        500
+      ]
+    },
+    "1611111": {
+      "type": 1015,
+      "params": [
+        1111,
+        70
+      ]
+    },
+    "1611112": {
+      "type": 1026,
+      "params": [
+        1111,
+        400
+      ]
+    },
+    "1611113": {
+      "type": 1027,
+      "params": [
+        1111,
+        5
+      ]
+    },
+    "1611114": {
+      "type": 1015,
+      "params": [
+        1111,
+        80
+      ]
+    },
+    "1611115": {
+      "type": 1025,
+      "params": [
+        1111,
+        45
+      ]
+    },
+    "1611116": {
+      "type": 1015,
+      "params": [
+        1111,
+        90
+      ]
+    },
+    "1611117": {
+      "type": 1026,
+      "params": [
+        1111,
+        500
+      ]
+    },
+    "1611191": {
+      "type": 1015,
+      "params": [
+        1119,
+        70
+      ]
+    },
+    "1611192": {
+      "type": 1026,
+      "params": [
+        1119,
+        400
+      ]
+    },
+    "1611193": {
+      "type": 1027,
+      "params": [
+        1119,
+        5
+      ]
+    },
+    "1611194": {
+      "type": 1015,
+      "params": [
+        1119,
+        80
+      ]
+    },
+    "1611195": {
+      "type": 1025,
+      "params": [
+        1119,
+        45
+      ]
+    },
+    "1611196": {
+      "type": 1015,
+      "params": [
+        1119,
+        90
+      ]
+    },
+    "1611197": {
+      "type": 1026,
+      "params": [
+        1119,
+        500
+      ]
+    },
+    "1611271": {
+      "type": 1015,
+      "params": [
+        1127,
+        70
+      ]
+    },
+    "1611272": {
+      "type": 1026,
+      "params": [
+        1127,
+        400
+      ]
+    },
+    "1611273": {
+      "type": 1027,
+      "params": [
+        1127,
+        5
+      ]
+    },
+    "1611274": {
+      "type": 1015,
+      "params": [
+        1127,
+        80
+      ]
+    },
+    "1611275": {
+      "type": 1025,
+      "params": [
+        1127,
+        45
+      ]
+    },
+    "1611276": {
+      "type": 1015,
+      "params": [
+        1127,
+        90
+      ]
+    },
+    "1611277": {
+      "type": 1026,
+      "params": [
+        1127,
+        500
+      ]
+    },
+    "1611381": {
+      "type": 1015,
+      "params": [
+        1138,
+        70
+      ]
+    },
+    "1611382": {
+      "type": 1026,
+      "params": [
+        1138,
+        400
+      ]
+    },
+    "1611383": {
+      "type": 1027,
+      "params": [
+        1138,
+        5
+      ]
+    },
+    "1611384": {
+      "type": 1015,
+      "params": [
+        1138,
+        80
+      ]
+    },
+    "1611385": {
+      "type": 1025,
+      "params": [
+        1138,
+        45
+      ]
+    },
+    "1611386": {
+      "type": 1015,
+      "params": [
+        1138,
+        90
+      ]
+    },
+    "1611387": {
+      "type": 1026,
+      "params": [
+        1138,
+        500
+      ]
+    },
+    "1611391": {
+      "type": 1015,
+      "params": [
+        1139,
+        70
+      ]
+    },
+    "1611392": {
+      "type": 1026,
+      "params": [
+        1139,
+        400
+      ]
+    },
+    "1611393": {
+      "type": 1027,
+      "params": [
+        1139,
+        5
+      ]
+    },
+    "1611394": {
+      "type": 1015,
+      "params": [
+        1139,
+        80
+      ]
+    },
+    "1611395": {
+      "type": 1025,
+      "params": [
+        1139,
+        45
+      ]
+    },
+    "1611396": {
+      "type": 1015,
+      "params": [
+        1139,
+        90
+      ]
+    },
+    "1611397": {
+      "type": 1026,
+      "params": [
+        1139,
+        500
+      ]
+    },
+    "1611991": {
+      "type": 1015,
+      "params": [
+        1199,
+        70
+      ]
+    },
+    "1611992": {
+      "type": 1026,
+      "params": [
+        1199,
+        400
+      ]
+    },
+    "1611993": {
+      "type": 1027,
+      "params": [
+        1199,
+        5
+      ]
+    },
+    "1611994": {
+      "type": 1015,
+      "params": [
+        1199,
+        80
+      ]
+    },
+    "1611995": {
+      "type": 1025,
+      "params": [
+        1199,
+        45
+      ]
+    },
+    "1611996": {
+      "type": 1015,
+      "params": [
+        1199,
+        90
+      ]
+    },
+    "1611997": {
+      "type": 1026,
+      "params": [
+        1199,
+        500
+      ]
+    },
+    "1612841": {
+      "type": 1015,
+      "params": [
+        1284,
+        70
+      ]
+    },
+    "1612842": {
+      "type": 1026,
+      "params": [
+        1284,
+        400
+      ]
+    },
+    "1612843": {
+      "type": 1027,
+      "params": [
+        1284,
+        5
+      ]
+    },
+    "1612844": {
+      "type": 1015,
+      "params": [
+        1284,
+        80
+      ]
+    },
+    "1612845": {
+      "type": 1025,
+      "params": [
+        1284,
+        45
+      ]
+    },
+    "1612846": {
+      "type": 1015,
+      "params": [
+        1284,
+        90
+      ]
+    },
+    "1612847": {
+      "type": 1026,
+      "params": [
+        1284,
+        500
+      ]
+    },
+    "5101101": {
+      "type": 1015,
+      "params": [
+        1011,
+        70
+      ]
+    },
+    "5101102": {
+      "type": 1015,
+      "params": [
+        1011,
+        1
+      ]
+    },
+    "5101201": {
+      "type": 1015,
+      "params": [
+        1012,
+        70
+      ]
+    },
+    "5101301": {
+      "type": 1015,
+      "params": [
+        1013,
+        70
+      ]
+    },
+    "5101501": {
+      "type": 1015,
+      "params": [
+        1015,
+        70
+      ]
+    },
+    "5101601": {
+      "type": 1015,
+      "params": [
+        1016,
+        70
+      ]
+    },
+    "5101701": {
+      "type": 1015,
+      "params": [
+        1017,
+        70
+      ]
+    },
+    "5101901": {
+      "type": 1015,
+      "params": [
+        1019,
+        70
+      ]
+    },
+    "5102001": {
+      "type": 1015,
+      "params": [
+        1020,
+        70
+      ]
+    },
+    "5102101": {
+      "type": 1015,
+      "params": [
+        1021,
+        70
+      ]
+    },
+    "5102201": {
+      "type": 1015,
+      "params": [
+        1022,
+        70
+      ]
+    },
+    "5102401": {
+      "type": 1015,
+      "params": [
+        1024,
+        70
+      ]
+    },
+    "5102601": {
+      "type": 1015,
+      "params": [
+        1026,
+        70
+      ]
+    },
+    "5102701": {
+      "type": 1015,
+      "params": [
+        1027,
+        70
+      ]
+    },
+    "5102801": {
+      "type": 1015,
+      "params": [
+        1028,
+        70
+      ]
+    },
+    "5103201": {
+      "type": 1015,
+      "params": [
+        1032,
+        70
+      ]
+    },
+    "5103202": {
+      "type": 1015,
+      "params": [
+        1032,
+        80
+      ]
+    },
+    "5103301": {
+      "type": 1015,
+      "params": [
+        1033,
+        70
+      ]
+    },
+    "5103401": {
+      "type": 1015,
+      "params": [
+        1034,
+        70
+      ]
+    },
+    "5103501": {
+      "type": 1015,
+      "params": [
+        1035,
+        70
+      ]
+    },
+    "5103701": {
+      "type": 1015,
+      "params": [
+        1037,
+        70
+      ]
+    },
+    "5103801": {
+      "type": 1015,
+      "params": [
+        1038,
+        70
+      ]
+    },
+    "5103902": {
+      "type": 1015,
+      "params": [
+        1039,
+        70
+      ]
+    },
+    "5104101": {
+      "type": 1015,
+      "params": [
+        1041,
+        1
+      ]
+    },
+    "5104102": {
+      "type": 1015,
+      "params": [
+        1041,
+        70
+      ]
+    },
+    "5104201": {
+      "type": 1015,
+      "params": [
+        1042,
+        70
+      ]
+    },
+    "5104301": {
+      "type": 1015,
+      "params": [
+        1043,
+        70
+      ]
+    },
+    "5104401": {
+      "type": 1015,
+      "params": [
+        1044,
+        70
+      ]
+    },
+    "5104501": {
+      "type": 1015,
+      "params": [
+        1045,
+        70
+      ]
+    },
+    "5104601": {
+      "type": 1015,
+      "params": [
+        1046,
+        70
+      ]
+    },
+    "5104701": {
+      "type": 1015,
+      "params": [
+        1047,
+        70
+      ]
+    },
+    "5104801": {
+      "type": 1015,
+      "params": [
+        1048,
+        70
+      ]
+    },
+    "5104901": {
+      "type": 1015,
+      "params": [
+        1049,
+        70
+      ]
+    },
+    "5105001": {
+      "type": 1015,
+      "params": [
+        1050,
+        70
+      ]
+    },
+    "5105201": {
+      "type": 1015,
+      "params": [
+        1052,
+        70
+      ]
+    },
+    "5105301": {
+      "type": 1015,
+      "params": [
+        1053,
+        70
+      ]
+    },
+    "5105401": {
+      "type": 1015,
+      "params": [
+        1054,
+        70
+      ]
+    },
+    "5105501": {
+      "type": 1015,
+      "params": [
+        1055,
+        20
+      ]
+    },
+    "5105502": {
+      "type": 1015,
+      "params": [
+        1055,
+        30
+      ]
+    },
+    "5105503": {
+      "type": 1015,
+      "params": [
+        1055,
+        70
+      ]
+    },
+    "5105601": {
+      "type": 1015,
+      "params": [
+        1056,
+        70
+      ]
+    },
+    "5105801": {
+      "type": 1015,
+      "params": [
+        1058,
+        80
+      ]
+    },
+    "5105802": {
+      "type": 1015,
+      "params": [
+        1058,
+        70
+      ]
+    },
+    "5105901": {
+      "type": 1015,
+      "params": [
+        1059,
+        70
+      ]
+    },
+    "5106001": {
+      "type": 1015,
+      "params": [
+        1060,
+        70
+      ]
+    },
+    "5106101": {
+      "type": 1015,
+      "params": [
+        1061,
+        70
+      ]
+    },
+    "5106601": {
+      "type": 1015,
+      "params": [
+        1066,
+        30
+      ]
+    },
+    "5106602": {
+      "type": 1015,
+      "params": [
+        1066,
+        40
+      ]
+    },
+    "5106603": {
+      "type": 1015,
+      "params": [
+        1066,
+        70
+      ]
+    },
+    "5106701": {
+      "type": 1015,
+      "params": [
+        1067,
+        70
+      ]
+    },
+    "5106801": {
+      "type": 1015,
+      "params": [
+        1068,
+        70
+      ]
+    },
+    "5107001": {
+      "type": 1015,
+      "params": [
+        1070,
+        70
+      ]
+    },
+    "5107101": {
+      "type": 1015,
+      "params": [
+        1071,
+        70
+      ]
+    },
+    "5107201": {
+      "type": 1015,
+      "params": [
+        1072,
+        70
+      ]
+    },
+    "5107301": {
+      "type": 1015,
+      "params": [
+        1073,
+        70
+      ]
+    },
+    "5107401": {
+      "type": 1015,
+      "params": [
+        1074,
+        70
+      ]
+    },
+    "5107501": {
+      "type": 1015,
+      "params": [
+        1075,
+        70
+      ]
+    },
+    "5107502": {
+      "type": 1015,
+      "params": [
+        1075,
+        1
+      ]
+    },
+    "5107601": {
+      "type": 1015,
+      "params": [
+        1076,
+        70
+      ]
+    },
+    "5107701": {
+      "type": 1015,
+      "params": [
+        1077,
+        70
+      ]
+    },
+    "5108001": {
+      "type": 1015,
+      "params": [
+        1080,
+        70
+      ]
+    },
+    "5108101": {
+      "type": 1015,
+      "params": [
+        1081,
+        80
+      ]
+    },
+    "5108301": {
+      "type": 1015,
+      "params": [
+        1083,
+        70
+      ]
+    },
+    "5108401": {
+      "type": 1015,
+      "params": [
+        1084,
+        70
+      ]
+    },
+    "5108501": {
+      "type": 1015,
+      "params": [
+        1085,
+        70
+      ]
+    },
+    "5108901": {
+      "type": 1015,
+      "params": [
+        1089,
+        70
+      ]
+    },
+    "5109301": {
+      "type": 1015,
+      "params": [
+        1093,
+        30
+      ]
+    },
+    "5109302": {
+      "type": 1015,
+      "params": [
+        1093,
+        70
+      ]
+    },
+    "5109401": {
+      "type": 1015,
+      "params": [
+        1094,
+        30
+      ]
+    },
+    "5109402": {
+      "type": 1015,
+      "params": [
+        1094,
+        70
+      ]
+    },
+    "5109403": {
+      "type": 1015,
+      "params": [
+        1094,
+        80
+      ]
+    },
+    "5109501": {
+      "type": 1015,
+      "params": [
+        1095,
+        70
+      ]
+    },
+    "5109601": {
+      "type": 1015,
+      "params": [
+        1096,
+        70
+      ]
+    },
+    "5109701": {
+      "type": 1015,
+      "params": [
+        1097,
+        70
+      ]
+    },
+    "5109901": {
+      "type": 1015,
+      "params": [
+        1099,
+        20
+      ]
+    },
+    "5109902": {
+      "type": 1015,
+      "params": [
+        1099,
+        70
+      ]
+    },
+    "5111101": {
+      "type": 1015,
+      "params": [
+        1111,
+        70
+      ]
+    },
+    "5111901": {
+      "type": 1015,
+      "params": [
+        1119,
+        70
+      ]
+    },
+    "5112701": {
+      "type": 1015,
+      "params": [
+        1127,
+        70
+      ]
+    },
+    "5113201": {
+      "type": 1015,
+      "params": [
+        1132,
+        70
+      ]
+    },
+    "5113301": {
+      "type": 1015,
+      "params": [
+        1133,
+        70
+      ]
+    },
+    "5113701": {
+      "type": 1015,
+      "params": [
+        1137,
+        70
+      ]
+    },
+    "5113801": {
+      "type": 1015,
+      "params": [
+        1138,
+        40
+      ]
+    },
+    "5113802": {
+      "type": 1015,
+      "params": [
+        1138,
+        20
+      ]
+    },
+    "5113803": {
+      "type": 1015,
+      "params": [
+        1138,
+        30
+      ]
+    },
+    "5113804": {
+      "type": 1015,
+      "params": [
+        1138,
+        70
+      ]
+    },
+    "5113901": {
+      "type": 1015,
+      "params": [
+        1139,
+        70
+      ]
+    },
+    "5113902": {
+      "type": 1015,
+      "params": [
+        1139,
+        80
+      ]
+    },
+    "5114801": {
+      "type": 1015,
+      "params": [
+        1148,
+        70
+      ]
+    },
+    "5115001": {
+      "type": 1015,
+      "params": [
+        1150,
+        70
+      ]
+    },
+    "5115601": {
+      "type": 1015,
+      "params": [
+        1156,
+        70
+      ]
+    },
+    "5115801": {
+      "type": 1015,
+      "params": [
+        1158,
+        70
+      ]
+    },
+    "5116601": {
+      "type": 1015,
+      "params": [
+        1166,
+        70
+      ]
+    },
+    "5116602": {
+      "type": 1015,
+      "params": [
+        1166,
+        1
+      ]
+    },
+    "5117001": {
+      "type": 1015,
+      "params": [
+        1170,
+        70
+      ]
+    },
+    "5118401": {
+      "type": 1015,
+      "params": [
+        1184,
+        20
+      ]
+    },
+    "5118402": {
+      "type": 1015,
+      "params": [
+        1184,
+        70
+      ]
+    },
+    "5119401": {
+      "type": 1015,
+      "params": [
+        1194,
+        70
+      ]
+    },
+    "5119701": {
+      "type": 1015,
+      "params": [
+        1197,
+        70
+      ]
+    },
+    "5119901": {
+      "type": 1015,
+      "params": [
+        1199,
+        30
+      ]
+    },
+    "5121101": {
+      "type": 1015,
+      "params": [
+        1211,
+        70
+      ]
+    },
+    "5124801": {
+      "type": 1015,
+      "params": [
+        1248,
+        70
+      ]
+    },
+    "5128401": {
+      "type": 1015,
+      "params": [
+        1284,
+        70
+      ]
+    }
+  },
+  "reviser_sequences": {
+    "128451": [
+      128451,
+      128452,
+      128453
+    ],
+    "106651": [
+      106651,
+      106652,
+      106653
+    ],
+    "113951": [
+      113951,
+      113952,
+      113953
+    ],
+    "101351": [
+      101351,
+      101352,
+      101353
+    ],
+    "111151": [
+      111151,
+      111152,
+      111153
+    ],
+    "109451": [
+      109451,
+      109452,
+      109453
+    ],
+    "113851": [
+      113851,
+      113852,
+      113853
+    ],
+    "102851": [
+      102851,
+      102852,
+      102853
+    ],
+    "109351": [
+      109351,
+      109352,
+      109353
+    ],
+    "119951": [
+      119951,
+      119952,
+      119953
+    ],
+    "112751": [
+      112751,
+      112752,
+      112753
+    ],
+    "111951": [
+      111951,
+      111952,
+      111953
+    ],
+    "104151": [
+      104151,
+      104152,
+      104153
+    ],
+    "107051": [
+      107051,
+      107052,
+      107053
+    ],
+    "104951": [
+      104951,
+      104952,
+      104953
+    ]
+  },
+  "love_level_exp": [
+    100,
+    200,
+    300,
+    400,
+    0
+  ]
+}

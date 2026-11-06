@@ -160,6 +160,7 @@ class HandlerCtx:
         # 操作级道具变动原子追踪集（sc_17023 差量推送）与事件待发帧队列
         self.touched_items = set()
         self.touched_heroes = set()
+        self.pending_trust_mood_heroes = set()
         self.added_equips = []
         self.added_weapons = []
         self.touched_chat_stickers = False
@@ -195,6 +196,7 @@ class HandlerCtx:
         """重置单次操作级状态（防止跨请求累积泄漏导致客户端重复删除/Lua崩溃）"""
         self.touched_items.clear()
         self.touched_heroes.clear()
+        self.pending_trust_mood_heroes.clear()
         self.added_equips.clear()
         self.added_weapons.clear()
         self.touched_chat_stickers = False
@@ -716,7 +718,7 @@ def _pkt_field1_varint(pkt):
 
 
 def _gen_battle_id(seq_ref):
-    """battle_id 生成：时间戳毫秒 + 连接级自增序号。
+    """毫秒基准与进程级单调水位生成唯一battle_id。
 
     返回 int —— 协议里 battle_id 是 uint64（varint）：
     sc_54035.f2 / cs_54032.f1 / battle_result_net_rec.f1 / battle_start_net_rec.f2
@@ -724,8 +726,17 @@ def _gen_battle_id(seq_ref):
     （只有 cs_54300.battle_id 是 string，那是 f21，另一回事。）
     17 位十进制 ≈ 1.7e16，远小于 uint64 上限，可安全 varint 编码。
     """
-    seq_ref[0] += 1
-    return int("%d%04d" % (int(time.time() * 1000), seq_ref[0]))
+    global _BATTLE_ID_LAST
+    # 连接级序号无法区分同一毫秒的两个连接。与会话表共用短临界区，
+    # 统一分配进程内ID，时钟回拨或连接重建也不回用已分配的编号。
+    with _BATTLE_LOCK:
+        candidate = max(int(time.time() * 1000) * 10000,
+                        globals().get('_BATTLE_ID_LAST', 0)) + 1
+        if candidate >= (1 << 64):
+            raise OverflowError('battle_id exceeds uint64')
+        seq_ref[0] += 1
+        _BATTLE_ID_LAST = candidate
+        return candidate
 
 
 # ---------------- 战斗系统（V5 动态战斗服集成，2026-08-22） ----------------
@@ -742,6 +753,7 @@ _BATTLE_PORT = [6105]
 _BATTLE_IP = ["127.0.0.1"]                  # 动态战斗服 IP（下发 sc_54007 用）
 _BATTLE_SRV = [None]                      # BattleServer 实例（main 装配注入）
 _BATTLE_SESSIONS = {}                     # battle_id -> {uid, dest, activity_id, battle_times, heroes, ts}
+_BATTLE_ID_LAST = 0                       # 进程内共享分配水位；连接序号仅作本地计数
 _BATTLE_LOCK = threading.Lock()
 
 _DROP_CFG = None                          # drop_cfg.json（懒加载）
@@ -760,7 +772,7 @@ def set_battle_server(bs, port, host_ip="127.0.0.1"):
         _BATTLE_IP[0] = str(host_ip)
 
 
-def register_battle_session(bid, uid, dest=0, activity_id=0, battle_times=1, heroes=None, stage_type=0, node_id=0, cooperate_skill=0, mimir_info=None, is_story=False, map_backtrack_token='', **kwargs):
+def register_battle_session(bid, uid, dest=0, activity_id=0, battle_times=1, heroes=None, stage_type=0, node_id=0, cooperate_skill=0, mimir_info=None, is_story=False, map_backtrack_token='', boss_context=None, index=0, mythic_context=None, rogue_run_id='', hodur_context=None, **kwargs):
     with _BATTLE_LOCK:
         _BATTLE_SESSIONS[bid] = {"uid": uid, "dest": int(dest or 0),
                                  "activity_id": int(activity_id or 0),
@@ -772,6 +784,22 @@ def register_battle_session(bid, uid, dest=0, activity_id=0, battle_times=1, her
                                  "mimir_info": mimir_info if isinstance(mimir_info, dict) else {},
                                  "is_story": bool(is_story),
                                  "map_backtrack_token": str(map_backtrack_token or ''),
+                                 "boss_context": dict(boss_context) if boss_context else None,
+                                 "mythic_context": dict(mythic_context) if mythic_context else None,
+                                 "rogue_run_id": str(rogue_run_id or ''),
+                                 "rogue_floor_num": kwargs.get('rogue_floor_num'),
+                                 "rogue_hidden": kwargs.get('rogue_hidden'),
+                                 "rogue_real_stage": kwargs.get('rogue_real_stage'),
+                                 "rogue_tactic_camp": kwargs.get('rogue_tactic_camp'),
+                                 "rogue_report_token": kwargs.get('rogue_report_token'),
+                                 "rogue_report_bid": bid if rogue_run_id else None,
+                                 "hodur_context": dict(hodur_context) if hodur_context else None,
+                                 "summer_board_context": dict(kwargs['summer_board_context']) if kwargs.get('summer_board_context') else None,
+                                 "sphero_context": dict(kwargs['sphero_context']) if kwargs.get('sphero_context') else None,
+                                 "quanzhou_context": dict(kwargs['quanzhou_context']) if kwargs.get('quanzhou_context') else None,
+                                 "polyhedron_context": dict(kwargs['polyhedron_context']) if kwargs.get('polyhedron_context') else None,
+                                 "warchess_context": dict(kwargs['warchess_context']) if kwargs.get('warchess_context') else None,
+                                 "index": int(index or 0),
                                  "ts": time.time()}
         # 只留最近 100 场
         if len(_BATTLE_SESSIONS) > 100:
@@ -1060,15 +1088,18 @@ def _advance_stage(db, uid, dest, star_achieved=None, times=1):
 # ---- cs_54030/cs_54038 common_info 解析（codec schema 驱动） ----
 
 def _parse_battle_common(req, ctx):
-    """cs_54030/54038 的 common_info → {heroes, hero_details, dest, activity_id, battle_times, type, cooperate_skill, mimir_info}。"""
-    out = {"heroes": [], "hero_details": [], "dest": 0, "activity_id": 0, "battle_times": 1, "type": 0,
-           "cooperate_skill": 0, "mimir_info": None}
+    """Decode common_info, preserving hero references, native opts and restart flag."""
+    out = {"heroes": [], "hero_details": [], "dest": 0, "activity_id": 0, "index": 0, "battle_times": 1, "type": 0,
+           "cooperate_skill": 0, "mimir_info": None, "opts": [], "is_restarted_battle": 0}
     try:
         if ctx.codec_decode and req.payload:
             d = ctx.codec_decode(req.payload, "cs_%d" % req.cmd)
             ci = (d or {}).get("common_info") or {}
+            out["opts"] = ci.get("opts", [])
+            out["is_restarted_battle"] = int((d or {}).get("is_restarted_battle") or 0)
             out["dest"] = int(ci.get("dest") or 0)
             out["activity_id"] = int(ci.get("activity_id") or 0)
+            out["index"] = int(ci.get("index") or 0)
             out["battle_times"] = int(ci.get("battle_times") or 1)
             out["type"] = int(ci.get("type") or 0)
             out["cooperate_skill"] = int(ci.get("cooperate_unique_skill_id") or 0)
@@ -1329,7 +1360,7 @@ def build_battle_result(bid, result, dest, clear_times=1, drops=None, heroes=Non
     }
 
 
-def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=False, battle_info=None, stage_type=0, activity_id=0):
+def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=False, battle_info=None, stage_type=0, activity_id=0, battle_context=None):
     """结算引擎：掉落计算 + 首通/重复奖励区分 + 体力扣减 + 熟练度/好感/经验成长 + 进度推进 → 返回 (battle_result dict, 附加帧列表)。"""
     import random as _rs
     heroes = heroes or []
@@ -1345,21 +1376,142 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
     battle_info = battle_info or {}
 
     dest_int = int(dest or 0)
-    is_mythic_final = (stage_type == 35) or (3028001 <= dest_int <= 3028041) or (dest_int in (1, 2) and (1 <= int(activity_id or 0) <= 30))
-    is_mythic_normal = (stage_type == 11) or (3026001 <= dest_int <= 3027039)
+    from summer_board_nested import reserved as board_reserved,settle as settle_board
+    board_session=battle_context or get_battle_session(bid) or {}
+    if board_session.get('summer_board_context') or board_reserved(stage_type,dest_int):
+        if sweep:raise ValueError('棋盘小游戏不能扫荡')
+        settle_board(ctx,uid,bid,result,board_session)
+        return build_battle_result(bid,result,dest_int,heroes=heroes,star_ids=(),
+            use_seconds=max(0,int(battle_info.get('battle_time') or 0))//1000),[]
+    from quanzhou_service import reserved as quanzhou_reserved, settle as settle_quanzhou
+    if quanzhou_reserved(stage_type,dest_int):
+        if sweep:raise ValueError('刺桐战斗不支持扫荡')
+        frames,items=settle_quanzhou(ctx,uid,bid,battle_context or get_battle_session(bid) or {},result,battle_info)
+        return build_battle_result(bid,result,dest_int,heroes=heroes,drops=[[(i['id'],i['num']) for i in items]] if items else [],star_ids=(),
+            use_seconds=max(0,int(battle_info.get('battle_time') or 0))//1000),frames
+    from rogueteam_battle import reserved as rogue_reserved, settle as settle_rogue
+    if rogue_reserved(stage_type,dest_int):
+        if sweep:raise ValueError('推演战斗不能扫荡')
+        frames=settle_rogue(ctx,uid,battle_context or get_battle_session(bid) or {},result,battle_info)
+        return build_battle_result(bid,result,dest_int,heroes=heroes,star_ids=(),
+            use_seconds=max(0,int(battle_info.get('battle_time') or 0))//1000),frames
+    from warchess_battle import reserved as chess_reserved, settle as settle_chess
+    if chess_reserved(stage_type,dest_int):
+        if sweep:raise ValueError('因果观测不支持扫荡')
+        frames=settle_chess(ctx,uid,battle_context or get_battle_session(bid) or {},result,battle_info)
+        return build_battle_result(bid,result,dest_int,heroes=heroes,star_ids=(),
+            use_seconds=max(0,int(battle_info.get('battle_time') or 0))//1000),frames
+    from polyhedron_battle import reserved as poly_reserved, settle as settle_poly
+    if poly_reserved(stage_type,dest_int):
+        if sweep:raise ValueError('多维变量不支持扫荡')
+        frames=settle_poly(ctx,uid,battle_context or get_battle_session(bid) or {},result,battle_info)
+        return build_battle_result(bid,result,dest_int,heroes=heroes,star_ids=(),
+            use_seconds=max(0,int(battle_info.get('battle_time') or 0))//1000),frames
+    from sphero_battle_service import STAGES as sphero_stages,settle as settle_sphero
+    if stage_type==66 or dest_int in sphero_stages:
+        if sweep or stage_type!=66 or dest_int not in sphero_stages:raise ValueError('薇儿活动不支持此结算入口')
+        frames,items=settle_sphero(ctx,uid,bid,battle_context or get_battle_session(bid) or {},result,battle_info)
+        return build_battle_result(bid,result,dest_int,heroes=heroes,drops=[items] if items else [],star_ids=(),
+            use_seconds=max(0,int(battle_info.get('battle_time') or 0))//1000),frames
+    from skuld_service import COMBAT as skuld_nodes, REAL as skuld_real, finish_battle as finish_skuld
+    if stage_type == 602 or dest_int in skuld_real:
+        if stage_type != 602 or sweep:
+            raise ValueError('心象关卡仅支持原生战斗/剧情结算')
+        extra_frames, rewards = finish_skuld(ctx,uid,dest_int,activity_id,result)
+        br = build_battle_result(bid,result,dest_int,heroes=heroes,drops=[rewards] if rewards else [],
+                                star_ids=(),use_seconds=max(0,int(battle_info.get('battle_time') or 0))//1000)
+        return br,extra_frames
+    from osiris_service import STAGES as osiris_stages, settle as settle_osiris, ACTIVITY as osiris_activity
+    if dest_int in osiris_stages:
+        if stage_type != 86 or sweep:
+            raise ValueError('战术研习仅支持原生战斗结算')
+        extra_frames = settle_osiris(ctx,uid,dest_int,activity_id,result,battle_info)
+        br = build_battle_result(bid,result,dest_int,heroes=heroes,star_ids=(),
+                                use_seconds=max(0,int(battle_info.get('battle_time') or 0))//1000)
+        return br,extra_frames
+    from summer_pub_service import REAL as pub_real, COMBAT as pub_levels, finish_battle as finish_pub
+    if dest_int in pub_real or dest_int in pub_levels:
+        if stage_type != 87 or sweep:
+            raise ValueError('餐厅关卡仅支持原生战斗/剧情结算')
+        extra_frames, pub_rewards = finish_pub(ctx,uid,dest_int,activity_id,result)
+        br = build_battle_result(bid,result,dest_int,heroes=heroes,drops=[pub_rewards] if pub_rewards else [],
+                                star_ids=(),use_seconds=max(0,int(battle_info.get('battle_time') or 0))//1000)
+        return br,extra_frames
+    from ash_service import REAL as ash_stages, settle as settle_ash
+    if dest_int in ash_stages:
+        if stage_type != 89 or sweep:
+            raise ValueError('列车大劫案仅支持原生射击战斗')
+        extra_frames, ash_rewards = settle_ash(ctx, uid, dest_int, activity_id, result, battle_info)
+        br = build_battle_result(bid, result, dest_int, heroes=heroes, drops=[ash_rewards] if ash_rewards else [],
+                                 star_ids=(), use_seconds=max(0, int(battle_info.get('battle_time') or 0)) // 1000)
+        return br, extra_frames
+    from hodur_service import STAGES as hodur_stages, check_battle as check_hodur_battle, finish_battle as finish_hodur_battle
+    if dest_int in hodur_stages:
+        if stage_type != 92 or sweep:
+            raise ValueError('谧光叙录普通关卡仅允许原生战斗结算')
+        hodur_session = battle_context or get_battle_session(bid) or {}
+        check_hodur_battle(ctx.db, uid, hodur_session)
+        if hodur_stages[dest_int]['chapter_id'] == 4:
+            from hodur_challenge import finish_battle as finish_hodur_challenge
+            extra_frames = finish_hodur_challenge(ctx, uid, hodur_session, result, battle_info)
+        else:
+            extra_frames = finish_hodur_battle(ctx, uid, dest_int, activity_id, win=win, report=battle_info, session=hodur_session)
+        extra_frames = (ctx.pop_pending_frames() if hasattr(ctx, 'pop_pending_frames') else []) + extra_frames
+        br = build_battle_result(bid, result, dest_int, heroes=heroes, star_ids=(),
+                                 use_seconds=max(0, int(battle_info.get('battle_time') or 0)) // 1000)
+        return br, extra_frames
+    if stage_type == 603:
+        from pinball_service import battle_entry
+        if sweep:
+            raise ValueError('弹珠战斗不支持扫荡')
+        battle_entry(ctx.db, uid, dest_int, activity_id)
+    from mythic_cycle import is_final
+    is_mythic_final = is_final(stage_type, dest_int, activity_id)
+    mythic_identity = None
+    if is_mythic_final:
+        if sweep:
+            from mythic_final_service import entry
+            mythic_identity = entry(ctx.db, uid, dest_int, activity_id)
+        else:
+            from mythic_final_service import validate
+            mythic_identity = validate(ctx.db, uid, battle_context or get_battle_session(bid) or {})
+    from mythic_normal_service import is_normal, validate as validate_normal
+    is_mythic_normal = is_normal(stage_type, dest_int)
+    normal_identity = None
+    if is_mythic_normal:
+        if sweep:
+            raise ValueError('常规黑区不支持扫荡')
+        normal_identity = validate_normal(ctx.db, uid, battle_context or get_battle_session(bid) or {})
     is_boss_normal = (stage_type == 10) or (3010101 <= dest_int <= 3012015)
     is_boss_advance = (stage_type == 100) or (3012201 <= dest_int <= 3012399)
+    if (is_boss_normal or is_boss_advance) and not sweep:
+        # 必须在体力/资产/通关广播前检查；直接调用结算引擎也不能绕过。
+        _require_boss_battle_period(ctx, uid, battle_context or get_battle_session(bid) or {})
+    boss_identity = None
+    if is_boss_normal or is_boss_advance:
+        if sweep:
+            boss_identity = _boss_battle_context(ctx, uid, stage_type, dest_int,
+                                                 (battle_context or {}).get('index', 0))
+        else:
+            boss_identity = _require_boss_battle_identity(ctx, uid, battle_context or get_battle_session(bid) or {})
     is_equip_seizure = (stage_type == 53) or (3070101 <= dest_int <= 3070126)
     is_core_verification = (stage_type == 67) or (3090001 <= dest_int <= 3090999) or (10101 <= dest_int <= 16208)
     is_core_verification_cl = (stage_type in (88, 90)) or (3092001 <= dest_int <= 3093099)
     is_equip_stage = (2020000 <= dest_int <= 2020099)
     is_polyhedron = (stage_type == 52) or (3035000 <= dest_int <= 3036000) or (dest_int in (5001, 5002, 5003))
     is_rogue_team = (stage_type == 78) or (4100000 <= dest_int <= 4199999) or (100 <= dest_int <= 999)
+    if is_rogue_team and not sweep:
+        from rogueteam_flow import check_battle
+        check_battle(ctx.db,uid,battle_context or get_battle_session(bid) or {})
     is_warchess = (stage_type == 15) or (4040000 <= dest_int <= 4050000)
     from teach_service import service as teach_service
     teach_type = teach_service.stage_type(dest_int)
 
     star_achieved, star_list_pb = evaluate_three_star(dest, win, battle_info, heroes)
+    if is_mythic_normal:
+        from mythic_normal_service import evaluate as normal_evaluate, record as normal_record
+        star_achieved, star_list_pb = normal_evaluate(dest_int, win, battle_info)
+        normal_record(ctx.db, uid, normal_identity, star_achieved, win)
 
     if win:
         first_clear = False if sweep else ((_stage_progress(ctx.db, dest, uid) == 0) if dest else False)
@@ -1367,7 +1519,7 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
         _stage_meta = StageService.get_instance(db=ctx.db).stages.get(str(dest_int), {})
         # Snapshot before pass_stage changes the count. Chapter/subplot replays
         # do not grant player or hero EXP; other battle growth still applies.
-        grant_exp = first_clear or _stage_meta.get('category') not in ('MAIN', 'SUB_PLOT')
+        grant_exp = stage_type != 603 and (first_clear or _stage_meta.get('category') not in ('MAIN', 'SUB_PLOT'))
 
         # 1. 扣减体力（Fatigue ID 4）：stamina_need * times
         stamina_per = _stage_stamina_cost(ctx.db, dest, uid) if dest else 0
@@ -1385,6 +1537,12 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
             if hasattr(ctx, "touched_items") and ctx.touched_items is not None:
                 ctx.touched_items.add(4)
 
+        # Pinball's boss uses 54032, while the Lua settlement view does not
+        # send 89402. Persist its native stage before unrelated battle events.
+        if stage_type == 603:
+            from pinball_service import finish_battle
+            extra_frames.extend(finish_battle(ctx, uid, dest_int, activity_id))
+
         # 广播事件总线：通关事件、首通事件、体力消耗事件与怪物击杀事件
         try:
             from event_bus import bus, Events
@@ -1393,7 +1551,8 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
             _combo_id = 0
             _mimir_id, _mimir_chips = 0, ""
             try:
-                _b_sess = get_battle_session(bid) or {}
+                # 扫荡没有出战会话，使用本次已解析的上下文；普通结算继续读取原会话。
+                _b_sess = battle_context if battle_context is not None else (get_battle_session(bid) or {})
                 _combo_id = int(_b_sess.get("cooperate_skill") or 0)
                 _mi = _b_sess.get("mimir_info") or {}
                 _mimir_id = int(_mi.get("mimir_id") or 0)
@@ -1634,87 +1793,23 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                         ctx.log(f'[chapter-map] 通关状态同步失败: {exc}', 'WARN')
             
             # 黑区净化关卡进度专属处理
-            if is_mythic_normal:
-                if 3026001 <= dest_int <= 3026013:
-                    p_id = dest_int - 3026000
-                    st_count = len(star_achieved) if star_achieved else 3
-                    if hasattr(ctx.db, "record_mythic_partition_clear"):
-                        ctx.db.record_mythic_partition_clear(uid, p_id, star=st_count)
-                elif 3027001 <= dest_int <= 3027039:
-                    sub_idx = dest_int - 3027001
-                    d_idx = 1 + sub_idx // 3
-                    s_idx = 1 + sub_idx % 3
-                    p_id = d_idx * 100 + s_idx
-                    if hasattr(ctx.db, "record_mythic_partition_clear"):
-                        ctx.db.record_mythic_partition_clear(uid, p_id, star=3)
-            elif is_mythic_final:
+            if is_mythic_final:
                 # 失序深区 / 终焉难度 (1~30 档，支持单队与双队连续接力)
                 raw_btime = int(battle_info.get("battle_time") or 45000)
                 u_sec = int(round(raw_btime / 1000.0)) if raw_btime > 1000 else max(1, raw_btime)
-                team_id = dest_int if dest_int in (1, 2) else (1 if 3028001 <= dest_int <= 3028019 else (1 + (dest_int - 3028020) % 2))
-                diff = int(activity_id) if (1 <= int(activity_id or 0) <= 30) else (dest_int - 3028000 if 3028001 <= dest_int <= 3028019 else (20 + (dest_int - 3028020) // 2 if 3028020 <= dest_int <= 3028041 else 30))
-                if hasattr(ctx.db, "record_mythic_final_clear"):
-                    ctx.db.record_mythic_final_clear(uid, diff=diff, team_id=team_id, use_time=u_sec)
-                elif hasattr(ctx.db, "record_mythic_final_stage_clear"):
-                    ctx.db.record_mythic_final_stage_clear(uid, dest_int, use_time=u_sec)
+                ctx.db.record_mythic_final_clear(uid, diff=mythic_identity['difficulty'], team_id=mythic_identity['team_id'],
+                                                use_time=u_sec, attempt=mythic_identity)
             elif is_boss_normal:
-                # 梦境再构·普通梦境通关处理
-                import weekly_challenge_service
-                cat = weekly_challenge_service.get_boss_catalog()
-                stage_groups = cat.get("stage_groups", {})
-                matched_gid = 5024 # 默认兜底
-                for gid_str, g_obj in stage_groups.items():
-                    if dest_int in g_obj.get("stages", []):
-                        matched_gid = int(gid_str)
-                        break
+                # 消费通关广播前已校验的开战归属，禁止固定组兜底。
+                matched_gid = boss_identity['boss_id']
                 if hasattr(ctx.db, "record_boss_challenge_normal_clear"):
                     ctx.db.record_boss_challenge_normal_clear(uid, matched_gid, dest_int, star_list=star_list_pb, heroes=heroes)
             elif is_boss_advance:
-                # 梦境再构·进阶/扭曲梦境算分与通关处理
-                import weekly_challenge_service
-                cat = weekly_challenge_service.get_boss_catalog()
-                adv_pool = cat.get("advance_pool") or cat.get("advance_boss_pool", {})
-                
-                # 获取当前玩家正在挑战的首领列表，精准匹配当前轮换的首领 pool_id
-                _, _, sc_101 = weekly_challenge_service.get_boss_challenge_data(uid, ctx.db)
-                cur_boss_ids = [b["id"] for b in sc_101.get("boss_list", [])]
-                matched_pid = None
-                for bid in cur_boss_ids:
-                    p_obj = adv_pool.get(str(bid)) or adv_pool.get(bid, {})
-                    if int(p_obj.get("stage_id", 0)) == dest_int or int(p_obj.get("boss_id", 0)) == int(activity_id or 0):
-                        matched_pid = bid
-                        break
-                if matched_pid is None:
-                    for pid_str, p_obj in adv_pool.items():
-                        if int(p_obj.get("stage_id", 0)) == dest_int:
-                            if int(pid_str) in cur_boss_ids:
-                                matched_pid = int(pid_str)
-                                break
-                if matched_pid is None:
-                    for pid_str, p_obj in adv_pool.items():
-                        if int(p_obj.get("stage_id", 0)) == dest_int:
-                            matched_pid = int(pid_str)
-                            break
-                if matched_pid is None and cur_boss_ids:
-                    matched_pid = cur_boss_ids[0]
-                matched_pid = matched_pid or 20001
-                
-                # 读取该首领自选词缀与难度
-                aff_conf = {"diff_idx": 1, "time_list": [], "affix_list": []}
-                try:
-                    ar = ctx.db.query("SELECT * FROM boss_challenge_affixes WHERE uid=? AND boss_id=?", (uid, matched_pid))
-                    if ar:
-                        aff_conf["diff_idx"] = int(ar[0].get("diffculty_index") or 1)
-                        aff_conf["time_list"] = json.loads(ar[0].get("time_index_list") or "[]")
-                        aff_conf["affix_list"] = json.loads(ar[0].get("affix_index_list") or "[]")
-                except Exception:
-                    pass
-                earned_score = weekly_challenge_service.calc_boss_advance_score(
-                    aff_conf["diff_idx"], aff_conf["time_list"], aff_conf["affix_list"]
-                )
+                matched_pid = boss_identity['boss_id']
+                earned_score = boss_identity['score']
                 if hasattr(ctx.db, "record_boss_challenge_advance_clear"):
                     ctx.db.record_boss_challenge_advance_clear(uid, matched_pid, earned_score, heroes=heroes)
-                ctx.log(f"[settle] 进阶梦境通关记录: boss_id={matched_pid} diff={aff_conf['diff_idx']} score={earned_score} heroes={heroes}")
+                ctx.log(f"[settle] 进阶梦境通关记录: boss_id={matched_pid} score={earned_score} heroes={heroes}")
             elif is_core_verification:
                 # 迭代校验常规关卡结算
                 import weekly_challenge_service as _wcs
@@ -1808,6 +1903,9 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
         use_sec = int(round(use_sec / 1000.0))
     br = build_battle_result(bid, result, dest, clear_times=ct, drops=drops, heroes=heroes,
                              use_seconds=use_sec, star_list_pb=star_list_pb)
+    if is_mythic_normal:
+        # Native GotoSettlement accepts collection conditions even on loss/quit.
+        br['star_list'] = star_list_pb
 
     # 结算联动推送（仅胜利有数据变动时推送）：
     if win:
@@ -1815,10 +1913,14 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
             # 1. 资产原子差量帧 sc_17023（含经验 12、体力 4、掉落物与新掉落装备），驱动客户端 EXPChange 触发等级提升与结算升级弹窗
             if (hasattr(ctx, "touched_items") and ctx.touched_items) or new_equips:
                 try:
-                    p17023 = ctx.generator.gen_payload(17023, uid=uid, db=ctx.db, touched_items=getattr(ctx, "touched_items", set()), equip_list=(new_equips or None))
+                    p17023 = ctx.generator.gen_payload(17023, uid=uid, db=ctx.db, touched_items=getattr(ctx, "touched_items", set()), equip_list=(new_equips or None), strict=is_mythic_normal)
                     if p17023:
                         extra_frames.append(DownFrame(17023, p17023))
+                    elif is_mythic_normal:
+                        raise ValueError('常规黑区必要资产差量为空')
                 except Exception:
+                    if is_mythic_normal:
+                        raise
                     pass
                 if hasattr(ctx, "touched_items") and 4 in ctx.touched_items:
                     try:
@@ -1863,172 +1965,18 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                 except Exception:
                     pass
 
-        # 多维变量局内战斗胜利推进与全量状态推送 (sc_18001)
-        if is_polyhedron and ctx.db is not None:
-            try:
-                from polyhedron_service import PolyhedronRunManager
-                run_data = PolyhedronRunManager.on_battle_finish(uid, ctx.db, is_win=win, damage_info=battle_info)
-                if run_data:
-                    import generator as _gen
-                    p18001 = _gen.gen_payload(18001, uid=uid, db=ctx.db)
-                    if p18001:
-                        extra_frames.append(DownFrame(18001, p18001))
-            except Exception as _pye:
-                ctx.log(f"[settle] 多维变量局内结算异常: {_pye}", "WARN")
-
-        # 虚构推演局内战斗胜利推进与战后掉落面板/全量状态推送 (sc_88033 + sc_88001 + sc_88013)
-        if is_rogue_team and ctx.db is not None:
-            try:
-                from rogueteam_service import RogueTeamService
-                effective_uid = uid or 2174928301
-                svc = RogueTeamService.get_instance(db=ctx.db)
-                sess = get_battle_session(bid) or {}
-                target_node_id = sess.get("node_id") or 0
-                if not target_node_id and (100 <= dest_int <= 999):
-                    target_node_id = dest_int
-                if not target_node_id:
-                    session = svc.get_session_data(effective_uid)
-                    target_node_id = session.get("select_node_id", 0) if session else 0
-                
-                _, drop_stat, popup_event = svc.settle_battle_node(effective_uid, target_node_id, win=win)
-                ctx.log(f"[settle] 虚构推演战斗节点结算: node_id={target_node_id} dest={dest_int} win={win} drop={drop_stat}")
-                
-                if ctx.codec_encode:
-                    # 1. 战后掉落统计帧 (sc_88033: treasure_num, relic_num, coin_num) - 防止 BattleRogueTeamResultDropPanel 空指针崩溃
-                    p_88033 = ctx.codec_encode("sc_88033", drop_stat or {"treasure_num": 1, "relic_num": 0, "coin_num": 40})
-                    if p_88033:
-                        extra_frames.append(DownFrame(88033, p_88033))
-
-                    # 1b. 战后三选一弹窗 (sc_88015) - 注意顺序：必须在 sc_88001 之前推。
-                    #     客户端回到地图后 PopOperateWindowProcessSystem 才消费 OPERATE_POP_WINDOW 触发，
-                    #     sc_88015 的 UpdatePopWindow() 先把 unOperateData 与触发队列填好，
-                    #     若漏发 -> 面板有数字但背包/货币永远不动（B 报告第 4 条）。
-                    if popup_event and popup_event.get("param_list") and ctx.codec_encode:
-                        p_88015b = ctx.codec_encode("sc_88015", {"other_info": popup_event})
-                        if p_88015b:
-                            extra_frames.append(DownFrame(88015, p_88015b))
-                            ctx.log(f"[settle] 虚构推演战后三选一 sc_88015: type={popup_event.get('event_type')} n={len(popup_event.get('param_list'))}")
-                    
-                    # 2. 全量状态与下一轮地图前沿帧 (sc_88001)
-                    session_data = svc.get_session_data(effective_uid)
-                    if session_data:
-                        p_88001 = ctx.codec_encode("sc_88001", session_data)
-                        if p_88001:
-                            extra_frames.append(DownFrame(88001, p_88001))
-                        # 3. 属性更新 (sc_88013)
-                        p_88013 = ctx.codec_encode("sc_88013", {"attr_list": session_data.get("attr_list", [])})
-                        if p_88013:
-                            extra_frames.append(DownFrame(88013, p_88013))
-                        # 4. 若无战后弹窗且本层已通关，下发切层信号 (sc_88221)
-                        if (not popup_event or not popup_event.get("param_list")) and svc._is_floor_clear(session_data.get("map_info", [])):
-                            p_88221 = ctx.codec_encode("sc_88221", {"sign": 1})
-                            if p_88221:
-                                extra_frames.append(DownFrame(88221, p_88221))
-                                ctx.log("[settle] 虚构推演本层已通关，下发 sc_88221 触发切层动画")
-            except Exception as _re:
-                ctx.log(f"[settle] 虚构推演战斗结算异常: {_re}", "WARN")
-
-        # 灰烬牛仔 (列车大劫案) 战后关卡进度与同调率实时推送 (sc_68183)
-        if dest_int in (5280301, 5280302, 5280304, 5280306, 5280311, 5280312, 5280313, 5280316, 5280322, 5280324, 5280325, 5280326, 5280327):
-            try:
-                from minigame_service import MiniGameService
-                ash_score = int(battle_info.get("score") or 8000)
-                ash_res = MiniGameService.get_instance(ctx.db).settle_ash_stage(
-                    ctx, uid, dest_int, point=ash_score, win=win
-                )
-                if ash_res and ash_res.get("p68183"):
-                    extra_frames.append(DownFrame(68183, ash_res["p68183"]))
-                    ctx.log(f"[settle] 灰烬牛仔关卡结算: real={dest_int} ash_id={ash_res.get('ash_stage_id')} score={ash_res.get('point')}")
-            except Exception as _ae:
-                ctx.log(f"[settle] 灰烬牛仔结算异常: {_ae}", "WARN")
-
-        # 奥西里斯战术研习 (Activity 323801) 战后关卡与章节推送 (sc_68177 / sc_68175)
-        if 5260111 <= dest_int <= 5260164:
-            try:
-                from minigame_service import MiniGameService
-                osiris_score = int(battle_info.get("score") or battle_info.get("point") or 10000)
-                osiris_use_time = int(battle_info.get("battle_time") or 60)
-                osi_res = MiniGameService.get_instance(ctx.db).settle_osiris_stage(
-                    ctx, uid, dest_int, pass_time=osiris_use_time, point=osiris_score, win=win
-                )
-                if osi_res:
-                    for f in osi_res.get("frames", []):
-                        extra_frames.append(f)
-                    ctx.log(f"[settle] 奥西里斯战术研习关卡结算: stage={dest_int} time={osiris_use_time} point={osiris_score}")
-            except Exception as _oe:
-                ctx.log(f"[settle] 奥西里斯战术研习结算异常: {_oe}", "WARN")
-
-        # 斯克尔德心象 (Activity 321201) 战后关卡结算 (5240101 <= dest_int <= 5240130)
-        if 5240101 <= dest_int <= 5240130:
-            try:
-                from minigame_service import MiniGameService
-                skuld_res = MiniGameService.get_instance(ctx.db).settle_skuld_stage(
-                    ctx, uid, dest_int, win=win
-                )
-                if skuld_res and skuld_res.get("first_rewards"):
-                    for item_id, count in skuld_res["first_rewards"]:
-                        res_rewards.append((item_id, count))
-                    ctx.log(f"[settle] 斯克尔德心象关卡结算: dest={dest_int} 首通发奖={skuld_res['first_rewards']}")
-            except Exception as _se:
-                ctx.log(f"[settle] 斯克尔德心象结算异常: {_se}", "WARN")
-
-        # 霍德尔活动 (Activity 3941101) 战后关卡结算 (5310201 <= dest_int <= 5310222)
-        if 5310201 <= dest_int <= 5310222:
-            try:
-                from minigame_service import MiniGameService
-                hodur_res = MiniGameService.get_instance(ctx.db).settle_hodur_stage(
-                    ctx, uid, dest_int, win=win
-                )
-                if hodur_res:
-                    ctx.log(f"[settle] 霍德尔关卡结算: dest={dest_int} chap={hodur_res['chapter_id']} first={hodur_res['is_first']}")
-            except Exception as _he:
-                ctx.log(f"[settle] 霍德尔关卡结算异常: {_he}", "WARN")
-
-        # 薇儿丹蒂 SP 潜质觉醒 (Activity 242841/242851) 战后关卡结算 (5170201 <= dest_int <= 5170222)
-        if 5170201 <= dest_int <= 5170222:
-            try:
-                from minigame_service import MiniGameService
-                sphero_score = 0
-                if battle_info and isinstance(battle_info, dict):
-                    sphero_score = int(battle_info.get("score") or battle_info.get("battle_score") or 0)
-                sphero_res = MiniGameService.get_instance(ctx.db).settle_sphero_stage(
-                    ctx, uid, dest_int, battle_score=sphero_score, win=win
-                )
-                if sphero_res:
-                    for f in sphero_res.get("frames", []):
-                        extra_frames.append(f)
-                    ctx.log(f"[settle] 薇儿丹蒂 SP 关卡结算: dest={dest_int} type={sphero_res.get('type')}")
-            except Exception as _spe:
-                ctx.log(f"[settle] 薇儿丹蒂 SP 关卡结算异常: {_spe}", "WARN")
-
-        # 因果观测 (WarChess) 战后圣物/神格三选一推送 (sc_49011)
-        if is_warchess:
-            try:
-                import random as _rs
-                sample_artifacts = _rs.sample([1001, 1002, 1003, 1004, 1005, 1006, 1007, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 3001, 3002, 3003, 3004, 3005], 3)
-                p_49011 = ctx.codec_encode("sc_49011", {
-                    "tag": 0,
-                    "pos": {"x": 0.0, "z": 0.0},
-                    "event_id": 10202,
-                    "attribute": sample_artifacts
-                })
-                if p_49011:
-                    extra_frames.append(DownFrame(49011, p_49011))
-                    ctx.log(f"[settle] 因果观测战后下发三选一神格 (sc_49011): {sample_artifacts}")
-            except Exception as _wce:
-                ctx.log(f"[settle] 因果观测 sc_49011 组包异常: {_wce}", "WARN")
-
         # 黑区净化状态实时推送 (44009 / 44023 / 44039)
-        if (is_mythic_normal or is_mythic_final) and ctx.codec_encode and ctx.db:
+        if is_mythic_final and ctx.codec_encode and ctx.db:
             try:
                 import weekly_challenge_service
                 _, sc_09, _, _, sc_23 = weekly_challenge_service.get_mythic_data(uid, ctx.db)
-                if is_mythic_normal:
-                    p09 = ctx.codec_encode("sc_44009", sc_09)
-                    if p09: extra_frames.append(DownFrame(44009, p09))
-                elif is_mythic_final:
+                if is_mythic_final:
+                    from mythic_cycle import final_payload
+                    sc_23 = final_payload(ctx.db.get_mythic_final_progress(uid))
                     p23 = ctx.codec_encode("sc_44023", sc_23)
-                    if p23: extra_frames.append(DownFrame(44023, p23))
+                    if not isinstance(p23,(bytes,bytearray,memoryview)) or not p23:
+                        raise ValueError('失序深区必要进度帧为空')
+                    extra_frames.append(DownFrame(44023, bytes(p23)))
                     
                     # 44039: 实时推送当前战斗积分（基于最高通关档位与剩余时间加成）
                     ch_info = sc_23.get("challenge_info") or []
@@ -2038,6 +1986,8 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                     p39 = ctx.codec_encode("sc_44039", {"score": final_score})
                     if p39: extra_frames.append(DownFrame(44039, p39))
             except Exception as _me:
+                if is_mythic_final:
+                    raise
                 ctx.log(f"[settle] 黑区净化联动推送异常: {_me}", "WARN")
 
         # 梦境再构状态实时推送 (45001 / 45003 / 45101)
@@ -2188,9 +2138,127 @@ def _chapter_map_battle_token(ctx, uid, dest):
     return service.battle_token(ctx.db, uid, dest)
 
 
+def _boss_mode_signature(prog):
+    prog = prog or {}
+    mode = int(prog.get('mode') or 0)
+    if mode in (3, 4):
+        return 1, mode
+    if mode in (101, 102):
+        return 2, mode
+    if mode == 1:
+        return 1, int(prog.get('area_id') or 4)
+    if mode == 2:
+        return 2, int(prog.get('advance_id') or 101)
+    return 0, 0
+
+
+def _boss_battle_context(ctx, uid, stage_type, dest, index=0, heroes=None):
+    from boss_challenge_cycle import battle_kind, bounds
+    from boss_battle_identity import resolve, check_kind
+    kind = battle_kind(stage_type, dest)
+    if not kind:
+        return None
+    check_kind(stage_type, kind)
+    if ctx.db is None:
+        raise ValueError('梦境战斗缺少存档')
+    now = int(time.time())
+    import weekly_challenge_service as weekly
+    overview, normal, advance = weekly.get_boss_challenge_data(uid, ctx.db, strict=True)
+    mode = int(overview['mode'])
+    branch = int(normal['area_id'] if kind == 1 else advance['advance_id'])
+    if mode != kind:
+        raise ValueError('梦境战斗与当前模式不一致')
+    boss_id = resolve(kind, dest, index, weekly.get_boss_catalog(), normal, advance)
+    if heroes is not None:
+        from boss_challenge_team import check_team
+        check_team(kind, boss_id, heroes, overview, normal, advance)
+    snapshot = dict(cycle_start=bounds(now)[0], mode=mode, branch=branch,
+                    boss_id=boss_id, stage_id=int(dest))
+    if kind == 2:
+        boss = next(b for b in advance['boss_list'] if int(b['id']) == boss_id)
+        snapshot['score'] = weekly.calc_boss_advance_score(
+            int(boss.get('diffculty_index') or 1), boss['time_index_list'], boss['affix_index_list'], mode_id=branch)
+    return snapshot
+
+
+def _require_boss_battle_identity(ctx, uid, session):
+    from boss_battle_identity import BossIdentityError, check_kind
+    from boss_challenge_cycle import battle_kind
+    snapshot = session.get('boss_context') or {}
+    dest, index = int(session.get('dest') or 0), int(session.get('index') or 0)
+    kind = battle_kind(session.get('stage_type'), dest)
+    check_kind(session.get('stage_type'), kind)
+    if not snapshot.get('boss_id'):
+        # 旧内存会话只在当前轮换中唯一命中时采用，绝不搜索全池猜测。
+        snapshot = _boss_battle_context(ctx, uid, session.get('stage_type'), dest, index)
+        session['boss_context'] = snapshot
+    if not snapshot or int(snapshot.get('mode') or 0) != kind or int(snapshot.get('stage_id') or 0) != dest:
+        raise BossIdentityError('梦境开战归属与关卡不一致')
+    if kind == 2 and index and index != int(snapshot['boss_id']):
+        raise BossIdentityError('梦境开战首领与index不一致')
+    if kind == 2 and ('score' not in snapshot or int(snapshot['score']) < 0):
+        raise BossIdentityError('梦境缺少有效开战积分快照')
+    return snapshot
+
+
+def _require_boss_battle_period(ctx, uid, session):
+    from boss_challenge_cycle import check_battle_period, BattlePeriodExpired
+    check_battle_period(session)
+    if int(session.get('uid') or 0) != int(uid):
+        raise BattlePeriodExpired('梦境会话不属于当前玩家')
+    snapshot = session.get('boss_context')
+    if snapshot:
+        if ctx.db is None:
+            raise BattlePeriodExpired('梦境战斗缺少存档')
+        current = _boss_mode_signature(ctx.db.get_boss_challenge_progress(uid))
+        if current != (int(snapshot['mode']), int(snapshot['branch'])):
+            raise BattlePeriodExpired('梦境模式或难度已更换')
+
+
+def _boss_period_rejection(ctx, uid, bid, dest, reason):
+    """只恢复当前周期状态；原生非零ACK的QUIT结构保证客户端结束结算等待。"""
+    frames = []
+    try:
+        import weekly_challenge_service as weekly
+        overview, normal, advance = weekly.get_boss_challenge_data(uid, ctx.db, strict=True)
+        for sc, data in ((45201, overview), (45001, normal), (45101, advance)):
+            payload = ctx.codec_encode('sc_' + str(sc), data)
+            if not isinstance(payload, (bytes, bytearray, memoryview)) or not payload:
+                raise ValueError(f'梦境刷新帧{sc}为空')
+            frames.append(DownFrame(sc, bytes(payload)))
+    except Exception as exc:
+        frames = []
+        ctx.log(f'[boss-period] 当前状态恢复失败: {exc}', 'WARN')
+    ctx.log(f'[boss-battle] 拒绝结算 bid={bid} uid={uid} stage={dest}: {reason}', 'WARN')
+    return CSResponse(frames + [DownFrame(54033, _settlement_error_payload(bid, dest))])
+
+
 def h_54034(req, ctx):
     """剧情战斗入口 → sc_54035（result=0 + battle_id f2 varint）。会话登记供结算。"""
     dest = _pkt_session_id({"payload": req.payload})
+    from skuld_service import CFG as skuld_cfg, battle_entry as skuld_entry, ACTIVITY as skuld_activity
+    if str(dest) in skuld_cfg['battles']:
+        data=ctx.codec_decode(req.payload,'cs_54034')
+        node=skuld_entry(ctx.db,req.uid,dest,data.get('activity_id',0),story=True)
+        next_seq=[ctx.battle_seq[0]];bid=_gen_battle_id(next_seq)
+        packet=ctx.codec_encode('sc_54035',dict(result=0,battle_id=bid))
+        if not isinstance(packet,(bytes,bytearray,memoryview)) or not packet:
+            raise ValueError('心象剧情回执为空')
+        register_battle_session(bid,req.uid,dest=node,is_story=True,stage_type=602,activity_id=skuld_activity)
+        ctx.battle_seq[0]=next_seq[0];ctx.battle_stage[0]=node;ctx.battle_id[0]=bid
+        return CSResponse([DownFrame(54035,bytes(packet))])
+    from summer_pub_service import CFG as pub_cfg, REAL as pub_real, battle_entry as pub_entry, ACTIVITY as pub_activity
+    if str(dest) in pub_cfg['battles']:
+        data=ctx.codec_decode(req.payload,'cs_54034')
+        level=pub_entry(ctx.db,req.uid,dest,data.get('activity_id',0),story=True)
+        next_seq=[ctx.battle_seq[0]]
+        bid=_gen_battle_id(next_seq)
+        packet=ctx.codec_encode('sc_54035',dict(result=0,battle_id=bid))
+        if not isinstance(packet,(bytes,bytearray,memoryview)) or not packet:
+            raise ValueError('餐厅剧情回执为空')
+        register_battle_session(bid,req.uid,dest=level,is_story=True,stage_type=87,activity_id=pub_activity)
+        ctx.battle_seq[0]=next_seq[0];ctx.battle_stage[0]=level;ctx.battle_id[0]=bid
+        return CSResponse([DownFrame(54035,bytes(packet))])
     bid = _gen_battle_id(ctx.battle_seq)
     ctx.battle_stage[0] = dest
     ctx.battle_id[0] = bid
@@ -2201,6 +2269,25 @@ def h_54034(req, ctx):
     return CSResponse([DownFrame(54035, _p35)])
 
 
+def _mythic_period_rejection(ctx, uid, bid, dest, reason):
+    """旧战报只恢复本期周期/进度，返回原生非零QUIT确认，不进入结算。"""
+    from mythic_cycle import final_payload
+    frames = []
+    try:
+        import weekly_challenge_service as weekly
+        progress = ctx.db.get_mythic_final_progress(uid)
+        for sc, data in ((44007, weekly.get_mythic_data(uid, None)[0]), (44023, final_payload(progress))):
+            payload = ctx.codec_encode('sc_' + str(sc), data)
+            if not isinstance(payload, (bytes, bytearray, memoryview)) or not payload:
+                raise ValueError(f'失序深区恢复帧{sc}为空')
+            frames.append(DownFrame(sc, bytes(payload)))
+    except Exception as exc:
+        frames = []
+        ctx.log(f'[mythic-period] 当前状态恢复失败: {exc}', 'WARN')
+    ctx.log(f'[mythic-period] 拒绝结算 bid={bid} uid={uid}: {reason}', 'WARN')
+    return CSResponse(frames + [DownFrame(54033, _settlement_error_payload(bid, dest))])
+
+
 def h_54030(req, ctx):
     """普通战斗入口 → sc_54031 + sc_54003（按出战英雄重写）+ sc_54007（动态 battle_id/ip/port）。
 
@@ -2208,29 +2295,83 @@ def h_54030(req, ctx):
     必要报文准备成功后登记会话，并保存关卡现役编队。
     """
     info = _parse_battle_common(req, ctx)
+    from polyhedron_battle import entry as poly_entry, entry_frames as poly_entry_frames
+    polyhedron_context = poly_entry(ctx,req.uid,info)
+    from warchess_battle import entry as chess_entry
+    warchess_context = chess_entry(ctx,req.uid,info)
+    from summer_board_nested import entry as board_entry,publish as board_publish
+    board_context=board_entry(ctx.db,req.uid,info)
+    from sphero_battle_service import entry as sphero_entry
+    sphero_context=sphero_entry(ctx.db,req.uid,info)
+    from quanzhou_service import entry as quanzhou_entry
+    quanzhou_context=quanzhou_entry(ctx,req.uid,info)
+    from skuld_service import COMBAT as skuld_nodes, REAL as skuld_real, battle_entry as skuld_entry
+    if info['type'] == 602 or info['dest'] in skuld_real or info['dest'] in skuld_nodes:
+        if info['type'] != 602:raise ValueError('心象战斗类型不匹配')
+        info['dest']=skuld_entry(ctx.db,req.uid,info['dest'],info['activity_id'])
+    from osiris_service import STAGES as osiris_stages, entry as osiris_entry
+    if info['dest'] in osiris_stages:
+        if info['type'] != 86:
+            raise ValueError('战术研习战斗类型不匹配')
+        osiris_entry(ctx.db,req.uid,info['dest'],info['activity_id'],info['hero_details'])
+    elif info['type'] == 86:
+        raise ValueError('未知战术研习关卡')
+    from summer_pub_service import REAL as pub_real, COMBAT as pub_levels, battle_entry as pub_entry
+    if info['dest'] in pub_real or info['dest'] in pub_levels:
+        if info['type'] != 87:
+            raise ValueError('餐厅战斗类型不匹配')
+        info['dest'] = pub_entry(ctx.db,req.uid,info['dest'],info['activity_id'])
+    elif info['type'] == 87:
+        raise ValueError('未知餐厅战斗关卡')
+    from ash_service import REAL as ash_stages, entry as ash_entry
+    if info['dest'] in ash_stages:
+        if info['type'] != 89:
+            raise ValueError('列车大劫案战斗类型不匹配')
+        ash_entry(ctx.db, req.uid, info['dest'], info['activity_id'], info['opts'])
+    elif info['type'] == 89:
+        raise ValueError('未知列车大劫案关卡')
+    from hodur_service import NORMAL as hodur_normal, STAGES as hodur_stages, entry as hodur_entry
+    hodur_context = None
+    if info['dest'] in hodur_stages:
+        if info['type'] != 92:
+            raise ValueError('谧光叙录战斗类型不匹配')
+        hodur_context = hodur_entry(ctx.db, req.uid, info['dest'], info['activity_id'], info['heroes'], info['opts'])
+    elif info['type'] == 92 and info['dest'] not in hodur_stages:
+        raise ValueError('未知谧光叙录关卡')
+    if info.get('type') == 603:
+        from pinball_service import battle_entry
+        battle_entry(ctx.db, req.uid, info['dest'], info.get('activity_id'))
     from new_player_service import enabled, stage_available
-    if enabled(ctx.db,req.uid) and not stage_available(ctx.db,req.uid,int(info.get('dest') or 0)):
+    if board_context is None and sphero_context is None and quanzhou_context is None and polyhedron_context is None and warchess_context is None and enabled(ctx.db,req.uid) and not stage_available(ctx.db,req.uid,int(info.get('dest') or 0)):
         raise ValueError('关卡尚未解锁')
+    from boss_challenge_team import BossTeamError
+    try:
+        boss_context = _boss_battle_context(ctx, req.uid, info.get('type'), info.get('dest'), info.get('index', 0), info['heroes'])
+    except BossTeamError as exc:
+        ctx.log(f'[boss-team] 拒绝开战: {exc}', 'WARN')
+        return CSResponse([DownFrame(54031, b'\x08' + _varint(exc.code))])
+    from mythic_cycle import bounds as mythic_bounds, is_final as mythic_is_final
+    mythic_start = None
+    mythic_context = None
+    if mythic_is_final(info.get('type'), info.get('dest'), info.get('activity_id')):
+        mythic_start = mythic_bounds()[0]
+        from mythic_final_service import entry
+        mythic_context = entry(ctx.db, req.uid, info['dest'], info.get('activity_id'))
 
-    # 多维变量 (stage_type == 52 或 dest 处于多维关卡区间) 且 cs_54030 中 heroes 为空时：
-    # 必须从当前活跃的 polyhedron_run 中获取 fight_hero_id_list 出战英雄，供 sc_54003 组装！
-    dest_num = int(info.get("dest") or 0)
-    if (info.get("type") == 52 or (3035000 <= dest_num <= 3038000)) and not info["heroes"]:
-        if ctx.db:
-            try:
-                from polyhedron_service import PolyhedronRunManager
-                run_data = PolyhedronRunManager.load_run(req.uid, ctx.db)
-                if run_data and run_data.get("fight_hero_id_list"):
-                    info["heroes"] = [int(x) for x in run_data["fight_hero_id_list"]]
-                    ctx.log(f"[battle] 多维对局出战英雄自动装载: {info['heroes']}")
-            except Exception as e:
-                ctx.log(f"[battle] 多维出战英雄获取异常: {e}")
+    from mythic_normal_service import is_normal as normal_kind, entry as normal_entry
+    normal_context = normal_entry(ctx.db, req.uid, info['dest']) if normal_kind(info.get('type'), info['dest']) else None
+
+    dest_num = int(info.get('dest') or 0)
+    polyhedron_initial = poly_entry_frames(ctx,req.uid) if polyhedron_context is not None else []
 
     # Prepare every required battle packet before publishing a session or team.
     # An ID-only rewrite of a historical payload cannot supply current progression.
     if ctx.db is None or not req.uid:
         raise ValueError('Battle initialization requires an authenticated account')
-    _p03 = battle_payload.build_sc_54003_dynamic(ctx.db, req.uid, info["heroes"])
+    if polyhedron_context is not None:
+        _p03 = battle_payload.build_sc_54003_polyhedron(ctx.db, req.uid, info["heroes"])
+    else:
+        _p03 = battle_payload.build_sc_54003_dynamic(ctx.db, req.uid, info["heroes"])
     if not isinstance(_p03, (bytes, bytearray, memoryview)) or not _p03:
         raise ValueError('Dynamic sc_54003 is missing')
     _p03 = bytes(_p03)
@@ -2244,52 +2385,61 @@ def h_54030(req, ctx):
         raise ValueError('Dynamic sc_54007 is missing')
     _p07 = bytes(_p07)
 
-    # 虚构推演 (stage_type == 78 或 dest 处于地图节点 ID 区间 100~999):
-    # 自动记录选中节点，并将 dest 映射为真实关卡 ID (param)
-    is_rogue_team = (info.get("type") == 78 or (info.get("type") == 0 and 100 <= dest_num <= 999))
-    rogue_node_id = 0
+    # Pre-encode the account snapshot before publishing a battle identity.
+    from rogueteam_battle import reserved as rogue_reserved, entry_snapshot as rogue_entry
+    is_rogue_team = rogue_reserved(info.get('type',0),dest_num)
+    rogue_node_id = dest_num if is_rogue_team else 0
+    rogue_run_id = ''
+    rogue_snapshot = {}
+    rogue_initial = None
     effective_uid = req.uid
-    rogue_service = None
     if is_rogue_team:
-        try:
-            from rogueteam_service import RogueTeamService
-            svc = RogueTeamService.get_instance(db=ctx.db)
-            is_valid, corr_node, reason = svc.is_valid_node(effective_uid, dest_num)
-            if not is_valid:
-                ctx.log(f"[battle] 虚构推演节点 {dest_num} 越界 ({reason})，自动纠偏至合法节点 {corr_node}", "WARN")
-                dest_num = corr_node
-            rogue_service = svc
-            rogue_node_id = dest_num
-            session = svc.get_session_data(effective_uid)
-            if session and session.get("map_info"):
-                for n in session["map_info"]:
-                    if n.get("node_id") == dest_num:
-                        real_stg = n.get("param")
-                        if real_stg and real_stg != 0:
-                            ctx.log(f"[battle] 虚构推演节点 {dest_num} 映射真实关卡 ID: {real_stg}")
-                            info["dest"] = int(real_stg)
-                        break
-        except Exception as e:
-            ctx.log(f"[battle] 虚构推演战斗映射异常: {e}", "WARN")
+        rogue_snapshot, rogue_initial = rogue_entry(ctx,effective_uid,info)
+        rogue_run_id = rogue_snapshot.pop('rogue_run_id')
+        info['dest'] = rogue_snapshot['rogue_real_stage']
 
-    register_battle_session(bid, effective_uid, dest=info["dest"],
-                            activity_id=info["activity_id"],
-                            battle_times=info["battle_times"], heroes=info["heroes"],
-                            stage_type=info.get("type", 0),
-                            node_id=rogue_node_id,
-                            cooperate_skill=info.get("cooperate_skill", 0),
-                            mimir_info=info.get("mimir_info") or {},
-                            map_backtrack_token=_chapter_map_battle_token(ctx, effective_uid, info['dest']))
+    if boss_context:
+        from boss_challenge_cycle import bounds, BattlePeriodExpired
+        if boss_context['cycle_start'] != bounds()[0]:
+            raise BattlePeriodExpired('梦境初始化期间已刷新，请重新选择首领')
+    if mythic_start is not None and mythic_start != mythic_bounds()[0]:
+        raise ValueError('失序深区初始化期间已刷新，请重新进入')
+    from mythic_final_service import publication
+    from hodur_challenge import publication as hodur_publication
+    from sphero_battle_service import publication as sphero_publication
+    from quanzhou_service import publication as quanzhou_publication
+    from polyhedron_battle import publication as polyhedron_publication
+    from warchess_battle import publication as warchess_publication
+    with publication(ctx.db, effective_uid, bid, mythic_context), hodur_publication(ctx, effective_uid, bid, hodur_context) as (hodur_context, hodur_initial), sphero_publication(ctx,effective_uid,bid,sphero_context), quanzhou_publication(ctx,effective_uid,bid,quanzhou_context), polyhedron_publication(ctx,effective_uid,bid,polyhedron_context), warchess_publication(ctx,effective_uid,bid,warchess_context):
+        if mythic_context:
+            current = entry(ctx.db, req.uid, info['dest'], info.get('activity_id'))
+            if current != mythic_context:
+                raise ValueError('失序深区初始化期间挑战已变化')
+            if current['restart']:
+                ctx.db.reset_mythic_final_team(req.uid)
+                mythic_context = entry(ctx.db, req.uid, info['dest'], info.get('activity_id'))
+        if normal_context is not None and normal_context != normal_entry(ctx.db, effective_uid, info['dest']):
+            raise ValueError('常规黑区初始化期间挑战已变化')
+        board_publish(ctx.db,effective_uid,bid,board_context)
+        if rogue_run_id:
+            from rogueteam_battle_facts import publish as publish_rogue_report
+            publish_rogue_report(ctx.db,effective_uid,bid,rogue_node_id,
+                                 dict(rogue_snapshot,rogue_run_id=rogue_run_id))
+        register_battle_session(bid, effective_uid, dest=info["dest"],
+                                activity_id=info["activity_id"],
+                                battle_times=info["battle_times"], heroes=info["heroes"],
+                                stage_type=info.get("type", 0),
+                                node_id=rogue_node_id,
+                                cooperate_skill=info.get("cooperate_skill", 0),
+                                mimir_info=info.get("mimir_info") or {},
+                                map_backtrack_token=_chapter_map_battle_token(ctx, effective_uid, info['dest']),
+                                boss_context=boss_context, index=info.get('index', 0), mythic_context=mythic_context, rogue_run_id=rogue_run_id, hodur_context=hodur_context,summer_board_context=board_context,sphero_context=sphero_context,quanzhou_context=quanzhou_context,polyhedron_context=polyhedron_context,warchess_context=warchess_context,**rogue_snapshot)
+    if normal_context is not None:
+        get_battle_session(bid)['mythic_normal_context'] = dict(normal_context)
     ctx.battle_seq[0] = next_seq[0]
     ctx.battle_id[0] = bid
     ctx.battle_stage[0] = info["dest"]
     ctx.hero_last_payload[0] = req.payload
-    if rogue_service is not None:
-        try:
-            rogue_service.set_selected_node(effective_uid, rogue_node_id)
-        except Exception as exc:
-            ctx.log(f"[battle] 虚构推演节点保存异常: {exc}", "WARN")
-
     # 自动持久化出战编队（旧逻辑，已停用）：reserve_team 预设不再被出战数据污染，
     # 编队记录由下方 TEAM SERVER 关卡现役编队接管（sync_stage_battle_team 保留备回滚）
 
@@ -2308,18 +2458,11 @@ def h_54030(req, ctx):
             ctx.log(f"[team] 关卡现役编队保存异常: {e}", "WARN")
 
     frames = [DownFrame(54031, b"\x08\x00")]
-    # 若为虚构推演，先下发 sc_88001 同步 select_node_id，确保客户端 PathGetRogueTeamMapID 100% 命中合法节点
-    if is_rogue_team and ctx.codec_encode and ctx.db:
-        try:
-            from rogueteam_service import RogueTeamService
-            svc = RogueTeamService.get_instance(db=ctx.db)
-            session_data = svc.get_session_data(effective_uid)
-            if session_data:
-                p_88001 = ctx.codec_encode("sc_88001", session_data)
-                if p_88001:
-                    frames.append(DownFrame(88001, p_88001))
-        except Exception as _r88:
-            ctx.log(f"[battle] 虚构推演 sc_88001 预下发异常: {_r88}", "WARN")
+    frames.extend(polyhedron_initial)
+    if hodur_initial is not None:
+        frames.append(DownFrame(89421, hodur_initial))
+    if rogue_initial is not None:
+        frames.append(rogue_initial)
     frames.append(DownFrame(54003, _p03))
     frames.append(DownFrame(54007, _p07))
     ctx.log(f"cs_54030 -> battle_id={bid} dest={info['dest']} heroes={info['heroes']} "
@@ -2333,6 +2476,24 @@ def h_54300(req, ctx):
     return CSResponse(reply=False)
 
 
+def _take_trust_mood_frames(ctx, uid):
+    """Build final hero snapshots after growth; callers send them after settlement ACK."""
+    pending = getattr(ctx, 'pending_trust_mood_heroes', None)
+    if not pending:
+        return []
+    frames = []
+    from hero_codec import build_hero_14007_frame
+    for hero_id in sorted(pending):
+        try:
+            frame = build_hero_14007_frame(ctx.db, uid, hero_id)
+            if frame:
+                frames.append(frame)
+        except Exception as exc:
+            ctx.log(f'[trust] 心情快照构造失败 hero={hero_id}: {exc}', 'WARN')
+    pending.clear()
+    return frames
+
+
 def h_54032(req, ctx):
     """战斗结算 → sc_54033（动态结算引擎）。
 
@@ -2343,11 +2504,84 @@ def h_54032(req, ctx):
     """
     bid = _pkt_field1_varint({"payload": req.payload}) or ctx.battle_id[0] or 1
     session = get_battle_session(bid) or {}
+    if session and session.get('uid') != req.uid:
+        return CSResponse([DownFrame(54033, _settlement_error_payload(bid, session.get('dest', 0)))])
+    # 只在建立会话私有锁时持公共锁；SQL/广播/报文构造不阻塞其他战斗。
+    # 私有锁随会话字典释放，不另建无上限的全局锁表。
+    with _BATTLE_LOCK:
+        settlement_lock = session.get('_settlement_lock')
+        if settlement_lock is None:
+            settlement_lock = threading.Lock()
+            session['_settlement_lock'] = settlement_lock
+    with settlement_lock:
+        return _settle_battle_session(req, ctx, bid, session)
+
+
+def _settle_battle_session(req, ctx, bid, session):
+    """在单场会话锁内取得战报、结算一次并准备对应响应。"""
     dest = session.get("dest") or ctx.battle_stage[0] or 0
     heroes = session.get("heroes") or []
     times = session.get("battle_times") or 1
     stage_type = session.get("stage_type") or 0
     activity_id = session.get("activity_id") or 0
+    from hodur_service import STAGES as hodur_stages
+    hodur_battle = int(dest) in hodur_stages
+    from ash_service import REAL as ash_stages
+    ash_battle = int(dest) in ash_stages
+    osiris_battle = stage_type == 86
+    pub_battle = stage_type == 87
+    skuld_battle = stage_type == 602
+    pinball_battle = stage_type == 603
+    board_battle = bool(session.get('summer_board_context'))
+    from sphero_battle_service import STAGES as sphero_stages
+    sphero_battle = stage_type==66 or int(dest) in sphero_stages
+    from quanzhou_service import reserved as quanzhou_reserved
+    quanzhou_battle=quanzhou_reserved(stage_type,int(dest))
+    from polyhedron_battle import reserved as poly_reserved, validate as validate_poly
+    polyhedron_battle = poly_reserved(stage_type,int(dest))
+    if polyhedron_battle:
+        try:validate_poly(ctx.db,req.uid,session,after=('br' in session))
+        except ValueError as exc:
+            ctx.log(f'[polyhedron] 拒绝旧战斗{bid}: {exc}', 'WARN')
+            return CSResponse([DownFrame(54033,_settlement_error_payload(bid,dest))])
+    from warchess_battle import reserved as chess_reserved, validate as validate_chess
+    warchess_battle = chess_reserved(stage_type,int(dest))
+    if warchess_battle:
+        try:validate_chess(ctx.db,req.uid,session,after=('br' in session))
+        except Exception as exc:
+            ctx.log(f'[warchess] 拒绝旧战斗{bid}: {exc}', 'WARN')
+            return CSResponse([DownFrame(54033,_settlement_error_payload(bid,dest))])
+    pinball_ack = None
+    from rogueteam_flow import check_battle as check_rogue_battle, RogueBattleExpired
+    rogue_battle = stage_type == 78 or 4100000 <= int(dest) <= 4199999 or bool(session.get('node_id'))
+    if rogue_battle and 'br' not in session:
+        try:check_rogue_battle(ctx.db,req.uid,session)
+        except RogueBattleExpired as exc:return _rogue_battle_rejection(ctx,req.uid,bid,dest,str(exc))
+    from boss_challenge_cycle import battle_kind, BattlePeriodExpired
+    from boss_battle_identity import BossIdentityError
+    boss_kind = battle_kind(stage_type, dest)
+    from mythic_cycle import is_final as mythic_is_final, MythicPeriodExpired
+    from mythic_final_service import validate as validate_mythic
+    mythic_final = mythic_is_final(stage_type, dest, activity_id)
+    from mythic_normal_service import is_normal as normal_kind, validate as validate_normal
+    mythic_normal = normal_kind(stage_type, dest)
+    if mythic_normal and 'br' not in session:
+        try:
+            validate_normal(ctx.db, req.uid, session)
+        except MythicPeriodExpired as exc:
+            ctx.log(f'[mythic-normal] {exc}', 'WARN')
+            return CSResponse([DownFrame(54033, _settlement_error_payload(bid, dest))])
+    if mythic_final and 'br' not in session:
+        try:
+            validate_mythic(ctx.db, req.uid, session)
+        except MythicPeriodExpired as exc:
+            return _mythic_period_rejection(ctx, req.uid, bid, dest, str(exc))
+    if boss_kind and 'br' not in session:
+        try:
+            _require_boss_battle_period(ctx, req.uid, session)
+            _require_boss_battle_identity(ctx, req.uid, session)
+        except (BattlePeriodExpired, BossIdentityError) as exc:
+            return _boss_period_rejection(ctx, req.uid, bid, dest, str(exc))
 
     res_obj = session.get("result_data")
     if res_obj is None:
@@ -2372,7 +2606,57 @@ def h_54032(req, ctx):
         # 兼容旧会话中仍有 extra 的情况，但不再读取或重发它。
         br, extra = session["br"], []
     else:
-        br, extra = _settle_frames(ctx, req.uid, bid, result, dest, times=times, heroes=heroes, battle_info=b_info, stage_type=stage_type, activity_id=activity_id)
+        if boss_kind or mythic_final or rogue_battle or pinball_battle or hodur_battle or ash_battle or pub_battle or osiris_battle or skuld_battle or board_battle or sphero_battle or quanzhou_battle or polyhedron_battle or warchess_battle or mythic_normal:
+            from account_db import savepoint_transaction
+            from operation_notifications import checkpoint_notifications, restore_notifications
+            checkpoint = checkpoint_notifications(ctx)
+            try:
+                with savepoint_transaction(ctx.db):
+                    if boss_kind:
+                        _require_boss_battle_period(ctx, req.uid, session)
+                        _require_boss_battle_identity(ctx, req.uid, session)
+                    if mythic_final:
+                        validate_mythic(ctx.db, req.uid, session)
+                    if mythic_normal:
+                        validate_normal(ctx.db, req.uid, session)
+                    if rogue_battle:
+                        check_rogue_battle(ctx.db,req.uid,session)
+                    if polyhedron_battle:
+                        validate_poly(ctx.db,req.uid,session)
+                    if warchess_battle:
+                        validate_chess(ctx.db,req.uid,session)
+                    br, extra = _settle_frames(ctx, req.uid, bid, result, dest, times=times, heroes=heroes,
+                                              battle_info=b_info, stage_type=stage_type, activity_id=activity_id)
+                    if rogue_battle or pinball_battle or hodur_battle or ash_battle or pub_battle or osiris_battle or skuld_battle or board_battle or sphero_battle or quanzhou_battle or polyhedron_battle or warchess_battle or mythic_normal:
+                        pinball_ack = ctx.codec_encode('sc_54033', dict(result=0, battle_result=br))
+                        if not isinstance(pinball_ack, (bytes, bytearray, memoryview)) or not pinball_ack:
+                            raise ValueError('小游戏战斗结算回执为空')
+                    # 若结算执行期间越过边界，撤销本次SQL和待发通知，不缓存成功。
+                    if boss_kind:
+                        _require_boss_battle_period(ctx, req.uid, session)
+                    if mythic_final:
+                        validate_mythic(ctx.db, req.uid, session, after_clear=True)
+                    if mythic_normal:
+                        validate_normal(ctx.db, req.uid, session)
+                    if rogue_battle:
+                        check_rogue_battle(ctx.db,req.uid,session,after=True)
+                    if polyhedron_battle:
+                        validate_poly(ctx.db,req.uid,session,after=True)
+                    if warchess_battle:
+                        validate_chess(ctx.db,req.uid,session,after=True)
+            except BaseException as exc:
+                restore_notifications(ctx, checkpoint)
+                if isinstance(exc, (BattlePeriodExpired, BossIdentityError)):
+                    return _boss_period_rejection(ctx, req.uid, bid, dest, str(exc))
+                if isinstance(exc, MythicPeriodExpired):
+                    if mythic_normal:
+                        return CSResponse([DownFrame(54033, _settlement_error_payload(bid, dest))])
+                    return _mythic_period_rejection(ctx, req.uid, bid, dest, str(exc))
+                if isinstance(exc, RogueBattleExpired):
+                    return _rogue_battle_rejection(ctx,req.uid,bid,dest,str(exc))
+                raise
+        else:
+            br, extra = _settle_frames(ctx, req.uid, bid, result, dest, times=times, heroes=heroes, battle_info=b_info, stage_type=stage_type, activity_id=activity_id)
         session["br"] = br
     if ctx.db is not None:
         from enemy_kill_service import record_battle
@@ -2381,9 +2665,9 @@ def h_54032(req, ctx):
         except Exception as exc:
             # br is retained: retrying statistics must not replay rewards.
             ctx.log(f'[enemy] 统计写入失败，保留结算等待重试 bid={bid}: {exc}', 'WARN')
-            return CSResponse(extra + [DownFrame(54033, _settlement_error_payload(bid, dest))])
+            return CSResponse(extra + [DownFrame(54033, _settlement_error_payload(bid, dest))] + _take_trust_mood_frames(ctx, req.uid))
     try:
-        _p33 = ctx.codec_encode("sc_54033", {"result": 0, "battle_result": br})
+        _p33 = pinball_ack if pinball_ack is not None else ctx.codec_encode("sc_54033", {"result": 0, "battle_result": br})
         if not isinstance(_p33, (bytes, bytearray, memoryview)) or not _p33:
             raise ValueError('Missing battle settlement acknowledgement')
         _p33 = bytes(_p33)
@@ -2391,9 +2675,22 @@ def h_54032(req, ctx):
         # Settlement has already run: retain br, send committed state once, and
         # never reapply rewards merely because receipt encoding failed.
         ctx.log(f"[settle] 结算回执编码失败，保留结果并返回错误: {exc}", "WARN")
-        return CSResponse(extra + [DownFrame(54033, _settlement_error_payload(bid, dest))])
+        return CSResponse(extra + [DownFrame(54033, _settlement_error_payload(bid, dest))] + _take_trust_mood_frames(ctx, req.uid))
     ctx.log(f"cs_54032 -> 结算 bid={bid} result={result} dest={dest} 掉落组={len(br['all_drop_list'])} 三星={br.get('star_list')}")
-    return CSResponse(extra + [DownFrame(54033, _p33)])
+    return CSResponse(extra + [DownFrame(54033, _p33)] + _take_trust_mood_frames(ctx, req.uid))
+
+
+def _rogue_battle_rejection(ctx,uid,bid,dest,reason):
+    frames=[]
+    try:
+        from rogueteam_service import RogueTeamService
+        data=RogueTeamService.get(db=ctx.db).get_session_data(uid)
+        if data:
+            payload=ctx.codec_encode('sc_88001',data)
+            if payload:frames.append(DownFrame(88001,payload))
+    except Exception as exc:ctx.log(f'[rogue] 状态恢复失败: {exc}','WARN')
+    ctx.log(f'[rogue] 拒绝旧战斗{bid}: {reason}','WARN')
+    return CSResponse(frames+[DownFrame(54033,_settlement_error_payload(bid,dest))])
 
 
 def h_43002(req, ctx):
@@ -2468,7 +2765,9 @@ def _sweep_settlement(req, ctx):
     bid = _gen_battle_id(ctx.battle_seq)
     ctx.battle_id[0] = bid
     br, extra = _settle_frames(ctx, req.uid, bid, 1, dest,
-                               times=times, heroes=heroes, sweep=True)
+                               times=times, heroes=heroes, sweep=True,
+                               stage_type=info['type'], activity_id=info['activity_id'],
+                               battle_context=info)
     if ctx.db is not None:
         from enemy_kill_service import record_battle
         extra.extend(record_battle(ctx, req.uid, bid, 1, dest, sweep=True, times=times))
@@ -2481,7 +2780,7 @@ def _sweep_settlement(req, ctx):
     if not isinstance(_p39, (bytes, bytearray)) or not _p39:
         raise ValueError('Missing sweep settlement acknowledgement')
     ctx.log(f"cs_54038 -> 扫荡 dest={dest} x{times} 出战英雄={heroes} 获得掉落组={len(br.get('all_drop_list', []))}")
-    return CSResponse(extra + [DownFrame(54039, _p39)])
+    return CSResponse(extra + [DownFrame(54039, _p39)] + _take_trust_mood_frames(ctx, req.uid))
 
 
 def h_63000(req, ctx):
@@ -3736,7 +4035,7 @@ CORE_HANDLERS = {
 }
 
 # 不回包白名单（契约 §9.3，LUA 挖掘确认 sc_None，客户端不期待响应）
-DROP_NO_REPLY = {81002, 28834, 40012, 38014, 78012, 54300, 19036}
+DROP_NO_REPLY = {81002, 40012, 38014, 78012, 54300, 19036}
 # 56002 例外：回空包防重试（已由 h_56002 处理，不回 DROP）
 
 

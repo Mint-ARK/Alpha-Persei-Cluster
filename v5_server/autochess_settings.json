@@ -1,0 +1,576 @@
+{
+  "source": "decompiled_v2/x64/game/config/gamesetting.lua",
+  "sha256": "b319e751fcbd59b8ebd54316f231fe6174c51f1462ace55833a3ec2792dd6dce",
+  "settings": {
+    "auto_chess_teach101_round1": [
+      101,
+      102,
+      104
+    ],
+    "auto_chess_teach101_round2": [
+      103,
+      103,
+      110
+    ],
+    "auto_chess_teach101_round2_refresh": [
+      103,
+      102,
+      109
+    ],
+    "auto_chess_teach101_round3": [
+      104,
+      104
+    ],
+    "auto_chess_teach102_round1": [
+      105,
+      104,
+      103
+    ],
+    "auto_chess_teach102_round3": [
+      204,
+      205,
+      210,
+      201
+    ],
+    "auto_chess_teach202_round1": [
+      102
+    ],
+    "auto_chess_boss_round1": [
+      403,
+      303,
+      308,
+      404
+    ],
+    "auto_chess_boss_round2": [
+      408,
+      407,
+      307,
+      207
+    ],
+    "auto_chess_boss_round3": [
+      406,
+      402,
+      405,
+      306
+    ],
+    "auto_chess_boss_round4": [
+      410,
+      409,
+      309,
+      310
+    ],
+    "auto_chess_boss_team_id": [
+      130399
+    ],
+    "auto_chess_boss_manager_buff": [
+      541
+    ],
+    "auto_chess_boss_fan_buff": [
+      543
+    ],
+    "auto_chess_boss_stage": [
+      303
+    ],
+    "auto_chess_PVP_unlock": [
+      303
+    ],
+    "auto_chess_base_admin_unlock": [
+      201
+    ],
+    "auto_chess_pro_admin_unlock": [
+      301
+    ],
+    "auto_chess_item_unlock": [
+      202
+    ],
+    "auto_chess_win_limit": [
+      8
+    ],
+    "auto_chess_lose_limit": [
+      5
+    ],
+    "auto_chess_pve_restart_times": [
+      999
+    ],
+    "auto_chess_pve_restart_add_coin": [
+      10
+    ],
+    "auto_chess_prepare_grid_num": [
+      5
+    ],
+    "auto_chess_battle_grid_num": [
+      7
+    ],
+    "auto_chess_shop_star_rate": [
+      [
+        1,
+        [
+          [
+            1,
+            100
+          ]
+        ]
+      ],
+      [
+        2,
+        [
+          [
+            1,
+            65
+          ],
+          [
+            2,
+            35
+          ]
+        ]
+      ],
+      [
+        3,
+        [
+          [
+            1,
+            40
+          ],
+          [
+            2,
+            40
+          ],
+          [
+            3,
+            20
+          ]
+        ]
+      ],
+      [
+        4,
+        [
+          [
+            1,
+            25
+          ],
+          [
+            2,
+            25
+          ],
+          [
+            3,
+            30
+          ],
+          [
+            4,
+            20
+          ]
+        ]
+      ]
+    ],
+    "auto_chess_number": [
+      12
+    ],
+    "auto_chess_VS_delay": [
+      2
+    ],
+    "auto_chess_PVP_blacklist_count": [
+      10
+    ],
+    "auto_chess_PVP_history_count": [
+      10
+    ],
+    "auto_chess_easter_keys": [
+      "AUTO_CHESS_BUG_TIP1",
+      "AUTO_CHESS_BUG_TIP2",
+      "AUTO_CHESS_BUG_TIP3",
+      "AUTO_CHESS_BUG_TIP4",
+      "AUTO_CHESS_BUG_TIP5",
+      "AUTO_CHESS_BUG_TIP6",
+      "AUTO_CHESS_BUG_TIP7",
+      "AUTO_CHESS_BUG_TIP8",
+      "AUTO_CHESS_BUG_TIP9"
+    ],
+    "auto_chess_expression_icons": [
+      "easter_icon_1",
+      "easter_icon_1",
+      "easter_icon_2",
+      "easter_icon_3",
+      "easter_icon_3",
+      "easter_icon_2",
+      "easter_icon_3",
+      "easter_icon_2",
+      "easter_icon_2"
+    ],
+    "auto_chess_fixed_percentage": [
+      50
+    ],
+    "auto_chess_exp_threshold": [
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        3
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        5,
+        5
+      ],
+      [
+        6,
+        6
+      ]
+    ],
+    "auto_chess_shake": [
+      10,
+      30
+    ],
+    "auto_chess_normal_shop": [
+      [
+        3,
+        1
+      ],
+      [
+        7,
+        1
+      ]
+    ],
+    "auto_chess_item_shop": [
+      5,
+      1
+    ],
+    "auto_chess_PVE_desc": [
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_1",
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_2",
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_3",
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_4"
+    ],
+    "auto_chess_PVP_desc": [
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_5",
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_6",
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_7"
+    ],
+    "auto_chess_disconnect_count": [
+      3
+    ],
+    "auto_chess_2_match_time_range": [
+      [
+        [
+          10,
+          20
+        ],
+        [
+          25,
+          35
+        ]
+      ],
+      [
+        [
+          15,
+          25
+        ],
+        [
+          30,
+          40
+        ]
+      ],
+      [
+        [
+          20,
+          30
+        ],
+        [
+          35,
+          45
+        ]
+      ],
+      [
+        [
+          25,
+          35
+        ],
+        [
+          40,
+          50
+        ]
+      ],
+      [
+        [
+          30,
+          40
+        ],
+        [
+          50,
+          60
+        ]
+      ],
+      [
+        [
+          40,
+          50
+        ],
+        [
+          70,
+          90
+        ]
+      ]
+    ],
+    "auto_chess_2_pack_energy_refresh_time": [
+      5,
+      0,
+      0
+    ],
+    "auto_chess_2_match_succeed_countdown": [
+      3
+    ],
+    "auto_chess_2_match_hp": [
+      5
+    ],
+    "auto_chess_2_room_num_max": [
+      8
+    ],
+    "auto_chess_2_pack_energy_max": [
+      28
+    ],
+    "auto_chess_2_pack_energy_recover": [
+      4
+    ],
+    "auto_chess_2_pack_energy_convert": [
+      2,
+      2
+    ],
+    "auto_chess_2_pack_energy_convert_async": [
+      2,
+      2
+    ],
+    "auto_chess_2_card_rarity_text_color": [
+      "A166C2",
+      "E19A38"
+    ],
+    "auto_chess_2_exchange_self_times": [
+      1
+    ],
+    "auto_chess_2_exchange_stranger_times": [
+      1
+    ],
+    "auto_chess_2_exchange_friend_times": [
+      2
+    ],
+    "auto_chess_2_exchange_reward_pack_num": [
+      3
+    ],
+    "auto_chess_2_chat_join_load_num": [
+      5
+    ],
+    "auto_chess_2_chat_send_cd": [
+      30
+    ],
+    "auto_chess_2_chat_refresh_num": [
+      20
+    ],
+    "auto_chess_2_exchange_publish_cd": [
+      300
+    ],
+    "auto_chess_2_wish_texts": [
+      608002,
+      608003,
+      608004,
+      608005,
+      608006
+    ],
+    "auto_chess_2_pvp_history_num": [
+      10
+    ],
+    "auto_chess_2_card_pack_id": [
+      82
+    ],
+    "auto_chess_2_pack_drop_rate": [
+      [
+        1,
+        8500
+      ],
+      [
+        2,
+        1450
+      ],
+      [
+        3,
+        50
+      ]
+    ],
+    "auto_chess_2_pack_contain_num": [
+      5
+    ],
+    "auto_chess_2_pack_pity_num": [
+      10
+    ],
+    "auto_chess_2_pack_history_num": [
+      250
+    ],
+    "auto_chess_2_bronze_exp_provide": [
+      1
+    ],
+    "auto_chess_2_silver_exp_provide": [
+      2
+    ],
+    "auto_chess_2_gold_exp_provide": [
+      5
+    ],
+    "auto_chess_2_silver_exp_need": [
+      10
+    ],
+    "auto_chess_2_gold_exp_need": [
+      20
+    ],
+    "auto_chess_2_sticker_ID": [
+      283,
+      127,
+      64,
+      53,
+      249,
+      263
+    ],
+    "auto_chess_2_sticker_CD": [
+      5
+    ],
+    "auto_chess_2_sticker_display_time": [
+      4
+    ],
+    "auto_chess_2_tutorial_stage_id": [
+      401
+    ],
+    "auto_chess_2_abandon_punish_round": [
+      4
+    ],
+    "auto_chess_2_abandon_punish_rank": [
+      5001,
+      5002,
+      5003,
+      6001
+    ],
+    "auto_chess_2_teach_round1": [
+      102,
+      103,
+      104
+    ],
+    "auto_chess_2_teach_round2": [
+      102,
+      104,
+      104
+    ],
+    "auto_chess_2_teach_round2_item": [
+      101
+    ],
+    "auto_chess_2_teach_round2_reward": [
+      204,
+      210
+    ],
+    "auto_chess_2_teach_round3": [
+      108,
+      203,
+      203
+    ],
+    "auto_chess_2_teach_round3_refresh": [
+      203,
+      102,
+      109
+    ],
+    "auto_chess_2_teach_round3_refresh_item": [
+      103
+    ],
+    "auto_chess_2_player_pool_size": [
+      100,
+      100
+    ],
+    "auto_chess_2_real_team_round_requirement": [
+      8
+    ],
+    "auto_chess_2_coin_consume_round_requirement": [
+      13
+    ],
+    "auto_chess_2_round_max": [
+      99
+    ],
+    "auto_chess_2_count_down": [
+      [
+        2,
+        75
+      ],
+      [
+        4,
+        105
+      ],
+      [
+        7,
+        135
+      ]
+    ],
+    "auto_chess_2_count_down_high": [
+      [
+        2,
+        60
+      ],
+      [
+        4,
+        90
+      ],
+      [
+        7,
+        120
+      ]
+    ],
+    "auto_chess_2_rank_high": [
+      3003
+    ],
+    "auto_chess_2_pack_wait_time": [
+      2
+    ],
+    "auto_chess_2_pack_energy_initial": [
+      4
+    ],
+    "auto_chess_2_skip_time": [
+      20
+    ],
+    "auto_chess_2_speed_up": [
+      40,
+      4
+    ],
+    "auto_chess_2_foolproof_rank": [
+      2003
+    ],
+    "auto_chess_2_foolproof_count": [
+      4
+    ],
+    "auto_chess_2_sync_desc": [
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_8",
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_9",
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_10",
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_11"
+    ],
+    "auto_chess_2_async_desc": [
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_5",
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_6",
+      "Widget/System/Activity_AutoChess_Main/Description/Activity_AutoChess_Description_7"
+    ],
+    "auto_chess_2_quick_count_down_need_round": [
+      2
+    ],
+    "auto_chess_2_quick_count_down": [
+      60
+    ],
+    "auto_chess_2_round_end_play": [
+      20
+    ],
+    "auto_chess_2_abandon_punish_round_async": [
+      4
+    ],
+    "auto_chess_2_pack_energy_convert_async_win": [
+      5
+    ]
+  }
+}

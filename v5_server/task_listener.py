@@ -128,6 +128,16 @@ def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=F
         """,
         (uid, cond_int, uid, *extra_params)
     )
+    if cond_int == 329001:
+        return []  # Skuld projects persistent logical nodes.
+    if 340001 <= cond_int <= 340009:
+        return []  # Osiris projects configured stages and native records once.
+    if 350001 <= cond_int <= 350005:
+        return []  # SummerPub projects persistent facts through its required event.
+    if cond_int == 300:
+        # Ash film tasks project the authoritative balance, never add a generic PT delta.
+        from ash_service import LIMITED_TASKS
+        rows = [r for r in rows if int(r['task_id']) not in LIMITED_TASKS]
     if not rows:
         return []
 
@@ -276,87 +286,10 @@ def on_stage_pass(ctx, uid, times=1, stage_id=0, stage_type=None, **kwargs):
     if stage_type == "black_zone" or (isinstance(stage_id, int) and 200000 <= stage_id < 300000):
         c3 = _trigger_task_condition(ctx.db, uid, condition=453, delta=times)
 
-    # 5. 海拉弹珠关卡 (cond=392001)
-    c4 = []
-    if stage_type == "minigame_pinball" or (isinstance(stage_id, int) and 40601 <= stage_id <= 40650):
-        c4 = _trigger_task_condition(db, uid, condition=392001, delta=1, param=stage_id, set_value=True)
-
-    # 6. 灰烬牛仔关卡 (cond=380001 & cond=501)
-    c5 = []
-    ash_stage_id = kwargs.get("ash_stage_id") or stage_id
-    if stage_type == "ash_shoot" or (isinstance(stage_id, int) and (404101 <= stage_id <= 404401 or 5280301 <= stage_id <= 5280327)):
-        # 推进单关通关任务 (cond=380001)
-        c5_single = _trigger_task_condition(db, uid, condition=380001, delta=1, param=ash_stage_id, set_value=True)
-        # 驱动累计完成活动关卡限时任务 (cond=501, need=3..18)
-        done_rows = db.query(
-            "SELECT count(*) as cnt FROM task WHERE uid = ? AND task_id BETWEEN 40401001 AND 40401018 AND progress >= 1",
-            (uid,)
-        )
-        done_cnt = int(done_rows[0]["cnt"]) if done_rows else 0
-        c5_total = _trigger_task_condition(db, uid, condition=501, delta=done_cnt, set_value=True)
-        c5 = c5_single + c5_total
-
-    # 7. 卡达斯夏活坦克配件收集 (cond=423002)
-    c6 = []
-    if stage_type == "summer_race":
-        module_count = kwargs.get("module_count")
-        if module_count is not None:
-            module_type = kwargs.get("module_type", 1)
-            c6 = _trigger_task_condition(db, uid, condition=423002, delta=module_count, param=module_type, set_value=True)
-
-    # 8. 霍德尔活动关卡首通 (cond=400004)
-    c7 = []
-    stg = stage_id or kwargs.get("dest_int", 0)
-    if stage_type == "hodur" or (isinstance(stg, int) and 5310201 <= stg <= 5310222):
-        c7 = _trigger_task_condition(db, uid, condition=400004, delta=1, param=stg, set_value=True)
-
-    # 9. 薇儿丹蒂 SP 潜质觉醒任务 (cond=160002 训练熟练度, cond=160003 Boss得分, cond=160007 满熟练度)
-    c8 = []
-    if stage_type == "sphero_train":
-        grp = kwargs.get("group_type")
-        prog = kwargs.get("progress", 0)
-        if grp is not None:
-            c8.extend(_trigger_task_condition(db, uid, condition=160002, delta=prog, param=grp, set_value=True))
-            if prog >= 3000:
-                c8.extend(_trigger_task_condition(db, uid, condition=160007, delta=1, param=3000, set_value=True))
-    elif stage_type == "sphero_boss":
-        boss_sc = kwargs.get("score", 0)
-        stg = stage_id or kwargs.get("dest_int", 0)
-        if boss_sc >= 4000000:
-            c8.extend(_trigger_task_condition(db, uid, condition=160003, delta=1, param=stg, set_value=True))
-
-    # 10. 乌尔碰碰车 (极限机装, cond=422001 关卡通关, cond=422002 击杀怪物, cond=422003 合成技能, cond=422004 累计通关, cond=501 小游戏通关)
-    c9 = []
-    if stage_type == "vehicle_ball":
-        stg = stage_id or kwargs.get("dest_int", 0)
-        if kwargs.get("win", True) and stg:
-            c9.extend(_trigger_task_condition(db, uid, condition=422001, delta=1, param=stg, set_value=True))
-            c9.extend(_trigger_task_condition(db, uid, condition=501, delta=1))
-            c9.extend(_trigger_task_condition(db, uid, condition=422004, delta=1))
-        kills = kwargs.get("kill_count", 0)
-        if kills > 0:
-            c9.extend(_trigger_task_condition(db, uid, condition=422002, delta=kills))
-        merges = kwargs.get("merge_count", 0)
-        if merges > 0:
-            c9.extend(_trigger_task_condition(db, uid, condition=422003, delta=merges))
-
-    # 11. 浮光绎曲音乐会 (cond=50104 完成指定乐曲初战任务 40601001~40601008)
-    c10 = []
-    if stage_type == "music_game":
-        tid = kwargs.get("task_id")
-        if tid:
-            t_rows = db.query("SELECT progress FROM task WHERE uid = ? AND task_id = ?", (uid, tid))
-            if not t_rows:
-                db.execute("INSERT INTO task (uid, task_id, progress) VALUES (?, ?, 1)", (uid, tid))
-                c10.append({"id": tid, "progress": 1, "complete_flag": 0})
-            elif t_rows[0]["progress"] < 1:
-                db.execute("UPDATE task SET progress = 1 WHERE uid = ? AND task_id = ?", (uid, tid))
-                c10.append({"id": tid, "progress": 1, "complete_flag": 0})
-
     # Native battle common_info preserves team order; the first hero is captain.
     captain = (kwargs.get('heroes') or [0])[0]
     captain_tasks = _trigger_task_condition(db, uid, condition=1001, delta=times, param=captain) if captain else []
-    _push_task_diff(ctx, uid, c0 + c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8 + c9 + c10 + captain_tasks)
+    _push_task_diff(ctx, uid, c0 + c1 + c2 + c3 + captain_tasks)
 
 
 @bus.subscribe(Events.STORY_READ)
@@ -401,19 +334,26 @@ def on_buy_fatigue(ctx, uid, times=1, **kwargs):
     _push_task_diff(ctx, uid, c)
 
 
-@bus.subscribe(Events.HERO_UPGRADE)
-def on_hero_upgrade(ctx, uid, times=1, **kwargs):
-    """修正者升级/突破/钥从强化 (cond=8: 6013 需1次)"""
-    c = _trigger_task_condition(ctx.db, uid, condition=8, delta=times)
+@bus.subscribe(Events.MAIN_INTERACT)
+def on_main_interact(ctx, uid, hero_id=0, **kwargs):
+    """大厅看板交互一次 (cond=8: 6013)，不由角色养成/战斗熟练度代替。"""
+    if not hero_id:
+        return
+    c = _trigger_task_condition(ctx.db, uid, condition=8, delta=1, param=hero_id)
     _push_task_diff(ctx, uid, c)
 
 
 @bus.subscribe(Events.EQUIP_REFORGE)
 def on_equip_reforge(ctx, uid, times=1, **kwargs):
-    """刻印赋能/重构 (cond=9: 6014 需1次; cond=350 消耗模块 100018)"""
-    c1 = _trigger_task_condition(ctx.db, uid, condition=9, delta=times)
-    c2 = _trigger_task_condition(ctx.db, uid, condition=350, delta=times)
-    _push_task_diff(ctx, uid, c1 + c2)
+    """刻印赋能/重构 (cond=350 消耗模块100018)。cond9属于管理喵派遣。"""
+    changed = _trigger_task_condition(ctx.db, uid, condition=350, delta=times)
+    _push_task_diff(ctx, uid, changed)
+
+
+@bus.subscribe(Events.ADMIN_CAT_EXPLORE_START)
+def on_admin_cat_explore_start(ctx, uid, **kwargs):
+    from admin_cat_dispatch_progress import notify
+    notify(ctx, uid)
 
 
 @bus.subscribe(Events.DISPATCH_FINISH)
@@ -684,17 +624,10 @@ def sync_dorm_illu_tasks(db, uid):
     return changed
 
 
-@bus.subscribe(Events.SUMMER_PUB_LEVEL_PASS)
-def on_summer_pub_level_pass(ctx, uid, level_id=None, **kwargs):
-    """夏日餐厅关卡推进：驱动 Condition 350001 (通关夏日酒馆/餐厅指定 level_id) 并原子下发差分帧"""
-    if not uid or not level_id:
-        return
-    db = getattr(ctx, "db", None) if ctx else None
-    if not db:
-        from account_db import get_db
-        db = get_db()
-    changed = _trigger_task_condition(db, uid, condition=350001, delta=1, param=level_id)
-    _push_task_diff(ctx, uid, changed)
+@bus.subscribe(Events.SUMMER_PUB_PROGRESS)
+def on_summer_pub_progress(ctx, uid, **kwargs):
+    from summer_pub_service import notify_tasks
+    notify_tasks(ctx, uid)
 
 
 @bus.subscribe(Events.ROGUE_CARD_POST_FINISH)
@@ -710,6 +643,60 @@ def on_rogue_card_post_finish(ctx, uid, post_id=None, **kwargs):
     _push_task_diff(ctx, uid, changed)
 
 
+@bus.subscribe(Events.ROGUE_CARD_PROGRESS)
+def on_rogue_card_progress(ctx,uid,statistics=None,viewed_misc=0,**kwargs):
+    from rogue_card_progress import notify_projection
+    return notify_projection(ctx,uid,statistics or {},viewed_misc)
+
+
+@bus.subscribe(Events.MUSIC_COMPLETE)
+def on_music_complete(ctx, uid, **kwargs):
+    from resident_music_service import notify_tasks
+    return notify_tasks(ctx, uid)
+
+
+@bus.subscribe(Events.PINBALL_CLEAR)
+def on_pinball_clear(ctx, uid, **kwargs):
+    from pinball_service import notify_tasks
+    return notify_tasks(ctx, uid)
+
+
+@bus.subscribe(Events.KADAS_PROGRESS)
+def on_kadas_progress(ctx, uid, **kwargs):
+    from kadas_race_service import notify_tasks
+    return notify_tasks(ctx, uid)
 
 
 
+
+
+
+
+@bus.subscribe(Events.VEHICLE_BALL_PROGRESS)
+def on_vehicle_ball_progress(ctx, uid, **kwargs):
+    from vehicle_ball_service import notify_tasks
+    notify_tasks(ctx, uid)
+
+
+@bus.subscribe(Events.HODUR_PROGRESS)
+def on_hodur_progress(ctx, uid, **kwargs):
+    from hodur_service import notify_tasks
+    notify_tasks(ctx, uid)
+
+
+@bus.subscribe(Events.ASH_PROGRESS)
+def on_ash_progress(ctx, uid, **kwargs):
+    from ash_service import notify_tasks
+    notify_tasks(ctx, uid)
+
+
+@bus.subscribe(Events.OSIRIS_STUDY_PROGRESS)
+def on_osiris_study_progress(ctx, uid, **kwargs):
+    from osiris_service import notify_tasks
+    notify_tasks(ctx, uid)
+
+
+@bus.subscribe(Events.SKULD_PROGRESS)
+def on_skuld_progress(ctx, uid, **kwargs):
+    from skuld_service import notify_tasks
+    notify_tasks(ctx, uid)

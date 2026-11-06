@@ -16,6 +16,7 @@ import time
 from typing import Dict, List, Optional, Tuple
 
 from inventory_service import InventoryService
+from lazy_timer import get_daily_5am_ts, get_weekly_mon_5am_ts
 
 
 class AdminCatExploreConst:
@@ -150,16 +151,8 @@ class AdminCatExploreService:
         data = db.get_admin_cat_explore_data(uid)
         now = int(time.time())
 
-        # 计算本周一 05:00 时间戳
-        # 获取当前周一 05:00
-        t_struct = time.localtime(now)
-        # weekday: 0=Mon, 6=Sun
-        days_since_monday = t_struct.tm_wday
-        midnight_today = now - (t_struct.tm_hour * 3600 + t_struct.tm_min * 60 + t_struct.tm_sec)
-        # 若今天已经过了 05:00，当前周期起点是周一 05:00；若还没到，算上周一 05:00
-        mon_0500 = midnight_today - (days_since_monday * 86400) + (5 * 3600)
-        if now < mon_0500:
-            mon_0500 -= 7 * 86400
+        # 和全局周期消费者共用周一05:00边界，保留旧队列及永久产出。
+        mon_0500 = get_weekly_mon_5am_ts(now)
 
         if data is None:
             data = {
@@ -200,6 +193,10 @@ class AdminCatExploreService:
         data = self.get_or_create_explore_data(db, uid)
         cats = db.get_admin_cat_list(uid)
         queues = db.get_admin_cat_queues(uid)
+
+        from admin_cat_log_service import visible_events
+        queues = [dict(q, explore_event=visible_events(q.get('explore_event'),
+                  max(0, int(q['stop_time'])-int(q['start_time'])))) for q in queues]
 
         mimir_list = []
         for c in cats:
@@ -256,6 +253,9 @@ class AdminCatExploreService:
         if len(queues) >= lvl_cfg["amount"]:
             return AdminCatExploreConst.ERR_QUEUE_LIMIT_REACHED
 
+        from admin_cat_dispatch_progress import read as dispatch_read, record as dispatch_record
+        dispatch_before = dispatch_read(db, uid)
+
         # 5. 生成挂机时间与奇遇时间轴事件
         now = int(time.time())
         duration_sec = hour_time * 3600
@@ -265,8 +265,8 @@ class AdminCatExploreService:
         events = []
         cur_t = random.randint(60, 300)
         while cur_t < duration_sec - 120:
-            addr = random.randint(101, 110)
-            content = random.randint(201, 306)
+            from admin_cat_log_service import choose_ids
+            addr, content = choose_ids()
             events.append({
                 "time": cur_t,
                 "address_id": addr,
@@ -280,27 +280,27 @@ class AdminCatExploreService:
         # 7. 累计今日探索与每周天数
         exp_data = self.get_or_create_explore_data(db, uid)
         last_daily = exp_data.get("daily_time", 0)
-        # 判定是否今天新一天 (05:00 刷新)
-        is_same_day = False
-        if last_daily > 0:
-            t_last = time.localtime(last_daily)
-            t_now = time.localtime(now)
-            if t_last.tm_yday == t_now.tm_yday and t_last.tm_year == t_now.tm_year:
-                is_same_day = True
+        # daily_time保留成功派遣的真实时间；是否已计天按05:00游戏日比较。
+        # 周一05:00前的旧派遣属于上周，不能挡住本周首次计数。
+        is_same_day = last_daily > 0 and get_daily_5am_ts(last_daily) == get_daily_5am_ts(now)
 
         if not is_same_day:
             exp_data["daily_time"] = now
             exp_data["weekly_time"] = min(7, exp_data.get("weekly_time", 0) + 1)
             db.save_admin_cat_explore_data(uid, exp_data)
 
+        dispatch_record(db, uid, dispatch_before)
+        import task_listener  # Ensure the required condition9 projection is registered.
+        from event_bus import bus, Events
+        bus.emit_required(Events.ADMIN_CAT_EXPLORE_START, ctx, uid, area_id=area_id, mimir_id=mimir_id)
         return AdminCatExploreConst.SUCCESS
 
     # ---------- 探索完成与挂机收益结算 (67006) ----------
 
-    def finish_explore(self, ctx, uid: int, area_id: int, force_finish: bool = True) -> Tuple[int, int, List[dict]]:
+    def finish_explore(self, ctx, uid: int, area_id: int, force_finish: bool = False) -> Tuple[int, int, List[dict]]:
         """
         结算并领取挂机奖励 (cs_67006)。
-        :param force_finish: 默认为 True，以提供单机调试与随时测试便利。
+        :param force_finish: 仅显式内部调试可绕过期限；普通RPC始终为False。
         :return: (result, event_id, reward_list)
         """
         db = self._resolve_db(ctx)
@@ -471,6 +471,12 @@ class AdminCatExploreService:
         exp_data = self.get_or_create_explore_data(db, uid)
         weekly_time = exp_data.get("weekly_time", 0)
         reward_state = exp_data.get("weekly_reward_state", 0)
+
+        # Lua CheckCanGetWeeklyReward只开放游戏星期6/7（05:00换日）。
+        # 周一05:00前仍是周日；周六05:00前仍是周五。
+        game_weekday = time.localtime(get_daily_5am_ts(int(time.time()))).tm_wday
+        if game_weekday not in (5, 6):
+            return AdminCatExploreConst.ERR_CONDITION_NOT_MET, []
 
         if reward_state != 0 or weekly_time <= 0:
             return AdminCatExploreConst.ERR_ALREADY_CLAIMED, []

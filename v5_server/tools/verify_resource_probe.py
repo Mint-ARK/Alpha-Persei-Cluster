@@ -23,7 +23,7 @@ def response_items(platform):
 
 class OfficialProbeChecks(unittest.TestCase):
     def test_01_channels_and_signature_include_actual_platform_channel(self):
-        for platform, channel in [('pc', '9'), ('android', '8'), ('ios', '7')]:
+        for platform, channel in [('pc', '9'), ('android', '7'), ('ios', '7')]:
             with self.subTest(platform=platform), patch('cdn_proxy.fetch_upstream') as fetch:
                 fetch.return_value = 200, {}, json.dumps({'errorCode': '0', 'data': response_items(platform)}).encode()
                 ok, info, _ = versions.probe_official_latest(platform)

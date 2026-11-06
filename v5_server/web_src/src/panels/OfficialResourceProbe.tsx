@@ -3,7 +3,7 @@ import { ArrowRight, CloudDownload, RefreshCw, X } from 'lucide-react'
 import { Button, Card, Chip, Label, ListBox, Modal, Select } from '@heroui/react'
 import { Section } from '../components/kit'
 import { checkOfficialUpdate, type CheckUpdateData, type DownloadQueueHint, type ResourcePlatform } from '../lib/api'
-import { platformNames } from './ResourcePlatformCard'
+import { platformNames, platformChannels } from './ResourcePlatformCard'
 
 export default function OfficialResourceProbe({ online, onQueue }: { online: boolean; onQueue: (hint: DownloadQueueHint) => void }) {
   const [platform, setPlatform] = useState<ResourcePlatform>('pc')
@@ -27,13 +27,13 @@ export default function OfficialResourceProbe({ online, onQueue }: { online: boo
           <div><h3 className="font-semibold">检查官方资源</h3><p className="mt-2 text-sm text-muted">探测只读取元数据与本地缓存，不自动下载缺失清单。</p>
             <div className="mt-3 flex gap-2"><Chip size="sm" variant="soft">{platformNames[platform]}</Chip><Chip size="sm" variant="soft">{result ? `${result.remote_app_version} / ${result.remote_version}` : '尚未检测'}</Chip></div></div></div>
         <div className="space-y-3"><Select aria-label="更新检测平台" selectedKey={platform} isDisabled={busy} onSelectionChange={key => { if (key) { setPlatform(key as ResourcePlatform); setResult(null) } }}>
-          <Label>检测平台 · channelId={{ pc: '9', android: '8', ios: '7' }[platform]}</Label><Select.Trigger><Select.Value /><Select.Indicator /></Select.Trigger>
+          <Label>检测平台 · channelId={platformChannels[platform]}</Label><Select.Trigger><Select.Value /><Select.Indicator /></Select.Trigger>
           <Select.Popover><ListBox>{(['pc', 'android', 'ios'] as const).map(p => <ListBox.Item key={p} id={p} textValue={platformNames[p]}>{platformNames[p]}</ListBox.Item>)}</ListBox></Select.Popover>
         </Select><Button className="w-full" variant="secondary" isDisabled={!online || busy} onPress={check}><CloudDownload className="size-4" />检查更新</Button></div>
       </Card>
     </Section>
     <Modal.Root isOpen={open} onOpenChange={setOpen}><Modal.Backdrop><Modal.Container><Modal.Dialog className="flex max-h-[88vh] w-full max-w-2xl flex-col p-5">
-      <Modal.Header className="flex flex-row items-start justify-between gap-3 border-b border-separator pb-3"><div><Modal.Heading>官方更新检测</Modal.Heading><p className="mt-1 text-xs text-muted">{platformNames[platform]} · channelId={{ pc: '9', android: '8', ios: '7' }[platform]}</p></div><Button isIconOnly size="sm" variant="ghost" aria-label="关闭官方检测" onPress={() => setOpen(false)}><X className="size-4" /></Button></Modal.Header>
+      <Modal.Header className="flex flex-row items-start justify-between gap-3 border-b border-separator pb-3"><div><Modal.Heading>官方更新检测</Modal.Heading><p className="mt-1 text-xs text-muted">{platformNames[platform]} · channelId={platformChannels[platform]}</p></div><Button isIconOnly size="sm" variant="ghost" aria-label="关闭官方检测" onPress={() => setOpen(false)}><X className="size-4" /></Button></Modal.Header>
       <Modal.Body className="min-h-0 space-y-4 overflow-y-auto py-4">
         {busy && <p className="flex items-center gap-2 py-8 text-muted"><RefreshCw className="size-4 animate-spin" />正在探测官方最新版本…</p>}
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}

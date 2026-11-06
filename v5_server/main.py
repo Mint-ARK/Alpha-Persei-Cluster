@@ -18,6 +18,7 @@ main.py — V5 服务器入口（模块装配）
 """
 import argparse
 from ipaddress import IPv4Address
+from pathlib import Path
 import os
 import struct
 import sys
@@ -51,6 +52,7 @@ import backhome_service           # noqa: E402  游园街领域服务（BackHome
 import peripheral_service         # noqa: E402  外围系统模块（32xxx 个性化/大厅场景/偏好，自注册操作 + 事件总线）
 import achievement_service        # noqa: E402  成就领域服务（53xxx 领奖/物语，自注册操作 + 事件总线）
 import minigame_service           # noqa: E402  常驻小游戏服务中枢（89xxx 弹珠/牛仔/坦克等，自注册操作 + 结算落库）
+import quanzhou_service          # Citong map, quests and voyage operations
 import autochess_service          # noqa: E402  决斗王自走棋服务（89xxx/90xxx PVE对弈状态机 + PVP拦截）
 import periodic_gift_service       # noqa: E402  周期连续时间礼包服务（7日/14日/季卡 订阅管理+邮件下发）
 import recharge_service            # noqa: E402  充值发货与累计充值服务（34xxx 直购/首充/累充积分/档位领奖）
@@ -58,6 +60,7 @@ import generator as _gen          # noqa: E402  响应生成
 
 from codec import encode as _enc, decode as _dec  # noqa: E402
 from account_db import get_db     # noqa: E402  数据层
+from save_slot_manager import TOTAL_SLOTS, slot_id_to_port  # noqa: E402
 
 # 网络层（V5 server_net 模块）与重放模块（--replay 激活才加载）
 import server_net                 # noqa: E402
@@ -99,8 +102,10 @@ def main(argv=None):
                     help="HTTP/HTTPS 本机监听地址（反代可使用 127.0.0.1）")
     ap.add_argument("--gw-port", type=int, default=8102, help="gateway TCP 端口")
     ap.add_argument("--game-port", type=int, default=8105, help="game TCP 端口")
-    ap.add_argument("--capture-cdn", action="store_true", default=True, help="开启官方 CDN 资源智能穿透与抓包（默认开启）")
+    ap.add_argument("--capture-cdn", action="store_true", default=False, help="开启官方 CDN 资源智能穿透与抓包（默认关闭）")
     ap.add_argument("--no-capture-cdn", action="store_true", help="强制禁用官方 CDN 抓包（纯离线模式）")
+    ap.add_argument("--cdn-mode", choices=("off", "relay", "cache"), default="off",
+                    help="CDN模式：off关闭，relay仅流式穿透（适合本地设备），cache穿透并存盘")
     ap.add_argument("--dns", action="store_true", help="启动内置轻量 UDP/TCP:53 DNS 服务器（需管理员权限）")
     ap.add_argument("--dns-upstream", action="append", type=IPv4Address, metavar="IPv4",
                     help="DNS 转发上游，可重复指定；本机代理改写公共 DNS 时可指定局域网路由器")
@@ -126,6 +131,9 @@ def main(argv=None):
                     default=os.environ.get("LOG_LEVEL", "INFO").upper(),
                     help="设置服务端日志打印级别 (默认: INFO, 可选: DEBUG, INFO, WARN, ERROR)")
     ap.add_argument("--self-check", action="store_true", help="自检并退出")
+    ap.add_argument("--custom-domain", default="", help="自定义面板访问域名")
+    ap.add_argument("--domain-proxy-mode", choices=("none", "semi", "manual", "no_https"), default="none", help="域名反代对接方式")
+    ap.add_argument("--site-conf-path", default="", help="外部站点配置文件绝对路径")
     args = ap.parse_args(argv)
 
     if args.list_resource_profiles:
@@ -149,10 +157,9 @@ def main(argv=None):
         minimum = 0 if name in ("http_port", "battle_port") else 1
         if not minimum <= getattr(args, name) <= 65535:
             ap.error(f"{name} 端口范围错误")
-    if "AG_ADMIN_AUTH_FILE" in os.environ:
-        from admin_access import load_credentials
-        load_credentials(os.environ["AG_ADMIN_AUTH_FILE"])
-    if sys.platform != "win32" and not args.self_check:
+    from admin_access import validate_environment
+    validate_environment()
+    if not args.self_check:
         from linux_manager import check_ports
         try:
             check_ports(args.https_port, args.http_port, args.gw_port, args.game_port,
@@ -275,101 +282,22 @@ def main(argv=None):
     if client_info.get('detected'):
         log(f'PC本机资源提示: {client_info.get("matched_file")}（仅PC渠道）', module='VERSION')
 
-    # ---------------- 端口自检与冲突进程自动守护 (PortGuard) ----------------
-    def _ensure_ports_clean(target_ports):
-        if sys.platform != "win32":
-            return  # Linux 只检测冲突，不终止占用端口的其他服务。
-        curr_pid = os.getpid()
-        target_ports = set(int(p) for p in target_ports if p and int(p) > 0)
-        killed_pids = set()
-
-        # 1. 检查并清理端口占用冲突
-        try:
-            import subprocess
-            import re
-            out = subprocess.check_output("netstat -ano", shell=True, text=True, errors="ignore")
-            for line in out.splitlines():
-                line = line.strip()
-                if not line:
-                    continue
-                parts = line.split()
-                if len(parts) >= 4 and parts[0].upper() in ("TCP", "UDP"):
-                    local_addr = parts[1]
-                    m = re.search(r":(\d+)$", local_addr)
-                    if m:
-                        port = int(m.group(1))
-                        if port in target_ports:
-                            try:
-                                pid = int(parts[-1])
-                            except ValueError:
-                                continue
-                            if pid > 0 and pid != curr_pid and pid not in killed_pids:
-                                log(f"发现端口 {port} 被残留进程 (PID: {pid}) 占用，正在自动终止清理...", module="PORT")
-                                try:
-                                    subprocess.run(["taskkill", "/F", "/PID", str(pid)],
-                                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
-                                    killed_pids.add(pid)
-                                    log(f"已成功清理冲突进程 PID: {pid}，释放端口 {port}。", module="PORT")
-                                except Exception as e:
-                                    log(f"清理 PID {pid} 失败: {e}", "ERROR", module="PORT")
-        except Exception as e:
-            log(f"netstat 端口扫描跳过: {e}", "WARN", module="PORT")
-
-        # 2. 检查 .server.pid 记录的历史实例
-        pid_file = os.path.join(v5_dir, ".server.pid")
-        if os.path.isfile(pid_file):
-            try:
-                with open(pid_file, "r", encoding="utf-8") as f:
-                    old_pid = int(f.read().strip())
-                if old_pid > 0 and old_pid != curr_pid and old_pid not in killed_pids:
-                    import subprocess
-                    out = subprocess.check_output(["tasklist", "/FI", f"PID eq {old_pid}", "/FO", "CSV", "/NH"],
-                                                  text=True, errors="ignore").strip()
-                    if out and "No tasks" not in out and "没有运行" not in out:
-                        log(f"发现 .server.pid 记录的旧实例 (PID: {old_pid})，正在自动终止...", module="PORT")
-                        subprocess.run(["taskkill", "/F", "/PID", str(old_pid)],
-                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
-                        killed_pids.add(old_pid)
-                        log(f"旧实例 PID {old_pid} 已清理。", module="PORT")
-            except Exception:
-                pass
-
-        if killed_pids:
-            time.sleep(0.5)
-
-        # 3. 写入当前实例标识与设置控制台标题
-        try:
-            with open(pid_file, "w", encoding="utf-8") as f:
-                f.write(str(curr_pid))
-        except Exception:
-            pass
-
-        if sys.platform == "win32":
-            try:
-                import ctypes
-                ctypes.windll.kernel32.SetConsoleTitleW(f"Tianchuan San (Mirfak) Server [PID: {curr_pid}]")
-            except Exception:
-                pass
-
-        log(f"端口自检与进程守护就绪，当前服务单例 PID: {curr_pid}", module="PORT")
-
-    # 执行端口预检与守护（包含 Gateway 32 槽位端口池，自动避开 game_port）
-    from save_slot_manager import TOTAL_SLOTS, slot_id_to_port
-    all_gw_ports = [slot_id_to_port(i, args.gw_port, args.game_port) for i in range(1, TOTAL_SLOTS + 1)]
-    _ensure_ports_clean([args.game_port, *all_gw_ports, args.https_port, args.battle_port, args.http_port])
-
     import gen_cert
     import cdn_proxy
     host_ip = args.host_ip.strip() if args.host_ip else gen_cert.get_default_lan_ip()
     server_net.set_host_ip(host_ip)
-    outbound_ip = cdn_proxy.select_source_ip(host_ip)
-    cdn_proxy.set_source_ip(outbound_ip)
-    log(f"对外发布 IP: {host_ip}，CDN 本机出站 IP: {outbound_ip}", module="NET")
-
-    if args.no_capture_cdn:
-        cdn_proxy.set_capture_enabled(False)
-    else:
-        cdn_proxy.set_capture_enabled(True)
+    capture_mode = 'off' if args.no_capture_cdn else 'cache' if args.capture_cdn else args.cdn_mode
+    if capture_mode != 'off':
+        try:
+            outbound_ip = cdn_proxy.select_source_ip(host_ip)
+            cdn_proxy.set_source_ip(outbound_ip)
+        except (OSError, ValueError) as error:
+            capture_mode = 'off'
+            log(f"CDN 出站地址未就绪，已关闭被动捕获，本地服务继续启动: {error}", "WARN", module="CDN")
+        else:
+            log(f"CDN 本机出站 IP: {outbound_ip}", module="NET")
+    cdn_proxy.set_capture_mode(capture_mode)
+    log(f"对外发布 IP: {host_ip}", module="NET")
 
     if args.self_check:
         print("=== 深空之眼单机服务核心自检 ===")
@@ -394,6 +322,52 @@ def main(argv=None):
             print(f"骨架加载: 跳过 ({e})")
         print("自检通过")
         return 0
+
+    # ---------------- 服务端单例生命周期管理 (Singleton Process Management) ----------------
+    # 严格遵循同名同路径进程匹配原则；严禁通过端口占用判断或杀伤进程，杜绝误杀 Nginx/系统关键服务
+    try:
+        from linux_manager import is_server_process, stop_server_process
+    except ImportError:
+        is_server_process = None
+        stop_server_process = None
+
+    curr_pid = os.getpid()
+    pid_file = os.path.join(v5_dir, ".server.pid")
+
+    if os.path.isfile(pid_file):
+        try:
+            with open(pid_file, "r", encoding="utf-8") as f:
+                raw_pid = f.read().strip()
+            if raw_pid.isdigit():
+                old_pid = int(raw_pid)
+                if old_pid > 0 and old_pid != curr_pid:
+                    if is_server_process and is_server_process(old_pid, Path(v5_dir)):
+                        log(f"发现同目录下正在运行的上一实例 (PID: {old_pid})，正在安全停止...", module="MAIN")
+                        stop_server_process(Path(v5_dir))
+                        log(f"上一实例 PID {old_pid} 已安全终止。", module="MAIN")
+                    else:
+                        # PID 已失效或属于非游戏无关进程，仅清理过期文件，绝不误杀
+                        try:
+                            os.remove(pid_file)
+                        except Exception:
+                            pass
+        except Exception:
+            pass
+
+    try:
+        with open(pid_file, "w", encoding="utf-8") as f:
+            f.write(str(curr_pid))
+    except Exception as e:
+        log(f"记录 .server.pid 失败: {e}", "WARN", module="MAIN")
+
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            ctypes.windll.kernel32.SetConsoleTitleW(f"Tianchuan San (Mirfak) Server [PID: {curr_pid}]")
+        except Exception:
+            pass
+
+    log(f"进程就绪，当前服务单例 PID: {curr_pid}", module="MAIN")
 
     # 自动校验与生成 ATS 合规双层证书与 iPhone 描述文件（若已有对应证书则不主动生成）
     v5_dir = os.path.dirname(os.path.abspath(__file__))
@@ -429,27 +403,74 @@ def main(argv=None):
     import timer_listeners
     timer_listeners.register_timer_listeners()
 
-    # 注册进程优雅退出信号捕获
+    # 注册进程优雅退出信号捕获与生命周期清理
+    import atexit
     import signal
     import event_bus
-    def _on_signal_exit(signum, frame):
-        log(f"收到进程退出信号 ({signum})，广播 SERVER_SHUTDOWN...", module="MAIN")
+
+    _gws = None
+    _srv = None
+    _battle_srv = None
+    _shutting_down = False
+
+    def _shutdown_server(signum=None):
+        nonlocal _shutting_down
+        if _shutting_down:
+            return
+        _shutting_down = True
+        if signum is not None:
+            log(f"收到进程退出信号 ({signum})，正在安全停止服务...", module="MAIN")
+        else:
+            log("正在安全停止服务...", module="MAIN")
+
         try:
             event_bus.bus.emit(event_bus.Events.SERVER_SHUTDOWN, ctx=core, uid=None, shutdown_ts=int(time.time()))
         except Exception:
             pass
-        sys.exit(0)
+
+        # 1. 立即清除 .server.pid
+        try:
+            pid_file = os.path.join(v5_dir, ".server.pid")
+            if os.path.isfile(pid_file):
+                os.remove(pid_file)
+        except Exception:
+            pass
+
+        # 2. 快速释放所有服务器套接字与监听池
+        if _gws is not None:
+            try:
+                _gws.shutdown()
+                _gws.server_close()
+            except Exception:
+                pass
+        if _srv is not None:
+            try:
+                _srv.server_close()
+            except Exception:
+                pass
+        if _battle_srv is not None:
+            try:
+                _battle_srv.stop()
+            except Exception:
+                pass
+
+        log("服务端已安全停止，端口与资源已释放。", module="MAIN")
+        if signum is not None:
+            os._exit(0)
+
     try:
-        signal.signal(signal.SIGINT, _on_signal_exit)
-        signal.signal(signal.SIGTERM, _on_signal_exit)
+        signal.signal(signal.SIGINT, lambda s, f: _shutdown_server(s))
+        signal.signal(signal.SIGTERM, lambda s, f: _shutdown_server(s))
     except Exception:
         pass
+
+    atexit.register(lambda: _shutdown_server())
 
     # 准备并校验客户端静态资源清单与语音包文件 (static_resources & D:\iOS_DATA)
     # 纯本地模式不得触发任何官方 CDN 请求，只同步已经存在的本地清单。
     try:
-        if args.no_capture_cdn:
-            log("纯本地资源模式：跳过官方 CDN 清单下载", module="CDN")
+        if cdn_proxy.get_capture_mode() != 'cache':
+            log(f"CDN模式{cdn_proxy.get_capture_mode()}：跳过启动清单自动下载", module="CDN")
         else:
             import fetch_manifests
             fetch_manifests.prepare_manifests(log=log)
@@ -502,11 +523,13 @@ def main(argv=None):
         _mw.set_battle_server(battle_srv, args.battle_port, host_ip=host_ip)
         threading.Thread(target=battle_srv.run, daemon=True).start()
         log(f"UDP 动态战斗服监听 0.0.0.0:{args.battle_port}（下发目标 {host_ip}:{args.battle_port}）", module="BATTLE")
+    _battle_srv = battle_srv
 
     # 启动 game TCP 服务器（server_net 网络层）
     srv = server_net.start_game_server(
         args.game_port, core, db, _gen, _enc, _dec,
         replay=replay_mod, material=material, frame_delay=args.frame_delay)
+    _srv = srv
     log(f"game TCP 监听 {args.game_port}", module="NET")
 
     # 启动 gateway TCP 服务器池（登录握手与多存档槽位管理）
@@ -516,6 +539,7 @@ def main(argv=None):
     )
     gws.game_port = args.game_port
     gws.game_server = srv
+    _gws = gws
     gw_thread = threading.Thread(target=gws.serve_forever, daemon=True)
     gw_thread.start()
     log(f"gateway TCP 服务器池监听 {args.gw_port}..{slot_id_to_port(TOTAL_SLOTS, args.gw_port, args.game_port)} (跳过 {args.game_port}) (下发目标 IP: {host_ip})", module="NET")
@@ -569,11 +593,7 @@ def main(argv=None):
                 log(f"game TCP 捕获异常: {e}，重试 {retries}/2...", "WARN", module="MAIN")
                 time.sleep(1)
     finally:
-        gws.shutdown()
-        gws.server_close()
-        srv.server_close()
-        if battle_srv is not None:
-            battle_srv.stop()
+        _shutdown_server()
     return 0
 
 

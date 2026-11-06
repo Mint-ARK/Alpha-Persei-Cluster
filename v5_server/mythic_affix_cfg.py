@@ -156,42 +156,14 @@ REGULAR_SUPERIORITY_POOL = [
 def get_semiweekly_cycle_info(ts=None):
     """
     计算半周周期序号与下一次周一/周四早 05:00 时间戳。
-    基准时间：2026-08-24 05:00:00 (周一早5点) -> cycle_id = 0
+    起止边界共用失序深区时钟；保留既有词缀种子编号算法。
     """
-    if ts is None:
-        ts = int(time.time())
-        
-    dt = datetime.datetime.fromtimestamp(ts)
-    
-    # 找到最近的过去周一或周四早 5:00
-    # 星期一=0, 星期二=1, 星期三=2, 星期四=3, 星期五=4, 星期六=5, 星期日=6
-    weekday = dt.weekday()
-    hour = dt.hour
-    
-    # 计算当前半周期的起始时间
-    if weekday < 3 or (weekday == 3 and hour < 5):
-        # 属于 周一 05:00 ~ 周四 04:59:59 周期
-        days_since_monday = weekday
-        monday_5am = dt.replace(hour=5, minute=0, second=0, microsecond=0) - datetime.timedelta(days=days_since_monday)
-        if weekday == 0 and hour < 5:
-            monday_5am -= datetime.timedelta(days=7)
-        period_start = monday_5am
-        # 下次刷新是周四 05:00
-        next_refresh = monday_5am + datetime.timedelta(days=3)
-    else:
-        # 属于 周四 05:00 ~ 下周一 04:59:59 周期
-        days_since_thursday = weekday - 3
-        thursday_5am = dt.replace(hour=5, minute=0, second=0, microsecond=0) - datetime.timedelta(days=days_since_thursday)
-        if weekday == 3 and hour < 5:
-            thursday_5am -= datetime.timedelta(days=3.5) # rollback to previous
-        period_start = thursday_5am
-        # 下次刷新是下周一 05:00
-        next_refresh = thursday_5am + datetime.timedelta(days=4)
+    from mythic_cycle import bounds
+    period_start, next_refresh_ts = bounds(ts)
         
     # 计算周期序号 (基于 2026-01-01)
     base_ts = 1767214800 # 2026-01-01 05:00
-    cycle_id = int(max(0, period_start.timestamp() - base_ts) // (3.5 * 86400))
-    next_refresh_ts = int(next_refresh.timestamp())
+    cycle_id = int(max(0, period_start - base_ts) // (3.5 * 86400))
     
     return cycle_id, next_refresh_ts
 

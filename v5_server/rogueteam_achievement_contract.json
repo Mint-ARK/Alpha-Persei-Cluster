@@ -1,0 +1,957 @@
+{
+  "source": {
+    "decompiled_v2/x64/game/config/achievementcfg.lua": "6b42861847e1eb2aeccfe405f26032e20c3974034144e90b3e9dabf4e1eeef3e",
+    "decompiled_v2/x64/game/config/rogueteam/rogueteamitemcfg.lua": "4094acc1f53672872856ab9cbf23c293716c8dab8a1065514dcc1fbbaa0b18b0",
+    "decompiled_v2/x64/game/const/challengerogueteamconst.lua": "7a8412036c7e35c60a4b4ba77bc475609b60fdbb71afcb1a83af1fa09f583bfe"
+  },
+  "achievements": {
+    "63001": {
+      "id": 63001,
+      "condition": 300005,
+      "need": 1,
+      "parameter": [
+        100001,
+        1
+      ],
+      "line": 11602
+    },
+    "63002": {
+      "id": 63002,
+      "condition": 300005,
+      "need": 1,
+      "parameter": [
+        100001,
+        2
+      ],
+      "line": 11626
+    },
+    "63003": {
+      "id": 63003,
+      "condition": 300005,
+      "need": 1,
+      "parameter": [
+        100001,
+        3
+      ],
+      "line": 11650
+    },
+    "63004": {
+      "id": 63004,
+      "condition": 300005,
+      "need": 1,
+      "parameter": [
+        100001,
+        4
+      ],
+      "line": 11674
+    },
+    "63006": {
+      "id": 63006,
+      "condition": 300006,
+      "need": 1,
+      "parameter": [
+        100001,
+        1
+      ],
+      "line": 11698
+    },
+    "63007": {
+      "id": 63007,
+      "condition": 300006,
+      "need": 1,
+      "parameter": [
+        100001,
+        2
+      ],
+      "line": 11722
+    },
+    "63008": {
+      "id": 63008,
+      "condition": 300006,
+      "need": 1,
+      "parameter": [
+        100001,
+        3
+      ],
+      "line": 11746
+    },
+    "63009": {
+      "id": 63009,
+      "condition": 300013,
+      "need": 1,
+      "parameter": [
+        100001,
+        10
+      ],
+      "line": 11770
+    },
+    "63010": {
+      "id": 63010,
+      "condition": 300014,
+      "need": 1,
+      "parameter": [
+        100001,
+        0,
+        20
+      ],
+      "line": 11794
+    },
+    "63022": {
+      "id": 63022,
+      "condition": 300006,
+      "need": 1,
+      "parameter": [
+        100001,
+        6
+      ],
+      "line": 12084
+    }
+  },
+  "items": {
+    "1310001": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 191
+    },
+    "1310002": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 210
+    },
+    "1310003": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 231
+    },
+    "1310004": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 250
+    },
+    "1310005": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 269
+    },
+    "1310006": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 288
+    },
+    "1310007": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 307
+    },
+    "1310008": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 326
+    },
+    "1310009": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 347
+    },
+    "1310010": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 366
+    },
+    "1310011": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 385
+    },
+    "1310012": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 404
+    },
+    "1310013": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 423
+    },
+    "1310014": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 443
+    },
+    "1310015": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 462
+    },
+    "1310016": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 480
+    },
+    "1310017": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 501
+    },
+    "1310018": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 520
+    },
+    "1310019": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 539
+    },
+    "1310020": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 558
+    },
+    "1310021": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 577
+    },
+    "1310022": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 594
+    },
+    "1310023": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 617
+    },
+    "1310024": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 636
+    },
+    "1310025": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 655
+    },
+    "1310026": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 674
+    },
+    "1310027": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 693
+    },
+    "1310028": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 710
+    },
+    "1310029": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 729
+    },
+    "1310030": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 748
+    },
+    "1310031": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 767
+    },
+    "1310032": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 786
+    },
+    "1310033": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 805
+    },
+    "1310034": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 822
+    },
+    "1310035": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 841
+    },
+    "1310036": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 860
+    },
+    "1310037": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 879
+    },
+    "1310038": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 898
+    },
+    "1310039": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 917
+    },
+    "1310040": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 936
+    },
+    "1310041": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 955
+    },
+    "1310042": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 974
+    },
+    "1310043": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 994
+    },
+    "1310044": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1014
+    },
+    "1310045": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1034
+    },
+    "1310046": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1057
+    },
+    "1310048": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1080
+    },
+    "1310049": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1097
+    },
+    "1310050": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1116
+    },
+    "1310051": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1135
+    },
+    "1310052": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1154
+    },
+    "1310053": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1171
+    },
+    "1310054": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1188
+    },
+    "1310055": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1205
+    },
+    "1310056": {
+      "type": 3,
+      "sub_type": 1,
+      "line": 1222
+    },
+    "1320001": {
+      "type": 3,
+      "sub_type": 2,
+      "line": 1241
+    },
+    "1320002": {
+      "type": 3,
+      "sub_type": 2,
+      "line": 1258
+    },
+    "1320003": {
+      "type": 3,
+      "sub_type": 2,
+      "line": 1275
+    },
+    "1320004": {
+      "type": 3,
+      "sub_type": 2,
+      "line": 1292
+    },
+    "1320005": {
+      "type": 3,
+      "sub_type": 2,
+      "line": 1309
+    },
+    "1320006": {
+      "type": 3,
+      "sub_type": 2,
+      "line": 1326
+    },
+    "1330001": {
+      "type": 3,
+      "sub_type": 3,
+      "line": 1343
+    },
+    "1330002": {
+      "type": 3,
+      "sub_type": 3,
+      "line": 1366
+    },
+    "1330003": {
+      "type": 3,
+      "sub_type": 3,
+      "line": 1383
+    },
+    "1410101": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1400
+    },
+    "1410102": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1423
+    },
+    "1410103": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1446
+    },
+    "1410104": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1469
+    },
+    "1410105": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1492
+    },
+    "1410106": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1515
+    },
+    "1410107": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1538
+    },
+    "1410108": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1561
+    },
+    "1410109": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1584
+    },
+    "1410110": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1607
+    },
+    "1410111": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1630
+    },
+    "1410112": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1653
+    },
+    "1420101": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 1676
+    },
+    "1420102": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 1699
+    },
+    "1420103": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 1722
+    },
+    "1410201": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1745
+    },
+    "1410202": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1768
+    },
+    "1410203": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1791
+    },
+    "1410204": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1814
+    },
+    "1410205": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1837
+    },
+    "1410206": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1860
+    },
+    "1410207": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1883
+    },
+    "1410208": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1906
+    },
+    "1410209": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1929
+    },
+    "1410210": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1952
+    },
+    "1410211": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1975
+    },
+    "1410212": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 1998
+    },
+    "1420201": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 2021
+    },
+    "1420202": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 2044
+    },
+    "1420203": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 2067
+    },
+    "1410301": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2090
+    },
+    "1410302": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2113
+    },
+    "1410303": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2136
+    },
+    "1410304": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2159
+    },
+    "1410305": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2182
+    },
+    "1410306": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2205
+    },
+    "1410307": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2228
+    },
+    "1410308": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2251
+    },
+    "1410309": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2274
+    },
+    "1410310": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2297
+    },
+    "1410311": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2320
+    },
+    "1410312": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2343
+    },
+    "1420301": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 2366
+    },
+    "1420302": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 2389
+    },
+    "1420303": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 2412
+    },
+    "1410401": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2435
+    },
+    "1410402": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2458
+    },
+    "1410403": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2481
+    },
+    "1410404": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2504
+    },
+    "1410405": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2527
+    },
+    "1410406": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2550
+    },
+    "1410407": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2573
+    },
+    "1410408": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2596
+    },
+    "1410409": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2619
+    },
+    "1410410": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2642
+    },
+    "1410411": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2665
+    },
+    "1410412": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2688
+    },
+    "1420401": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 2711
+    },
+    "1420402": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 2734
+    },
+    "1420403": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 2757
+    },
+    "1410501": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2780
+    },
+    "1410502": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2803
+    },
+    "1410503": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2826
+    },
+    "1410504": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2849
+    },
+    "1410505": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2872
+    },
+    "1410506": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2895
+    },
+    "1410507": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2918
+    },
+    "1410508": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2941
+    },
+    "1410509": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2964
+    },
+    "1410510": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 2987
+    },
+    "1410511": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3010
+    },
+    "1410512": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3033
+    },
+    "1420501": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 3056
+    },
+    "1420502": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 3079
+    },
+    "1420503": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 3102
+    },
+    "1410601": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3125
+    },
+    "1410602": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3148
+    },
+    "1410603": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3171
+    },
+    "1410604": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3194
+    },
+    "1410605": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3217
+    },
+    "1410606": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3240
+    },
+    "1410607": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3263
+    },
+    "1410608": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3286
+    },
+    "1410609": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3309
+    },
+    "1410610": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3332
+    },
+    "1410611": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3355
+    },
+    "1410612": {
+      "type": 4,
+      "sub_type": 1,
+      "line": 3378
+    },
+    "1420601": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 3401
+    },
+    "1420602": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 3424
+    },
+    "1420603": {
+      "type": 4,
+      "sub_type": 2,
+      "line": 3447
+    },
+    "1431201": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3470
+    },
+    "1431301": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3494
+    },
+    "1431401": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3518
+    },
+    "1431501": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3542
+    },
+    "1431601": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3566
+    },
+    "1432301": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3590
+    },
+    "1432401": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3614
+    },
+    "1432501": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3638
+    },
+    "1432601": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3662
+    },
+    "1433401": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3686
+    },
+    "1433501": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3710
+    },
+    "1433601": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3734
+    },
+    "1434501": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3758
+    },
+    "1434601": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3782
+    },
+    "1435601": {
+      "type": 4,
+      "sub_type": 3,
+      "line": 3806
+    }
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "activity_id": 3639701,
+  "parent_activity": 3610001,
+  "limited_activities": [
+    3600401,
+    3600402,
+    3600403,
+    3600404
+  ],
+  "limited_tasks": [
+    40401001,
+    40401002,
+    40401003,
+    40401004,
+    40401005,
+    40401006,
+    40401007,
+    40401008,
+    40401009,
+    40401010,
+    40401011,
+    40401012,
+    40401013,
+    40401014,
+    40401015,
+    40401016,
+    40401017,
+    40401018,
+    40401019,
+    40401020,
+    40401021,
+    40401022,
+    40401023,
+    40401024
+  ],
+  "stages": {
+    "404101": {
+      "stage_group": 1,
+      "stage_id": 5280301,
+      "type": 1,
+      "front_unlock_id": 0,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280301,
+      "film": 5
+    },
+    "404102": {
+      "stage_group": 1,
+      "stage_id": 5280302,
+      "type": 1,
+      "front_unlock_id": 404101,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280302,
+      "film": 5
+    },
+    "404103": {
+      "stage_group": 1,
+      "stage_id": 5280304,
+      "type": 1,
+      "front_unlock_id": 404102,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280303,
+      "film": 10
+    },
+    "404104": {
+      "stage_group": 1,
+      "stage_id": 5280306,
+      "type": 1,
+      "front_unlock_id": 404103,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280304,
+      "film": 10
+    },
+    "404201": {
+      "stage_group": 2,
+      "stage_id": 5280311,
+      "type": 1,
+      "front_unlock_id": 404104,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280311,
+      "film": 5
+    },
+    "404202": {
+      "stage_group": 2,
+      "stage_id": 5280312,
+      "type": 1,
+      "front_unlock_id": 404201,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280312,
+      "film": 5
+    },
+    "404203": {
+      "stage_group": 2,
+      "stage_id": 5280313,
+      "type": 1,
+      "front_unlock_id": 404202,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280313,
+      "film": 10
+    },
+    "404204": {
+      "stage_group": 2,
+      "stage_id": 5280316,
+      "type": 1,
+      "front_unlock_id": 404203,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280314,
+      "film": 10
+    },
+    "404301": {
+      "stage_group": 3,
+      "stage_id": 5280322,
+      "type": 1,
+      "front_unlock_id": 404204,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280321,
+      "film": 5
+    },
+    "404302": {
+      "stage_group": 3,
+      "stage_id": 5280324,
+      "type": 1,
+      "front_unlock_id": 404301,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280322,
+      "film": 10
+    },
+    "404303": {
+      "stage_group": 3,
+      "stage_id": 5280325,
+      "type": 1,
+      "front_unlock_id": 404302,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280323,
+      "film": 10
+    },
+    "404304": {
+      "stage_group": 3,
+      "stage_id": 5280326,
+      "type": 1,
+      "front_unlock_id": 404303,
+      "activity_id": 3639701,
+      "drop_lib_id": 5280324,
+      "film": 15
+    },
+    "404401": {
+      "stage_group": 4,
+      "stage_id": 5280327,
+      "type": 2,
+      "front_unlock_id": 404304,
+      "activity_id": 3639701,
+      "drop_lib_id": 0,
+      "film": 0
+    }
+  },
+  "skills": {
+    "404101": 5,
+    "404102": 60
+  },
+  "notices": {
+    "92910201": 30,
+    "92910301": 60
+  },
+  "scoring": {
+    "kind": "private_enemy_count_v1",
+    "points_per_enemy": 100,
+    "reward_thresholds": [
+      2000,
+      4000
+    ]
+  },
+  "sources": {
+    "decompiled_v2/x64/game/config/ashshootstagecfg.lua": "c3c70f409dc0724e052c20d2d58ae7fb7eed8c5b9bb92590e18213ccfcbe1cde",
+    "decompiled_v2/x64/game/config/battleashshootstagecfg.lua": "46ba0c4d327c06aa1ea2357166c7378752cac2a7a354520979872ec932e4c0f8",
+    "decompiled_v2/x64/game/config/ashshootunlockitemcfg.lua": "8e67dbe1a90d58f8987ff1e4c7801af016e81398d9f57ae32f654a8c40d5bf6d",
+    "decompiled_v2/x64/game/config/ashshooteffectcfg.lua": "086975ed578c5a7d1084480ee8bf56d1840efd6708ecd4dad5d8bdc015189f44",
+    "decompiled_v2/x64/game/config/dropcfg.lua": "58001c2766fbce644d2b7f0674fff8e1524b0bda9d851996666814cc0bd87b15",
+    "v5_server/data/activity_content_cfg.json": "2bc2b4e43e2f247912b4eaec092ceacd51097f975c0efc53ab2240d5c935a2cc"
+  }
+}

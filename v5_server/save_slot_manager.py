@@ -47,9 +47,11 @@ STATE_NORMAL = "NORMAL"
 STATE_DELETE_MODE = "DELETE_MODE"
 STATE_CREATE_MODE = "CREATE_MODE"
 STATE_TIMEOUT_SECONDS = 60.0
-# A/B have identical HTTP parameters. Observe a short window on every list
-# request rather than guessing which GET means a user clicked a control slot.
+# List queries never execute actions. A rapid follow-up gets a longer bounded
+# observation window for the SDK version check and WAN gateway connection.
 REGION_REFRESH_WINDOW_SECONDS = 0.35
+REGION_REFRESH_FOLLOWUP_GAP_SECONDS = 3.0
+REGION_REFRESH_FOLLOWUP_WINDOW_SECONDS = 3.0
 REGION_REFRESH_TIMEOUT_SECONDS = 12.0
 _DATABASE_SWITCH_LOCK = threading.RLock()
 logger = logging.getLogger('save_slot_manager')
@@ -475,32 +477,43 @@ class SaveSlotManager:
                 self._refresh_condition.notify_all()
 
     def wait_for_gateway_refresh(self, client_ip: str, *,
-                                 window: float = REGION_REFRESH_WINDOW_SECONDS,
+                                 window: Optional[float] = None,
                                  timeout: float = REGION_REFRESH_TIMEOUT_SECONDS) -> str:
         """Observe a following gateway action; never run one from a list GET.
 
-        Returns idle/completed/timeout. A request with no gateway costs at most
-        the observation window. Once a gateway is observed, wait for all actions
+        Returns idle/completed/timeout. Initial/isolated queries use the short
+        window; a rapid follow-up after an idle reply allows WAN login latency.
+        Once a gateway is observed, wait for all actions
         for that client, up to the total deadline. No retry or background poll.
         """
         key = self._session_key(client_ip)
         started = time.monotonic()
         deadline = started + max(0.0, timeout)
-        observe_until = min(deadline, started + max(0.0, window))
         with self._refresh_condition:
             entry = self._refresh_client(key)
+            if window is None:
+                last_reply = entry.get('last_list_reply')
+                followup = (last_reply is not None and entry.get('last_list_result') == 'idle'
+                            and 0.0 <= started - last_reply <= REGION_REFRESH_FOLLOWUP_GAP_SECONDS)
+                window = (REGION_REFRESH_FOLLOWUP_WINDOW_SECONDS if followup
+                          else REGION_REFRESH_WINDOW_SECONDS)
+            observe_until = min(deadline, started + max(0.0, window))
+            def finish(result):
+                entry['last_list_reply'] = time.monotonic()
+                entry['last_list_result'] = result
+                return result
             revision = entry['revision']
             while True:
                 now = time.monotonic()
                 if not entry['pending']:
                     if entry['revision'] != revision:
-                        return 'completed'
+                        return finish('completed')
                     if now >= observe_until:
-                        return 'idle'
+                        return finish('idle')
                     remaining = observe_until - now
                 else:
                     if now >= deadline:
-                        return 'timeout'
+                        return finish('timeout')
                     remaining = deadline - now
                 self._refresh_condition.wait(remaining)
 

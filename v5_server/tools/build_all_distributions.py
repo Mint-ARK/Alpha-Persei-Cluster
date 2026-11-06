@@ -149,7 +149,7 @@ def create_portable_launcher_scripts(staging_root: Path):
     (staging_root / 'run_server_linux.sh').write_text(
         '#!/bin/sh\nset -eu\n'
         'cd "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"\n'
-        'exec sh v5_server/run_server.sh "$@"\n', encoding='utf-8', newline='\n')
+        'exec sh v5_server/server.sh run "$@"\n', encoding='utf-8', newline='\n')
     # 1. GUI 快捷启动脚本
     gui_bat = """@echo off
 cd /d "%~dp0"

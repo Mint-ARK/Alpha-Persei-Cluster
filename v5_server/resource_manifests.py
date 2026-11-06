@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = ROOT / 'resource_distribution.json'
 NATIVE_PATH = ROOT / 'native_manifest_sources.json'
 PLATFORMS = ('pc', 'android', 'ios')
-CHANNELS = {'pc': '9', 'android': '8', 'ios': '7'}
+CHANNELS = {'pc': '9', 'android': '7', 'ios': '7'}
 _LOCK = threading.RLock()
 _sha_cache = OrderedDict()
 _pc_hint = None
@@ -148,7 +148,8 @@ def _native_records(state):
         integrity.platform(row['platform'])
         if row.get('provenance') not in ('bundled-official', 'official-download'):
             continue
-        row.update(origin='native', label=f"原生 {row['app_version']}/{row['resource_version']} · {row['assethash'][-14:-6]}",
+        row.update(channel_id=CHANNELS[row['platform']],
+                   origin='native', label=f"原生 {row['app_version']}/{row['resource_version']} · {row['assethash'][-14:-6]}",
                    base_id=None, removed=False)
         try:
             _verify_file(_main_path(row), row['sha256'])
@@ -213,6 +214,7 @@ def _records(state):
         try:
             if not base or base['origin'] != 'native' or not base['ready'] or base['platform'] != row['platform']:
                 raise ValueError('原生BASE不可用')
+            row['channel_id'] = CHANNELS[row['platform']]
             if row.get('removed'):
                 raise ValueError('已移入回收区')
             _verify_file(_main_path(row), row['sha256'])
@@ -254,9 +256,12 @@ def _selection(state, rows, platform, use_startup=True):
     if not selected or selected['platform'] != platform or not selected['ready']:
         selected = fallback
         reason = '所选方案不可用，已使用本渠道保险方案'
+    default_app = '307' if platform == 'pc' else '308'
+    app_version = saved.get('app_version') or default_app
     return dict(selected_id=selected['id'] if reason else choice, requested_id=choice,
                 effective_id=selected['id'], fallback_id=fallback['id'],
-                fallback_active=bool(reason), notice=reason, channel_id=CHANNELS[platform]), selected
+                fallback_active=bool(reason), notice=reason, channel_id=CHANNELS[platform],
+                app_version=app_version), selected
 
 
 def _public(row, rows):
@@ -288,8 +293,10 @@ def get_status():
 def _materialize(state, rows):
     for platform in PLATFORMS:
         selection, _ = _selection(state, rows, platform, use_startup=False)
+        default_app = '307' if platform == 'pc' else '308'
+        app_ver = selection.get('app_version') or default_app
         state.setdefault('selections', {}).setdefault(platform, dict(
-            selected_id=selection['selected_id'], fallback_id=selection['fallback_id']))
+            selected_id=selection['selected_id'], fallback_id=selection['fallback_id'], app_version=app_ver))
     state['profiles'] = {k: {a: b for a, b in r.items() if a not in ('ready', 'error')}
                          for k, r in rows.items() if r['origin'] == 'derived'}
     state.pop('legacy', None)
@@ -320,7 +327,18 @@ def save_platform(data):
             fallback = rows.get(values.get('fallback_id'))
             if not fallback or fallback['platform'] != platform or fallback['origin'] != 'native' or not fallback['ready']:
                 raise ValueError('保险方案必须是本渠道完整可用的原生清单')
-            updates[platform] = dict(selected_id=selection, fallback_id=fallback['id'])
+
+            app_ver = values.get('app_version')
+            if app_ver is not None:
+                app_ver = str(app_ver).strip()
+                if app_ver != 'auto' and not re.fullmatch(r'[1-9][0-9]{0,3}', app_ver):
+                    raise ValueError('底包版本必须为纯数字（如 307、308）或 auto')
+            else:
+                default_app = '307' if platform == 'pc' else '308'
+                saved_prev = state.get('selections', {}).get(platform, {})
+                app_ver = saved_prev.get('app_version') or default_app
+
+            updates[platform] = dict(selected_id=selection, fallback_id=fallback['id'], app_version=app_ver)
         for platform, update in updates.items():
             selection = update['selected_id']
             fallback = rows[update['fallback_id']]
@@ -513,26 +531,52 @@ def resolve_connection_version(platform, reported=''):
                     advertised=row['resource_version'], reason=reason)
 
 
+def get_effective_app_version(platform, client_app=None):
+    with _LOCK:
+        state = _state()
+        saved = state.get('selections', {}).get(platform, {})
+        cfg_app = saved.get('app_version') or ('307' if platform == 'pc' else '308')
+        if cfg_app == 'auto':
+            if client_app:
+                return str(client_app).strip()
+            return '307' if platform == 'pc' else '308'
+        return str(cfg_app)
+
+
 def distribution_entries(platform, app_version=None):
     """Use explicit installation metadata when available, otherwise a list."""
     with _LOCK:
-        _, rows, _, selected = _effective(platform)
+        state, rows, selection, selected = _effective(platform)
         base = selected if selected['origin'] == 'native' else rows[selected['base_id']]
-        candidates = [selected] + ([base] if base['id'] != selected['id'] else [])
+
+        # Determine target app version for client matching
+        cfg_app = selection.get('app_version') or ('307' if platform == 'pc' else '308')
+        if cfg_app == 'auto':
+            target_app = str(app_version).strip() if app_version else ('307' if platform == 'pc' else '308')
+        else:
+            target_app = str(cfg_app).strip()
+
+        candidates = [selected]
+        if base['id'] != selected['id']:
+            candidates.append(base)
         candidates.extend(r for r in rows.values() if r.get('bundled_compat') and r['ready']
                           and r['base_id'] == selected['id'] and r['platform'] == platform)
-        if app_version:
-            candidates = [r for r in candidates if r['app_version'] == str(app_version)]
-            if not candidates:
-                fallback = _latest(rows, platform)
-                if fallback['app_version'] == str(app_version):
-                    candidates = [fallback]
-        for row in candidates:
+
+        seen = set()
+        unique = []
+        for r in candidates:
+            if r['id'] not in seen:
+                seen.add(r['id'])
+                unique.append(r)
+
+        for row in unique:
             _seal_base(row if row['origin'] == 'native' else rows[row['base_id']])
-        return [dict(app_version=r['app_version'], resource_version=r['resource_version'],
-            version_name=r['version_name'], assethash=r['assethash'], profile_id=r['id'],
+
+        return [dict(app_version=target_app, manifest_app_version=r['app_version'],
+            resource_version=r['resource_version'], version_name=r['version_name'],
+            assethash=r['assethash'], profile_id=r['id'],
             download_path=f'/{platform}/resources/profiles/{r["id"]}/', source_version=base['resource_version'])
-            for r in candidates]
+            for r in unique]
 
 
 def get_ios_manifest(_cfg, app_version):

@@ -65,24 +65,30 @@ class VersionChecks(unittest.TestCase):
             fallback_id=self.native(platform, '321')['id']))
 
     def test_platform_fields_and_sdk_channel_are_distinct(self):
-        for enum, channel, platform in ((0,8,'android'), (1,7,'ios'), (4,9,'pc')):
+        for enum, channel, platform in ((0,7,'android'), (1,7,'ios'), (4,9,'pc')):
             self.assertEqual(client_version.platform_from_login({'platform_type': enum, 'channel_id':9}), platform)
-            self.assertEqual(client_version.platform_from_login({'channel_id': channel}), platform)
+            self.assertEqual(client_version.platform_from_login({'platform_type': enum, 'channel_id':channel}), platform)
+        self.assertEqual(client_version.platform_from_login({'channel_id':9}),'pc')
+        self.assertIsNone(client_version.platform_from_login({'channel_id':7}))
         app = Flask(__name__)
         for agent, channel, expected in (('iPhone',9,'ios'), ('Android',9,'android'), ('Windows',7,'pc')):
             with app.test_request_context('/?channelId='+str(channel), headers={'User-Agent':agent}):
                 from flask import request
                 self.assertEqual(client_version.http_platform(request),expected)
+        with app.test_request_context('/?platformType=android&channelId=7', headers={'User-Agent':'iPhone'}):
+            self.assertEqual(client_version.http_platform(request),'android')
 
     def test_sdk_login_uses_channel_config_not_latest_other_client(self):
         self.apply('ios','229')
         fake_db = SimpleNamespace(get_system_config=lambda *args:'1')
         app = net.build_https_app(SimpleNamespace(db=fake_db),host_ip='127.0.0.1')
         client = app.test_client()
-        for platform, channel in (('pc',9),('ios',7),('android',8),('ios',7)):
+        for platform, channel in (('pc',9),('ios',7),('android',7),('ios',7)):
             response = client.post('/mix-sdk-api/pass/user/login',json={'platformType':platform,'channelId':channel}).get_json()
             self.assertEqual(response['data']['channelId'],channel)
             self.assertEqual(response['data']['enablePay'],platform=='ios')
+            config = client.post('/config',json={'platformType':platform,'channelId':channel}).get_json()
+            self.assertEqual((config['data']['platformType'],config['data']['channelId']),(platform,channel))
         self.assertEqual(versions.get_current_version(),'321')
 
     def test_channel_selections_do_not_change_global_or_other_channels(self):

@@ -324,6 +324,25 @@ class ManifestChecks(unittest.TestCase):
         self.assertEqual(manager._state(),before)
 
 
+    def test_21_legacy_android_channels_are_normalized_without_rewriting_storage(self):
+        row = self.generate('android')
+        self.apply(row)
+        native = json.loads(manager.NATIVE_PATH.read_text('utf-8'))
+        for source in native['sources']:
+            if source['platform'] == 'android':
+                source['channel_id'] = '8'
+        manager.NATIVE_PATH.write_text(json.dumps(native), encoding='utf-8')
+        state = manager._state()
+        state['profiles'][row['id']]['channel_id'] = '8'
+        manager._save(state)
+        before = (manager.NATIVE_PATH.read_bytes(), manager.CONFIG_PATH.read_bytes())
+        status = manager.get_status()
+        self.assertEqual(manager.CHANNELS, versions.PLATFORM_CHANNEL_IDS)
+        self.assertEqual(status['platforms']['android']['channel_id'], '7')
+        self.assertTrue(all(p['channel_id'] == '7' for p in status['profiles'] if p['platform'] == 'android'))
+        self.assertEqual((manager.NATIVE_PATH.read_bytes(), manager.CONFIG_PATH.read_bytes()), before)
+
+
 if __name__ == '__main__':
     ROOT = SERVER.parent/'archive/manifest_manager_20261027'/('checks_'+uuid.uuid4().hex)
     ROOT.mkdir(parents=True)

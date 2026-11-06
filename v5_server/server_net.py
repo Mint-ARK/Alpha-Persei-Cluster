@@ -868,9 +868,15 @@ class GatewayPool:
             self.servers[0].serve_forever()
 
     def shutdown(self):
+        # 并发向全部 32 个槽位发送停止请求，打破逐个串行等待轮询超时的卡顿
         for s in self.servers:
             try:
-                s.shutdown()
+                s._BaseServer__shutdown_request = True
+            except Exception:
+                pass
+        for s in self.servers:
+            try:
+                s.server_close()
             except Exception:
                 pass
 
@@ -1132,15 +1138,25 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
 
         # 6. GM 控制台后端 API：获取状态 (/api/gm/status) 与 切换抓包器 (/api/gm/toggle_capture)
         if path == "/api/gm/toggle_capture":
-            mode = request.args.get("enabled")
-            if mode is None:
-                data = request.get_json(silent=True) or {}
-                mode = data.get("enabled")
-            if mode is not None:
-                cdn_proxy.set_capture_enabled(str(mode).lower() in ("1", "true", "yes", "on"))
+            data = request.get_json(silent=True) or {}
+            if not isinstance(data, dict):
+                return jsonify({"code": 1, "msg": "请求内容必须为对象"}), 400
+            selected = request.args.get("mode")
+            if selected is None:
+                selected = data.get("mode")
+            if selected is not None:
+                try:
+                    cdn_proxy.set_capture_mode(selected)
+                except ValueError as error:
+                    return jsonify({"code": 1, "msg": str(error)}), 400
             else:
-                cdn_proxy.set_capture_enabled(not cdn_proxy.is_capture_enabled())
-            return jsonify({"code": 0, "msg": "success", "capture_enabled": cdn_proxy.is_capture_enabled()})
+                enabled = request.args.get("enabled")
+                if enabled is None:
+                    enabled = data.get("enabled")
+                cdn_proxy.set_capture_enabled(str(enabled).lower() in ("1", "true", "yes", "on")
+                                             if enabled is not None else not cdn_proxy.is_capture_enabled())
+            return jsonify({"code": 0, "msg": "success", "capture_enabled": cdn_proxy.is_capture_enabled(),
+                            "cdn_mode": cdn_proxy.get_capture_mode()})
 
         if path == "/api/gm/status":
             import res_version_manager
@@ -1151,6 +1167,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                     "gw_port": gw_port,
                     "host_ip": lan_ip,
                     "capture_enabled": cdn_proxy.is_capture_enabled(),
+                    "cdn_mode": cdn_proxy.get_capture_mode(),
                     "default_uid": _gen.DEFAULT_UID,
                     "server_time": int(time.time()),
                     "res_version": res_version_manager.get_current_version(),
@@ -1535,6 +1552,9 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             server_data = slot_mgr.build_zones_response(
                 client_ip=client_ip, host_ip=gw_ip, game_port=game_port
             )
+            core.log(f"[SDK] 区服列表 client={client_ip} "
+                     f"state={slot_mgr.get_session_state(client_ip)} "
+                     f"slots={[row['serverId'] for row in server_data]}", "INFO")
             response = jsonify({
                 "errorCode": "0",
                 "data": server_data
@@ -1714,7 +1734,8 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             from client_version import http_platform
             platform = http_platform(request)
             record_client_platform(platform)
-            channel_id = {'pc': 9, 'android': 8, 'ios': 7}[platform]
+            from res_version_manager import PLATFORM_CHANNEL_IDS
+            channel_id = int(PLATFORM_CHANNEL_IDS[platform])
             channel_user_id = "1012030496969579190"
             token = f"{uuid.uuid4().hex[:32]}.{_gen.DEFAULT_UID}"
             is_pay_allowed = _check_is_pay_allowed()
@@ -1755,12 +1776,11 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
 
         # 9. SDK 配置（客户端初始化必需）
         if path == "/config" or path.startswith("/config?"):
-            ua_low = request.headers.get("User-Agent", "").lower()
-            plat_req = request.args.get("platformType", "").lower()
-            is_ios_client = "ios" in ua_low or "iphone" in ua_low or "ipad" in ua_low or "darwin" in ua_low or plat_req == "ios"
-            plat_type = "ios" if is_ios_client else ("android" if ("android" in ua_low or plat_req == "android") else "pc")
+            from client_version import http_platform
+            from res_version_manager import PLATFORM_CHANNEL_IDS
+            plat_type = http_platform(request)
             record_client_platform(plat_type)
-            channel_id = 7 if plat_type == "ios" else (8 if plat_type == "android" else 9)
+            channel_id = int(PLATFORM_CHANNEL_IDS[plat_type])
             return jsonify({
                 "errorCode": "0",
                 "data": {
@@ -1886,14 +1906,13 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                 or ""
             ).lower()
             chid = str(request.args.get("channelId") or request.form.get("channelId") or req_json.get("channelId") or "")
-            ua = request.headers.get("User-Agent", "").lower()
-
-            known_channels = {'9': 'pc', '8': 'android', '7': 'ios'}
-            if plat in ('pc', 'android', 'ios') and chid in known_channels and known_channels[chid] != plat:
+            # Official Mix SDK request channels, distinct from Manifest plugin IDs.
+            # Android official and iOS both use 7; PC official uses 9.
+            known_channels = {'9': ('pc',), '7': ('ios', 'android')}
+            if plat in ('pc', 'android', 'ios') and chid in known_channels and plat not in known_channels[chid]:
                 return jsonify({'errorCode': '1', 'errorMsg': '平台与渠道不匹配', 'data': []})
-            cur_plat = (plat if plat in ('pc', 'android', 'ios') else known_channels.get(chid)
-                        or ('ios' if any(tag in ua for tag in ('iphone', 'ipad', 'darwin'))
-                            else 'android' if 'android' in ua else 'pc'))
+            from client_version import http_platform
+            cur_plat = http_platform(request)
             is_ios, is_android = cur_plat == 'ios', cur_plat == 'android'
 
             record_client_platform(cur_plat)
@@ -1918,18 +1937,16 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                     assethash=manifest['assethash'], batchId=0))
             print(f'[SDK] {cur_plat} 渠道{chid or resource_distribution.CHANNELS[cur_plat]} '
                   f'资源方案: {[m["profile_id"] for m in manifests]}', flush=True)
-            # Keep installation metadata independent of resource profile aliases.
+            # Keep installation metadata aligned with effective base app version.
+            target_install_version = manifests[0]['app_version'] if manifests else resource_distribution.get_effective_app_version(cur_plat, explicit_app)
             if is_ios:
                 install_url = 'https://apps.apple.com/cn/app/id1507863649'
-                install_version = '308'
             elif is_android:
                 install_url = 'https://download-eo.ys4fun.com/android/resources/'
-                install_version = '307'
             else:
                 install_url = 'https://packaging.ys4fun.com/packagepc/prod/307/AetherGazer_zh_cn_ali_prod_307_210_3_windows_limit_sdk_release_W12000000_5FF9A0158EA7C050D03D419F16DB8625.zip'
-                install_version = '307'
             entries.append(dict(createDate=now_ms, modifyDate=now_ms, sortWeight=0, type='install',
-                version=install_version, versionName=install_version, forceUpdate=False, fileSize=0,
+                version=target_install_version, versionName=target_install_version, forceUpdate=False, fileSize=0,
                 disDate=now_ms, downloadUrl=install_url, platformType=cur_plat,
                 enableWhiteList=False, enableFullPub=True, enableGrayPub=False, batchId=0))
             return jsonify({'errorCode': '0', 'data': entries})
@@ -1983,9 +2000,12 @@ def start_https(app, port, cert_file=None, key_file=None, *, http_port=80, bind_
     ssl_ctx = (cert_file, key_file)
 
     from werkzeug.serving import make_server, WSGIRequestHandler
+    from http_streaming import DisconnectAwareHandlerMixin, ensure_response_closed
     import threading
 
-    class _FilteredWSGIRequestHandler(WSGIRequestHandler):
+    app = ensure_response_closed(app)
+
+    class _FilteredWSGIRequestHandler(DisconnectAwareHandlerMixin, WSGIRequestHandler):
         def setup(self):
             super().setup()
             try:

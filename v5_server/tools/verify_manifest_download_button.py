@@ -95,7 +95,7 @@ class Checks(unittest.TestCase):
     def test_05_verified_cache_copy_avoids_network(self):
         cache=self.root/'cache'/self.name; cache.parent.mkdir(); cache.write_bytes(self.raw)
         self.cache.return_value=str(cache)
-        result=versions.download_official_manifest('android',self.name,'8')
+        result=versions.download_official_manifest('android',self.name,'7')
         self.assertTrue(result['valid']); self.assertEqual(self.opened,[])
         self.assertEqual((self.root/'android'/self.name).read_bytes(),self.raw)
     def test_06_check_update_never_downloads_missing_manifest(self):
@@ -114,7 +114,7 @@ class Checks(unittest.TestCase):
         self.addCleanup(queue.close)
         self.stack.enter_context(patch.object(queues,'get_manager',return_value=queue))
         app=Flask(__name__); app.register_blueprint(gm_api.gm_bp,url_prefix='/api/gm')
-        client=app.test_client(); body=dict(platform='android',channel_id='8',assethash=self.name)
+        client=app.test_client(); body=dict(platform='android',channel_id='7',assethash=self.name)
         first=client.post('/api/gm/system/download_manifest',json=body).get_json()
         queue.run_once()
         second=client.post('/api/gm/system/download_manifest',json=body).get_json()

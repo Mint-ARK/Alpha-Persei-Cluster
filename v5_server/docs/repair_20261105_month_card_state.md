@@ -1,0 +1,13 @@
+# A260：月卡签到显式发送真实新手权益状态
+
+2026-11-05，仅本地源码；没有写真实存档、改Lua、重启、云操作、Git或打包。
+
+当前MonthCardBonusOp已使用paid_entitlement_service与事务内响应准备，但遗漏59009。34024真实skeleton要求该帧，Core会给缺帧补schema默认值，导致客户端ActivityNoobData.UpdateRecharge将已有首充/月卡/战令权益覆盖为false。这是缺少权威动态帧，不是固定hex素材重放。
+
+本票窄改MonthCardBonusOp.respond：查询已有newbie_activity，使用A254已抽出的RechargeService.project_59009_payload纯投影，显式发送完整当前59009。缺行投影真实空状态，不借月卡领取创建新手活动。成功顺序17023→59009→34025，与骨架消费顺序一致；OnGetMonthCardBonus的SetMonthlyCardSign在当前ActivityNoobData中为空，不会额外累加。
+
+同时去掉34025编码失败的伪成功fallback；34025、59009和既有严格资产差量任一准备失败，同事务回滚90资产/领取日/日历等事实。重复当日申请空奖励仍返回真实权益。没有改变长期权益、购买期限、离线邮件补发、每日90或新手月卡累计天数；A259累计生产仍独立保留。
+
+tools/verify_month_card_state.py 4项真实内存Core/codec专项通过：完整权益对照SQL/冷59009、真实骨架不补false、资产→状态→ACK顺序、重复无资产、缺行不创建、三类必要帧故障完整回滚重试。专项只隔离既有paid.settle周期/补发步骤，真实claim_small、InventoryService、领取持久和登录事件仍执行。首轮4项失败原因是夹具未建登录事件要求的game_user；补齐隔离行后全部通过，初始日志及诊断保留，不计为生产缺陷。
+
+另4项原有小月卡回归通过：长期开关/日领/漏奖补发、未激活拒绝、续购保前日领史、05:00边界。合计8项。没有原生客户端/线上网络验收；证据及覆盖前副本archive/month_card_state_20261105。

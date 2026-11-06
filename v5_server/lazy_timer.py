@@ -42,14 +42,9 @@ def get_weekly_mon_5am_ts(now_ts=None):
 
 
 def get_weekly_thu_5am_ts(now_ts=None):
-    """计算当前时间所处每周四 05:00 周期的起始时间戳（Thursday=3，梦境再构/Boss挑战轮换）。"""
-    if now_ts is None:
-        now_ts = int(time.time())
-    dt = datetime.datetime.fromtimestamp(now_ts)
-    days_since_thu = (dt.weekday() - 3) % 7
-    this_thu_5am = (dt - datetime.timedelta(days=days_since_thu)).replace(hour=5, minute=0, second=0, microsecond=0)
-    cycle_dt = this_thu_5am if dt >= this_thu_5am else (this_thu_5am - datetime.timedelta(days=7))
-    return int(cycle_dt.timestamp())
+    """梦境周四05:00事件与领域时钟共用东八区周期。"""
+    from boss_challenge_cycle import bounds
+    return bounds(now_ts)[0]
 
 
 def get_monthly_5am_ts(now_ts=None):

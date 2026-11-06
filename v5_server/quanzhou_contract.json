@@ -1,0 +1,5510 @@
+{
+  "activity": {
+    "id": 323641,
+    "name": "泉州联动主题活动主入口",
+    "unlock_condition": "",
+    "remark": "刺桐港埠漫行纪",
+    "activity_theme": 32,
+    "activity_template": 364,
+    "sub_activity_list": [
+      3200411,
+      323841
+    ],
+    "reward_show": [
+      1,
+      8011,
+      2200016,
+      41701,
+      39,
+      2925,
+      7019,
+      9008,
+      1073,
+      30065
+    ],
+    "reward_show_permanent": [
+      1,
+      2925,
+      91010,
+      91011,
+      91012,
+      91013,
+      7019,
+      9008,
+      1073
+    ]
+  },
+  "child_activity": {
+    "id": 323841,
+    "name": "泉州箱庭航行玩法/见闻等级/正比战斗",
+    "reward_show_permanent": "",
+    "unlock_condition": "",
+    "reward_show": "",
+    "remark": "泉州箱庭航行玩法/见闻等级/正比战斗",
+    "activity_theme": 32,
+    "activity_template": 384,
+    "sub_activity_list": []
+  },
+  "entry": {
+    "story_id": 0,
+    "activity_id": 323641,
+    "stage_id": 1110101,
+    "map_condition": 4001
+  },
+  "map": {
+    "activity_id": 323641,
+    "bag_map_initialscale": 1.8,
+    "small_map_path": "1110101",
+    "big_map_rate": 307.1,
+    "id": 1110101,
+    "big_map_path": "1110101",
+    "big_map_minscale": 1.5,
+    "small_map_rate": 307.1,
+    "big_map_maxscale": 2.4,
+    "story_id": 0,
+    "hero_id": 9073,
+    "hero_replace": [
+      [
+        11106902,
+        907301
+      ]
+    ],
+    "big_map_center": [
+      36.01,
+      0,
+      38.37
+    ],
+    "big_map_size": [
+      2048,
+      1579
+    ],
+    "small_map_center": [
+      36.01,
+      0,
+      38.37
+    ],
+    "small_map_size": [
+      1433.6,
+      1105.3
+    ],
+    "system_list": [
+      1,
+      2,
+      2001,
+      2002,
+      2003,
+      2004,
+      2005
+    ],
+    "default_bgm": [
+      "bgm_activity_4_0_scene_citong",
+      "bgm_activity_4_0_scene_citong_ingame"
+    ],
+    "after_task_bgm": [
+      [
+        11107001,
+        "bgm_activity_4_0_story_citong_intense",
+        "bgm_activity_4_0_story_citong_intense_ingame"
+      ],
+      [
+        11108004,
+        "bgm_activity_4_0_scene_citong",
+        "bgm_activity_4_0_scene_citong_ingame"
+      ]
+    ]
+  },
+  "main_tasks": {
+    "11199": {
+      "main_task_type": 1,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11199,
+      "end_task_id": 11199001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 1,
+      "first_task_id": 11199001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [],
+      "important_reward": []
+    },
+    "11101": {
+      "main_task_type": 1,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "古船今事",
+      "main_task_id": 11101,
+      "end_task_id": 11101005,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11101001,
+      "next_main_mission": 11102,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          15
+        ],
+        [
+          40603,
+          5
+        ],
+        [
+          22003,
+          1
+        ]
+      ],
+      "important_reward": []
+    },
+    "11102": {
+      "main_task_type": 1,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "腹中空空",
+      "main_task_id": 11102,
+      "end_task_id": 11102002,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11102001,
+      "next_main_mission": 11103,
+      "receive_npc": 0,
+      "unlock_param": [
+        70101
+      ],
+      "reward": [
+        [
+          1,
+          15
+        ],
+        [
+          40603,
+          5
+        ],
+        [
+          22003,
+          1
+        ]
+      ],
+      "important_reward": []
+    },
+    "11103": {
+      "main_task_type": 1,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "素胚勾勒出……",
+      "main_task_id": 11103,
+      "end_task_id": 11103006,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11103000,
+      "next_main_mission": 11104,
+      "receive_npc": 0,
+      "unlock_param": [
+        70102
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ],
+        [
+          40603,
+          10
+        ],
+        [
+          22003,
+          2
+        ]
+      ],
+      "important_reward": []
+    },
+    "11104": {
+      "main_task_type": 1,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "染坊与古井",
+      "main_task_id": 11104,
+      "end_task_id": 11104011,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11104001,
+      "next_main_mission": 11105,
+      "receive_npc": 0,
+      "unlock_param": [
+        70103
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ],
+        [
+          40603,
+          10
+        ],
+        [
+          22003,
+          2
+        ]
+      ],
+      "important_reward": []
+    },
+    "11105": {
+      "main_task_type": 1,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "他山之「玉」",
+      "main_task_id": 11105,
+      "end_task_id": 11105006,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11105000,
+      "next_main_mission": 11106,
+      "receive_npc": 0,
+      "unlock_param": [
+        70104
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ],
+        [
+          40603,
+          10
+        ],
+        [
+          22003,
+          2
+        ]
+      ],
+      "important_reward": []
+    },
+    "11106": {
+      "main_task_type": 1,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "舌尖上的夏什瓦特",
+      "main_task_id": 11106,
+      "end_task_id": 11106008,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11106001,
+      "next_main_mission": 11107,
+      "receive_npc": 0,
+      "unlock_param": [
+        70105
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ],
+        [
+          40603,
+          10
+        ],
+        [
+          22003,
+          2
+        ]
+      ],
+      "important_reward": []
+    },
+    "11107": {
+      "main_task_type": 1,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "迫近的风暴",
+      "main_task_id": 11107,
+      "end_task_id": 11107010,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11107001,
+      "next_main_mission": 11108,
+      "receive_npc": 0,
+      "unlock_param": [
+        70106
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ],
+        [
+          40603,
+          10
+        ],
+        [
+          22003,
+          2
+        ]
+      ],
+      "important_reward": []
+    },
+    "11108": {
+      "main_task_type": 1,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "定风波，沧海阔",
+      "main_task_id": 11108,
+      "end_task_id": 11108006,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11108001,
+      "next_main_mission": 11109,
+      "receive_npc": 0,
+      "unlock_param": [
+        70107
+      ],
+      "reward": [
+        [
+          1,
+          30
+        ],
+        [
+          40603,
+          10
+        ],
+        [
+          22003,
+          2
+        ]
+      ],
+      "important_reward": []
+    },
+    "11109": {
+      "main_task_type": 1,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "刺桐依旧",
+      "main_task_id": 11109,
+      "end_task_id": 11109001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11109000,
+      "next_main_mission": 11219,
+      "receive_npc": 0,
+      "unlock_param": [
+        70108
+      ],
+      "reward": [],
+      "important_reward": []
+    },
+    "11201": {
+      "main_task_type": 2,
+      "descrption": "平静的海边，却站着一个并不平静的男孩，他是为什么展露出了伤心的表情？",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "遗失的礼物",
+      "main_task_id": 11201,
+      "end_task_id": 11201004,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11201002,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70201
+      ],
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40603,
+          5
+        ],
+        [
+          22003,
+          1
+        ]
+      ],
+      "important_reward": []
+    },
+    "11202": {
+      "main_task_type": 2,
+      "descrption": "在大街上如果发现了有神能波动的物品，该怎么偷偷处理掉比较好呢？真是让人伤脑筋……",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "神奇的石敢当",
+      "main_task_id": 11202,
+      "end_task_id": 11202006,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11202002,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70202
+      ],
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40603,
+          5
+        ],
+        [
+          22003,
+          1
+        ]
+      ],
+      "important_reward": []
+    },
+    "11203": {
+      "main_task_type": 2,
+      "descrption": "平时会在终端上挂着委托平台的麟钰，收到了来自附近的一则特殊委托，是来自一家人工智能企业的，一线业务员的求助……",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "稍作思考",
+      "main_task_id": 11203,
+      "end_task_id": 11203004,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11203002,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70203
+      ],
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40603,
+          5
+        ],
+        [
+          22003,
+          1
+        ]
+      ],
+      "important_reward": []
+    },
+    "11206": {
+      "main_task_type": 2,
+      "descrption": "不经历过一次熊孩子的捣蛋事件，你永远不知道一个母亲会在一瞬间爆发出多大的怒火……",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "暴走妈妈",
+      "main_task_id": 11206,
+      "end_task_id": 11206006,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11206002,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70206
+      ],
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40603,
+          5
+        ],
+        [
+          22003,
+          1
+        ]
+      ],
+      "important_reward": []
+    },
+    "11207": {
+      "main_task_type": 2,
+      "descrption": "开元寺里好不热闹，大家都在这里求签解签，想沾沾福气。没想到树边，男孩和女孩却因为福签的事情苦恼着……",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "错过还是恰好",
+      "main_task_id": 11207,
+      "end_task_id": 11207003,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11207004,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70207
+      ],
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40603,
+          5
+        ],
+        [
+          22003,
+          1
+        ]
+      ],
+      "important_reward": []
+    },
+    "11208": {
+      "main_task_type": 2,
+      "descrption": "让你不去钓鱼，你偏要去，公司出了事不知道，这下老实了吧？一天就知道钓鱼，钓鱼，再钓下去，你干脆跟鱼去过算了。——郝嫂如是说",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "戒钓",
+      "main_task_id": 11208,
+      "end_task_id": 11208003,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11208002,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70208
+      ],
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40603,
+          5
+        ],
+        [
+          22003,
+          1
+        ]
+      ],
+      "important_reward": []
+    },
+    "11209": {
+      "main_task_type": 2,
+      "descrption": "风暴虽然已经结束，但四方院仍然有一些善后事宜需要处理。",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "「善后」事宜",
+      "main_task_id": 11209,
+      "end_task_id": 11209005,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11209000,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70209
+      ],
+      "reward": [
+        [
+          1,
+          60
+        ],
+        [
+          40603,
+          15
+        ],
+        [
+          22003,
+          4
+        ]
+      ],
+      "important_reward": []
+    },
+    "11211": {
+      "main_task_type": 2,
+      "descrption": "平静的海边，却站着一个并不平静的男孩，他是为什么展露出了伤心的表情？",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "遗失的礼物",
+      "main_task_id": 11211,
+      "end_task_id": 11201001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11201001,
+      "next_main_mission": 11201,
+      "receive_npc": 0,
+      "unlock_param": [
+        70104
+      ],
+      "reward": [],
+      "important_reward": []
+    },
+    "11212": {
+      "main_task_type": 2,
+      "descrption": "在大街上如果发现了有神能波动的物品，该怎么偷偷处理掉比较好呢？真是让人伤脑筋……",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "神奇的石敢当",
+      "main_task_id": 11212,
+      "end_task_id": 11202001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11202001,
+      "next_main_mission": 11202,
+      "receive_npc": 0,
+      "unlock_param": [
+        70104
+      ],
+      "reward": [],
+      "important_reward": []
+    },
+    "11213": {
+      "main_task_type": 2,
+      "descrption": "平时会在终端上挂着委托平台的麟钰，收到了来自附近的一则特殊委托，是来自一家人工智能企业的，一线业务员的求助……",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "稍作思考",
+      "main_task_id": 11213,
+      "end_task_id": 11203001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11203001,
+      "next_main_mission": 11203,
+      "receive_npc": 0,
+      "unlock_param": [
+        70106
+      ],
+      "reward": [],
+      "important_reward": []
+    },
+    "11216": {
+      "main_task_type": 2,
+      "descrption": "不经历过一次熊孩子的捣蛋事件，你永远不知道一个母亲会在一瞬间爆发出多大的怒火……",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "unlock_param": "",
+      "title": "暴走妈妈",
+      "main_task_id": 11216,
+      "end_task_id": 11206001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11206001,
+      "next_main_mission": 11206,
+      "receive_npc": 0,
+      "reward": [],
+      "important_reward": []
+    },
+    "11217": {
+      "main_task_type": 2,
+      "descrption": "开元寺里好不热闹，大家都在这里求签解签，想沾沾福气。没想到树边，男孩和女孩却因为福签的事情苦恼着……",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "unlock_param": "",
+      "title": "错过还是恰好",
+      "main_task_id": 11217,
+      "end_task_id": 11207000,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11207000,
+      "next_main_mission": 11207,
+      "receive_npc": 0,
+      "reward": [],
+      "important_reward": []
+    },
+    "11218": {
+      "main_task_type": 2,
+      "descrption": "让你不去钓鱼，你偏要去，公司出了事不知道，这下老实了吧？一天就知道钓鱼，钓鱼，再钓下去，你干脆跟鱼去过算了。——郝嫂如是说",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "戒钓",
+      "main_task_id": 11218,
+      "end_task_id": 11208001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11208001,
+      "next_main_mission": 11208,
+      "receive_npc": 0,
+      "unlock_param": [
+        70106
+      ],
+      "reward": [],
+      "important_reward": []
+    },
+    "11219": {
+      "main_task_type": 2,
+      "descrption": "风暴虽然已经结束，但四方院仍然有一些善后事宜需要处理。",
+      "chapter_task_id": 0,
+      "priority": 2,
+      "title": "「善后」事宜",
+      "main_task_id": 11219,
+      "end_task_id": 11209001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 0,
+      "first_task_id": 11209001,
+      "next_main_mission": 11209,
+      "receive_npc": 0,
+      "unlock_param": [
+        70108
+      ],
+      "reward": [],
+      "important_reward": []
+    },
+    "11307": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "",
+      "main_task_id": 11307,
+      "end_task_id": 11307001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 1,
+      "first_task_id": 11307001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70104
+      ],
+      "reward": [],
+      "important_reward": []
+    },
+    "11308": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "",
+      "main_task_id": 11308,
+      "end_task_id": 11308001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 1,
+      "first_task_id": 11308001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70104
+      ],
+      "reward": [],
+      "important_reward": []
+    },
+    "11309": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "",
+      "main_task_id": 11309,
+      "end_task_id": 11309001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 1,
+      "first_task_id": 11309001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70104
+      ],
+      "reward": [],
+      "important_reward": []
+    },
+    "11310": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "title": "",
+      "main_task_id": 11310,
+      "end_task_id": 11310001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 1,
+      "first_task_id": 11310001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "unlock_param": [
+        70104
+      ],
+      "reward": [],
+      "important_reward": []
+    },
+    "11311": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11311,
+      "end_task_id": 11311001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11311001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11312": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11312,
+      "end_task_id": 11312001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11312001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11313": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11313,
+      "end_task_id": 11313001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11313001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11314": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11314,
+      "end_task_id": 11314001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11314001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11315": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11315,
+      "end_task_id": 11315001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11315001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11321": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11321,
+      "end_task_id": 11321001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11321001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11322": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11322,
+      "end_task_id": 11322001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11322001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11323": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11323,
+      "end_task_id": 11323001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11323001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11324": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11324,
+      "end_task_id": 11324001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11324001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11331": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11331,
+      "end_task_id": 11331001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11331001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11332": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11332,
+      "end_task_id": 11332001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11332001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11333": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11333,
+      "end_task_id": 11333001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11333001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11334": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11334,
+      "end_task_id": 11334001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11334001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11335": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11335,
+      "end_task_id": 11335001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11335001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11336": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 1,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11336,
+      "end_task_id": 11336001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 3,
+      "first_task_id": 11336001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          10
+        ]
+      ],
+      "important_reward": []
+    },
+    "11341": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 3,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11341,
+      "end_task_id": 11341001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 2,
+      "first_task_id": 11341001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          50
+        ],
+        [
+          40603,
+          10
+        ],
+        [
+          2,
+          10000
+        ]
+      ],
+      "important_reward": []
+    },
+    "11342": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 3,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11342,
+      "end_task_id": 11342001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 2,
+      "first_task_id": 11342001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          50
+        ],
+        [
+          40603,
+          10
+        ],
+        [
+          2,
+          10000
+        ]
+      ],
+      "important_reward": []
+    },
+    "11343": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 3,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11343,
+      "end_task_id": 11343001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 2,
+      "first_task_id": 11343001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40504,
+          5
+        ],
+        [
+          2,
+          5000
+        ]
+      ],
+      "important_reward": []
+    },
+    "11344": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 3,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11344,
+      "end_task_id": 11344001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 2,
+      "first_task_id": 11344001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40504,
+          5
+        ],
+        [
+          2,
+          5000
+        ]
+      ],
+      "important_reward": []
+    },
+    "11345": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 3,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11345,
+      "end_task_id": 11345001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 2,
+      "first_task_id": 11345001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40504,
+          5
+        ],
+        [
+          2,
+          5000
+        ]
+      ],
+      "important_reward": []
+    },
+    "11346": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 3,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11346,
+      "end_task_id": 11346001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 2,
+      "first_task_id": 11346001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40504,
+          5
+        ],
+        [
+          2,
+          5000
+        ]
+      ],
+      "important_reward": []
+    },
+    "11347": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 3,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11347,
+      "end_task_id": 11347001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 2,
+      "first_task_id": 11347001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40504,
+          5
+        ],
+        [
+          2,
+          5000
+        ]
+      ],
+      "important_reward": []
+    },
+    "11348": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 3,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11348,
+      "end_task_id": 11348001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 2,
+      "first_task_id": 11348001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40504,
+          5
+        ],
+        [
+          2,
+          5000
+        ]
+      ],
+      "important_reward": []
+    },
+    "11349": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 3,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11349,
+      "end_task_id": 11349001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 2,
+      "first_task_id": 11349001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40504,
+          5
+        ],
+        [
+          2,
+          5000
+        ]
+      ],
+      "important_reward": []
+    },
+    "11350": {
+      "main_task_type": 3,
+      "descrption": "",
+      "chapter_task_id": 0,
+      "priority": 3,
+      "unlock_param": "",
+      "title": "",
+      "main_task_id": 11350,
+      "end_task_id": 11350001,
+      "activity_id": 323641,
+      "unlock_operation": 2,
+      "hide_task": 2,
+      "first_task_id": 11350001,
+      "next_main_mission": 0,
+      "receive_npc": 0,
+      "reward": [
+        [
+          1,
+          20
+        ],
+        [
+          40504,
+          5
+        ],
+        [
+          2,
+          5000
+        ]
+      ],
+      "important_reward": []
+    }
+  },
+  "tasks": {
+    "11199001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11199,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 1,
+      "task_id": 11199001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11101001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "初到刺桐城就遇到了熟人，但对方行色匆匆，似乎遇到了什么困难？",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11101,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11101001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11101002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "初到刺桐城就遇到了熟人，但对方行色匆匆，似乎遇到了什么困难？",
+      "task_item": "",
+      "task_target": "前往码头",
+      "condition": 60,
+      "main_task_id": 11101,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11101002,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11101001
+      ],
+      "additional_parameter": []
+    },
+    "11101003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "初到刺桐城就遇到了熟人，但对方行色匆匆，似乎遇到了什么困难？",
+      "task_item": "",
+      "task_target": "（可选）到街上看看",
+      "condition": 60,
+      "main_task_id": 11101,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11101003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11101001
+      ],
+      "additional_parameter": []
+    },
+    "11101004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "初到刺桐城就遇到了熟人，但对方行色匆匆，似乎遇到了什么困难？",
+      "task_item": "",
+      "task_target": "（可选）到岸边看看",
+      "condition": 60,
+      "main_task_id": 11101,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11101004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11101001
+      ],
+      "additional_parameter": []
+    },
+    "11101005": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "初到刺桐城就遇到了熟人，但对方行色匆匆，似乎遇到了什么困难？",
+      "task_item": "",
+      "task_target": "找安海了解情况",
+      "condition": 330001,
+      "main_task_id": 11101,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11101005,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11101002
+      ],
+      "additional_parameter": [
+        5240201
+      ]
+    },
+    "11102001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "折腾了许久，古船总算是安然无恙回港，但需要做的事情还有不少……事已至此，不如先吃顿饭吧？",
+      "task_item": "",
+      "task_target": "跟随安海",
+      "condition": 60,
+      "main_task_id": 11102,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11102001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11102002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "折腾了许久，古船总算是安然无恙回港，但需要做的事情还有不少……事已至此，不如先吃顿饭吧？",
+      "task_item": "",
+      "task_target": "进入餐厅",
+      "condition": 60,
+      "main_task_id": 11102,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11102002,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11102001
+      ],
+      "additional_parameter": []
+    },
+    "11103000": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "德化窑的李爷爷年纪大了，有些仍待处理的瓷器素胚搬运困难，想要在巡船节前完成，恐怕有些困难。有什么能帮忙的？",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11103,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 1,
+      "task_id": 11103000,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11103001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "德化窑的李爷爷年纪大了，有些仍待处理的瓷器素胚搬运困难，想要在巡船节前完成，恐怕有些困难。有什么能帮忙的？",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11103,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 1,
+      "task_id": 11103001,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11103000
+      ],
+      "additional_parameter": []
+    },
+    "11103002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "德化窑的李爷爷年纪大了，有些仍待处理的瓷器素胚搬运困难，想要在巡船节前完成，恐怕有些困难。有什么能帮忙的？",
+      "task_item": "",
+      "task_target": "前往德化窑",
+      "condition": 60,
+      "main_task_id": 11103,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11103002,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11103000
+      ],
+      "additional_parameter": []
+    },
+    "11103003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "德化窑的李爷爷年纪大了，有些仍待处理的瓷器素胚搬运困难，想要在巡船节前完成，恐怕有些困难。有什么能帮忙的？",
+      "task_item": "",
+      "task_target": "和英招对话",
+      "condition": 60,
+      "main_task_id": 11103,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11103003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11103002
+      ],
+      "additional_parameter": []
+    },
+    "11103004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "德化窑的李爷爷年纪大了，有些仍待处理的瓷器素胚搬运困难，想要在巡船节前完成，恐怕有些困难。有什么能帮忙的？",
+      "task_item": "",
+      "task_target": "找到3个素胚",
+      "condition": 60,
+      "main_task_id": 11103,
+      "need": 3,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11103004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11103003
+      ],
+      "additional_parameter": []
+    },
+    "11103005": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "德化窑的李爷爷年纪大了，有些仍待处理的瓷器素胚搬运困难，想要在巡船节前完成，恐怕有些困难。有什么能帮忙的？",
+      "task_item": "",
+      "task_target": "将素胚交给李爷爷",
+      "condition": 60,
+      "main_task_id": 11103,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11103005,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11103004
+      ],
+      "additional_parameter": []
+    },
+    "11103006": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "德化窑的李爷爷年纪大了，有些仍待处理的瓷器素胚搬运困难，想要在巡船节前完成，恐怕有些困难。有什么能帮忙的？",
+      "task_target": "拍照留念！",
+      "condition": 60,
+      "main_task_id": 11103,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11103006,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11103901
+      ],
+      "additional_parameter": [],
+      "task_item": [
+        [
+          77,
+          1
+        ]
+      ]
+    },
+    "11103901": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "德化窑的李爷爷年纪大了，有些仍待处理的瓷器素胚搬运困难，想要在巡船节前完成，恐怕有些困难。有什么能帮忙的？",
+      "task_item": "",
+      "task_target": "和安海对话",
+      "condition": 330001,
+      "main_task_id": 11103,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11103901,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11103005
+      ],
+      "additional_parameter": [
+        5240202
+      ]
+    },
+    "11104001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "织染坊遇到了一些困难，坊中的清白源井年代已久，古井下的淤泥堵塞严重，单凭英招一个人有些难以解决。或许麟钰能帮到一些忙？",
+      "task_item": "",
+      "task_target": "前往织染坊找小鱼",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11104002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "织染坊遇到了一些困难，坊中的清白源井年代已久，古井下的淤泥堵塞严重，单凭英招一个人有些难以解决。或许麟钰能帮到一些忙？",
+      "task_item": "",
+      "task_target": "清理淤泥",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104002,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104001
+      ],
+      "additional_parameter": []
+    },
+    "11104003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "织染坊遇到了一些困难，坊中的清白源井年代已久，古井下的淤泥堵塞严重，单凭英招一个人有些难以解决。或许麟钰能帮到一些忙？",
+      "task_item": "",
+      "task_target": "搬运染缸",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104001
+      ],
+      "additional_parameter": []
+    },
+    "11104004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "织染坊遇到了一些困难，坊中的清白源井年代已久，古井下的淤泥堵塞严重，单凭英招一个人有些难以解决。或许麟钰能帮到一些忙？",
+      "task_item": "",
+      "task_target": "和英招聊聊",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104002,
+        11104003
+      ],
+      "additional_parameter": []
+    },
+    "11104005": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "织染坊遇到了一些困难，坊中的清白源井年代已久，古井下的淤泥堵塞严重，单凭英招一个人有些难以解决。或许麟钰能帮到一些忙？",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104005,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104901
+      ],
+      "additional_parameter": []
+    },
+    "11104006": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "织染坊遇到了一些困难，坊中的清白源井年代已久，古井下的淤泥堵塞严重，单凭英招一个人有些难以解决。或许麟钰能帮到一些忙？",
+      "task_item": "",
+      "task_target": "找王叔交差",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104006,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104005
+      ],
+      "additional_parameter": []
+    },
+    "11104007": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "织染坊遇到了一些困难，坊中的清白源井年代已久，古井下的淤泥堵塞严重，单凭英招一个人有些难以解决。或许麟钰能帮到一些忙？",
+      "task_item": "",
+      "task_target": "试试染布吧",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104007,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104006
+      ],
+      "additional_parameter": []
+    },
+    "11104008": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "织染坊遇到了一些困难，坊中的清白源井年代已久，古井下的淤泥堵塞严重，单凭英招一个人有些难以解决。或许麟钰能帮到一些忙？",
+      "task_target": "拍照留念！",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104008,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104007
+      ],
+      "additional_parameter": [],
+      "task_item": [
+        [
+          77,
+          1
+        ]
+      ]
+    },
+    "11104009": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "成功地解决了德化窑与织染坊的困难，现在去把这个消息告诉安海吧。",
+      "task_item": "",
+      "task_target": "前往钟楼",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104009,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104008
+      ],
+      "additional_parameter": []
+    },
+    "11104010": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "成功地解决了德化窑与织染坊的困难，现在去把这个消息告诉安海吧。",
+      "task_item": "",
+      "task_target": "与安海对话",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104010,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104009
+      ],
+      "additional_parameter": []
+    },
+    "11104011": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "成功地解决了德化窑与织染坊的困难，现在去把这个消息告诉安海吧。",
+      "task_target": "拍照留念！",
+      "condition": 60,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104011,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104010
+      ],
+      "additional_parameter": [],
+      "task_item": [
+        [
+          77,
+          1
+        ]
+      ]
+    },
+    "11104901": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "织染坊遇到了一些困难，坊中的清白源井年代已久，古井下的淤泥堵塞严重，单凭英招一个人有些难以解决。或许麟钰能帮到一些忙？",
+      "task_item": "",
+      "task_target": "和英招对话",
+      "condition": 330001,
+      "main_task_id": 11104,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11104901,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11104004
+      ],
+      "additional_parameter": [
+        5240203
+      ]
+    },
+    "11105000": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "这几年刺桐港对外交流越来越频繁，不少外地来的客商，也想把自己的货品推销到虚恒各地。一位欧莫菲斯来的首饰商，也有着参与巡船节的想法。",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11105,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11105000,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11105001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "这几年刺桐港对外交流越来越频繁，不少外地来的客商，也想把自己的货品推销到虚恒各地。一位欧莫菲斯来的首饰商，也有着参与巡船节的想法。",
+      "task_item": "",
+      "task_target": "找安海问个好",
+      "condition": 60,
+      "main_task_id": 11105,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11105001,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11105000
+      ],
+      "additional_parameter": []
+    },
+    "11105002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "这几年刺桐港对外交流越来越频繁，不少外地来的客商，也想把自己的货品推销到虚恒各地。一位欧莫菲斯来的首饰商，也有着参与巡船节的想法。",
+      "task_item": "",
+      "task_target": "寻找首饰店老板",
+      "condition": 60,
+      "main_task_id": 11105,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11105002,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11105001
+      ],
+      "additional_parameter": []
+    },
+    "11105003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "这几年刺桐港对外交流越来越频繁，不少外地来的客商，也想把自己的货品推销到虚恒各地。一位欧莫菲斯来的首饰商，也有着参与巡船节的想法。",
+      "task_item": "",
+      "task_target": "前往天禄贸易仓库",
+      "condition": 330002,
+      "main_task_id": 11105,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11105003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11105002
+      ],
+      "additional_parameter": [
+        5240221
+      ]
+    },
+    "11105004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "这几年刺桐港对外交流越来越频繁，不少外地来的客商，也想把自己的货品推销到虚恒各地。一位欧莫菲斯来的首饰商，也有着参与巡船节的想法。",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11105,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11105004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11105003
+      ],
+      "additional_parameter": []
+    },
+    "11105005": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "这几年刺桐港对外交流越来越频繁，不少外地来的客商，也想把自己的货品推销到虚恒各地。一位欧莫菲斯来的首饰商，也有着参与巡船节的想法。",
+      "task_item": "",
+      "task_target": "送回原石",
+      "condition": 60,
+      "main_task_id": 11105,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11105005,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11105004
+      ],
+      "additional_parameter": []
+    },
+    "11105006": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "这几年刺桐港对外交流越来越频繁，不少外地来的客商，也想把自己的货品推销到虚恒各地。一位欧莫菲斯来的首饰商，也有着参与巡船节的想法。",
+      "task_target": "拍照留念！",
+      "condition": 60,
+      "main_task_id": 11105,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11105006,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11105901
+      ],
+      "additional_parameter": [],
+      "task_item": [
+        [
+          77,
+          1
+        ]
+      ]
+    },
+    "11105901": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "这几年刺桐港对外交流越来越频繁，不少外地来的客商，也想把自己的货品推销到虚恒各地。一位欧莫菲斯来的首饰商，也有着参与巡船节的想法。",
+      "task_item": "",
+      "task_target": "和英招对话",
+      "condition": 330001,
+      "main_task_id": 11105,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11105901,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11105005
+      ],
+      "additional_parameter": [
+        5240204
+      ]
+    },
+    "11106001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "原本信心十足参展的特质调味酱，似乎出了些问题，让来自夏什瓦特的阿玛尔塔不知所措。一起去看看到底发生了什么吧？",
+      "task_item": "",
+      "task_target": "去酱料店看看",
+      "condition": 60,
+      "main_task_id": 11106,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11106001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11106002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "原本信心十足参展的特质调味酱，似乎出了些问题，让来自夏什瓦特的阿玛尔塔不知所措。一起去看看到底发生了什么吧？",
+      "task_item": "",
+      "task_target": "去买材料",
+      "condition": 60,
+      "main_task_id": 11106,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11106002,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11106001
+      ],
+      "additional_parameter": []
+    },
+    "11106003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "原本信心十足参展的特质调味酱，似乎出了些问题，让来自夏什瓦特的阿玛尔塔不知所措。一起去看看到底发生了什么吧？",
+      "task_item": "",
+      "task_target": "挑选香料",
+      "condition": 60,
+      "main_task_id": 11106,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11106003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11106002
+      ],
+      "additional_parameter": []
+    },
+    "11106004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "原本信心十足参展的特质调味酱，似乎出了些问题，让来自夏什瓦特的阿玛尔塔不知所措。一起去看看到底发生了什么吧？",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11106,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11106004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11106003
+      ],
+      "additional_parameter": []
+    },
+    "11106005": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "原本信心十足参展的特质调味酱，似乎出了些问题，让来自夏什瓦特的阿玛尔塔不知所措。一起去看看到底发生了什么吧？",
+      "task_item": "",
+      "task_target": "回到调料店",
+      "condition": 60,
+      "main_task_id": 11106,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11106005,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11106004
+      ],
+      "additional_parameter": []
+    },
+    "11106006": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "原本信心十足参展的特质调味酱，似乎出了些问题，让来自夏什瓦特的阿玛尔塔不知所措。一起去看看到底发生了什么吧？",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11106,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11106006,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11106901
+      ],
+      "additional_parameter": []
+    },
+    "11106007": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "原本信心十足参展的特质调味酱，似乎出了些问题，让来自夏什瓦特的阿玛尔塔不知所措。一起去看看到底发生了什么吧？",
+      "task_target": "拍照留念！",
+      "condition": 60,
+      "main_task_id": 11106,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11106007,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11106006
+      ],
+      "additional_parameter": [],
+      "task_item": [
+        [
+          77,
+          1
+        ]
+      ]
+    },
+    "11106008": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "原本信心十足参展的特质调味酱，似乎出了些问题，让来自夏什瓦特的阿玛尔塔不知所措。一起去看看到底发生了什么吧？",
+      "task_item": "",
+      "task_target": "前往餐厅",
+      "condition": 60,
+      "main_task_id": 11106,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11106008,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11106007
+      ],
+      "additional_parameter": []
+    },
+    "11106901": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "原本信心十足参展的特质调味酱，似乎出了些问题，让来自夏什瓦特的阿玛尔塔不知所措。一起去看看到底发生了什么吧？",
+      "task_item": "",
+      "task_target": "和禄良对话",
+      "condition": 330001,
+      "main_task_id": 11106,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11106901,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11106005
+      ],
+      "additional_parameter": [
+        5240205
+      ]
+    },
+    "11106902": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "原本信心十足参展的特质调味酱，似乎出了些问题，让来自夏什瓦特的阿玛尔塔不知所措。一起去看看到底发生了什么吧？",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11106,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11106902,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11106008
+      ],
+      "additional_parameter": []
+    },
+    "11107001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11107002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "到石桥边看看",
+      "condition": 60,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107002,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11107001
+      ],
+      "additional_parameter": []
+    },
+    "11107003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "和陆吾对话",
+      "condition": 60,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11107002
+      ],
+      "additional_parameter": []
+    },
+    "11107004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "调查1号监测水面",
+      "condition": 60,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11107003
+      ],
+      "additional_parameter": []
+    },
+    "11107005": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "调查2号监测水面",
+      "condition": 60,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107005,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11107003
+      ],
+      "additional_parameter": []
+    },
+    "11107006": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "返回石桥",
+      "condition": 60,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107006,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11107004,
+        11107005
+      ],
+      "additional_parameter": []
+    },
+    "11107007": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "前往防波堤",
+      "condition": 330002,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107007,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11107006
+      ],
+      "additional_parameter": [
+        5240222
+      ]
+    },
+    "11107008": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107008,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11107007
+      ],
+      "additional_parameter": []
+    },
+    "11107009": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "出航调查",
+      "condition": 60,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107009,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11107008
+      ],
+      "additional_parameter": []
+    },
+    "11107010": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107010,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11107901
+      ],
+      "additional_parameter": []
+    },
+    "11107901": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "远海天幕中正在逐步凝聚的风暴似乎并不是错觉，近岸边也出现了视骸活动的踪迹……到底出了什么问题？",
+      "task_item": "",
+      "task_target": "和禄良对话",
+      "condition": 330001,
+      "main_task_id": 11107,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11107901,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11107009
+      ],
+      "additional_parameter": [
+        5240206
+      ]
+    },
+    "11108001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "刺桐的渔船都已经归航，但风暴仍然在持续，肩上的责任催促着麟钰迈开步伐，向刺桐人的希冀奋勇前行。",
+      "task_item": "",
+      "task_target": "去桥边看看",
+      "condition": 60,
+      "main_task_id": 11108,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11108001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11108002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "刺桐的渔船都已经归航，但风暴仍然在持续，肩上的责任催促着麟钰迈开步伐，向刺桐人的希冀奋勇前行。",
+      "task_item": "",
+      "task_target": "石敢当的神力",
+      "condition": 60,
+      "main_task_id": 11108,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11108002,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11108001
+      ],
+      "additional_parameter": []
+    },
+    "11108003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "刺桐的渔船都已经归航，但风暴仍然在持续，肩上的责任催促着麟钰迈开步伐，向刺桐人的希冀奋勇前行。",
+      "task_item": "",
+      "task_target": "再次出航！",
+      "condition": 60,
+      "main_task_id": 11108,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11108003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11108002
+      ],
+      "additional_parameter": []
+    },
+    "11108004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "刺桐的渔船都已经归航，但风暴仍然在持续，肩上的责任催促着麟钰迈开步伐，向刺桐人的希冀奋勇前行。",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11108,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11108004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11108901
+      ],
+      "additional_parameter": []
+    },
+    "11108005": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "刺桐的渔船都已经归航，但风暴仍然在持续，肩上的责任催促着麟钰迈开步伐，向刺桐人的希冀奋勇前行。",
+      "task_item": "",
+      "task_target": "前往灯塔",
+      "condition": 60,
+      "main_task_id": 11108,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11108005,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11108004
+      ],
+      "additional_parameter": []
+    },
+    "11108006": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "刺桐的渔船都已经归航，但风暴仍然在持续，肩上的责任催促着麟钰迈开步伐，向刺桐人的希冀奋勇前行。",
+      "task_target": "拍照留念！",
+      "condition": 60,
+      "main_task_id": 11108,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11108006,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11108005
+      ],
+      "additional_parameter": [],
+      "task_item": [
+        [
+          77,
+          1
+        ]
+      ]
+    },
+    "11108901": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "刺桐的渔船都已经归航，但风暴仍然在持续，肩上的责任催促着麟钰迈开步伐，向刺桐人的希冀奋勇前行。",
+      "task_item": "",
+      "task_target": "和陆吾对话",
+      "condition": 330001,
+      "main_task_id": 11108,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11108901,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11108003
+      ],
+      "additional_parameter": [
+        5240207
+      ]
+    },
+    "11109000": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11109,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11109000,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11109001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11109,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11109001,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11109000
+      ],
+      "additional_parameter": []
+    },
+    "11201001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "平静的海边，却站着一个并不平静的男孩，他是为什么展露出了伤心的表情？",
+      "task_item": "",
+      "task_target": "询问男孩发生了什么",
+      "condition": 60,
+      "main_task_id": 11211,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11201001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11201002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "平静的海边，却站着一个并不平静的男孩，他是为什么展露出了伤心的表情？",
+      "task_item": "",
+      "task_target": "找个没人的地方施展法术",
+      "condition": 60,
+      "main_task_id": 11201,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11201002,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11201003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "平静的海边，却站着一个并不平静的男孩，他是为什么展露出了伤心的表情？",
+      "task_item": "",
+      "task_target": "找出男孩的玻璃罐",
+      "condition": 60,
+      "main_task_id": 11201,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11201003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11201002
+      ],
+      "additional_parameter": []
+    },
+    "11201004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "平静的海边，却站着一个并不平静的男孩，他是为什么展露出了伤心的表情？",
+      "task_item": "",
+      "task_target": "将玻璃罐交还给男孩",
+      "condition": 60,
+      "main_task_id": 11201,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11201004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11201003
+      ],
+      "additional_parameter": []
+    },
+    "11202001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "在大街上如果发现了有神能波动的物品，该怎么偷偷处理掉比较好呢？真是让人伤脑筋……",
+      "task_item": "",
+      "task_target": "找到四方院同事",
+      "condition": 60,
+      "main_task_id": 11212,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11202001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11202002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "在大街上如果发现了有神能波动的物品，该怎么偷偷处理掉比较好呢？真是让人伤脑筋……",
+      "task_item": "",
+      "task_target": "尝试对石敢当灌注一些神能",
+      "condition": 60,
+      "main_task_id": 11202,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11202002,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11202003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "在大街上如果发现了有神能波动的物品，该怎么偷偷处理掉比较好呢？真是让人伤脑筋……",
+      "task_item": "",
+      "task_target": "找到三个飞散的石敢当",
+      "condition": 60,
+      "main_task_id": 11202,
+      "need": 3,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11202003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11202002
+      ],
+      "additional_parameter": []
+    },
+    "11202004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "在大街上如果发现了有神能波动的物品，该怎么偷偷处理掉比较好呢？真是让人伤脑筋……",
+      "task_item": "",
+      "task_target": "找到第二个飞散的石敢当",
+      "condition": 60,
+      "main_task_id": 11202,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11202004,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11202005": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "在大街上如果发现了有神能波动的物品，该怎么偷偷处理掉比较好呢？真是让人伤脑筋……",
+      "task_item": "",
+      "task_target": "找到第三个飞散的石敢当",
+      "condition": 60,
+      "main_task_id": 11202,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11202005,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11202006": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "在大街上如果发现了有神能波动的物品，该怎么偷偷处理掉比较好呢？真是让人伤脑筋……",
+      "task_item": "",
+      "task_target": "回到发现石敢当的原处",
+      "condition": 60,
+      "main_task_id": 11202,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11202006,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11202003
+      ],
+      "additional_parameter": []
+    },
+    "11203001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "平时会在终端上挂着委托平台的麟钰，收到了来自附近的一则特殊委托，是来自一家人工智能企业的，一线业务员的求助……",
+      "task_item": "",
+      "task_target": "听听科鲁兹工作人员的苦恼",
+      "condition": 60,
+      "main_task_id": 11213,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11203001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11203002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "平时会在终端上挂着委托平台的麟钰，收到了来自附近的一则特殊委托，是来自一家人工智能企业的，一线业务员的求助……",
+      "task_item": "",
+      "task_target": "使用秘钥接入售货机",
+      "condition": 60,
+      "main_task_id": 11203,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11203002,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11203003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "平时会在终端上挂着委托平台的麟钰，收到了来自附近的一则特殊委托，是来自一家人工智能企业的，一线业务员的求助……",
+      "task_item": "",
+      "task_target": "尝试和智能售货机对话",
+      "condition": 60,
+      "main_task_id": 11203,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11203003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11203002
+      ],
+      "additional_parameter": []
+    },
+    "11203004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "平时会在终端上挂着委托平台的麟钰，收到了来自附近的一则特殊委托，是来自一家人工智能企业的，一线业务员的求助……",
+      "task_item": "",
+      "task_target": "回复科鲁兹工作人员",
+      "condition": 60,
+      "main_task_id": 11203,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11203004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11203003
+      ],
+      "additional_parameter": []
+    },
+    "11206001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "不经历过一次熊孩子的捣蛋事件，你永远不知道一个母亲会在一瞬间爆发出多大的怒火……",
+      "task_item": "",
+      "task_target": "听听年轻母亲的苦恼",
+      "condition": 60,
+      "main_task_id": 11216,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11206001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11206002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "不经历过一次熊孩子的捣蛋事件，你永远不知道一个母亲会在一瞬间爆发出多大的怒火……",
+      "task_item": "",
+      "task_target": "找个隐秘的地方释放神能",
+      "condition": 60,
+      "main_task_id": 11206,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11206002,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11206003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "不经历过一次熊孩子的捣蛋事件，你永远不知道一个母亲会在一瞬间爆发出多大的怒火……",
+      "task_item": "",
+      "task_target": "找到失散的数学作业",
+      "condition": 60,
+      "main_task_id": 11206,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11206003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11206002
+      ],
+      "additional_parameter": []
+    },
+    "11206004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "不经历过一次熊孩子的捣蛋事件，你永远不知道一个母亲会在一瞬间爆发出多大的怒火……",
+      "task_item": "",
+      "task_target": "找到失散的物理作业",
+      "condition": 60,
+      "main_task_id": 11206,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11206004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11206002
+      ],
+      "additional_parameter": []
+    },
+    "11206005": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "不经历过一次熊孩子的捣蛋事件，你永远不知道一个母亲会在一瞬间爆发出多大的怒火……",
+      "task_item": "",
+      "task_target": "找到失散的地理作业",
+      "condition": 60,
+      "main_task_id": 11206,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11206005,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11206002
+      ],
+      "additional_parameter": []
+    },
+    "11206006": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "不经历过一次熊孩子的捣蛋事件，你永远不知道一个母亲会在一瞬间爆发出多大的怒火……",
+      "task_item": "",
+      "task_target": "回去听听年轻母亲的想法",
+      "condition": 60,
+      "main_task_id": 11206,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11206006,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11206003,
+        11206004,
+        11206005
+      ],
+      "additional_parameter": []
+    },
+    "11207000": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "开元寺里好不热闹，大家都在这里求签解签，想沾沾福气。没想到树边，男孩和女孩却因为福签的事情苦恼着……",
+      "task_item": "",
+      "task_target": "来自工作人员的邀请",
+      "condition": 60,
+      "main_task_id": 11217,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11207000,
+      "pre_operation": 1,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11207001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "开元寺里好不热闹，大家都在这里求签解签，想沾沾福气。没想到树边，男孩和女孩却因为福签的事情苦恼着……",
+      "task_item": "",
+      "task_target": "听听两人在焦急什么",
+      "condition": 60,
+      "main_task_id": 11207,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11207001,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11207004
+      ],
+      "additional_parameter": []
+    },
+    "11207002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "开元寺里好不热闹，大家都在这里求签解签，想沾沾福气。没想到树边，男孩和女孩却因为福签的事情苦恼着……",
+      "task_item": "",
+      "task_target": "找工作人员拿回正确的福签",
+      "condition": 60,
+      "main_task_id": 11207,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11207002,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11207001
+      ],
+      "additional_parameter": []
+    },
+    "11207003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "开元寺里好不热闹，大家都在这里求签解签，想沾沾福气。没想到树边，男孩和女孩却因为福签的事情苦恼着……",
+      "task_item": "",
+      "task_target": "将正确的福签交给两人",
+      "condition": 60,
+      "main_task_id": 11207,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11207003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11207002
+      ],
+      "additional_parameter": []
+    },
+    "11207004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "开元寺里好不热闹，大家都在这里求签解签，想沾沾福气。没想到树边，男孩和女孩却因为福签的事情苦恼着……",
+      "task_item": "",
+      "task_target": "进入开元寺",
+      "condition": 60,
+      "main_task_id": 11207,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11207004,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11208001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "让你不去钓鱼，你偏要去，公司出了事不知道，这下老实了吧？一天就知道钓鱼，钓鱼，再钓下去，你干脆跟鱼去过算了。——郝嫂如是说",
+      "task_item": "",
+      "task_target": "问问郝大哥为什么叹气",
+      "condition": 60,
+      "main_task_id": 11218,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11208001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11208002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "让你不去钓鱼，你偏要去，公司出了事不知道，这下老实了吧？一天就知道钓鱼，钓鱼，再钓下去，你干脆跟鱼去过算了。——郝嫂如是说",
+      "task_item": "",
+      "task_target": "找郝大哥的渔友传个话",
+      "condition": 60,
+      "main_task_id": 11208,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11208002,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11208003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "让你不去钓鱼，你偏要去，公司出了事不知道，这下老实了吧？一天就知道钓鱼，钓鱼，再钓下去，你干脆跟鱼去过算了。——郝嫂如是说",
+      "task_item": "",
+      "task_target": "听听郝大哥如何反应",
+      "condition": 60,
+      "main_task_id": 11208,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11208003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11208002
+      ],
+      "additional_parameter": []
+    },
+    "11209001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "风暴虽然已经结束，但四方院仍然有一些善后事宜需要处理。",
+      "task_item": "",
+      "task_target": "听听四方院成员的问题",
+      "condition": 60,
+      "main_task_id": 11219,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11209001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11209000": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "风暴虽然已经结束，但四方院仍然有一些善后事宜需要处理。",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11209,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 1,
+      "task_id": 11209000,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11209002": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "风暴虽然已经结束，但四方院仍然有一些善后事宜需要处理。",
+      "task_item": "",
+      "task_target": "尝试捕捉天后宫前的石敢当",
+      "condition": 60,
+      "main_task_id": 11209,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11209002,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11209000
+      ],
+      "additional_parameter": []
+    },
+    "11209003": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "风暴虽然已经结束，但四方院仍然有一些善后事宜需要处理。",
+      "task_item": "",
+      "task_target": "尝试捕捉景观码头的石敢当",
+      "condition": 60,
+      "main_task_id": 11209,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11209003,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11209000
+      ],
+      "additional_parameter": []
+    },
+    "11209004": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "风暴虽然已经结束，但四方院仍然有一些善后事宜需要处理。",
+      "task_item": "",
+      "task_target": "尝试捕捉开元寺内的石敢当",
+      "condition": 60,
+      "main_task_id": 11209,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11209004,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11209000
+      ],
+      "additional_parameter": []
+    },
+    "11209005": {
+      "task_blueprint_sign": 0,
+      "is_unload": 1,
+      "main_description": "风暴虽然已经结束，但四方院仍然有一些善后事宜需要处理。",
+      "task_item": "",
+      "task_target": "询问成员完成情况",
+      "condition": 60,
+      "main_task_id": 11209,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11209005,
+      "pre_operation": 2,
+      "pre_task_id": [
+        11209002,
+        11209003,
+        11209004
+      ],
+      "additional_parameter": []
+    },
+    "11307001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11307,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11307001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": [],
+      "task_item": [
+        [
+          77,
+          1
+        ]
+      ]
+    },
+    "11308001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11308,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11308001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": [],
+      "task_item": [
+        [
+          77,
+          1
+        ]
+      ]
+    },
+    "11309001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11309,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11309001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": [],
+      "task_item": [
+        [
+          77,
+          1
+        ]
+      ]
+    },
+    "11310001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11310,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11310001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": [],
+      "task_item": [
+        [
+          77,
+          1
+        ]
+      ]
+    },
+    "11311001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11311,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11311001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11312001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11312,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11312001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11313001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11313,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11313001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11314001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11314,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11314001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11315001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11315,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11315001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11321001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11321,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11321001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11322001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11322,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11322001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11323001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11323,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11323001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11324001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11324,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11324001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11331001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11331,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11331001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11332001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11332,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11332001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11333001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11333,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11333001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11334001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11334,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11334001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11335001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11335,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11335001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11336001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11336,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11336001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11341001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11341,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11341001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11342001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11342,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11342001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11343001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11343,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11343001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11344001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11344,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11344001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11345001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11345,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11345001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11346001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11346,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11346001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11347001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11347,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11347001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11348001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11348,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11348001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11349001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11349,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11349001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    },
+    "11350001": {
+      "task_blueprint_sign": 0,
+      "is_unload": 0,
+      "main_description": "",
+      "task_item": "",
+      "task_target": "",
+      "condition": 60,
+      "main_task_id": 11350,
+      "need": 1,
+      "task_tag": "",
+      "hide_task": 0,
+      "task_id": 11350001,
+      "pre_operation": 2,
+      "pre_task_id": [],
+      "additional_parameter": []
+    }
+  },
+  "conditions": {
+    "4001": {
+      "progress_show": 0,
+      "type": 1014,
+      "id": 4001,
+      "desc": "玩家等级达到1级",
+      "params": [
+        1
+      ]
+    },
+    "70101": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70101,
+      "desc": "4.0泉州箱庭-完成主任务11101",
+      "params": [
+        11101
+      ]
+    },
+    "70102": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70102,
+      "desc": "4.0泉州箱庭-完成主任务11102",
+      "params": [
+        11102
+      ]
+    },
+    "70103": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70103,
+      "desc": "4.0泉州箱庭-完成主任务11103",
+      "params": [
+        11103
+      ]
+    },
+    "70104": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70104,
+      "desc": "4.0泉州箱庭-完成主任务11104",
+      "params": [
+        11104
+      ]
+    },
+    "70105": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70105,
+      "desc": "4.0泉州箱庭-完成主任务11105",
+      "params": [
+        11105
+      ]
+    },
+    "70106": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70106,
+      "desc": "4.0泉州箱庭-完成主任务11106",
+      "params": [
+        11106
+      ]
+    },
+    "70107": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70107,
+      "desc": "4.0泉州箱庭-完成主任务11107",
+      "params": [
+        11107
+      ]
+    },
+    "70108": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70108,
+      "desc": "4.0泉州箱庭-完成主任务11108",
+      "params": [
+        11108
+      ]
+    },
+    "70151": {
+      "progress_show": 0,
+      "type": 101,
+      "id": 70151,
+      "desc": "4.0泉州箱庭-完成子任务11103006",
+      "params": [
+        11103006
+      ]
+    },
+    "70201": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70201,
+      "desc": "4.0泉州箱庭-完成主任务11211（支线1-1）",
+      "params": [
+        11211
+      ]
+    },
+    "70202": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70202,
+      "desc": "4.0泉州箱庭-完成主任务11212（支线2-1）",
+      "params": [
+        11212
+      ]
+    },
+    "70203": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70203,
+      "desc": "4.0泉州箱庭-完成主任务11213（支线3-1）",
+      "params": [
+        11213
+      ]
+    },
+    "70206": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70206,
+      "desc": "4.0泉州箱庭-完成主任务11216（支线6-1）",
+      "params": [
+        11216
+      ]
+    },
+    "70207": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70207,
+      "desc": "4.0泉州箱庭-完成主任务11217（支线7-1）",
+      "params": [
+        11217
+      ]
+    },
+    "70208": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70208,
+      "desc": "4.0泉州箱庭-完成主任务11218（支线8-1）",
+      "params": [
+        11218
+      ]
+    },
+    "70209": {
+      "progress_show": 0,
+      "type": 100,
+      "id": 70209,
+      "desc": "4.0泉州箱庭-完成主任务11219（支线9-1）",
+      "params": [
+        11219
+      ]
+    }
+  },
+  "systems": {
+    "1": {
+      "task_id": 0,
+      "is_entrance": 0,
+      "name": "",
+      "type": 1,
+      "button_type": 0,
+      "tag_id": 0,
+      "activity_id": 0,
+      "id": 1,
+      "icon": "",
+      "sort": 0
+    },
+    "2": {
+      "task_id": 0,
+      "is_entrance": 1,
+      "name": "",
+      "type": 2,
+      "button_type": 32,
+      "tag_id": 0,
+      "activity_id": 0,
+      "id": 2,
+      "icon": "SandPlay_InScenes_00006",
+      "sort": 100
+    },
+    "2001": {
+      "task_id": 11103006,
+      "is_entrance": 1,
+      "name": "手记",
+      "type": 105,
+      "button_type": 33,
+      "tag_id": 0,
+      "activity_id": 323641,
+      "id": 2001,
+      "icon": "SandPlay_InScenes_00044",
+      "sort": 90
+    },
+    "2002": {
+      "task_id": 11109001,
+      "is_entrance": 0,
+      "name": "渡洋承运",
+      "type": 106,
+      "button_type": 0,
+      "tag_id": 11010601,
+      "activity_id": 0,
+      "id": 2002,
+      "icon": "",
+      "sort": 0
+    },
+    "2003": {
+      "task_id": 11104011,
+      "is_entrance": 0,
+      "name": "街市逸趣",
+      "type": 107,
+      "button_type": 0,
+      "tag_id": 0,
+      "activity_id": 0,
+      "id": 2003,
+      "icon": "",
+      "sort": 0
+    },
+    "2004": {
+      "task_id": 0,
+      "is_entrance": 0,
+      "name": "见闻等级",
+      "type": 108,
+      "button_type": 0,
+      "tag_id": 0,
+      "activity_id": 0,
+      "id": 2004,
+      "icon": "",
+      "sort": 0
+    },
+    "2005": {
+      "task_id": 0,
+      "is_entrance": 0,
+      "name": "主线历程",
+      "type": 109,
+      "button_type": 0,
+      "tag_id": 0,
+      "activity_id": 0,
+      "id": 2005,
+      "icon": "",
+      "sort": 0
+    }
+  },
+  "function_open": {
+    "111010101": {
+      "id": 111010101,
+      "function_content": "手记已解锁",
+      "icon": "SandPlay_icon_00044",
+      "condition_id": 70151,
+      "map_id": 1110101,
+      "task_id": 11103006
+    }
+  },
+  "phase": {
+    "1": {
+      "id": 1,
+      "name": "素瓷绮罗衢越巷",
+      "task_id": 0,
+      "nextphase": 2,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_Com/QuanZhou_Com_map_01",
+      "start_time": 6,
+      "show_time": 1,
+      "icon": "TextureConfig/SandPlay_QuanZhou/QuanZhou_Com/QuanZhou_Com_stage_01",
+      "tips_icon": [],
+      "tips_desc": []
+    },
+    "2": {
+      "id": 2,
+      "name": "沉瑜琳琅引行商",
+      "task_id": 11105000,
+      "nextphase": 3,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_Com/QuanZhou_Com_map_02",
+      "start_time": 6,
+      "show_time": 1,
+      "icon": "TextureConfig/SandPlay_QuanZhou/QuanZhou_Com/QuanZhou_Com_stage_02",
+      "tips_icon": [
+        "SandPlay_icon_quanzhou_photo",
+        "SandPlay_Questicon_Side"
+      ],
+      "tips_desc": [
+        "「街市逸趣」解锁新内容",
+        "解锁新的支线任务"
+      ]
+    },
+    "3": {
+      "id": 3,
+      "name": "刺桐海隅风云起",
+      "task_id": 11107001,
+      "nextphase": 4,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_Com/QuanZhou_Com_map_03",
+      "start_time": 5,
+      "show_time": 1,
+      "icon": "TextureConfig/SandPlay_QuanZhou/QuanZhou_Com/QuanZhou_Com_stage_03",
+      "tips_icon": [
+        "SandPlay_Questicon_Side"
+      ],
+      "tips_desc": [
+        "解锁新的支线任务"
+      ]
+    },
+    "4": {
+      "id": 4,
+      "name": "齐心协力定风波",
+      "task_id": 11109000,
+      "nextphase": 0,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_Com/QuanZhou_Com_map_03",
+      "start_time": 5,
+      "show_time": 1,
+      "icon": "TextureConfig/SandPlay_QuanZhou/QuanZhou_Com/QuanZhou_Com_stage_04",
+      "tips_icon": [
+        "SandPlay_icon_32379001",
+        "SandPlay_Questicon_Side"
+      ],
+      "tips_desc": [
+        "「渡洋承运」解锁新内容",
+        "解锁新的支线任务"
+      ]
+    }
+  },
+  "photo": {
+    "1001": {
+      "thing_id": 110906,
+      "pre_pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/AttractionsPre_01",
+      "enity_id": 110006,
+      "type": 1,
+      "id": 1001,
+      "task_id": 11104011,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/Attractions_01",
+      "desc": "风格独特的钟楼，位于街道的交汇处，要注意交通安全哦~"
+    },
+    "1002": {
+      "thing_id": 110907,
+      "pre_pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/AttractionsPre_02",
+      "enity_id": 110007,
+      "type": 1,
+      "id": 1002,
+      "task_id": 11307001,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/Attractions_02",
+      "desc": "四周遍布红色的砖瓦，鳞次栉比挤挤挨挨在一起，目的地在哪个方向来着？"
+    },
+    "1003": {
+      "thing_id": 110908,
+      "pre_pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/AttractionsPre_03",
+      "enity_id": 110008,
+      "type": 1,
+      "id": 1003,
+      "task_id": 11308001,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/Attractions_03",
+      "desc": "经过修复后的福船，希望它可以圆满完成此次巡船节的任务吧。"
+    },
+    "1004": {
+      "thing_id": 110909,
+      "pre_pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/AttractionsPre_04",
+      "enity_id": 110009,
+      "type": 1,
+      "id": 1004,
+      "task_id": 11309001,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/Attractions_04",
+      "desc": "高耸的双塔伫立在远处，它默默地站在那里，就好像在远远地凝望着这里的人们。"
+    },
+    "1005": {
+      "thing_id": 110910,
+      "pre_pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/AttractionsPre_05",
+      "enity_id": 110010,
+      "type": 1,
+      "id": 1005,
+      "task_id": 11310001,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/Attractions_05",
+      "desc": "规模宏伟的庙宇，听当地人说它见证着此地海洋贸易的形成和发展历程。"
+    },
+    "2001": {
+      "thing_id": 110901,
+      "pre_pic": "",
+      "enity_id": 110001,
+      "type": 2,
+      "id": 2001,
+      "task_id": 11103006,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/MainPlot_01",
+      "desc": "李伯在上釉烧瓷时发现用来烧制瓷器的瓷窑损坏了，我和姐姐帮助李伯找到了新的瓷器素胚。"
+    },
+    "2002": {
+      "thing_id": 110902,
+      "pre_pic": "",
+      "enity_id": 110002,
+      "type": 2,
+      "id": 2002,
+      "task_id": 11104008,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/MainPlot_02",
+      "desc": "小时候制作染布的场景还历历在目，虽然第一次尝试的时候给自己搞了个大花脸，但很久没有染布了，真怀念啊……"
+    },
+    "2003": {
+      "thing_id": 110903,
+      "pre_pic": "",
+      "enity_id": 110003,
+      "type": 2,
+      "id": 2003,
+      "task_id": 11105006,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/MainPlot_03",
+      "desc": "瓦伦西亚姐姐用鸣玉制作的刺桐花真漂亮，禄良前辈还送了我一件，我会好好珍藏的！"
+    },
+    "2004": {
+      "thing_id": 110904,
+      "pre_pic": "",
+      "enity_id": 110004,
+      "type": 2,
+      "id": 2004,
+      "task_id": 11106007,
+      "pic": "TextureConfig/SandPlay_QuanZhou/QuanZhou_CollectBook/MainPlot_04",
+      "desc": "禄良前辈真的很厉害，居然那么轻易就察觉到了问题所在，并且迅速帮助阿玛尔塔寻来了新的香料，解除了因为调味不同导致食客不满的危机。"
+    },
+    "2005": {
+      "thing_id": 110905,
+      "pre_pic": "",
+      "enity_id": 110005,
+      "type": 2,
+      "id": 2005,
+      "task_id": 11108006,
+      "pic": "TextureBg/SandPlay_QuanZhou/QuanZhou_CollectBook/QuanZhou_CollectBook_perform_01",
+      "desc": "巡船节完美落幕，骸能风暴也顺利解决。这个时候当然要合影留念啦~\\n一起说，茄——子——！"
+    }
+  },
+  "sea_stages": {
+    "400001": {
+      "reward": 0,
+      "stage_id": 5240201,
+      "type": 1,
+      "model_list": "",
+      "pre_stage": 0,
+      "desc": "航行中将遇到奇怪的船只阻击。",
+      "activity_id": 323841,
+      "recommend_skill": 0,
+      "id": 400001
+    },
+    "400101": {
+      "reward": 32364101,
+      "stage_id": 5240202,
+      "type": 1,
+      "pre_stage": 0,
+      "desc": "航行中将遇到奇怪的船只阻击，请同时小心漂浮的爆桶。\\n似乎有办法将爆桶<color=#FF9500>撞回去</color>？",
+      "activity_id": 323841,
+      "recommend_skill": 2001,
+      "id": 400101,
+      "model_list": [
+        [
+          "QW_NPC_9510",
+          3.06,
+          0.05,
+          -1.12,
+          0,
+          -7.21,
+          0,
+          "dorm_male_idle01"
+        ]
+      ]
+    },
+    "400102": {
+      "reward": 32364102,
+      "stage_id": 5240203,
+      "type": 1,
+      "pre_stage": 0,
+      "desc": "航行中将遇到奇怪的船只阻击，请同时小心漂浮的爆桶。\\n似乎有办法将爆桶<color=#FF9500>撞回去</color>？",
+      "activity_id": 323841,
+      "recommend_skill": 2001,
+      "id": 400102,
+      "model_list": [
+        [
+          "QW_NPC_9074",
+          3.06,
+          0.05,
+          -1.12,
+          0,
+          -7.21,
+          0,
+          "happy02"
+        ]
+      ]
+    },
+    "400103": {
+      "reward": 32364103,
+      "stage_id": 5240204,
+      "type": 1,
+      "pre_stage": 0,
+      "desc": "航行中将遇到奇怪的船只阻击，请同时小心坚固的障碍。\\n也许可以使用<color=#FF9500>穿透敌人</color>的武器！",
+      "activity_id": 323841,
+      "recommend_skill": 2002,
+      "id": 400103,
+      "model_list": [
+        [
+          "QW_NPC_9074",
+          3.06,
+          0.05,
+          -1.12,
+          0,
+          -7.21,
+          0,
+          "happy02"
+        ]
+      ]
+    },
+    "400104": {
+      "reward": 32364104,
+      "stage_id": 5240205,
+      "type": 1,
+      "pre_stage": 0,
+      "desc": "航行中将遇到奇怪的船只阻击，请同时小心坚固的障碍。\\n也许可以使用<color=#FF9500>穿透敌人</color>的武器！",
+      "activity_id": 323841,
+      "recommend_skill": 2002,
+      "id": 400104,
+      "model_list": [
+        [
+          "QW_NPC_9072",
+          2.9,
+          0.05,
+          -1.12,
+          0,
+          -2.763,
+          0,
+          "proud"
+        ],
+        [
+          "QW_NPC_9074",
+          3.35,
+          0.13,
+          -1.84,
+          0,
+          30.55,
+          0,
+          "happy02"
+        ]
+      ]
+    },
+    "400105": {
+      "reward": 32364105,
+      "stage_id": 5240206,
+      "type": 1,
+      "pre_stage": 0,
+      "desc": "航行中将遇到视骸阻击，它们将召唤骸能风暴持续干扰。\\n如果能有持续的<color=#FF9500>防护</color>就好了！",
+      "activity_id": 323841,
+      "recommend_skill": 2003,
+      "id": 400105,
+      "model_list": [
+        [
+          "QW_NPC_9072",
+          2.9,
+          0.05,
+          -1.12,
+          0,
+          -2.763,
+          0,
+          "proud"
+        ],
+        [
+          "QW_NPC_9074",
+          3.35,
+          0.13,
+          -1.84,
+          0,
+          30.55,
+          0,
+          "happy02"
+        ]
+      ]
+    },
+    "400106": {
+      "reward": 32364106,
+      "stage_id": 5240207,
+      "type": 1,
+      "pre_stage": 0,
+      "desc": "航行中将遇到高威胁度视骸阻击，它似乎可以影响主动技能。",
+      "activity_id": 323841,
+      "recommend_skill": 2003,
+      "id": 400106,
+      "model_list": [
+        [
+          "QW_NPC_9060",
+          3.03,
+          0.05,
+          -1.12,
+          0,
+          -7.21,
+          0,
+          "firm"
+        ],
+        [
+          "QW_NPC_9074",
+          3.59,
+          0.13,
+          -1.84,
+          0,
+          26.89,
+          0,
+          "happy02"
+        ],
+        [
+          "QW_NPC_9072",
+          2.24,
+          0.13,
+          -1.993,
+          0,
+          -19.92,
+          0,
+          "proud"
+        ]
+      ]
+    },
+    "400201": {
+      "reward": 32364107,
+      "stage_id": 5240208,
+      "type": 2,
+      "model_list": "",
+      "pre_stage": 0,
+      "desc": "航行中将遇到奇怪的船只阻击，请同时小心漂浮的爆桶。\\n似乎有办法将爆桶<color=#FF9500>撞回去</color>？",
+      "activity_id": 323841,
+      "recommend_skill": 2001,
+      "id": 400201
+    },
+    "400202": {
+      "reward": 32364108,
+      "stage_id": 5240209,
+      "type": 2,
+      "model_list": "",
+      "pre_stage": 400201,
+      "desc": "航行中将遇到奇怪的船只阻击，请同时小心坚固的障碍。\\n也许可以使用<color=#FF9500>穿透敌人</color>的武器！",
+      "activity_id": 323841,
+      "recommend_skill": 2002,
+      "id": 400202
+    },
+    "400203": {
+      "reward": 32364109,
+      "stage_id": 5240210,
+      "type": 2,
+      "model_list": "",
+      "pre_stage": 400202,
+      "desc": "航行中将遇到视骸阻击，它们将召唤骸能风暴持续干扰。\\n如果能有持续的<color=#FF9500>防护</color>就好了！",
+      "activity_id": 323841,
+      "recommend_skill": 2003,
+      "id": 400203
+    },
+    "400204": {
+      "reward": 32364110,
+      "stage_id": 5240211,
+      "type": 2,
+      "model_list": "",
+      "pre_stage": 400203,
+      "desc": "航行中将遇到高威胁度视骸阻击，它似乎可以影响主动技能。",
+      "activity_id": 323841,
+      "recommend_skill": 2003,
+      "id": 400204
+    }
+  },
+  "sea_skills": {
+    "1001": {
+      "icon": "1074",
+      "name": "",
+      "id": 1001,
+      "type": 1,
+      "desc": "船员跟随出航时<color=#5AB283>普通弹</color>的等级上限提升，命中敌人后产生爆炸范围伤害",
+      "icon_bullet": "QuanZhou_Navigation_editShell_0001",
+      "tag": "",
+      "task_id": 11104004,
+      "icon_show": "",
+      "affix_list": [
+        9355,
+        1,
+        3
+      ]
+    },
+    "1002": {
+      "icon": "1072",
+      "name": "",
+      "id": 1002,
+      "type": 1,
+      "desc": "船员跟随出航时<color=#62A2C7>激光弹</color>的等级上限提升，激光将锁定距离最近的敌人",
+      "icon_bullet": "QuanZhou_Navigation_editShell_0002",
+      "tag": "",
+      "task_id": 11106005,
+      "icon_show": "",
+      "affix_list": [
+        9356,
+        1,
+        3
+      ]
+    },
+    "1003": {
+      "icon": "1060",
+      "name": "",
+      "id": 1003,
+      "type": 1,
+      "desc": "船员跟随出航时<color=#D7893B>追踪弹</color>的等级上限提升，命中后分裂成数个追踪弹",
+      "icon_bullet": "QuanZhou_Navigation_editShell_0003",
+      "tag": "",
+      "task_id": 11108003,
+      "icon_show": "",
+      "affix_list": [
+        9357,
+        1,
+        3
+      ]
+    },
+    "2001": {
+      "icon": "QuanZhou_Navigation_skill_0001",
+      "name": "冲击梁",
+      "id": 2001,
+      "type": 2,
+      "desc": "船只加速向前冲刺，过程中无视伤害并对碰到敌人造成大量伤害，<color=#FF9500>可以撞飞爆桶</color>",
+      "icon_bullet": "",
+      "tag": "冲撞",
+      "task_id": 11103005,
+      "icon_show": "QuanZhou_Navigation_skillSet_0001",
+      "affix_list": [
+        9358,
+        1,
+        3
+      ]
+    },
+    "2002": {
+      "icon": "QuanZhou_Navigation_skill_0002",
+      "name": "船首炮",
+      "id": 2002,
+      "type": 2,
+      "desc": "保持长按进行蓄力，蓄力时移动速度降低，松开后根据蓄力进度发射<color=#FF9500>高伤害穿透激光</color>",
+      "icon_bullet": "",
+      "tag": "穿透",
+      "task_id": 11105005,
+      "icon_show": "QuanZhou_Navigation_skillSet_0002",
+      "affix_list": [
+        9359,
+        1,
+        3
+      ]
+    },
+    "2003": {
+      "icon": "QuanZhou_Navigation_skill_0003",
+      "name": "驭风台",
+      "id": 2003,
+      "type": 2,
+      "desc": "获得限时护盾，<color=#FF9500>格挡</color>持续期间受到的伤害造成<color=#FF9500>范围反伤</color>",
+      "icon_bullet": "",
+      "tag": "反伤",
+      "task_id": 11107009,
+      "icon_show": "QuanZhou_Navigation_skillSet_0003",
+      "affix_list": [
+        9360,
+        1,
+        3
+      ]
+    }
+  },
+  "sand_battles": {
+    "5240221": {
+      "map": "5240221",
+      "name": "麟钰",
+      "ai_level": 1,
+      "type": 85,
+      "id": 5240221,
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1200,
+        7500
+      ],
+      "hero_list": [
+        [
+          1073,
+          10730002
+        ],
+        [
+          1072,
+          10720001
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240222": {
+      "map": "5240222",
+      "name": "麟钰簪花皮",
+      "ai_level": 1,
+      "type": 85,
+      "id": 5240222,
+      "monster_level": 80,
+      "attribute_factor": [
+        1000,
+        1200,
+        18000
+      ],
+      "hero_list": [
+        [
+          1073,
+          10730101
+        ],
+        [
+          1074,
+          10740102
+        ],
+        [
+          1060,
+          10600002
+        ]
+      ]
+    }
+  },
+  "sea_battles": {
+    "5240201": {
+      "map": "5240201",
+      "name": "出航准备",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240201,
+      "tips": "让我们先来学习一下怎么操作船只吧。",
+      "attribute_factor": [
+        1000,
+        1000,
+        1000
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240202": {
+      "map": "5240202",
+      "name": "近海贸易Ⅰ",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240202,
+      "tips": "将李爷爷的瓷器素胚送往隔壁港口。",
+      "attribute_factor": [
+        1000,
+        1000,
+        1000
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240203": {
+      "map": "5240203",
+      "name": "近海贸易Ⅱ",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240203,
+      "tips": "织染坊的王叔出海去对岸岛上的桑树园清点织染要用到的织布迟迟未归，担心他会遇到海上风暴，麟钰和英招决定去寻找他。",
+      "attribute_factor": [
+        1000,
+        1000,
+        1000
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240204": {
+      "map": "5240204",
+      "name": "远洋贸易Ⅰ",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240204,
+      "tips": "瓦伦西亚决定使用鸣玉制作工艺品，但手边没有鸣玉原石，刚好禄良知道哪里可以获得。",
+      "attribute_factor": [
+        1000,
+        1000,
+        1000
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240205": {
+      "map": "5240205",
+      "name": "远洋贸易Ⅱ",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240205,
+      "tips": "前往附近港口的药草集散点，为阿玛尔塔采购调味酱的原料。",
+      "attribute_factor": [
+        1000,
+        1000,
+        1000
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240206": {
+      "map": "5240206",
+      "name": "暗礁风暴Ⅰ",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240206,
+      "tips": "海上的风浪越来越大，还检测到了骸能反应。但不少船都已经提前出海，麟钰需要带回刺桐港外的航船。",
+      "attribute_factor": [
+        1000,
+        1000,
+        1000
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240207": {
+      "map": "5240207",
+      "name": "暗礁风暴Ⅱ",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240207,
+      "tips": "骸能风暴已经迫近，快出海与孟章汇合，解决这次危机。",
+      "attribute_factor": [
+        1000,
+        1000,
+        1000
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240208": {
+      "map": "5240208",
+      "name": "深海危机Ⅰ",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240208,
+      "tips": "海面上的威胁并没有被完全解决，小心为上。",
+      "attribute_factor": [
+        1500,
+        1000,
+        1600
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240209": {
+      "map": "5240209",
+      "name": "深海危机Ⅱ",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240209,
+      "tips": "海面上的威胁并没有被完全解决，小心为上。",
+      "attribute_factor": [
+        1500,
+        1000,
+        1600
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240210": {
+      "map": "5240210",
+      "name": "深海危机Ⅲ",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240210,
+      "tips": "海面上的威胁并没有被完全解决，小心为上。",
+      "attribute_factor": [
+        1800,
+        1000,
+        1600
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "5240211": {
+      "map": "5240211",
+      "name": "深海危机Ⅳ",
+      "monster_level": 80,
+      "type": 84,
+      "id": 5240211,
+      "tips": "海面上的威胁并没有被完全解决，小心为上。",
+      "attribute_factor": [
+        1300,
+        1000,
+        1600
+      ],
+      "hero_list": [
+        [
+          6133,
+          613301
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    }
+  },
+  "point_rewards": {
+    "32364101": {
+      "need": 1,
+      "system_key": 40007701,
+      "need_item_id": 77,
+      "activity_id": 323841,
+      "id": 32364101,
+      "special_level": "",
+      "reward_item_list": [
+        [
+          1073,
+          1
+        ],
+        [
+          1,
+          20
+        ],
+        [
+          22003,
+          2
+        ]
+      ]
+    },
+    "32364102": {
+      "need": 2,
+      "system_key": 40007701,
+      "need_item_id": 77,
+      "activity_id": 323841,
+      "id": 32364102,
+      "special_level": "",
+      "reward_item_list": [
+        [
+          91010,
+          1
+        ],
+        [
+          1,
+          20
+        ],
+        [
+          22003,
+          2
+        ]
+      ]
+    },
+    "32364103": {
+      "need": 3,
+      "system_key": 40007701,
+      "need_item_id": 77,
+      "activity_id": 323841,
+      "id": 32364103,
+      "special_level": "",
+      "reward_item_list": [
+        [
+          91011,
+          1
+        ],
+        [
+          1,
+          20
+        ],
+        [
+          22003,
+          2
+        ]
+      ]
+    },
+    "32364104": {
+      "need": 4,
+      "system_key": 40007701,
+      "need_item_id": 77,
+      "activity_id": 323841,
+      "id": 32364104,
+      "special_level": "",
+      "reward_item_list": [
+        [
+          30013,
+          5
+        ],
+        [
+          1,
+          20
+        ],
+        [
+          22003,
+          2
+        ]
+      ]
+    },
+    "32364105": {
+      "need": 5,
+      "system_key": 40007701,
+      "need_item_id": 77,
+      "activity_id": 323841,
+      "id": 32364105,
+      "special_level": "",
+      "reward_item_list": [
+        [
+          7019,
+          1
+        ],
+        [
+          1,
+          20
+        ],
+        [
+          22003,
+          2
+        ]
+      ]
+    },
+    "32364106": {
+      "need": 6,
+      "system_key": 40007701,
+      "need_item_id": 77,
+      "activity_id": 323841,
+      "id": 32364106,
+      "special_level": "",
+      "reward_item_list": [
+        [
+          9008,
+          1
+        ],
+        [
+          1,
+          20
+        ],
+        [
+          22003,
+          2
+        ]
+      ]
+    },
+    "32364107": {
+      "need": 7,
+      "system_key": 40007701,
+      "need_item_id": 77,
+      "activity_id": 323841,
+      "id": 32364107,
+      "special_level": "",
+      "reward_item_list": [
+        [
+          91012,
+          1
+        ],
+        [
+          1,
+          20
+        ],
+        [
+          22003,
+          2
+        ]
+      ]
+    },
+    "32364108": {
+      "need": 8,
+      "system_key": 40007701,
+      "need_item_id": 77,
+      "activity_id": 323841,
+      "id": 32364108,
+      "special_level": "",
+      "reward_item_list": [
+        [
+          91013,
+          1
+        ],
+        [
+          1,
+          20
+        ],
+        [
+          22003,
+          2
+        ]
+      ]
+    },
+    "32364109": {
+      "need": 9,
+      "system_key": 40007701,
+      "need_item_id": 77,
+      "activity_id": 323841,
+      "id": 32364109,
+      "special_level": "",
+      "reward_item_list": [
+        [
+          30013,
+          5
+        ],
+        [
+          1,
+          20
+        ],
+        [
+          22003,
+          2
+        ]
+      ]
+    },
+    "32364110": {
+      "need": 10,
+      "system_key": 40007701,
+      "need_item_id": 77,
+      "activity_id": 323841,
+      "id": 32364110,
+      "special_level": "",
+      "reward_item_list": [
+        [
+          2925,
+          1
+        ],
+        [
+          1,
+          20
+        ],
+        [
+          22003,
+          2
+        ]
+      ]
+    }
+  },
+  "drops": {
+    "32364101": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 32364101,
+      "base_drop": [
+        [
+          1,
+          20,
+          100
+        ],
+        [
+          40103,
+          10,
+          100
+        ],
+        [
+          22003,
+          2,
+          100
+        ]
+      ]
+    },
+    "32364102": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 32364102,
+      "base_drop": [
+        [
+          1,
+          20,
+          100
+        ],
+        [
+          40103,
+          10,
+          100
+        ],
+        [
+          22003,
+          2,
+          100
+        ]
+      ]
+    },
+    "32364103": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 32364103,
+      "base_drop": [
+        [
+          1,
+          20,
+          100
+        ],
+        [
+          40103,
+          10,
+          100
+        ],
+        [
+          22003,
+          2,
+          100
+        ]
+      ]
+    },
+    "32364104": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 32364104,
+      "base_drop": [
+        [
+          1,
+          20,
+          100
+        ],
+        [
+          40103,
+          10,
+          100
+        ],
+        [
+          22003,
+          2,
+          100
+        ]
+      ]
+    },
+    "32364105": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 32364105,
+      "base_drop": [
+        [
+          1,
+          20,
+          100
+        ],
+        [
+          40103,
+          10,
+          100
+        ],
+        [
+          22003,
+          2,
+          100
+        ]
+      ]
+    },
+    "32364106": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 32364106,
+      "base_drop": [
+        [
+          1,
+          20,
+          100
+        ],
+        [
+          40103,
+          10,
+          100
+        ],
+        [
+          22003,
+          2,
+          100
+        ]
+      ]
+    },
+    "32364107": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 32364107,
+      "base_drop": [
+        [
+          1,
+          20,
+          100
+        ],
+        [
+          40103,
+          10,
+          100
+        ],
+        [
+          22003,
+          2,
+          100
+        ]
+      ]
+    },
+    "32364108": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 32364108,
+      "base_drop": [
+        [
+          1,
+          20,
+          100
+        ],
+        [
+          40103,
+          10,
+          100
+        ],
+        [
+          22003,
+          2,
+          100
+        ]
+      ]
+    },
+    "32364109": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 32364109,
+      "base_drop": [
+        [
+          1,
+          20,
+          100
+        ],
+        [
+          40103,
+          10,
+          100
+        ],
+        [
+          22003,
+          2,
+          100
+        ]
+      ]
+    },
+    "32364110": {
+      "weight_drop": "",
+      "weight_drop_count": 0,
+      "random_drop": "",
+      "id": 32364110,
+      "base_drop": [
+        [
+          1,
+          20,
+          100
+        ],
+        [
+          40103,
+          10,
+          100
+        ],
+        [
+          22003,
+          2,
+          100
+        ]
+      ]
+    }
+  },
+  "level_item": {
+    "decompose_id": 0,
+    "name": "见闻等级",
+    "compose_id": 0,
+    "type": 1,
+    "id": 77,
+    "rare": 5,
+    "desc": "待正式文案",
+    "limit": 0,
+    "sub_type": 0,
+    "littleicon": "70",
+    "display_rare": 5,
+    "icon": "70",
+    "use": 0,
+    "max": 0,
+    "source": []
+  },
+  "description": "1.季风时节，麟钰重返故地刺桐港，与新朋旧友们一同筹办名为「巡船节」的海路展销活动，刺桐古船即将扬帆启航。\n2.在「刺桐港埠漫行纪」活动中，管理员可以通过完成「主线任务」来推进剧情故事。在探索过程中还会遇到一些「支线任务」。\n3.在「刺桐港埠漫行纪」活动中，管理员可以参与「渡洋承运」玩法，控制古船出航。航行过程中会遇到敌人，可以凭借船员和改装部件的能力击退敌人到达终点。\n4.「刺桐港」内有很多值得探索的内容。在「刺桐港埠漫行纪」活动中，管理员需要通过完成「主线任务」和探索「刺桐港」来获得见闻等级，每级见闻等级会对应一些奖励。",
+  "level_tasks": {
+    "60501": {
+      "name": "4.0-当期推荐",
+      "pre_id": 0,
+      "type": 211,
+      "source": "",
+      "condition": 300,
+      "desc": "在「刺桐港埠漫行纪」中见闻等级达到3级",
+      "need": 3,
+      "activity_id": 0,
+      "system": "",
+      "id": 60501,
+      "phase": 0,
+      "additional_parameter": [
+        77
+      ],
+      "reward": [
+        [
+          41302,
+          50
+        ]
+      ],
+      "unlock_condition": [
+        30,
+        100
+      ]
+    },
+    "60502": {
+      "name": "4.0-当期推荐",
+      "pre_id": 0,
+      "type": 211,
+      "source": "",
+      "condition": 300,
+      "desc": "在「刺桐港埠漫行纪」中见闻等级达到5级",
+      "need": 5,
+      "activity_id": 0,
+      "system": "",
+      "id": 60502,
+      "phase": 0,
+      "additional_parameter": [
+        77
+      ],
+      "reward": [
+        [
+          40603,
+          100
+        ]
+      ],
+      "unlock_condition": [
+        30,
+        100
+      ]
+    },
+    "60503": {
+      "name": "4.0-当期推荐",
+      "pre_id": 0,
+      "type": 211,
+      "source": "",
+      "condition": 300,
+      "desc": "在「刺桐港埠漫行纪」中见闻等级达到8级",
+      "need": 8,
+      "activity_id": 0,
+      "system": "",
+      "id": 60503,
+      "phase": 0,
+      "additional_parameter": [
+        77
+      ],
+      "reward": [
+        [
+          40104,
+          80
+        ]
+      ],
+      "unlock_condition": [
+        30,
+        100
+      ]
+    },
+    "60504": {
+      "name": "4.0-当期推荐",
+      "pre_id": 0,
+      "type": 211,
+      "source": "",
+      "condition": 300,
+      "desc": "在「刺桐港埠漫行纪」中见闻等级达到10级",
+      "need": 10,
+      "activity_id": 0,
+      "system": "",
+      "id": 60504,
+      "phase": 0,
+      "additional_parameter": [
+        77
+      ],
+      "reward": [
+        [
+          1,
+          300
+        ]
+      ],
+      "unlock_condition": [
+        30,
+        100
+      ]
+    }
+  },
+  "chapters": {},
+  "source_sha256": {
+    "decompiled_v2/x64/game/config/activitycfg.lua": "34170d09ef5fd14829933cdc85ba9e1fe45b0072971aa9520366ba2c2b0182fd",
+    "decompiled_v2/x64/game/config/activitysandplaycfg.lua": "5bcff2e46b8e71942eb322f0e258b5623b7fdb6baa207785359af106439467cc",
+    "decompiled_v2/x64/game/config/sandplaymapcfg.lua": "83f59129d2aae9c9b37f8edbbf232e5076e89dfca98e1da43cee83eb860f0a5a",
+    "decompiled_v2/x64/game/config/sandplaytaskmaincfg.lua": "9d90adc27a9d6eca3d0d908a4c24ed0b98401536c95ba8c46d899cae44c5e1da",
+    "decompiled_v2/x64/game/config/sandplaytaskcfg.lua": "06561714285dc0f5bbe9b634ae1414869df74f2f6cbc68d4e51d6c9580156b9b",
+    "decompiled_v2/x64/game/config/conditioncfg.lua": "ed79f765579f9fbccb0ed52fe7563f6334d6777b9510e575ab970979bd768511",
+    "decompiled_v2/x64/game/config/sandplaysystemcfg.lua": "7033f2e3f21cd39a92cb092008a7a31376a615b190da5fa94daacc44317777aa",
+    "decompiled_v2/x64/game/config/sandplayfunctionopencfg.lua": "8d450698ecfb7e457ddff14e92f53269750d7bd97efecf1e3922ba85dcee9ce6",
+    "decompiled_v2/x64/game/config/quanzhouphasecfg.lua": "ab8174af1c84975ad6bf0b6016b067ad4a3613a49274cfbd5440746d00d255e2",
+    "decompiled_v2/x64/game/config/quanzhouphotocfg.lua": "b9651314c4e9145cf5b53aaea0719ad4a13f02c32397d339397076158d82cae5",
+    "decompiled_v2/x64/game/config/seawarfarestagecfg.lua": "18844bc400112f58eb596c6411c2b679aa86f8d672800bbc26f2c931eb8d3b4e",
+    "decompiled_v2/x64/game/config/seawarfareskillcfg.lua": "5eaae5aafaa4b3be60b9188c9ceba46e6897dfba9d82a3f710c558959fc9d978",
+    "decompiled_v2/x64/game/config/battlesandplaystagecfg.lua": "385839617a3705ee7909e51b3851c3c82f2b71cc097b9b81af1c833606b657bf",
+    "decompiled_v2/x64/game/config/battleseawarfarestagecfg.lua": "0e4879470ad3131db026757232f5e3864d34206c8b31d80dc52a1381ab3a9ba2",
+    "decompiled_v2/x64/game/config/activitypointrewardcfg.lua": "cb88c730e78d9c5cda3b7849cd4aa91a2c14b4a647f9e4d6a0700bbb65907d61",
+    "decompiled_v2/x64/game/config/dropcfg.lua": "58001c2766fbce644d2b7f0674fff8e1524b0bda9d851996666814cc0bd87b15",
+    "decompiled_v2/x64/game/config/itemcfg.lua": "139d084ca636e1706de76064aea7caa4bd7867eb5f1c9546c83b1d1209546f99",
+    "decompiled_v2/x64/game/config/sandplaytaskchaptercfg.lua": "23390ab76125bbdab342176e7cdb378fa67008611852c12ad09cf8cc549c16e8",
+    "decompiled_v2/x64/game/config/assignmentcfg.lua": "e5455ded9e1976c208b5174c3000252ead0185733d10a872be0eed2fb338d28a",
+    "decompiled_v2/x64/game/config/tipscfg.lua": "5eb2490cfa9694aa8d419dd94edba4d884ed14c7d08865901618d39eddb5038f"
+  }
+}

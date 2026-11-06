@@ -899,6 +899,32 @@ class TrustService:
     def _init_event_listeners(self):
         """挂载全局事件总线监听器：出战心情动力学与每日5点跨天刷新"""
 
+        @bus.subscribe(Events.TRUST_MOOD_CHANGE)
+        def on_trust_mood_change(ctx, uid, hero_id=0, old_mood=0, new_mood=0, reason='', **kwargs):
+            # 开启交心已有73021/14007同步，不能重复接管其原生回调。
+            if reason not in ('battle_win', 'daily_reset_5am') or old_mood == new_mood:
+                return
+            db = getattr(ctx, 'db', None)
+            if not db or not self.is_hero_supported(hero_id) or not db.query(
+                    'SELECT 1 FROM hero WHERE uid=? AND id=? AND unlock=1 AND trust_level>=1', (uid, hero_id)):
+                return
+            if reason == 'battle_win':
+                # 此时其他成长消费者可能尚未执行。结算完成后再取最终快照，
+                # 并放到54033/54039后，避免原生回调重复累加熟练度。
+                if not hasattr(ctx, 'pending_trust_mood_heroes'):
+                    ctx.pending_trust_mood_heroes = set()
+                ctx.pending_trust_mood_heroes.add(int(hero_id))
+            else:
+                from hero_codec import build_hero_14007_frame
+                frame = build_hero_14007_frame(db, uid, hero_id)
+                if frame:
+                    if hasattr(ctx, 'append_frame'):
+                        ctx.append_frame(frame)
+                    else:
+                        if not hasattr(ctx, 'pending_frames'):
+                            ctx.pending_frames = []
+                        ctx.pending_frames.append(frame)
+
         @bus.subscribe(Events.STAGE_PASS)
         def on_stage_pass(ctx, uid, **kwargs):
             """监听战斗胜利通关：白名单二阶好感英雄出战胜场累计驱动心情升级

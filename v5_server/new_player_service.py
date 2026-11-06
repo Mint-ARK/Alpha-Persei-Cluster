@@ -169,6 +169,8 @@ def ensure_tasks(db, uid, now=None, *, res_version=None):
                 (uid,task_id,task_type,progress,complete_flag,expired_ts,claimed_ts)
                 VALUES(?,?,?,?,0,0,0)''', (uid, tid, kind, progress))
         ensure_activity_tasks(db, uid, get_activity_list(db, uid, res_version), res_version, now)
+        from quanzhou_collection import ensure_tasks as ensure_quanzhou_tasks
+        ensure_quanzhou_tasks(db, uid)
         close_noob_if_complete(db, uid, now)
 
 
@@ -426,7 +428,44 @@ def payload(db, uid, cmd, *, res_version=None):
             newbie_recharge_reward=recharge_service.RechargeService.get_instance(db=db).build_59009_payload(db,uid)['newbie_recharge_reward'])
     if cmd == 28001:
         ensure_tasks(db,uid,res_version=res_version)
-        rows=db.query('SELECT * FROM task WHERE uid=?',(uid,))
+        from admin_cat_dispatch_progress import project_tasks as restore_cat_dispatch_tasks
+        restore_cat_dispatch_tasks(db,uid)
+        from rogue_card_progress import restore_for_login
+        restore_for_login(db,uid)
+        from resident_music_service import restore_for_login as restore_music_tasks
+        restore_music_tasks(db,uid)
+        from pinball_service import restore_for_login as restore_pinball_tasks
+        restore_pinball_tasks(db,uid)
+        from kadas_race_service import restore_for_login as restore_kadas_tasks, visible_tasks
+        restore_kadas_tasks(db,uid)
+        from vehicle_ball_service import restore_for_login as restore_vehicle_tasks, visible_tasks as visible_vehicle_tasks
+        restore_vehicle_tasks(db,uid)
+        from hodur_service import restore_for_login as restore_hodur_tasks, visible_tasks as visible_hodur_tasks
+        restore_hodur_tasks(db,uid)
+        from ash_service import restore_for_login as restore_ash_tasks, visible_tasks as visible_ash_tasks
+        restore_ash_tasks(db,uid)
+        from summer_pub_service import restore_for_login as restore_pub_tasks, visible_tasks as visible_pub_tasks
+        restore_pub_tasks(db,uid)
+        from osiris_service import restore_for_login as restore_osiris_tasks, visible_tasks as visible_osiris_tasks
+        restore_osiris_tasks(db,uid)
+        from skuld_service import restore_for_login as restore_skuld_tasks, visible_tasks as visible_skuld_tasks
+        restore_skuld_tasks(db,uid)
+        from summer_board_progress import project_tasks as restore_board_tasks
+        restore_board_tasks(db,uid)
+        from sphero_battle_service import project_tasks as restore_sphero_tasks
+        restore_sphero_tasks(db,uid)
+        from sphero_leisure_service import project_tasks as restore_leisure_tasks
+        restore_leisure_tasks(db,uid)
+        from autochess_progress import project_tasks as restore_autochess_tasks
+        restore_autochess_tasks(db,uid)
+        from offline_minigame_rewards import restore_tasks as restore_offline_rewards
+        restore_offline_rewards(db,uid)
+        from quanzhou_collection import project_tasks as restore_quanzhou_tasks
+        restore_quanzhou_tasks(db,uid)
+        rows=visible_tasks(db,uid,db.query('SELECT * FROM task WHERE uid=?',(uid,)))
+        rows=visible_ash_tasks(db,uid,visible_hodur_tasks(db,uid,visible_vehicle_tasks(db,uid,rows)))
+        rows=visible_osiris_tasks(db,uid,visible_pub_tasks(db,uid,rows))
+        rows=visible_skuld_tasks(db,uid,rows)
         def phase(kind):
             return max([int(config()['tasks'][str(r['task_id'])]['phase'] or 1) for r in rows
                         if str(r['task_id']) in config()['tasks'] and config()['tasks'][str(r['task_id'])]['type']==kind] or [1])
@@ -435,16 +474,13 @@ def payload(db, uid, cmd, *, res_version=None):
         rows=db.query('SELECT id_list FROM loading_set WHERE uid=?',(uid,))
         return dict(id_list=json.loads(rows[0]['id_list']) if rows else [])
     if cmd == 44009:
-        rows=db.query('SELECT partition_id,star FROM mythic_progress_partition WHERE uid=?',(uid,))
-        selected=(db.get('mythic_public',uid) or {}).get('current_difficulty') or 1
-        stars=next((int(r['star'] or 0) for r in rows if r['partition_id']==selected),0)
-        return dict(clear_partition_id_list=[r['partition_id'] for r in rows],main_partition_star_list=list(range(1,stars+1)),star_reward_provide_list=[r['reward_id'] for r in db.query('SELECT reward_id FROM mythic_progress_reward WHERE uid=?',(uid,))])
+        from mythic_normal_service import payload as normal_payload
+        return normal_payload(db,uid)
     if cmd == 44019:
         return dict(open_difficulty_list=mythic_open(db,uid),difficulty=(db.get('mythic_public',uid) or {}).get('current_difficulty') or 1,is_new_difficulty=False)
     if cmd == 44023:
-        row=db.get('mythic_final_progress',uid) or {}
-        return dict(difficulty_id_can_choose=json.loads(row.get('can_choose_list') or '[1]'),now_difficulty=row.get('now_difficulty') or 1,
-                    receive_reward=json.loads(row.get('receive_reward_list') or '[]'),clear_list=json.loads(row.get('clear_list') or '[]'),is_new_difficulty=False,challenge_info=json.loads(row.get('challenge_info_json') or '[]'))
+        from mythic_cycle import final_payload
+        return final_payload(db.get_mythic_final_progress(uid))
     if cmd == 62011:
         return dict(end_timestamps=0,return_vs_id=110,return_level=1,mul_times=1,
                     receive_sign_index=0,received_sign_list=[],left_day=0,find_time=0,
