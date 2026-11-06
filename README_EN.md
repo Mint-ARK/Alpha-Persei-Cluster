@@ -1,8 +1,8 @@
 # Alpha Persei Cluster
 
-> This project is maintained by one person. Recent commitments may slow down bug investigation and fixes; thank you for your patience and understanding.
+> This project is maintained independently by an individual. Due to heavy workloads recently, troubleshooting and issue fixes may take some time. Thank you for your patience and understanding.
 
-> **Troubleshooting**: Start with the [issue index and scan reports](https://github.com/Mint-ARK/Alpha-Persei-Cluster/blob/codex/diagnostic-reports-20261020/reports/README.md). Find the relevant feature and symptom, then use the report's initial diagnosis, files, and protocol entry points to investigate, or share it with an agent for help. When opening an Issue, include your client platform, version, reproduction steps, relevant logs, and the matching A-number if available.
+> **Troubleshooting**: Please refer first to the [Issue Index and Diagnostic Reports](https://github.com/Mint-ARK/Alpha-Persei-Cluster/blob/codex/diagnostic-reports-20261020/reports/README.md). Locate the corresponding report based on feature modules and error symptoms, then investigate using the preliminary diagnosis, related files, and protocol entry points; you may also feed the report to an AI Agent for assisted localization. When submitting an Issue, please include your client platform, version, reproduction steps, and relevant logs, noting the corresponding "A-number" if applicable.
 
 <div align="center">
 
@@ -16,62 +16,172 @@
 ![Status](https://img.shields.io/badge/Milestone-Stage%201%20Completed-brightgreen?style=flat-square)
 
 <p align="center">
-  <b>A local offline simulation server (LocalServer) developed for Aether Gazer, designed to keep the game playable via local host redirection even if official game servers become unavailable.</b>
+  <b>A local offline simulation server (LocalServer) built for Aether Gazer, designed to keep the game playable via local HOST redirection and network emulation even after official servers are shut down.</b>
 </p>
-
 </div>
 
 > 📖 **Developer's Note / Behind the Scenes**:  
-> Curious about the story, motivations, and journey behind this project? Check out the author's blog post: [About LocalServer - MoriaRuRuka (Chinese)](https://moriaruruka.com/2026/09/24/411/).
+> Want to know the journey, motivations, and musings behind this project? Welcome to read the blog post: [About LocalServer - MoriaRuRuka (Chinese)](https://moriaruruka.com/2026/09/24/411/).
 
-## Current release: v5.0.1 (2026-10-19)
+## 🚀 Changelog (2026.11.06)
 
-This maintenance release updates runtime flows and packaging integrity. Download the validated portable, installer, or backend package from [v5.0.1](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/tag/v5.0.1). See the [changelog](CHANGELOG.md) and verify downloads with [SHA256SUMS.txt](SHA256SUMS.txt).
+## Current Release: v5.0.3 (2026-11-06)
 
-**We recommend the portable ZIP (`AetherGazer_Server_v5.0_Portable.zip`), which requires no installation.** After extracting it, choose either CMD by running `启动离线单机服务(控制台).bat`, or the desktop launcher by running `LocalServer.exe` / `启动离线单机服务(GUI界面).bat`. The installer remains optional.
+This release introduces password protection for the web management console in public network deployments and deep fixes for minigames and core gameplay systems. To download validated portable packages, installer packages, or Linux core archives, visit the [v5.0.3 Release Page](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/tag/v5.0.3); see [Changelog](CHANGELOG.md) for full commit records and verify downloaded archives using [`SHA256SUMS_v5.0.3.txt`](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/SHA256SUMS_v5.0.3.txt).
 
-Back up your database, extract to a separate directory, and stop the previous server before starting the update. Distribution certificates are separate from the development environment; mobile devices must install and trust the certificate/profile provided by their current host. Full game resources and external CDN caches are not included.
+**We strongly recommend downloading the portable archive [`AetherGazer_Server_v5.0.3_Portable.zip`](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Portable.zip), which requires no installation.** After extraction, you can launch it via `启动离线单机服务(控制台).bat` for command-line mode, or run `LocalServer.exe` / `启动离线单机服务(GUI界面).bat` for the desktop host. For Linux users, please use [`AetherGazer_Server_v5.0.3_Linux_Core.zip`](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Linux_Core.zip) and execute `sh server.sh setup` to complete the interactive setup and set an administrator security password.
 
-**Platform and resource support:**
+### Key Update Highlights:
 
-| Platform | Supported builds | Notes |
+1. **Web Console Password Authentication**: Added an administrative password protection mechanism designed for public server deployments. Please remember the password set during initialization.
+2. **Windows Core Source Package**: Released a lightweight core package containing pre-built web assets without bundled desktop launchers or pre-installed Python environments.
+3. **Overhauled Linux Deployment Wizard**: The streamlined setup script is now fully compatible with WSL 2 (Ubuntu 20.04+), Termux (Android 8.1+ Rooted), and OpenCloudOS 9.
+4. **Minigame Gameplay Logic Completion**:
+   1. **Citong Alley (Quanzhou)**: 53 main quests, 129 sub-quests, 11 sailing stages, and 2 character battles; quest milestone rewards yield **2.7x** the requirement for max level, allowing players to claim all rewards without exhausting all exploration.
+   2. **Battle of Dojo (Autochess)**: Players can now directly challenge the configured boss after four consecutive wins and claim victory rewards properly.
+   3. **Verthandi Resident Event**: Passing stages now directly awards full scores, eliminating repetitive grinding.
+   4. **Resident Events**: Fixed erroneous deliveries of expired limited-time rewards.
+5. **Fictional Deduction (RogueTeam) Iteration**:
+   Incorporated the community patch from **[Issue #8](https://github.com/Mint-ARK/Alpha-Persei-Cluster/issues/8)** and overhauled the finite state machine:
+   - Unified ownership of run sessions, floors, main/hidden maps, nodes, and pending choices to prevent illegal phase skipping, stale session requests, and duplicate settlements.
+   - Fixed drop deduplication, merchant pricing, immediate purchase effects, milestone points, mechanism selection, and reward queues.
+   - Connected transitions for hidden island entries, story battles, reward claims, and returning to the main board.
+   - Fixed the sequencing of endgame battles, story confirmations, settlements, reward distribution, and reconnect recoveries.
+   - Restored 7 active effects across 5 relics, program upgrades, and immediate chain triggers.
+   - Correctly activated, saved, and restored tactical directives upon collecting 6 identical school programs; the first activated school is locked for the run.
+   - Recorded post-battle residual energy and tracked single-directive kill statistics based on genuine battle reports.
+   - Reconnected 17 verified RogueTeam achievements (10 clear/possession, 6 tactical acquisition, 1 single kill).
+   - New saves automatically skip the unready 101 tutorial while retaining 501 story and onboarding guides.
+   *(Note: Per-character HP persistence and remaining relics/tech perks will be polished in subsequent updates; the core state machine, endgame settlements, and achievements are now fully hooked up.)*
+6. **Reward and Achievement System Hardening**:
+   - Deduplicated batched achievement requests and verified eligibility in atomic transactions, preventing duplicate claims or claiming unearned rewards.
+   - Fixed legacy achievement thresholds to avoid faking unread content as fully read.
+   - Fixed gacha ticket deductions and reward granting when essential server responses fail.
+   - Fixed target banner cross-contamination under shared pity pools.
+   - 4-star Functors are now generated strictly according to the currently selected Gen-zone.
+   - Fixed pre-built but unowned characters from being misidentified as owned and prematurely converted to Intel shards.
+   - Aligned displayed rewards with actual inventory increments for permanent items and capacity caps.
+   - Employed delta/instance frames for new functors, sigils, and characters, reducing full-sync overhead.
+   - Prevented fallback SQL insertions when public reward pipelines fail, eliminating duplicate deliveries.
+   - Validated package consumption and candidate choices prior to item usage to prevent empty consumption or out-of-bounds selections.
+7. **Character Progression & Admin Cat Fixes**:
+   - **Sigils**: Fixed slot ownership, double slot occupation, breakthrough costs/experience checks, gen-zone reconstruction confirmations, and invalid enchantment preview indexes.
+   - **Functors**: Fixed awakening targets, materials, and instance handling while preserving transcendence and equip references.
+   - **Chips**: Fixed invalid presets, misaligned characters/slots, and missing prerequisites; achievements now tally real ownership.
+   - **Battles**: Prevented duplicate battle IDs within the same millisecond; concurrent settlements only award assets once.
+   - **Sweeps & Tasks**: Preserved gameplay, team, and combo contexts, preventing battle progression from misfiring lobby interaction quests.
+   - **Mood & Collection**: Restored battle, sweep, and daily reset mood sync; added missing 7-tier faction collection rewards.
+   - **Admin Cat**: Fixed early termination, log config referencing, 05:00 day boundary and weekend claim windows; fixed UI freeze after dispatch.
+8. **Onboarding, Monthly Pass & Customization Fixes**:
+   - Fixed game days, final days, and duplicate claiming in newbie check-in.
+   - Fixed eligibility, claimed records, and task status for newbie level and cumulative progress rewards.
+   - Persistently cleared 5 categories of newbie notification badges.
+   - Prevented base status from overriding active 30-day monthly passes; synchronized online status upon claiming.
+   - Fixed response sequence and failure rollbacks for uncollected battlepass tier rewards.
+   - Fixed loss of stamina recovery baseline when system clocks rollback.
+   - Fixed custom loading wallpapers resetting to default 3 images upon reconnect.
+   - Synchronized illustration reward claim states.
+   - Fixed cross-month blue dot misalignment on the web check-in calendar.
+9. **Linux / WSL / Termux Deployment & CDN Overhaul**:
+   - Unified legacy shell scripts into **`sh server.sh`**, offering interactive setup, env checks, dependency installation, start, stop, and status querying.
+   - Guided setup checks dependencies and ports, captures local/LAN/public IPs, and persists configurations.
+   - Integrated optional Nginx templates with syntax validation, hot reload, and failure rollbacks.
+   - Termux optimizations: high-port defaults, local IP binding, and system package guidance.
+   - Three CDN modes: **off, relay-only, and relay-with-cache** (default: off).
+   - Eliminated invalid outbound IP blocks and fixed HTTP/TLS stream truncation errors.
+   - Resolved Chinese filename encoding issues inside Linux ZIP archives.
+   - **Standardized Official Android Channel to 7** (Channel 8 for Bilibili), synchronizing SDKs, asset probing, and web parameters.
+   - Fixed server selection delays when creating/deleting saves on public iOS instances.
+10. **Recurring Dream, Dark Zone, Polyhedron & WarChess Advancements**:
+
+    | Mode | Key Changes |
+    | :---: | :--- |
+    | **Recurring Dream** | Unified Thursday 05:00 refresh; fixed reward eligibility, boss score collisions, stale cross-period battle reports, post-claim resets, and cross-boss character locks. |
+    | **Hazard Zone (Final)** | Unified Monday/Thursday 05:00 semi-weekly reset; enabled team-relay handoffs and isolated challenge reports across saves. |
+    | **Regular Dark Zone** | Preserved exact star requirements; fixed star rewards eligibility and repeat claims without blindly treating runs as 3-star clears. |
+    | **Iterative Verification** | Added Mode 4 reward eligibility, history tracking, and task rollback logic; remaining modes and 5-team totals will follow. |
+    | **Dimensional Variable** | Fixed "refresh in 7000+ days" bug to **every Monday 05:00**; refined opening, door selection, shops, recruitment, battles, weekly rewards, and reconnect recovery. |
+    | **WarChess (Casualties Observation)** | Completed 14 battles, 3 small chests, 2 large chests, mechanisms, 100% progress, and mission recovery on the initial map. |
+
+11. **Resident Minigames Completion List**:
+
+    | Minigame | Major Improvements |
+    | :---: | :--- |
+    | **Mecha Gear Challenge** | Added stage prerequisites, vehicle unlocks, and archive rewards; fixed kill/retrofit/archive quests; added login state recovery. |
+    | **Night Tales** | Separated main storyline and challenge save slots; fixed exit, interruptions, stale games, and duplicate settlements; added challenge and reading tasks. |
+    | **Climbing Ladder** | Blocked multiplayer matchmaking while granting 4 permanent quest rewards with anti-duplication records. |
+    | **Muted Light Chronicle** | Added normal chapter exploration, prerequisites, resets, and tasks; implemented Extreme Study 4-chain battles with affix, lineup, and HP inheritance. |
+    | **Remote Village / Hela Pinball** | Fixed skill slots and equipped skill validation; separated normal and challenge scores; hooked up Stage 5 battle and mission trackers. |
+    | **Fleeting Melodies (Rhythm)** | Matched songs with tasks; fixed high scores, completion flags, and reconnect recovery; rewards validated against target score thresholds. |
+    | **PVE Autochess (Dojo)** | Overhauled card pools, exp, synthesis, enemy teams, skills, props, shields, summons, ties, coins, retries, replays, and persistence. |
+    | **Train Heist** | Fixed duplicate movie progress rewards, fixed dummy scores, and score collisions; added skill prerequisites, tasks, and dialogue recovery. |
+    | **Food & Another World** | Fixed mismatches between logical stages and asset IDs; resolved first-clear food delivery omissions; added pinballs, companions, and cooking tasks. |
+    | **Tactical Study Records** | Added 18 tutorial stages and 6 sandbox stages with prerequisites, hero locks, and tasks; fixed score caching and first-clear refresh. |
+    | **Citong Alley (Quanzhou)** | Added quest state machine, map positions, feature unlocks, sea battles, character duels, photos, milestone levels, and rewards. |
+    | **Dream Catcher** | Fixed node and plot asset IDs, puzzle prerequisites, and first-clear logic; added 36 node tasks and 9 chapter archive rewards. |
+    | **Summer Board Game** | Added 13 map grids, movement, dice, terrain events, NPCs, shops, 12 item types, QTEs, nested minigames, tasks, and clear history. |
+    | **Verthandi Resident Event** | Added schedule, commissions, acceleration, story, training, boss, barbecue, 20 puzzle stages, garland exchange, and tasks. |
+    | **Kadas Holiday Race** | Fixed course routing, modding slots, setups, and challenge scores; clearly distinguished current limited rewards from resident rewards. |
+
+**Platform and Resource Support Matrix:**
+
+| Platform | Supported Builds | Notes |
 | --- | --- | --- |
-| **PC** | **All three: 229 / 311 / 321** | Resource manifests are configured for all three builds. |
-| **iOS** | **229 / 321; 311 is invalid** | **Build 229 supports the in-app purchase experience**. The maintainer missed capturing the iOS311 resource package, so its corresponding manifests are unavailable. |
-| **Android and other unlisted platforms** | **Manual configuration required** | Due to limited access to devices and testing environments, the corresponding internal asset manifests have not been configured. Users must configure and import them themselves. |
+| **PC** | **All three: 229 / 311 / 321** | Resource manifests are configured and verified for all three client builds. |
+| **iOS** | **229 / 321; 311 is invalid** | **Build 229 supports the in-app purchase simulation**. iOS 311 resource manifests were omitted during initial capture and are currently unavailable. |
+| **Android & Other Platforms** | **Manual configuration required** | Due to limited test devices, internal asset manifests require manual configuration and importing by users. |
 
+## v5.0.2 Detailed Changelog (Included in v5.0.3)
 
-## v5.0.2 source and local build update: 2026-10-26
+1. **Save Slot Management Module**: Real-time selection, creation, and deletion of independent save slots via **Web Panel, Launch Arguments, and In-Game Server Selection**.
+   - Consolidated newbie and Lv.70 generation routines; supports fully customized save creation.
+   - One database per account, establishing clean character, inventory, quest, and gameplay states.
+   - Adjustable starting level from **Lv.1 to Lv.100**, matching cumulative exp and stamina limits to client tables.
+   - Custom or random UID support (numeric, up to 12 digits).
+   - Save names support UTF-8 characters including Chinese and spaces, up to 32 characters.
+   - Independent toggling for the opening 501 storyline and onboarding tutorials.
+   - Supports pre-clearing Prologue through Chapter 5 with first-clear rewards granted directly.
+2. **Three Preset Saves & Support Mail**:
+   - *Full Exploration*: Lv.1, keeps 501 story and feature guides, no pre-cleared stages.
+   - *Skip Prologue*: Lv.1, skips 501, pre-clears Prologue, keeps feature guides.
+   - *Quick Start*: Lv.70, pre-clears Chapters 1~5, skips guides, newbie tasks ready to claim.
+   - Bundles **18 support letters** with stamina props, anniversary characters, signature functors, cosmetics, currency, and materials.
+3. **In-Game Server Selection Converted to Save Slot Manager**:
+   - Create, switch, and delete save slots directly from the server selection screen.
+   - Switch saves without restarting the client; automated backups are preserved before slot deletion.
+4. **Web Management Console Upgrades**:
+   - Independent save management tab with global save switcher in the top navigation bar.
+   - Two-way binding between preset configurations and individual form controls.
+5. **Per-Save AI Profiles & Proactive Greetings**:
+   - Each save maintains its own LLM API keys and model configurations.
+   - Automatic morning greetings upon the first login of each day, dynamically merging solar terms, birthdays, and relationship context.
+6. **Storyline, Gacha, and Battlepass Fixes**:
+   - Fixed trial character battle payloads in Chapter 23, Chapter 19 scanning clues, and stage star chests.
+   - Handled 26 cosmetic/scene gacha pools across builds 311 and 321 with pity carryover.
+   - Weekly battlepass refreshes every Monday at 05:00 with enhanced exp supply mail.
 
-This branch integrates save generation and in-game save selection, UTF-8 launch arguments, activity tasks and shops, first-clear and battle-time fixes, birthday mail, daily AI greetings, and chat-history restoration. Portable archives let Windows users choose the console or desktop launcher; Linux uses the core package. See the [save and AI guide](docs/save_and_ai_guide.md). This update adds per-save API profiles, the Web save manager, paid-entitlement controls and corrected leaderboard sources. Windows and Linux packages are built locally; the Issue #8 patch is not merged.
+## v5.0.2 Source & Local Build Update: 2026-10-26
 
+Integrated independent save generation, in-game save switching, UTF-8 launch arguments, resident activities and shop restorations, first-clear rewards and battle timer fixes, birthday mail, AI daily greetings, and chat history recovery. Portable packages allow choosing CMD or desktop launchers; Linux uses the core package. See [Save and AI Guide](docs/save_and_ai_guide.md).
 
-## v5.0.2 update: 2026-10-28
+## v5.0.2 Addendum: 2026-10-28
 
-Adds per-platform manifest management, an active download queue and shared cache storage. Fixes Build 229 login loading and preserves battlepass progress across resource versions. Packages include account.db and three preset saves with API credentials removed. See the [resource and download guide](docs/resource_download_guide.md).
+Added multi-channel manifest management, active download queues, and unified cache storage. Fixed Build 229 login loading hangs and preserved cross-version battlepass progress. See [Resource Download Guide](docs/resource_download_guide.md).
 
 ---
 
 ## Table of Contents
 
 - [1. Project Overview & Design Philosophy](#1-project-overview--design-philosophy)
-- [2. System Architecture Diagram](#2-system-architecture-diagram)
-- [3. Quick Start & Setup Guide](#3-quick-start--setup-guide)
+- [2. System Architecture Topology Diagram](#2-system-architecture-topology-diagram)
+- [3. Quick Start & Multi-Platform Deployment Guide](#3-quick-start--multi-platform-deployment-guide)
   - [3.1 Prerequisites](#31-prerequisites)
-  - [3.2 Mode A: Desktop Launcher (Recommended)](#32-mode-a-desktop-launcher-recommended)
-  - [3.3 Mode B: Command-Line Interface (CLI)](#33-mode-b-command-line-interface-cli)
-  - [3.4 Client Traffic Redirection](#34-client-traffic-redirection)
-- [4. CLI Arguments Reference](#4-cli-arguments-reference)
+  - [3.2 Windows Deployment & Running (GUI / CLI)](#32-windows-deployment--running-gui--cli)
+  - [3.3 Linux Core Deployment (git / curl / scp)](#33-linux-core-deployment-git--curl--scp)
+  - [3.4 Android Single-Device Standalone Deployment (Root / Termux / sing-box)](#34-android-single-device-standalone-deployment-root--termux--sing-box)
+  - [3.5 iOS Local Area Network (LAN) Setup Guide](#35-ios-local-area-network-lan-setup-guide)
+- [4. Server CLI Arguments Reference](#4-server-cli-arguments-reference)
 - [5. Core Server Architecture: Breakdown of all 70 Modules](#5-core-server-architecture-breakdown-of-all-70-modules)
-  - [5.1 Main Assembly & Lifecycle Entrypoints (4 modules)](#51-main-assembly--lifecycle-entrypoints-4-modules)
-  - [5.2 Network Transport & Listeners (6 modules)](#52-network-transport--listeners-6-modules)
-  - [5.3 Session Scheduling & Dispatch Pipeline (5 modules)](#53-session-scheduling--dispatch-pipeline-5-modules)
-  - [5.4 Dynamic Protobuf Codec & Response Assembly (7 modules)](#54-dynamic-protobuf-codec--response-assembly-7-modules)
-  - [5.5 Data Persistence & Migration (2 modules)](#55-data-persistence--migration-2-modules)
-  - [5.6 Core Business Domain Services (25 modules)](#56-core-business-domain-services-25-modules)
-  - [5.7 Combat & Battle Subsystems (5 modules)](#57-combat--battle-subsystems-5-modules)
-  - [5.8 AI Companion & Dialogue Subsystem (7 modules)](#58-ai-companion--dialogue-subsystem-7-modules)
-  - [5.9 Operations, Logging & Event Listeners (9 modules)](#59-operations-logging--event-listeners-9-modules)
 - [6. WinUI 3 Desktop Host & Process Supervisor (`LocalServer`)](#6-winui-3-desktop-host--process-supervisor-localserver)
 - [7. Web Management Console (`web_src` / `static_web`)](#7-web-management-console-web_src--static_web)
 - [8. Troubleshooting & FAQ](#8-troubleshooting--faq)
@@ -93,7 +203,7 @@ This project is an experimental local simulation environment for offline study a
 
 ---
 
-## 2. System Architecture Diagram
+## 2. System Architecture Topology Diagram
 
 ```
 +-----------------------------------------------------------------------------------------------+
@@ -139,202 +249,513 @@ This project is an experimental local simulation environment for offline study a
 
 ---
 
-## 3. Quick Start & Setup Guide
+## 3. Quick Start & Multi-Platform Deployment Guide
 
 ### 3.1 Prerequisites
 
-* **Operating System**: Windows 10 or later (x64 recommended), with Microsoft Edge WebView2 Runtime and WinUI 3 support available;
+* **Operating System**: Windows 10 or later (x64 recommended), with Microsoft Edge WebView2 and WinUI 3 support available; Linux distributions (WSL 2 / Ubuntu 20.04+, OpenCloudOS 9, Debian, Termux, etc.).
 * **Dependencies**:
   * **Python 3.10+**;
-  * **.NET 10.0 Runtime / SDK** (if running the desktop launcher);
+  * **.NET 10.0 Runtime / SDK** (if using the desktop launcher);
   * **Microsoft Edge WebView2 Runtime** (pre-installed on Windows 11);
-* **Permissions**: Modifying the system `hosts` file and binding privileged ports (such as 443 and 80) require Administrator privileges. Run terminal scripts or the launcher as Administrator.
+* **Permissions**: Modifying the system `hosts` file and binding privileged ports (443 and 80) require Administrator privileges. Run terminal scripts or the launcher as Administrator.
 
-### 3.2 Mode A: Desktop Launcher (Recommended)
+### 3.2 Windows Deployment & Running (GUI / CLI)
 
-1. **Launch Desktop Host**:
-   ```powershell
-   cd LocalServer
-   dotnet run -c Release
-   ```
+1. **Portable GUI Mode (Recommended)**:
+   Extract [`AetherGazer_Server_v5.0.3_Portable.zip`](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Portable.zip) and double-click `LocalServer.exe` (or run `启动离线单机服务(GUI界面).bat`).
+   > **Note**: Initial server startup may take a few seconds. On first run, Windows Firewall will request network access permissions for Python; please click **"Allow access"**.
+
 2. **Install Local Root Certificate**:
-   Follow the prompt on the desktop interface to install the self-signed root certificate (required for the game client to trust the local HTTPS authentication service).
-3. **One-Click Service Supervision**:
-   Click **"Start Service"** on the GUI. The host will check port availability, start the Python backend, and render the management dashboard in the embedded WebView2 view.
+   Follow the prompts in the desktop GUI to install the self-signed root certificate, or locate `v5_server/sdk_ca.crt`, double-click it, and import it into **"Trusted Root Certification Authorities"**.
 
-### 3.3 Mode B: Command-Line Interface (CLI)
+3. **Configure System HOSTS Redirection**:
+   Open `C:/Windows/System32/drivers/etc/hosts` with Administrator privileges and append the following domain entries:
 
-Ideal for headless environments or direct Python debugging:
-
-1. **Install Python Dependencies** (*Required for source code debugging; pre-bundled in Portable & Setup distributions, skip if using Release builds*):
-   ```powershell
-   cd v5_server
-   pip install -r requirements.txt
+   ```hosts
+   127.0.0.1  open.ys4fun.com
+   127.0.0.1  prod-api-activity.ys4fun.com
+   127.0.0.1  ta.ys4fun.com
+   127.0.0.1  account.ys4fun.com
+   127.0.0.1  m.bbs.ys4fun.com
+   127.0.0.1  bbs.ys4fun.com
+   127.0.0.1  skzy.ys4fun.com
+   127.0.0.1  webstatic.ys4fun.com
+   127.0.0.1  ys4fun-prod-pub.ys4fun.com
+   127.0.0.1  download.ys4fun.com
+   127.0.0.1  download-eo.ys4fun.com
+   127.0.0.1  packaging.ys4fun.com
    ```
-2. **Install Root CA** (Run as Administrator):
-   ```powershell
-   ..\一键安装Windows证书.bat
-   ```
-3. **Start Core Server**:
+
+   This redirects client traffic intended for official servers to the local loopback network, where the server intercepts and responds.
+
+4. **Console / CLI Mode**:
+   Ensure Python 3.10+ is installed. Open a terminal inside the `v5_server` directory and execute:
+
    ```powershell
    python main.py
    ```
-4. **Access Management Console**:
-   Open the URL printed in the console (e.g. `http://127.0.0.1/web/gm_console.html`) in your browser.
 
-### 3.4 Client Traffic Redirection
+   Alternatively, double-click `启动离线单机服务(控制台).bat`.
 
-The game client queries official domains for metadata and login authentication. For local offline play, traffic must be redirected to `127.0.0.1`:
+### 3.3 Linux Core Deployment (git / curl / scp)
 
-#### Method 1: System HOSTS Redirection (Recommended for Windows PC)
-Add static resolution entries to `C:\Windows\System32\drivers\etc\hosts` pointing to `127.0.0.1`. The desktop launcher includes a one-click host configuration tool (domain names are omitted here for security and compliance).
+1. **Fetch and Launch Directly from GitHub**:
 
-#### Method 2: Mobile Device (iOS) LAN Redirection
-1. Connect both the PC and mobile device to the same local Wi-Fi network;
-2. Start the server with LAN IP binding and DNS forwarding enabled:
+   * **Method 1: Clone via Git**
+     ```bash
+     # 1. Clone repository
+     git clone https://github.com/Mint-ARK/Alpha-Persei-Cluster.git
+
+     # 2. Enter server directory
+     cd Alpha-Persei-Cluster/v5_server
+
+     # 3. Launch interactive setup wizard
+     sh server.sh setup
+     ```
+
+   * **Method 2: Pull Linux Core Archive via Curl**
+     ```bash
+     # 1. Create and enter deployment directory
+     mkdir -p aethergazer && cd aethergazer
+
+     # 2. Download v5.0.3 Linux Core archive
+     curl -fL --retry 3 -o AetherGazer_Server_v5.0.3_Linux_Core.zip        https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Linux_Core.zip
+
+     # 3. Extract release package
+     unzip AetherGazer_Server_v5.0.3_Linux_Core.zip
+
+     # 4. Run interactive setup wizard
+     sh server.sh setup
+     ```
+
+2. **Cross-Platform Transfer Alternative (If GitHub access is constrained)**:
+   * Download [`AetherGazer_Server_v5.0.3_Linux_Core.zip`](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Linux_Core.zip) on a Windows computer.
+   * Transfer via SCP:
+     ```bash
+     scp file_path user@ip:server_path
+     ```
+   * Alternatively, upload via panel utilities (aaPanel, 1Panel, SFTP), extract, and execute `sh server.sh setup`.
+
+### 3.4 Android Single-Device Standalone Deployment (Root / Termux / sing-box)
+
+#### 3.4.1 Prerequisites
+
+* **Install ADB (Android Debug Bridge)**:
+  ```powershell
+  winget install -e --id Google.PlatformTools --silent --accept-package-agreements --accept-source-agreements
+  ```
+  Verify installation:
+  ```powershell
+  adb --version
+  ```
+* **Acquire Root Privileges**:
+  Meizu Flyme supports native Root toggle in Developer Options; OnePlus, Xiaomi, and other bootloader-unlocked devices running Magisk / KernelSU / APatch are fully compatible.
+* **Install Terminal App**: Install [Termux](https://github.com/termux/termux-app).
+* **Install Proxy Router**: Install [sing-box](https://github.com/SagerNet/sing-box) with the following Tun routing configuration (redirecting game packets to high ports bound by Termux):
+
+```json
+{
+  "log": {
+    "level": "info"
+  },
+  "dns": {
+    "servers": [
+      {
+        "type": "local",
+        "tag": "local"
+      }
+    ],
+    "final": "local"
+  },
+  "inbounds": [
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "stack": "gvisor",
+      "address": ["172.18.0.1/30"],
+      "mtu": 1500,
+      "auto_route": true,
+      "include_package": [
+        "com.yongshi.tenojo.ys"
+      ]
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "action": "sniff",
+        "sniffer": ["http", "tls"]
+      },
+      {
+        "network": "tcp",
+        "domain_suffix": ["ys4fun.com"],
+        "port": 443,
+        "action": "route",
+        "outbound": "direct",
+        "override_address": "127.0.0.1",
+        "override_port": 18443
+      },
+      {
+        "network": "tcp",
+        "domain_suffix": ["ys4fun.cn"],
+        "port": 80,
+        "action": "route",
+        "outbound": "direct",
+        "override_address": "127.0.0.1",
+        "override_port": 1880
+      }
+    ],
+    "final": "direct"
+  }
+}
+```
+
+#### 3.4.2 Practical Steps: Single-Device Standalone (No APK Patching Required)
+
+1. **Calculate and Prepare Root CA**:
+   * **Android System CA Naming Convention**: Certificates placed in `/system/etc/security/cacerts/` must be named strictly as **`<Subject_Hash>.0`**.
+   * Calculate subject hash:
+     ```bash
+     openssl x509 -inform PEM -subject_hash_old -in sdk_ca.crt
+     ```
+     The bundled release CA hash is fixed to **`ad2b2d99`**, meaning the file must be named `ad2b2d99.0`.
+   * Push certificate to device storage:
+     ```bash
+     adb push v5_server/sdk_ca.crt /sdcard/ad2b2d99.0
+     ```
+
+2. **Bind-Mount Certificate into System Trust Store**:
+   ```bash
+   mkdir -p /data/local/tmp/cacerts
+   cp -n /system/etc/security/cacerts/* /data/local/tmp/cacerts/ 2>/dev/null
+   cp /sdcard/ad2b2d99.0 /data/local/tmp/cacerts/
+   chown -R root:root /data/local/tmp/cacerts
+   chmod 755 /data/local/tmp/cacerts
+   chmod 644 /data/local/tmp/cacerts/*
+   mount -o bind /data/local/tmp/cacerts /system/etc/security/cacerts
+   ```
+
+3. **Bypass Tencent ACE Anti-Cheat Root Detection**:
+   * **Principle**: Non-root apps detect root by checking whether `/system/xbin/su` is executable by everyone. By changing `su` permissions from `4755` (world executable) to `6750` (executable only by root and privileged groups), the game app receives `Permission Denied` and deems the environment unrooted.
+   * Apply anti-detection permissions:
+     ```bash
+     mount -o rw,remount /system
+     chmod 750 /system/xbin
+     chmod 6750 /system/xbin/su
+     chmod 644 /system/build.prop
+     mount -o ro,remount /system
+     ```
+   * Verify detection evasion:
+     ```bash
+     adb shell "su 10102 ls -la /system/xbin/su"
+     ```
+     Expected output:
+     ```
+     Permission denied
+     ```
+
+4. **Environment Restoration (When Needed)**:
+   ```bash
+   # 1. Unmount CA certificate
+   adb shell "su 0 umount /system/etc/security/cacerts"
+
+   # 2. Restore su permissions (lift ACE evasion)
+   adb shell "su 0 sh -c 'mount -o rw,remount /system && chmod 755 /system/xbin && chmod 4755 /system/xbin/su && mount -o ro,remount /system'"
+   ```
+
+5. **Diagnostic Checks**:
+   ```bash
+   # 1. Check connected device
+   adb devices
+   # 2. Verify CA presence in system store
+   adb shell "ls -l /system/etc/security/cacerts/ad2b2d99.0 2>/dev/null"
+   # 3. Check su permission status (6750 for shielded, 4755 for exposed)
+   adb shell "ls -l /system/xbin/su"
+   ```
+
+6. **Deploy and Run Server in Termux**:
+   * Update packages and install prerequisites:
+     ```bash
+     pkg update && pkg upgrade -y
+     pkg install -y unzip curl
+     ```
+   * Fetch and extract the Linux Core package:
+     ```bash
+     # 1. Create directory
+     mkdir -p aethergazer && cd aethergazer
+
+     # 2. Download release package
+     curl -fL --retry 3 -o AetherGazer_Server_v5.0.3_Linux_Core.zip        https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Linux_Core.zip
+
+     # 3. Extract
+     unzip AetherGazer_Server_v5.0.3_Linux_Core.zip
+
+     # 4. Launch setup wizard
+     sh server.sh setup
+     ```
+   * Follow the wizard to complete network parameters and set your admin password.
+
+### 3.5 iOS Local Area Network (LAN) Setup Guide
+
+1. **Same LAN Wi-Fi**: Ensure your iOS device and the computer/server hosting the simulation backend are on the same Wi-Fi network;
+2. **Start Server with DNS Mode**: Launch the backend specifying `--dns` (binds to LAN IP with DNS forwarding):
    ```powershell
    python main.py --dns
    ```
-3. In iOS Wi-Fi settings, manually set the DNS server to the PC's LAN IP (`192.168.1.100`);
-4. Open Safari on iOS, navigate to `http://192.168.1.100/sdk_ca.mobileconfig`, then install and trust the profile;
-5. **Note**: Due to limited testing hardware, only iOS has undergone preliminary verification. Android and HarmonyOS have not yet been systematically tested, though the underlying networking principles remain comparable.
+3. **Configure Wi-Fi DNS**: In iOS Wi-Fi settings, switch DNS configuration to "Manual" and enter the computer's LAN IP (e.g. `192.168.1.100`);
+4. **Install Certificate Profile**: Open Safari on iOS, navigate to `http://<LAN_IP>/sdk_ca.mobileconfig` (e.g. `http://192.168.1.100/sdk_ca.mobileconfig`), install the profile, and toggle full trust under "Settings -> General -> About -> Certificate Trust Settings";
+5. **VPN / Proxy Configuration (e.g. [Shadowrocket](https://apps.apple.com/app/shadowrocket/id932747118))**:
+   If modifying global Wi-Fi DNS is inconvenient, add rule entries under the `[Host]` section of your Shadowrocket profile:
+   * **GUI Mode**: Profile -> Hosts -> Add -> Local Value:
+     ```
+     Domains: *.soboten.com, *.ys4fun.com, *.ys4fun.cn
+     Value: <Your Server IPv4 Address>
+     ```
+   * **Text Edit Mode**: Append directly to the `[Host]` block:
+     ```ini
+     [Host]
+     *.soboten.com = your_server_ip
+     *.ys4fun.com = your_server_ip
+     *.ys4fun.cn = your_server_ip
+     ```
 
 ---
 
-## 4. CLI Arguments Reference
+## 4. Server CLI Arguments Reference
 
-Run `python main.py --help` in the `v5_server` directory to inspect available options:
-
-| Flag | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `--host-ip` | `string` | Auto LAN IP | Bound local IPv4 address, used to provide connection metadata for mobile clients |
-| `--https-port` | `int` | `443` | HTTPS auth & SDK port (privileged port; requires Administrator) |
-| `--gw-port` | `int` | `8102` | TCP Gateway port for the initial client connection handshake |
-| `--game-port` | `int` | `8105` | TCP Game port carrying primary runtime protocol packets |
-| `--battle-port` | `int` | `6105` | UDP battle server port (pass `0` to disable the standalone battle server) |
-| `--db` | `string` | `account.db` | Path or filename of the local SQLite database |
-| `--res-version` | `enum` | `auto` | Target asset version baseline: `auto` (auto-detect), `229`, or `311` |
-| `--client-assets-dir` | `string` | Empty | Path to the client's `StreamingAssets` directory for version detection |
-| `--capture-cdn` | `flag` | `True` | Forward CDN requests to official mirrors and cache downloaded assets locally |
-| `--no-capture-cdn` | `flag` | - | Disable external CDN probing; operate strictly offline |
-| `--dns` | `flag` | `False` | Run a lightweight UDP/TCP:53 DNS redirection server (requires Administrator) |
-| `--log-level` | `enum` | `INFO` | Console output verbosity: `DEBUG`, `INFO`, `WARN`, `ERROR` |
-| `--self-check` | `flag` | - | Validate component initialization and operation registrations, then exit |
+| Category | Flag | Default | Description |
+| :---: | :--- | :---: | :--- |
+| **Help** | `-h`, `--help` | — | Display help message and exit. |
+| **Save** | `--db <path>` | `ACCOUNT_DB_PATH` or `account.db` | Specify target SQLite database path. Supports UTF-8, spaces, and absolute paths. |
+| **Network** | `--host-ip <IPv4>` | Auto LAN IP | Advertised address for client connections. Can be loopback, LAN, or public IPv4. |
+| **Network** | `--web-bind <IPv4>` | `0.0.0.0` | Local bind address for HTTP/HTTPS listeners. Use `127.0.0.1` behind reverse proxies. |
+| **Network** | `--https-port <port>` | `443` | HTTPS port for SDK, auth, and web panel (`1-65535`). |
+| **Network** | `--http-port <port>` | `80` | HTTP auxiliary port (`0-65535`; `0` to disable). |
+| **Network** | `--gw-port <port>` | `8102` | Starting TCP port for the multi-save gateway pool (`1-65535`). |
+| **Network** | `--game-port <port>` | `8105` | Primary TCP game service port (`1-65535`). |
+| **Network** | `--battle-port <port>` | `6105` | UDP battle server port (`0-65535`; `0` to disable). |
+| **DNS** | `--dns` | Disabled | Enable embedded DNS server listening on UDP/TCP:53. |
+| **DNS** | `--dns-upstream <IP>` | `223.5.5.5`, `114.114.114.114` | Upstream DNS servers for queries outside game domains. Repeatable. |
+| **CDN** | `--cdn-mode <mode>` | `off` | `off`: disable; `relay`: forward only; `cache`: forward and save to local disk. |
+| **CDN** | `--capture-cdn` | Disabled | Legacy alias for `--cdn-mode cache`. |
+| **CDN** | `--no-capture-cdn` | Disabled | Force disable passive CDN forwarding, overriding other CDN flags. |
+| **Assets** | `--res-version <ver>` | `auto` | Target asset baseline. `auto` uses channel defaults; supports `229`, `311`, `321`. |
+| **Assets** | `--resource-profile "<ch>=<prof>"` | None | Explicit manifest profile selection (`pc`, `android`, `ios`). |
+| **Assets** | `--list-resource-profiles` | Disabled | List available base/derived manifests and exit. |
+| **Assets** | `--client-assets-dir <dir>` | Auto | Path to client's `StreamingAssets` for local version detection. |
+| **Game** | `--game-version <ver>` | `321` | Fallback business version when client channel metadata is omitted. |
+| **Tool** | `--check-update` | Disabled | Check differences between official PC manifests and local definitions, then exit. |
+| **Tool** | `--sync-update` | Disabled | Delegate asset synchronization to the PC unified download queue. |
+| **Login** | `--frame-delay <sec>` | `0.001` | Frame interval delay during login burst pushes in seconds. |
+| **Debug** | `--replay <dir>` | Disabled | Enable protocol replay subsystem using archived capture files. |
+| **Debug** | `--frame-override <bin>` | None | Override replay frames with custom binary payloads. |
+| **Log** | `--log-level <level>` | `INFO` | Console output verbosity: `DEBUG`, `INFO`, `WARN`, `ERROR`. |
+| **Diagnostic**| `--self-check` | Disabled | Validate component initialization and operation registrations, then exit. |
 
 ---
 
 ## 5. Core Server Architecture: Breakdown of all 70 Modules
 
-The 70 Python modules in `v5_server` are systematically divided into 9 functional subsystems:
-
-### 5.1 Main Assembly & Lifecycle Entrypoints (4 modules)
-
-* **`main.py`**: Server entrypoint. Handles argument parsing, environment and port checks, initializes the core dispatch engine, and launches asynchronous network listeners;
-* **`login.py`**: Login flow coordinator. Reads login push templates and SQLite data, preparing initial state synchronization and establishing user sessions;
-* **`server_daemon.py`**: Background daemon helper providing cross-platform PID tracking, health monitoring, and shutdown hooks;
-* **`replay.py`**: Protocol replay and packet debugging script. Loads serialized packets to simulate client traffic (legacy utility, largely unused except during specialized debugging).
-
-### 5.2 Network Transport & Listeners (6 modules)
-
-* **`server_net.py`**: Multi-protocol network gateway. Listens on TCP 8102 (Gateway) and 8105 (Game), provides HTTPS (443) and HTTP (80) routing, and serves static files and WebP assets;
-* **`transport.py`**: Binary TCP transport framer. Handles streaming packet boundaries, magic bytes, payload length calculations, and sequence numbers;
-* **`dns_server.py`**: Lightweight UDP/TCP:53 DNS server that redirects target domains to the host's LAN IP and forwards other queries upstream;
-* **`cdn_proxy.py`**: Transparent CDN proxy and caching module. Retrieves remote asset patches requested by clients and writes them to local storage;
-* **`fetch_manifests.py`**: Remote asset manifest fetcher and parser for indexing version hashes;
-* **`gen_cert.py`**: Self-signed Certificate Authority (CA) and SSL certificate generator, with support for exporting `.mobileconfig` profiles for iOS.
-
-### 5.3 Session Scheduling & Dispatch Pipeline (5 modules)
-
-* **`core.py`**: Session dispatcher and packet router. Parses sequence numbers (`sn`), builds `OperationContext` transaction envelopes, and catches unhandled exceptions;
-* **`middleware.py`**: Pipeline middleware. Performs basic session validation, heartbeat maintenance, skeleton packet completion, and outbound frame scheduling;
-* **`operations.py`**: Central registry of 130+ native operation handlers, managing parameter checks, database mutations, and downstream packet routing;
-* **`event_bus.py`**: Lightweight in-process publish/subscribe (Pub/Sub) event bus, decoupling domain services;
-* **`protocol_ref.py`**: Protocol reference table mapping packet IDs (1xxxx~9xxxx) and error code semantics.
-
-### 5.4 Dynamic Protobuf Codec & Response Assembly (7 modules)
-
-* **`codec.py`**: Pure-Python dynamic Protobuf wire-format encoder/decoder, supporting schema parsing without precompiled proto stubs;
-* **`generator.py`**: Outbound packet generator. Assembles initial login sync packets, incremental pushes, and business responses according to protocol structures;
-* **`decode_schema.py`**: Protocol schema reverser and field dictionary extractor;
-* **`hero_codec.py`**: Serializer tailored for character trees, astrolabe nodes, and warp skill configurations;
-* **`reserve_codec.py`**: Serializer for team presets and lineup configurations;
-* **`daily_fatigue_codec.py`**: State management and `sc_12045` packet assembler for twice-daily stamina deliveries (11:00 and 18:00);
-* **`schema_default.py`**: Default field value inferrer and placeholder provider, preserving backward compatibility across protocol revisions.
-
-### 5.5 Data Persistence & Migration (2 modules)
-
-* **`account_db.py`**: SQLite database abstraction layer. Manages connections, schema initialization, transactions, and common queries;
-* **`normalize_db_transitions.py`**: Data migration utility. Normalizes legacy nested list formats in the `exclusive_skill_list` column of the `hero` table into standard JSON format.
-
-### 5.6 Core Business Domain Services (25 modules)
-
-1. **`hero_service.py`**: Modifier character progression service. Handles character exp, breakthroughs, skill leveling, astrolabe nodes, and warp skills;
-2. **`draw_service.py`**: Gacha summoning service. Manages 4 pity pools (Precision 90, Precision 70, Standard 70, Functor 70), drop rates, anti-dupe guarantees, duplicate shards, and dynamic pool lists;
-3. **`inventory_service.py`**: Inventory and asset management. Centrally handles currencies, items, materials, sigils, and functors, generating atomic delta frames (`sc_17023`);
-4. **`achievement_service.py`**: Achievement system. Listens to domain events, tracking 478 achievements, pushing banner notifications (`sc_53003`), and managing achievement stories and point claims;
-5. **`fatigue_service.py`**: Stamina natural recovery service. Recovers 1 stamina point every 360 seconds (6 minutes) and calculates dynamic caps based on player level;
-6. **`equip_service.py`**: Sigil equipment service. Supports leveling (with low-tier exp material refunds on excess), breakthroughs, enchantments, gen-zone reconstruction, slot equips, and suit inheritance;
-7. **`servant_service.py`**: Weapon Functor service. Tracks unique functor instances by ID, handling awakening (sleeping children to signature functors), transcendence, locking, equipping, and salvaging;
-8. **`chip_service.py`**: Chip system. Coordinates Admin Cat Mimir chips and presets, character-specific AI combat chips (4 slots), and support tactic chips;
-9. **`stage_service.py`**: Stage and chapter progression. Manages main story, subplots, resident events, and resource stages, including 3-star conditions, first-clear rewards, and progression presets;
-10. **`mail_service.py`**: Mail and Special Letters archive service. Handles inbox management, attachments claiming, and character birthday letters;
-11. **`shop_service.py`**: Store and trade system. Manages regular token shops, packs, daily shop slot draws and manual refreshes, and periodic stock resets;
-12. **`recharge_service.py`**: Payment simulation service. Recognizes item IDs, handles initial double-bonus simulation, accumulates recharge points, and grants cumulative tier rewards;
-13. **`trust_service.py`**: Trust and affection service. Manages affection levels (Lv.1~Lv.5), gift interactions, combat mood modifiers, and relationship network progression;
-14. **`oath_service.py`**: Oath system. Supports oath ceremonies, 3D chapel protocols, 24 exclusive hero assignments, and photo gallery storage for supported heroines (Verthandi, Izanami, Thoth);
-15. **`backhome_service.py`**: Dormitory and canteen service (58xxx protocols). Handles canteen recipe queues, dorm furniture placement, character stamina recovery, and commissions;
-16. **`admin_cat_explore_service.py`**: Admin Cat exploration (idle dispatch) service. Manages dispatch queues, offline reward calculations, exploration levels, zone unlocks, and cat upgrades;
-17. **`polyhedron_service.py`**: Dimensional Variable (Polyhedron) rogue-like engine. Handles stage tree pathing, beacons, terminal talents, shop rooms, and run settlements *(Note: this system has known bugs and incomplete features)*;
-18. **`weekly_challenge_service.py`**: Weekly challenge rotator. Handles automated period rotation (Monday / Thursday 05:00), boss rotations, and affixes for Recurring Dream and Hazard Zone;
-19. **`rogueteam_service.py`**: Challenge Rogue Team (Fictional Deduction) service. Handles tech trees, branching nodes, events, and relics *(Note: this mode is currently an unfinished work-in-progress)*;
-20. **`autochess_service.py`**: Dojo AutoChess service. Handles PVE stage selection, store card rolling, piece synthesis, and local combat playback simulations; PVP matching is safely blocked with alerts *(Note: lacks comprehensive testing)*;
-21. **`minigame_service.py`**: Lightweight resident minigames service. Handles progression and scoring for specific minigames like Hela Pinball, Summer Tank Race, and Ash Cowboy Shooting;
-22. **`periodic_gift_service.py`**: Multi-day supply pack service. Manages daily email distribution and fulfillment for 7-day, 14-day, and season-pass style subscriptions;
-23. **`peripheral_service.py`**: Profile and customization service. Manages avatars, frames, card backgrounds, signatures, main lobby scene/BGM changes, assistant interactions, and sticker layouts;
-24. **`archive_service.py`**: Character profile and Heart-Link story service. Maps character base identities to battle forms, unlocking Heart-Link stories and anecdotes;
-25. **`activity_lottery.py`**: Activity chest lottery service. Awards chances at exclusive skins, 3D scenes, and vouchers from daily/weekly activity chests, with automatic duplicate refunds into Shifted Flowers.
-
-### 5.7 Combat & Battle Subsystems (5 modules)
-
-* **`battle_server.py`**: Standalone UDP battle server. Matches the XServer protocol header (9-byte header / 20-byte sequence retransmission), managing ping/pong keepalives and fragmented frame forwarding;
-* **`battle_payload.py`**: Battle initialization payload builder. Dynamically serializes real-time character stats, functors, astrolabes, and sigil enchants to assemble the `sc_54003` combat start frame;
-* **`cooperation_skill_server.py`**: Ultimate Skill Combo tracking service. Tracks combo usage in normal and high-difficulty stages, reporting progress to `trust_service` to unlock combo upgrades;
-* **`team_server.py`**: Active team lineup memory service. Records stage-specific team configurations to preserve lineup presets across sessions;
-* **`mythic_affix_cfg.py`**: Hazard Zone and high-difficulty affix database. Manages environmental buffs/debuffs, boss-specific mechanisms, and semi-weekly rotations.
-
-### 5.8 AI Companion & Dialogue Subsystem (7 modules)
-
-* **`ai_bot_service.py`**: Large Language Model (LLM) interaction service, enabling immersive chat conversations with game characters;
-* **`ai_bot_config.py`**: AI configuration manager. Loads and validates API credentials (OpenAI, Gemini, DeepSeek, etc.) and model tuning parameters;
-* **`ai_context_builder.py`**: Context and system prompt assembler. Compiles prompts based on character lore, bond levels, and recent dialog history;
-* **`ai_history_manager.py`**: Chat history persistence manager. Stores conversation logs in local JSONL format;
-* **`ai_calendar.py`**: Solar terms and character birthday calendar engine, triggering greetings and mail on specific dates;
-* **`ai_bot_leaderboard.py`**: Model benchmark lookup helper (provides non-critical reference data; users are encouraged to check official model sites directly);
-* **`ai_translator.py`**: Translation helper mapping in-game item identifiers and sticker emoji syntax into tokens understandable by LLMs.
-
-### 5.9 Operations, Logging & Event Listeners (9 modules)
-
-* **`gm_api.py`**: HTTP API service. Exposes read-only and diagnostic endpoints for account data, inventory, and gacha statuses to the Web UI;
-* **`gm_reader.py`**: Static configuration reader for querying read-only game tables for the management console;
-* **`res_version_manager.py`**: Resource version manager. Manages version asset hashes for builds 229 and 311, handling dynamic version switching;
-* **`task_listener.py`**: Task system event subscriber. Listens to gameplay events, updating daily, weekly, and achievement criteria, and dispatching progress frames (`sc_28007`);
-* **`timer_listeners.py`**: Periodic time event listener. Subscribes to `lazy_timer` events to trigger stamina recovery, daily/weekly 05:00 resets, and shop refreshes;
-* **`lazy_timer.py`**: Inbound-driven lazy timestamp tracker. Calculates 05:00 reset boundaries on incoming requests without requiring background polling loops;
-* **`logger.py`**: Base logging engine, providing colored console output and daily log rotation;
-* **`log_sifter.py`**: Dual-track log filter. Separates raw protocol debug logs (written to file) from readable console notifications, collapsing high-frequency heartbeats;
-* **`illustrated_listener.py`**: Gallery and collection event listener. Tracks stage clears, story reads, and unlocks to update gallery indexes and loading wallpapers.
+| Category | Module (`v5_server/`) | Description |
+| :---: | :---: | :--- |
+| **Entry & Core** | `main.py` | Server entrypoint; parses launch flags, mounts databases, domain services, and network listeners. |
+| **Entry & Core** | `core.py` | Defines request/connection models; registers and dispatches operations; packages responses. |
+| **Entry & Core** | `middleware.py` | Receives decoded requests, connecting business logic, battle sessions, and settlements. |
+| **Entry & Core** | `operations.py` | Registers game operations; validates parameters, mutates states, and generates responses. |
+| **Entry & Core** | `event_bus.py` | In-process Pub/Sub event bus connecting combat, inventory, quest, and achievement modules. |
+| **Entry & Core** | `operation_notifications.py` | Manages pending notifications within operations, tracking instance deletions and rollbacks. |
+| **Entry & Core** | `lazy_timer.py` | Lazy time evaluator triggered on requests, heartbeats, and logins for daily/weekly boundaries. |
+| **Entry & Core** | `timer_listeners.py` | Event subscriber driving stamina regeneration, tasks, stores, and periodic resets. |
+| **Entry & Core** | `logger.py` | Unified logging entrypoint managing console output levels and rotating log files. |
+| **Entry & Core** | `log_sifter.py` | Filters high-frequency heartbeat noise and extracts key asset mutations for console visibility. |
+| **Entry & Core** | `multiplayer_policy.py` | Blocks multiplayer matchmaking and guild networks while preserving necessary single-player flows. |
+| **Network & Protocol** | `server_net.py` | Coordinates TCP gateway, game connections, SDK routing, HTTPS handlers, and save slot handoffs. |
+| **Network & Protocol** | `battle_server.py` | Standalone UDP battle server handling handshakes, frame interactions, and result caching. |
+| **Network & Protocol** | `transport.py` | Manages binary frame boundaries, sequence numbers, and ZLIB compression. |
+| **Network & Protocol** | `codec.py` | Bidirectional pure-Python dynamic Protobuf wire-format encoder/decoder. |
+| **Network & Protocol** | `decode_schema.py` | Loads protocol schemas and provides field indexing and low-level decoding inspection. |
+| **Network & Protocol** | `schema_default.py` | Infers and synthesizes schema-compliant default responses to prevent empty packet crashes. |
+| **Network & Protocol** | `login.py` | Coordinates login push sequence, reads dynamic save states, and dedupes initial frames. |
+| **Network & Protocol** | `generator.py` | Synthesizes login, query, and state synchronization payloads according to protocol definitions. |
+| **Network & Protocol** | `battle_payload.py` | Serializes modifier stats, functors, astrolabes, and trial characters for `sc_54003`. |
+| **Network & Protocol** | `hero_codec.py` | Serializes character database records into client modifier structures with backwards compatibility. |
+| **Network & Protocol** | `reserve_codec.py` | Encodes and decodes team presets and game mode battle lineups. |
+| **Network & Protocol** | `formation_codec.py` | Validates, serializes, and saves custom team formations. |
+| **Network & Protocol** | `team_server.py` | Manages active team lineups, combo skills, and Mimir setups across gameplay modes. |
+| **Network & Protocol** | `dns_server.py` | Local DNS redirector resolving game domains to host IP and forwarding other queries. |
+| **Network & Protocol** | `replay.py` | Optional packet replay module reconstructing login streams from archived captures. |
+| **Database & Save** | `account_db.py` | SQLite abstraction layer managing tables, migrations, transactions, backups, and exports. |
+| **Database & Save** | `save_generator.py` | Generates clean save slots based on level, UID, characters, guides, and pre-clear parameters. |
+| **Database & Save** | `save_presets.py` | Defines shared starting presets (Full Exploration, Skip Prologue, Quick Start). |
+| **Database & Save** | `save_slot_manager.py` | Scans and registers saves, allocates gateway ports, and handles slot switching and mounting. |
+| **Database & Save** | `new_player_service.py` | Manages initial states, onboarding activities, stage unlock criteria, and quest recovery. |
+| **Database & Save** | `new_player_login_policy.py` | Regulates login pushes for new saves, omitting locked systems. |
+| **Database & Save** | `onboarding_operations.py` | Handles newbie check-ins, level rewards, cumulative milestone rewards, and onboarding tasks. |
+| **Panel & Auth** | `gm_api.py` | Web API provider routing read requests to reader layers and mutations to domain services. |
+| **Panel & Auth** | `gm_reader.py` | Read-only inspector querying accounts, characters, items, mail, and system states. |
+| **Panel & Auth** | `gm_save_scope.py` | Binds management requests to targeted save databases without altering in-game mounts. |
+| **Panel & Auth** | `admin_access.py` | Identifies administrative entrypoints and applies authentication checks. |
+| **Panel & Auth** | `admin_session_auth.py` | Implements single-password authentication, session management, CSRF validation, and brute-force throttling. |
+| **Assets & CDN** | `client_version.py` | Binds platform and asset versions to isolate cross-channel version contexts. |
+| **Assets & CDN** | `res_version_manager.py` | Tracks asset version registrations, local detection, and official update sync tasks. |
+| **Assets & CDN** | `resource_distribution.py` | Public interface exposing platform selection and manifest management features. |
+| **Assets & CDN** | `resource_manifests.py` | Manages native BASE manifests, derived copies, checksums, and delivery profiles. |
+| **Assets & CDN** | `resource_storage.py` | Manages asset root directories, platform subdirectories, and storage path selection. |
+| **Assets & CDN** | `fetch_manifests.py` | Retrieves and parses official primary manifests and audio archives with platform isolation. |
+| **Assets & CDN** | `cdn_proxy.py` | Local cache distributor and passive forwarder (off, relay, cache modes). |
+| **Assets & CDN** | `cdn_integrity.py` | Validates filenames, sizes, and hashes; handles atomic publication of cached assets. |
+| **Assets & CDN** | `cdn_transfer_control.py` | Prioritizes real-time passive client requests over active background downloads. |
+| **Assets & CDN** | `cdn_active_downloads.py` | Configures concurrent download workers for asset synchronization tasks. |
+| **Assets & CDN** | `cdn_download_index.py` | Parses manifest entries and compiles deduplicated download queues. |
+| **Assets & CDN** | `cdn_download_queue.py` | Persistent task queue manager supporting pauses, cancellations, and speed metrics. |
+| **Assets & CDN** | `http_streaming.py` | Handles HTTP streaming disconnects, ensuring timely closure of sockets and file handles. |
+| **Deploy & Certs** | `linux_manager.py` | Interactive Linux environment inspector, setup wizard, daemon controller, and status checker. |
+| **Deploy & Certs** | `linux_nginx.py` | Generates and manages Nginx reverse proxy configs with syntax checks and failure rollbacks. |
+| **Deploy & Certs** | `gen_cert.py` | Generates root CA, server certificates, and iOS mobileconfig configuration profiles. |
+| **Progression & Items** | `inventory_service.py` | Atomic management of currencies, materials, sigils, and functors, generating delta frames. |
+| **Progression & Items** | `hero_service.py` | Manages character levels, breakthroughs, skill trees, astrolabe nodes, functors, and skins. |
+| **Progression & Items** | `equip_service.py` | Manages sigil instances, equipping, leveling, breakthroughs, enchants, and gen-zone reconstruction. |
+| **Progression & Items** | `enchant_slots_util.py` | Serializes sigil enchantment slots, preview fields, and attribute bonuses. |
+| **Progression & Items** | `servant_service.py` | Manages weapon functors: awakening, refinement, locking, binding, and salvaging. |
+| **Progression & Items** | `chip_service.py` | Manages Mimir chips, character AI combat chips, support chips, and preset configurations. |
+| **Progression & Items** | `fatigue_service.py` | Computes stamina recovery, level-up bonuses, and online timer synchronization. |
+| **Progression & Items** | `daily_fatigue_codec.py` | Handles twice-daily free stamina claim windows (11:00 / 18:00) and client state frames. |
+| **Progression & Items** | `trust_service.py` | Manages character trust, bond exp, mood, level breakthroughs, and relationship maps. |
+| **Quests & Welfare** | `achievement_service.py` | Listens to domain events, tracks achievement progress, and validates atomic reward claims. |
+| **Quests & Welfare** | `task_listener.py` | Translates battles, consumptions, and interactions into task progress and delta frames. |
+| **Quests & Welfare** | `task_cycle_notifications.py` | Handles daily/weekly quest resets and baseline state notifications. |
+| **Quests & Welfare** | `sign_service.py` | Validates version-specific check-in rewards and modal popup conditions. |
+| **Quests & Welfare** | `newbie_sign_reward_service.py` | Tracks newbie 7-day check-ins, game day progression, and anti-duplication checks. |
+| **Quests & Welfare** | `newbie_level_reward_service.py` | Validates level progression rewards against actual player level and claimed records. |
+| **Quests & Welfare** | `newbie_progress_reward_service.py` | Evaluates newbie cumulative quest milestone points and rewards. |
+| **Quests & Welfare** | `newbie_notice_service.py` | Persistently clears newbie notification badges. |
+| **Quests & Welfare** | `teach_service.py` | Records character tutorial completions and unlocks related progression dependencies. |
+| **Shop, Gacha, Mail** | `shop_service.py` | Store catalogue manager handling item purchases, shelf refreshes, and purchase caps. |
+| **Shop, Gacha, Mail** | `draw_service.py` | Character/functor gacha summons: rate calculation, pity pools, and duplicate conversions. |
+| **Shop, Gacha, Mail** | `skin_draw_service.py` | Limited-pool skin/scene gacha lotteries with ticket tracking and pity preservation. |
+| **Shop, Gacha, Mail** | `activity_lottery.py` | Adds cosmetics and ticket lottery chances to daily/weekly activity milestone chests. |
+| **Shop, Gacha, Mail** | `recharge_service.py` | Simulates in-app purchases, double-bonus tracking, and cumulative recharge rewards. |
+| **Shop, Gacha, Mail** | `paid_entitlement_service.py` | Manages battlepass tiers, weekly supply mail, and monthly pass daily rewards. |
+| **Shop, Gacha, Mail** | `periodic_gift_service.py` | Handles multi-day subscription packs, daily deliveries, and login catch-ups. |
+| **Shop, Gacha, Mail** | `mail_service.py` | Mailbox manager handling attachments claiming, special letters, and read states. |
+| **Shop, Gacha, Mail** | `support_cosmetic_service.py` | Awards historical cosmetics and commemorative avatars to eligible saves. |
+| **Shop, Gacha, Mail** | `activity_content_service.py` | Assembles resident event tasks, story recoveries, and event shop catalogues. |
+| **Archive & Profile** | `archive_service.py` | Manages character profiles, Heart-Link anecdotes, and story unlock states. |
+| **Archive & Profile** | `illustrated_listener.py` | Listens to stage clears and asset unlocks to update gallery archives and faction sets. |
+| **Archive & Profile** | `illustrated_story_service.py` | Verifies story reading facts and publishes illustration unlock frames. |
+| **Archive & Profile** | `worldview_service.py` | Exposes worldview glossary entries and tracks reading flags. |
+| **Archive & Profile** | `enemy_kill_service.py` | Tracks enemy kill counters and boss defeat statistics for the monster index. |
+| **Archive & Profile** | `cooperation_skill_server.py` | Tracks ultimate combo skill usage across normal and challenge stages. |
+| **Archive & Profile** | `peripheral_service.py` | Manages business cards, avatars, chat bubbles, lobby characters/scenes, and sticker layouts. |
+| **Archive & Profile** | `profile_rules.py` | Validates birthdays, custom signatures, likes, and lobby component projections. |
+| **Archive & Profile** | `sticker_wall_rules.py` | Validates sticker ownership, exclusion rules, and layout schemes for web and game. |
+| **Archive & Profile** | `oath_service.py` | Manages oath ceremonies, chapel 3D events, hero assignments, and gallery photos. |
+| **Archive & Profile** | `oath_rights_service.py` | Grants cosmetic perks tied to oath levels and tracks reward grants. |
+| **Archive & Profile** | `birthday_service.py` | Evaluates player birthday eligibility, annual commemorative mail, and missed gifts. |
+| **Dorm & Admin Cat** | `backhome_service.py` | Manages canteen recipe queues, dorm furniture placement, and character interactions. |
+| **Dorm & Admin Cat** | `dorm_gift_config.py` | Configures manual furniture gifting permissions and constraints. |
+| **Dorm & Admin Cat** | `admin_cat_explore_service.py` | Admin Cat idle dispatches: queues, zones, offline reward calculations, and levels. |
+| **Dorm & Admin Cat** | `admin_cat_dispatch_progress.py` | Records dispatch counts and updates corresponding mission progress. |
+| **Dorm & Admin Cat** | `admin_cat_log_service.py` | Generates exploration logs and filters obsolete entries. |
+| **Dorm & Admin Cat** | `admin_cat_response.py` | Packages exploration state frames and asset notifications within transactional boundaries. |
+| **AI Dialogue** | `ai_api_profiles.py` | Manages multi-profile LLM configurations per save slot. |
+| **AI Dialogue** | `ai_bot_config.py` | Default AI templates, credential validation, character model routing, and token masking. |
+| **AI Dialogue** | `ai_bot_service.py` | Adapts LLM interfaces, handling synchronous/asynchronous chat, health checks, and fallbacks. |
+| **AI Dialogue** | `ai_history_manager.py` | Reconstructs and isolates chat histories between individual characters. |
+| **AI Dialogue** | `ai_context_builder.py` | Compiles ephemeral roleplay and relationship context prompts without polluting history. |
+| **AI Dialogue** | `ai_calendar.py` | Evaluates solar terms, traditional festivals, and character birthdays to schedule events. |
+| **AI Dialogue** | `ai_translator.py` | Translates sticker semantics and dispatches customized greeting letters and attachments. |
+| **AI Dialogue** | `ai_proactive_service.py` | Generates proactive morning greetings upon the first login of each day. |
+| **AI Dialogue** | `ai_bot_leaderboard.py` | Aggregates public model leaderboards and caches benchmark directories. |
+| **Stages & Story** | `stage_service.py` | Categorizes main, sub, resource, and event stages; evaluates stars and first-clear rewards. |
+| **Stages & Story** | `chapter_v2_map_service.py` | Manages new-generation map nodes, positions, dossier reading, and time-rewind states. |
+| **Stages & Story** | `chapter19_service.py` | Manages Chapter 19 scanning, clue acquisition, and document interactions. |
+| **Stages & Story** | `plot_progress_service.py` | Reconstructs chapter quest completion rates from persistent stage clear facts. |
+| **Stages & Story** | `chapter_star_reward_service.py` | Verifies star chest eligibility and manages reward claims. |
+| **Weekly Challenges** | `weekly_challenge_service.py` | Shared state provider for Recurring Dream, Dark Zone, Polyhedron, and Matrix. |
+| **Weekly Challenges** | `boss_battle_identity.py` | Determines boss identities and verifies score attribution according to weekly rotations. |
+| **Weekly Challenges** | `boss_challenge_cycle.py` | Manages Recurring Dream cycles, boss rotations, and cross-period validation. |
+| **Weekly Challenges** | `boss_challenge_reset.py` | Validates dream reset eligibility and restores previous scores upon failure. |
+| **Weekly Challenges** | `boss_challenge_team.py` | Enforces character lineup locking across different bosses within the same cycle. |
+| **Weekly Challenges** | `mythic_affix_cfg.py` | Provides environmental affixes and boss combat mechanics for Dark Zone and Hazard Zone. |
+| **Weekly Challenges** | `mythic_cycle.py` | Calculates semi-weekly cycles for Hazard Zone (Final), intercepting stale battle attempts. |
+| **Weekly Challenges** | `mythic_final_service.py` | Manages Hazard Zone team relay queues, challenge tiers, and stage transitions. |
+| **Weekly Challenges** | `mythic_normal_service.py` | Preserves precise star conditions for regular Dark Zone challenges and verifies resets. |
+| **Weekly Challenges** | `core_mode4_reward_service.py` | Verifies Mode 4 rewards and event history for Iterative Verification challenges. |
+| **Polyhedron** | `polyhedron_service.py` | Dimensional Variable engine: opening, room selection, shops, recruitment, and settlements. |
+| **Polyhedron** | `polyhedron_account.py` | Tracks persistent talent points, character unlock states, beacons, and combo choices. |
+| **Polyhedron** | `polyhedron_battle.py` | Builds battle data for Polyhedron runs, validates combat identities, and syncs HP. |
+| **Polyhedron** | `polyhedron_flow.py` | Coordinates operation flow, terminal talent updates, snapshots, and settlement order. |
+| **Polyhedron** | `polyhedron_login.py` | Reconstructs active exploration, terminal state, and pending rewards upon login. |
+| **RogueTeam** | `rogueteam_service.py` | Fictional Deduction engine: map generation, talent trees, and node exploration rules. |
+| **RogueTeam** | `rogueteam_flow.py` | Manages run lifecycle, endings, reward distribution, and merchant settlements. |
+| **RogueTeam** | `rogueteam_transition.py` | Validates node choices and enforces legal phase transitions in the state machine. |
+| **RogueTeam** | `rogueteam_battle.py` | Dedicated battle initialization and settlement for RogueTeam stages. |
+| **RogueTeam** | `rogueteam_battle_facts.py` | Tracks post-battle energy and single-directive kill statistics based on real combat logs. |
+| **RogueTeam** | `rogueteam_effects.py` | Implements room entry effects, instant rewards, and program upgrade triggers for relics. |
+| **RogueTeam** | `rogueteam_tactics.py` | Activates tactical directives when accumulating 6 matching programs; locks active school. |
+| **RogueTeam** | `rogueteam_achievement.py` | Compiles victory facts, endings, and relic holdings to push 17 dedicated achievements. |
+| **RogueTeam** | `rogueteam_login.py` | Restores map state, team lineup, pending choices, and applies tutorial-skipping policies. |
+| **WarChess** | `warchess_service.py` | Coordinates map exploration, grid events, chests, and quests for Casualties Observation. |
+| **WarChess** | `warchess_battle.py` | Bridges dedicated WarChess battles, validating map identities and updating results. |
+| **Minigames Hub** | `minigame_service.py` | Dispatches minigame operations and coordinates individual minigame services. |
+| **Minigames Hub** | `minigame_point_service.py` | Manages activity point rewards, score thresholds, and asset deltas across events. |
+| **Minigames Hub** | `offline_minigame_rewards.py` | Awards multiplayer-exclusive task rewards in single-player offline environments. |
+| **Autochess** | `autochess_service.py` | Manages PVE Dojo autochess: stage selection, store card rolling, pieces, and rounds. |
+| **Autochess** | `autochess_combat.py` | Simulates piece attacks, skills, shields, summons, death queues, and combat outcomes. |
+| **Autochess** | `autochess_preparation.py` | Executes skill effects during purchase, sale, round start, and preparation end phases. |
+| **Autochess** | `autochess_special.py` | Generates and applies in-game props, upgrade cards, and bonus mechanics. |
+| **Autochess** | `autochess_progress.py` | Records first-clear achievements and certificates to advance corresponding quests. |
+| **Autochess** | `autochess_login.py` | Restores board configurations and pending settlement states upon login. |
+| **Citong Alley** | `quanzhou_quest.py` | Manages 53 main and 129 sub-quests, prerequisites, and milestone reward tracking. |
+| **Citong Alley** | `quanzhou_collection.py` | Tracks sailing clears, photo unlocks, nautical skills, and milestone knowledge levels. |
+| **Citong Alley** | `quanzhou_service.py` | Preserves map coordinates and bridges sea battles and character duels. |
+| **Summer Board Game** | `summer_board_service.py` | Manages 13 board maps, dice rolling, character movement, and match lifecycle. |
+| **Summer Board Game** | `summer_board_movement.py` | Computes hexagonal tile traversal, landing events, and auto-movement. |
+| **Summer Board Game** | `summer_board_chance.py` | Handles opportunity cards, internal stores, prop candidate draws, and claims. |
+| **Summer Board Game** | `summer_board_npc.py` | Routes NPC turns, handling collision events, protection shields, and cutscenes. |
+| **Summer Board Game** | `summer_board_props.py` | Validates and applies custom dice, swap cards, roadblocks, and bomb props. |
+| **Summer Board Game** | `summer_board_games.py` | Evaluates QTE challenges, dice duels, item rewards, and turn attempts. |
+| **Summer Board Game** | `summer_board_nested.py` | Bridges nested minigames and battles while isolating opportunity sessions. |
+| **Summer Board Game** | `summer_board_progress.py` | Tracks board missions, chapter clear history, and external reward tasks. |
+| **Resident Minigames** | `rogue_card_service.py` | Manages match lifecycles, exits, and state recovery for Night Tales card games. |
+| **Resident Minigames** | `rogue_card_progress.py` | Tracks card operations, challenge criteria, and article reads to advance quests. |
+| **Resident Minigames** | `resident_music_service.py` | Records rhythm game scores, completion marks, tasks, and reward thresholds. |
+| **Resident Minigames** | `pinball_service.py` | Manages Hela Pinball stages, skill equip verification, and combat bridging. |
+| **Resident Minigames** | `kadas_race_service.py` | Tracks Kadas Holiday Race routes, modding slots, setups, and challenge scores. |
+| **Resident Minigames** | `vehicle_ball_service.py` | Coordinates Mecha Gear challenge stages, vehicle upgrades, and archive rewards. |
+| **Resident Minigames** | `hodur_service.py` | Manages Muted Light Chronicle chapters, events, resets, and exploration missions. |
+| **Resident Minigames** | `hodur_challenge.py` | Evaluates Extreme Study 4-chain battles with team affixes and HP inheritance. |
+| **Resident Minigames** | `ash_service.py` | Tracks Train Heist movie progress, score calculations, and narrative dialogue. |
+| **Resident Minigames** | `summer_pub_service.py` | Manages Food & Another World battles, recipes, cooking, pinballs, and tasks. |
+| **Resident Minigames** | `osiris_service.py` | Manages Tactical Study Records: 18 study stages, 6 sandbox stages, and tasks. |
+| **Resident Minigames** | `skuld_service.py` | Manages Dream Catcher nodes, puzzle locks, first-clears, and chapter collections. |
+| **Resident Minigames** | `sphero_schedule_service.py` | Manages Verthandi resident activity daily schedules, commission queues, and timers. |
+| **Resident Minigames** | `sphero_battle_service.py` | Handles Verthandi story battles, boss training, proficiency, and daily limits. |
+| **Resident Minigames** | `sphero_leisure_service.py` | Manages Verthandi barbecue, 20 puzzle stages, auto-solve, and garland exchanges. |
+| **Bundled Tools** | `tools/download_assets.py` | Unified active asset download CLI for PC, Android, and iOS manifests. |
+| **Bundled Tools** | `tools/download_pc_assets.py` | Legacy PC asset download entrypoint delegating to unified download queue. |
+| **Bundled Tools** | `tools/download_ios_assets.py` | Legacy iOS asset download entrypoint delegating to unified download queue. |
+| **Bundled Tools** | `tools/upgrade_legacy_saves.py` | Validates legacy save schema and migrates obsolete AI configurations. |
 
 ---
 
 ## 6. WinUI 3 Desktop Host & Process Supervisor (`LocalServer`)
 
-The desktop application is built with **WinUI 3 + .NET 10** to manage the server process and provide an integrated viewer:
+The desktop application is built with **WinUI 3 + .NET 10** to supervise the server process and provide an integrated viewer:
 
 * **Job Object Process Management**:
   * Utilizes Win32 `CreateJobObject` and `SetInformationJobObject` with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`;
   * When the desktop launcher exits (normally or via an unexpected termination), the Windows kernel cleans up the associated Python child process, preventing port locks from orphan processes;
 * **Embedded WebView2**:
-  * Employs Microsoft Edge WebView2 to load the web console once the backend is ready;
+  * Employs Microsoft Edge WebView2 to load the web management console once the backend is ready;
 * **Streamed Log Redirection**:
   * Asynchronously redirects Python stdout and stderr into a GUI terminal window for easy operational monitoring.
 
@@ -365,9 +786,9 @@ The management console is built with **React 19 + TypeScript + Tailwind CSS** an
 
 ### 8.1 Connection Failure / 4xxxx Client Errors
 * **Remedies**:
-  1. Confirm your system `hosts` file has the required domain redirection pointing to `127.0.0.1`;
-  2. Verify that `AetherGazer V5 Root CA` has been imported into "Trusted Root Certification Authorities";
-  3. If using local proxy tools (Clash, v2ray, etc.), configure loopback addresses and target domains to DIRECT mode to prevent loopback traffic from being intercepted.
+  1. Confirm your system `hosts` file has the required domain redirection pointing to `127.0.0.1` or the server's real IP;
+  2. Verify that `AetherGazer V5 Root CA` has been imported into "Trusted Root Certification Authorities" on PC or installed and trusted on mobile devices;
+  3. If using local proxy tools (Clash, v2ray, Surge, etc.), configure loopback addresses and target domains to DIRECT mode to prevent loopback traffic from being intercepted.
 
 ### 8.2 Port Already in Use (WinError 10048)
 * **Remedies**:
@@ -394,27 +815,28 @@ The management console is built with **React 19 + TypeScript + Tailwind CSS** an
 - [x] **Core Progression**: Character progression, functors, sigils, chips, battle settlement, shop purchases, and gacha pity systems;
 - [x] **Asset Delivery**: Dynamic manifest delivery matching client versions, backed by local asset caching;
 - [x] **Desktop Supervision**: WinUI 3 + .NET 10 desktop host with Windows Job Object process supervision;
-- [x] **Web Console**: Read-only browser dashboard for status inspection and AI conversation testing.
+- [x] **Web Console**: Read-only browser dashboard for status inspection and AI conversation testing;
+- [x] **DNS Auxiliary Resolution**: Non-target domain forwarding fixed; UDP/TCP queries and failure responses supported;
+- [x] **Costume Gacha Banner**: Exclusive costume and 3D scene lottery pools fully implemented;
+- [x] **Save Slot Management**: Multi-save creation, switching, deletion, and 3 starter presets fully operational.
 
 ### Known Limitations & Stage 2 Roadmap
 - [ ] **Multiplayer Network Blocked**: Multiplayer features and Guild (Co-op) networks are disabled;
-- [ ] **Complex Game Modes Unverified**:
-  - Many resident events involve dozens of unique protocol frames; they have only been adjusted to avoid hard client hangs and have not been systematically verified;
-  - Citong Port, Summer Arena, and Battle of Dojo currently experience significant issues;
-  - Dimensional Variable (Polyhedron) remains unstable;
-  - Challenge Rogue Team (Fictional Deduction) is unfinished and remains a work-in-progress;
-  - Tower Climb has no protocol implementation; AutoChess and Verthandi events lack rigorous testing;
-- [ ] **Automated Account Migration**: Packet analysis and database conversion tools have not yet been automated;
-- [ ] **Costume Gacha Banner**: Exclusive costume banner mechanics have not yet been implemented.
-- [x] **DNS issue (initially resolved)**: Forwarding for non-target domains has been fixed, with UDP/TCP queries and failure responses supported. Further observation across iPhones and other devices on different networks is still needed.
-- [ ] **Potential Program Issues**: In addition to the known issues mentioned above, you may still encounter other problems while using this program—such as the loading overlay freezing or "Network Connection Failed" pop-ups. These issues typically stem from Lua crashes caused by anomalous server protocol frame fields, or a failure to receive responses (or receiving responses with incorrect frame numbers) due to missing fallback mappings for skeleton files.
-- [ ] **Gameplay/Experience Issues**: These are issues affecting your actual in-game experience, such as items not being granted correctly, items being deducted multiple times or at incorrect rates, incorrect return rates for items, anomalies in item or numerical value updates, and toast notifications indicating errors like "Remote Call Error." These problems generally arise from anomalies in the program's internal execution logic; minor numerical display issues can often be resolved by exiting to the login screen and re-entering the game. If the issue involves database errors, you may—if you have the technical capability—compile the source code yourself to update the core, or submit an issue to provide feedback. I am deeply grateful to everyone willing to try this project and submit reports; your contributions significantly improve the project's usability.
+- [ ] **Complex Game Modes Progression**:
+  - Many resident events involve dozens of unique protocol frames; they are being systematically polished through regression testing;
+  - **Citong Alley (Quanzhou)**: 53 main quests, 129 sub-quests, sea battles, and character duels completed; milestone exp yields 2.7x max requirement;
+  - **Battle of Dojo (Autochess)**: Overhauled card pools, exp, synthesis, and combat simulation; boss battle unlocks after 4 consecutive wins;
+  - **Dimensional Variable (Polyhedron)**: Fixed refresh schedule to every Monday 05:00; refined room selection, shops, recruitment, and reconnect recovery;
+  - **Fictional Deduction (RogueTeam)**: Incorporated community patch from [Issue #8](https://github.com/Mint-ARK/Alpha-Persei-Cluster/issues/8), completing the core state machine, endings, and 17 dedicated achievements;
+  - Tower Climb and remaining minigames have logic implemented and are undergoing client-side verification;
+- [ ] **Potential Program Issues**: You may still encounter occasional issues, such as loading overlay freezes or "Network Connection Failed" pop-ups, typically caused by minor protocol frame field discrepancies or missing fallback mappings;
+- [ ] **Gameplay/Experience Anomalies**: Certain gameplay modes may exhibit abnormal item drops or value updates; minor display glitches can often be resolved by reconnecting. If you identify logic or database errors, feel free to [submit an Issue](https://github.com/Mint-ARK/Alpha-Persei-Cluster/issues); every report is warmly appreciated!
 
 ---
 
 ## Contributors
 
-Thanks to [@a3164155](https://github.com/a3164155), [@LingYzh](https://github.com/LingYzh), [@baixiaoxiao831](https://github.com/baixiaoxiao831), [@Rachel08311](https://github.com/Rachel08311), and [@qiuyuxc](https://github.com/qiuyuxc) for patches, issue reports, investigation materials, and gameplay feedback, and to [@Arborsm](https://github.com/Arborsm) for discussion and suggestions. See [Contributors](CONTRIBUTORS.md) for individual contributions and issue references.
+Special thanks to [@a3164155](https://github.com/a3164155), [@LingYzh](https://github.com/LingYzh), [@baixiaoxiao831](https://github.com/baixiaoxiao831), [@Rachel08311](https://github.com/Rachel08311), and [@qiuyuxc](https://github.com/qiuyuxc) for providing code patches, issue reports, diagnostic materials, and live feedback, and to [@Arborsm](https://github.com/Arborsm) for insightful discussions and suggestions. See the full list in [Contributors](CONTRIBUTORS.md).
 
 ---
 
