@@ -164,7 +164,11 @@ def settle_fatigue(db, uid, now_ts=None):
 
         # 3. 时钟回拨保护
         if last_recover_time > now_ts:
-            last_recover_time = now_ts
+            db.execute(
+                "UPDATE currency SET last_fatigue_recover_time=?, update_ts=? WHERE uid=? AND id=4",
+                (now_ts, now_ts, uid)
+            )
+            return cur_num, now_ts
 
         elapsed = max(0, now_ts - last_recover_time)
         recover_points = elapsed // RECOVER_INTERVAL_SEC
@@ -295,6 +299,15 @@ def check_and_push_fatigue(conn, uid, db, codec_encode):
         now_ts = int(time.time())
         if last_recover_time <= 0:
             settle_fatigue(db, uid, now_ts=now_ts)
+            return False
+        if last_recover_time > now_ts:
+            new_num, new_last_time = settle_fatigue(db, uid, now_ts=now_ts)
+            # 修正计时起点不增加体力，仅通知客户端重建倒计时。
+            if new_num == cur_num and new_last_time == now_ts and hasattr(conn, "send_push"):
+                payload = codec_encode("sc_17025", {"last_fatigue_recover_time": new_last_time})
+                if payload:
+                    conn.send_push(17025, payload)
+                    return True
             return False
         if now_ts - last_recover_time < RECOVER_INTERVAL_SEC:
             return False

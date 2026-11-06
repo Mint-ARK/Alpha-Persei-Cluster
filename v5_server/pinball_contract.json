@@ -1,0 +1,266 @@
+{
+  "activity_id": 3840801,
+  "active_slots": 2,
+  "stages": {
+    "40601": {
+      "activity_id": 3840801,
+      "pre_stage": 0,
+      "lv_up": 2,
+      "skill_unlock": 40603,
+      "barrier_type": 1,
+      "barrier_id": 5300101
+    },
+    "40602": {
+      "activity_id": 3840801,
+      "pre_stage": 40601,
+      "lv_up": 3,
+      "skill_unlock": 40607,
+      "barrier_type": 1,
+      "barrier_id": 5300102
+    },
+    "40603": {
+      "activity_id": 3840801,
+      "pre_stage": 40602,
+      "lv_up": 4,
+      "skill_unlock": 40610,
+      "barrier_type": 1,
+      "barrier_id": 5300103
+    },
+    "40604": {
+      "activity_id": 3840801,
+      "pre_stage": 40603,
+      "lv_up": 5,
+      "skill_unlock": 40613,
+      "barrier_type": 1,
+      "barrier_id": 5300104
+    },
+    "40605": {
+      "activity_id": 3840801,
+      "pre_stage": 40604,
+      "lv_up": 6,
+      "skill_unlock": 40604,
+      "barrier_type": 2,
+      "barrier_id": 5300105
+    },
+    "40606": {
+      "activity_id": 3840801,
+      "pre_stage": 40605,
+      "lv_up": 7,
+      "skill_unlock": 40608,
+      "barrier_type": 1,
+      "barrier_id": 5300106
+    },
+    "40607": {
+      "activity_id": 3840801,
+      "pre_stage": 40606,
+      "lv_up": 8,
+      "skill_unlock": 40611,
+      "barrier_type": 1,
+      "barrier_id": 5300107
+    },
+    "40608": {
+      "activity_id": 3840801,
+      "pre_stage": 40607,
+      "lv_up": 9,
+      "skill_unlock": 40605,
+      "barrier_type": 1,
+      "barrier_id": 5300108
+    },
+    "40609": {
+      "activity_id": 3840801,
+      "pre_stage": 40608,
+      "lv_up": 10,
+      "skill_unlock": 40609,
+      "barrier_type": 1,
+      "barrier_id": 5300109
+    },
+    "40610": {
+      "activity_id": 3840801,
+      "pre_stage": 40609,
+      "lv_up": 11,
+      "skill_unlock": 40606,
+      "barrier_type": 1,
+      "barrier_id": 5300110
+    },
+    "40611": {
+      "activity_id": 3840801,
+      "pre_stage": 40610,
+      "lv_up": 12,
+      "skill_unlock": 40612,
+      "barrier_type": 1,
+      "barrier_id": 5300111
+    },
+    "40612": {
+      "activity_id": 3840801,
+      "pre_stage": 40611,
+      "lv_up": 13,
+      "skill_unlock": 40615,
+      "barrier_type": 1,
+      "barrier_id": 5300112
+    },
+    "40650": {
+      "activity_id": 3840801,
+      "pre_stage": 0,
+      "lv_up": 0,
+      "skill_unlock": 0,
+      "barrier_type": 3,
+      "barrier_id": 0
+    }
+  },
+  "skills": {
+    "40601": {
+      "activity_id": 3840801,
+      "skill_type": 3,
+      "skill_group": 0
+    },
+    "40602": {
+      "activity_id": 3840801,
+      "skill_type": 3,
+      "skill_group": 0
+    },
+    "40603": {
+      "activity_id": 3840801,
+      "skill_type": 1,
+      "skill_group": 0
+    },
+    "40604": {
+      "activity_id": 3840801,
+      "skill_type": 1,
+      "skill_group": 0
+    },
+    "40605": {
+      "activity_id": 3840801,
+      "skill_type": 1,
+      "skill_group": 0
+    },
+    "40606": {
+      "activity_id": 3840801,
+      "skill_type": 1,
+      "skill_group": 0
+    },
+    "40607": {
+      "activity_id": 3840801,
+      "skill_type": 2,
+      "skill_group": 1
+    },
+    "40608": {
+      "activity_id": 3840801,
+      "skill_type": 2,
+      "skill_group": 1
+    },
+    "40609": {
+      "activity_id": 3840801,
+      "skill_type": 2,
+      "skill_group": 1
+    },
+    "40610": {
+      "activity_id": 3840801,
+      "skill_type": 2,
+      "skill_group": 2
+    },
+    "40611": {
+      "activity_id": 3840801,
+      "skill_type": 2,
+      "skill_group": 2
+    },
+    "40612": {
+      "activity_id": 3840801,
+      "skill_type": 2,
+      "skill_group": 2
+    },
+    "40613": {
+      "activity_id": 3840801,
+      "skill_type": 2,
+      "skill_group": 3
+    },
+    "40614": {
+      "activity_id": 3840801,
+      "skill_type": 2,
+      "skill_group": 3
+    },
+    "40615": {
+      "activity_id": 3840801,
+      "skill_type": 2,
+      "skill_group": 3
+    },
+    "40616": {
+      "activity_id": 3840801,
+      "skill_type": 4,
+      "skill_group": 4
+    },
+    "40617": {
+      "activity_id": 3840801,
+      "skill_type": 4,
+      "skill_group": 4
+    },
+    "40618": {
+      "activity_id": 3840801,
+      "skill_type": 4,
+      "skill_group": 4
+    },
+    "40619": {
+      "activity_id": 3840801,
+      "skill_type": 4,
+      "skill_group": 5
+    },
+    "40620": {
+      "activity_id": 3840801,
+      "skill_type": 4,
+      "skill_group": 5
+    },
+    "40621": {
+      "activity_id": 3840801,
+      "skill_type": 4,
+      "skill_group": 5
+    },
+    "40622": {
+      "activity_id": 3840801,
+      "skill_type": 4,
+      "skill_group": 6
+    },
+    "40623": {
+      "activity_id": 3840801,
+      "skill_type": 4,
+      "skill_group": 6
+    },
+    "40624": {
+      "activity_id": 3840801,
+      "skill_type": 4,
+      "skill_group": 6
+    },
+    "40625": {
+      "activity_id": 3840801,
+      "skill_type": 6,
+      "skill_group": 0
+    },
+    "40626": {
+      "activity_id": 3840801,
+      "skill_type": 6,
+      "skill_group": 0
+    },
+    "40627": {
+      "activity_id": 3840801,
+      "skill_type": 3,
+      "skill_group": 0
+    },
+    "40628": {
+      "activity_id": 3840801,
+      "skill_type": 3,
+      "skill_group": 0
+    }
+  },
+  "battles": {
+    "5300105": {
+      "type": 603,
+      "cost": 0,
+      "hero_exp": 0,
+      "user_exp": 0
+    }
+  },
+  "sources": {
+    "decompiled_v2/x64/game/config/pinballstagecfg.lua": "d5e1d7efede5bca6664561cf68d2fd8522b397b03ddc2e99ff603f580b950996",
+    "decompiled_v2/x64/game/config/pinballskillcfg.lua": "6635ed8e8843857859b414b8f732497312510d56bc5cf1b8f4f69f00512bd233",
+    "decompiled_v2/x64/game/views/activity/submodule/pinball/hellapinball/hellapinballheroview.lua": "88dee5af62ad977c5c230a8d3ef992e08a8127da62f1147d26129f935cea190c",
+    "decompiled_v2/x64/game/config/battlehellapinballstagecfg.lua": "f92e83b8b0d2b1483c4b1448dc71e6e2229552aa4f0a683b927c061b0d1b1f3f"
+  }
+}

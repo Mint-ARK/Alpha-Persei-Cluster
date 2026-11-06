@@ -1,0 +1,2903 @@
+{
+  "version": 1,
+  "source": "current x64 client action calls and current Python runtime registry",
+  "historical_unfinished_count": 3,
+  "historical_unfinished_names": "unconfirmed; user no longer recalls names",
+  "exclusions_revoked": "2026-11-04: minigames and Issue 8 RogueTeam now in scope",
+  "policy": "入口存在不代表有持久进度/奖励/恢复，更不代表实机已验证。无业务入口也须先核是否为本地玩法或明确禁用。",
+  "service": "v5_server/minigame_service.py",
+  "service_families": [
+    {
+      "line": 25,
+      "title": "1. 远村异闻 (海拉弹珠, Activity 3840801) 元数据"
+    },
+    {
+      "line": 42,
+      "title": "2. 卡达斯假日赛 (夏活坦克竞速, Activity 4343601) 元数据"
+    },
+    {
+      "line": 60,
+      "title": "3. 列车大劫案 (灰烬牛仔射击, Activity 3639701) 元数据"
+    },
+    {
+      "line": 83,
+      "title": "4. 战术研习记录 (奥西里斯研习, Activity 323801) 元数据"
+    },
+    {
+      "line": 103,
+      "title": "5. 溯梦之隙 (斯克尔德心象, Activity 321201) 元数据"
+    },
+    {
+      "line": 162,
+      "title": "6. 谧光叙录 (霍德尔专属活动, Activity 3941101) 元数据"
+    },
+    {
+      "line": 170,
+      "title": "7. 潜质觉醒 (现时无返之途·薇儿丹蒂 SP, Activity 242841/242851/242871) 元数据"
+    },
+    {
+      "line": 184,
+      "title": "极限机装（武罗活动4243101；旧服务标签乌尔碰碰车）元数据"
+    },
+    {
+      "line": 190,
+      "title": "9. 浮光绎曲与鸣律探微 (常驻音律演奏会与夏日小游戏, Activity 3814801 / 283041) 元数据"
+    },
+    {
+      "line": 203,
+      "title": "10. 食与异世界 (夏日餐厅经营, Activity 3539101) 元数据"
+    }
+  ],
+  "client_families": [
+    {
+      "id": "MG-C001",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityaccumulativeaction.lua",
+      "family": "activityaccumulativeaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 60054,
+          "runtime_operation": "minigame_service.ActivityPointRewardOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 2690,
+              "operation": "ActivityPointRewardOp"
+            },
+            {
+              "file": "v5_server/operations.py",
+              "line": 6097,
+              "operation": "ActivityPointTierRewardOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": []
+    },
+    {
+      "id": "MG-C002",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityattributearenaaction.lua",
+      "family": "activityattributearenaaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 72302,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        72302
+      ]
+    },
+    {
+      "id": "MG-C003",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityautocookaction.lua",
+      "family": "activityautocookaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 86018,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 86022,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        86018,
+        86022
+      ]
+    },
+    {
+      "id": "MG-C004",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityheroenhanceaction.lua",
+      "family": "activityheroenhanceaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 83028,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 83030,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        83028,
+        83030
+      ]
+    },
+    {
+      "id": "MG-C005",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityheroletteraction.lua",
+      "family": "activityheroletteraction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 11092,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 12116,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        11092,
+        12116
+      ]
+    },
+    {
+      "id": "MG-C006",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activitymatrixaction.lua",
+      "family": "activitymatrixaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 26010,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 26012,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 26020,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 26024,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        26010,
+        26012,
+        26020,
+        26024
+      ]
+    },
+    {
+      "id": "MG-C007",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityoathdrawaction.lua",
+      "family": "activityoathdrawaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 68186,
+          "runtime_operation": "operations.OathDrawOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/operations.py",
+              "line": 2261,
+              "operation": "OathDrawOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": []
+    },
+    {
+      "id": "MG-C008",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityptscrollaction.lua",
+      "family": "activityptscrollaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 76152,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 76154,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        76152,
+        76154
+      ]
+    },
+    {
+      "id": "MG-C009",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activitypushboxaction.lua",
+      "family": "activitypushboxaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 11084,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 11086,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 11088,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        11084,
+        11086,
+        11088
+      ]
+    },
+    {
+      "id": "MG-C010",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityquizaction.lua",
+      "family": "activityquizaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 77100,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 77102,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 77104,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 77106,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        77100,
+        77102,
+        77104,
+        77106
+      ]
+    },
+    {
+      "id": "MG-C011",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityrecallaction.lua",
+      "family": "activityrecallaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 27600,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 64088,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 64090,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 64092,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 64096,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 64098,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 64116,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        27600,
+        64088,
+        64090,
+        64092,
+        64096,
+        64098,
+        64116
+      ]
+    },
+    {
+      "id": "MG-C012",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityreforgeaction.lua",
+      "family": "activityreforgeaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 84004,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 84006,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 84008,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 84010,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 84012,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 84014,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 84016,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 84018,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 84020,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 84022,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 84024,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        84004,
+        84006,
+        84008,
+        84010,
+        84012,
+        84014,
+        84016,
+        84018,
+        84020,
+        84022,
+        84024
+      ]
+    },
+    {
+      "id": "MG-C013",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityrhythmgameaction.lua",
+      "family": "activityrhythmgameaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 83126,
+          "runtime_operation": "minigame_service.RhythmPlayStoryOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3288,
+              "operation": "RhythmPlayStoryOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": []
+    },
+    {
+      "id": "MG-C014",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityskindrawaction.lua",
+      "family": "activityskindrawaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 68152,
+          "runtime_operation": "operations.SkinDrawOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/operations.py",
+              "line": 2186,
+              "operation": "SkinDrawOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 68156,
+          "runtime_operation": "operations.SkinFinishPopOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/operations.py",
+              "line": 2240,
+              "operation": "SkinFinishPopOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": []
+    },
+    {
+      "id": "MG-C015",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityskindrawactionold.lua",
+      "family": "activityskindrawactionold",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 68152,
+          "runtime_operation": "operations.SkinDrawOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/operations.py",
+              "line": 2186,
+              "operation": "SkinDrawOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": []
+    },
+    {
+      "id": "MG-C016",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityspringfestivalgive2100action.lua",
+      "family": "activityspringfestivalgive2100action",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 89502,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        89502
+      ]
+    },
+    {
+      "id": "MG-C017",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activitysummerswimsuitpreheataction.lua",
+      "family": "activitysummerswimsuitpreheataction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 65502,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 65508,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        65502,
+        65508
+      ]
+    },
+    {
+      "id": "MG-C018",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/activityworldbossaction.lua",
+      "family": "activityworldbossaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 11006,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 61202,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        11006,
+        61202
+      ]
+    },
+    {
+      "id": "MG-C019",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/advancemonstertestaction.lua",
+      "family": "advancemonstertestaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 79302,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        79302
+      ]
+    },
+    {
+      "id": "MG-C020",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/antitheticalcoupletaction.lua",
+      "family": "antitheticalcoupletaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 61080,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 61084,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        61080,
+        61084
+      ]
+    },
+    {
+      "id": "MG-C021",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/battlefirstpassaction.lua",
+      "family": "battlefirstpassaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 11058,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        11058
+      ]
+    },
+    {
+      "id": "MG-C022",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/blistergameaction.lua",
+      "family": "blistergameaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 60054,
+          "runtime_operation": "minigame_service.ActivityPointRewardOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 2690,
+              "operation": "ActivityPointRewardOp"
+            },
+            {
+              "file": "v5_server/operations.py",
+              "line": 6097,
+              "operation": "ActivityPointTierRewardOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 86002,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        86002
+      ]
+    },
+    {
+      "id": "MG-C023",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/cowboyaction.lua",
+      "family": "cowboyaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 61010,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 61014,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        61010,
+        61014
+      ],
+      "mapping_note": "旧61010/61014不是用户当前3639701入口；当前为AshSystemAction/89战斗，不能按中文灰烬牛仔标签混同。旧610xx保持候选索引状态。"
+    },
+    {
+      "id": "MG-C024",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/destroyboxgameaction.lua",
+      "family": "destroyboxgameaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 72122,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        72122
+      ]
+    },
+    {
+      "id": "MG-C025",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/fireworkaction.lua",
+      "family": "fireworkaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 64052,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 64054,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        64052,
+        64054
+      ]
+    },
+    {
+      "id": "MG-C026",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/fishingaction.lua",
+      "family": "fishingaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 60002,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 60004,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 60006,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 60008,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 60010,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 60012,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 60014,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 60016,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 60018,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        60002,
+        60004,
+        60006,
+        60008,
+        60010,
+        60012,
+        60014,
+        60016,
+        60018
+      ]
+    },
+    {
+      "id": "MG-C027",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/godeateraction.lua",
+      "family": "godeateraction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 87004,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 87008,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 87010,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        87004,
+        87008,
+        87010
+      ]
+    },
+    {
+      "id": "MG-C028",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/herogiftaction.lua",
+      "family": "herogiftaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 61002,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        61002
+      ]
+    },
+    {
+      "id": "MG-C029",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/ichibanaction.lua",
+      "family": "ichibanaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 89512,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        89512
+      ]
+    },
+    {
+      "id": "MG-C030",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/idolcompetitionaction.lua",
+      "family": "idolcompetitionaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 65102,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 65104,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        65102,
+        65104
+      ]
+    },
+    {
+      "id": "MG-C031",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/kagutsuchifishingeventaction.lua",
+      "family": "kagutsuchifishingeventaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 76006,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        76006
+      ]
+    },
+    {
+      "id": "MG-C032",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/kagutsuchigachaaction.lua",
+      "family": "kagutsuchigachaaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 76102,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        76102
+      ]
+    },
+    {
+      "id": "MG-C033",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/kagutsuchihanafudaaction.lua",
+      "family": "kagutsuchihanafudaaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 76010,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 76012,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        76010,
+        76012
+      ]
+    },
+    {
+      "id": "MG-C034",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/kagutsuchitalentaction.lua",
+      "family": "kagutsuchitalentaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 76004,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        76004
+      ]
+    },
+    {
+      "id": "MG-C035",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/kagutsuchiworkaction.lua",
+      "family": "kagutsuchiworkaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 76002,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        76002
+      ]
+    },
+    {
+      "id": "MG-C036",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/limitedcalculationaction.lua",
+      "family": "limitedcalculationaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 60054,
+          "runtime_operation": "minigame_service.ActivityPointRewardOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 2690,
+              "operation": "ActivityPointRewardOp"
+            },
+            {
+              "file": "v5_server/operations.py",
+              "line": 6097,
+              "operation": "ActivityPointTierRewardOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": []
+    },
+    {
+      "id": "MG-C037",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/momotalkaction.lua",
+      "family": "momotalkaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 91002,
+          "runtime_operation": "operations.MomoTalkFinishBreakOp",
+          "runtime_handler": "h_91002",
+          "declared": [
+            {
+              "file": "v5_server/operations.py",
+              "line": 4750,
+              "operation": "MomoTalkFinishBreakOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 91006,
+          "runtime_operation": "operations.MomoTalkSetReadOp",
+          "runtime_handler": "h_91006",
+          "declared": [
+            {
+              "file": "v5_server/operations.py",
+              "line": 4773,
+              "operation": "MomoTalkSetReadOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 91014,
+          "runtime_operation": "operations.MomoTalkAddBreakOp",
+          "runtime_handler": "h_91014",
+          "declared": [
+            {
+              "file": "v5_server/operations.py",
+              "line": 4728,
+              "operation": "MomoTalkAddBreakOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 91016,
+          "runtime_operation": null,
+          "runtime_handler": "h_91016",
+          "declared": [],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": []
+    },
+    {
+      "id": "MG-C038",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/monstercosplayaction.lua",
+      "family": "monstercosplayaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 83402,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 83404,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        83402,
+        83404
+      ]
+    },
+    {
+      "id": "MG-C039",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/moonboaction.lua",
+      "family": "moonboaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 61006,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        61006
+      ]
+    },
+    {
+      "id": "MG-C040",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/musicaction.lua",
+      "family": "musicaction",
+      "scope": "minigame",
+      "scan_status": "source_stage_complete",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 61048,
+          "runtime_operation": "minigame_service.MusicQueryCompeletOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3233,
+              "operation": "MusicQueryCompeletOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 61050,
+          "runtime_operation": "minigame_service.MusicQueryRewardOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3263,
+              "operation": "MusicQueryRewardOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": [],
+      "ticket": "MG-RESIDENT-MUSIC-20261104",
+      "remaining": "Unity实机验收；不包含独立鸣律探微83124/83126"
+    },
+    {
+      "id": "MG-C041",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/pachinkoaction.lua",
+      "family": "pachinkoaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 84322,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        84322
+      ]
+    },
+    {
+      "id": "MG-C042",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/parkouraction.lua",
+      "family": "parkouraction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 11062,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        11062
+      ]
+    },
+    {
+      "id": "MG-C043",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/pinballaction.lua",
+      "family": "pinballaction",
+      "scope": "minigame",
+      "scan_status": "source_stage_complete",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 89402,
+          "runtime_operation": "minigame_service.PinballFinishOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 2558,
+              "operation": "PinballFinishOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89404,
+          "runtime_operation": "minigame_service.PinballEquipSkillOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 2593,
+              "operation": "PinballEquipSkillOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": [],
+      "ticket": "MG-PINBALL-20261104",
+      "remaining": "Unity实机验收；排行榜/多人及其他弹珠活动不包含"
+    },
+    {
+      "id": "MG-C044",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/roguecardgameaction.lua",
+      "family": "roguecardgameaction",
+      "scope": "minigame",
+      "scan_status": "source_stage_complete",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 89602,
+          "runtime_operation": "minigame_service.RogueCardStartPostOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3446,
+              "operation": "RogueCardStartPostOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89604,
+          "runtime_operation": "minigame_service.RogueCardCompleteStoryOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3471,
+              "operation": "RogueCardCompleteStoryOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89606,
+          "runtime_operation": "minigame_service.RogueCardClickLikePostOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3498,
+              "operation": "RogueCardClickLikePostOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89608,
+          "runtime_operation": "minigame_service.RogueCardRebackPostOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3523,
+              "operation": "RogueCardRebackPostOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89610,
+          "runtime_operation": "minigame_service.RogueCardViewThreadPostOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3548,
+              "operation": "RogueCardViewThreadPostOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89612,
+          "runtime_operation": "minigame_service.RogueCardCompletePostOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3573,
+              "operation": "RogueCardCompletePostOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89616,
+          "runtime_operation": "minigame_service.RogueCardChallengeSettleOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3600,
+              "operation": "RogueCardChallengeSettleOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89618,
+          "runtime_operation": "minigame_service.RogueCardEnterGameOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3627,
+              "operation": "RogueCardEnterGameOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89620,
+          "runtime_operation": "minigame_service.RogueCardSaveProgressPostOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3654,
+              "operation": "RogueCardSaveProgressPostOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89622,
+          "runtime_operation": "minigame_service.RogueCardContinueProgressPostOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3682,
+              "operation": "RogueCardContinueProgressPostOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89624,
+          "runtime_operation": "minigame_service.RogueCardSaveRollBackPostOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3708,
+              "operation": "RogueCardSaveRollBackPostOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89626,
+          "runtime_operation": "minigame_service.RogueCardGetStageSaveDataOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3734,
+              "operation": "RogueCardGetStageSaveDataOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 89628,
+          "runtime_operation": "minigame_service.RogueCardInterruptPostOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 3761,
+              "operation": "RogueCardInterruptPostOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": [],
+      "ticket": "MG-ROGUECARD-LIFECYCLE-20261104",
+      "remaining": "游戏实测、原生牌型数组顺序核对和旧SkinDLCPopUI缺资源"
+    },
+    {
+      "id": "MG-C045",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/simbusinessaction.lua",
+      "family": "simbusinessaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 83132,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 83134,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 83136,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 83138,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        83132,
+        83134,
+        83136,
+        83138
+      ]
+    },
+    {
+      "id": "MG-C046",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/skindiscountgiftaction.lua",
+      "family": "skindiscountgiftaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 84312,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        84312
+      ]
+    },
+    {
+      "id": "MG-C047",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/skinexchangeaction.lua",
+      "family": "skinexchangeaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 60066,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        60066
+      ]
+    },
+    {
+      "id": "MG-C048",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/skuldtravelaction.lua",
+      "family": "skuldtravelaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 24020,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 24022,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 24024,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 24026,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        24020,
+        24022,
+        24024,
+        24026
+      ]
+    },
+    {
+      "id": "MG-C049",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/slayeraction.lua",
+      "family": "slayeraction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 11044,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        11044
+      ]
+    },
+    {
+      "id": "MG-C050",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/snowballgameaction.lua",
+      "family": "snowballgameaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 65422,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 65424,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        65422,
+        65424
+      ]
+    },
+    {
+      "id": "MG-C051",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/springfestivalgreetingaction.lua",
+      "family": "springfestivalgreetingaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 60054,
+          "runtime_operation": "minigame_service.ActivityPointRewardOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 2690,
+              "operation": "ActivityPointRewardOp"
+            },
+            {
+              "file": "v5_server/operations.py",
+              "line": 6097,
+              "operation": "ActivityPointTierRewardOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        }
+      ],
+      "business_gaps": []
+    },
+    {
+      "id": "MG-C052",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/springfestivalriddleaction.lua",
+      "family": "springfestivalriddleaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 64062,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        64062
+      ]
+    },
+    {
+      "id": "MG-C053",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/springfestivalshopaciton.lua",
+      "family": "springfestivalshopaciton",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 60056,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        60056
+      ]
+    },
+    {
+      "id": "MG-C054",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/springpreheataction.lua",
+      "family": "springpreheataction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 60054,
+          "runtime_operation": "minigame_service.ActivityPointRewardOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 2690,
+              "operation": "ActivityPointRewardOp"
+            },
+            {
+              "file": "v5_server/operations.py",
+              "line": 6097,
+              "operation": "ActivityPointTierRewardOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 76402,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 76404,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        76402,
+        76404
+      ]
+    },
+    {
+      "id": "MG-C055",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/springwelfareaction.lua",
+      "family": "springwelfareaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 32036,
+          "runtime_operation": "peripheral_service.GetSimpleForeignInfoOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/peripheral_service.py",
+              "line": 1637,
+              "operation": "GetSimpleForeignInfoOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 60054,
+          "runtime_operation": "minigame_service.ActivityPointRewardOp",
+          "runtime_handler": null,
+          "declared": [
+            {
+              "file": "v5_server/minigame_service.py",
+              "line": 2690,
+              "operation": "ActivityPointRewardOp"
+            },
+            {
+              "file": "v5_server/operations.py",
+              "line": 6097,
+              "operation": "ActivityPointTierRewardOp"
+            }
+          ],
+          "coverage": "runtime_entry"
+        },
+        {
+          "cmd": 76412,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 76414,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        76412,
+        76414
+      ]
+    },
+    {
+      "id": "MG-C056",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/strategymatrixaction.lua",
+      "family": "strategymatrixaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 29010,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 29012,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 29020,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 29024,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        29010,
+        29012,
+        29020,
+        29024
+      ]
+    },
+    {
+      "id": "MG-C057",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/strongholdaction.lua",
+      "family": "strongholdaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 65410,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 65412,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 65420,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        65410,
+        65412,
+        65420
+      ]
+    },
+    {
+      "id": "MG-C058",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/subdemonchallengeaction.lua",
+      "family": "subdemonchallengeaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 11032,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        11032
+      ]
+    },
+    {
+      "id": "MG-C059",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/summerlittlegameaction.lua",
+      "family": "summerlittlegameaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 60060,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 60064,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        60060,
+        60064
+      ]
+    },
+    {
+      "id": "MG-C060",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/survivesoloaction.lua",
+      "family": "survivesoloaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 61054,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        61054
+      ]
+    },
+    {
+      "id": "MG-C061",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/swimsuitbattleaction.lua",
+      "family": "swimsuitbattleaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 65504,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 65506,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        65504,
+        65506
+      ]
+    },
+    {
+      "id": "MG-C062",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/talenttreeaction.lua",
+      "family": "talenttreeaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 11052,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        11052
+      ]
+    },
+    {
+      "id": "MG-C063",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/towergameaction.lua",
+      "family": "towergameaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 61076,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        61076
+      ]
+    },
+    {
+      "id": "MG-C064",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/valentinegameaction.lua",
+      "family": "valentinegameaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 64070,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 64074,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 79422,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        64070,
+        64074,
+        79422
+      ]
+    },
+    {
+      "id": "MG-C065",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/weekbossaction.lua",
+      "family": "weekbossaction",
+      "scope": "activity_reference",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 79502,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        79502
+      ]
+    },
+    {
+      "id": "MG-C066",
+      "client": "decompiled_v2/x64/game/action/activitysubmodule/zumaaction.lua",
+      "family": "zumaaction",
+      "scope": "minigame",
+      "scan_status": "pending_chain_audit",
+      "live_status": "not_tested",
+      "commands": [
+        {
+          "cmd": 79002,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 79004,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        },
+        {
+          "cmd": 79006,
+          "runtime_operation": null,
+          "runtime_handler": null,
+          "declared": [],
+          "coverage": "no_business_entry"
+        }
+      ],
+      "business_gaps": [
+        79002,
+        79004,
+        79006
+      ]
+    }
+  ],
+  "pending_regressions": [
+    {
+      "id": "MG-ROGUECARD-EXIT",
+      "name": "诡谈夜话任务页返回Lua异常",
+      "status": "resource_evidence_needed",
+      "evidence": "archive/activity_catalog_fix_20261025_131213/rogue_task_exit_client.log",
+      "evidence_summary": "唯一LuaException为SkinDLCPopUI找不到资源；未据此认定返回协议错误"
+    },
+    {
+      "id": "MG-ROGUECARD-TASK-STATS",
+      "status": "source_verified",
+      "name": "411009—411018挑战、累计及浏览任务缺生产",
+      "evidence": "当前task_listener仅覆盖411008，activity_content_cfg已有其余条件",
+      "ticket": "MG-ROGUECARD-TASKS-20261104",
+      "report": "v5_server/docs/repair_20261104_rogue_card_tasks.md"
+    },
+    {
+      "id": "MG-INITIAL-EMPTY-FRAMES",
+      "status": "verified_no_defect",
+      "name": "纯repeated空消息在实际登录入口是否被跳过",
+      "evidence": "4项真实send_login_flood路径通过；68181/60105/60107/68171/83021空消息合法下发，判断为gen is not None，不需补丁。",
+      "report": "v5_server/docs/repair_20261104_minigame_point_rewards.md"
+    }
+  ],
+  "repair_progress": [
+    {
+      "ticket": "MG-ROGUECARD-LIFECYCLE-20261104",
+      "status": "source_verified",
+      "coverage": "双模式对局/中断/恢复及帖子完成差量；非整玩法完成",
+      "report": "v5_server/docs/repair_20261104_rogue_card_lifecycle.md"
+    },
+    {
+      "ticket": "MG-ROGUECARD-TASKS-20261104",
+      "status": "source_verified",
+      "coverage": "411009—411018统计/投影/差量/冷恢复；牌型布局待实机",
+      "report": "v5_server/docs/repair_20261104_rogue_card_tasks.md"
+    },
+    {
+      "ticket": "MG-POINT-REWARDS-20261104",
+      "status": "source_verified",
+      "coverage": "60054/60055共用领奖目录、资格、幂等、原子差量；空初态仅核验无缺陷",
+      "report": "v5_server/docs/repair_20261104_minigame_point_rewards.md"
+    },
+    {
+      "ticket": "MG-RESIDENT-MUSIC-20261104",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261104_resident_music.md",
+      "coverage": "61048成绩/任务/恢复及61050门槛/原子领奖；常驻任务28010链通过，不包含独立鸣律探微"
+    },
+    {
+      "ticket": "MG-PINBALL-20261104",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261104_pinball.md",
+      "coverage": "89402/04与类型603第五关桥接，392001—392004任务统计/领奖/冷恢复；非其他弹珠玩法"
+    },
+    {
+      "ticket": "MG-KADAS-RACE-20261104",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261104_kadas_race.md",
+      "coverage": "84332/34、原生车体孔位、多部件/关卡/击杀/挑战任务及实际活动上下文奖励隔离；待游戏实测"
+    },
+    {
+      "ticket": "MG-VEHICLE-BALL-20261104",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261104_vehicle_ball.md",
+      "coverage": "极限机装89702/04/06/08、真实任务语义、图鉴资源差量及登录恢复；待游戏实测"
+    },
+    {
+      "ticket": "MG-HODUR-MAINLINE-20261104",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261104_hodur_mainline.md",
+      "coverage": "普通三章89422/26及原生92战斗、任务与登录恢复；整个入口部分完成，挑战与跨战HP另轮"
+    },
+    {
+      "ticket": "MG-HODUR-CHALLENGE-20261104",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261104_hodur_challenge.md",
+      "coverage": "第四章四战状态、队伍/HP继承、重打和结算、分数及词缀任务；评分为奖励门槛私服v1，待实机"
+    },
+    {
+      "ticket": "MG-ASH-SHOOT-20261104",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261104_ash_shoot.md",
+      "coverage": "列车89战斗首通/花絮、技能与前置、任务/积分领奖/对话提示及冷恢复；花絮计分私服v1，待实机"
+    },
+    {
+      "ticket": "MG-SUMMER-PUB-20261104",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261104_summer_pub.md",
+      "coverage": "餐厅87战斗/剧情、89002/04/06/08、首通掉落、350001/2/3/5及501任务、原子差量和冷恢复；待实机"
+    },
+    {
+      "ticket": "MG-OSIRIS-STUDY-20261104",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261104_osiris_study.md",
+      "coverage": "86战斗、18学习/6沙盘、临时角色与任务机制93—98、68173/75/77及60201缓存、原子差量/冷恢复；计分私服v1，待实机"
+    },
+    {
+      "ticket": "MG-SKULD-20261105",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261105_skuld.md",
+      "coverage": "602普通逻辑/剧情资源节点、24052/54、36关前置/精确首通、329001/501任务、九收藏24045/43及原子差量/登录恢复；待游戏实测"
+    },
+    {
+      "ticket": "MG-SUMMER-BOARD-BOOTSTRAP-20261105",
+      "status": "partial",
+      "report": "v5_server/docs/repair_20261105_summer_board_bootstrap.md",
+      "coverage": "85001同名schema隔离、13地图初态/首次事件、85012骰子、85028放弃及85035恢复源码通过；移动/完整事件/任务奖励未完成"
+    },
+    {
+      "ticket": "MG-SUMMER-BOARD-MOVEMENT-20261105",
+      "status": "partial",
+      "report": "v5_server/docs/repair_20261105_summer_board_movement.md",
+      "coverage": "13原始地图、85010普通/自动格移动、地块事件与无NPC85014/Buff周期源码通过；机会/NPC/任务奖励继续"
+    },
+    {
+      "ticket": "MG-SUMMER-BOARD-CHANCE-20261105",
+      "status": "partial",
+      "report": "v5_server/docs/repair_20261105_summer_board_chance.md",
+      "coverage": "非战斗机会85020/22/33、85018局内商店、85024/36待选及部分85016道具源码通过；NPC、其他道具/小游戏和任务奖励继续"
+    },
+    {
+      "ticket": "MG-SUMMER-BOARD-NPC-20261105",
+      "status": "partial",
+      "report": "v5_server/docs/repair_20261105_summer_board_npc.md",
+      "coverage": "85014 NPC路线/相遇/Buff/合成/停止、物件封路与原生属性下限通过；其余道具/小游戏机会/任务奖励继续"
+    },
+    {
+      "ticket": "MG-SUMMER-BOARD-PROPS-20261105",
+      "status": "partial",
+      "report": "v5_server/docs/repair_20261105_summer_board_props.md",
+      "coverage": "普通地图12道具效果、85016选骰→85012、目标/放置/维修及回合恢复源码通过；85038属后续竞技机会，不是任意骰子"
+    },
+    {
+      "ticket": "MG-SUMMER-BOARD-GAMES-20261105",
+      "status": "partial",
+      "report": "v5_server/docs/repair_20261105_summer_board_games.md",
+      "coverage": "14个QTE及501111竞技85038、白名单道具/次数点数/胜负/原子回包源码通过；17个嵌套小游戏机会和最终任务奖励继续"
+    },
+    {
+      "ticket": "MG-SUMMER-BOARD-FINISH-20261105",
+      "status": "source_verified",
+      "report": "v5_server/docs/repair_20261105_summer_board_finish.md",
+      "coverage": "283011主棋盘17嵌套机会、35局内任务、13图通关/历史及外部原生领奖恢复链源码完成；待游戏实测"
+    },
+    {
+      "ticket": "MG-QUANZHOU-20261105",
+      "status": "source_verified",
+      "coverage": "完整任务/航行/见闻奖励与初态恢复；未实机",
+      "report": "v5_server/docs/repair_20261105_quanzhou.md"
+    }
+  ],
+  "development_scope": {
+    "include": [
+      "当前常驻玩法",
+      "229版本有必要资源且实际可进入的活动"
+    ],
+    "exclude": [
+      "已移除的多人玩法及其专属协议",
+      "缺必要MD5/资产且无法复刻进入的旧活动",
+      "仅有历史协议、未证明存在可玩入口的候选"
+    ],
+    "acceptance": [
+      "可进入并实际游玩",
+      "进度能保存与恢复",
+      "关联任务能推进",
+      "奖励能正常领取"
+    ],
+    "inventory_rule": "协议总数与Action候选数量不是待开发玩法数；先核可达入口，再建立实现/修复票"
+  },
+  "focused_features": [
+    {
+      "id": "MG-QUANZHOU",
+      "user_name": "刺桐巷",
+      "client_title": "刺桐港埠漫行纪",
+      "activity_id": 323641,
+      "map_id": 1110101,
+      "status": "source_stage_complete",
+      "priority": "separate_complex_feature",
+      "sources": [
+        "decompiled_v2/x64/game/views/chapter/residentact/actview/chapterresidentactquanzhouview.lua",
+        "decompiled_v2/x64/game/config/activitycfg.lua",
+        "decompiled_v2/x64/game/config/sandplaymapcfg.lua",
+        "decompiled_v2/x64/game/action/qworldaction.lua",
+        "decompiled_v2/x64/game/action/qworldquestaction.lua",
+        "decompiled_v2/x64/game/action/sandplayilluaction.lua",
+        "decompiled_v2/x64/game/action/seawarfareaction.lua"
+      ],
+      "note": "53主129子状态机和航行/奖励/恢复本地完成，待实机",
+      "report": "v5_server/docs/repair_20261105_quanzhou.md"
+    }
+  ],
+  "next": "按实机清单检查刺桐巷冲刺/教程/重登、决斗王一期与简化梵天、夏日嵌套返回、薇儿跨日及诡谈资源。其他报告和战棋专项继续，全部仅本地。",
+  "confirmed_roster": {
+    "source": "2026-11-04 user live-client inspection",
+    "report": "v5_server/docs/minigame_user_roster_20261104.md",
+    "entry_count": 15,
+    "base_229_entry_count": 15,
+    "added_311_plus": 0,
+    "entries": [
+      {
+        "order": 1,
+        "name": "极限机装",
+        "activity_ids": [
+          4243101
+        ],
+        "status": "source_stage_complete",
+        "note": "四关/三载具/图鉴及任务链路源码完成，限时与常驻隔离",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 2,
+        "name": "诡谈夜话",
+        "activity_ids": [
+          4142701
+        ],
+        "status": "source_stage_complete",
+        "note": "RogueCard当前源码阶段完成",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 3,
+        "name": "决斗王·岁醒夺魁",
+        "activity_ids": [
+          4041301,
+          4042001
+        ],
+        "status": "offline_policy_complete",
+        "note": "多人请求已禁用；原生四项常驻任务60533—60536开放领取，保已领和永久台账，7项检查通过。",
+        "available_since": "229_permanent",
+        "verified_mapping": {
+          "native_label": "天梯夺魁",
+          "activity_ids": [
+            4041301,
+            4042001
+          ],
+          "task_ids": [
+            60533,
+            60534,
+            60535,
+            60536
+          ],
+          "task_type": 211,
+          "condition": 420001,
+          "task_activity_id": 0
+        }
+      },
+      {
+        "order": 4,
+        "name": "谧光叙录",
+        "activity_ids": [
+          3941101
+        ],
+        "status": "source_stage_complete",
+        "note": "普通及挑战源码阶段完成；私服评分按奖励定标，HP/队伍/重打已接通",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 5,
+        "name": "远村异闻",
+        "activity_ids": [
+          3840801
+        ],
+        "status": "source_stage_complete",
+        "note": "海拉弹珠",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 6,
+        "name": "浮光绎曲",
+        "activity_ids": [
+          3814801
+        ],
+        "status": "source_stage_complete",
+        "note": "常驻音乐",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 7,
+        "name": "决斗王·人机对战",
+        "activity_ids": [
+          3740601
+        ],
+        "status": "source_stage_complete",
+        "note": "一期及批准的303四胜Boss完成；本轮旧缺战报结算局留完整恢复记录后取消，17登录+23持久化检查通过，待实机。",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 8,
+        "name": "列车大劫案",
+        "activity_ids": [
+          3639701
+        ],
+        "status": "source_stage_complete",
+        "note": "正片首通100影片进程、花絮私服击杀计分及任务/领奖/通知链源码完成，待实机",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 9,
+        "name": "食与异世界",
+        "activity_ids": [
+          3539101
+        ],
+        "status": "source_stage_complete",
+        "note": "战斗/剧情、普通困难弹珠、8料理及首通食材/任务源码完成，待实机",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 10,
+        "name": "战术研习记录",
+        "activity_ids": [
+          323801
+        ],
+        "status": "source_stage_complete",
+        "note": "18学习/6沙盘、角色/任务与专用积分缓存源码完成，计分私服v1，待实机",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 11,
+        "name": "刺桐巷",
+        "activity_ids": [
+          323641
+        ],
+        "status": "source_stage_complete",
+        "note": "53主/129子任务、航行/角色战、照片技能、见闻奖励和登录恢复；46本地检查",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 12,
+        "name": "溯梦之隙",
+        "activity_ids": [
+          321201
+        ],
+        "status": "source_stage_complete",
+        "note": "36节点前置/首通、任务与9收藏差量/恢复源码完成；主线12仅提醒关联，待实机",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 13,
+        "name": "夏日竞技",
+        "activity_ids": [
+          283011
+        ],
+        "status": "source_stage_complete",
+        "note": "13图/35局内任务/17嵌套机会、道具/NPC/历史/原生奖励链一阶源码完成，待实机",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 14,
+        "name": "薇儿丹蒂常驻活动",
+        "activity_ids": [
+          242841,
+          242851,
+          242861,
+          242871
+        ],
+        "status": "source_stage_complete",
+        "note": "日程/委托、6剧情9训练2Boss、3难度烧烤/20解谜、40任务与收集角色/商店/历史一阶源码完成，待实机",
+        "available_since": "229_permanent"
+      },
+      {
+        "order": 15,
+        "name": "卡达斯假日赛",
+        "activity_ids": [
+          4343601
+        ],
+        "status": "source_stage_complete",
+        "note": "229已存在；当前源码阶段完成，限时与常驻按实际活动上下文隔离",
+        "available_since": "229_version_event",
+        "reward_context_policy": {
+          "introduced_by_version": "229",
+          "original_context": "229当期版本活动，存在限时奖励",
+          "resident_context": {
+            "permanent_rewards": true,
+            "limited_rewards": false
+          },
+          "discriminator": "按实际活动入口、任务归属和限时/常驻上下文区分；不能仅凭客户端版本229启用限时奖励",
+          "implementation_status": "source_verified_pending_restart_and_live"
+        }
+      }
+    ],
+    "counting_rule": "入口数不等于子玩法数；鸣律探微归夏日关联子玩法，不重复计数",
+    "base_229_permanent_entry_count": 14,
+    "correction": "用户纠正：卡达斯229已存在，当期有限时奖励；常驻化仅常驻奖励。15入口总数不变。"
+  },
+  "historical_unfinished_tracking": "按用户确认入口清单逐项核对；不在15入口外再加三个猜测项目",
+  "offline_reward_policy": {
+    "user_label": "决斗王·岁醒夺魁",
+    "native_label": "天梯夺魁",
+    "status": "source_verified_pending_client",
+    "activity_ids": [
+      4041301,
+      4042001
+    ],
+    "gameplay": "沿现有全局策略禁用90000—90049及90100—90199，不提供匹配或多人对战",
+    "task_ids": [
+      60533,
+      60534,
+      60535,
+      60536
+    ],
+    "rewards": "只将四项常驻任务置可领取；普通和新档28001恢复，沿28010/28014正常领取，保已领和永久台账。旧限时/段位排行奖励不纳入。",
+    "checks": 7,
+    "report": "v5_server/docs/repair_20261105_minigame_closeout.md"
+  },
+  "kadas_reward_policy": {
+    "introduced_by_version": "229",
+    "original_context": "229当期版本活动，存在限时奖励",
+    "resident_context": {
+      "permanent_rewards": true,
+      "limited_rewards": false
+    },
+    "discriminator": "按实际活动入口、任务归属和限时/常驻上下文区分；不能仅凭客户端版本229启用限时奖励",
+    "implementation_status": "source_verified_pending_restart_and_live"
+  },
+  "ash_current_contract": {
+    "ticket": "MG-ASH-SHOOT-20261104",
+    "activity_id": 3639701,
+    "client": "decompiled_v2/x64/game/action/ashsystemaction.lua",
+    "stage_type": 89,
+    "requests": [
+      54030,
+      54032,
+      12120,
+      60054
+    ],
+    "pushes": [
+      68181,
+      68183,
+      12119
+    ],
+    "scoring": "private_enemy_count_v1",
+    "live_status": "not_tested"
+  },
+  "summer_pub_current_contract": {
+    "ticket": "MG-SUMMER-PUB-20261104",
+    "activity_id": 3539101,
+    "client": "decompiled_v2/x64/game/action/summerpubaction.lua",
+    "stage_type": 87,
+    "requests": [
+      89002,
+      89004,
+      89006,
+      89008,
+      54030,
+      54034,
+      54032
+    ],
+    "pushes": [
+      89011
+    ],
+    "live_status": "not_tested"
+  },
+  "osiris_current_contract": {
+    "ticket": "MG-OSIRIS-STUDY-20261104",
+    "activity_id": 323801,
+    "client": "decompiled_v2/x64/game/action/osirisplaygameaction.lua",
+    "stage_type": 86,
+    "requests": [
+      54030,
+      54032,
+      60054
+    ],
+    "pushes": [
+      68171,
+      68173,
+      68175,
+      68177,
+      60201
+    ],
+    "scoring": "private_time_bonus_v1",
+    "live_status": "not_tested"
+  },
+  "skuld_current_contract": {
+    "ticket": "MG-SKULD-20261105",
+    "activity_id": 321201,
+    "stage_type": 602,
+    "nodes": 36,
+    "combat": 17,
+    "puzzle": 19,
+    "archives": 9,
+    "requests": [
+      24052,
+      24054,
+      54030,
+      54034,
+      54032,
+      60054
+    ],
+    "pushes": [
+      24051,
+      24043,
+      24045,
+      17023,
+      28007,
+      60107
+    ],
+    "live_status": "not_tested"
+  },
+  "summer_board_current_contract": {
+    "ticket": "MG-SUMMER-BOARD-FINISH-20261105",
+    "activity_id": 283011,
+    "regions": [
+      283021,
+      283022,
+      283023,
+      283024,
+      283025
+    ],
+    "maps": 13,
+    "requests_implemented": [
+      85000,
+      85010,
+      85012,
+      85014,
+      85016,
+      85018,
+      85020,
+      85022,
+      85024,
+      85026,
+      85028,
+      85036,
+      85038
+    ],
+    "pushes": [
+      28007,
+      51001,
+      85031,
+      85033,
+      85035,
+      86008
+    ],
+    "status": "source_verified",
+    "pending": [
+      "live client route playback and minigame lineups",
+      "unused native extension501113",
+      "CSharp branch preference observation",
+      "related standalone minigames are separate scope"
+    ],
+    "live_status": "not_tested",
+    "phase": "first_stage_source_complete",
+    "qte_chances_implemented": 14,
+    "arena_chances_implemented": [
+      501111
+    ],
+    "nested_chances_implemented": 17,
+    "local_tasks_implemented": 35,
+    "history_conditions": 13
+  },
+  "sphero_current_contract": {
+    "status": "source_verified",
+    "phase": "first_stage_source_complete",
+    "activity_ids": [
+      242841,
+      242851,
+      242861,
+      242871
+    ],
+    "protocols": [
+      54030,
+      54032,
+      83003,
+      83005,
+      83007,
+      83009,
+      83011,
+      83013,
+      83015,
+      83016,
+      83017,
+      83018,
+      83020,
+      83021,
+      83022,
+      83024,
+      83026,
+      83040
+    ],
+    "report": "v5_server/docs/repair_20261105_sphero_leisure.md",
+    "local_checks": 105,
+    "linux_checks": 19,
+    "runtime_hashes": 10,
+    "service_restarted": false,
+    "real_save_writes": false,
+    "live_client_verified": false,
+    "next": [
+      "统一重启后验证实际UI/日奖flag显示/在线跨日缓存"
+    ],
+    "boss_score_policy": "成功通关直接550万满分，用户明确要求，不按耗时扣分",
+    "daily_rewarded_clear_limit": 4,
+    "boss_pool_policy": "六项各3件，每次有奖Boss从剩余名额等概率取1件，真实实例/凭据原子提交",
+    "barbecue_grades": 15,
+    "puzzle_stages": 20,
+    "activity_tasks": 40,
+    "shop_goods": 9
+  },
+  "autochess_current_contract": {
+    "status": "source_stage_complete",
+    "phase": "finish",
+    "report": "v5_server/docs/repair_20261105_autochess_finish.md",
+    "local_checks": 141,
+    "linux_checks": 0,
+    "live_verified": false,
+    "cloud_synced": false,
+    "native_brahma": "partial; user-approved simplified boss implemented",
+    "next": "刺桐巷状态机"
+  },
+  "quanzhou_current_contract": {
+    "status": "source_stage_complete",
+    "local_checks": 46,
+    "main_quests": 53,
+    "subquests": 129,
+    "sea_stages": 11,
+    "sand_battles": 2,
+    "photos": 10,
+    "level_cap": 10,
+    "story_level_total": 27,
+    "report": "v5_server/docs/repair_20261105_quanzhou.md",
+    "cloud_synced": false,
+    "live_verified": false
+  },
+  "closeout_20261105": {
+    "date": "2026-11-05",
+    "status": "source_complete_pending_client",
+    "summary": "15个确认入口完成一阶源码收口：14个单人可玩入口，加1个封锁多人并解锁常驻奖励的入口；游戏实测待验。",
+    "checks": {
+      "offline_rewards_and_atomic_claim": 7,
+      "autochess_login": 17,
+      "autochess_persistence": 23,
+      "total": 47
+    },
+    "reports": [
+      "v5_server/docs/repair_20261105_minigame_closeout.md",
+      "v5_server/docs/repair_20261105_autochess_orphan_recovery.md",
+      "v5_server/docs/minigame_closeout_audit_20261105.md"
+    ],
+    "next": "按实机清单检查刺桐巷冲刺/教程/重登、决斗王一期与简化梵天、夏日嵌套返回、薇儿跨日及诡谈资源。其他报告和战棋专项继续，全部仅本地。",
+    "remote_sync": false,
+    "live_client": false
+  }
+}

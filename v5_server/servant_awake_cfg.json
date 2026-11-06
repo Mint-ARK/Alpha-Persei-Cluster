@@ -1,0 +1,700 @@
+{
+  "version": 1,
+  "source": "current Lua: GameSetting / WeaponServantCfg / WeaponEffectCfg",
+  "recipes": {
+    "1": {
+      "base_id": 2510000,
+      "count": 1,
+      "currency_id": 2,
+      "currency_num": 100
+    },
+    "2": {
+      "base_id": 2520000,
+      "count": 1,
+      "currency_id": 2,
+      "currency_num": 100
+    },
+    "3": {
+      "base_id": 2530000,
+      "count": 1,
+      "currency_id": 2,
+      "currency_num": 100
+    },
+    "4": {
+      "base_id": 2540000,
+      "count": 1,
+      "currency_id": 2,
+      "currency_num": 100
+    },
+    "5": {
+      "base_id": 2550000,
+      "count": 1,
+      "currency_id": 2,
+      "currency_num": 100
+    },
+    "9": {
+      "base_id": 2590000,
+      "count": 1,
+      "currency_id": 2,
+      "currency_num": 100
+    }
+  },
+  "targets": {
+    "2510001": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1038
+    },
+    "2510002": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1039
+    },
+    "2510003": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1059
+    },
+    "2510004": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1041
+    },
+    "2510005": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1042
+    },
+    "2510006": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1067
+    },
+    "2510007": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1097
+    },
+    "2510008": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1096
+    },
+    "2510009": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1138
+    },
+    "2510010": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1139
+    },
+    "2510012": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1197
+    },
+    "2510013": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1022
+    },
+    "2510014": {
+      "race": 1,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1021
+    },
+    "2520001": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1019
+    },
+    "2520002": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1011
+    },
+    "2520003": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1024
+    },
+    "2520004": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1035
+    },
+    "2520005": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1111
+    },
+    "2520006": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1119
+    },
+    "2520007": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1017
+    },
+    "2520008": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1015
+    },
+    "2520009": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1095
+    },
+    "2520010": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1034
+    },
+    "2520011": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1211
+    },
+    "2520012": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1047
+    },
+    "2520013": {
+      "race": 2,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1044
+    },
+    "2530001": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1099
+    },
+    "2530002": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1048
+    },
+    "2530003": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1066
+    },
+    "2530004": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1093
+    },
+    "2530005": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1148
+    },
+    "2530006": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1050
+    },
+    "2530007": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1199
+    },
+    "2530008": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1058
+    },
+    "2530009": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1055
+    },
+    "2530010": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1158
+    },
+    "2530011": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1049
+    },
+    "2530012": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1150
+    },
+    "2530013": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1248
+    },
+    "2530014": {
+      "race": 3,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1166
+    },
+    "2540001": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1080
+    },
+    "2540002": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1084
+    },
+    "2540003": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1094
+    },
+    "2540004": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1037
+    },
+    "2540005": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1184
+    },
+    "2540006": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1028
+    },
+    "2540008": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1032
+    },
+    "2540009": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1033
+    },
+    "2540010": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1081
+    },
+    "2540011": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1132
+    },
+    "2540012": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1284
+    },
+    "2540013": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1133
+    },
+    "2540014": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1085
+    },
+    "2540015": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1194
+    },
+    "2540016": {
+      "race": 4,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1137
+    },
+    "2550001": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1027
+    },
+    "2550002": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1013
+    },
+    "2550004": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1026
+    },
+    "2550005": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1056
+    },
+    "2550006": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1068
+    },
+    "2550007": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1016
+    },
+    "2550008": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1127
+    },
+    "2550009": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1052
+    },
+    "2550010": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1020
+    },
+    "2550011": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1156
+    },
+    "2550012": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1089
+    },
+    "2550013": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1083
+    },
+    "2550014": {
+      "race": 5,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1043
+    },
+    "2590001": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1070
+    },
+    "2590003": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1075
+    },
+    "2590004": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1071
+    },
+    "2590005": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1072
+    },
+    "2590006": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1076
+    },
+    "2590007": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1074
+    },
+    "2590008": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1060
+    },
+    "2590009": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1061
+    },
+    "2590010": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1012
+    },
+    "2590011": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1073
+    },
+    "2590012": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1053
+    },
+    "2590013": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1170
+    },
+    "2590014": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1054
+    },
+    "2590015": {
+      "race": 9,
+      "type": 2,
+      "starlevel": 5,
+      "display_type": 0,
+      "summon_blocked": 0,
+      "spec_hero": 1077
+    }
+  }
+}

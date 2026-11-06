@@ -48,19 +48,8 @@ def get_next_semiweekly_5am(now_ts=None):
     计算半周刷新（周一 05:00 或 周四 05:00）的下一个时间戳。
     用于：黑区净化 (Mythic / Hazard Zone) 失序深区周期轮换。
     """
-    if now_ts is None:
-        now_ts = int(time.time())
-    dt = datetime.datetime.fromtimestamp(now_ts)
-    candidates = []
-    for target_weekday in [0, 3]: # Mon=0, Thu=3
-        days_ahead = target_weekday - dt.weekday()
-        cand = dt.replace(hour=5, minute=0, second=0, microsecond=0) + datetime.timedelta(days=days_ahead)
-        if cand.timestamp() > now_ts:
-            candidates.append(cand.timestamp())
-        else:
-            cand_next = cand + datetime.timedelta(days=7)
-            candidates.append(cand_next.timestamp())
-    return int(min(candidates))
+    from mythic_cycle import bounds
+    return bounds(now_ts)[1]
 
 def get_weekly_cycle_id(now_ts=None, base_anchor=1700000000):
     if now_ts is None:
@@ -71,6 +60,26 @@ def get_weekly_cycle_id(now_ts=None, base_anchor=1700000000):
 # ----------------- 2. 配置资产加载器 -----------------
 
 _CATALOGS = {}
+
+
+def get_polyhedron_cycle(now_ts=None):
+    """多维历程统一按东八区周一05:00轮换，与宿主机时区无关。"""
+    now_ts = int(time.time() if now_ts is None else now_ts)
+    zone = datetime.timezone(datetime.timedelta(hours=8))
+    now = datetime.datetime.fromtimestamp(now_ts, zone)
+    start = (now - datetime.timedelta(days=now.weekday())).replace(
+        hour=5, minute=0, second=0, microsecond=0)
+    if start.timestamp() > now_ts:
+        start -= datetime.timedelta(days=7)
+    return int(start.timestamp()), int(start.timestamp()) + 604800
+
+
+def get_polyhedron_activity(res_version=None, now_ts=None):
+    import res_version_manager
+    cfg = res_version_manager.get_version_config(res_version)
+    start, end = get_polyhedron_cycle(now_ts)
+    return dict(activity_id=int(cfg['polyhedron_activity_id']), start_time=start,
+                stop_time=end, state=1, theme=int(cfg['theme_id']), template=73)
 
 def _load_catalog(filename):
     if filename not in _CATALOGS:
@@ -150,15 +159,6 @@ def get_boss_challenge_reward_items(reward_type, reward_val, area_id=4, mode_id=
                 for d in rew.get("drops", []):
                     items.append({"id": int(d[0]), "num": int(d[1])})
                 break
-        if not items:
-            for _, a_obj in areas.items():
-                for rew in a_obj.get("rewards", []):
-                    if int(rew.get("star", 0)) == int(reward_val):
-                        for d in rew.get("drops", []):
-                            items.append({"id": int(d[0]), "num": int(d[1])})
-                        break
-                if items:
-                    break
     elif int(reward_type) == 2:
         modes = cat.get("advance_modes", {})
         mode_obj = modes.get(str(mode_id), modes.get(mode_id, {}))
@@ -167,25 +167,10 @@ def get_boss_challenge_reward_items(reward_type, reward_val, area_id=4, mode_id=
                 for d in rew.get("drops", []):
                     items.append({"id": int(d[0]), "num": int(d[1])})
                 break
-        if not items:
-            for _, m_obj in modes.items():
-                for rew in m_obj.get("rewards", []):
-                    if int(rew.get("point", 0)) == int(reward_val):
-                        for d in rew.get("drops", []):
-                            items.append({"id": int(d[0]), "num": int(d[1])})
-                        break
-                if items:
-                    break
-    # 兜底
-    if not items:
-        if int(reward_type) == 1:
-            items = [{"id": 1, "num": 50}, {"id": 2, "num": 30000}]
-        else:
-            items = [{"id": 1, "num": 50}, {"id": 41, "num": 7}, {"id": 37, "num": 24}]
     return items
 
 
-def get_boss_challenge_data(uid, db):
+def get_boss_challenge_data(uid, db, *, strict=False):
     """
     返回梦境再构当期动态数据：
     - sc_45201: mode, next_refresh_time, difficulty_list
@@ -193,14 +178,17 @@ def get_boss_challenge_data(uid, db):
     - sc_45101: 进阶梦境 (advance_id, boss_list, receive_point_list)
     """
     now = int(time.time())
-    next_rf = get_next_thursday_5am(now)
-    cycle = get_weekly_cycle_id(now)
+    from boss_challenge_cycle import bounds, seed_at
+    cycle_start, next_rf, _ = bounds(now)
+    cycle = seed_at(cycle_start)
     cat = get_boss_catalog()
     
     if db and hasattr(db, "check_and_lazy_refresh_boss_challenge"):
         try:
             db.check_and_lazy_refresh_boss_challenge(uid, now)
         except Exception:
+            if strict:
+                raise
             pass
 
     # 1. 读取玩家梦境再构进度与模式
@@ -224,6 +212,11 @@ def get_boss_challenge_data(uid, db):
                 rows = db.query("SELECT * FROM boss_challenge_progress WHERE uid=?", (uid,))
                 prog = rows[0] if rows else {}
             if prog:
+                # 数据库保存本期有效种子；旧档首次采用时保留当时列表，
+                # 周三不再重新按物理时间计算种子。
+                cycle = int(prog.get('cycle_id') or cycle)
+                if int(prog.get('last_weekly_ts') or 0) >= next_rf:
+                    next_rf = int(prog['last_weekly_ts']) + 604800
                 raw_mode = int(prog.get("mode") or 0)
                 use_times = int(prog.get("use_times") or 0)
                 area_id = int(prog.get("area_id") or 4)
@@ -239,6 +232,8 @@ def get_boss_challenge_data(uid, db):
                 else:
                     user_mode = 0
         except Exception:
+            if strict:
+                raise
             pass
             
         try:
@@ -250,6 +245,8 @@ def get_boss_challenge_data(uid, db):
                     "diff_idx": int(r.get("diffculty_index") or 1)
                 }
         except Exception:
+            if strict:
+                raise
             pass
             
         try:
@@ -260,6 +257,8 @@ def get_boss_challenge_data(uid, db):
                 adv_heroes_map[bid] = json.loads(r.get("used_heroes") or "[]")
                 adv_presets_map[bid] = json.loads(r.get("last_heroes_cfg") or "[]")
         except Exception:
+            if strict:
+                raise
             pass
             
         try:
@@ -269,6 +268,8 @@ def get_boss_challenge_data(uid, db):
                 if bid not in user_points or user_points[bid] == 0:
                     user_points[bid] = int(r.get("score") or 0)
         except Exception:
+            if strict:
+                raise
             pass
 
         try:
@@ -282,6 +283,8 @@ def get_boss_challenge_data(uid, db):
                     "star_info": json.loads(r.get("star_info") or "[]")
                 }
         except Exception:
+            if strict:
+                raise
             pass
             
         try:
@@ -292,6 +295,8 @@ def get_boss_challenge_data(uid, db):
                 elif r.get("reward_type") == 2:
                     claimed_points.append(int(r["reward_id"]))
         except Exception:
+            if strict:
+                raise
             pass
 
     # 2. 进阶/扭曲梦境 BOSS 抽取（按周期确定性抽取 3 或 4 位首领）
@@ -407,9 +412,6 @@ def get_mythic_data(uid, db):
         })
         
     user_diff = 10 # 默认选中难度 10 (可自由切换 1~13 档)
-    claimed_star_rewards = []
-    clear_partitions = []
-    main_stars = [1, 2, 3]
     
     if db:
         try:
@@ -419,19 +421,6 @@ def get_mythic_data(uid, db):
         except Exception:
             pass
             
-        try:
-            r_rows = db.query("SELECT reward_id FROM mythic_progress_reward WHERE uid=?", (uid,))
-            claimed_star_rewards = [r["reward_id"] for r in r_rows]
-        except Exception:
-            pass
-            
-        try:
-            p_rows = db.query("SELECT partition_id, star FROM mythic_progress_partition WHERE uid=?", (uid,))
-            if p_rows:
-                clear_partitions = [r["partition_id"] for r in p_rows]
-        except Exception:
-            pass
-
     # sc_44007: 全量词条与半周轮换数据
     sc_44007_obj = {
         "difficulty_list": diff_list,
@@ -443,11 +432,8 @@ def get_mythic_data(uid, db):
     }
     
     # sc_44009: 常规黑区通关分区、星数与已领奖励
-    sc_44009_obj = {
-        "clear_partition_id_list": clear_partitions,
-        "main_partition_star_list": main_stars,
-        "star_reward_provide_list": claimed_star_rewards
-    }
+    from mythic_normal_service import payload as normal_payload
+    sc_44009_obj = normal_payload(db, uid)
     
     # sc_44019: 已开放难度与当前选中难度
     sc_44019_obj = {
@@ -457,13 +443,10 @@ def get_mythic_data(uid, db):
     }
     
     # sc_44021: 30 档最终失序深区关卡列表 (1~19 档单关，20~30 档双关)
-    stage_list = []
-    for d in range(1, 31):
-        if d <= 19:
-            stage_list.append({"difficulty_id": d, "stage_id": [3028000 + d]})
-        else:
-            base_s = 3028020 + (d - 20) * 2
-            stage_list.append({"difficulty_id": d, "stage_id": [base_s, base_s + 1]})
+    from mythic_final_service import catalog as final_catalog, profile as final_profile
+    final_rows = final_catalog()[final_profile()]['difficulties']
+    stage_list = [dict(difficulty_id=int(d), stage_id=final_rows[d]['stages'][rot['cycle_id'] % len(final_rows[d]['stages'])])
+                  for d in sorted(final_rows,key=int)]
         
     sc_44021_obj = {
         "stage_list": stage_list
@@ -539,63 +522,19 @@ def get_polyhedron_data(uid, db, res_version=None):
         owned={r['id'] for r in db.query('SELECT id FROM hero WHERE uid=? AND unlock=1',(uid,))}
         unlocked_heroes=[item for item in unlocked_heroes if item['hero_id'] in owned]
 
-    # 2. 已解锁信标列表
-    beacon_rows = db.query("SELECT beacon_id FROM polyhedron_beacon WHERE uid = ?", (uid,))
-    if beacon_rows:
-        beacon_id_list = [r["beacon_id"] for r in beacon_rows]
-    else:
-        beacon_id_list = list(range(1, 16))
-
-    # 3. 终端升级天赋列表
-    term_rows = db.query("SELECT terminal_id FROM polyhedron_terminal WHERE uid = ?", (uid,))
-    if term_rows:
-        terminal_upgrades = [r["terminal_id"] for r in term_rows]
-    else:
-        terminal_upgrades = [
-            2001, 3001, 3009, 3002, 3008, 3003, 3012, 3010,
-            1001, 1002, 1018, 1006, 1003, 1010, 1007, 1014,
-            1011, 1015, 1008, 1012, 1016, 1004, 1009, 1013,
-            1017, 1005, 3011, 3004, 3005, 3006, 3007
-        ]
-
-    # 4. 已通关难度列表
-    diff_rows = db.query("SELECT difficulty_id FROM polyhedron_difficulty WHERE uid = ? ORDER BY difficulty_id DESC", (uid,))
-    if diff_rows:
-        clear_difficulties = [r["difficulty_id"] for r in diff_rows]
-    else:
-        clear_difficulties = [19, 18, 17, 16, 11, 6, 1]
-
-    # 5. 图鉴样本
-    art_rows = db.query("SELECT artifact_id, state FROM polyhedron_artifact WHERE uid = ?", (uid,))
-    if art_rows:
-        manual_samples = [{"id": r["artifact_id"], "state": r["state"]} for r in art_rows]
-    else:
-        manual_samples = [
-            {"id": 70562, "state": 2}, {"id": 70563, "state": 2}, {"id": 70811, "state": 2},
-            {"id": 70805, "state": 2}, {"id": 70814, "state": 1}, {"id": 70806, "state": 2},
-            {"id": 70810, "state": 2}, {"id": 70807, "state": 2}, {"id": 70561, "state": 2},
-            {"id": 70551, "state": 2}, {"id": 70552, "state": 2}, {"id": 109405, "state": 2},
-            {"id": 70812, "state": 2}, {"id": 70809, "state": 2}, {"id": 70714, "state": 2},
-            {"id": 70704, "state": 2}, {"id": 70610, "state": 1}, {"id": 70615, "state": 1},
-            {"id": 70609, "state": 2}, {"id": 109402, "state": 1}, {"id": 109401, "state": 2}
-        ]
-
-    if fresh_save:
-        if not beacon_rows:
-            beacon_id_list=[]
-        if not term_rows:
-            terminal_upgrades=[]
-        if not diff_rows:
-            clear_difficulties=[]
-        if not art_rows:
-            manual_samples=[]
+    # Empty persisted sets are authoritative, including a deliberate terminal reset.
+    beacon_rows = db.query("SELECT beacon_id FROM polyhedron_beacon WHERE uid=?", (uid,))
+    beacon_id_list = [r['beacon_id'] for r in beacon_rows]
+    term_rows = db.query("SELECT terminal_id FROM polyhedron_terminal WHERE uid=?", (uid,))
+    terminal_upgrades = [r['terminal_id'] for r in term_rows]
+    diff_rows = db.query("SELECT difficulty_id FROM polyhedron_difficulty WHERE uid=? ORDER BY difficulty_id DESC", (uid,))
+    clear_difficulties = [r['difficulty_id'] for r in diff_rows]
+    art_rows = db.query("SELECT artifact_id,state FROM polyhedron_artifact WHERE uid=?", (uid,))
+    manual_samples = [dict(id=r['artifact_id'],state=r['state']) for r in art_rows]
 
     # 6. 历程周期性刷新检测（仅重置维度偏移 Currency 45 与已领取记录）
-    try:
-        from polyhedron_service import PolyhedronRunManager
-        PolyhedronRunManager.check_and_refresh_policy_cycle(uid, db, activity_id=activity_id)
-    except Exception as _ce:
-        pass
+    from polyhedron_service import PolyhedronRunManager
+    PolyhedronRunManager.check_and_refresh_policy_cycle(uid, db, activity_id=activity_id)
 
     # 7. Meta 元数据（游戏局内状态、重置次数、红点等）
     meta = db.get("polyhedron_meta", uid, "AND activity_id=?", (activity_id,))
@@ -616,7 +555,7 @@ def get_polyhedron_data(uid, db, res_version=None):
         }, keys=("uid", "activity_id"))
 
     # 7. 历程已领取等级列表
-    policy_rows = db.query("SELECT level FROM polyhedron_policy_claimed WHERE uid=? AND activity_id=?", (uid, activity_id))
+    policy_rows = db.query("SELECT DISTINCT level FROM polyhedron_policy_claimed WHERE uid=?", (uid,))
     apply_id_list = [r["level"] for r in policy_rows] if policy_rows else []
 
     # 8. 局内进行中的对局状态恢复
@@ -624,15 +563,12 @@ def get_polyhedron_data(uid, db, res_version=None):
     game_obj = {
         "state": game_state
     }
-    try:
-        from polyhedron_service import PolyhedronRunManager
-        active_run = PolyhedronRunManager.load_run(uid, db)
-        if active_run and active_run.get("state") in (2, 3):
-            game_obj["state"] = active_run.get("state")
-            game_obj["start_info"] = active_run.get("start_info", {})
-            game_obj["progress"] = PolyhedronRunManager.build_progress_obj(active_run)
-    except Exception as e:
-        pass
+    from polyhedron_service import PolyhedronRunManager
+    active_run = PolyhedronRunManager.load_run(uid, db)
+    if active_run and active_run.get("state") in (2, 3):
+        game_obj["state"] = active_run.get("state")
+        game_obj["start_info"] = active_run.get("start_info", {})
+        game_obj["progress"] = PolyhedronRunManager.build_progress_obj(active_run)
 
     sc_18001_obj = {
         "game": game_obj,
@@ -909,6 +845,8 @@ def get_core_verification_challenge_data(uid, db, activity_id=None):
         }
     else:
         # Mode 4 (sc_89801)
+        from core_mode4_reward_service import task_states
+        task_items = task_states(db, uid, activity_id) if db is not None else []
         c_stages = []
         for s in common_stage_data_list:
             c_stages.append({

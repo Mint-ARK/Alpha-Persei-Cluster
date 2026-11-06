@@ -161,7 +161,7 @@ class InventoryService:
 
     @staticmethod
     def rewards_after_overflow(items, summary):
-        """Subtract each converted source once, even when it yields two currencies."""
+        """Subtract unretained units once, including caps without exchange targets."""
         merged = {}
         for iid, count in items:
             merged[iid] = merged.get(iid, 0) + count
@@ -495,7 +495,8 @@ class InventoryService:
                     m_rows = db.query("SELECT num FROM material WHERE uid=? AND id=?", (uid, iid))
                     cur_m = int(m_rows[0]["num"] or 0) if m_rows else 0
                     if is_dyn_sticker:
-                        s_rows = db.query("SELECT 1 FROM chat_sticker WHERE uid=? AND emoji_id=?", (uid, iid))
+                        real_eid = get_sticker_item_map().get(iid, iid)
+                        s_rows = db.query("SELECT 1 FROM chat_sticker WHERE uid=? AND emoji_id=?", (uid, real_eid))
                         cur_num = max(cur_m, 1 if s_rows else 0)
                     else:
                         cur_num = cur_m
@@ -512,8 +513,6 @@ class InventoryService:
                             (uid, iid, new_num, now, new_num, now),
                         )
                         if is_dyn_sticker:
-                            stk_map = get_sticker_item_map()
-                            real_eid = stk_map.get(iid, iid)
                             db.execute(
                                 "INSERT OR IGNORE INTO chat_sticker (uid, emoji_id, name, desc) VALUES (?, ?, '', '')",
                                 (uid, real_eid)
@@ -527,8 +526,8 @@ class InventoryService:
 
                     if surplus > 0:
                         logger.info(f"[InventoryService] 材料/表情 {iid} 触发限额 (拥有={cur_num}, 请求={count}), 溢出={surplus}")
+                        summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                         if exch_grants:
-                            summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                             cls.grant_items(ctx, uid, exch_grants, silent=True, source=f"{source}_overflow")
                             for eid, enum in exch_grants:
                                 summary["overflow_converted"].append({"src_id": iid, "surplus": surplus, "target_id": eid, "target_num": enum})
@@ -569,6 +568,10 @@ class InventoryService:
                     is_new, is_piece, hid, pieces = cls._grant_single_hero(ctx, db, uid, iid, now)
                     if is_new:
                         summary["hero_unlocked"].append(hid)
+                        # 17023 的 HERO 条目触发客户端 HERO_UNLOCK_SUCCESS；
+                        # 14007 只修改角色数据，不能替代解锁事件。
+                        if getattr(ctx, "touched_items", None) is not None:
+                            ctx.touched_items.add(hid)
                         from peripheral_service import PeripheralService
                         from profile_rules import skin_portrait_config
                         portrait_id = PeripheralService(db).unlock_acquisition_portrait(uid, hid, ctx)
@@ -626,8 +629,8 @@ class InventoryService:
 
                 if surplus > 0:
                     logger.info(f"[InventoryService] 皮肤 {iid} 触发保护性限额 (拥有={cur_num}, 请求={count}), 溢出={surplus}")
+                    summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                     if exch_grants:
-                        summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                         cls.grant_items(ctx, uid, exch_grants, silent=True, source=f"{source}_overflow")
                         for eid, enum in exch_grants:
                             summary["overflow_converted"].append({"src_id": iid, "surplus": surplus, "target_id": eid, "target_num": enum})
@@ -662,8 +665,8 @@ class InventoryService:
 
                 if surplus > 0:
                     logger.info(f"[InventoryService] 场景 {iid} 触发保护性限额 (拥有={cur_num}, 请求={count}), 溢出={surplus}")
+                    summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                     if exch_grants:
-                        summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                         cls.grant_items(ctx, uid, exch_grants, silent=True, source=f"{source}_overflow")
                         for eid, enum in exch_grants:
                             summary["overflow_converted"].append({"src_id": iid, "surplus": surplus, "target_id": eid, "target_num": enum})
@@ -766,8 +769,8 @@ class InventoryService:
 
                 if surplus > 0:
                     logger.info(f"[InventoryService] 装饰资产 {iid} (kind={kind}) 触发限额 (拥有={cur_num}, 请求={count}), 溢出={surplus}")
+                    summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                     if exch_grants:
-                        summary["overflow_consumed"][iid] = summary["overflow_consumed"].get(iid, 0) + surplus
                         cls.grant_items(ctx, uid, exch_grants, silent=True, source=f"{source}_overflow")
                         for eid, enum in exch_grants:
                             summary["overflow_converted"].append({"src_id": iid, "surplus": surplus, "target_id": eid, "target_num": enum})
@@ -795,6 +798,12 @@ class InventoryService:
                 ctx.added_weapons.extend(dict(uid=s['id'], item=dict(id=s['prefab_id'], num=1))
                                          for s in new_servants)
 
+        # Native SP Hero wreath rewards must unlock their collection task now.
+        sp_gains=summary.get('material',{})
+        if not silent and (sp_gains.get(53100) or sp_gains.get(53101)) and hasattr(ctx,'append_frame'):
+            from sphero_leisure_service import record_grants
+            record_grants(ctx,uid,coins=sp_gains.get(53100,0),wreath=sp_gains.get(53101,0))
+
         # 4. 事务后置触发 EventBus 广播
         if not silent and pending_events:
             for ev_name, ev_kwargs in pending_events:
@@ -821,8 +830,9 @@ class InventoryService:
         star = int(cfg[0]["unlock_star"]) if cfg and cfg[0].get("unlock_star") else 300
         piece_add = 30 if star >= 300 else (18 if star == 200 else 10)
 
-        exists = db.query("SELECT id FROM hero WHERE uid=? AND id=?", (uid, hero_id))
-        if not exists:
+        rows = db.query("SELECT * FROM hero WHERE uid=? AND id=?", (uid, hero_id))
+        existing = rows[0] if rows else None
+        if not existing or int(existing.get('unlock') or 0) != 1:
             from hero_codec import initial_hero_row
             from account_db import HERO_TO_ARCHIVE
             archive = int(HERO_TO_ARCHIVE.get(hero_id, hero_id))
@@ -831,6 +841,17 @@ class InventoryService:
             initial = initial_hero_row(hero_id, star, now_ts)
             if cfg and cfg[0].get('name'):
                 initial['name'] = cfg[0]['name']
+            if existing:
+                # A precreated locked row is not ownership. Preserve its stored
+                # progression/links, filling only missing acquisition defaults.
+                defaults = initial
+                initial = {key: value for key, value in defaults.items() if existing.get(key) is None}
+                for key in ('level', 'star', 'using_skin', 'battle_using_skin'):
+                    if not existing.get(key):
+                        initial[key] = defaults[key]
+                if existing.get('skill_list') in (None, '', '[]', []):
+                    initial['skill_list'] = defaults['skill_list']
+                initial.update(id=hero_id, unlock=1, update_ts=now_ts)
             db.upsert('hero', uid, initial, keys=('uid', 'id'))
             if not previously_owned:
                 # Unlock the newly acquired archive, preserving manual locks on
@@ -1015,6 +1036,119 @@ class InventoryService:
 
     @classmethod
     def use_items(cls, ctx, uid, use_item_list):
+        """Keep the structured error API, with all SQL/notifications rolled back."""
+        if not use_item_list:
+            return dict(result=0, drop_list=[], touched_heroes=[], touched_scene=False)
+        from core import OperationError
+        from account_db import savepoint_transaction
+        from operation_notifications import checkpoint_notifications, restore_notifications
+        db = getattr(ctx, 'db', ctx)
+        if db is None:
+            return dict(result=1, drop_list=[], touched_heroes=[], touched_scene=False)
+        checkpoint = checkpoint_notifications(ctx)
+        try:
+            with savepoint_transaction(db):
+                result = cls._use_items(ctx, uid, use_item_list)
+                if result.get('result', 0) != 0:
+                    raise OperationError(int(result['result']), '道具使用失败')
+                return result
+        except OperationError as exc:
+            restore_notifications(ctx, checkpoint)
+            return dict(result=exc.code, drop_list=[], touched_heroes=[], touched_scene=False)
+        except BaseException:
+            restore_notifications(ctx, checkpoint)
+            raise
+
+    @classmethod
+    def _plan_item_use(cls, db, iid, choices, usable_cfgs, drop_cfgs, retained_items):
+        """Validate the selected execution branch, without spending or drawing."""
+        from core import OperationError
+
+        def invalid():
+            raise OperationError(2, f'道具 {iid} 的使用配置或选择无效')
+
+        def positive(value):
+            return type(value) is int and value > 0
+
+        def pair(value):
+            return (isinstance(value, (list, tuple)) and len(value) >= 2
+                    and positive(value[0]) and positive(value[1]))
+
+        def bundle(param):
+            return (isinstance(param, list) and bool(param)
+                    and (all(pair(p) for p in param) if isinstance(param[0], (list, tuple)) else pair(param)))
+
+        if iid in retained_items:
+            return {'mode': 'retained'}
+        if iid == 41101:
+            if not callable(getattr(db, 'reset_mythic_by_beacon', None)):
+                invalid()
+            return {'mode': 'beacon'}
+        cfg = usable_cfgs.get(str(iid))
+        if not isinstance(cfg, dict):
+            invalid()
+        param = cfg.get('param')
+        itype, subtype = int(cfg.get('type') or 0), int(cfg.get('sub_type') or 0)
+        plan = dict(param=param, itype=itype, subtype=subtype)
+        if choices or subtype in (504,508,514,515,516,517):
+            # Native optional-box UI sends one index; item_info.num carries
+            # batch quantity, including subtypes named OPTIONAL_*_MULTI.
+            # Do not apply this rule to instance-specific arguments (513).
+            if subtype in (504,508,514,515,516,517) and len(choices) > 1:
+                invalid()
+            if not isinstance(param, list) or not param:
+                invalid()
+            for index in choices or [1]:
+                if not 1 <= index <= len(param):invalid()
+                reward = param[index-1]
+                if not (pair(reward) if isinstance(reward, (list,tuple)) else positive(reward)):
+                    invalid()
+            plan['mode'] = 'choice'
+        elif subtype == 507:
+            drop_id = param[0] if isinstance(param, list) and param else param
+            if not positive(drop_id):invalid()
+            pool = drop_cfgs.get(str(drop_id))
+            if not isinstance(pool, dict) or not any(k in pool for k in ('base','random','weight')):invalid()
+            for key in ('base','random','weight'):
+                records = pool.get(key) or []
+                if not isinstance(records, list):invalid()
+                for record in records:
+                    if not pair(record):invalid()
+                    if key == 'weight':
+                        if len(record)<3 or type(record[2]) is not int or record[2]<0:invalid()
+                    elif len(record)>=3 and (type(record[2]) not in (int,float) or not 0<=record[2]<=100):
+                        invalid()
+            weights = pool.get('weight') or []
+            draws = pool.get('weight_count', 1 if weights else 0)
+            if type(draws) is not int or draws<0:invalid()
+            if weights and draws and sum(record[2] for record in weights)<=0:invalid()
+            plan['mode'] = 'random'
+        elif subtype in (501,506,518) or itype == 5:
+            if not bundle(param):invalid()
+            plan['mode'] = 'bundle'
+        elif subtype in (401,402,403,404):
+            if not bundle(param):invalid()
+            plan['mode'] = 'value'
+        elif itype == 14 or subtype == 407:
+            skins = param if isinstance(param,list) else [param]
+            if not skins or not all(positive(i) for i in skins):invalid()
+            plan['mode'] = 'skin'
+        elif itype == 20 or 90000 <= iid < 92000:
+            emoji = get_sticker_item_map().get(iid)
+            if not positive(emoji):invalid()
+            plan.update(mode='sticker', emoji_id=emoji)
+        elif itype == 21 or 6000 <= iid <= 6999:
+            plan['mode'] = 'scene'
+        elif itype in (11,12,13,18,22,23,25,26,28):
+            plan['mode'] = 'cosmetic'
+        elif isinstance(param,list) and param and all(pair(p) for p in param):
+            plan['mode'] = 'fallback'
+        else:
+            invalid()
+        return plan
+
+    @classmethod
+    def _use_items(cls, ctx, uid, use_item_list):
         """
         统一道具/礼包使用接口（纳管礼包、自选箱、材料、体力药、皮肤券、表情激活等）
         :param ctx: 上下文 (含 db, touched_items, touched_heroes 等) 或直接 db
@@ -1022,6 +1156,7 @@ class InventoryService:
         :param use_item_list: 客户端 cs_17012 格式列表 [{"item_info": {...}, "use_list": [...]}, ...]
         :return: dict，包含 result (0=成功), drop_list (按 item_net_rec 规范生成的奖励列表), touched_heroes, touched_scene
         """
+        from core import OperationError
         if not use_item_list:
             return {"result": 0, "drop_list": [], "touched_heroes": [], "touched_scene": False}
 
@@ -1032,15 +1167,28 @@ class InventoryService:
         usable_cfgs = _get_item_usable_cfg()
         drop_cfgs = _get_drop_cfg()
 
-        # 1. 前置校验：若任一待消耗道具余额不足，返回错误码 3 (道具不足)
+        from birthday_service import commemorative_items
+        from save_generator import generation_config
+        retained_items = set(commemorative_items()) | set(generation_config()['permanent_replay_items'])
+
+        # 1. Sum consumption without merging individual selection semantics.
+        # Replay keepsakes are retained; repeated requests need ownership only.
+        required = {}
+        plans = []
         for entry in use_item_list:
             info = entry.get("item_info") if isinstance(entry, dict) else getattr(entry, "item_info", None)
             if not info:
-                continue
+                raise OperationError(2, '缺少使用道具信息')
             iid = int(info.get("id") if isinstance(info, dict) else getattr(info, "id", 0))
             count = int(info.get("num") if isinstance(info, dict) else getattr(info, "num", 1))
             if count <= 0 or iid <= 0:
-                continue
+                raise OperationError(2, '道具ID及使用数量必须为正数')
+            choices = entry.get('use_list') if isinstance(entry,dict) else getattr(entry,'use_list',[])
+            choices = [int(x) for x in (choices or [])]
+            plan = cls._plan_item_use(db,iid,choices,usable_cfgs,drop_cfgs,retained_items)
+            plans.append((iid,count,choices,plan))
+            required[iid] = max(required.get(iid, 0), count) if iid in retained_items else required.get(iid, 0) + count
+        for iid, count in required.items():
             _, have = cls.get_item_balance(db, uid, iid)
             if have < count:
                 logger.warning(f"[InventoryService.use_items] 道具不足: uid={uid} id={iid} 拥有={have} 消耗={count}")
@@ -1051,23 +1199,10 @@ class InventoryService:
         touched_heroes = set()
         touched_scene = False
 
-        # 2. 依次扣除消耗道具并按类型/配置展开产出
-        for entry in use_item_list:
-            info = entry.get("item_info") if isinstance(entry, dict) else getattr(entry, "item_info", None)
-            if not info:
-                continue
-            iid = int(info.get("id") if isinstance(info, dict) else getattr(info, "id", 0))
-            count = int(info.get("num") if isinstance(info, dict) else getattr(info, "num", 1))
-            use_choices = entry.get("use_list") if isinstance(entry, dict) else getattr(entry, "use_list", [])
-            use_choices = [int(x) for x in (use_choices or [])]
-
-            if count <= 0 or iid <= 0:
-                continue
-
-            # Replay keepsakes play stories in the client; retain ownership.
-            from birthday_service import commemorative_items
-            from save_generator import generation_config
-            if iid in commemorative_items() or iid in generation_config()['permanent_replay_items']:
+        # 2. Execute only plans that passed the complete batch preflight.
+        for iid, count, use_choices, plan in plans:
+            mode = plan['mode']
+            if mode == 'retained':
                 continue
 
             # 扣除道具
@@ -1075,22 +1210,14 @@ class InventoryService:
             if not succ:
                 return {"result": 3, "drop_list": [], "touched_heroes": list(touched_heroes), "touched_scene": touched_scene}
 
-            cfg = usable_cfgs.get(str(iid))
-            param = cfg.get("param") if cfg else None
-            sub_type = int(cfg.get("sub_type") or 0) if cfg else 0
-            itype = int(cfg.get("type") or 0) if cfg else 0
-
-            # 特殊功能道具: 黑区信标 (41101)
-            if iid == 41101:
-                if hasattr(db, "reset_mythic_by_beacon"):
-                    try:
-                        db.reset_mythic_by_beacon(uid)
-                    except Exception as e:
-                        logger.error(f"重置黑区信标失败: {e}")
+            param = plan.get('param')
+            if mode == 'beacon':
+                if db.reset_mythic_by_beacon(uid) is False:
+                    raise OperationError(9, '黑区信标重置失败')
                 continue
 
             # 分支 1: 自选箱 (use_choices 存在，或 sub_type 为 504, 508, 514, 515, 516, 517)
-            if (use_choices or sub_type in (504, 508, 514, 515, 516, 517)) and param and isinstance(param, list):
+            if mode == 'choice':
                 # 若客户端未上报选择索引，默认选取第 1 项避免越界穿透至全部发放
                 choices = use_choices if use_choices else [1]
                 for choice_idx in choices:
@@ -1106,10 +1233,10 @@ class InventoryService:
                         all_items_to_grant.append((cid, cnum))
                         raw_drops.append({"id": cid, "num": cnum, "time_valid": 0})
                     else:
-                        logger.warning(f"自选索引超界: iid={iid} choice_idx={choice_idx} total={len(param)}")
+                        raise OperationError(2, '自选索引超出范围')
 
             # 分支 2: 掉落包 (sub_type == 507: 纳管 base 保底、random 独立概率、weight 权重轮盘)
-            elif sub_type == 507 and param:
+            elif mode == 'random':
                 drop_id = param[0] if isinstance(param, list) and param else param
                 d_entry = drop_cfgs.get(str(drop_id))
                 if d_entry:
@@ -1133,7 +1260,7 @@ class InventoryService:
                                 rid, rnum = int(r[0]), int(r[1])
                                 all_items_to_grant.append((rid, rnum))
                                 raw_drops.append({"id": rid, "num": rnum, "time_valid": 0})
-                            elif len(r) >= 2:
+                            elif len(r) == 2:
                                 rid, rnum = int(r[0]), int(r[1])
                                 all_items_to_grant.append((rid, rnum))
                                 raw_drops.append({"id": rid, "num": rnum, "time_valid": 0})
@@ -1155,7 +1282,7 @@ class InventoryService:
                                             break
 
             # 分支 3: 固定礼包 / 复合材料包 (sub_type in (501, 506, 518) 或 type == 5)
-            elif (sub_type in (501, 506, 518) or itype == 5) and param and isinstance(param, list):
+            elif mode == 'bundle':
                 if len(param) > 0 and isinstance(param[0], (list, tuple)):
                     for sub in param:
                         sid = int(sub[0])
@@ -1169,7 +1296,7 @@ class InventoryService:
                     raw_drops.append({"id": sid, "num": snum, "time_valid": 0})
 
             # 分支 4: 体力道具 / 货币好感道具 (sub_type in (401, 402, 403, 404))
-            elif sub_type in (401, 402, 403, 404) and param:
+            elif mode == 'value':
                 if isinstance(param, list) and len(param) > 0:
                     first = param[0]
                     if isinstance(first, (list, tuple)):
@@ -1185,7 +1312,7 @@ class InventoryService:
                         raw_drops.append({"id": cid, "num": cnum, "time_valid": 0})
 
             # 分支 5: 换装兑换券 / 限时体验卡 (type == 14 或 sub_type == 407)
-            elif (itype == 14 or sub_type == 407) and param:
+            elif mode == 'skin':
                 skin_ids = param if isinstance(param, list) else [param]
                 for sk_id in skin_ids:
                     sk_int = int(sk_id)
@@ -1193,9 +1320,8 @@ class InventoryService:
                     raw_drops.append({"id": sk_int, "num": 1 * count, "time_valid": 0})
 
             # 分支 6: 动态表情/贴纸激活 (type == 20 或 90000 <= iid < 92000)
-            elif itype == 20 or (90000 <= iid < 92000):
-                stk_map = get_sticker_item_map()
-                emoji_id = stk_map.get(iid) or (int(param[0]) if (param and isinstance(param, list)) else iid)
+            elif mode == 'sticker':
+                emoji_id = plan['emoji_id']
                 if emoji_id:
                     db.execute(
                         "INSERT INTO chat_sticker (uid, emoji_id, name, desc) VALUES (?, ?, '', '') "
@@ -1209,13 +1335,13 @@ class InventoryService:
                 setattr(ctx, "touched_chat_stickers", True)
 
             # 分支 7: 场景解锁 (type == 21 或 6000 <= iid <= 6999)
-            elif itype == 21 or (6000 <= iid <= 6999):
+            elif mode == 'scene':
                 all_items_to_grant.append((iid, count))
                 raw_drops.append({"id": iid, "num": count, "time_valid": 0})
                 touched_scene = True
 
             # 分支 8: 通用装饰/名片/气泡等
-            elif itype in (11, 12, 13, 18, 22, 23, 25, 26, 28):
+            elif mode == 'cosmetic':
                 all_items_to_grant.append((iid, count))
                 raw_drops.append({"id": iid, "num": count, "time_valid": 0})
 
@@ -1257,8 +1383,13 @@ class InventoryService:
                     hid = conv["hero_id"]
                     pieces = conv["pieces"]
                     piece_id = 10000 + hid
-                    if hid in merged_drops:
-                        del merged_drops[hid]
+                    # Each conversion consumes one received copy, not the
+                    # first newly unlocked hero in the same reward batch.
+                    remaining = merged_drops.get(hid, 0) - 1
+                    if remaining > 0:
+                        merged_drops[hid] = remaining
+                    else:
+                        merged_drops.pop(hid, None)
                     merged_drops[piece_id] = merged_drops.get(piece_id, 0) + pieces
 
         final_drop_list = [

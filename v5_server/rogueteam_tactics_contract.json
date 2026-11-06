@@ -1,0 +1,1091 @@
+{
+  "source": {
+    "decompiled_v2/x64/game/config/rogueteam/rogueteamitemcfg.lua": "4094acc1f53672872856ab9cbf23c293716c8dab8a1065514dcc1fbbaa0b18b0",
+    "decompiled_v2/x64/game/config/achievementcfg.lua": "6b42861847e1eb2aeccfe405f26032e20c3974034144e90b3e9dabf4e1eeef3e",
+    "decompiled_v2/x64/game/const/challengerogueteamconst.lua": "7a8412036c7e35c60a4b4ba77bc475609b60fdbb71afcb1a83af1fa09f583bfe",
+    "decompiled_v2/x64/game/tools/challengerogueteamtools.lua": "83125c5c62ac523ea2c44fc9ae78508721909b2e40b3dc1077f7497578609906",
+    "decompiled_v2/x64/game/data/rogueteam/challengerogueteamsuitskilldata.lua": "d5a5ee49b60da6378e29e87d043b253f6cca83ef1bc9941e82dedaa2f966ec1f",
+    "decompiled_v2/x64/game/action/challengerogueteamaction.lua": "afd939b1b96c6b1248feb5ff2d609f063e1bbd105a0aa090d9154d9705aff3d7"
+  },
+  "threshold": 6,
+  "programs": {
+    "1410101": {
+      "id": 1410101,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1400
+    },
+    "1410102": {
+      "id": 1410102,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1423
+    },
+    "1410103": {
+      "id": 1410103,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1446
+    },
+    "1410104": {
+      "id": 1410104,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1469
+    },
+    "1410105": {
+      "id": 1410105,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1492
+    },
+    "1410106": {
+      "id": 1410106,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1515
+    },
+    "1410107": {
+      "id": 1410107,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1538
+    },
+    "1410108": {
+      "id": 1410108,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1561
+    },
+    "1410109": {
+      "id": 1410109,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1584
+    },
+    "1410110": {
+      "id": 1410110,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1607
+    },
+    "1410111": {
+      "id": 1410111,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1630
+    },
+    "1410112": {
+      "id": 1410112,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1653
+    },
+    "1420101": {
+      "id": 1420101,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1676
+    },
+    "1420102": {
+      "id": 1420102,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1699
+    },
+    "1420103": {
+      "id": 1420103,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 1722
+    },
+    "1410201": {
+      "id": 1410201,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1745
+    },
+    "1410202": {
+      "id": 1410202,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1768
+    },
+    "1410203": {
+      "id": 1410203,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1791
+    },
+    "1410204": {
+      "id": 1410204,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1814
+    },
+    "1410205": {
+      "id": 1410205,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1837
+    },
+    "1410206": {
+      "id": 1410206,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1860
+    },
+    "1410207": {
+      "id": 1410207,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1883
+    },
+    "1410208": {
+      "id": 1410208,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1906
+    },
+    "1410209": {
+      "id": 1410209,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1929
+    },
+    "1410210": {
+      "id": 1410210,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1952
+    },
+    "1410211": {
+      "id": 1410211,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1975
+    },
+    "1410212": {
+      "id": 1410212,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 1998
+    },
+    "1420201": {
+      "id": 1420201,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 2021
+    },
+    "1420202": {
+      "id": 1420202,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 2044
+    },
+    "1420203": {
+      "id": 1420203,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 2067
+    },
+    "1410301": {
+      "id": 1410301,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2090
+    },
+    "1410302": {
+      "id": 1410302,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2113
+    },
+    "1410303": {
+      "id": 1410303,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2136
+    },
+    "1410304": {
+      "id": 1410304,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2159
+    },
+    "1410305": {
+      "id": 1410305,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2182
+    },
+    "1410306": {
+      "id": 1410306,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2205
+    },
+    "1410307": {
+      "id": 1410307,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2228
+    },
+    "1410308": {
+      "id": 1410308,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2251
+    },
+    "1410309": {
+      "id": 1410309,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2274
+    },
+    "1410310": {
+      "id": 1410310,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2297
+    },
+    "1410311": {
+      "id": 1410311,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2320
+    },
+    "1410312": {
+      "id": 1410312,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2343
+    },
+    "1420301": {
+      "id": 1420301,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2366
+    },
+    "1420302": {
+      "id": 1420302,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2389
+    },
+    "1420303": {
+      "id": 1420303,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 2412
+    },
+    "1410401": {
+      "id": 1410401,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2435
+    },
+    "1410402": {
+      "id": 1410402,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2458
+    },
+    "1410403": {
+      "id": 1410403,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2481
+    },
+    "1410404": {
+      "id": 1410404,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2504
+    },
+    "1410405": {
+      "id": 1410405,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2527
+    },
+    "1410406": {
+      "id": 1410406,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2550
+    },
+    "1410407": {
+      "id": 1410407,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2573
+    },
+    "1410408": {
+      "id": 1410408,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2596
+    },
+    "1410409": {
+      "id": 1410409,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2619
+    },
+    "1410410": {
+      "id": 1410410,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2642
+    },
+    "1410411": {
+      "id": 1410411,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2665
+    },
+    "1410412": {
+      "id": 1410412,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2688
+    },
+    "1420401": {
+      "id": 1420401,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2711
+    },
+    "1420402": {
+      "id": 1420402,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2734
+    },
+    "1420403": {
+      "id": 1420403,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 2757
+    },
+    "1410501": {
+      "id": 1410501,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 2780
+    },
+    "1410502": {
+      "id": 1410502,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 2803
+    },
+    "1410503": {
+      "id": 1410503,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 2826
+    },
+    "1410504": {
+      "id": 1410504,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 2849
+    },
+    "1410505": {
+      "id": 1410505,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 2872
+    },
+    "1410506": {
+      "id": 1410506,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 2895
+    },
+    "1410507": {
+      "id": 1410507,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 2918
+    },
+    "1410508": {
+      "id": 1410508,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 2941
+    },
+    "1410509": {
+      "id": 1410509,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 2964
+    },
+    "1410510": {
+      "id": 1410510,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 2987
+    },
+    "1410511": {
+      "id": 1410511,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 3010
+    },
+    "1410512": {
+      "id": 1410512,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 3033
+    },
+    "1420501": {
+      "id": 1420501,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 3056
+    },
+    "1420502": {
+      "id": 1420502,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 3079
+    },
+    "1420503": {
+      "id": 1420503,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 3102
+    },
+    "1410601": {
+      "id": 1410601,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3125
+    },
+    "1410602": {
+      "id": 1410602,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3148
+    },
+    "1410603": {
+      "id": 1410603,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3171
+    },
+    "1410604": {
+      "id": 1410604,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3194
+    },
+    "1410605": {
+      "id": 1410605,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3217
+    },
+    "1410606": {
+      "id": 1410606,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3240
+    },
+    "1410607": {
+      "id": 1410607,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3263
+    },
+    "1410608": {
+      "id": 1410608,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3286
+    },
+    "1410609": {
+      "id": 1410609,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3309
+    },
+    "1410610": {
+      "id": 1410610,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3332
+    },
+    "1410611": {
+      "id": 1410611,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3355
+    },
+    "1410612": {
+      "id": 1410612,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3378
+    },
+    "1420601": {
+      "id": 1420601,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3401
+    },
+    "1420602": {
+      "id": 1420602,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3424
+    },
+    "1420603": {
+      "id": 1420603,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3447
+    },
+    "1431201": {
+      "id": 1431201,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1,
+        2
+      ],
+      "line": 3470
+    },
+    "1431301": {
+      "id": 1431301,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1,
+        3
+      ],
+      "line": 3494
+    },
+    "1431401": {
+      "id": 1431401,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1,
+        4
+      ],
+      "line": 3518
+    },
+    "1431501": {
+      "id": 1431501,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1,
+        5
+      ],
+      "line": 3542
+    },
+    "1431601": {
+      "id": 1431601,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        1,
+        6
+      ],
+      "line": 3566
+    },
+    "1432301": {
+      "id": 1432301,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2,
+        3
+      ],
+      "line": 3590
+    },
+    "1432401": {
+      "id": 1432401,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2,
+        4
+      ],
+      "line": 3614
+    },
+    "1432501": {
+      "id": 1432501,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2,
+        5
+      ],
+      "line": 3638
+    },
+    "1432601": {
+      "id": 1432601,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        2,
+        6
+      ],
+      "line": 3662
+    },
+    "1433401": {
+      "id": 1433401,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3,
+        4
+      ],
+      "line": 3686
+    },
+    "1433501": {
+      "id": 1433501,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3,
+        5
+      ],
+      "line": 3710
+    },
+    "1433601": {
+      "id": 1433601,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        3,
+        6
+      ],
+      "line": 3734
+    },
+    "1434501": {
+      "id": 1434501,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4,
+        5
+      ],
+      "line": 3758
+    },
+    "1434601": {
+      "id": 1434601,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        4,
+        6
+      ],
+      "line": 3782
+    },
+    "1435601": {
+      "id": 1435601,
+      "type": 4,
+      "template": 1,
+      "camps": [
+        5,
+        6
+      ],
+      "line": 3806
+    }
+  },
+  "tactics": {
+    "1": {
+      "id": 1500101,
+      "type": 5,
+      "template": 1,
+      "camps": [
+        1
+      ],
+      "line": 3830
+    },
+    "2": {
+      "id": 1500201,
+      "type": 5,
+      "template": 1,
+      "camps": [
+        2
+      ],
+      "line": 3849
+    },
+    "3": {
+      "id": 1500301,
+      "type": 5,
+      "template": 1,
+      "camps": [
+        3
+      ],
+      "line": 3868
+    },
+    "4": {
+      "id": 1500401,
+      "type": 5,
+      "template": 1,
+      "camps": [
+        4
+      ],
+      "line": 3887
+    },
+    "5": {
+      "id": 1500501,
+      "type": 5,
+      "template": 1,
+      "camps": [
+        5
+      ],
+      "line": 3906
+    },
+    "6": {
+      "id": 1500601,
+      "type": 5,
+      "template": 1,
+      "camps": [
+        6
+      ],
+      "line": 3925
+    }
+  },
+  "achievements": {
+    "63011": {
+      "id": 63011,
+      "condition": 300009,
+      "need": 3,
+      "parameter": [
+        100001,
+        1
+      ],
+      "line": 11819
+    },
+    "63012": {
+      "id": 63012,
+      "condition": 300009,
+      "need": 3,
+      "parameter": [
+        100001,
+        3
+      ],
+      "line": 11843
+    },
+    "63013": {
+      "id": 63013,
+      "condition": 300009,
+      "need": 3,
+      "parameter": [
+        100001,
+        4
+      ],
+      "line": 11867
+    },
+    "63014": {
+      "id": 63014,
+      "condition": 300009,
+      "need": 3,
+      "parameter": [
+        100001,
+        5
+      ],
+      "line": 11891
+    },
+    "63015": {
+      "id": 63015,
+      "condition": 300009,
+      "need": 3,
+      "parameter": [
+        100001,
+        6
+      ],
+      "line": 11915
+    },
+    "63023": {
+      "id": 63023,
+      "condition": 300009,
+      "need": 3,
+      "parameter": [
+        100001,
+        2
+      ],
+      "line": 12108
+    }
+  }
+}

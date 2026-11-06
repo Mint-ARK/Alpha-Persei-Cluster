@@ -45,6 +45,14 @@ if os.path.exists(SERVANT_PROMOTE_CFG_PATH):
     except Exception as _e:
         logger.warning(f"加载 servant_promote_cfg.json 失败: {_e}")
 
+# 唤名只接受客户端当前配方；配置缺失时拒绝转换，不猜测目标或费用。
+SERVANT_AWAKE_CFG = {}
+try:
+    with open(os.path.join(BASE_DIR, 'servant_awake_cfg.json'), encoding='utf-8') as _f:
+        SERVANT_AWAKE_CFG = json.load(_f)
+except (OSError, ValueError) as _e:
+    logger.warning('加载 servant_awake_cfg.json 失败: %s', _e)
+
 # 钥从精炼升阶金币消耗：按 starlevel -> [1阶->2阶, 2阶->3阶, 3阶->4阶, 4阶->5阶] (对齐 gamesetting.lua)
 SERVANT_GOLD_COSTS = {
     3: [1000, 2000, 3000, 4000],
@@ -284,108 +292,63 @@ class ServantService:
     # ==================== 4. 沉睡之子唤名转换 (Awaken / Merge) ====================
 
     def awake_servant(self, ctx, uid, servant_id, cost_uid_list):
-        """
-        沉睡之子唤名（转换为目标专属五星钥从）：cs_46030 -> sc_46031
-        - 消耗指定神系的沉睡之子实体 (cost_uid_list)
-        - 校验非锁、非穿戴保护
-        - 生成全新专属五星钥从独立实体（分配新 servant_uid）
-        - 若原沉睡之子正在被角色佩戴，自动将角色权钥挂载到新专属钥从上
+        """Convert one sleeping servant in place, preserving its instance identity.
+
+        The operation transaction owns SQL and notification rollback. 17023 removes
+        the old prefab index; a single-record 46011 restores the complete instance
+        before 46031. AddNewServant(17023) alone would reset stage/lock defaults.
         """
         db = getattr(ctx, "db", self.db)
         sid = int(servant_id or 0)
-        costs = [int(x) for x in (cost_uid_list or []) if str(x).isdigit()]
-        if not sid or not costs:
-            raise OperationError(2, "缺少唤名目标 ID 或沉睡之子材料")
-
-        equipped_map = {}
-        h_rows = db.query("SELECT id, weapon_servant_uid FROM hero WHERE uid=? AND weapon_servant_uid > 0", (uid,))
-        for r in (h_rows or []):
-            equipped_map[int(r["weapon_servant_uid"])] = int(r["id"])
-
-        cost_suid = costs[0]
-        s_rows = db.query("SELECT * FROM servant WHERE uid=? AND id=?", (uid, cost_suid))
-        if not s_rows:
-            raise OperationError(406, f"沉睡之子钥从 {cost_suid} 不存在")
-        c_item = s_rows[0]
-
-        if int(c_item.get("is_locked") or 0) == 1:
+        target = SERVANT_AWAKE_CFG.get('targets', {}).get(str(sid))
+        if not target:
+            raise OperationError(2, "该钥从不支持唤名")
+        recipe = SERVANT_AWAKE_CFG.get('recipes', {}).get(str(target['race']))
+        if not recipe or recipe.get('count') != 1:
+            raise OperationError(2, "缺少有效的唤名配方")
+        if not isinstance(cost_uid_list, (list, tuple)) or len(cost_uid_list) != 1:
+            raise OperationError(2, "唤名需要一把对应神系的沉睡之子")
+        value = cost_uid_list[0]
+        if isinstance(value, bool) or not str(value).isdigit() or int(value) <= 0:
+            raise OperationError(2, "钥从实例UID无效")
+        cost_suid = int(value)
+        rows = db.query('SELECT * FROM servant WHERE uid=? AND id=?', (uid, cost_suid))
+        if not rows:
+            raise OperationError(406, "沉睡之子钥从不存在")
+        source = rows[0]
+        old_prefab = int(source.get('prefab_id') or 0)
+        if old_prefab != int(recipe['base_id']):
+            raise OperationError(2, "唤名材料不是对应神系的沉睡之子")
+        if int(source.get('is_locked') or 0) != 0:
             raise OperationError(2, "该沉睡之子钥从已被锁定，无法唤名")
+        if target.get('display_type') == 1:
+            known = db.query("SELECT 1 FROM illustrated WHERE uid=? AND kind='servant' AND item_id=?", (uid, sid))
+            if not known:
+                raise OperationError(2, "该钥从尚未开放唤名")
 
-        # 官方唤名消耗：100 金币 (currency ID 2)
-        self._deduct_item(ctx, uid, 2, 100)
-
-        # 继承原沉睡之子的精炼等阶与锁定状态
-        inherit_stage = int(c_item.get("stage") or 1)
-        inherit_lock = int(c_item.get("is_locked") or 0)
-        wearing_hero_id = equipped_map.get(cost_suid)
-
-        # 销毁多余的副材料沉睡之子实体
-        for extra_c in costs[1:]:
-            c_pid = int(c_item.get("prefab_id") or 0)
-            if c_pid > 0:
-                db.execute("INSERT OR REPLACE INTO servant_history (uid, id, prefab_id) VALUES (?, ?, ?)", (uid, extra_c, c_pid))
-            db.execute("DELETE FROM servant WHERE uid=? AND id=?", (uid, extra_c))
-
-        # 主沉睡之子实体原地升格为专属五星钥从
-        target_uid = cost_suid
-        now = int(time.time())
+        # 正在佩戴的主实例允许转换。保留UID，英雄引用不需要改写。
+        equipped = db.query('SELECT id FROM hero WHERE uid=? AND weapon_servant_uid=?', (uid, cost_suid))
+        wearing_hero_id = int(equipped[0]['id']) if equipped else None
+        inherit_stage = int(source.get('stage') or 1)
+        inherit_lock = int(source.get('is_locked') or 0)
+        self._deduct_item(ctx, uid, int(recipe['currency_id']), int(recipe['currency_num']))
         db.execute(
-            """
-            UPDATE servant
-            SET prefab_id=?, starlevel=5, stage=?, is_locked=?, update_ts=?
-            WHERE uid=? AND id=?
-            """,
-            (sid, inherit_stage, inherit_lock, now, uid, target_uid)
-        )
+            'UPDATE servant SET prefab_id=?, race=?, starlevel=?, update_ts=? WHERE uid=? AND id=?',
+            (sid, target['race'], target['starlevel'], int(time.time()), uid, cost_suid))
+        event_bus.bus.emit(event_bus.Events.SERVANT_OBTAIN, ctx, uid, servant_id=sid, count=1)
 
-        try:
-            event_bus.bus.emit(event_bus.Events.SERVANT_OBTAIN, ctx, uid, servant_id=sid, count=1)
-        except Exception:
-            pass
-
-        # 构造下行刷新
-        frames = []
-        try:
-            import generator as _gen
-            p_15009 = _gen.gen_payload(15009, uid=uid, db=db)
-            if p_15009:
-                frames.append(DownFrame(15009, p_15009))
-        except Exception:
-            pass
-
-        touched = getattr(ctx, "touched_items", None)
-        wl = [{"uid": c, "item": {"id": int(c_item.get("prefab_id") or 0), "num": 0}} for c in costs[1:]]
-        try:
-            import generator as _gen
-            p_17023 = _gen.gen_payload(17023, uid=uid, db=db, touched_items=touched, weapon_list=wl if wl else None)
-            if p_17023:
-                frames.append(DownFrame(17023, p_17023))
-        except Exception:
-            pass
-
-        p_46011 = self.build_servant_46011_payload(uid, db=db)
-        if p_46011:
-            frames.append(DownFrame(46011, p_46011))
-
-        if wearing_hero_id:
-            try:
-                import hero_codec as _hc
-                hf = _hc.build_hero_14007_frame(db, uid, wearing_hero_id)
-                if hf:
-                    frames.append(hf)
-            except Exception:
-                pass
-
-        p_46031 = encode("sc_46031", {"result": 0, "servant_uid": target_uid}) or b"\x08\x00"
-        frames.append(DownFrame(46031, p_46031))
-
-        return {
-            "servant_id": sid,
-            "new_servant_uid": target_uid,
-            "cost_uids": costs,
-            "wearing_hero_id": wearing_hero_id,
-            "frames": frames
-        }
+        import generator as _gen
+        p_diff = _gen.gen_payload(17023, uid=uid, db=db,
+                                 touched_items=getattr(ctx, 'touched_items', set()), strict=True,
+                                 weapon_list=[{'uid': cost_suid, 'item': {'id': old_prefab, 'num': 0}}])
+        p_instance = encode('sc_46011', {'servant_list': [
+            {'uid': cost_suid, 'id': sid, 'stage': inherit_stage, 'is_locked': inherit_lock}]})
+        p_ack = encode('sc_46031', {'result': 0, 'servant_uid': cost_suid})
+        if not p_diff or not p_instance or not p_ack:
+            raise OperationError(1, "钥从唤名响应生成失败")
+        return dict(servant_id=sid, new_servant_uid=cost_suid, cost_uids=[cost_suid],
+                    wearing_hero_id=wearing_hero_id,
+                    frames=[DownFrame(17023, p_diff), DownFrame(46011, p_instance), DownFrame(46031, p_ack)])
 
     # ==================== 5. 钥从分解出售 (Decompose) ====================
 

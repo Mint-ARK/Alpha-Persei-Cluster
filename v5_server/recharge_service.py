@@ -441,7 +441,11 @@ class RechargeService:
 
     def build_59009_payload(self, db, uid: int) -> dict:
         """构建当前玩家的 sc_59009 (新手首充/月卡/战令状态更新) 报文。"""
-        n_act = db.get_newbie_activity(uid)
+        return self.project_59009_payload(db.get_newbie_activity(uid))
+
+    @staticmethod
+    def project_59009_payload(n_act: dict) -> dict:
+        """纯状态投影；失败恢复使用现有行，不触发新手活动初始化。"""
         return {
             "newbie_recharge_reward": {
                 "first_recharge_reward": {
@@ -462,7 +466,7 @@ class RechargeService:
                 },
                 "first_battlepass_reward": {
                     "first_battlepass_reward": int(n_act.get("bp_reward") or 0),
-                    "is_new_battlepass_reward": bool(n_act.get("bp_new_tag") or 0),
+                    "is_new_battlepass_reward": bool(n_act.get("bp_new") or 0),
                 }
             }
         }

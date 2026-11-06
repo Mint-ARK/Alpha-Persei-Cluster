@@ -1,0 +1,220 @@
+{
+  "activity_id": 4243101,
+  "parent_activity": 4210001,
+  "limited_activities": [
+    4200401,
+    4200402,
+    4200403,
+    4200404
+  ],
+  "limited_tasks": [
+    150528,
+    150529,
+    150530,
+    50102001,
+    50102002,
+    50102003,
+    50102004,
+    50103001,
+    50103002,
+    50103003,
+    50103004,
+    50103005,
+    50103006,
+    50104001,
+    50104002,
+    50104003,
+    50104004,
+    50104005,
+    50105001,
+    50105002,
+    50105003,
+    50105004,
+    50105005,
+    50108002
+  ],
+  "stages": {
+    "50101": {
+      "activity_id": 4243101,
+      "unlock_vehicle": 50112,
+      "unlock_skill": 50121,
+      "ult_progress": 1
+    },
+    "50102": {
+      "activity_id": 4243101,
+      "unlock_vehicle": 50113,
+      "unlock_skill": 50122,
+      "ult_progress": 2
+    },
+    "50103": {
+      "activity_id": 4243101,
+      "unlock_vehicle": 0,
+      "unlock_skill": 50123,
+      "ult_progress": 3
+    },
+    "50104": {
+      "activity_id": 4243101,
+      "unlock_vehicle": 0,
+      "unlock_skill": 0,
+      "ult_progress": 0
+    }
+  },
+  "vehicles": {
+    "50111": {
+      "type": 1,
+      "unlock_stage": 0
+    },
+    "50112": {
+      "type": 1,
+      "unlock_stage": 50101
+    },
+    "50113": {
+      "type": 1,
+      "unlock_stage": 50102
+    },
+    "50121": {
+      "type": 2,
+      "unlock_stage": 50101
+    },
+    "50122": {
+      "type": 2,
+      "unlock_stage": 50102
+    },
+    "50123": {
+      "type": 2,
+      "unlock_stage": 50103
+    }
+  },
+  "buffs": {
+    "1001": {
+      "type": 1,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "1002": {
+      "type": 1,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "1003": {
+      "type": 1,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "1004": {
+      "type": 1,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "2001": {
+      "type": 2,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "2002": {
+      "type": 2,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "2003": {
+      "type": 2,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "2004": {
+      "type": 2,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "2005": {
+      "type": 2,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "3001": {
+      "type": 3,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "3002": {
+      "type": 3,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "3003": {
+      "type": 3,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "3004": {
+      "type": 3,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "3005": {
+      "type": 3,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "4001": {
+      "type": 4,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "4002": {
+      "type": 4,
+      "reward": [
+        1,
+        10
+      ]
+    },
+    "5001": {
+      "type": 5,
+      "reward": []
+    },
+    "5002": {
+      "type": 5,
+      "reward": []
+    },
+    "5004": {
+      "type": 5,
+      "reward": []
+    }
+  },
+  "sources": {
+    "decompiled_v2/x64/game/config/mergeballstagecfg.lua": "ca9fef9bcb4ca405c90277657af233f8cef7fe441f9abc5b00cb01204600563f",
+    "decompiled_v2/x64/game/config/mergeballvehiclecfg.lua": "69207c8570baa78b9e782c5a7a271d13b2d7f49ee9cec89b2c56bf23612a7337",
+    "decompiled_v2/x64/game/config/mergeballbuffcfg.lua": "8a6bbb8dc4dc80be3667c0cf7357288808f29fda1ced37dbc02d30a53bf42e9a",
+    "v5_server/data/activity_content_cfg.json": "2bc2b4e43e2f247912b4eaec092ceacd51097f975c0efc53ab2240d5c935a2cc"
+  }
+}

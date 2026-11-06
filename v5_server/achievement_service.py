@@ -96,6 +96,38 @@ def _save_user_extra(db, uid, extra):
     db.execute("UPDATE users SET extra=? WHERE uid=?", (extra_str, uid))
 
 
+def get_story_read_ids(db, uid, persist_legacy=False):
+    """正常/降级恢复共用阅读状态；保留缺字段老账号的点数兼容规则。"""
+    rows = db.query('SELECT extra FROM users WHERE uid=?', (uid,))
+    if not rows:
+        return []
+    try:
+        raw = rows[0].get('extra')
+        extra = json.loads(raw) if raw else {}
+        if not isinstance(extra, dict):
+            raise ValueError('users.extra must be an object')
+    except (TypeError, ValueError):
+        logger.warning('uid=%s 成就阅读状态损坏，使用空阅读列表', uid)
+        return []
+    read = extra.get('achievement_story_read')
+    if read is None:
+        points = db.query('SELECT num FROM currency WHERE uid=? AND id=33', (uid,))
+        total = int(points[0]['num'] or 0) if points else 0
+        read = [sid for sid, cfg in ACHIEVEMENT_STORIES.items() if total >= cfg['unlock_point']]
+        if persist_legacy:
+            extra['achievement_story_read'] = read
+            _save_user_extra(db, uid, extra)
+    if not isinstance(read, list):
+        return []
+    result = []
+    for value in read:
+        if type(value) is int or (isinstance(value, str) and value.isascii() and value.isdigit()):
+            sid = int(value)
+            if sid in ACHIEVEMENT_STORIES and sid not in result:
+                result.append(sid)
+    return result
+
+
 def _append_frame_to_ctx(ctx, frame):
     """向请求上下文统一挂载下行帧"""
     if not ctx or not frame:
@@ -136,11 +168,26 @@ class AchievementService:
     # 基础与登录全量包 (Login Payload sc_53001)
     # ------------------------------------------------------------------
 
+    def _sync_achievement_needs(self, uid, rows):
+        """只同步当前配置门槛，不重置进度、领史、奖励配置和完成时间。"""
+        updates = []
+        for row in rows:
+            aid = int(row['achievement_id'])
+            if aid not in _CFG:
+                continue
+            need = int(_CFG[aid].get('need') or 0)
+            if int(row.get('need') or 0) != need:
+                updates.append((need, uid, aid))
+            row['need'] = need
+        if updates:
+            self.db.executemany('UPDATE achievement SET need=? WHERE uid=? AND achievement_id=?', updates)
+
     def init_user_achievements(self, uid):
         """确保玩家数据库中存在全量 478 项成就行"""
         if not self.db or not _CFG:
             return
-        rows = self.db.query("SELECT achievement_id FROM achievement WHERE uid=?", (uid,))
+        rows = self.db.query("SELECT achievement_id,need FROM achievement WHERE uid=?", (uid,))
+        self._sync_achievement_needs(uid, rows)
         existing_ids = {int(r["achievement_id"]) for r in (rows or [])}
         missing_ids = set(_CFG.keys()) - existing_ids
         if not missing_ids:
@@ -184,7 +231,7 @@ class AchievementService:
         self.reconcile_achievements(uid)
 
         rows = self.db.query(
-            "SELECT achievement_id, progress, complete_flag, achieve_time FROM achievement WHERE uid=? ORDER BY achievement_id",
+            "SELECT achievement_id, progress, need, complete_flag, achieve_time FROM achievement WHERE uid=? ORDER BY achievement_id",
             (uid,)
         )
         now_ts = int(time.time())
@@ -200,29 +247,101 @@ class AchievementService:
                 "complete_flag": int(r.get("complete_flag") or 0)
             })
 
-        extra = _load_user_extra(self.db, uid)
-        story_read = extra.get("achievement_story_read")
-        if story_read is None:
-            # 兼容老账号：根据持有的成就点数 (货币33) 自动解锁已达标物语
-            c_rows = self.db.query("SELECT num FROM currency WHERE uid=? AND id=33", (uid,))
-            pts = int(c_rows[0]["num"] or 0) if c_rows else 0
-            if pts >= 100:
-                story_read = [s_id for s_id, s_cfg in ACHIEVEMENT_STORIES.items() if pts >= s_cfg["unlock_point"]]
-            else:
-                story_read = []
-            extra["achievement_story_read"] = story_read
-            _save_user_extra(self.db, uid, extra)
+        story_read = get_story_read_ids(self.db, uid, persist_legacy=True)
 
         return encode("sc_53001", {
             "achievement_list": ach_list,
             "story_line": list(story_read or [])
         })
 
+    def reconcile_chip_achievements(self, uid, ctx=None):
+        """260/261 are owned asset counts, not lifetime event counters.
+
+        Only these unclaimed snapshot achievements may decrease. Claimed rows
+        remain a reward ledger. Keep a failed notification from half-updating
+        this small reconciliation even when the optional EventBus isolates it.
+        """
+        if self.db is None:
+            return []
+        from account_db import savepoint_transaction
+        from operation_notifications import checkpoint_notifications, restore_notifications
+        checkpoint = checkpoint_notifications(ctx) if ctx is not None else None
+        try:
+            with savepoint_transaction(self.db):
+                return self._reconcile_chip_achievements(uid, ctx)
+        except BaseException:
+            if checkpoint is not None:
+                restore_notifications(ctx, checkpoint)
+            raise
+
+    def _reconcile_chip_achievements(self, uid, ctx):
+        _ensure_cfg()
+        items = list(_CFG_BY_COND.get(260, [])) + list(_CFG_BY_COND.get(261, []))
+        if not self.db or not items:
+            return []
+        from chip_service import CHIP_UNLOCK_CFG
+        catalog = CHIP_UNLOCK_CFG.get('chips')
+        if not catalog:
+            raise OperationError(2, '缺少原生芯片目录，无法核对成就资格')
+        counts = dict(kernels=0, chips=0)
+        categories = {1:'kernel', 2:'secondary', 3:'hero', 4:'reviser'}
+        for asset in self.db.query('SELECT id,cat FROM chip WHERE uid=? AND unlocked=1', (uid,)):
+            cfg = catalog.get(str(asset['id']))
+            if cfg and categories.get(cfg['type_id']) == asset['cat']:
+                counts['kernels' if cfg['type_id'] == 1 else 'chips'] += 1
+        ids = [item['id'] for item in items]
+        rows = self.db.query(
+            'SELECT achievement_id,progress,need,complete_flag,achieve_time FROM achievement '
+            'WHERE uid=? AND achievement_id IN (' + ','.join('?' for _ in ids) + ')', (uid, *ids))
+        self._sync_achievement_needs(uid, rows)
+        states = {int(row['achievement_id']): row for row in rows}
+        now = int(time.time())
+        diff = []
+        for item in items:
+            aid, need = int(item['id']), int(item['need'])
+            row = states.get(aid)
+            if row and int(row.get('complete_flag') or 0) != 0:
+                continue
+            if row is None:
+                self.db.execute(
+                    'INSERT INTO achievement(uid,achievement_id,name,condition,desc,need,reward_json,progress,complete_flag,achieve_time) '
+                    'VALUES(?,?,?,?,?,?,?,0,0,0)',
+                    (uid, aid, item.get('name',''), item['condition'], item.get('desc',''), need,
+                     json.dumps(item.get('reward') or [])))
+                row = {}
+            old, stamp = int(row.get('progress') or 0), int(row.get('achieve_time') or 0)
+            value = int(counts['kernels'] if item['condition'] == 260 else counts['chips'])
+            new_stamp = (now if old < need or stamp in (0,1786411503) else stamp) if value >= need else 0
+            if old == value and stamp == new_stamp:
+                continue
+            self.db.execute('UPDATE achievement SET progress=?,achieve_time=? WHERE uid=? AND achievement_id=?',
+                            (value,new_stamp,uid,aid))
+            diff.append(dict(id=aid,progress=value,complete_flag=0,achieve_time=new_stamp))
+        if diff and ctx is not None:
+            payload = encode('sc_53003', {'achievement_progress': diff})
+            if not payload:
+                raise ValueError('芯片成就差量为空')
+            _append_frame_to_ctx(ctx, DownFrame(53003, payload))
+        return diff
+
     # ------------------------------------------------------------------
     # 奖励领取 (Claim Rewards cs_53004 -> sc_53005)
     # ------------------------------------------------------------------
 
     def claim_achievements(self, uid, aid_list, ctx=None):
+        """领奖标记、资产和上下文通知同生共死；直接服务调用也有事务。"""
+        from account_db import savepoint_transaction
+        from operation_notifications import checkpoint_notifications, restore_notifications
+        checkpoint = checkpoint_notifications(ctx) if ctx is not None else None
+        try:
+            with savepoint_transaction(self.db):
+                return self._claim_achievements(uid, aid_list, ctx)
+        except BaseException:
+            if checkpoint is not None:
+                restore_notifications(ctx, checkpoint)
+            raise
+
+    def _claim_achievements(self, uid, aid_list, ctx=None):
         """
         领奖业务核心：
         支持单领 (GetReceiveReward) 与一键全领 (TryToSubmitAchievementList)。
@@ -231,11 +350,15 @@ class AchievementService:
         """
         _ensure_cfg()
         if not aid_list:
-            return {"result": 0, "reward_list": [], "claimed_ids": []}
+            raise OperationError(2, "成就列表为空")
 
-        clean_ids = [int(x) for x in aid_list if int(x) in _CFG]
-        if not clean_ids:
-            return {"result": 0, "reward_list": [], "claimed_ids": []}
+        clean_ids = list(dict.fromkeys(int(x) for x in aid_list))
+        if any(aid <= 0 or aid not in _CFG for aid in clean_ids):
+            raise OperationError(2, "成就ID无效")
+
+        if any(_CFG[aid].get('condition') in (260, 261) for aid in clean_ids):
+            # A saved progress value is not proof of the current asset count.
+            self.reconcile_chip_achievements(uid, ctx=ctx)
 
         placeholders = ",".join("?" for _ in clean_ids)
         rows = self.db.query(
@@ -250,15 +373,13 @@ class AchievementService:
         for aid in clean_ids:
             r = row_map.get(aid)
             if not r:
-                continue
-            # 已领过的跳过
-            if int(r.get("complete_flag") or 0) == 1:
-                continue
-            # 未达成指标的跳过
+                raise OperationError(2005, "未达到成就领奖条件")
+            if int(r.get("complete_flag") or 0) != 0:
+                raise OperationError(2013, "奖励已经领取过了")
             prog = int(r.get("progress") or 0)
-            need = int(r.get("need") or 0)
+            need = int(_CFG[aid].get('need') or 0)
             if prog < need:
-                continue
+                raise OperationError(2005, "未达到成就领奖条件")
 
             valid_ids.append(aid)
             cfg_item = _CFG[aid]
@@ -266,15 +387,16 @@ class AchievementService:
                 if isinstance(pair, (list, tuple)) and len(pair) >= 2:
                     raw_rewards.append((int(pair[0]), int(pair[1])))
 
-        if not valid_ids:
-            return {"result": 0, "reward_list": [], "claimed_ids": []}
-
-        # 1. 标记 complete_flag = 1 (已领奖)
+        # 1. 条件转换0→1成功后才能发奖；批量资格必须全部成立。
+        self._sync_achievement_needs(uid, [row_map[aid] for aid in valid_ids])
         v_placeholders = ",".join("?" for _ in valid_ids)
-        self.db.execute(
-            f"UPDATE achievement SET complete_flag=1 WHERE uid=? AND achievement_id IN ({v_placeholders})",
+        marked = self.db.execute(
+            f"UPDATE achievement SET complete_flag=1 WHERE uid=? AND achievement_id IN ({v_placeholders}) "
+            "AND COALESCE(complete_flag,0)=0 AND COALESCE(progress,0)>=COALESCE(need,0)",
             (uid, *valid_ids)
         )
+        if marked.rowcount != len(valid_ids):
+            raise OperationError(2013, "成就领奖状态已变化，请刷新后重试")
 
         # 2. 统一移交 InventoryService 资产发放
         from inventory_service import InventoryService
@@ -342,6 +464,8 @@ class AchievementService:
         若产生变更则即时组装 sc_53003 差量包并挂载到 ctx.pending_frames。
         """
         _ensure_cfg()
+        if int(condition) in (260, 261):
+            return self.reconcile_chip_achievements(uid, ctx=ctx)
         target_items = _CFG_BY_COND.get(int(condition), [])
         if not target_items or not self.db:
             return []
@@ -353,9 +477,10 @@ class AchievementService:
         item_ids = [item["id"] for item in target_items]
         placeholders = ",".join("?" for _ in item_ids)
         rows = self.db.query(
-            f"SELECT achievement_id, progress, complete_flag, achieve_time FROM achievement WHERE uid=? AND achievement_id IN ({placeholders})",
+            f"SELECT achievement_id, progress, need, complete_flag, achieve_time FROM achievement WHERE uid=? AND achievement_id IN ({placeholders})",
             (uid, *item_ids)
         )
+        self._sync_achievement_needs(uid, rows)
         db_state = {int(r["achievement_id"]): r for r in (rows or [])}
 
         for item in target_items:
@@ -555,23 +680,33 @@ class AchievementService:
             return []
 
         now = int(time.time())
-        diff_list = []
+        diff_list = self.reconcile_chip_achievements(uid)
 
         # 查询该玩家所有成就的现有状态，必要时自动初始化
         rows = self.db.query(
-            "SELECT achievement_id, progress, complete_flag, achieve_time FROM achievement WHERE uid=?",
+            "SELECT achievement_id, progress, need, complete_flag, achieve_time FROM achievement WHERE uid=?",
             (uid,)
         )
         if not rows or len(rows) < len(_CFG):
             self.init_user_achievements(uid)
             rows = self.db.query(
-                "SELECT achievement_id, progress, complete_flag, achieve_time FROM achievement WHERE uid=?",
+                "SELECT achievement_id, progress, need, complete_flag, achieve_time FROM achievement WHERE uid=?",
                 (uid,)
             )
 
-        # 洗净库中残留的素材历史假时间戳 (1786411503≈2026/08/11)
+        self._sync_achievement_needs(uid, rows)
+        # 清理与状态快照共用同一门槛，避免旧need清掉真实完成时间。
         self.db.execute("UPDATE achievement SET achieve_time=0 WHERE uid=? AND complete_flag=0 AND progress < need AND achieve_time > 0", (uid,))
         self.db.execute("UPDATE achievement SET achieve_time=? WHERE uid=? AND complete_flag=0 AND progress >= need AND achieve_time=1786411503", (now, uid))
+        for row in rows:
+            if int(row.get('complete_flag') or 0) != 0:
+                continue
+            progress, need = int(row.get('progress') or 0), int(row.get('need') or 0)
+            stamp = int(row.get('achieve_time') or 0)
+            if progress < need and stamp > 0:
+                row['achieve_time'] = 0
+            elif progress >= need and stamp == 1786411503:
+                row['achieve_time'] = now
 
         db_state = {int(r["achievement_id"]): dict(r) for r in (rows or [])}
 
@@ -633,16 +768,7 @@ class AchievementService:
         for item in _CFG_BY_COND.get(312, []):
             update_item_progress(item["id"], st_cnt)
 
-        # 4. 芯片与智库猫咪 (Condition 260, 261)
-        mimir_rows = self.db.query("SELECT COUNT(*) as cnt FROM chip WHERE uid=? AND cat='kernel' AND (unlocked=1 OR unlocked IS NULL)", (uid,))
-        mimir_cnt = int(mimir_rows[0]["cnt"] or 0) if mimir_rows else 0
-        for item in _CFG_BY_COND.get(260, []):
-            update_item_progress(item["id"], mimir_cnt)
-
-        chip_rows = self.db.query("SELECT COUNT(*) as cnt FROM chip WHERE uid=? AND cat!='kernel' AND (unlocked=1 OR unlocked IS NULL)", (uid,))
-        chip_cnt = int(chip_rows[0]["cnt"] or 0) if chip_rows else 0
-        for item in _CFG_BY_COND.get(261, []):
-            update_item_progress(item["id"], chip_cnt)
+        # 260/261 use exact owned counts prepared above; other counters stay monotonic.
 
         # 5. 历战空间 (Condition 441)
         tower_rows = self.db.query("SELECT stage FROM tower WHERE uid=?", (uid,))
@@ -713,37 +839,15 @@ class AchievementService:
             if not param or param == [5]:
                 update_item_progress(item["id"], eq_5_cnt)
 
-        # 8.2 多维变量资产自愈 (Condition 300005, 300009, 300013, 300014)
-        p_diff_rows = self.db.query("SELECT difficulty_id FROM polyhedron_difficulty WHERE uid=?", (uid,))
-        p_diffs = set(int(r["difficulty_id"]) for r in (p_diff_rows or []))
-        max_p_diff = max(p_diffs) if p_diffs else 0
-        for item in _CFG_BY_COND.get(300005, []):
-            param = item.get("parameter") or []
-            if len(param) >= 2 and max_p_diff >= int(param[1]):
-                update_item_progress(item["id"], 1)
-
-        p_beacon_rows = self.db.query("SELECT beacon_id FROM polyhedron_beacon WHERE uid=?", (uid,))
-        p_beacons = set(int(r["beacon_id"]) for r in (p_beacon_rows or []))
-        for item in _CFG_BY_COND.get(300009, []):
-            param = item.get("parameter") or []
-            if len(param) >= 2 and int(param[1]) in p_beacons:
-                update_item_progress(item["id"], int(item.get("need") or 1))
-
-        p_art_rows = self.db.query("SELECT COUNT(*) as cnt FROM polyhedron_artifact WHERE uid=?", (uid,))
-        p_art_cnt = int(p_art_rows[0]["cnt"] or 0) if p_art_rows else 0
-        for item in _CFG_BY_COND.get(300013, []):
-            param = item.get("parameter") or []
-            threshold = int(param[1]) if len(param) >= 2 else int(item.get("need") or 1)
-            if p_art_cnt >= threshold:
-                update_item_progress(item["id"], 1)
-
-        p_hero_rows = self.db.query("SELECT COUNT(*) as cnt FROM polyhedron_hero WHERE uid=?", (uid,))
-        p_hero_cnt = int(p_hero_rows[0]["cnt"] or 0) if p_hero_rows else 0
-        for item in _CFG_BY_COND.get(300014, []):
-            param = item.get("parameter") or []
-            threshold = int(param[2]) if len(param) >= 3 else (int(param[1]) if len(param) >= 2 else int(item.get("need") or 1))
-            if p_hero_cnt >= threshold:
-                update_item_progress(item["id"], 1)
+        # Conditions 300005/300006/300009/300012/300013/300014 belong to
+        # RogueTeam (寻屿勘云记), not legacy Polyhedron. Its unlock tables
+        # cannot prove Rogue endings, tactical orders or held programs.
+        # Preserve existing achievement history; do not infer new progress.
+        # Rogue's own victory history and audited held-item receipts are
+        # authoritative. It does not inspect any Polyhedron unlock tables.
+        from rogueteam_achievement import reconcile as reconcile_rogue
+        for frame in reconcile_rogue(self.db, uid, ctx=ctx):
+            _append_frame_to_ctx(ctx, frame)
 
         # 9. 修正者档案：累计送礼 (Condition 112) 与 心链事件 (Condition 121)
         arch_rows = self.db.query("SELECT archive_id, exp, gift_list, super_heart_link_list, video_list FROM hero_archive WHERE uid=?", (uid,))
@@ -1003,13 +1107,14 @@ class AchievementRewardOp(Operation):
     """
     cmd = 53004
     sc = 53005
+    prepare_response_in_transaction = True
 
     def validate(self, data, ctx):
         aid_data = data.get("id")
         if isinstance(aid_data, int):
             aid_list = [aid_data]
         elif isinstance(aid_data, (list, tuple)):
-            aid_list = [int(x) for x in aid_data if int(x) > 0]
+            aid_list = [int(x) for x in aid_data]
         else:
             aid_list = []
         data["_aid_list"] = aid_list
@@ -1017,7 +1122,8 @@ class AchievementRewardOp(Operation):
 
     def apply(self, data, ctx):
         aid_list = data["_aid_list"]
-        svc = AchievementService.get_instance(ctx.db)
+        # 请求自己的数据库绑定，避免其他存档请求改写单例db。
+        svc = AchievementService(ctx.db)
         return svc.claim_achievements(self.uid, aid_list, ctx=ctx)
 
     def respond(self, result, data, ctx):
@@ -1026,18 +1132,22 @@ class AchievementRewardOp(Operation):
 
         # 1. 优先下发变动货币的原子差量帧 sc_17023 (移转之辉 1 与成就点 33)
         if hasattr(ctx, "touched_items") and ctx.touched_items:
-            try:
-                p_17023 = _gen.gen_payload(17023, uid=self.uid, db=ctx.db, touched_items=ctx.touched_items)
-                if p_17023:
-                    out.append(DownFrame(17023, p_17023))
-            except Exception as e:
-                logger.warning(f"生成成就 sc_17023 异常: {e}")
+            p_17023 = _gen.gen_payload(17023, uid=self.uid, db=ctx.db,
+                                     touched_items=ctx.touched_items, strict=True)
+            if not p_17023:
+                raise ValueError('成就奖励资产差量生成失败')
+            out.append(DownFrame(17023, p_17023))
+
+        from operation_notifications import take_pending_frames
+        out.extend(take_pending_frames(ctx))
 
         # 2. 响应业务确认帧 sc_53005
         p_53005 = ctx.codec_encode("sc_53005", {
             "result": 0,
             "reward_list": result.get("reward_list", [])
-        }) or b"\x08\x00"
+        })
+        if not p_53005:
+            raise ValueError('成就领奖确认帧生成失败')
         out.append(DownFrame(self.sc, p_53005))
 
         ctx.log(f"cs_53004 -> 领取成就奖励 uid={self.uid} claimed={len(result.get('claimed_ids', []))}项")
@@ -1440,17 +1550,16 @@ def _on_dorm_gift(ctx, uid, **kwargs):
 
 
 @bus.subscribe(Events.CHIP_UNLOCK)
+@bus.subscribe(Events.CHAR_CHIP_ACTIVATE)
 def _on_chip_unlock(ctx, uid, **kwargs):
-    svc = AchievementService.get_instance(getattr(ctx, "db", None))
-    svc.trigger_condition(uid, 260, delta=1, ctx=ctx)
-    svc.trigger_condition(uid, 261, delta=1, ctx=ctx)
-    svc.reconcile_achievements(uid, ctx=ctx)
+    AchievementService(getattr(ctx, 'db', None)).reconcile_chip_achievements(uid, ctx=ctx)
 
 
 @bus.subscribe(Events.CHIP_EQUIP)
 def _on_chip_equip(ctx, uid, **kwargs):
-    svc = AchievementService.get_instance(getattr(ctx, "db", None))
-    svc.trigger_condition(uid, 261, delta=1, ctx=ctx)
+    # Equipping does not acquire an asset. A snapshot is quiet when unchanged
+    # and can correct a legacy unclaimed count without adding an event count.
+    AchievementService(getattr(ctx, 'db', None)).reconcile_chip_achievements(uid, ctx=ctx)
 
 
 @bus.subscribe(Events.EQUIP_REFORGE)
@@ -1487,29 +1596,6 @@ def _on_equip_obtain(ctx, uid, **kwargs):
     # Condition 301: 获得5星品质刻印 (param=[5])
     if star == 5 or (500000 <= prefab_id < 600000) or str(prefab_id).startswith("5"):
         svc.trigger_condition(uid, 301, delta=count, param=[5], ctx=ctx)
-
-
-@bus.subscribe(Events.POLYHEDRON_PASS)
-def _on_polyhedron_pass(ctx, uid, **kwargs):
-    svc = AchievementService.get_instance(getattr(ctx, "db", None))
-    difficulty = int(kwargs.get("difficulty") or 1)
-    for d in range(1, difficulty + 1):
-        svc.trigger_condition(uid, 300005, delta=1, param=[100001, d], ctx=ctx)
-    terminals = kwargs.get("terminals") or []
-    for t_id in terminals:
-        svc.trigger_condition(uid, 300006, delta=1, param=[100001, int(t_id)], ctx=ctx)
-    beacons = kwargs.get("beacons") or []
-    for b_id in beacons:
-        svc.trigger_condition(uid, 300009, delta=3, param=[100001, int(b_id)], ctx=ctx)
-    artifacts = kwargs.get("artifacts") or []
-    if len(artifacts) >= 10:
-        svc.trigger_condition(uid, 300013, delta=1, param=[100001, 10], ctx=ctx)
-    heroes = kwargs.get("heroes") or []
-    if len(heroes) >= 20:
-        svc.trigger_condition(uid, 300014, delta=1, param=[100001, 0, 20], ctx=ctx)
-    if kwargs.get("beacon_kill"):
-        svc.trigger_condition(uid, 300012, delta=1, param=[0, 0, 5], ctx=ctx)
-    svc.reconcile_achievements(uid, ctx=ctx)
 
 
 @bus.subscribe(Events.POLYHEDRON_TACTIC_KILL)

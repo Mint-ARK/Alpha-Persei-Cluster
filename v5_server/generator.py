@@ -11,6 +11,7 @@ payload，再与帧头（size/cmd/idx/srv）组合成下行帧，交给服务器
   idx/srv 回显请求（SendWithLoadingNew 回调匹配必需）
 """
 import os
+from rogueteam_flow import assignment_phase as _rogue_assignment_phase
 import struct
 import time
 
@@ -209,12 +210,14 @@ def gen_49023(pkt, db, uid):
 
 
 def gen_sc_49003(uid, chapter_id, db=None):
-    """生成因果观测进入地图响应 sc_49003 payload。"""
+    """Read an already authorized chess run; entry belongs to Operation49002."""
     db = db or get_db()
-    session = db.get_or_create_warchess_session(uid, chapter_id)
+    from warchess_service import active, require
+    state = active(db, uid)
+    require(state['chapter'] == int(chapter_id), 'Wrong chess snapshot chapter')
     return encode("sc_49003", {
         "result": 0,
-        "map_info": session
+        "map_info": state['map']
     })
 
 
@@ -224,6 +227,8 @@ def gen_28001(pkt, db, uid):
     if _fresh.enabled(db,uid):
         return encode('sc_28001',_fresh.payload(db,uid,28001))
     db.check_and_refresh_periodic_tasks(uid)
+    from admin_cat_dispatch_progress import project_tasks as restore_cat_dispatch_tasks
+    restore_cat_dispatch_tasks(db, uid)
     from task_listener import sync_cleared_stage_tasks
     sync_cleared_stage_tasks(db, uid)
     tasks = db.query(
@@ -245,6 +250,40 @@ def gen_28001(pkt, db, uid):
             (uid,)
         )
 
+    from rogue_card_progress import restore_for_login as restore_rogue_card_tasks
+    from quanzhou_collection import ensure_tasks as ensure_quanzhou_tasks, project_tasks as project_quanzhou_tasks
+    quanzhou_changed = ensure_quanzhou_tasks(db, uid) + len(project_quanzhou_tasks(db, uid))
+    from resident_music_service import restore_for_login as restore_music_tasks
+    rogue_changed = restore_rogue_card_tasks(db,uid)
+    music_changed = restore_music_tasks(db,uid)
+    from pinball_service import restore_for_login as restore_pinball_tasks
+    pinball_changed = restore_pinball_tasks(db,uid)
+    from kadas_race_service import restore_for_login as restore_kadas_tasks, visible_tasks
+    kadas_changed = restore_kadas_tasks(db,uid)
+    from vehicle_ball_service import restore_for_login as restore_vehicle_tasks, visible_tasks as visible_vehicle_tasks
+    vehicle_changed = restore_vehicle_tasks(db,uid)
+    from hodur_service import restore_for_login as restore_hodur_tasks, visible_tasks as visible_hodur_tasks
+    hodur_changed = restore_hodur_tasks(db,uid)
+    from ash_service import restore_for_login as restore_ash_tasks, visible_tasks as visible_ash_tasks
+    ash_changed = restore_ash_tasks(db,uid)
+    from summer_pub_service import restore_for_login as restore_pub_tasks, visible_tasks as visible_pub_tasks
+    pub_changed = restore_pub_tasks(db,uid)
+    from osiris_service import restore_for_login as restore_osiris_tasks, visible_tasks as visible_osiris_tasks
+    osiris_changed = restore_osiris_tasks(db,uid)
+    from skuld_service import restore_for_login as restore_skuld_tasks, visible_tasks as visible_skuld_tasks
+    skuld_changed = restore_skuld_tasks(db,uid)
+    from summer_board_progress import project_tasks as restore_board_tasks
+    board_changed=restore_board_tasks(db,uid)
+    from sphero_battle_service import project_tasks as restore_sphero_tasks
+    sphero_changed=restore_sphero_tasks(db,uid)
+    from sphero_leisure_service import project_tasks as restore_leisure_tasks
+    leisure_changed=restore_leisure_tasks(db,uid)
+    from autochess_progress import project_tasks as restore_autochess_tasks
+    autochess_changed=restore_autochess_tasks(db,uid)
+    from offline_minigame_rewards import restore_tasks as restore_offline_rewards
+    offline_changed=restore_offline_rewards(db,uid)
+    if quanzhou_changed or rogue_changed or music_changed or pinball_changed or kadas_changed or vehicle_changed or hodur_changed or ash_changed or pub_changed or osiris_changed or skuld_changed or board_changed or sphero_changed or leisure_changed or autochess_changed or offline_changed:
+        tasks=db.query('SELECT task_id,progress,complete_flag,expired_ts,claimed_ts FROM task WHERE uid=?',(uid,))
     try:
         from task_listener import sync_dorm_illu_tasks
         sync_dorm_illu_tasks(db, uid)
@@ -255,6 +294,9 @@ def gen_28001(pkt, db, uid):
     except Exception:
         pass
 
+    tasks = visible_ash_tasks(db, uid, visible_hodur_tasks(db, uid, visible_vehicle_tasks(db, uid, visible_tasks(db, uid, tasks))))
+    tasks = visible_osiris_tasks(db,uid,visible_pub_tasks(db,uid,tasks))
+    tasks = visible_skuld_tasks(db,uid,tasks)
     assignment_list = []
     for t in tasks:
         is_claimed = bool(t.get("claimed_ts"))
@@ -269,7 +311,7 @@ def gen_28001(pkt, db, uid):
         "assignment_list": assignment_list,
         "send_type": 0,
         "newbie_phase": 19,
-        "assignment_phase": 1
+        "assignment_phase": _rogue_assignment_phase(tasks)
     })
 
 
@@ -814,7 +856,28 @@ def get_activity_list(db, uid, res_version=None):
     from skin_draw_service import merge_activities
     act_list = merge_activities(act_list, cur_ver)
     from activity_content_service import complete_activity_tree
-    return complete_activity_tree(act_list, cur_ver)
+    from quanzhou_collection import activity_policy as quanzhou_activity_policy
+    act_list = quanzhou_activity_policy(act_list, cur_ver)
+    act_list = complete_activity_tree(act_list, cur_ver)
+    from kadas_race_service import activity_policy as kadas_activity_policy
+    act_list = kadas_activity_policy(act_list)
+    from vehicle_ball_service import activity_policy as vehicle_activity_policy
+    act_list = vehicle_activity_policy(act_list)
+    from hodur_service import activity_policy as hodur_activity_policy
+    act_list = hodur_activity_policy(act_list)
+    from ash_service import activity_policy as ash_activity_policy
+    act_list = ash_activity_policy(act_list)
+    from summer_pub_service import activity_policy as pub_activity_policy
+    act_list = pub_activity_policy(act_list)
+    from osiris_service import activity_policy as osiris_activity_policy
+    act_list = osiris_activity_policy(act_list)
+    from skuld_service import activity_policy as skuld_activity_policy
+    act_list = skuld_activity_policy(act_list)
+    from weekly_challenge_service import get_polyhedron_activity
+    poly_activity = get_polyhedron_activity(cur_ver)
+    act_list = [a for a in act_list if a['activity_id'] != poly_activity['activity_id']]
+    act_list.append(poly_activity)
+    return act_list
 
 
 def gen_payload(cmd, uid=None, db=None, **kw):
@@ -850,12 +913,21 @@ def gen_payload(cmd, uid=None, db=None, **kw):
         return gen_28001(None, db, uid)
     if cmd == 28019:
         return gen_28019(None, db, uid)
+    if cmd in (79601,28801,28837,86035):
+        from quanzhou_service import position_payload
+        from quanzhou_quest import quest_payload,function_payload
+        from quanzhou_collection import sea_payload
+        builder={79601:position_payload,28801:quest_payload,28837:function_payload,86035:sea_payload}[cmd]
+        return encode('sc_'+str(cmd),builder(db,uid))
     if cmd == 89401:
         from minigame_service import MiniGameService
         return MiniGameService.get_instance(db=db).build_89401_payload(db, uid)
     if cmd == 84331:
         from minigame_service import MiniGameService
         return MiniGameService.get_instance(db=db).build_84331_payload(db, uid)
+    if cmd == 12119:
+        from ash_service import notices_payload
+        return encode('sc_12119', notices_payload(db,uid))
     if cmd == 68181:
         from minigame_service import MiniGameService
         return MiniGameService.get_instance(db=db).build_68181_payload(db, uid)
@@ -868,12 +940,34 @@ def gen_payload(cmd, uid=None, db=None, **kw):
     if cmd == 68171:
         from minigame_service import MiniGameService
         return MiniGameService.get_instance(db=db).build_68171_payload(db, uid)
+    if cmd == 85035:
+        from summer_board_service import system_payload
+        return encode('sc_85035',system_payload(db,uid))
+    if cmd == 51001:
+        from summer_board_progress import history
+        from sphero_schedule_service import history_entries
+        from sphero_battle_service import history_entries as battle_history
+        from sphero_leisure_service import history_entries as leisure_history
+        data=history(db,uid)
+        entries={r['id']:r for r in data['data_list']}
+        entries.update({r['id']:r for r in history_entries(db,uid)})
+        entries.update({r['id']:r for r in battle_history(db,uid)})
+        entries.update({r['id']:r for r in leisure_history(db,uid)})
+        return encode('sc_51001',dict(data_list=[entries[i] for i in sorted(entries)]))
+
+    if cmd == 24043:
+        from skuld_service import archive_payload
+        return encode('sc_24043',archive_payload(db,uid))
+
     if cmd == 24051:
         from minigame_service import MiniGameService
         return MiniGameService.get_instance(db=db).build_24051_payload(db, uid)
     if cmd == 89421:
         from minigame_service import MiniGameService
         return MiniGameService.get_instance(db=db).build_89421_payload(db, uid)
+    if cmd == 83017:
+        from sphero_schedule_service import schedule_payload
+        return encode('sc_83017',schedule_payload(db,uid))
     if cmd == 83016:
         from minigame_service import MiniGameService
         return MiniGameService.get_instance(db=db).build_83016_payload(db, uid)
@@ -1001,7 +1095,10 @@ def gen_payload(cmd, uid=None, db=None, **kw):
                             bal = int(c_rows[0].get("num") or 0)
                     elif itype == 2:
                         h_rows = db.query("SELECT 1 FROM hero WHERE uid=? AND id=? AND unlock=1", (uid, iid))
-                        bal = 1 if h_rows else 0
+                        # 客户端 HERO 分支不检查 num，0 也会被当成解锁。
+                        if not h_rows:
+                            continue
+                        bal = 1
                     elif itype == 3:
                         hid = iid % 10000 if iid > 10000 else iid
                         p_rows = db.query("SELECT num FROM hero_piece WHERE uid=? AND hero_id=?", (uid, hid))
@@ -1166,7 +1263,7 @@ def gen_payload(cmd, uid=None, db=None, **kw):
         })
     if cmd == 88309:
         from rogueteam_service import RogueTeamService
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=db)
         out = svc.get_outside_data(uid)
         return encode("sc_88309", {
             "template_id": out["template_id"],
@@ -1175,7 +1272,7 @@ def gen_payload(cmd, uid=None, db=None, **kw):
         })
     if cmd == 88315:
         from rogueteam_service import RogueTeamService
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=db)
         out = svc.get_outside_data(uid)
         return encode("sc_88315", {
             "activity_id": out["activity_id"],
@@ -1184,7 +1281,7 @@ def gen_payload(cmd, uid=None, db=None, **kw):
         })
     if cmd == 88001:
         from rogueteam_service import RogueTeamService
-        svc = RogueTeamService.get()
+        svc = RogueTeamService.get(db=db)
         s = svc.get_session_data(uid)
         if s and s.get("in_game", 0) != 0:
             return encode("sc_88001", s)
@@ -1635,7 +1732,7 @@ def gen_payload(cmd, uid=None, db=None, **kw):
             return encode("sc_28001", {"assignment_list": lst,
                                        "send_type": 0,
                                        "newbie_phase": max(1, nb),
-                                       "assignment_phase": max(1, ap)})
+                                       "assignment_phase": _rogue_assignment_phase(rows,max(1, ap))})
         return None
     if cmd == 12001:
         # 剧情观看记录（StageService 统管驱动 → sc_12001 story_list）
@@ -1657,8 +1754,10 @@ def gen_payload(cmd, uid=None, db=None, **kw):
         # 全量成就列表库驱动 → sc_53001 (achievement 表，委托至 achievement_service)
         try:
             import achievement_service
-            return achievement_service.AchievementService.get_instance(db).get_achievement_login_payload(uid)
-        except Exception:
+            return achievement_service.AchievementService(db).get_achievement_login_payload(uid)
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).warning('uid=%s 成就补算失败，恢复持久状态: %s', uid, exc)
             rows = db.query("SELECT achievement_id, progress, complete_flag, achieve_time FROM achievement WHERE uid=? ORDER BY achievement_id", (uid,))
             ach_list = []
             for r in (rows or []):
@@ -1670,7 +1769,7 @@ def gen_payload(cmd, uid=None, db=None, **kw):
                 })
             return encode("sc_53001", {
                 "achievement_list": ach_list,
-                "story_line": [6, 5, 4, 3, 2, 1]
+                "story_line": achievement_service.get_story_read_ids(db, uid)
             })
     if cmd == 41001:
         # 历战空间/爬塔进度库驱动 → sc_41001 info_list (tower 表)
@@ -1688,15 +1787,17 @@ def gen_payload(cmd, uid=None, db=None, **kw):
         # 加载插画图集库驱动 → sc_52021 id_list (loading_set 表)
         import json as _j21
         row = db.query("SELECT id_list FROM loading_set WHERE uid=?", (uid,))
-        ids = []
-        if row and row[0]["id_list"]:
+        ids = [2109401, 2109403, 2109402]
+        if row:
             try:
-                ids = _j21.loads(row[0]["id_list"]) if isinstance(row[0]["id_list"], str) else row[0]["id_list"]
-            except Exception:
-                ids = []
-        if not ids:
-            ids = [2109401, 2109403, 2109402]
-        return encode("sc_52021", {"id_list": [int(x) for x in ids]})
+                saved = _j21.loads(row[0]["id_list"]) if isinstance(row[0]["id_list"], str) else row[0]["id_list"]
+                if not isinstance(saved, list):
+                    raise ValueError('loading_set must contain a list')
+                ids = [int(x) for x in saved]
+            except (TypeError, ValueError):
+                import logging
+                logging.getLogger(__name__).warning('uid=%s loading_set损坏，使用默认过场图', uid)
+        return encode("sc_52021", {"id_list": ids})
     if cmd == 52025:
         # 英雄种族收集进度库驱动 → sc_52025 hero_race_collect (hero_race_collect 表)
         import json as _j25
@@ -2012,19 +2113,11 @@ def gen_payload(cmd, uid=None, db=None, **kw):
             return encode("sc_89021", p)
 
     if cmd == 49001:
-        current_chapter, chapter_info_list = db.get_warchess_overview(uid)
-        return encode("sc_49001", {
-            "chess_map_list": [{
-                "activity_id": 0,
-                "chapter": current_chapter,
-                "chapter_info": chapter_info_list
-            }]
-        })
+        from warchess_service import overview_payload
+        return encode('sc_49001', overview_payload(db, uid))
     if cmd == 49023:
-        open_list = db.get_warchess_open_list()
-        return encode("sc_49023", {
-            "chess_open_info_list": open_list
-        })
+        from warchess_service import open_payload
+        return encode('sc_49023', open_payload(db))
 
     return None
 

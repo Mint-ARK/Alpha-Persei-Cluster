@@ -51,6 +51,7 @@ export interface MonthSignInData {
   month: number
   today: number
   signed_days: number[]
+  signed_dates?: string[]
   total_signed: number
   is_signed_today: boolean
   uid: number
@@ -85,6 +86,7 @@ export interface OverviewStatusData {
   save_owner_uid?: number | null
   online_users?: number
   total_users?: number
+  cdn_mode?: 'off' | 'relay' | 'cache'
   capture_enabled?: boolean
   version?: string
   db_name?: string
@@ -502,6 +504,16 @@ export function resolveApiUrl(path: string): string {
   return cleanPath
 }
 
+let _csrfToken: string | null = null
+
+export function getCsrfToken(): string | null {
+  return _csrfToken
+}
+
+export function setCsrfToken(token: string | null): void {
+  _csrfToken = token
+}
+
 /**
  * 统一网络请求包装器
  */
@@ -514,11 +526,15 @@ export async function apiRequest<T = any>(
     'Content-Type': 'application/json',
     Accept: 'application/json',
   }
+  if (_csrfToken) {
+    defaultHeaders['X-Admin-CSRF'] = _csrfToken
+  }
   const save = getSelectedSave()
   if (save && !path.startsWith('/api/gm/saves')) defaultHeaders['X-Save-Name'] = encodeURIComponent(save)
 
   try {
     const res = await fetch(url, {
+      credentials: 'include',
       ...options,
       headers: {
         ...defaultHeaders,
@@ -527,8 +543,16 @@ export async function apiRequest<T = any>(
     })
 
     if (!res.ok) {
-      const error = new Error(`HTTP Error ${res.status}: ${res.statusText}`) as Error & { status: number }
+      if (res.status === 401 && !path.startsWith('/api/gm/auth/')) {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('admin-auth-unauthorized'))
+        }
+      }
+      const error = new Error(`HTTP Error ${res.status}: ${res.statusText}`) as Error & { status: number; retryAfter?: number }
       error.status = res.status
+      if (res.status === 429) {
+        error.retryAfter = parseInt(res.headers.get('Retry-After') || '60', 10)
+      }
       throw error
     }
 
@@ -543,6 +567,7 @@ export async function apiRequest<T = any>(
       if (data.errorCode && data.errorCode !== '0') {
         const error: any = new Error(data.errorMsg || `请求失败 (${data.errorCode})`)
         error.code = data.errorCode
+        error.data = data.data
         throw error
       }
       if (data.errorMsg && data.code === undefined) {
@@ -554,6 +579,178 @@ export async function apiRequest<T = any>(
   } catch (err: any) {
     console.warn(`[GM API] 请求失败 ${url}:`, err.message)
     throw err
+  }
+}
+
+// ===========================================================================
+// 0. 控制面板管理密码会话认证 (/api/gm/auth)
+// ===========================================================================
+
+export interface AuthSessionData {
+  enabled: boolean
+  authenticated: boolean
+  csrf_token?: string
+  expires_at?: number
+  error?: string
+}
+
+export interface AuthLoginResult {
+  ok: boolean
+  csrf_token?: string
+  expires_at?: number
+  error?: string
+  retryAfter?: number
+}
+
+export interface AuthChangePasswordResult {
+  ok: boolean
+  reauthenticate?: boolean
+  error?: string
+  retryAfter?: number
+}
+
+/**
+ * 查询控制面板是否开启了管理单密码保护，以及当前会话是否已经登录
+ */
+export async function checkAuthSession(): Promise<AuthSessionData> {
+  const url = resolveApiUrl('/api/gm/auth/session')
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+    if (!res.ok) {
+      if (res.status === 404) {
+        // 未启用密码会话（旧版本或未设置 AG_ADMIN_PASSWORD_FILE）
+        return { enabled: false, authenticated: true }
+      }
+      throw new Error(`HTTP ${res.status}`)
+    }
+    const data = await res.json()
+    if (data.csrf_token) {
+      setCsrfToken(data.csrf_token)
+    }
+    return {
+      enabled: Boolean(data.enabled),
+      authenticated: Boolean(data.authenticated),
+      csrf_token: data.csrf_token,
+      expires_at: data.expires_at,
+    }
+  } catch (err) {
+    console.warn('[GM Auth] 检查会话状态失败，降级为免认证模式:', err)
+    return { enabled: false, authenticated: true }
+  }
+}
+
+/**
+ * 提交管理密码进行登录
+ */
+export async function loginAdmin(password: string): Promise<AuthLoginResult> {
+  const url = resolveApiUrl('/api/gm/auth/login')
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({ password }),
+    })
+
+    if (res.status === 429) {
+      const retryAfter = parseInt(res.headers.get('Retry-After') || '60', 10)
+      return { ok: false, error: 'try_later', retryAfter }
+    }
+
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      return { ok: false, error: data.error || `HTTP_${res.status}` }
+    }
+
+    if (data.csrf_token) {
+      setCsrfToken(data.csrf_token)
+    }
+
+    return {
+      ok: true,
+      csrf_token: data.csrf_token,
+      expires_at: data.expires_at,
+    }
+  } catch (err: any) {
+    return { ok: false, error: err.message || '网络连接异常' }
+  }
+}
+
+/**
+ * 注销当前管理会话（登出）
+ */
+export async function logoutAdmin(): Promise<{ ok: boolean }> {
+  const url = resolveApiUrl('/api/gm/auth/logout')
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    }
+    if (_csrfToken) {
+      headers['X-Admin-CSRF'] = _csrfToken
+    }
+    const res = await fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+    })
+    setCsrfToken(null)
+    return { ok: res.ok }
+  } catch {
+    setCsrfToken(null)
+    return { ok: true }
+  }
+}
+
+/**
+ * 修改控制台管理密码
+ */
+export async function changeAdminPassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<AuthChangePasswordResult> {
+  const url = resolveApiUrl('/api/gm/auth/password')
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    }
+    if (_csrfToken) {
+      headers['X-Admin-CSRF'] = _csrfToken
+    }
+    const res = await fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+      }),
+    })
+
+    if (res.status === 429) {
+      const retryAfter = parseInt(res.headers.get('Retry-After') || '60', 10)
+      return { ok: false, error: 'try_later', retryAfter }
+    }
+
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      return { ok: false, error: data.error || `HTTP_${res.status}` }
+    }
+
+    setCsrfToken(null)
+    return { ok: true, reauthenticate: Boolean(data.reauthenticate) }
+  } catch (err: any) {
+    return { ok: false, error: err.message || '网络连接异常' }
   }
 }
 
@@ -1080,10 +1277,10 @@ export async function backupDatabase(): Promise<ApiResponse<any>> {
   })
 }
 
-export async function toggleCapture(enabled?: boolean): Promise<ApiResponse<any>> {
+export async function toggleCapture(enabled?: boolean, mode?: 'off' | 'relay' | 'cache'): Promise<ApiResponse<any>> {
   return apiRequest('/api/gm/server/toggle_capture', {
     method: 'POST',
-    body: JSON.stringify({ enabled }),
+    body: JSON.stringify({ enabled, mode }),
   })
 }
 
@@ -1516,7 +1713,7 @@ export interface ManifestProfile {
   base_assethash: string; base_sha256: string; base_resource_version?: string; ready: boolean; error: string
   removed: boolean; created_at: number; registered_at?: number; voice_source: string
 }
-export interface ChannelManifestSelection { selected_id: string; fallback_id: string }
+export interface ChannelManifestSelection { selected_id: string; fallback_id: string; app_version?: string }
 export interface ResourceDistributionData {
   gameplay_version: string; scope: 'server'; native_only_base: boolean
   operation_notice?: string
@@ -1524,6 +1721,7 @@ export interface ResourceDistributionData {
   platforms: Record<ResourcePlatform, ChannelManifestSelection & {
     channel_id: string; effective_id: string; effective: ManifestProfile; latest_native_id: string
     fallback_active: boolean; notice: string
+    app_version?: string
   }>
 }
 export interface ManifestGenerateInput {

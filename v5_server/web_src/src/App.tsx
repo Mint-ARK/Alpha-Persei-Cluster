@@ -7,6 +7,8 @@ import {
   Hexagon,
   Info,
   LayoutDashboard,
+  Lock,
+  ShieldCheck,
   Mail,
   Moon,
   RefreshCw,
@@ -36,6 +38,7 @@ import ShopPanel from './panels/Shop'
 import SavesPanel from './panels/Saves'
 import ResourcesPanel from './panels/Resources'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import AdminLockScreen from './components/AdminLockScreen'
 
 import { ServerProvider, useServer } from './lib/serverContext'
 import { getStoredApiBase, setStoredApiBase } from './lib/api'
@@ -80,6 +83,7 @@ function TopBar({ onSelectTab }: TopBarProps) {
     consoleName,
     operatorName,
     saves, selectedSave, selectSave, saveCatalogLoading, saveCatalogError,
+    authEnabled, logoutAdmin,
   } = useServer()
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -410,6 +414,21 @@ function TopBar({ onSelectTab }: TopBarProps) {
             {resolved === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </Button>
 
+          {/* 会话安全锁定 / 退出登录 */}
+          {authEnabled && (
+            <div title="锁定控制台 (退出当前管理会话)">
+              <Button
+                aria-label="锁定控制台"
+                isIconOnly
+                size="sm"
+                variant="ghost"
+                onPress={() => void logoutAdmin()}
+              >
+                <Lock className="size-4 text-muted hover:text-foreground transition-colors" />
+              </Button>
+            </div>
+          )}
+
           <Separator orientation="vertical" className="mx-1 h-5" />
 
           {/* 管理员头像展示区（免点击省事设计，受系统设置操作员标识控制） */}
@@ -500,23 +519,22 @@ function Sidebar() {
 }
 
 function Console() {
-  const { selectedSave, saves, saveCatalogLoading, saveCatalogError, saveCatalogLoaded, refreshSaves } = useServer()
+  const {
+    selectedSave,
+    saves,
+    saveCatalogLoading,
+    saveCatalogError,
+    saveCatalogLoaded,
+    refreshSaves,
+    authEnabled,
+    isAuthenticated,
+    authLoading,
+  } = useServer()
+
   const [connectionBase, setConnectionBase] = useState(getStoredApiBase)
   const isStandaloneAgreement =
     typeof window !== 'undefined' &&
     window.location.pathname.toLowerCase().includes('agreement.html')
-
-  if (isStandaloneAgreement) {
-    return (
-      <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-4 py-8 sm:px-6">
-        <div className="w-full max-w-[960px]">
-          <ErrorBoundary fallbackTitle="关于面板异常">
-            <AgreementPanel standalone />
-          </ErrorBoundary>
-        </div>
-      </div>
-    )
-  }
 
   // 面板 id 同步到 URL hash，便于把某个页签的链接直接发给别人
   const [tab, setTab] = useState(() => {
@@ -551,6 +569,33 @@ function Console() {
       window.removeEventListener('nav-to-tab', onNavEvent)
     }
   }, [])
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4">
+        <div className="flex items-center gap-3 rounded-2xl bg-surface p-4 shadow-sm border border-separator text-sm text-muted animate-pulse">
+          <ShieldCheck className="size-5 text-accent animate-spin" />
+          <span>正在检查控制台安全会话…</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (authEnabled && !isAuthenticated) {
+    return <AdminLockScreen />
+  }
+
+  if (isStandaloneAgreement) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex flex-col items-center px-4 py-8 sm:px-6">
+        <div className="w-full max-w-[960px]">
+          <ErrorBoundary fallbackTitle="关于面板异常">
+            <AgreementPanel standalone />
+          </ErrorBoundary>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">

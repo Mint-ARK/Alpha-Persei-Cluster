@@ -50,7 +50,10 @@ while True:
         proc = subprocess.Popen(cmd, cwd=v5_dir, env=child_env)
         print(f"[V5 Supervisor] 服务器子进程已上线 (PID: {proc.pid})", flush=True)
         ret = proc.wait()
-        print(f"[V5 Supervisor] 服务器子进程结束 (ExitCode: {ret})，正在 1 秒内自动无缝拉起...", flush=True)
+        if ret == 0:
+            print("[V5 Supervisor] 服务端子进程正常退出，守护引擎停止。", flush=True)
+            break
+        print(f"[V5 Supervisor] 服务器子进程异常结束 (ExitCode: {ret})，正在 1 秒内自动拉起...", flush=True)
         time.sleep(1)
     except KeyboardInterrupt:
         print("[V5 Supervisor] 守护引擎收到终止指令，正常关闭。", flush=True)

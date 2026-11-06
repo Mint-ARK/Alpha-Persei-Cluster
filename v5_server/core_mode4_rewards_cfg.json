@@ -1,0 +1,200 @@
+{
+  "profiles": {
+    "229": {
+      "parent": 4343301,
+      "activity": 4343501,
+      "tasks": {
+        "50209": {
+          "condition_id": 1450201,
+          "condition_type": 11304,
+          "params": [
+            3092111
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50210": {
+          "condition_id": 1450202,
+          "condition_type": 11304,
+          "params": [
+            3092112
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50211": {
+          "condition_id": 1450203,
+          "condition_type": 11304,
+          "params": [
+            3092113
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50212": {
+          "condition_id": 1450204,
+          "condition_type": 11304,
+          "params": [
+            3093111
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 60
+            }
+          ]
+        },
+        "50213": {
+          "condition_id": 1450205,
+          "condition_type": 11307,
+          "params": [
+            3093111,
+            15000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 60
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        },
+        "50214": {
+          "condition_id": 1450206,
+          "condition_type": 11307,
+          "params": [
+            3093111,
+            22000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 40
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        }
+      }
+    },
+    "311": {
+      "parent": 4443301,
+      "activity": 4443501,
+      "tasks": {
+        "50301": {
+          "condition_id": 1450301,
+          "condition_type": 11304,
+          "params": [
+            3092121
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50302": {
+          "condition_id": 1450302,
+          "condition_type": 11304,
+          "params": [
+            3092122
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50303": {
+          "condition_id": 1450303,
+          "condition_type": 11304,
+          "params": [
+            3092123
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50304": {
+          "condition_id": 1450304,
+          "condition_type": 11304,
+          "params": [
+            3093121
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 60
+            }
+          ]
+        },
+        "50305": {
+          "condition_id": 1450305,
+          "condition_type": 11307,
+          "params": [
+            3093121,
+            15000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 60
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        },
+        "50306": {
+          "condition_id": 1450306,
+          "condition_type": 11307,
+          "params": [
+            3093121,
+            22000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 40
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        }
+      }
+    }
+  },
+  "source_sha256": {
+    "decompiled_v2/x64/game/config/activitycfg.lua": "34170d09ef5fd14829933cdc85ba9e1fe45b0072971aa9520366ba2c2b0182fd",
+    "decompiled_v2/x64/game/config/coreverificationclrewardcfg.lua": "a6147826082ce8ca60d0b694e1a6985ad5970b06e782cac276e8ac2bdc9254e5",
+    "decompiled_v2/x64/game/config/conditioncfg.lua": "ed79f765579f9fbccb0ed52fe7563f6334d6777b9510e575ab970979bd768511",
+    "v5_server/tools/diff_lua_decompiled_311/ActivityCfg.lua": "7a9fc66d6880cf96b6481f0bf5575be50e1525aac519798ba3e60fafbfe88500",
+    "v5_server/tools/diff_lua_decompiled_311/CoreVerificationClRewardCfg.lua": "c88457680b54601cf11250f8f5788a358b1fb18c124f87d08a59a409cb51db0d",
+    "v5_server/tools/diff_lua_decompiled_311/ConditionCfg.lua": "f879f54bda62fc21aba55049ac6cb389480ab41725fa4b3f14f5ff0862a7a40f"
+  }
+}

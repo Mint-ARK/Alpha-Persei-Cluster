@@ -82,3 +82,6 @@ linux_generated/
 /v5_server/runtime/
 /v5_server/cdn_cache/
 *.json.lock
+
+# Host-local admin password hash
+linux_admin_auth.json

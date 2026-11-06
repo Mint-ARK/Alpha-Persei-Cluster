@@ -1686,9 +1686,9 @@ class HeroService:
 
     # ==================== 8. 刻印佩戴装配联动 (Equip-Hero Association) ====================
 
-    def get_hero_equip_slots(self, uid, hero_id):
+    def get_hero_equip_slots(self, uid, hero_id, db=None):
         """读取 hero.equip_slot JSON 映射 {"1": equip_id, ..., "6": equip_id}"""
-        db = self.db
+        db = db or self.db
         rows = db.query("SELECT equip_slot FROM hero WHERE uid=? AND id=?", (uid, int(hero_id)))
         if not rows:
             return {}
@@ -1698,7 +1698,31 @@ class HeroService:
             d = {}
         return d if isinstance(d, dict) else {}
 
+    def _check_equip_wear_target(self, db, uid, hero_id):
+        rows = db.query('SELECT unlock FROM hero WHERE uid=? AND id=?', (uid, hero_id))
+        if not rows:
+            raise OperationError(406, '目标角色不存在')
+        if rows[0].get('unlock') != 1:
+            raise OperationError(2, '目标角色未解锁')
+
+    def _check_equip_wear_item(self, db, uid, equip_id, pos):
+        if not 1 <= pos <= 6:
+            raise OperationError(2, '刻印槽位越界')
+        rows = db.query('SELECT id,hero_id,prefab_id FROM equip WHERE uid=? AND id=?', (uid, equip_id))
+        if not rows:
+            raise OperationError(406, '刻印不存在')
+        from inventory_service import _get_equip_map
+        configured = _get_equip_map().get(str(rows[0]['prefab_id']))
+        if not configured or int(configured.get('pos') or 0) != pos:
+            raise OperationError(2, '刻印与配置槽位不匹配')
+        return rows[0]
+
     def swap_equip(self, ctx, uid, hero_id, equip_id, pos):
+        from account_db import savepoint_transaction
+        with savepoint_transaction(getattr(ctx, 'db', self.db)):
+            return self._swap_equip(ctx, uid, hero_id, equip_id, pos)
+
+    def _swap_equip(self, ctx, uid, hero_id, equip_id, pos):
         """
         刻印穿戴/置换：cs_13012 -> sc_13013
         - 验证 pos 1~6
@@ -1709,37 +1733,42 @@ class HeroService:
         hid = int(hero_id)
         eid = int(equip_id)
         p = int(pos)
-        if not (1 <= p <= 6):
-            raise OperationError(2, f"刻印槽位越界: pos={p}（应为 1~6）")
-
-        eq = db.query("SELECT id, hero_id FROM equip WHERE uid=? AND id=?", (uid, eid))
-        if not eq:
-            raise OperationError(406, f"刻印 {eid} 不存在")
-
-        slots = self.get_hero_equip_slots(uid, hid)
-        prev_owner = int(eq[0]["hero_id"] or 0)
+        self._check_equip_wear_target(db, uid, hid)
+        eq = self._check_equip_wear_item(db, uid, eid, p)
+        slots = self.get_hero_equip_slots(uid, hid, db=db)
+        prev_owner = int(eq['hero_id'] or 0)
+        old_eid = int(slots.get(str(p)) or 0)
+        if prev_owner == hid and old_eid == eid and sum(int(v or 0) == eid for v in slots.values()) == 1:
+            return dict(hero_id=hid, equip_id=eid, pos=p, replaced=old_eid, prev_owner=prev_owner)
 
         # 1. 若曾属于别的角色，从原拥有者槽位卸下
         if prev_owner and prev_owner != hid:
-            other_slots = self.get_hero_equip_slots(uid, prev_owner)
+            other_slots = self.get_hero_equip_slots(uid, prev_owner, db=db)
             other_slots = {k: v for k, v in other_slots.items() if int(v or 0) != eid}
             db.execute("UPDATE hero SET equip_slot=?, update_ts=? WHERE uid=? AND id=?",
                        (json.dumps({str(k): int(v) for k, v in other_slots.items() if v}), int(time.time()), uid, prev_owner))
 
         # 2. 若当前槽位已有刻印，卸下原刻印
-        old_eid = int(slots.get(str(p)) or 0)
         if old_eid and old_eid != eid:
-            db.execute("UPDATE equip SET hero_id=0 WHERE uid=? AND id=?", (uid, old_eid))
+            db.execute("UPDATE equip SET hero_id=0 WHERE uid=? AND id=? AND hero_id=?", (uid, old_eid, hid))
 
         # 3. 装配新刻印
         db.execute("UPDATE equip SET hero_id=? WHERE uid=? AND id=?", (hid, uid, eid))
+        slots = {k: v for k, v in slots.items() if int(v or 0) != eid}
         slots[str(p)] = eid
-        db.execute("UPDATE hero SET equip_slot=?, update_ts=? WHERE uid=? AND id=?",
+        saved = db.execute("UPDATE hero SET equip_slot=?, update_ts=? WHERE uid=? AND id=?",
                    (json.dumps({str(k): int(v) for k, v in slots.items() if v}), int(time.time()), uid, hid))
+        if saved.rowcount != 1:
+            raise OperationError(406, '目标角色保存失败')
 
         return {"hero_id": hid, "equip_id": eid, "pos": p, "replaced": old_eid, "prev_owner": prev_owner}
 
     def quick_dress_equips(self, ctx, uid, hero_id, use_equip_list):
+        from account_db import savepoint_transaction
+        with savepoint_transaction(getattr(ctx, 'db', self.db)):
+            return self._quick_dress_equips(ctx, uid, hero_id, use_equip_list)
+
+    def _quick_dress_equips(self, ctx, uid, hero_id, use_equip_list):
         """
         一键快速穿戴刻印：cs_13026 -> sc_13027
         use_equip_list: [{"pos": int, "equip_id": int}, ...]
@@ -1749,38 +1778,25 @@ class HeroService:
         hid = int(hero_id)
         affected_heroes = {hid}
         dressed_results = []
-
-        slots = self.get_hero_equip_slots(uid, hid)
-
+        self._check_equip_wear_target(db, uid, hid)
+        plan = []
+        positions, equip_ids = set(), set()
         for item in (use_equip_list or []):
             p = int(item.get("pos") or 0)
             eid = int(item.get("equip_id") or 0)
-            if not (1 <= p <= 6) or not eid:
-                continue
-
-            eq = db.query("SELECT id, hero_id FROM equip WHERE uid=? AND id=?", (uid, eid))
-            if not eq:
-                dressed_results.append({"equip_id": eid, "result": 2})
-                continue
-
-            prev_owner = int(eq[0]["hero_id"] or 0)
+            if p in positions or eid in equip_ids:
+                raise OperationError(2, '一键穿戴存在重复刻印或槽位')
+            self._check_equip_wear_item(db, uid, eid, p)
+            positions.add(p)
+            equip_ids.add(eid)
+            plan.append((p, eid))
+        # 所有条目先验证，再沿用单件的同一套原子转移逻辑。
+        for p, eid in plan:
+            result = self._swap_equip(ctx, uid, hid, eid, p)
+            prev_owner = result['prev_owner']
             if prev_owner and prev_owner != hid:
                 affected_heroes.add(prev_owner)
-                other_slots = self.get_hero_equip_slots(uid, prev_owner)
-                other_slots = {k: v for k, v in other_slots.items() if int(v or 0) != eid}
-                db.execute("UPDATE hero SET equip_slot=?, update_ts=? WHERE uid=? AND id=?",
-                           (json.dumps({str(k): int(v) for k, v in other_slots.items() if v}), int(time.time()), uid, prev_owner))
-
-            old_eid = int(slots.get(str(p)) or 0)
-            if old_eid and old_eid != eid:
-                db.execute("UPDATE equip SET hero_id=0 WHERE uid=? AND id=?", (uid, old_eid))
-
-            db.execute("UPDATE equip SET hero_id=? WHERE uid=? AND id=?", (hid, uid, eid))
-            slots[str(p)] = eid
             dressed_results.append({"equip_id": eid, "result": 0})
-
-        db.execute("UPDATE hero SET equip_slot=?, update_ts=? WHERE uid=? AND id=?",
-                   (json.dumps({str(k): int(v) for k, v in slots.items() if v}), int(time.time()), uid, hid))
 
         return {
             "hero_id": hid,

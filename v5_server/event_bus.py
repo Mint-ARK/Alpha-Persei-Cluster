@@ -38,6 +38,8 @@ class Events:
     STAGE_START          = 'stage_start'          # 战斗/关卡开始 (stage_id, heroes, battle_times, is_story)
     STAGE_PASS           = 'stage_pass'           # 关卡/战斗通关或扫荡 (times, stage_id, stage_type, win_stars)
     STAGE_FIRST_CLEAR    = 'stage_first_clear'    # 关卡首次通关 (stage_id, stage_type, first_rewards)
+    SPHERO_BATTLE_PROGRESS = 'sphero_battle_progress' # 薇儿挑战持久熟练度/双Boss分数事实
+    SPHERO_LEISURE_PROGRESS = 'sphero_leisure_progress' # 烧烤/解谜/花环及活动任务持久事实
     TEACH_STAGE_CLEAR    = 'teach_stage_clear'    # 教学进度已保存 (stage_id, stage_type_id, hero_id, clear_times)
     STAGE_FAIL           = 'stage_fail'           # 战斗失败 (stage_id, heroes)
     STAGE_QUIT           = 'stage_quit'           # 战斗中途退出 (stage_id)
@@ -52,14 +54,25 @@ class Events:
     HERO_UPGRADE     = 'hero_upgrade'     # 修正者升级/突破/钥从升级 (hero_id, new_level)
     EQUIP_REFORGE    = 'equip_reforge'    # 刻印赋能/重构 (equip_id)
     DISPATCH_FINISH     = 'dispatch_finish'     # 修正者派遣完成 (dispatch_id)
+    ADMIN_CAT_EXPLORE_START = 'admin_cat_explore_start'  # 管理喵观测站成功派遣一次
     DORM_ACTION         = 'dorm_action'         # 游园街后宅交互 (action_type: visit, game, train, commission, furniture)
     POLYHEDRON_PASS          = 'polyhedron_pass'          # 多维变量通关/参与 (times)
     POLYHEDRON_TACTIC_KILL   = 'polyhedron_tactic_kill'   # 虚构推演战术击杀预留 (tactic_type: 1..6, kill_count)
     DISORDER_ABYSS_PASS      = 'disorder_abyss_pass'      # 失序深阱通关预留 (tier: 1..6)
     SUMMER_PARK_ACTION       = 'summer_park_action'       # 盛夏乐园活动专属预留 (oper)
+    SUMMER_PUB_PROGRESS      = 'summer_pub_progress'     # 餐厅持久通关/料理/伙伴事实
     SUMMER_PUB_COOK          = 'summer_pub_cook'          # 夏日餐厅做菜与特写CG (dish_id, stage)
     SUMMER_PUB_LEVEL_PASS    = 'summer_pub_level_pass'    # 夏日餐厅关卡通关 (level_id)
     ROGUE_CARD_POST_FINISH   = 'rogue_card_post_finish'   # 诡谈夜话完成帖子 (post_id)
+    ROGUE_CARD_PROGRESS     = 'rogue_card_progress'      # 诡谈夜话持久累计统计（事务内必需订阅）
+    MUSIC_COMPLETE         = 'music_complete'           # 音乐曲目完成，按曲目活动投影任务
+    PINBALL_CLEAR          = 'pinball_clear'            # 海拉弹珠持久通关，投影原生任务
+    SKULD_PROGRESS = 'skuld_progress'    # 心象节点通关事实
+    OSIRIS_STUDY_PROGRESS = 'osiris_study_progress'    # 战术研习持久关卡与机制事实
+    ASH_PROGRESS          = 'ash_progress'             # 列车射击持久通关/分数/影片事实
+    HODUR_PROGRESS        = 'hodur_progress'           # 谧光叙录普通探索持久事实
+    VEHICLE_BALL_PROGRESS  = 'vehicle_ball_progress'    # 极限机装持久进度及统计
+    KADAS_PROGRESS         = 'kadas_progress'           # 卡达斯持久关卡/配件/挑战事实
     STORY_BRANCH_EXPLORE     = 'story_branch_explore'     # 剧情多分支解谜与碎片收集预留 (chapter_id, branch_id, memory_count)
     DRAW_PERFORM        = 'draw_perform'        # 抽卡执行 (pool_id, draw_count, pool_group)
     DRAW_TEN_RESULT     = 'draw_ten_result'     # 抽卡十连产出 (items, pool_id)
@@ -242,6 +255,20 @@ class EventBus:
                 else:
                     logger.exception(msg)
         return completed
+
+    @classmethod
+    def emit_required(cls, event_name, ctx=None, uid=0, **kwargs):
+        """Required transaction participants fail with their owning operation.
+
+        Existing emit remains exception-isolated. This explicit entry is for
+        operations that cannot commit while a required projection failed.
+        """
+        handlers=list(cls._handlers.get(event_name, []))
+        if not handlers:
+            raise RuntimeError(f'必要事件缺少订阅: {event_name}')
+        for handler in handlers:
+            args,call_kwargs=_bind_handler_call(handler,ctx,uid,kwargs)
+            handler(*args,**call_kwargs)
 
     @classmethod
     def emit(cls, event_name, ctx=None, uid=0, **kwargs):

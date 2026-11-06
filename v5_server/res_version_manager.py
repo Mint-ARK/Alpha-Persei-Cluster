@@ -469,7 +469,8 @@ def get_voice_package_list(ver: Optional[str] = None) -> str:
 
 # ----------------- 官方上游 DoH 穿透探测引擎 (Upstream DoH Probe) -----------------
 
-PLATFORM_CHANNEL_IDS = {"pc": "9", "android": "8", "ios": "7"}
+# Mix SDK production channels; Android official and iOS share channel 7.
+PLATFORM_CHANNEL_IDS = {"pc": "9", "android": "7", "ios": "7"}
 
 
 def probe_official_latest(platform: str = "pc", channel: Optional[str] = None) -> Tuple[bool, dict, str]:

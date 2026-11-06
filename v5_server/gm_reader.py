@@ -505,7 +505,9 @@ class GMReader:
     # -----------------------------------------------------------------------
 
     def get_month_sign_days(self, uid=None, year=None, month=None):
-        """查询指定玩家当月已签到天数列表（activity_id=3 常驻签到）。"""
+        """按记录自身年月返回签到日期；当月统计不借用其他月份的数据。"""
+        from datetime import date
+
         now_time = time.localtime()
         y = year or now_time.tm_year
         m = month or now_time.tm_mon
@@ -515,31 +517,38 @@ class GMReader:
             u_row = self.query_one("SELECT uid FROM users ORDER BY level DESC, uid ASC LIMIT 1")
             uid = u_row["uid"] if u_row else 2174928301
 
-        sign_row = self.query_one(
-            "SELECT sign_list, day, last_sign_ts FROM sign WHERE uid = ? AND activity_id = 3 AND year = ? AND month = ?",
-            (uid, y, m)
+        sign_rows = self.query(
+            "SELECT year, month, sign_list FROM sign WHERE uid = ? AND activity_id = 3",
+            (uid,)
         )
-        if not sign_row:
-            sign_row = self.query_one(
-                "SELECT sign_list, day, last_sign_ts FROM sign WHERE uid = ? AND activity_id = 3 ORDER BY rowid DESC LIMIT 1",
-                (uid,)
-            )
-
-        signed_days = []
-        if sign_row and sign_row.get("sign_list"):
+        signed_dates = set()
+        for row in sign_rows:
             try:
-                raw_list = json.loads(sign_row["sign_list"]) if isinstance(sign_row["sign_list"], str) else sign_row["sign_list"]
-                signed_days = sorted(list(set(int(x) for x in raw_list if 1 <= int(x) <= 31)))
-            except Exception:
-                signed_days = []
+                record_year, record_month = int(row["year"]), int(row["month"])
+                raw_list = row.get("sign_list") or []
+                raw_list = json.loads(raw_list) if isinstance(raw_list, str) else raw_list
+            except (TypeError, ValueError, KeyError):
+                continue
+            if not isinstance(raw_list, list):
+                continue
+            for day in raw_list:
+                if type(day) is not int:
+                    continue
+                try:
+                    signed_dates.add(date(record_year, record_month, day))
+                except ValueError:
+                    continue
 
-        is_signed_today = today in signed_days
+        signed_days = sorted(d.day for d in signed_dates if (d.year, d.month) == (y, m))
+
+        is_signed_today = (y, m) == (now_time.tm_year, now_time.tm_mon) and today in signed_days
 
         return {
             "year": y,
             "month": m,
             "today": today,
             "signed_days": signed_days,
+            "signed_dates": [d.isoformat() for d in sorted(signed_dates)],
             "total_signed": len(signed_days),
             "is_signed_today": is_signed_today,
             "uid": uid

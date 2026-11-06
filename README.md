@@ -24,6 +24,10 @@
 > 📖 **项目杂谈 / 开发者手记**：  
 > 想了解本项目立项背后的心路历程、开发故事与作者的碎碎念？欢迎阅读博文：[《关于LocalServer》- MoriaRuRuka](https://moriaruruka.com/2026/09/24/411/)。
 
+## 2026-11-06 源码更新
+
+整合常驻小游戏、刺桐巷、虚构推演与问题报告修复，更新Linux部署及面板密码保护。详见[本轮源码说明](v5_server/docs/source_update_20261106.md)。内部检查通过，未经游戏实测；本次仅更新源码，发行附件暂未更新。
+
 ## 当前发行版：v5.0.1（2026-10-19）
 
 本次为运行链路与封包修复更新。下载已验证的便携版、安装版或独立后端包，请前往 [v5.0.1 发行页](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/tag/v5.0.1)；变更与限制见 [更新记录](CHANGELOG.md)，下载后可按 [SHA256SUMS.txt](SHA256SUMS.txt) 校验。

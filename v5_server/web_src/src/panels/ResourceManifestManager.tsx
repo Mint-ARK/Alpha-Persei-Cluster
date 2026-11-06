@@ -5,15 +5,20 @@ import { Section } from '../components/kit'
 import { generateManifest, previewManifest, removeManifest, restoreManifest, saveResourceDistribution,
   type ChannelManifestSelection, type ManifestGenerateInput, type ManifestPreview, type ManifestProfile,
   type ResourceDistributionData, type ResourcePlatform } from '../lib/api'
-import ResourcePlatformCard, { platformNames } from './ResourcePlatformCard'
+import ResourcePlatformCard, { platformNames, platformChannels as channels } from './ResourcePlatformCard'
 
 const platforms = ['pc', 'android', 'ios'] as const
-const channels = { pc: '9', android: '8', ios: '7' }
 type Draft = Record<ResourcePlatform, ChannelManifestSelection>
 const fromSaved = (data: ResourceDistributionData): Draft => Object.fromEntries(platforms.map(p => [p, {
-  selected_id: data.platforms[p].selected_id, fallback_id: data.platforms[p].fallback_id,
+  selected_id: data.platforms[p].selected_id,
+  fallback_id: data.platforms[p].fallback_id,
+  app_version: data.platforms[p].app_version || (p === 'pc' ? '307' : '308'),
 }])) as Draft
-const equal = (a: Draft, b: Draft) => platforms.every(p => a[p].selected_id === b[p].selected_id && a[p].fallback_id === b[p].fallback_id)
+const equal = (a: Draft, b: Draft) => platforms.every(p =>
+  a[p].selected_id === b[p].selected_id &&
+  a[p].fallback_id === b[p].fallback_id &&
+  (a[p].app_version || '') === (b[p].app_version || '')
+)
 
 export default function ResourceManifestManager({ data, onSaved, disabled, downloadControls }: {
   data: ResourceDistributionData; onSaved: (data: ResourceDistributionData) => void; disabled: boolean
@@ -35,7 +40,9 @@ export default function ResourceManifestManager({ data, onSaved, disabled, downl
     const old = fromSaved(previousData.current)
     setDraft(current => Object.fromEntries(platforms.map(p => {
       const valid = current[p].selected_id === 'auto' || data.profiles.some(r => r.id === current[p].selected_id && r.ready)
-      const clean = current[p].selected_id === old[p].selected_id && current[p].fallback_id === old[p].fallback_id
+      const clean = current[p].selected_id === old[p].selected_id &&
+                    current[p].fallback_id === old[p].fallback_id &&
+                    (current[p].app_version || '') === (old[p].app_version || '')
       return [p, clean || !valid ? fromSaved(data)[p] : current[p]]
     })) as Draft)
     previousData.current = data
@@ -44,8 +51,11 @@ export default function ResourceManifestManager({ data, onSaved, disabled, downl
     const native = data.profiles.filter(r => r.platform === p && r.origin === 'native' && r.ready)
       .sort((a, b) => Number(b.resource_version) - Number(a.resource_version) || (b.registered_at || 0) - (a.registered_at || 0))
     const fallback = data.platforms[p].latest_native_id || native[0]?.id || data.platforms[p].fallback_id
-    return [p, { selected_id: build === 'auto' ? 'auto' : native.find(r => r.resource_version === build)?.id || fallback,
-      fallback_id: fallback }]
+    return [p, {
+      selected_id: build === 'auto' ? 'auto' : native.find(r => r.resource_version === build)?.id || fallback,
+      fallback_id: fallback,
+      app_version: draft[p]?.app_version || data.platforms[p].app_version || (p === 'pc' ? '307' : '308'),
+    }]
   })) as Draft
   const preset = custom ? 'custom' : ['auto', '229', '311', '321'].find(p => equal(draft, presets(p))) || 'custom'
   const apply = async () => {

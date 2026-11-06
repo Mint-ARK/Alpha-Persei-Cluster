@@ -24,8 +24,10 @@ BLOCKED_COMMANDS = frozenset((
     58160, 58161, 58176, 58177, 58178, 58179, 58180, 58181,
     58182, 58183, 58184, 58185,
     *range(58204, 58218),
-    60054, 60055, 90080, 90081, 90082, 90083,
+    90080, 90081, 90082, 90083,
 ))
+# 60054/60055 belong to ActivityPointAction's solo activity reward claim.
+# Their numeric ownership is confirmed by the current client, not old labels.
 # Keep the character-chat UI; its player-to-player requests are blocked below.
 CLOSED_SYSTEMS = frozenset((12, 703, 2401, 2402, 2403, 2404, 2405, 2406))
 CHARACTER_CHAT_COMMANDS = frozenset((19001, 19029, 19030, 19031, 19034, 19035, 19039))

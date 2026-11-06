@@ -2086,6 +2086,7 @@ CREATE TABLE IF NOT EXISTS polyhedron_meta (         -- sc_18001 多面体/矩�
     reset_times INTEGER DEFAULT 0,
     already_challenge_times INTEGER DEFAULT 0,
     is_new INTEGER DEFAULT 0,
+    policy_cycle_start INTEGER DEFAULT 0,
     update_ts INTEGER DEFAULT 0,
     PRIMARY KEY (uid, activity_id)
 );
@@ -2361,6 +2362,16 @@ CREATE TABLE IF NOT EXISTS rogueteam_session (        -- sc_88001 / 88xxx 局内
     affix_list_json TEXT DEFAULT '[]',
     in_game INTEGER DEFAULT 0,
     update_ts INTEGER DEFAULT 0, "room_passed_count" INTEGER DEFAULT 0, "battle_passed_count" INTEGER DEFAULT 0, "score_rate" INTEGER DEFAULT 100,
+    mech_pop_pending INTEGER DEFAULT 0,
+    pending_ending INTEGER DEFAULT 0,
+    mech_total INTEGER DEFAULT 0,
+    run_start_ts INTEGER DEFAULT 0,
+    used_events_json TEXT DEFAULT '[]',
+    shop_offered_json TEXT DEFAULT '[]',
+    ending_won INTEGER DEFAULT 0,
+    silence_cnt INTEGER DEFAULT 0,
+    expired_items_json TEXT DEFAULT '[]',
+    flow_json TEXT DEFAULT '{}',
     PRIMARY KEY (uid, template_id)
 );
 

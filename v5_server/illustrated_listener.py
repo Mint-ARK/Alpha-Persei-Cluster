@@ -307,19 +307,13 @@ def trigger_equip_obtain(db, uid, suit_id, pos):
 
 def get_hero_race_counts(db, uid):
     """查询玩家当前各阵营（1奥山/2尼罗/3真樱/4圣树/5众星/9天垣）已拥有修正者数量"""
-    rows = db.query("SELECT id FROM hero WHERE uid=? AND (unlock=1 OR clear_times > 0)", (uid,))
+    rows = db.query("SELECT id FROM hero WHERE uid=? AND unlock=1", (uid,))
     if not rows:
         return {}
 
     counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 9: 0}
-    cfg_p = os.path.join(_DIR, "hero_race_map.json")
-    hero_race = {}
-    if os.path.exists(cfg_p):
-        try:
-            with open(cfg_p, "r", encoding="utf-8") as f:
-                hero_race = json.load(f)
-        except Exception:
-            hero_race = {}
+    # 与客户端公开名册及领奖档位共用导出配置，不把私有/试用角色计入拥有数量。
+    hero_race = _get_hero_race_cfg().get('public_hero_races', {})
 
     for r in rows:
         hid = str(r["id"])
@@ -735,18 +729,9 @@ def on_story_read(ctx, uid, story_id=0, archive_id=None, video_list=None, **kwar
             logger.error(f"构造 sc_52011 失败: {e}")
 
 
-@bus.subscribe(Events.HERO_UNLOCK)
-def on_hero_unlock(ctx, uid, hero_id=0, **kwargs):
-    """解锁新修正者：更新阵营收集状态并推送 sc_52025"""
-    try:
-        data = get_hero_race_collect_frame(ctx.db, uid)
-        p25 = encode("sc_52025", data)
-        if p25:
-            _push_frame(ctx, DownFrame(52025, p25))
-            if hasattr(ctx, "log"):
-                ctx.log(f"[IllustratedListener] sc_52025 修正者={hero_id} 解锁更新阵营收集")
-    except Exception as e:
-        logger.error(f"构造 sc_52025 失败: {e}")
+# 新角色由库存 17023 HERO 差量触发客户端 HERO_UNLOCK_SUCCESS，
+# HeroRaceCollectData.NewHeroUnlock 会重算拥有数和红点。
+# 52025 只在登录恢复领史时下发，获取角色无需再覆盖整份领奖记录。
 
 
 @bus.subscribe(Events.SERVANT_OBTAIN)

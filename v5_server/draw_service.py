@@ -8,7 +8,7 @@ draw_service.py — V5 抽卡与卡池领域服务（DrawService，2026-09-05）
    - 卡池资源安全评级（Grade A 现役验证 / Grade B 通用多选一 / Grade C 远古单UP待验证）；
    - 识别并隔离消耗“限时精确探测凭证”的特殊卡池（统计入库但不开放，防资产异常）。
 2. 保底与状态跨池共享继承体系（draw_group_state 表）：
-   - 系列内部继承 since_ssr / is_up_guaranteed / up_id；
+   - 系列内部继承抽数和大小保底，UP目标由各池独立保存；
    - 系列之间保底计数与状态严格物理隔离。
 3. 抽卡核心业务引擎（RNG、验资扣券、防歪大保底、产物严格物理隔离）：
    - 角色池严禁产出 4/5 星钥从，仅出 S/A 角色与 3 星钥从副产物；
@@ -83,6 +83,16 @@ SERVANT_4_LIST = [
     2430001, 2430002, 2440001, 2440002,
     2450001, 2450002, 2490001, 2490002
 ]
+
+# DrawPoolCfg[10002]: optional_lists paired with optional_lists_a.
+SERVANT_4_BY_CHILD = {
+    2510000: (2410001, 2410002),
+    2520000: (2420001, 2420002),
+    2530000: (2430001, 2430002),
+    2540000: (2440001, 2440002),
+    2550000: (2450001, 2450002),
+    2590000: (2490001, 2490002),
+}
 
 BASE_B_ITEMS = SERVANT_3_LIST + HERO_B_LIST
 
@@ -444,6 +454,11 @@ class DrawService:
         }
         return race_to_child.get(u, 0)
 
+    def get_servant_sr_candidates(self, up_id):
+        """Native four-star pair for the selected child; keep the unset fallback."""
+        child = self.get_servant_sleeping_child(up_id)
+        return SERVANT_4_BY_CHILD.get(child, tuple(SERVANT_4_LIST))
+
     def check_pool_safety(self, pool_id, detail_json=""):
         """评估卡池的安全评级：
         Grade A: 现役已验证安全卡池（有完整 Prefab、立绘与动作资源，绝对安全不崩溃）
@@ -586,33 +601,34 @@ class DrawService:
         return {"since_ssr": 0, "since_sr": 0, "total_draws": 0, "up_id": 0, "is_up_guaranteed": 0, "last_pool_id": 0}
 
     def save_draw_state(self, uid, pool_group, state, pool_id=0):
-        """保存用户的保底与卡池状态"""
+        """Save shared progress and a compatible pool snapshot, never its choice."""
         if self.db is None:
             return
+        from account_db import savepoint_transaction
         now = int(time.time())
-        self.db.execute(
-            "INSERT INTO draw_group_state (uid, pool_group, since_ssr, since_sr, total_draws, up_id, is_up_guaranteed, last_pool_id, update_ts) "
-            "VALUES (?,?,?,?,?,?,?,?,?) "
-            "ON CONFLICT(uid, pool_group) DO UPDATE SET "
-            "since_ssr=excluded.since_ssr, since_sr=excluded.since_sr, total_draws=excluded.total_draws, "
-            "up_id=excluded.up_id, is_up_guaranteed=excluded.is_up_guaranteed, "
-            "last_pool_id=excluded.last_pool_id, update_ts=excluded.update_ts",
-            (uid, pool_group, int(state["since_ssr"]), int(state.get("since_sr", 0)), int(state["total_draws"]),
-             int(state["up_id"]), int(state["is_up_guaranteed"]), int(pool_id or state.get("last_pool_id", 0)), now)
-        )
-        if pool_id:
-            try:
+        with savepoint_transaction(self.db):
+            self.db.execute(
+                "INSERT INTO draw_group_state (uid, pool_group, since_ssr, since_sr, total_draws, up_id, is_up_guaranteed, last_pool_id, update_ts) "
+                "VALUES (?,?,?,?,?,?,?,?,?) "
+                "ON CONFLICT(uid, pool_group) DO UPDATE SET "
+                "since_ssr=excluded.since_ssr, since_sr=excluded.since_sr, total_draws=excluded.total_draws, "
+                "up_id=excluded.up_id, is_up_guaranteed=excluded.is_up_guaranteed, "
+                "last_pool_id=excluded.last_pool_id, update_ts=excluded.update_ts",
+                (uid, pool_group, int(state["since_ssr"]), int(state.get("since_sr", 0)), int(state["total_draws"]),
+                 int(state["up_id"]), int(state["is_up_guaranteed"]), int(pool_id or state.get("last_pool_id", 0)), now)
+            )
+            if pool_id:
+                # Native draw_state has no since_sr; that counter lives only
+                # in draw_group_state. A progress save cannot create a choice.
                 self.db.execute(
-                    "INSERT INTO draw_state (uid, pool_id, since_ssr, since_sr, total_draws, up_id, is_up_guaranteed, pool_group) "
-                    "VALUES (?,?,?,?,?,?,?,?) "
+                    "INSERT INTO draw_state (uid, pool_id, since_ssr, total_draws, up_id, is_up_guaranteed, pool_group) "
+                    "VALUES (?,?,?,?,0,?,?) "
                     "ON CONFLICT(uid, pool_id) DO UPDATE SET "
-                    "since_ssr=excluded.since_ssr, since_sr=excluded.since_sr, total_draws=excluded.total_draws, "
-                    "up_id=excluded.up_id, is_up_guaranteed=excluded.is_up_guaranteed, pool_group=excluded.pool_group",
-                    (uid, int(pool_id), int(state["since_ssr"]), int(state.get("since_sr", 0)), int(state["total_draws"]),
-                     int(state["up_id"]), int(state["is_up_guaranteed"]), pool_group)
+                    "since_ssr=excluded.since_ssr, total_draws=excluded.total_draws, "
+                    "is_up_guaranteed=excluded.is_up_guaranteed, pool_group=excluded.pool_group",
+                    (uid, int(pool_id), int(state["since_ssr"]), int(state["total_draws"]),
+                     int(state["is_up_guaranteed"]), pool_group)
                 )
-            except Exception:
-                pass
 
     def set_pool_up(self, uid, pool_id, up_id):
         """设置自选 UP 目标（支持角色自选与钥从神系映射，按 pool_id 物理隔离，杜绝串池）"""
@@ -627,23 +643,21 @@ class DrawService:
             if child_id:
                 up_id = child_id
 
-        # 1. 独立更新 draw_state 表（按 uid, pool_id 物理隔离，保障每个自选池独立保存目标）
-        now = int(time.time())
-        try:
+        from account_db import savepoint_transaction
+        # Only explicit selection writes a pool's UP. Keep it atomic with
+        # the shared progress snapshot, including direct service callers.
+        with savepoint_transaction(self.db):
             self.db.execute(
                 "INSERT INTO draw_state (uid, pool_id, since_ssr, total_draws, up_id, is_up_guaranteed, pool_group) "
                 "VALUES (?, ?, 0, 0, ?, 0, ?) "
                 "ON CONFLICT(uid, pool_id) DO UPDATE SET up_id=excluded.up_id",
                 (uid, pool_id, up_id, pool_group)
             )
-        except Exception as e:
-            logger.warning(f"[DrawService] 写入 draw_state 异常: {e}")
-
-        # 2. 保留系列保底进度流转
-        state = self.get_draw_state(uid, pool_group)
-        state["last_pool_id"] = pool_id
-        state["up_id"] = up_id
-        self.save_draw_state(uid, pool_group, state, pool_id)
+            # Preserve legacy group metadata without using it as a target.
+            state = self.get_draw_state(uid, pool_group)
+            state["last_pool_id"] = pool_id
+            state["up_id"] = up_id
+            self.save_draw_state(uid, pool_group, state, pool_id)
         return {"pool_id": pool_id, "pool_group": pool_group, "up_id": up_id}
 
     def calc_draw_rebate(self, item_id):
@@ -821,7 +835,7 @@ class DrawService:
             s_other_item = [did for c, did in DRAW_ITEM_SERVANT_5.items() if did != target_child_did]
             a_up_probability = 0
             a_up_item = []
-            a_other_item = list(SERVANT_4_DRAW_ITEMS)
+            a_other_item = [DRAW_ITEM_SERVANT_4[sid] for sid in self.get_servant_sr_candidates(target_up_s)]
             b_item = list(SERVANT_B_DRAW_ITEMS)
         else:
             # hero_standard_70 常驻/标准池
@@ -1103,7 +1117,6 @@ class DrawService:
         since_sr = state.get("since_sr", 0)
         total_draws = state["total_draws"]
         is_up_guaranteed = state["is_up_guaranteed"]
-        up_id = state["up_id"]
 
         is_keyong_pool = (pool_group == "weapon_servant_70")
         pity_threshold = 90 if (pool_group == "hero_precision_90") else 70
@@ -1152,7 +1165,7 @@ class DrawService:
                 since = 0
                 got_ssr = True
                 if is_keyong_pool:
-                    target_child = self.get_servant_sleeping_child(up_id)
+                    target_child = self.get_servant_sleeping_child(target_up)
                     selected_child = target_child if target_child else random.choice(SLEEPING_CHILDREN)
                     
                     _, rebate = self.calc_draw_rebate(selected_child)
@@ -1184,7 +1197,7 @@ class DrawService:
                     records_to_insert.append((uid, pool_id, pool_group, chosen_hero, 1, now))
 
                     # 角色解锁边界判定：已拥有则转碎片交库管，未拥有则 DrawService 自管入库
-                    exists = self.db.query("SELECT id FROM hero WHERE uid=? AND id=?", (uid, chosen_hero))
+                    exists = self.db.query("SELECT id FROM hero WHERE uid=? AND id=? AND unlock=1", (uid, chosen_hero))
                     if not exists:
                         new_heroes += 1
                         from inventory_service import InventoryService
@@ -1206,7 +1219,7 @@ class DrawService:
                 if is_sr:
                     since_sr = 0
                     if is_keyong_pool:
-                        kid = random.choice(SERVANT_4_LIST)
+                        kid = random.choice(self.get_servant_sr_candidates(target_up))
                         _, rebate = self.calc_draw_rebate(kid)
                         total_huimang += rebate
                         keyongs += 1
@@ -1223,7 +1236,7 @@ class DrawService:
                         total_huimang += rebate
                         records_to_insert.append((uid, pool_id, pool_group, chosen_hero, 1, now))
 
-                        exists = self.db.query("SELECT id FROM hero WHERE uid=? AND id=?", (uid, chosen_hero))
+                        exists = self.db.query("SELECT id FROM hero WHERE uid=? AND id=? AND unlock=1", (uid, chosen_hero))
                         if not exists:
                             new_heroes += 1
                             from inventory_service import InventoryService
@@ -1257,7 +1270,7 @@ class DrawService:
                             total_huimang += rebate
                             records_to_insert.append((uid, pool_id, pool_group, chosen_b, 1, now))
 
-                            exists = self.db.query("SELECT id FROM hero WHERE uid=? AND id=?", (uid, chosen_b))
+                            exists = self.db.query("SELECT id FROM hero WHERE uid=? AND id=? AND unlock=1", (uid, chosen_b))
                             if not exists:
                                 new_heroes += 1
                                 from inventory_service import InventoryService
@@ -1312,6 +1325,7 @@ class DrawService:
                 """, (uid, pool_group))
             except Exception as e:
                 logger.warning(f"[DrawService] 保存 draw_record 异常: {e}")
+                raise
 
         # 广播抽卡业务事件（供日常任务等消费）
         try:

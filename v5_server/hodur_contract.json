@@ -1,0 +1,322 @@
+{
+  "activity_id": 3941101,
+  "parent_activity": 3910001,
+  "limited_activities": [
+    3900401,
+    3900402,
+    3900403,
+    3900404
+  ],
+  "limited_tasks": [
+    150476,
+    150477,
+    150478,
+    40700001,
+    40700002,
+    40700003,
+    40700004,
+    40700005,
+    40700006,
+    40700007,
+    40700008,
+    40700009,
+    40700010,
+    40700011,
+    40700012,
+    40700013,
+    40700014,
+    40700015,
+    40700016,
+    40700017,
+    40700018,
+    40707002
+  ],
+  "chapters": {
+    "1": {
+      "previous_chapter": 0,
+      "chapter_type": 1,
+      "stages": [
+        5310220,
+        5310219
+      ]
+    },
+    "2": {
+      "previous_chapter": 1,
+      "chapter_type": 1,
+      "stages": [
+        5310213,
+        5310211,
+        5310218
+      ]
+    },
+    "3": {
+      "previous_chapter": 2,
+      "chapter_type": 1,
+      "stages": [
+        5310201,
+        5310202,
+        5310221
+      ]
+    },
+    "4": {
+      "previous_chapter": 3,
+      "chapter_type": 2,
+      "stages": [
+        5310203,
+        5310204,
+        5310205,
+        5310206
+      ]
+    }
+  },
+  "stages": {
+    "5310220": {
+      "chapter_id": 1,
+      "previous_stage": 0,
+      "event_lock": 0
+    },
+    "5310219": {
+      "chapter_id": 1,
+      "previous_stage": 5310220,
+      "event_lock": 101
+    },
+    "5310213": {
+      "chapter_id": 2,
+      "previous_stage": 0,
+      "event_lock": 201
+    },
+    "5310211": {
+      "chapter_id": 2,
+      "previous_stage": 5310213,
+      "event_lock": 202
+    },
+    "5310218": {
+      "chapter_id": 2,
+      "previous_stage": 5310211,
+      "event_lock": 203
+    },
+    "5310201": {
+      "chapter_id": 3,
+      "previous_stage": 0,
+      "event_lock": 301
+    },
+    "5310202": {
+      "chapter_id": 3,
+      "previous_stage": 5310201,
+      "event_lock": 302
+    },
+    "5310221": {
+      "chapter_id": 3,
+      "previous_stage": 5310202,
+      "event_lock": 303
+    },
+    "5310203": {
+      "chapter_id": 4,
+      "previous_stage": 0,
+      "event_lock": 0
+    },
+    "5310204": {
+      "chapter_id": 4,
+      "previous_stage": 5310203,
+      "event_lock": 0
+    },
+    "5310205": {
+      "chapter_id": 4,
+      "previous_stage": 5310204,
+      "event_lock": 0
+    },
+    "5310206": {
+      "chapter_id": 4,
+      "previous_stage": 5310205,
+      "event_lock": 0
+    }
+  },
+  "events": {
+    "101": {
+      "condition": 5310220,
+      "options": [
+        1011,
+        1012
+      ]
+    },
+    "201": {
+      "condition": 0,
+      "options": [
+        2011,
+        2012
+      ]
+    },
+    "202": {
+      "condition": 5310213,
+      "options": [
+        2021,
+        2022
+      ]
+    },
+    "203": {
+      "condition": 5310211,
+      "options": [
+        2031,
+        2032
+      ]
+    },
+    "301": {
+      "condition": 0,
+      "options": [
+        3011,
+        3012
+      ]
+    },
+    "302": {
+      "condition": 5310201,
+      "options": [
+        3021,
+        3022
+      ]
+    },
+    "303": {
+      "condition": 5310202,
+      "options": [
+        3031,
+        3032
+      ]
+    }
+  },
+  "options": {
+    "1011": {
+      "buff_id": 80488
+    },
+    "1012": {
+      "buff_id": 80489
+    },
+    "2011": {
+      "buff_id": 80490
+    },
+    "2012": {
+      "buff_id": 80499
+    },
+    "2021": {
+      "buff_id": 80491
+    },
+    "2022": {
+      "buff_id": 80500
+    },
+    "2031": {
+      "buff_id": 80492
+    },
+    "2032": {
+      "buff_id": 80501
+    },
+    "3011": {
+      "buff_id": 80493
+    },
+    "3012": {
+      "buff_id": 80496
+    },
+    "3021": {
+      "buff_id": 80494
+    },
+    "3022": {
+      "buff_id": 80497
+    },
+    "3031": {
+      "buff_id": 80495
+    },
+    "3032": {
+      "buff_id": 80498
+    }
+  },
+  "battles": {
+    "5310201": {
+      "type": 92
+    },
+    "5310202": {
+      "type": 92
+    },
+    "5310203": {
+      "type": 92
+    },
+    "5310204": {
+      "type": 92
+    },
+    "5310205": {
+      "type": 92
+    },
+    "5310206": {
+      "type": 92
+    },
+    "5310211": {
+      "type": 92
+    },
+    "5310213": {
+      "type": 92
+    },
+    "5310218": {
+      "type": 92
+    },
+    "5310219": {
+      "type": 92
+    },
+    "5310220": {
+      "type": 92
+    },
+    "5310221": {
+      "type": 92
+    }
+  },
+  "affixes": {
+    "80478": {
+      "point": 10
+    },
+    "80479": {
+      "point": 10
+    },
+    "80480": {
+      "point": 10
+    },
+    "80481": {
+      "point": 10
+    },
+    "80482": {
+      "point": 10
+    },
+    "80483": {
+      "point": 15
+    },
+    "80484": {
+      "point": 15
+    },
+    "80486": {
+      "point": 60
+    },
+    "80485": {
+      "point": 20
+    }
+  },
+  "scoring": {
+    "kind": "private_reward_calibrated_v1",
+    "reward_thresholds": [
+      100000,
+      300000,
+      800000
+    ],
+    "clear_floor": 800000,
+    "dimensions": 4,
+    "time_bonus_limit_ms": 300000,
+    "hit_bonus_limit": 20,
+    "unresolved_dimensions": [
+      "combo",
+      "mechanism"
+    ]
+  },
+  "sources": {
+    "decompiled_v2/x64/game/config/activityhodurchaptercfg.lua": "4645d52d1ece6a585b93f235ceb6759f0b4212e23119301842a39fc45e426da1",
+    "decompiled_v2/x64/game/config/activityhodurcfg.lua": "7a968a67344ec2f726f988551e0a311f911261754d69ec4773cb2cc9d60a024c",
+    "decompiled_v2/x64/game/config/activityhodureventcfg.lua": "0c8ddbcba1fd81cf5804a611307fba72dae51741a20477cbc6baa4b601745ce9",
+    "decompiled_v2/x64/game/config/activityhodureventoptioncfg.lua": "55ef27618362db4ce4a52b1e57d6f0c247809b32a2d57f0d2f4c4414cec92376",
+    "decompiled_v2/x64/game/config/battlehodurstagecfg.lua": "194098ad544d3dd5127b19c3bdc38befe746819b5e5d02e6a192f10d53116ebd",
+    "decompiled_v2/x64/game/config/publicbuffcfg.lua": "fba54a99546b02c97efe5e79a5103724326fbd043fc12d5bf2174f35b8f21d5b",
+    "decompiled_v2/x64/game/config/activityaffixpoolcfg.lua": "4a589ce0de3adedf343610aaaaec168450a27fef7eef41e704dc453d854540a7",
+    "v5_server/data/activity_content_cfg.json": "2bc2b4e43e2f247912b4eaec092ceacd51097f975c0efc53ab2240d5c935a2cc"
+  }
+}

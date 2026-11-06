@@ -172,6 +172,8 @@ class Operation:
     # send messages or perform irreversible external work. Legacy operations
     # keep their existing boundary until reviewed individually.
     prepare_response_in_transaction = False
+    # Most ACKs put result at field 1; native exceptions can declare its tag.
+    error_result_field = 1
     # Fire-and-forget client pushes have no acknowledgement/error message schema.
     no_reply = False
 
@@ -912,7 +914,7 @@ class Core:
             self._log_operation(op, cs_req, ctx, error=e)
             if op.no_reply:
                 return CoreResponse([], reply=False, src="dynamic")
-            payload = b"\x08" + _mw._varint(e.code & 0xFFFFFFFFFFFFFFFF)
+            payload = _mw._varint((op.error_result_field << 3)) + _mw._varint(e.code & 0xFFFFFFFFFFFFFFFF)
             err_frames = []
             if not apply_committed:
                 err_frames.extend(
@@ -928,6 +930,7 @@ class Core:
                 except Exception:
                     pass
             err_frames.append({"sc": sc, "payload": payload, "flag": 0, "srv": None})
+            self._append_error_recovery(op, ctx, err_frames)
             return CoreResponse(err_frames, reply=True, src="dynamic")
         except Exception as e:
             if not apply_committed:
@@ -941,8 +944,26 @@ class Core:
                     {"sc": f.cmd, "payload": f.payload, "flag": f.flag, "srv": f.srv}
                     for f in take_pending_frames(ctx)
                 )
-            err_frames.append({"sc": sc, "payload": b"\x08\x01", "flag": 0, "srv": None})
+            err_frames.append({"sc": sc, "payload": _mw._varint((op.error_result_field << 3)) + b"\x01", "flag": 0, "srv": None})
+            self._append_error_recovery(op, ctx, err_frames)
             return CoreResponse(err_frames, reply=True, src="dynamic")
+
+    def _append_error_recovery(self, op, ctx, frames):
+        """仅显式声明的操作可在失败ACK后恢复状态，不再次执行业务。"""
+        recover = getattr(op, 'error_recovery_frames', None)
+        if recover is None:
+            return
+        try:
+            recovered = list(recover(ctx))
+            for frame in recovered:
+                if frame.cmd == op.sc or not isinstance(frame.payload, (bytes, bytearray, memoryview)) or not frame.payload:
+                    raise ValueError('错误恢复帧无效或重复回执')
+            frames.extend(dict(sc=f.cmd, payload=bytes(f.payload), flag=f.flag, srv=f.srv) for f in recovered)
+        except Exception as exc:
+            try:
+                ctx.log(f'[error-recovery] cs_{op.cmd} 状态恢复失败: {exc}', 'WARN')
+            except Exception:
+                pass
 
     def _prepare_operation_response(self, op, cs_req, ctx, result, data):
         """Build the existing ordered frame set without sending it."""

@@ -10,15 +10,15 @@ autochess_service.py — 决斗王（道馆对弈自走棋，Activity 3740601 / 
    - autochess_card & autochess_meta: 实物卡牌收藏与天梯积分元数据；
    - autochess_session: 局内状态恢复与断点存档。
 3. 登录洪流帧动态无损生成：
-   - sc_89201 (关卡与徽章): 100% 逐字节对齐抓包存档；
-   - sc_90051 (卡牌收藏): 100% 逐字节对齐抓包存档；
+   - sc_89201 (关卡与徽章): 按当前账号持久数据生成；
+   - sc_90051 (卡牌收藏): 按当前账号持久数据生成；
    - sc_89125 (游戏状态), sc_90007 (重连检查), sc_89207 (历史战绩).
 4. PVE 单机对弈状态机（89xxx 协议族）：
    - 开局选关(89116->89117)；
    - 商店发牌与金币扣减(89118->89119)；
-   - 棋子购买、出售、布阵、三星自动合成(89102/89122/89104/89130)；
+   - 棋子购买、出售、布阵、经验合成(89102/89122/89104/89130)；
    - 回合战斗生成(89108->89109，下发关卡敌人阵容回放包，客户端本地模拟演播)；
-   - 关卡胜利结算(89126->89127，发奖落库 + EventBus STAGE_PASS 广播)。
+   - 关卡胜利结算(89126->89127，首次凭证、徽章与任务差量)。
 5. PVP 模式截断与安全阻断（90xxx 协议族）：
    - cs_90002 匹配请求直接返回 sc_90003 { result: 608020 } (AUTO_CHESS_2_CLOSED，弹出 Toast 拦截)；
    - 其余联机协议静默回执兜底，杜绝客户端卡死转圈。
@@ -29,12 +29,22 @@ import json
 import time
 import random
 import logging
+import threading
+from copy import deepcopy
 from typing import Dict, Any, List, Optional, Tuple
 
 from core import Operation, OperationError, operation
 from middleware import DownFrame
 from event_bus import bus, Events
-from codec import encode, decode
+from codec import encode as _encode, decode
+
+
+def encode(name, data):
+    payload = _encode(name, data)
+    if (not isinstance(payload, (bytes, bytearray))
+            or (not payload and ('result' in data or 'game_type' in data))):
+        raise ValueError(f'自走棋必要报文编码失败: {name}')
+    return payload
 
 logger = logging.getLogger("autochess_service")
 
@@ -112,21 +122,35 @@ class AutoChessConst:
 
 class AutoChessService:
     _instance: Optional["AutoChessService"] = None
+    _instance_lock = threading.RLock()
 
     def __init__(self, db=None):
         self.db = db
         self.cfg: Dict[str, Any] = {}
         self._load_cfg()
-        self._sessions: Dict[int, Dict[str, Any]] = {}
+        self._local = threading.local()
         self._next_uid = 100000
+
+    @property
+    def _sessions(self):
+        # A mutable working copy belongs to this thread, never another save or
+        # connection. SQL is re-read on every public access, including rollback.
+        if not hasattr(self._local, 'sessions'):
+            self._local.sessions = {}
+        return self._local.sessions
 
     @classmethod
     def get_instance(cls, db=None) -> "AutoChessService":
-        if cls._instance is None:
-            cls._instance = cls(db=db)
-        elif db is not None:
-            cls._instance.db = db
-        return cls._instance
+        with cls._instance_lock:
+            if db is None:
+                if cls._instance is None:
+                    cls._instance = cls()
+                return cls._instance
+            service = getattr(db, '_autochess_service', None)
+            if service is None:
+                service = cls(db=db)
+                db._autochess_service = service
+            return service
 
     def _load_cfg(self):
         if os.path.exists(CFG_PATH):
@@ -163,6 +187,59 @@ class AutoChessService:
         gid = str(stage.get("group_id", 0))
         return self.cfg.get("stage_group_map", {}).get(gid, [])
 
+    def _enemy_team_id(self, session, round_num=None):
+        stage_id = int(session['stage_id'])
+        # Local simplified Brahma rule: four victories, then the configured boss.
+        if stage_id == self._setting('auto_chess_boss_stage', 303) and int(session.get('win_count', 0)) >= 4:
+            return self._setting('auto_chess_boss_team_id', 130399)
+        ids = [tid for tid in self.get_enemy_teams_for_stage(stage_id)
+               if int((self.get_enemy_team_cfg(tid) or {}).get('round', 0)) < 99]
+        if not ids:
+            raise OperationError(2, '缺少当前关卡敌方阵容')
+        rnd = int(round_num if round_num is not None else session.get('round', 1))
+        if rnd < 1:
+            raise OperationError(2, '对战回合无效')
+        return ids[min(rnd, len(ids)) - 1]
+
+    def _enemy_records(self, team_id):
+        """Team tuples use EXP, ATK, HP (never board position); positions are ordered."""
+        team = self.get_enemy_team_cfg(team_id)
+        if not team:
+            raise OperationError(2, '敌方阵容配置缺失')
+        records = []
+        for pos, entry in enumerate(team.get('team_info', []), 1):
+            cid, exp = int(entry[0]), int(entry[1])
+            cfg = self.get_chess_cfg(cid)
+            if not cfg:
+                raise OperationError(2, '敌方棋子配置缺失')
+            level = self._piece_level(dict(chess_id=cid, exp=exp))
+            atk, hp = cfg['body']
+            atk += int(entry[2]); hp += int(entry[3])
+            levels = cfg.get('level_buffs', [])
+            bids = levels[level - 1] if len(levels) >= level else []
+            bids = bids if isinstance(bids, list) else [bids]
+            extra = []
+            for attachment in entry[4]:
+                # Native 120101/11 contains bare [1,1], not valid export_buff
+                # records. Ignore malformed extras, retaining the configured unit.
+                if not isinstance(attachment, list) or len(attachment) != 2:
+                    continue
+                bid, params = attachment
+                if int(bid) == 1:
+                    # Native preconfigured teams encode permanent base increments here.
+                    if isinstance(params, list) and len(params) >= 2:
+                        atk += int(params[0]); hp += int(params[1])
+                else:
+                    extra.append(int(bid))
+            uid = 200000 + pos
+            buffs = [dict(unique_id=uid*100+i, buff_id=int(bid), owner_type=1,
+                          source_type=1, source_uid=uid, source_cfg_id=cid)
+                     for i, bid in enumerate(bids + extra, 1)]
+            records.append(dict(unique_id=uid, chess_id=cid, index=pos,
+                chess_attr_list=[dict(key=1,value=max(0,atk)), dict(key=2,value=max(1,hp)),
+                                 dict(key=3,value=exp)], buff_list=buffs))
+        return records
+
     def _require_phase1_game_type(self, game_type: int):
         if int(game_type) != AutoChessConst.GAME_TYPE_PVE:
             raise OperationError(AutoChessConst.TIP_CLOSED, "当前仅开放一期 PVE 自走棋")
@@ -191,10 +268,50 @@ class AutoChessService:
     def _piece_exp(piece: Dict[str, Any]) -> int:
         return max(1, int(piece.get("exp", piece.get("star", 1))))
 
+    def _piece_level(self, piece):
+        cfg = self.get_chess_cfg(int(piece.get('chess_id', piece.get('id', 0)))) or {}
+        return 1 + sum(self._piece_exp(piece) >= int(v) for v in cfg.get('exp', []) if isinstance(v, (int,float)))
+
+    def _piece_buffs(self, piece, owner_type=0):
+        cfg = self.get_chess_cfg(piece['chess_id']) or {}
+        level = self._piece_level(piece)
+        levels = cfg.get('level_buffs', [])
+        bids = levels[level - 1] if len(levels) >= level else []
+        bids = bids if isinstance(bids, list) else [bids]
+        uid = piece['unique_id']
+        buffs = [dict(unique_id=(1 << 40) + uid*100+i, buff_id=int(bid),
+                      owner_type=owner_type, source_type=1, source_uid=uid,
+                      source_cfg_id=piece['chess_id']) for i,bid in enumerate(bids, 1)]
+        return buffs + deepcopy(piece.get('buff_list', []))
+
+    def _validate_board(self, session, *, battle=False):
+        board = session.get('board_chess', [])
+        positions = [int(p.get('index', 0)) for p in board]
+        uids = [int(p.get('unique_id', 0)) for p in board + session.get('bench_chess', [])]
+        if (len(board) > 5 or any(p < 1 or p > 5 for p in positions)
+                or len(set(positions)) != len(positions) or len(set(uids)) != len(uids)):
+            raise OperationError(2, '准备棋盘位置须在1至5且不能重复')
+        if battle and session.get('bench_chess'):
+            raise OperationError(2, '请先将备战棋子移回棋盘或出售')
+
+    def _base_chess_exp(self, session):
+        stage = self.get_stage_cfg(session.get('stage_id', 0)) or {}
+        return 3 if 622 in (stage.get('scene_buff') or []) else 1
+
+    def _apply_chess_bonus(self, session, piece):
+        bonus = session.get('chess_bonus', {}).get(str(piece.get('chess_id', piece.get('id'))), [0,0])
+        piece['atk'] = int(piece.get('atk', 0)) + int(bonus[0])
+        piece['hp'] = int(piece.get('hp', 0)) + int(bonus[1])
+        return piece
+
     def _sync_uid_counter(self, session: Dict[str, Any]):
         max_uid = self._next_uid
         for piece in session.get("board_chess", []) + session.get("bench_chess", []):
             max_uid = max(max_uid, int(piece.get("unique_id", 0)))
+            for buff in piece.get('buff_list', []):
+                max_uid = max(max_uid, int(buff.get('unique_id', 0)))
+        for buff in session.get('buff_list', []):
+            max_uid = max(max_uid, int(buff.get('unique_id', 0)))
         for item in session.get("shop_items", []):
             max_uid = max(max_uid, int(item.get("shop_unique_id", 0)))
         self._next_uid = max_uid
@@ -223,6 +340,7 @@ class AutoChessService:
                 stg_rows = [{"id": r["stage_id"], "time": r["clear_time"]} for r in rows]
             except Exception as e:
                 logger.warning(f"Query autochess_stage failed: {e}")
+                raise
 
             try:
                 rows = db.query(
@@ -240,6 +358,7 @@ class AutoChessService:
                 ]
             except Exception as e:
                 logger.warning(f"Query autochess_medal failed: {e}")
+                raise
 
         obj = {"stage_list": stg_rows, "medal": mdl_rows}
         return encode("sc_89201", obj)
@@ -356,7 +475,7 @@ class AutoChessService:
                     {"key": AutoChessConst.CHESS_ATTR_HP, "value": c.get("hp", 100)},
                     {"key": AutoChessConst.CHESS_ATTR_EXP, "value": self._piece_exp(c)}
                 ],
-                "buff_list": []
+                "buff_list": self._piece_buffs(c)
             })
         for c in session.get("bench_chess", []):
             chess_records.append({
@@ -368,7 +487,7 @@ class AutoChessService:
                     {"key": AutoChessConst.CHESS_ATTR_HP, "value": c.get("hp", 100)},
                     {"key": AutoChessConst.CHESS_ATTR_EXP, "value": self._piece_exp(c)}
                 ],
-                "buff_list": []
+                "buff_list": self._piece_buffs(c)
             })
         return chess_records
 
@@ -381,8 +500,8 @@ class AutoChessService:
 
         attrs = [
             {"key": AutoChessConst.KEY_NOW_MONEY, "value": gold},
-            {"key": AutoChessConst.KEY_RESTART_MONEY, "value": 10},
-            {"key": AutoChessConst.KEY_MONEY_INCRISE_CEIL, "value": 10},
+            {"key": AutoChessConst.KEY_RESTART_MONEY, "value": 10 + session.get("prop_effects",{}).get("restart_money_bonus",0)},
+            {"key": AutoChessConst.KEY_MONEY_INCRISE_CEIL, "value": 10 + session.get("prop_effects",{}).get("money_ceiling_bonus",0)},
             {"key": AutoChessConst.KEY_PREPARE_CELL_COUNT, "value": 0},
             {"key": AutoChessConst.KEY_CHESS_GOOD_COUNT, "value": 4},
             {"key": AutoChessConst.KEY_PROP_GOOD_COUNT, "value": 2},
@@ -390,12 +509,12 @@ class AutoChessService:
             {"key": AutoChessConst.KEY_SHOP_LEVEL_UP_ROUND, "value": 1},
             {"key": AutoChessConst.KEY_REFRESH_SHOP_COST, "value": AutoChessConst.REFRESH_SHOP_COST},
             {"key": AutoChessConst.KEY_SHOP_STAR_NUM, "value": session.get("shop_level", 1)},
-            {"key": AutoChessConst.KEY_SHOP_CHESS_BASE_EXP, "value": 3},
+            {"key": AutoChessConst.KEY_SHOP_CHESS_BASE_EXP, "value": self._base_chess_exp(session)},
             {"key": 13, "value": 0},
             {"key": 14, "value": 0},
             {"key": 15, "value": 0},
-            {"key": 16, "value": 0},
-            {"key": 17, "value": 0},
+            {"key": AutoChessConst.KEY_SHOP_FREE_REFRESH_COUNT, "value": session.get("free_refresh", 0)},
+            {"key": 17, "value": session.get("free_prop",0)},
             {"key": 18, "value": 0}
         ]
 
@@ -420,7 +539,7 @@ class AutoChessService:
             "game_type": session.get("game_type", 0),
             "auto_chessboard_info": {
                 "base_info_list": [
-                    {"key": AutoChessConst.INFO_KEY_BATTLE_UID, "value": 0, "value2": 562949954626314},
+                    {"key": AutoChessConst.INFO_KEY_BATTLE_UID, "value": 0, "value2": (session.get("pending_round") or {}).get("battle_uid", 0)},
                     {"key": AutoChessConst.INFO_KEY_SUNGLASS_FLAG, "value": 1},
                     {"key": AutoChessConst.INFO_KEY_HP, "value": hp},
                     {"key": AutoChessConst.INFO_KEY_CUR_ROUND_COUNT, "value": round_num},
@@ -433,7 +552,7 @@ class AutoChessService:
             "shop_items": shop_records,
             "buff_list": session.get("buff_list", []),
             "attr_list": attrs,
-            "pve_restart_times": 0
+            "pve_restart_times": session.get("restart_times", 0)
         }
         return encode("sc_89101", obj)
 
@@ -441,59 +560,65 @@ class AutoChessService:
     # 对局会话与状态机核心 (Session & State Machine)
     # =========================================================================
 
-    def get_session(self, uid: int) -> Dict[str, Any]:
-        if uid not in self._sessions:
-            # 优先从数据库加载
-            if self.db is not None:
-                try:
-                    row = self.db.query("SELECT * FROM autochess_session WHERE uid=?", (uid,))
-                    if row:
-                        r = row[0]
-                        self._sessions[uid] = {
-                            "uid": uid,
-                            "game_type": r.get("game_type", 0),
-                            "state": r.get("state", 0),
-                            "stage_id": r.get("stage_id", 0),
-                            "round": r.get("round", 1),
-                            "gold": r.get("gold", 10),
-                            "hp": r.get("hp", 100),
-                            "win_count": r.get("win_count", 0),
-                            "defeat_count": r.get("defeat_count", 0),
-                            "shop_level": r.get("shop_level", 1),
-                            "board_chess": json.loads(r["chess_board_json"]) if r.get("chess_board_json") else [],
-                            "bench_chess": json.loads(r["bench_chess_json"]) if r.get("bench_chess_json") else [],
-                            "shop_items": json.loads(r["shop_items_json"]) if r.get("shop_items_json") else [],
-                            "buff_list": json.loads(r["buff_list_json"]) if r.get("buff_list_json") else [],
-                        }
-                        self._sync_uid_counter(self._sessions[uid])
-                        return self._sessions[uid]
-                except Exception as e:
-                    logger.warning(f"Load autochess_session failed: {e}")
+    SESSION_KIND = 'autochess_runtime_v1'
+    EXTRA_FIELDS = ('last_battle_result', 'pending_round', 'last_replay',
+                    'free_refresh', 'buy_count_311', 'prepare_snapshot', 'restart_times', 'prop_effects', 'free_prop', 'chess_bonus')
 
-            # 默认空会话
-            self._sessions[uid] = {
+    def get_session(self, uid: int) -> Dict[str, Any]:
+        if self.db is None:
+            if uid in self._sessions:
+                return self._sessions[uid]
+            rows, extra = [], []
+        else:
+            # Read both halves in one SQL snapshot. Errors must propagate;
+            # a corrupt or unavailable save is not an empty game.
+            with self.db.transaction():
+                rows = self.db.query('SELECT * FROM autochess_session WHERE uid=?', (uid,))
+                extra = self.db.query('SELECT value_json FROM ops_common WHERE uid=? AND kind=? AND item_id=?',
+                                      (uid, self.SESSION_KIND, '0')) if rows else []
+        if rows:
+            r = rows[0]
+            session = {
                 "uid": uid,
-                "game_type": 0,
-                "state": AutoChessConst.STATE_NONE,
-                "stage_id": 0,
-                "round": 1,
-                "gold": 10,
-                "hp": 100,
-                "win_count": 0,
-                "defeat_count": 0,
-                "shop_level": 1,
-                "board_chess": [],
-                "bench_chess": [],
-                "shop_items": [],
-                "buff_list": [],
+                "game_type": r.get("game_type", 0),
+                "state": r.get("state", 0),
+                "stage_id": r.get("stage_id", 0),
+                "round": r.get("round", 1),
+                "gold": r.get("gold", 10),
+                "hp": r.get("hp", 100),
+                "win_count": r.get("win_count", 0),
+                "defeat_count": r.get("defeat_count", 0),
+                "shop_level": r.get("shop_level", 1),
+                "board_chess": json.loads(r["chess_board_json"]) if r.get("chess_board_json") else [],
+                "bench_chess": json.loads(r["bench_chess_json"]) if r.get("bench_chess_json") else [],
+                "shop_items": json.loads(r["shop_items_json"]) if r.get("shop_items_json") else [],
+                "buff_list": json.loads(r["buff_list_json"]) if r.get("buff_list_json") else [],
             }
-        return self._sessions[uid]
+            if extra:
+                data = json.loads(extra[0]['value_json'])
+                if not isinstance(data, dict) or data.get('version') != 1:
+                    raise OperationError(2, '自走棋扩展存档格式无效')
+                for key in self.EXTRA_FIELDS:
+                    if key in data:
+                        session[key] = data[key]
+            for key in ('board_chess', 'bench_chess', 'shop_items', 'buff_list'):
+                if not isinstance(session[key], list):
+                    raise OperationError(2, '自走棋存档列表格式无效')
+        else:
+            session = dict(uid=uid, game_type=0, state=AutoChessConst.STATE_NONE,
+                           stage_id=0, round=1, gold=10, hp=100, win_count=0,
+                           defeat_count=0, shop_level=1, board_chess=[],
+                           bench_chess=[], shop_items=[], buff_list=[])
+        self._sessions[uid] = session
+        self._sync_uid_counter(session)
+        return session
 
     def save_session(self, uid: int):
         s = self._sessions.get(uid)
         if not s or self.db is None:
             return
-        try:
+        from account_db import savepoint_transaction
+        with savepoint_transaction(self.db):
             self.db.execute("""
                 INSERT OR REPLACE INTO autochess_session (
                     uid, game_type, state, stage_id, round, gold, hp, win_count,
@@ -508,10 +633,28 @@ class AutoChessService:
                 json.dumps(s.get("shop_items", [])), json.dumps(s.get("buff_list", [])),
                 int(time.time())
             ))
-        except Exception as e:
-            logger.error(f"Save autochess_session failed: {e}")
 
-    def generate_shop_items(self, shop_level: int = 1, activity_id: Optional[int] = None) -> List[Dict[str, Any]]:
+            extra = dict(version=1, **{key: s[key] for key in self.EXTRA_FIELDS if key in s})
+            self.db.execute('INSERT INTO ops_common(uid,kind,item_id,value_json) VALUES(?,?,?,?) '
+                            'ON CONFLICT(uid,kind,item_id) DO UPDATE SET value_json=excluded.value_json',
+                            (uid, self.SESSION_KIND, '0', json.dumps(extra, ensure_ascii=False)))
+
+    def pending_round(self, session):
+        pending = session.get('pending_round')
+        if (not isinstance(pending, dict) or pending.get('consumed') is not False
+                or pending.get('stage_id') != session['stage_id']
+                or pending.get('round') != session['round']
+                or pending.get('state') != session['state']
+                or pending.get('result') not in (0, 1, 2, 3)
+                or not pending.get('battle_uid')):
+            raise OperationError(2, '缺少有效的待结算战报，请退出本局后重新开始')
+        replay = session.get('last_replay')
+        if (not isinstance(replay, dict) or replay.get('info', {}).get('battle_uid') != pending['battle_uid']
+                or replay['info'].get('result') != pending['result']):
+            raise OperationError(2, '待结算战报与回合记录不一致')
+        return pending
+
+    def generate_shop_items(self, shop_level: int = 1, activity_id: Optional[int] = 3740601, base_exp: int = 1) -> List[Dict[str, Any]]:
         """从卡池随机生成 4 个棋子商店栏位（对齐 GameSetting.auto_chess_shop_star_rate 轮盘星级权重与 body 身材）"""
         all_chess = self.cfg.get("chess", {})
         candidates_by_star: Dict[int, List[Dict[str, Any]]] = {1: [], 2: [], 3: [], 4: []}
@@ -539,13 +682,7 @@ class AutoChessService:
                 candidates_by_star[star].append(c)
 
         if not all_candidates:
-            # 兜底：筛选任意合法 type == 0 棋子
-            for c in all_chess.values():
-                if isinstance(c, dict) and c.get("type") == 0:
-                    lb = c.get("level_buffs")
-                    if lb and isinstance(lb, list) and len(lb) > 0 and lb[0]:
-                        all_candidates.append(c)
-                        candidates_by_star[1].append(c)
+            raise OperationError(2, '当前活动没有可购买棋子')
 
         # 官方 GameSetting.auto_chess_shop_star_rate 权重分配
         star_rates = {
@@ -582,13 +719,28 @@ class AutoChessService:
                 "shop_unique_id": self._allocate_uid(),
                 "id": cid,
                 "index": idx,
-                "star": star,
-                "exp": 1,
+                "rarity": star,
+                "star": 1 + sum(base_exp >= int(v) for v in choice.get("exp", [])),
+                "exp": base_exp,
                 "atk": atk,
                 "hp": hp,
                 "is_lock": 0
             })
         return items
+
+    @staticmethod
+    def _setting(name, default):
+        from autochess_special import setting
+        value = setting(name, [default])
+        return int(value[0])
+
+    def _generate_session_shop(self, session):
+        from autochess_special import generate_props
+        generated = self.generate_shop_items(session.get('shop_level', 1), base_exp=self._base_chess_exp(session))
+        for piece in generated:
+            self._apply_chess_bonus(session, piece)
+        generated += generate_props(self, session)
+        return generated
 
     def start_new_game(self, ctx, uid: int, game_type: int, stage_id: int):
         """开启新对局：cs_89116 -> sc_89117 + sc_89101 + sc_89125"""
@@ -607,12 +759,30 @@ class AutoChessService:
         defeat_num = int(stage_cfg.get("defeat_num", 3))
 
         session = self.get_session(uid)
+        if session.get('state') == AutoChessConst.STATE_TOTAL_SETTLE_LOSE and session.get('stage_id') == stage_id:
+            self.pending_round(session)
+            snapshot = session.get('prepare_snapshot')
+            retries = int(session.get('restart_times', 0))
+            if not isinstance(snapshot, dict) or retries >= self._setting('auto_chess_pve_restart_times',999):
+                raise OperationError(2, '本局没有可用的重新挑战机会')
+            restored = deepcopy(snapshot)
+            restored['restart_times'] = retries + 1
+            restored['gold'] = int(restored.get('gold', 0)) + self._setting('auto_chess_pve_restart_add_coin',10)
+            restored['state'] = AutoChessConst.STATE_PREPARE
+            self._sessions[uid] = restored
+            self.save_session(uid)
+            return restored
+        if session.get('state') == AutoChessConst.STATE_TOTAL_SETTLE_WIN:
+            self.settle_battle(ctx, uid, game_type)
+            session = self.get_session(uid)
         if session.get("state") not in (
             AutoChessConst.STATE_NONE,
             AutoChessConst.STATE_TOTAL_SETTLE_WIN,
             AutoChessConst.STATE_TOTAL_SETTLE_LOSE,
         ):
             raise OperationError(AutoChessConst.TIP_INVALID_OP, "已有进行中的一期 PVE 对局")
+        for key in self.EXTRA_FIELDS:
+            session.pop(key, None)
         session["game_type"] = game_type
         session["stage_id"] = stage_id
         session["state"] = AutoChessConst.STATE_PREPARE
@@ -625,7 +795,7 @@ class AutoChessService:
         session["board_chess"] = []
         session["bench_chess"] = []
         session["buff_list"] = []
-        session["shop_items"] = self.generate_shop_items(shop_level=1)
+        session["shop_items"] = self._generate_session_shop(session)
 
         self.save_session(uid)
         ctx.log(f"AutoChess: StartNewGame uid={uid} game_type={game_type} stage={stage_id} hp={defeat_num} gold=10")
@@ -646,18 +816,18 @@ class AutoChessService:
 
         # 保留已锁定的商品
         current_shop = session.get("shop_items", [])
-        locked_indices = {s["index"]: s for s in current_shop if s.get("is_lock") == 1}
+        locked_indices = {(s.get("shop_type",0),s["index"]): s for s in current_shop if s.get("is_lock") == 1}
 
-        new_shop = self.generate_shop_items(session.get("shop_level", 1))
+        new_shop = self._generate_session_shop(session)
         final_shop = []
         for item in new_shop:
-            idx = item["index"]
+            idx = (item.get("shop_type",0),item["index"])
             if idx in locked_indices:
                 final_shop.append(locked_indices[idx])
             else:
                 final_shop.append(item)
 
-        session["shop_items"] = final_shop
+        session["shop_items"] = final_shop + [i for i in current_shop if i.get("shop_type")==2]
         self.save_session(uid)
         ctx.log(f"AutoChess: RefreshShop uid={uid} remain_gold={session['gold']} free_remain={session.get('free_refresh', 0)}")
         return session
@@ -681,17 +851,26 @@ class AutoChessService:
         if int(target_item.get("shop_type", AutoChessConst.SHOP_TYPE_NORMAL)) != int(shop_type):
             raise OperationError(AutoChessConst.TIP_INVALID_OP, "商品类型与请求不一致")
 
+        if int(shop_type) == AutoChessConst.SHOP_TYPE_PROP:
+            from autochess_special import buy_prop
+            buy_prop(self, ctx, uid, session, target_item, int(to_index))
+            self.save_session(uid)
+            return session
+        if int(shop_type) not in (AutoChessConst.SHOP_TYPE_NORMAL, AutoChessConst.SHOP_TYPE_REWARD):
+            raise OperationError(2, '不支持的商品类型')
+
         chess_cfg = self.get_chess_cfg(int(target_item["id"])) or {}
-        price = int(chess_cfg.get("shop_price", 0))
-        if price <= 0:
+        price = 0 if int(shop_type)==AutoChessConst.SHOP_TYPE_REWARD else int(chess_cfg.get("shop_price", 0))
+        if price < 0 or (price == 0 and int(shop_type)!=AutoChessConst.SHOP_TYPE_REWARD):
             raise OperationError(AutoChessConst.TIP_INVALID_OP, "该棋子不可购买")
 
         if session.get("gold", 0) < price:
             raise OperationError(AutoChessConst.TIP_INVALID_OP, "金币不足")
 
-        if int(to_index) < 0:
+        if not 1 <= int(to_index) <= 5:
             raise OperationError(AutoChessConst.TIP_INVALID_OP, "目标格非法")
 
+        self._validate_board(session)
         target_piece = None
         if int(to_index) > 0:
             target_piece = next(
@@ -707,7 +886,7 @@ class AutoChessService:
             if exp_limits and current_exp >= max(exp_limits):
                 raise OperationError(AutoChessConst.TIP_INVALID_OP, "目标棋子已达到最高等级")
             target_piece["exp"] = current_exp + self._piece_exp(target_item)
-            target_piece["star"] = target_piece["exp"]  # 兼容旧存档字段，协议中按 EXP 下发
+            target_piece["star"] = self._piece_level(target_piece)
             target_piece["atk"] = int(target_piece.get("atk", 0)) + int(target_item.get("atk", 0))
             target_piece["hp"] = int(target_piece.get("hp", 0)) + int(target_item.get("hp", 0))
             new_piece = target_piece
@@ -717,7 +896,7 @@ class AutoChessService:
                 "chess_id": target_item["id"],
                 "index": int(to_index),
                 "exp": self._piece_exp(target_item),
-                "star": self._piece_exp(target_item),
+                "star": self._piece_level(target_item),
                 "atk": target_item.get("atk", 10),
                 "hp": target_item.get("hp", 100),
             }
@@ -729,33 +908,8 @@ class AutoChessService:
         session["gold"] -= price
         shop_items.remove(target_item)
 
-        # 触发 ON_BUY 技能:
-        all_allies = session.get("board_chess", []) + session.get("bench_chess", [])
-        for p in all_allies:
-            if p["unique_id"] == new_piece["unique_id"]:
-                continue
-            p_cid = int(p.get("chess_id", 0))
-            p_star = self._piece_exp(p)
-            # 102 潮音·波塞冬: 购买其他棋子时：使随机 1 个友方棋子 +3*star 血
-            if p_cid == 102:
-                candidates = [x for x in all_allies if x["unique_id"] != p["unique_id"]]
-                if candidates:
-                    target_f = random.choice(candidates)
-                    target_f["hp"] = int(target_f.get("hp", 0)) + 3 * p_star
-            # 401 轰雷·托尔: 购买&出售其他棋子时：随机 1 个己方棋子获得 +2*star 攻 / +2*star 血
-            elif p_cid == 401:
-                target_f = random.choice(all_allies) if all_allies else None
-                if target_f:
-                    target_f["atk"] = int(target_f.get("atk", 0)) + 2 * p_star
-                    target_f["hp"] = int(target_f.get("hp", 0)) + 2 * p_star
-            # 311 梦影·俄尼里伊: 每购买 2 次其他棋子时：商店中的棋子永久成长
-            elif p_cid == 311:
-                buy_cnt = session.get("buy_count_311", 0) + 1
-                session["buy_count_311"] = buy_cnt
-                if buy_cnt % 2 == 0:
-                    for s_item in shop_items:
-                        s_item["atk"] = int(s_item.get("atk", 0)) + 1 * p_star
-                        s_item["hp"] = int(s_item.get("hp", 0)) + 1 * p_star
+        from autochess_preparation import trigger
+        trigger(self, session, 3, new_piece)
 
         self.save_session(uid)
         ctx.log(
@@ -764,25 +918,6 @@ class AutoChessService:
             f"gold_left={session['gold']}"
         )
         return session
-
-    def _check_and_merge(self, session: Dict[str, Any], chess_id: int):
-        """检测手牌或场上同名低星棋子自动合成"""
-        all_pieces = session.get("board_chess", []) + session.get("bench_chess", [])
-        matching_1star = [p for p in all_pieces if p["chess_id"] == chess_id and p.get("star", 1) == 1]
-        if len(matching_1star) >= 3:
-            # 合成 2 星：保留第一个，升级星级与属性，删除后两个
-            keeper = matching_1star[0]
-            to_remove = matching_1star[1:3]
-            keeper["star"] = 2
-            keeper["atk"] = int(keeper.get("atk", 10) * 1.8)
-            keeper["hp"] = int(keeper.get("hp", 100) * 1.8)
-
-            for rm in to_remove:
-                if rm in session.get("board_chess", []):
-                    session["board_chess"].remove(rm)
-                if rm in session.get("bench_chess", []):
-                    session["bench_chess"].remove(rm)
-            logger.info(f"AutoChess: Auto merged 3x 1-star chess {chess_id} into 2-star!")
 
     def sell_chess(self, ctx, uid: int, game_type: int, unique_id: int):
         """出售棋子：cs_89122 -> sc_89123 + sc_89101 + sc_89133
@@ -806,39 +941,15 @@ class AutoChessService:
             raise OperationError(AutoChessConst.TIP_INVALID_OP, "未找到目标棋子")
 
         # 返还金币 (按星级 1星=1, 2星=2, 3星=3)
-        refund = target.get("star", 1)
+        sell_prices = (self.get_chess_cfg(target['chess_id']) or {}).get('sell_price', [])
+        level = self._piece_level(target)
+        if len(sell_prices) < level:
+            raise OperationError(2, '缺少棋子出售价格')
+        refund = int(sell_prices[level - 1])
         session["gold"] = session.get("gold", 0) + refund
 
-        # 触发 ON_SELL 技能:
-        sold_cid = int(target.get("chess_id", 0))
-        sold_star = int(target.get("star", 1))
-        all_allies = session.get("board_chess", []) + session.get("bench_chess", [])
-        for p in all_allies:
-            p_cid = int(p.get("chess_id", 0))
-            p_star = self._piece_exp(p)
-            # 401 轰雷·托尔: 购买&出售其他棋子时：随机 1 个己方棋子获得 +2*star 攻 / +2*star 血
-            if p_cid == 401:
-                target_f = random.choice(all_allies) if all_allies else None
-                if target_f:
-                    target_f["atk"] = int(target_f.get("atk", 0)) + 2 * p_star
-                    target_f["hp"] = int(target_f.get("hp", 0)) + 2 * p_star
-
-        # 211 光煌·阿波罗: 出售时：随机召唤 1 个 2 阶棋子到备战席
-        if sold_cid == 211:
-            summon_cand = [201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 212, 213, 214, 215]
-            gen_cid = random.choice(summon_cand)
-            c_cfg = self.get_chess_cfg(gen_cid) or {}
-            c_body = c_cfg.get("body", [4, 5])
-            new_summon = {
-                "unique_id": self._allocate_uid(session),
-                "chess_id": gen_cid,
-                "index": 0,
-                "exp": 1,
-                "star": 1,
-                "atk": c_body[0] if len(c_body) > 0 else 4,
-                "hp": c_body[1] if len(c_body) > 1 else 5,
-            }
-            session.setdefault("bench_chess", []).append(new_summon)
+        from autochess_preparation import trigger
+        trigger(self, session, 5, target)
 
         self.save_session(uid)
         ctx.log(f"AutoChess: SellChess uid={uid} uid={unique_id} refund={refund}")
@@ -848,13 +959,15 @@ class AutoChessService:
         """调整棋子站位：cs_89104 -> sc_89105"""
         session = self._require_session_state(uid, game_type, {AutoChessConst.STATE_PREPARE})
         # chess_list 格式: [{"key": unique_id, "value": new_index}, ...] 或 [{"unique_id": ..., "index": ...}]
+        if len({item.get("key", item.get("unique_id")) for item in chess_list}) != len(chess_list):
+            raise OperationError(2, "阵容请求UID重复")
         pos_map = {item.get("key", item.get("unique_id")): item.get("value", item.get("index")) for item in chess_list}
 
         all_pieces = session.get("board_chess", []) + session.get("bench_chess", [])
         known_uids = {p["unique_id"] for p in all_pieces}
         if any(uid_key not in known_uids for uid_key in pos_map):
             raise OperationError(AutoChessConst.TIP_INVALID_OP, "阵容包含未知棋子 UID")
-        if any(pos is None for pos in pos_map.values()):
+        if any(pos is None or not 1 <= int(pos) <= 5 for pos in pos_map.values()):
             raise OperationError(AutoChessConst.TIP_INVALID_OP, "阵容位置缺失")
 
         proposed_positions = {
@@ -878,7 +991,7 @@ class AutoChessService:
                     proposed_positions[occupier["unique_id"]] = old_pos
             proposed_positions[moved_uid] = new_pos
 
-        if any(pos < 0 for pos in proposed_positions.values()):
+        if any(pos < 0 or pos > 5 for pos in proposed_positions.values()):
             raise OperationError(AutoChessConst.TIP_INVALID_OP, "棋子位置不能为负数")
         positive_positions = [pos for pos in proposed_positions.values() if pos > 0]
         if len(positive_positions) != len(set(positive_positions)):
@@ -944,7 +1057,7 @@ class AutoChessService:
             raise OperationError(AutoChessConst.TIP_INVALID_OP, "目标棋子已达到最高等级")
 
         source["exp"] = current_exp + self._piece_exp(loss)
-        source["star"] = source["exp"]
+        source["star"] = self._piece_level(source)
         source["atk"] = int(source.get("atk", 0)) + int(loss.get("atk", 0))
         source["hp"] = int(source.get("hp", 0)) + int(loss.get("hp", 0))
         for collection_name in ("board_chess", "bench_chess"):
@@ -957,35 +1070,13 @@ class AutoChessService:
 
     def prepare_end(self, ctx, uid: int, game_type: int):
         session = self._require_session_state(uid, game_type, {AutoChessConst.STATE_PREPARE})
+        self._validate_board(session, battle=True)
+        session['prepare_snapshot'] = {k: deepcopy(v) for k,v in session.items()
+                                       if k not in ('prepare_snapshot','pending_round','last_replay')}
         session["state"] = AutoChessConst.STATE_PREPARE_END
 
-        # 触发 ON_ROUND_END 钩子 (302 托特额外轮次, 201 大国主相邻赋攻, 304 霍德尔最前排增幅)
-        board_chess = session.get("board_chess", [])
-        if board_chess:
-            # 302 托特·透特: 准备阶段结束时效果额外触发 1/2 次
-            extra_rounds = max([p.get("star", 1) for p in board_chess if p.get("chess_id") == 302], default=0)
-            exec_count = 1 + extra_rounds
-
-            for _ in range(exec_count):
-                for p in list(board_chess):
-                    cid = p.get("chess_id")
-                    star = p.get("star", 1)
-                    idx = p.get("index", 0)
-
-                    # 201 雀羽·大国主: 相邻友方棋子获得 +1/+2/+3 攻击力
-                    if cid == 201:
-                        for other in board_chess:
-                            if other is not p and other.get("index", 0) in (idx - 1, idx + 1):
-                                other["atk"] = int(other.get("atk", 0)) + star
-                                ctx.log(f"AutoChess: Hook ON_ROUND_END [201 大国主] buffed adjacent uid={other.get('unique_id')} atk+{star}")
-
-                    # 304 幽潮·霍德尔: 最前排棋子获得 +2/+4/+6 攻血
-                    elif cid == 304:
-                        front = min(board_chess, key=lambda x: x.get("index", 999))
-                        if front:
-                            front["atk"] = int(front.get("atk", 0)) + 2 * star
-                            front["hp"] = int(front.get("hp", 0)) + 2 * star
-                            ctx.log(f"AutoChess: Hook ON_ROUND_END [304 霍德尔] buffed front uid={front.get('unique_id')} atk+{2*star} hp+{2*star}")
+        from autochess_preparation import trigger
+        trigger(self, session, 10)
 
         self.save_session(uid)
         ctx.log(f"AutoChess: PrepareEnd uid={uid} round={session.get('round', 1)}")
@@ -1002,628 +1093,19 @@ class AutoChessService:
                     {"key": AutoChessConst.CHESS_ATTR_HP, "value": int(piece.get("hp", 0))},
                     {"key": AutoChessConst.CHESS_ATTR_EXP, "value": self._piece_exp(piece)},
                 ],
-                "buffs": [],
+                "buffs": [dict(buff_id=int(b['buff_id']), chess_kv=deepcopy(b.get('other_param', [])))
+                          for b in piece.get('buff_list', [])],
             })
         return {"chess_list": chess_list, "user_buff": []}
 
-    def _simulate_round_battle(
-        self,
-        player_board: List[Dict[str, Any]],
-        enemy_board: List[Dict[str, Any]],
-        session: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[int, List[Dict[str, Any]]]:
-        """推演双方棋盘碰撞过程，生成完整行动帧 (FIGHT / DEAD / EFFECT / MOVE)，并计算胜负结果。
-        全生命周期战斗技能引擎：
-        - START_OF_BATTLE (204 休/308 努阿达/413 金固/411 执明)
-        - ON_ATTACK / ON_FRONT_ALLY_ATTACK (303 薇儿丹蒂/103 狂鳄/203 朝约/213 诗蔻蒂/212 埃克什瓦)
-        - FIGHT (对撞伤害结算、剧毒/瓦解一击必杀、圣盾抵消)
-        - ON_SHIELD_BROKEN (307 阿修罗)
-        - ON_DEAL_DAMAGE (113 雅典娜/412 塞赫麦特)
-        - ON_DAMAGED (101 大国主/104 旧誓/110 羽灼/210 阿尔忒弥斯/309 阿努比斯/410 月读)
-        - DEAD (阵亡动画下发)
-        - ON_KILL (114 国常立/215 孟章/415 英招)
-        - ON_FRIEND_DEAD (313 白泽/402 波塞冬)
-        - DEATHRATTLE (105/405/406/106/112 亡语召唤、赋盾、伤害)
-        - ON_SUMMON_SPAWN (208 维达尔/111 提尔)
-        - MOVE (补位前移)
-        """
-        sorted_p = sorted(player_board, key=lambda x: x.get("index", 0))
-        sorted_e = sorted(enemy_board, key=lambda x: x.get("index", 0))
-
-        def _build_fighter(p: Dict[str, Any], side: int) -> Dict[str, Any]:
-            cid = p.get("chess_id") or p.get("id", 101)
-            star = p.get("star", 1)
-            raw_buffs = p.get("buff_list", [])
-            buff_dicts = []
-            for b in raw_buffs:
-                if isinstance(b, dict):
-                    buff_dicts.append(b)
-                elif isinstance(b, int):
-                    buff_dicts.append({"buff_id": b, "unique_id": p.get("unique_id", 0) * 100 + len(buff_dicts) + 1})
-
-            if not buff_dicts:
-                c_cfg = self.get_chess_cfg(cid) or {}
-                lb = c_cfg.get("level_buffs", [])
-                if len(lb) >= star:
-                    star_b = lb[star - 1]
-                    bids = star_b if isinstance(star_b, list) else ([star_b] if star_b else [])
-                    for b_idx, bid in enumerate(bids, 1):
-                        buff_dicts.append({
-                            "buff_id": bid,
-                            "unique_id": p.get("unique_id", 0) * 100 + b_idx
-                        })
-
-            has_shield = False
-            is_deadly = False
-            deathrattles = []
-            parsed_buffs = []
-
-            for b in buff_dicts:
-                bid = b.get("buff_id", 0)
-                b_uid = b.get("unique_id", 0)
-                bcfg = dict(self.get_buff_cfg(bid) or {})
-                bcfg["buff_unique_id"] = b_uid
-                bcfg["buff_id"] = bid
-                kw = bcfg.get("keyword_type", 0)
-                act = bcfg.get("action_type", 0)
-                mom = bcfg.get("moment", 0)
-                desc = bcfg.get("desc", "")
-
-                if kw == 1 or act == 7 or "护盾" in desc or "圣盾" in desc:
-                    has_shield = True
-                if kw == 5 or act == 33 or "瓦解" in desc or "剧毒" in desc:
-                    is_deadly = True
-                if kw == 2 or mom == 17 or "离场" in desc or "亡语" in desc:
-                    deathrattles.append(bcfg)
-                parsed_buffs.append(bcfg)
-
-            atk = p.get("atk")
-            hp = p.get("hp")
-            if atk is None or hp is None:
-                for attr in p.get("chess_attr_list", []):
-                    k = attr.get("key")
-                    v = attr.get("value")
-                    if k == AutoChessConst.CHESS_ATTR_ATK and atk is None:
-                        atk = v
-                    elif k == AutoChessConst.CHESS_ATTR_HP and hp is None:
-                        hp = v
-            if atk is None:
-                c_cfg = self.get_chess_cfg(cid) or {}
-                body = c_cfg.get("body", [2, 3])
-                atk = (body[0] if len(body) > 0 else 2) * star
-            if hp is None:
-                c_cfg = self.get_chess_cfg(cid) or {}
-                body = c_cfg.get("body", [2, 3])
-                hp = (body[1] if len(body) > 1 else 3) * star
-
-            atk = max(1, int(atk))
-            hp = max(1, int(hp))
-
-            return {
-                "unique_id": p["unique_id"],
-                "chess_id": cid,
-                "index": p.get("index", 0),
-                "star": star,
-                "atk": atk,
-                "hp": hp,
-                "curr_hp": hp,
-                "has_shield": has_shield,
-                "is_deadly": is_deadly,
-                "deathrattles": deathrattles,
-                "buffs": parsed_buffs,
-                "side": side,
-                "shield_recharge_used": False,
-            }
-
-        p_fighters = [_build_fighter(p, 0) for p in sorted_p]
-        e_fighters = [_build_fighter(e, 1) for e in sorted_e]
-
-        if not p_fighters:
-            return 2, []
-
-        action_list = []
-        action_id = 0
-        max_turns = 100
-        enemy_uid_seq = 290000
-        p_dead_count = 0
-        e_dead_count = 0
-
-        def _buid(f):
-            if not f:
-                return 0
-            buffs = f.get("buffs")
-            if buffs and len(buffs) > 0 and isinstance(buffs[0], dict):
-                return buffs[0].get("buff_unique_id", 0)
-            return 0
-
-        def _emit_add_attr(target_f, delta_atk, delta_hp, buff_uid):
-            nonlocal action_id
-            if delta_atk == 0 and delta_hp == 0:
-                return
-            target_f["atk"] = max(1, target_f["atk"] + delta_atk)
-            target_f["hp"] = max(1, target_f["hp"] + delta_hp)
-            target_f["curr_hp"] = max(1, target_f["curr_hp"] + delta_hp)
-            action_id += 1
-            action_list.append({
-                "action_id": action_id,
-                "action_type": AutoChessConst.ACTION_TYPE_EFFECT,
-                "action_effect_info": {
-                    "effect_enum": 1,  # ADD_ATTR
-                    "buff_uid": int(buff_uid),
-                    "target_list": [
-                        {
-                            "id": target_f["unique_id"],
-                            "temp_id": target_f["chess_id"],
-                            "update_list": [
-                                {"key": AutoChessConst.CHESS_ATTR_ATK, "value": delta_atk},
-                                {"key": AutoChessConst.CHESS_ATTR_HP, "value": delta_hp}
-                            ]
-                        }
-                    ]
-                }
-            })
-
-        def _emit_damage(target_f, damage, buff_uid):
-            nonlocal action_id
-            if damage <= 0 or target_f["curr_hp"] <= 0:
-                return False
-            if target_f["has_shield"]:
-                target_f["has_shield"] = False
-                actual_dmg = 0
-            else:
-                actual_dmg = damage
-                target_f["curr_hp"] -= actual_dmg
-
-            action_id += 1
-            action_list.append({
-                "action_id": action_id,
-                "action_type": AutoChessConst.ACTION_TYPE_EFFECT,
-                "action_effect_info": {
-                    "effect_enum": 2,  # DAMAGE
-                    "buff_uid": int(buff_uid),
-                    "target_list": [
-                        {
-                            "id": target_f["unique_id"],
-                            "temp_id": target_f["chess_id"],
-                            "update_list": [
-                                {"key": AutoChessConst.CHESS_ATTR_HP, "value": -actual_dmg}
-                            ]
-                        }
-                    ]
-                }
-            })
-            return target_f["curr_hp"] <= 0
-
-        def _emit_shield(target_f, buff_uid):
-            nonlocal action_id
-            target_f["has_shield"] = True
-            action_id += 1
-            action_list.append({
-                "action_id": action_id,
-                "action_type": AutoChessConst.ACTION_TYPE_EFFECT,
-                "action_effect_info": {
-                    "effect_enum": 4,  # ADD_BUFF
-                    "buff_uid": int(buff_uid),
-                    "add_buff_info": [
-                        {
-                            "target_type": 0,
-                            "target_uid": target_f["unique_id"],
-                            "buff_info": {
-                                "buff_id": 3,
-                                "unique_id": target_f["unique_id"] * 100 + 99,
-                                "owner_type": target_f["side"],
-                                "source_type": 1,
-                                "source_uid": target_f["unique_id"],
-                                "source_cfg_id": target_f["chess_id"]
-                            }
-                        }
-                    ]
-                }
-            })
-
-        def _spawn_summon(s_cid, side, star=1, bonus_atk=0, bonus_hp=0, source_buff_uid=0):
-            nonlocal action_id, enemy_uid_seq
-            s_cfg = self.get_chess_cfg(s_cid) or {}
-            s_body = s_cfg.get("body", [2, 2])
-            s_star = s_cfg.get("star", star)
-            s_atk = (s_body[0] if len(s_body) > 0 else 2) + bonus_atk
-            s_hp = (s_body[1] if len(s_body) > 1 else 2) + bonus_hp
-
-            if side == 0:
-                s_uid = self._allocate_uid(session)
-            else:
-                enemy_uid_seq += 1
-                s_uid = enemy_uid_seq
-
-            s_rec = {
-                "unique_id": s_uid,
-                "chess_id": s_cid,
-                "index": 1,
-                "star": s_star,
-                "atk": s_atk,
-                "hp": s_hp,
-                "chess_attr_list": [
-                    {"key": AutoChessConst.CHESS_ATTR_ATK, "value": s_atk},
-                    {"key": AutoChessConst.CHESS_ATTR_HP, "value": s_hp},
-                    {"key": AutoChessConst.CHESS_ATTR_EXP, "value": s_star}
-                ],
-                "buff_list": []
-            }
-            s_fighter = _build_fighter(s_rec, side)
-
-            # 触发 ON_SUMMON_SPAWN (208 维达尔套盾, 111 提尔加攻血)
-            allies = p_fighters if side == 0 else e_fighters
-            for ally in allies:
-                if ally["chess_id"] == 208:
-                    s_fighter["has_shield"] = True
-                elif ally["chess_id"] == 111:
-                    buid = _buid(ally)
-                    _emit_add_attr(ally, 0, ally["star"], buid)
-
-            action_id += 1
-            action_list.append({
-                "action_id": action_id,
-                "action_type": AutoChessConst.ACTION_TYPE_EFFECT,
-                "action_effect_info": {
-                    "effect_enum": AutoChessConst.ACTION_EFFECT_TYPE_SUMMON,
-                    "buff_uid": int(source_buff_uid),
-                    "call_info": {
-                        "user_id": side,
-                        "chess_list": [s_rec]
-                    }
-                }
-            })
-            return s_fighter
-
-        # 1. 战斗开始时 (BUS_BATTLE_START)
-        for team, side in [(p_fighters, 0), (e_fighters, 1)]:
-            for f in list(team):
-                cid = f["chess_id"]
-                star = f["star"]
-                buid = _buid(f)
-                if cid == 204 and team:  # 疾风之枪·休: 最前排+2*star/+2*star
-                    _emit_add_attr(team[0], 2 * star, 2 * star, buid)
-                elif cid == 308:  # 银臂·努阿达: 相邻赋盾+2*star攻
-                    idx = team.index(f)
-                    for n_idx in (idx - 1, idx + 1):
-                        if 0 <= n_idx < len(team):
-                            _emit_shield(team[n_idx], buid)
-                            _emit_add_attr(team[n_idx], 2 * star, 0, buid)
-                elif cid == 413:  # 荒獠·金固: 开局最前排召唤索贝克
-                    s_f = _spawn_summon(9001, side, star=star, source_buff_uid=buid)
-                    team.insert(0, s_f)
-                elif cid == 411:  # 玄机·执明: 自身与随机1个队友+2*star攻血
-                    _emit_add_attr(f, 2 * star, 2 * star, buid)
-                    other_allies = [a for a in team if a is not f]
-                    if other_allies:
-                        _emit_add_attr(other_allies[0], 2 * star, 2 * star, buid)
-
-        # 循环对撞交锋
-        while p_fighters and e_fighters and action_id < max_turns:
-            p = p_fighters[0]
-            e = e_fighters[0]
-
-            # 2. 攻击时触发 (BUS_ON_ATTACK)
-            # 队首自身攻击
-            if p["chess_id"] == 303:  # 黯耀·薇儿丹蒂
-                buid = _buid(p)
-                _emit_add_attr(p, 2 * p["star"], 2 * p["star"], buid)
-            if e["chess_id"] == 303:
-                buid = _buid(e)
-                _emit_add_attr(e, 2 * e["star"], 2 * e["star"], buid)
-
-            # 后排前方队友攻击响应 (ON_FRONT_ALLY_ATTACK)
-            if len(p_fighters) > 1:
-                p_sup = p_fighters[1]
-                sup_cid = p_sup["chess_id"]
-                sup_star = p_sup["star"]
-                sup_buid = _buid(p_sup)
-                if sup_cid == 103:  # 狂鳄: 自身+1*star攻
-                    _emit_add_attr(p_sup, 1 * sup_star, 0, sup_buid)
-                elif sup_cid == 203:  # 朝约: 队首+2*star血
-                    _emit_add_attr(p, 0, 2 * sup_star, sup_buid)
-                elif sup_cid == 213:  # 诗蔻蒂: 敌方打3伤害
-                    _emit_damage(e, 3, sup_buid)
-
-            if len(e_fighters) > 1:
-                e_sup = e_fighters[1]
-                sup_cid = e_sup["chess_id"]
-                sup_star = e_sup["star"]
-                sup_buid = _buid(e_sup)
-                if sup_cid == 103:
-                    _emit_add_attr(e_sup, 1 * sup_star, 0, sup_buid)
-                elif sup_cid == 203:
-                    _emit_add_attr(e, 0, 2 * sup_star, sup_buid)
-                elif sup_cid == 213:
-                    _emit_damage(p, 3, sup_buid)
-
-            # 3. 交锋伤害结算 (FIGHT)
-            p_shield_broken = False
-            e_shield_broken = False
-
-            if e["has_shield"]:
-                p_actual_dmg = 0
-                e["has_shield"] = False
-                e_shield_broken = True
-            else:
-                p_actual_dmg = p["atk"]
-                if p["is_deadly"]:
-                    p_actual_dmg = max(p_actual_dmg, e["curr_hp"])
-
-            if p["has_shield"]:
-                e_actual_dmg = 0
-                p["has_shield"] = False
-                p_shield_broken = True
-            else:
-                e_actual_dmg = e["atk"]
-                if e["is_deadly"]:
-                    e_actual_dmg = max(e_actual_dmg, p["curr_hp"])
-
-            action_id += 1
-            action_list.append({
-                "action_id": action_id,
-                "action_type": AutoChessConst.ACTION_TYPE_FIGHT,
-                "action_battle_info": {
-                    "action_list": [
-                        {"key": p["unique_id"], "value": -e_actual_dmg},
-                        {"key": e["unique_id"], "value": -p_actual_dmg},
-                    ]
-                }
-            })
-
-            p["curr_hp"] -= e_actual_dmg
-            e["curr_hp"] -= p_actual_dmg
-
-            # 4. 破盾与再次获盾 (ON_SHIELD_BROKEN)
-            if p["chess_id"] == 307 and (p_shield_broken or e_actual_dmg > 0) and not p.get("shield_recharge_used"):
-                p["shield_recharge_used"] = True
-                _emit_shield(p, _buid(p))
-            if e["chess_id"] == 307 and (e_shield_broken or p_actual_dmg > 0) and not e.get("shield_recharge_used"):
-                e["shield_recharge_used"] = True
-                _emit_shield(e, _buid(e))
-
-            # 5. 造成伤害响应 (ON_DEAL_DAMAGE)
-            if p_actual_dmg > 0:
-                for ally in p_fighters[1:]:
-                    if ally["chess_id"] == 113:  # 雅典娜自身+1*star血
-                        _emit_add_attr(ally, 0, 1 * ally["star"], _buid(ally))
-                    elif ally["chess_id"] == 412:  # 塞赫麦特+2*star/+2*star
-                        _emit_add_attr(ally, 2 * ally["star"], 2 * ally["star"], _buid(ally))
-            if e_actual_dmg > 0:
-                for ally in e_fighters[1:]:
-                    if ally["chess_id"] == 113:
-                        _emit_add_attr(ally, 0, 1 * ally["star"], _buid(ally))
-                    elif ally["chess_id"] == 412:
-                        _emit_add_attr(ally, 2 * ally["star"], 2 * ally["star"], _buid(ally))
-
-            # 6. 受击狂暴与反击 (ON_DAMAGED)
-            if e_actual_dmg > 0 and p["curr_hp"] > 0:
-                p_cid = p["chess_id"]
-                p_star = p["star"]
-                p_buid = _buid(p)
-                if p_cid == 101:  # 大国主: +1*star攻
-                    _emit_add_attr(p, 1 * p_star, 0, p_buid)
-                elif p_cid == 104:  # 旧誓: +1*star血
-                    _emit_add_attr(p, 0, 1 * p_star, p_buid)
-                elif p_cid == 110:  # 羽灼: +1*star攻/+1*star血
-                    _emit_add_attr(p, 1 * p_star, 1 * p_star, p_buid)
-                elif p_cid == 210 and e_fighters:  # 阿尔忒弥斯: 打3伤害
-                    _emit_damage(e_fighters[0], 3, p_buid)
-                elif p_cid == 309:  # 阿努比斯: 召唤胡狼
-                    s_f = _spawn_summon(3091, 0, star=p_star, source_buff_uid=p_buid)
-                    p_fighters.insert(0, s_f)
-
-                # 410 震离·月读全场队友受击狂暴
-                for ally in p_fighters:
-                    if ally is not p and ally["chess_id"] == 410:
-                        a_buid = _buid(ally)
-                        _emit_add_attr(ally, 2 * ally["star"], 2 * ally["star"], a_buid)
-
-            if p_actual_dmg > 0 and e["curr_hp"] > 0:
-                e_cid = e["chess_id"]
-                e_star = e["star"]
-                e_buid = _buid(e)
-                if e_cid == 101:
-                    _emit_add_attr(e, 1 * e_star, 0, e_buid)
-                elif e_cid == 104:
-                    _emit_add_attr(e, 0, 1 * e_star, e_buid)
-                elif e_cid == 110:
-                    _emit_add_attr(e, 1 * e_star, 1 * e_star, e_buid)
-                elif e_cid == 210 and p_fighters:
-                    _emit_damage(p_fighters[0], 3, e_buid)
-                elif e_cid == 309:
-                    s_f = _spawn_summon(3091, 1, star=e_star, source_buff_uid=e_buid)
-                    e_fighters.insert(0, s_f)
-
-                for ally in e_fighters:
-                    if ally is not e and ally["chess_id"] == 410:
-                        a_buid = _buid(ally)
-                        _emit_add_attr(ally, 2 * ally["star"], 2 * ally["star"], a_buid)
-
-            # 7. 阵亡结算 (DEAD)
-            p_dead = (p["curr_hp"] <= 0)
-            e_dead = (e["curr_hp"] <= 0)
-            dead_uids = []
-            dead_p_fighter = None
-            dead_e_fighter = None
-
-            if p_dead:
-                dead_uids.append(p["unique_id"])
-                dead_p_fighter = p_fighters.pop(0)
-                p_dead_count += 1
-            if e_dead:
-                dead_uids.append(e["unique_id"])
-                dead_e_fighter = e_fighters.pop(0)
-                e_dead_count += 1
-
-            if dead_uids:
-                action_id += 1
-                action_list.append({
-                    "action_id": action_id,
-                    "action_type": AutoChessConst.ACTION_TYPE_DEAD,
-                    "action_dead_info": {"uid_list": dead_uids}
-                })
-
-            # 8. 击杀触发 (ON_KILL)
-            if e_dead and not p_dead and p["curr_hp"] > 0:
-                p_cid = p["chess_id"]
-                p_star = p["star"]
-                p_buid = _buid(p)
-                if p_cid == 114:  # 觅影·国常立: 其他己方棋子+1*star/+1*star
-                    for ally in p_fighters:
-                        if ally is not p:
-                            _emit_add_attr(ally, 1 * p_star, 1 * p_star, p_buid)
-                elif p_cid == 215:  # 青君·孟章: 自身+2*star/+2*star
-                    _emit_add_attr(p, 2 * p_star, 2 * p_star, p_buid)
-                elif p_cid == 415:  # 巡天·英招: 获得护盾
-                    _emit_shield(p, p_buid)
-
-            if p_dead and not e_dead and e["curr_hp"] > 0:
-                e_cid = e["chess_id"]
-                e_star = e["star"]
-                e_buid = _buid(e)
-                if e_cid == 114:
-                    for ally in e_fighters:
-                        if ally is not e:
-                            _emit_add_attr(ally, 1 * e_star, 1 * e_star, e_buid)
-                elif e_cid == 215:
-                    _emit_add_attr(e, 2 * e_star, 2 * e_star, e_buid)
-                elif e_cid == 415:
-                    _emit_shield(e, e_buid)
-
-            # 9. 队友阵亡触发 (ON_FRIEND_DEAD)
-            if p_dead:
-                for ally in p_fighters:
-                    a_cid = ally["chess_id"]
-                    a_star = ally["star"]
-                    a_buid = _buid(ally)
-                    if a_cid == 313 and e_fighters:  # 天诫·白泽: 对敌方首位打3伤害
-                        _emit_damage(e_fighters[0], 3, a_buid)
-                    elif a_cid == 402:  # 潮音·波塞冬: 己方全员+1*star/+1*star
-                        for f in p_fighters:
-                            _emit_add_attr(f, 1 * a_star, 1 * a_star, a_buid)
-
-            if e_dead:
-                for ally in e_fighters:
-                    a_cid = ally["chess_id"]
-                    a_star = ally["star"]
-                    a_buid = _buid(ally)
-                    if a_cid == 313 and p_fighters:
-                        _emit_damage(p_fighters[0], 3, a_buid)
-                    elif a_cid == 402:
-                        for f in e_fighters:
-                            _emit_add_attr(f, 1 * a_star, 1 * a_star, a_buid)
-
-            # 10. 离场亡语 (DEATHRATTLE)
-            p_summons = []
-            e_summons = []
-
-            for dead_f in [dead_p_fighter, dead_e_fighter]:
-                if not dead_f:
-                    continue
-                side = dead_f["side"]
-                spawned_summons = p_summons if side == 0 else e_summons
-                dead_count = p_dead_count if side == 0 else e_dead_count
-
-                for dr in dead_f.get("deathrattles", []):
-                    act_type = dr.get("action_type", 0)
-                    param = dr.get("param", [])
-                    desc = dr.get("desc", "")
-
-                    if act_type in (3, 23) or "召唤" in desc:
-                        summon_cids = []
-                        bonus_atk = 0
-                        bonus_hp = 0
-
-                        if act_type == 23 and isinstance(param, list) and len(param) >= 3:
-                            c_cand = param[0]
-                            c_cfg = self.get_chess_cfg(c_cand)
-                            if c_cfg and c_cfg.get("type") == 2:
-                                summon_cids.append(c_cand)
-                                if isinstance(param[2], list) and len(param[2]) >= 2:
-                                    bonus_atk = dead_count * param[2][0]
-                                    bonus_hp = dead_count * param[2][1]
-                        elif isinstance(param, list):
-                            for item in param:
-                                if isinstance(item, list):
-                                    for sub in item:
-                                        c = self.get_chess_cfg(sub)
-                                        if c and c.get("type") == 2:
-                                            summon_cids.append(sub)
-                                else:
-                                    c = self.get_chess_cfg(item)
-                                    if c and c.get("type") == 2:
-                                        summon_cids.append(item)
-
-                        if not summon_cids:
-                            dead_cid = dead_f["chess_id"]
-                            if dead_cid == 105:
-                                summon_cids = [1051 if dead_f["star"] == 1 else (1052 if dead_f["star"] == 2 else 1053)]
-                            elif dead_cid == 405:
-                                summon_cids = [4051 if dead_f["star"] == 1 else (4052 if dead_f["star"] == 2 else 4054)]
-
-                        for s_cid in summon_cids:
-                            s_f = _spawn_summon(s_cid, side, star=dead_f["star"], bonus_atk=bonus_atk, bonus_hp=bonus_hp, source_buff_uid=dr.get("buff_unique_id") or dr.get("id", 0))
-                            spawned_summons.append(s_f)
-
-                    elif act_type == 4 or "护盾" in desc:
-                        side_team = p_fighters if side == 0 else e_fighters
-                        if side_team:
-                            _emit_shield(side_team[0], dr.get("buff_unique_id") or dr.get("id", 0))
-
-                    elif act_type in (1, 2) or "造成" in desc:
-                        opp_team = e_fighters if side == 0 else p_fighters
-                        if opp_team:
-                            _emit_damage(opp_team[0], 3, dr.get("buff_unique_id") or dr.get("id", 0))
-
-            if p_summons:
-                p_fighters = p_summons + p_fighters
-            if e_summons:
-                e_fighters = e_summons + e_fighters
-
-            # 11. 补位位移 (MOVE)
-            p_summon_uids = {s["unique_id"] for s in p_summons}
-            e_summon_uids = {s["unique_id"] for s in e_summons}
-            move_records = []
-
-            if p_dead and p_fighters:
-                for new_idx, fighter in enumerate(p_fighters, start=1):
-                    if fighter.get("unique_id") not in p_summon_uids:
-                        if fighter.get("index") != new_idx:
-                            move_records.append({"key": fighter["unique_id"], "value": new_idx})
-                    fighter["index"] = new_idx
-
-            if e_dead and e_fighters:
-                for new_idx, fighter in enumerate(e_fighters, start=1):
-                    if fighter.get("unique_id") not in e_summon_uids:
-                        if fighter.get("index") != new_idx:
-                            move_records.append({"key": fighter["unique_id"], "value": new_idx})
-                    fighter["index"] = new_idx
-
-            if move_records:
-                action_id += 1
-                action_list.append({
-                    "action_id": action_id,
-                    "action_type": AutoChessConst.ACTION_TYPE_MOVE,
-                    "action_move_info": {
-                        "action_list": move_records
-                    }
-                })
-
-        if not e_fighters and p_fighters:
-            battle_result = 1  # WIN
-        elif not p_fighters and e_fighters:
-            battle_result = 2  # LOSE
-        elif not p_fighters and not e_fighters:
-            battle_result = 1 if len(player_board) >= len(enemy_board) else 3
-        else:
-            battle_result = 1
-
-        return battle_result, action_list
+    def _simulate_round_battle(self, player_board, enemy_board, session=None):
+        from autochess_combat import simulate
+        return simulate(self, player_board, enemy_board, session)
 
     def launch_round_battle(self, ctx, uid: int, game_type: int) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
         """启动回合对战：cs_89108 -> sc_89109 + sc_89125 + sc_89113 (推演双方交锋动画与真实胜负)"""
         session = self._require_session_state(uid, game_type, {AutoChessConst.STATE_PREPARE_END})
+        self._validate_board(session, battle=True)
         stage_id = session.get("stage_id", 101)
         round_num = session.get("round", 1)
         stage_cfg = self.get_stage_cfg(stage_id) or {}
@@ -1633,22 +1115,9 @@ class AutoChessService:
         player_board_records = []
         for p in session.get("board_chess", []):
             cid = p.get("chess_id") or p.get("id", 101)
-            star = p.get("star", 1)
+            star = self._piece_level(p)
             c_cfg = self.get_chess_cfg(cid) or {}
-            level_buffs = c_cfg.get("level_buffs", [])
-            star_buff_records = []
-            if len(level_buffs) >= star:
-                raw_b = level_buffs[star - 1]
-                bids = raw_b if isinstance(raw_b, list) else ([raw_b] if raw_b else [])
-                for b_idx, bid in enumerate(bids, 1):
-                    star_buff_records.append({
-                        "unique_id": p["unique_id"] * 100 + b_idx,
-                        "buff_id": bid,
-                        "owner_type": 0,
-                        "source_type": 1,
-                        "source_uid": p["unique_id"],
-                        "source_cfg_id": cid,
-                    })
+            star_buff_records = self._piece_buffs(p)
 
             p_atk = p.get("atk")
             p_hp = p.get("hp")
@@ -1667,6 +1136,9 @@ class AutoChessService:
                 if p_hp is None:
                     p_hp = (body[1] if len(body) > 1 else 3) * star
 
+            team_bonus = session.get('prop_effects',{}).get('team_bonus',[0,0])
+            p_atk += int(team_bonus[0]); p_hp += int(team_bonus[1])
+
             player_board_records.append({
                 "unique_id": p["unique_id"],
                 "chess_id": cid,
@@ -1682,52 +1154,8 @@ class AutoChessService:
                 "buff_list": star_buff_records
             })
 
-        # 敌人棋盘预设构建 (装配星级技能与真实属性)
-        enemy_team_ids = self.get_enemy_teams_for_stage(stage_id)
-        enemy_team_id = enemy_team_ids[round_num - 1] if round_num <= len(enemy_team_ids) else (enemy_team_ids[-1] if enemy_team_ids else 110101)
-        enemy_team_cfg = self.get_enemy_team_cfg(enemy_team_id) or {}
-
-        enemy_board_records = []
-        raw_team_info = enemy_team_cfg.get("team_info", [])
-        for idx, entry in enumerate(raw_team_info, 1):
-            # entry: [chess_id, star, hp_num, pos, buff_list]
-            cid = entry[0] if len(entry) > 0 else 101
-            star = entry[1] if len(entry) > 1 else 1
-            pos = entry[3] if len(entry) > 3 and entry[3] > 0 else idx
-            c_cfg = self.get_chess_cfg(cid) or {}
-            c_body = c_cfg.get("body", [2, 3])
-            c_atk = (c_body[0] if len(c_body) > 0 else 2) * star
-            c_hp = (c_body[1] if len(c_body) > 1 else 3) * star
-
-            level_buffs = c_cfg.get("level_buffs", [])
-            star_buff_records = []
-            if len(level_buffs) >= star:
-                raw_b = level_buffs[star - 1]
-                bids = raw_b if isinstance(raw_b, list) else ([raw_b] if raw_b else [])
-                for b_idx, bid in enumerate(bids, 1):
-                    star_buff_records.append({
-                        "unique_id": (200000 + idx) * 100 + b_idx,
-                        "buff_id": bid,
-                        "owner_type": 1,
-                        "source_type": 1,
-                        "source_uid": 200000 + idx,
-                        "source_cfg_id": cid,
-                    })
-
-            enemy_board_records.append({
-                "unique_id": 200000 + idx,
-                "chess_id": cid,
-                "index": pos,
-                "star": star,
-                "atk": c_atk,
-                "hp": c_hp,
-                "chess_attr_list": [
-                    {"key": AutoChessConst.CHESS_ATTR_ATK, "value": c_atk},
-                    {"key": AutoChessConst.CHESS_ATTR_HP, "value": c_hp},
-                    {"key": AutoChessConst.CHESS_ATTR_EXP, "value": star}
-                ],
-                "buff_list": star_buff_records
-            })
+        enemy_team_id = self._enemy_team_id(session)
+        enemy_board_records = self._enemy_records(enemy_team_id)
 
         # 确保玩家与敌人棋盘记录严格按 index (1~5) 升序排列
         player_board_records.sort(key=lambda x: x["index"])
@@ -1780,12 +1208,23 @@ class AutoChessService:
                 session["state"] = AutoChessConst.STATE_TOTAL_SETTLE_WIN
             else:
                 session["state"] = AutoChessConst.STATE_ROUND_SETTLE
-        else:
+        elif battle_result == 2:
             if session.get("hp", defeat_num) - 1 <= 0:
                 session["state"] = AutoChessConst.STATE_TOTAL_SETTLE_LOSE
             else:
                 session["state"] = AutoChessConst.STATE_ROUND_SETTLE
 
+        else:
+            session['state'] = AutoChessConst.STATE_ROUND_SETTLE
+
+        session['pending_round'] = dict(stage_id=stage_id, round=round_num,
+                                        battle_uid=battle_uid, result=battle_result,
+                                        state=session['state'], consumed=False, enemy_team_id=enemy_team_id)
+        for side in ('auto_chessboard_info1', 'auto_chessboard_info2'):
+            for piece in replay_info[side]['chess_list']:
+                for key in ('star','atk','hp'):
+                    piece.pop(key, None)
+        session['last_replay'] = dict(info=deepcopy(replay_info), actions=deepcopy(action_list))
         self.save_session(uid)
         ctx.log(f"AutoChess: LaunchRoundBattle uid={uid} round={round_num} result={battle_result} actions={len(action_list)}")
         return replay_info, action_list
@@ -1804,7 +1243,11 @@ class AutoChessService:
         stage_id = session.get("stage_id", 101)
         stage_cfg = self.get_stage_cfg(stage_id) or {}
         battle_state = session["state"]
-        last_result = session.get("last_battle_result", 1)
+        pending = self.pending_round(session)
+        last_result = pending['result']
+        if last_result in (0,3):
+            battle_state = AutoChessConst.STATE_ROUND_SETTLE
+        pending['consumed'] = True
         is_stage_cleared = battle_state == AutoChessConst.STATE_TOTAL_SETTLE_WIN
         is_stage_lost = battle_state == AutoChessConst.STATE_TOTAL_SETTLE_LOSE
 
@@ -1817,32 +1260,8 @@ class AutoChessService:
         if is_stage_cleared:
             # 标记通关并入库，会话恢复闲置
             session["state"] = AutoChessConst.STATE_NONE
-            if self.db is not None:
-                try:
-                    self.db.execute(
-                        "INSERT OR REPLACE INTO autochess_stage (uid, stage_id, clear_time) VALUES (?, ?, ?)",
-                        (uid, stage_id, int(time.time()))
-                    )
-                    ctx.log(f"AutoChess: Stage {stage_id} CLEARED! Saved to autochess_stage.")
-                except Exception as e:
-                    logger.error(f"Save autochess_stage failed: {e}")
-
-                # 检查道馆徽章解锁 (103->1001, 203->1002, 303->1003, 401->1004)
-                medal_map = {103: 1001, 203: 1002, 303: 1003, 401: 1004}
-                if stage_id in medal_map:
-                    mid = medal_map[stage_id]
-                    try:
-                        self.db.execute(
-                            "INSERT OR REPLACE INTO autochess_medal (uid, medal_id, level, unlock_time, upgrade_time) VALUES (?, ?, 1, ?, 0)",
-                            (uid, mid, int(time.time()))
-                        )
-                        ctx.log(f"AutoChess: Medal {mid} UNLOCKED! Saved to autochess_medal.")
-                    except Exception as e:
-                        logger.error(f"Save autochess_medal failed: {e}")
-
-            # 广播任务事件
-            bus.emit(Events.STAGE_PASS, ctx, uid, stage_id=stage_id)
-            bus.emit(Events.STAGE_FIRST_CLEAR, ctx, uid, stage_id=stage_id)
+            from autochess_progress import settle_completed
+            settle_completed(ctx, uid, stage_id)
         elif is_stage_lost:
             session["state"] = AutoChessConst.STATE_NONE
         else:
@@ -1851,32 +1270,25 @@ class AutoChessService:
             session["state"] = AutoChessConst.STATE_PREPARE
             session["shop_level"] = min(4, session["round"])
             # 每一轮战斗结束后，商店费用恢复到上限 10 点 (对齐 KEY_RESTART_MONEY = 10)
-            session["gold"] = max(10, session.get("gold", 0))
+            effects = session.setdefault('prop_effects', {})
+            session['gold'] = 10 + int(effects.get('restart_money_bonus',0)) + int(effects.pop('next_round_gold',0))
+            session["free_refresh"] = 0
 
-            # 触发 ON_ROUND_START 钩子 (101 大国主额外金币, 202 前鬼免费刷新)
-            for p in session.get("board_chess", []):
-                p_cid = p.get("chess_id")
-                p_star = p.get("star", 1)
-                if p_cid == 101:
-                    session["gold"] = session.get("gold", 0) + p_star
-                    ctx.log(f"AutoChess: Hook ON_ROUND_START [101 大国主] added gold+{p_star}, now={session['gold']}")
-                elif p_cid == 202:
-                    free_refresh = 2 * p_star
-                    session["free_refresh"] = session.get("free_refresh", 0) + free_refresh
-                    ctx.log(f"AutoChess: Hook ON_ROUND_START [202 前鬼] added free_refresh+{free_refresh}")
+            from autochess_preparation import round_start
+            round_start(self, session)
 
             # 自动刷新一轮商店，并保留已锁定的商品
             current_shop = session.get("shop_items", [])
-            locked_indices = {s["index"]: s for s in current_shop if s.get("is_lock") == 1}
-            new_shop = self.generate_shop_items(session.get("shop_level", 1))
+            locked_indices = {(s.get("shop_type",0),s["index"]): s for s in current_shop if s.get("is_lock") == 1}
+            new_shop = self._generate_session_shop(session)
             final_shop = []
             for item in new_shop:
-                idx = item["index"]
+                idx = (item.get("shop_type",0),item["index"])
                 if idx in locked_indices:
                     final_shop.append(locked_indices[idx])
                 else:
                     final_shop.append(item)
-            session["shop_items"] = final_shop
+            session["shop_items"] = final_shop + [i for i in current_shop if i.get("shop_type")==2]
 
         self.save_session(uid)
         return is_stage_cleared, session
@@ -1894,6 +1306,8 @@ class AutoChessService:
                 AutoChessConst.STATE_TOTAL_SETTLE_LOSE,
             },
         )
+        for key in self.EXTRA_FIELDS:
+            session.pop(key, None)
         session["state"] = AutoChessConst.STATE_NONE
         session["stage_id"] = 0
         session["board_chess"] = []
@@ -1912,6 +1326,7 @@ class AutoChessService:
 # 1. 开启新对局
 @operation
 class AutoChessStartNewGameOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89116
     sc = 89117
 
@@ -1932,16 +1347,20 @@ class AutoChessStartNewGameOp(Operation):
         p89117 = encode("sc_89117", {"result": 0})
         p89101 = svc.build_89101_payload(ctx.db, self.uid)
         p89125 = svc.build_89125_payload(ctx.db, self.uid)
-        return [
+        frames = [
             DownFrame(89125, p89125),
             DownFrame(89101, p89101),
             DownFrame(89117, p89117)
         ]
+        from operations import _refresh_frames
+        frames.extend(_refresh_frames(ctx, self.uid, strict=True))
+        return frames
 
 
 # 2. 刷新商店
 @operation
 class AutoChessRefreshShopOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89118
     sc = 89119
 
@@ -1966,6 +1385,7 @@ class AutoChessRefreshShopOp(Operation):
 # 3. 购买棋子
 @operation
 class AutoChessBuyChessOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89102
     sc = 89103
 
@@ -2000,6 +1420,7 @@ class AutoChessBuyChessOp(Operation):
 # 4. 出售棋子
 @operation
 class AutoChessSellChessOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89122
     sc = 89123
 
@@ -2033,6 +1454,7 @@ class AutoChessSellChessOp(Operation):
 # 5. 调整阵容
 @operation
 class AutoChessChangeTeamOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89104
     sc = 89105
 
@@ -2051,6 +1473,7 @@ class AutoChessChangeTeamOp(Operation):
 # 6. 锁定商店
 @operation
 class AutoChessLockShopOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89120
     sc = 89121
 
@@ -2075,6 +1498,7 @@ class AutoChessLockShopOp(Operation):
 # 7. 启动回合对战
 @operation
 class AutoChessLaunchRoundBattleOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89108
     sc = 89109
 
@@ -2106,6 +1530,7 @@ class AutoChessLaunchRoundBattleOp(Operation):
 # 8. 结算对战
 @operation
 class AutoChessSettleBattleOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89126
     sc = 89127
 
@@ -2134,12 +1559,15 @@ class AutoChessSettleBattleOp(Operation):
             frames.append(DownFrame(89127, p89127))
             frames.append(DownFrame(89101, svc.build_89101_payload(ctx.db, self.uid)))
 
+        from operations import _refresh_frames
+        frames.extend(_refresh_frames(ctx, self.uid, strict=True))
         return frames
 
 
 # 9. 放弃对局
 @operation
 class AutoChessCancelGameOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89128
     sc = 89129
 
@@ -2178,32 +1606,12 @@ class AutoChessLookEnemyInfoOp(Operation):
         stage_cfg = svc.get_stage_cfg(stage_id) or {}
         defeat_num = int(stage_cfg.get("defeat_num", 3))
 
-        tids = svc.cfg.get("stage_group_map", {}).get(str(gid), [])
-        if not tids and str(stage_id) in svc.cfg.get("stage_group_map", {}):
-            tids = svc.cfg.get("stage_group_map", {}).get(str(stage_id), [])
-        tid = tids[rnd - 1] if rnd <= len(tids) else (tids[-1] if tids else 110101)
-        t_cfg = svc.get_enemy_team_cfg(tid) or {}
-
-        records = []
-        for idx, entry in enumerate(t_cfg.get("team_info", []), 1):
-            cid = entry[0] if len(entry) > 0 else 101
-            star = entry[1] if len(entry) > 1 else 1
-            pos = entry[3] if len(entry) > 3 and entry[3] > 0 else idx
-            c_cfg = svc.get_chess_cfg(cid) or {}
-            c_body = c_cfg.get("body", [2, 3])
-            c_atk = (c_body[0] if len(c_body) > 0 else 2) * star
-            c_hp = (c_body[1] if len(c_body) > 1 else 3) * star
-            records.append({
-                "unique_id": 300000 + idx,
-                "chess_id": cid,
-                "index": pos,
-                "chess_attr_list": [
-                    {"key": AutoChessConst.CHESS_ATTR_ATK, "value": c_atk},
-                    {"key": AutoChessConst.CHESS_ATTR_HP, "value": c_hp},
-                    {"key": AutoChessConst.CHESS_ATTR_EXP, "value": star}
-                ],
-                "buff_list": []
-            })
+        if not session or session.get('state') == AutoChessConst.STATE_NONE:
+            svc._require_phase1_stage(int(gid))
+            session = dict(stage_id=int(gid), round=int(rnd), win_count=0)
+            stage_id = int(gid)
+        tid = svc._enemy_team_id(session, int(rnd))
+        records = svc._enemy_records(tid)
 
         board = {
             "base_info_list": [
@@ -2223,6 +1631,7 @@ class AutoChessLookEnemyInfoOp(Operation):
 # 11. 手动合成棋子
 @operation
 class AutoChessMergeChessOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89130
     sc = 89131
 
@@ -2254,33 +1663,15 @@ class AutoChessMergeChessOp(Operation):
 # 12. 快速跳过关卡
 @operation
 class AutoChessSkipStageOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89212
     sc = 89213
 
-    def validate(self, data, ctx):
-        return data or {}
-
     def apply(self, data, ctx):
-        sid = data.get("stage_id", 101)
-        AutoChessService.get_instance(ctx.db)._require_phase1_stage(sid)
-        if ctx.db is not None:
-            try:
-                ctx.db.execute(
-                    "INSERT OR REPLACE INTO autochess_stage (uid, stage_id, clear_time) VALUES (?, ?, ?)",
-                    (self.uid, sid, int(time.time()))
-                )
-            except Exception as e:
-                logger.warning(f"SkipStage insert failed: {e}")
-        return data
-
-    def respond(self, result, data, ctx):
-        svc = AutoChessService.get_instance(ctx.db)
-        p89213 = encode("sc_89213", {"result": 0})
-        frames = [
-            DownFrame(89201, svc.build_89201_payload(ctx.db, self.uid)),
-            DownFrame(89213, p89213)
-        ]
-        return frames
+        # The only native call is RemakeMainView.ShowTeachStage, for
+        # GameSetting.auto_chess_2_tutorial_stage_id=401 (area 4, ONLINE).
+        # Phase-1 PVE has no skip action; it must complete normal settlement.
+        raise OperationError(17, '当前人机道馆不支持跳过关卡')
 
 
 # 13. 轻量应答族 (升级/一键购买/回放/整备结束/导出/暂停/战绩/榜单)
@@ -2288,25 +1679,41 @@ class AutoChessSkipStageOp(Operation):
 class AutoChessPlayerUpgradeOp(Operation):
     cmd = 89134
     sc = 89135
-    def apply(self, data, ctx): return data
+    def apply(self, data, ctx):
+        raise OperationError(2, '当前没有可执行的管理员升级机会')
     def respond(self, result, data, ctx): return [DownFrame(89135, encode("sc_89135", {"result": 0}))]
 
 @operation
 class AutoChessBuyChessOneKeyOp(Operation):
     cmd = 89140
     sc = 89141
-    def apply(self, data, ctx): return data
+    def apply(self, data, ctx):
+        raise OperationError(2, '当前没有可执行的一键购买机会')
     def respond(self, result, data, ctx): return [DownFrame(89141, encode("sc_89141", {"result": 0}))]
 
 @operation
 class AutoChessLookReplayOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89142
     sc = 89143
-    def apply(self, data, ctx): return data
-    def respond(self, result, data, ctx): return [DownFrame(89143, encode("sc_89143", {"result": 0}))]
+    def apply(self, data, ctx):
+        svc = AutoChessService.get_instance(ctx.db)
+        svc._require_phase1_game_type(data.get('game_type', 0))
+        session = svc.get_session(self.uid)
+        replay = session.get('last_replay')
+        if not isinstance(replay, dict) or not replay.get('info') or not isinstance(replay.get('actions'), list):
+            raise OperationError(2, '当前没有保存的战斗回放')
+        return deepcopy(replay)
+    def respond(self, result, data, ctx):
+        info = result['info']
+        return [DownFrame(89143, encode('sc_89143', dict(result=0,replay_info=info))),
+                DownFrame(89113, encode('sc_89113', dict(game_type=info['game_type'],battle_uid=info['battle_uid'],
+                          battle_info=dict(group_id=1,action_list=result['actions']))))]
+
 
 @operation
 class AutoChessPrepareEndOp(Operation):
+    prepare_response_in_transaction = True
     cmd = 89144
     sc = 89145
     def apply(self, data, ctx):

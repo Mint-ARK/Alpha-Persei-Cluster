@@ -1,0 +1,35 @@
+{
+  "records": {
+    "80": {
+      "id": 80,
+      "type_id": 80,
+      "name": "新多维大招充能继承用"
+    },
+    "88": {
+      "id": 88,
+      "type_id": 88,
+      "name": "1次流派大招击杀数"
+    }
+  },
+  "wire": {
+    "record_ids": 14,
+    "record_numbers": 15
+  },
+  "achievement": {
+    "id": 63016,
+    "condition": 300012,
+    "need": 1,
+    "parameter": [
+      0,
+      0,
+      5
+    ]
+  },
+  "source": {
+    "archive/enemy_illustration_20261023/native_config.bytes": "7fc168ed5ba4e9035dab91bcad2a8d9f0b3614c1d4bdbf806ddab645be8c3fc3",
+    "dump.cs": "9ce9986d35f09776eea66037d6dac2fe1fc9d8be97ebb08e2ef38cff27732449",
+    "decompiled_v2/x64/game/config/achievementcfg.lua": "6b42861847e1eb2aeccfe405f26032e20c3974034144e90b3e9dabf4e1eeef3e",
+    "decompiled_v2/x64/game/battle/template/battlechallengerogueteamtemplate.lua": "0fb45457e8a6068da88cab1ecbf6b9a6a83d3ecaa4414a7bfef78e7c57c59e9b",
+    "decompiled_v2/x64/game/action/challengerogueteamaction.lua": "afd939b1b96c6b1248feb5ff2d609f063e1bbd105a0aa090d9154d9705aff3d7"
+  }
+}

@@ -946,6 +946,16 @@ CREATE TABLE IF NOT EXISTS rogueteam_session (        -- sc_88001 / 88xxx 局内
     score_rate INTEGER DEFAULT 100,
     in_game INTEGER DEFAULT 0,
     update_ts INTEGER DEFAULT 0,
+    mech_pop_pending INTEGER DEFAULT 0,
+    pending_ending INTEGER DEFAULT 0,
+    mech_total INTEGER DEFAULT 0,
+    run_start_ts INTEGER DEFAULT 0,
+    used_events_json TEXT DEFAULT '[]',
+    shop_offered_json TEXT DEFAULT '[]',
+    ending_won INTEGER DEFAULT 0,
+    silence_cnt INTEGER DEFAULT 0,
+    expired_items_json TEXT DEFAULT '[]',
+    flow_json TEXT DEFAULT '{}',
     PRIMARY KEY (uid, template_id)
 );
 CREATE TABLE IF NOT EXISTS sp_hero_boss_progress (   -- sc_17484 SP 英雄挑战·挑战关卡(Boss战, 242851)
@@ -1620,6 +1630,7 @@ CREATE TABLE IF NOT EXISTS polyhedron_meta (         -- sc_18001 多面体/矩�
     reset_times INTEGER DEFAULT 0,
     already_challenge_times INTEGER DEFAULT 0,
     is_new INTEGER DEFAULT 0,
+    policy_cycle_start INTEGER DEFAULT 0,
     update_ts INTEGER DEFAULT 0,
     PRIMARY KEY (uid, activity_id)
 );
@@ -2390,6 +2401,7 @@ _COLUMN_MIGRATIONS = [
     ("hero", "relation_net", "TEXT DEFAULT '[]'"),
     # 2026-08-26 梦境再构（Boss Challenge）周常与日常惰性刷新列
     ("boss_challenge_progress", "cycle_id", "INTEGER DEFAULT 0"),
+    ("polyhedron_meta", "policy_cycle_start", "INTEGER DEFAULT 0"),
     ("boss_challenge_progress", "area_id", "INTEGER DEFAULT 4"),
     ("boss_challenge_progress", "advance_id", "INTEGER DEFAULT 101"),
     ("boss_challenge_progress", "use_times", "INTEGER DEFAULT 0"),
@@ -2402,6 +2414,17 @@ _COLUMN_MIGRATIONS = [
     ("rogueteam_session", "room_passed_count", "INTEGER DEFAULT 0"),
     ("rogueteam_session", "battle_passed_count", "INTEGER DEFAULT 0"),
     ("rogueteam_session", "score_rate", "INTEGER DEFAULT 100"),
+    ('rogueteam_session', 'mech_pop_pending', 'INTEGER DEFAULT 0'),
+    ('rogueteam_session', 'pending_ending', 'INTEGER DEFAULT 0'),
+    ('rogueteam_session', 'mech_total', 'INTEGER DEFAULT 0'),
+    ('rogueteam_session', 'run_start_ts', 'INTEGER DEFAULT 0'),
+    ('rogueteam_session', 'used_events_json', "TEXT DEFAULT '[]'"),
+    ('rogueteam_session', 'shop_offered_json', "TEXT DEFAULT '[]'"),
+    ('rogueteam_session', 'ending_won', 'INTEGER DEFAULT 0'),
+    ('rogueteam_session', 'silence_cnt', 'INTEGER DEFAULT 0'),
+    ('rogueteam_session', 'expired_items_json', "TEXT DEFAULT '[]'"),
+    ('rogueteam_session', 'flow_json', "TEXT DEFAULT '{}'"),
+
     ("game_user", "last_daily_task_refresh_ts", "INTEGER DEFAULT 0"),
     ("game_user", "last_weekly_task_refresh_ts", "INTEGER DEFAULT 0"),
     ("game_user", "last_login_task_cycle_ts", "INTEGER DEFAULT 0"),
@@ -5823,60 +5846,50 @@ class AccountDB:
         )
 
     def check_and_lazy_refresh_boss_challenge(self, uid, now_ts=None):
-        """
-        梦境再构惰性刷新机制：
-        1. 周四 05:00 周期轮换：重置得分、重置通关进度、重置已领奖励、释放锁定角色、重置挑战次数。
-        2. 每日 05:00 日常刷新：重置每日已用挑战次数 (use_times = 0)。
-        """
-        if now_ts is None:
-            now_ts = int(time.time())
-        import datetime
-        dt = datetime.datetime.fromtimestamp(now_ts)
-        
-        # 计算当前周期的周四 05:00 起点
-        target_weekday = 3 # Thursday
-        days_ahead = target_weekday - dt.weekday()
-        next_thu_dt = dt.replace(hour=5, minute=0, second=0, microsecond=0) + datetime.timedelta(days=days_ahead)
-        if next_thu_dt.timestamp() <= now_ts:
-            next_thu_dt += datetime.timedelta(days=7)
-        cur_thu_5am = int((next_thu_dt - datetime.timedelta(days=7)).timestamp())
-        
-        # 计算今天的 05:00 起点
-        today_5am_dt = dt.replace(hour=5, minute=0, second=0, microsecond=0)
-        if today_5am_dt.timestamp() > now_ts:
-            today_5am_dt -= datetime.timedelta(days=1)
-        cur_today_5am = int(today_5am_dt.timestamp())
-        
-        cycle_id = int((now_ts - 1700000000) // 604800)
-
-        prog = self.get_boss_challenge_progress(uid)
-        if not prog:
-            self.execute(
-                "INSERT OR REPLACE INTO boss_challenge_progress (uid, mode, cycle_id, area_id, use_times, last_daily_ts, last_weekly_ts, update_ts) "
-                "VALUES (?, 0, ?, 4, 0, ?, ?, ?)",
-                (int(uid), cycle_id, cur_today_5am, cur_thu_5am, now_ts)
-            )
-            return
-
-        last_weekly = int(prog.get("last_weekly_ts") or 0)
-        last_daily = int(prog.get("last_daily_ts") or 0)
-
-        if last_weekly < cur_thu_5am:
-            # 触发周常周期重置
-            self.execute("DELETE FROM boss_challenge_normal WHERE uid=?", (int(uid),))
-            self.execute("DELETE FROM boss_challenge_advance WHERE uid=?", (int(uid),))
-            self.execute("DELETE FROM boss_challenge_scores WHERE uid=?", (int(uid),))
-            self.execute("DELETE FROM boss_challenge_claimed_rewards WHERE uid=?", (int(uid),))
-            self.execute(
-                "UPDATE boss_challenge_progress SET cycle_id=?, use_times=0, last_daily_ts=?, last_weekly_ts=?, update_ts=? WHERE uid=?",
-                (cycle_id, cur_today_5am, cur_thu_5am, now_ts, int(uid))
-            )
-        elif last_daily < cur_today_5am:
-            # 仅触发每日挑战次数重置
-            self.execute(
-                "UPDATE boss_challenge_progress SET use_times=0, last_daily_ts=?, update_ts=? WHERE uid=?",
-                (cur_today_5am, now_ts, int(uid))
-            )
+        """梦境独立原子刷新；BUS与惰性读取共用完成水位和本期种子。"""
+        from boss_challenge_cycle import bounds, seed_at
+        now_ts = int(time.time() if now_ts is None else now_ts)
+        uid = int(uid)
+        start, _, daily = bounds(now_ts)
+        key = f'boss_challenge.cycle_clock_v1.{uid}'
+        with savepoint_transaction(self):
+            prog = self.get_boss_challenge_progress(uid)
+            # 此处不能调用吞查询错误的get_system_config，失败不等同首次迁移。
+            adopted = self.query('SELECT value FROM server_global_config WHERE key=?', (key,))
+            if not prog:
+                self.execute(
+                    'INSERT INTO boss_challenge_progress '
+                    '(uid,mode,cycle_id,area_id,use_times,last_daily_ts,last_weekly_ts,update_ts) '
+                    'VALUES (?,0,?,4,0,?,?,?)', (uid, seed_at(start), daily, start, now_ts))
+                self.set_system_config(key, '1')
+                return True
+            last_weekly = int(prog.get('last_weekly_ts') or 0)
+            last_daily = int(prog.get('last_daily_ts') or 0)
+            changed = False
+            if last_weekly < start:
+                for table in ('boss_challenge_normal', 'boss_challenge_advance',
+                              'boss_challenge_scores', 'boss_challenge_claimed_rewards'):
+                    self.execute(f'DELETE FROM {table} WHERE uid=?', (uid,))
+                # 当前标准库已有兑换表；兼容不含该表的历史结构，仅此表可选。
+                if self.query("SELECT 1 FROM sqlite_master WHERE type='table' AND name='boss_challenge_exchange'"):
+                    self.execute('DELETE FROM boss_challenge_exchange WHERE uid=?', (uid,))
+                self.execute(
+                    'UPDATE boss_challenge_progress SET cycle_id=?,use_times=0,'
+                    'last_daily_ts=?,last_weekly_ts=?,update_ts=? WHERE uid=?',
+                    (seed_at(start), daily, start, now_ts, uid))
+                changed = True
+            else:
+                if not adopted:
+                    # 首次采用保留旧算法在此刻展示的首领；不清成绩/领史。
+                    # 采用标记与种子同事务，从此只在下一次周四改变。
+                    self.execute('UPDATE boss_challenge_progress SET cycle_id=? WHERE uid=?',
+                                 (seed_at(now_ts), uid))
+                if last_daily < daily:
+                    self.execute('UPDATE boss_challenge_progress SET use_times=0,last_daily_ts=?,update_ts=? WHERE uid=?',
+                                 (daily, now_ts, uid))
+            if not adopted:
+                self.set_system_config(key, '1')
+            return changed
 
     def save_boss_challenge_affixes(self, uid, boss_id, affix_list, time_list, diff_idx):
         """保存梦境再构 Boss 自选词缀与难度。"""
@@ -5945,51 +5958,48 @@ class AccountDB:
 
     def reset_boss_challenge_normal_boss(self, uid, group_id):
         """重置普通梦境指定首领（清空通关进度与三星，释放锁定角色）。"""
-        now = int(time.time())
-        self.execute(
-            "UPDATE boss_challenge_normal SET finish_stage=0, used_heroes='[]', star_info='[]', update_ts=? WHERE uid=? AND group_id=?",
-            (now, int(uid), int(group_id))
-        )
+        from boss_challenge_reset import ensure_unclaimed
+        with savepoint_transaction(self):
+            ensure_unclaimed(self, uid, 1)
+            self.execute(
+                "UPDATE boss_challenge_normal SET finish_stage=0, used_heroes='[]', star_info='[]', update_ts=? WHERE uid=? AND group_id=?",
+                (int(time.time()), int(uid), int(group_id)))
 
     def reset_boss_challenge_advance_boss(self, uid, boss_id):
         """重置进阶梦境指定首领（清空该首领得分，释放锁定角色）。"""
-        now = int(time.time())
-        self.execute(
-            "UPDATE boss_challenge_advance SET score=0, used_heroes='[]', update_ts=? WHERE uid=? AND boss_id=?",
-            (now, int(uid), int(boss_id))
-        )
-        self.execute(
-            "UPDATE boss_challenge_scores SET score=0, update_ts=? WHERE uid=? AND boss_id=?",
-            (now, int(uid), int(boss_id))
-        )
+        from boss_challenge_reset import ensure_unclaimed
+        with savepoint_transaction(self):
+            ensure_unclaimed(self, uid, 2)
+            now = int(time.time())
+            self.execute(
+                "UPDATE boss_challenge_advance SET score=0, used_heroes='[]', update_ts=? WHERE uid=? AND boss_id=?",
+                (now, int(uid), int(boss_id)))
+            self.execute(
+                "UPDATE boss_challenge_scores SET score=0, update_ts=? WHERE uid=? AND boss_id=?",
+                (now, int(uid), int(boss_id)))
 
     def reset_boss_challenge_advance_all(self, uid):
         """重置整轮进阶梦境（清空全部首领得分，释放所有锁定角色，并将模式设为 0 待选）。"""
-        now = int(time.time())
-        self.execute(
-            "UPDATE boss_challenge_advance SET score=0, used_heroes='[]', update_ts=? WHERE uid=?",
-            (now, int(uid))
-        )
-        self.execute(
-            "UPDATE boss_challenge_scores SET score=0, update_ts=? WHERE uid=?",
-            (now, int(uid))
-        )
-        self.set_boss_challenge_mode(uid, 0)
+        from boss_challenge_reset import ensure_unclaimed
+        with savepoint_transaction(self):
+            # 此共享入口也由普通模式的“重选模式”按钮调用。
+            ensure_unclaimed(self, uid)
+            now = int(time.time())
+            self.execute("UPDATE boss_challenge_advance SET score=0, used_heroes='[]', update_ts=? WHERE uid=?", (now, int(uid)))
+            self.execute("UPDATE boss_challenge_scores SET score=0, update_ts=? WHERE uid=?", (now, int(uid)))
+            self.set_boss_challenge_mode(uid, 0)
 
     def save_boss_challenge_hero_team(self, uid, mode, boss_identifier, heroes_cfg):
         """保存首领预设出战阵容 (mode: 1=普通 group_id, 2=进阶 boss_id)。"""
-        now = int(time.time())
-        heroes_json = json.dumps(heroes_cfg or [])
-        if int(mode) == 1:
+        from boss_challenge_team import ensure_team
+        with savepoint_transaction(self):
+            ensure_team(self, uid, mode, boss_identifier, heroes_cfg)
+            now = int(time.time())
+            heroes_json = json.dumps(heroes_cfg)
+            table, key = ('boss_challenge_normal', 'group_id') if int(mode) == 1 else ('boss_challenge_advance', 'boss_id')
             self.execute(
-                "INSERT INTO boss_challenge_normal (uid, group_id, last_heroes_cfg, update_ts) VALUES (?, ?, ?, ?) "
-                "ON CONFLICT(uid, group_id) DO UPDATE SET last_heroes_cfg=excluded.last_heroes_cfg, update_ts=excluded.update_ts",
-                (int(uid), int(boss_identifier), heroes_json, now)
-            )
-        else:
-            self.execute(
-                "INSERT INTO boss_challenge_advance (uid, boss_id, last_heroes_cfg, update_ts) VALUES (?, ?, ?, ?) "
-                "ON CONFLICT(uid, boss_id) DO UPDATE SET last_heroes_cfg=excluded.last_heroes_cfg, update_ts=excluded.update_ts",
+                f"INSERT INTO {table} (uid, {key}, last_heroes_cfg, update_ts) VALUES (?, ?, ?, ?) "
+                f"ON CONFLICT(uid, {key}) DO UPDATE SET last_heroes_cfg=excluded.last_heroes_cfg, update_ts=excluded.update_ts",
                 (int(uid), int(boss_identifier), heroes_json, now)
             )
 
@@ -6042,42 +6052,25 @@ class AccountDB:
     def get_mythic_final_progress(self, uid):
         """获取失序深区（终焉难度）玩家进度，支持半周惰性周期重置。"""
         now = int(time.time())
-        try:
-            import weekly_challenge_service
-            cycle_start = weekly_challenge_service.get_next_semiweekly_5am(now) - 302400 # 3.5 days = 302400
-        except Exception:
-            cycle_start = now - 302400
-
-        rows = self.query("SELECT * FROM mythic_final_progress WHERE uid=?", (int(uid),))
+        from mythic_cycle import bounds
+        cycle_start = bounds(now)[0]
+        key = f'mythic.final_cycle_v1.{int(uid)}'
+        with savepoint_transaction(self):
+            rows = self.query("SELECT * FROM mythic_final_progress WHERE uid=?", (int(uid),))
+            # 独立完成水位不能被切档、通关或领奖的update_ts推进。
+            markers = self.query('SELECT value FROM server_global_config WHERE key=?', (key,))
+            last_cycle = int(markers[0]['value']) if markers else (
+                bounds(int(rows[0].get('update_ts') or 0))[0] if rows else cycle_start)
+            if rows and last_cycle < cycle_start:
+                self.execute(
+                    "UPDATE mythic_final_progress SET receive_reward_list='[]', clear_list='[]', "
+                    "challenge_info_json='[]', is_new_difficulty=0, update_ts=? WHERE uid=?", (now, int(uid)))
+                rows[0] = dict(rows[0], receive_reward_list='[]', clear_list='[]',
+                               challenge_info_json='[]', is_new_difficulty=0, update_ts=now)
+            if not markers or last_cycle < cycle_start:
+                self.set_system_config(key, str(max(last_cycle, cycle_start)))
         if rows:
             r = rows[0]
-            update_ts = r.get("update_ts") or 0
-            
-            # 若记录处于上一周期，惰性重置通关、领奖与战斗用时
-            if update_ts < cycle_start:
-                try:
-                    can_choose = json.loads(r.get("can_choose_list") or "[]")
-                except Exception:
-                    can_choose = list(range(1, 31))
-                if not can_choose:
-                    can_choose = list(range(1, 31))
-                now_diff = r.get("now_difficulty") or 30
-                if now_diff <= 0:
-                    now_diff = 30
-                # 写回重置
-                self.execute(
-                    "UPDATE mythic_final_progress SET receive_reward_list='[]', clear_list='[]', challenge_info_json='[]', update_ts=? WHERE uid=?",
-                    (now, int(uid))
-                )
-                return {
-                    "now_difficulty": now_diff,
-                    "can_choose_list": can_choose,
-                    "receive_reward": [],
-                    "clear_list": [],
-                    "challenge_info": [],
-                    "is_new_difficulty": False
-                }
-            
             try:
                 can_choose = json.loads(r.get("can_choose_list") or "[]")
             except Exception:
@@ -6099,6 +6092,8 @@ class AccountDB:
             now_diff = r.get("now_difficulty") or 30
             if now_diff <= 0:
                 now_diff = 30
+            from mythic_final_service import queue
+            challenge_info = queue(now_diff, challenge_info)
             return {
                 "now_difficulty": now_diff,
                 "can_choose_list": can_choose,
@@ -6117,23 +6112,34 @@ class AccountDB:
             "is_new_difficulty": False
         }
 
+    def _bump_mythic_final_attempt(self, uid):
+        from mythic_final_service import generation
+        value = generation(self, uid) + 1
+        self.set_system_config(f'mythic.final_attempt_v1.{int(uid)}', str(value))
+        return value
+
     def set_mythic_final_difficulty(self, uid, difficulty):
-        """切换失序深区当前热度档位。"""
-        now = int(time.time())
-        prog = self.get_mythic_final_progress(uid)
-        can_choose = prog["can_choose_list"]
-        from new_player_service import enabled
-        if enabled(self,uid) and int(difficulty) not in can_choose:
-            raise ValueError('失序深区档位尚未解锁')
-        if int(difficulty) not in can_choose:
-            can_choose.append(int(difficulty))
-            can_choose.sort()
-        self.execute(
-            "INSERT INTO mythic_final_progress (uid, now_difficulty, can_choose_list, receive_reward_list, clear_list, challenge_info_json, update_ts) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?) "
-            "ON CONFLICT(uid) DO UPDATE SET now_difficulty=excluded.now_difficulty, can_choose_list=excluded.can_choose_list, update_ts=excluded.update_ts",
-            (int(uid), int(difficulty), json.dumps(can_choose), json.dumps(prog["receive_reward"]), json.dumps(prog["clear_list"]), json.dumps(prog["challenge_info"]), now)
-        )
+        """显式切档开启新挑战；同档选择幂等，历史通关和领史保留。"""
+        from mythic_final_service import definition
+        difficulty = int(difficulty)
+        definition(difficulty)
+        with savepoint_transaction(self):
+            prog = self.get_mythic_final_progress(uid)
+            if difficulty == int(prog['now_difficulty']):
+                return False
+            can_choose = list(prog['can_choose_list'])
+            from new_player_service import enabled
+            if enabled(self, uid) and difficulty not in can_choose:
+                raise ValueError('失序深区档位尚未解锁')
+            if difficulty not in can_choose:
+                can_choose = sorted(can_choose + [difficulty])
+            self.execute(
+                "INSERT INTO mythic_final_progress (uid,now_difficulty,can_choose_list,receive_reward_list,clear_list,challenge_info_json,update_ts) "
+                "VALUES (?,?,?,?,?,'[]',?) ON CONFLICT(uid) DO UPDATE SET now_difficulty=excluded.now_difficulty,"
+                "can_choose_list=excluded.can_choose_list,challenge_info_json='[]',update_ts=excluded.update_ts",
+                (int(uid), difficulty, json.dumps(can_choose), json.dumps(prog['receive_reward']), json.dumps(prog['clear_list']), int(time.time())))
+            self._bump_mythic_final_attempt(uid)
+            return True
 
     def claim_mythic_final_reward(self, uid, difficulty_id):
         """领取失序深区单档奖励。"""
@@ -6178,100 +6184,76 @@ class AccountDB:
         return newly_claimed
 
     def reset_mythic_final_team(self, uid):
-        """重置失序深区队伍挑战状态与用时记录。"""
-        now = int(time.time())
-        prog = self.get_mythic_final_progress(uid)
-        self.execute(
-            "INSERT INTO mythic_final_progress (uid, now_difficulty, can_choose_list, receive_reward_list, clear_list, challenge_info_json, update_ts) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?) "
-            "ON CONFLICT(uid) DO UPDATE SET challenge_info_json='[]', update_ts=excluded.update_ts",
-            (int(uid), prog["now_difficulty"], json.dumps(prog["can_choose_list"]), json.dumps(prog["receive_reward"]), json.dumps(prog["clear_list"]), '[]', now)
-        )
+        """放弃本次接力并作废待结算战斗；保留历史通关和奖励。"""
+        with savepoint_transaction(self):
+            prog = self.get_mythic_final_progress(uid)
+            self.execute(
+                "INSERT INTO mythic_final_progress (uid,now_difficulty,can_choose_list,receive_reward_list,clear_list,challenge_info_json,update_ts) "
+                "VALUES (?,?,?,?,?,'[]',?) ON CONFLICT(uid) DO UPDATE SET challenge_info_json='[]',update_ts=excluded.update_ts",
+                (int(uid), prog['now_difficulty'], json.dumps(prog['can_choose_list']), json.dumps(prog['receive_reward']), json.dumps(prog['clear_list']), int(time.time())))
+            self._bump_mythic_final_attempt(uid)
+            return True
 
     def reset_mythic_by_beacon(self, uid):
-        """
-        使用黑区信标（41101）刷新黑区与失序深区挑战：
-        - 重置失序深区：通关记录 clear_list、领奖记录 receive_reward_list、出战用时 challenge_info_json 全部置空，必须重新挑战！
-        - 重置常规黑区：清空 mythic_progress_reward（已领星级奖励）、清空 mythic_progress_partition（通关分区）。
-        - 严格保留自然刷新周期（不影响时间戳刷新）。
-        """
-        now = int(time.time())
-        # 1. 重置失序深区：通关记录、领奖记录、队伍用时全部清空，保留可选档位
-        prog = self.get_mythic_final_progress(uid)
-        self.execute(
-            "INSERT INTO mythic_final_progress (uid, now_difficulty, can_choose_list, receive_reward_list, clear_list, challenge_info_json, update_ts) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?) "
-            "ON CONFLICT(uid) DO UPDATE SET receive_reward_list='[]', clear_list='[]', challenge_info_json='[]', update_ts=excluded.update_ts",
-            (int(uid), prog["now_difficulty"], json.dumps(prog["can_choose_list"]), "[]", "[]", "[]", now)
-        )
-        
-        # 3. 重置常规黑区
-        self.execute("DELETE FROM mythic_progress_reward WHERE uid=?", (int(uid),))
-        self.execute("DELETE FROM mythic_progress_partition WHERE uid=?", (int(uid),))
+        """信标保持既有清理范围，同时原子作废旧挑战战报。"""
+        with savepoint_transaction(self):
+            prog = self.get_mythic_final_progress(uid)
+            self.execute(
+                "INSERT INTO mythic_final_progress (uid,now_difficulty,can_choose_list,receive_reward_list,clear_list,challenge_info_json,update_ts) "
+                "VALUES (?,?,?,'[]','[]','[]',?) ON CONFLICT(uid) DO UPDATE SET "
+                "receive_reward_list='[]',clear_list='[]',challenge_info_json='[]',update_ts=excluded.update_ts",
+                (int(uid), prog['now_difficulty'], json.dumps(prog['can_choose_list']), int(time.time())))
+            self.execute('DELETE FROM mythic_progress_reward WHERE uid=?', (int(uid),))
+            self.execute('DELETE FROM mythic_progress_partition WHERE uid=?', (int(uid),))
+            from mythic_normal_service import reset as reset_normal
+            reset_normal(self, uid)
+            self._bump_mythic_final_attempt(uid)
 
-    def record_mythic_final_clear(self, uid, diff=30, team_id=1, use_time=45):
-        """记录失序深区（终焉难度）队伍通关。支持 1~19 档单队与 20~30 档双队连续接力。"""
-        now = int(time.time())
-        diff = max(1, min(30, int(diff or 30)))
-        team_id = max(1, min(2, int(team_id or 1)))
-        use_time = max(1, int(use_time or 45))
-        
-        prog = self.get_mythic_final_progress(uid)
-        cleared = prog["clear_list"]
-        can_choose = prog["can_choose_list"]
-        challenge_info = prog["challenge_info"]
-        is_multi_team = (diff >= 20)
-        
-        if not is_multi_team:
-            for d in range(1, diff + 1):
-                if d not in cleared:
-                    cleared.append(d)
-            cleared.sort()
-            if diff + 1 <= 30 and (diff + 1) not in can_choose:
-                can_choose.append(diff + 1)
-                can_choose.sort()
-            challenge_info = [{"team_id": 1, "clear_state": 1, "use_time": use_time}]
-        else:
-            team_map = {item.get("team_id"): item for item in challenge_info}
-            team_map[team_id] = {"team_id": team_id, "clear_state": 1, "use_time": use_time}
-            challenge_info = [team_map[k] for k in sorted(team_map.keys())]
-            
-            if len(challenge_info) >= 2 and all(item.get("clear_state") == 1 for item in challenge_info):
-                for d in range(1, diff + 1):
-                    if d not in cleared:
-                        cleared.append(d)
-                cleared.sort()
-                if diff + 1 <= 30 and (diff + 1) not in can_choose:
-                    can_choose.append(diff + 1)
-                    can_choose.sort()
-                    
-        self.execute(
-            "INSERT INTO mythic_final_progress (uid, now_difficulty, can_choose_list, receive_reward_list, clear_list, challenge_info_json, update_ts) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?) "
-            "ON CONFLICT(uid) DO UPDATE SET can_choose_list=excluded.can_choose_list, clear_list=excluded.clear_list, challenge_info_json=excluded.challenge_info_json, update_ts=excluded.update_ts",
-            (int(uid), prog["now_difficulty"], json.dumps(can_choose), json.dumps(prog["receive_reward"]), json.dumps(cleared), json.dumps(challenge_info), now)
-        )
-        return {
-            "now_difficulty": prog["now_difficulty"],
-            "can_choose_list": can_choose,
-            "receive_reward": prog["receive_reward"],
-            "clear_list": cleared,
-            "challenge_info": challenge_info,
-            "is_new_difficulty": False
-        }
+    def record_mythic_final_clear(self, uid, diff=30, team_id=1, use_time=45, attempt=None):
+        """按配置逐队记录，只将同一次挑战的完整队列计为通关。"""
+        from mythic_final_service import definition, queue, next_team, generation, catalog, profile
+        from mythic_cycle import bounds, MythicPeriodExpired
+        diff, team_id, use_time = int(diff), int(team_id), int(use_time)
+        cfg = definition(diff)
+        if team_id not in range(1, int(cfg['team_num']) + 1) or use_time <= 0:
+            raise ValueError('失序深区队伍或用时无效')
+        with savepoint_transaction(self):
+            prog = self.get_mythic_final_progress(uid)
+            if diff != int(prog['now_difficulty']):
+                raise MythicPeriodExpired('失序深区结算档位已切换')
+            if attempt is not None and (int(attempt['generation']) != generation(self, uid)
+                    or int(attempt['cycle_start']) != bounds()[0] or int(attempt['difficulty']) != diff
+                    or int(attempt['team_id']) != team_id):
+                raise MythicPeriodExpired('失序深区结算挑战已失效')
+            rows = queue(diff, prog['challenge_info'])
+            if rows and rows[team_id - 1]['clear_state'] == 1:
+                return prog  # 直接重复记账幂等，不覆盖已完成队伍的用时。
+            if team_id != next_team(prog):
+                raise ValueError('失序深区须按队伍顺序完成')
+            if not rows:
+                rows = [dict(team_id=t, clear_state=0, use_time=0) for t in range(1, int(cfg['team_num']) + 1)]
+            rows[team_id - 1] = dict(team_id=team_id, clear_state=1, use_time=use_time)
+            cleared, can_choose = list(prog['clear_list']), list(prog['can_choose_list'])
+            if all(row['clear_state'] == 1 for row in rows):
+                cleared = sorted(set(cleared) | {int(d) for d in catalog()[profile()]['difficulties'] if int(d) <= diff})
+                try:
+                    definition(diff + 1)
+                except ValueError:
+                    pass
+                else:
+                    can_choose = sorted(set(can_choose) | {diff + 1})
+            self.execute(
+                "INSERT INTO mythic_final_progress (uid,now_difficulty,can_choose_list,receive_reward_list,clear_list,challenge_info_json,update_ts) "
+                "VALUES (?,?,?,?,?,?,?) ON CONFLICT(uid) DO UPDATE SET can_choose_list=excluded.can_choose_list,"
+                "clear_list=excluded.clear_list,challenge_info_json=excluded.challenge_info_json,update_ts=excluded.update_ts",
+                (int(uid), diff, json.dumps(can_choose), json.dumps(prog['receive_reward']), json.dumps(cleared), json.dumps(rows), int(time.time())))
+            return dict(prog, clear_list=cleared, can_choose_list=can_choose, challenge_info=rows, is_new_difficulty=False)
 
     def record_mythic_final_stage_clear(self, uid, stage_id, use_time=45):
         """记录失序深区关卡通关进度（兼容 stage_id 形式）。"""
-        sid = int(stage_id)
-        diff = 30
-        team_id = 1
-        if 3028001 <= sid <= 3028019:
-            diff = sid - 3028000
-            team_id = 1
-        elif 3028020 <= sid <= 3028041:
-            diff = 20 + (sid - 3028020) // 2
-            team_id = 1 + (sid - 3028020) % 2
-        return self.record_mythic_final_clear(uid, diff=diff, team_id=team_id, use_time=use_time)
+        from mythic_final_service import entry
+        snapshot = entry(self, uid, stage_id)
+        return self.record_mythic_final_clear(uid, diff=snapshot['difficulty'], team_id=snapshot['team_id'], use_time=use_time, attempt=snapshot)
 
     # ----------------- 迭代校验 (Core Verification) 数据持久化 -----------------
 
@@ -7044,11 +7026,14 @@ class AccountDB:
         """记录因果观测宝箱开启历史并累加计数。"""
         uid, chapter_id, box_id, tag = int(uid), int(chapter_id), int(box_id), int(tag)
         x, z = float(x), float(z)
-        self.execute(
-            "INSERT OR IGNORE INTO warchess_box_record (uid, chapter_id, box_id, tag, pos_x, pos_z, open_ts) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (uid, chapter_id, box_id, tag, x, z, int(time.time()))
-        )
-        self.open_warchess_box(uid, chapter_id, box_id, 1)
+        with self.transaction():
+            inserted = self.execute(
+                "INSERT OR IGNORE INTO warchess_box_record (uid, chapter_id, box_id, tag, pos_x, pos_z, open_ts) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (uid, chapter_id, box_id, tag, x, z, int(time.time()))
+            )
+            if inserted.rowcount:
+                self.open_warchess_box(uid, chapter_id, box_id, 1)
+        return bool(inserted.rowcount)
 
     def get_warchess_event_info(self, uid: int, chapter_id: int):
         """获取因果观测已执行的事件/已开启的宝箱列表（用于 sc_49003.map_info.event_info 组包）。"""

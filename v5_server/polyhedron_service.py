@@ -5,7 +5,7 @@ polyhedron_service.py — 多维变量（Polyhedron / 矩阵）局内探索推�
 职责：
 - 局内对局完整生命周期管理（开局、选门、战斗、战后3选1珍宝、商店、招募、编队、结算）
 - 1-1 到 3-10 关卡树推进与大门随机生成（严格匹配官方 Tier 1/2/3 专属事件 ID 与地图）
-- 14大信标BUFF与31大终端天赋全量计算与生效（初始金币、商店货架、免费刷新、放弃增币、第一层额外门、经验加成等）
+- 信标/终端资格与局内部分效果；完整数值及效果优先级尚待专项校准
 - 区分常规小怪战、艰难精英战、首领BOSS战、队员招募房（303X401）与多维补给商店（303X601）
 - 记忆珍宝掉落、商店在售货架、泉水回血、兔兔打字机强化
 - 局内进度持久化存储至 account.db (polyhedron_run)
@@ -16,6 +16,9 @@ import os
 import json
 import time
 import random
+import uuid
+
+from hodur_service import require
 
 _CFG_CACHE = None
 
@@ -88,9 +91,26 @@ class PolyhedronRunManager:
             data = json.loads(rows[0]["run_data"])
             data["state"] = rows[0]["state"]
             data["tier_id"] = rows[0]["tier_id"]
+            # Historical state 3 was written after granting assets, without a
+            # receipt. It is not evidence of an unpaid run; never re-grant it.
+            if data['state']==3 and not data.get('settlement_version') and not data.get('settled'):
+                data.update(settled=True,legacy_settlement_unknown=True,
+                            end_info=dict(point=0,decision_exp=0,terminal_exp=0))
             return data
-        except Exception:
-            return None
+        except Exception as exc:
+            raise ValueError('多维对局存档损坏，不能覆盖') from exc
+
+    @classmethod
+    def active(cls, uid, db, point=None):
+        data=cls.load_run(uid,db)
+        require(data and data.get('state')==2 and not data.get('settled'), '多维探索未进行中')
+        if point is not None:
+            require(data.get('current_stage',{}).get('save_point')==point,'多维探索阶段不匹配')
+        # An old *active* run may legitimately finish after this upgrade. Its
+        # next committed mutation establishes the new receipt contract before
+        # changing state to 3; only already-terminal historical rows are barred.
+        data.setdefault('settlement_version',1)
+        return data
 
     @classmethod
     def save_run(cls, uid, db, run_data):
@@ -111,6 +131,23 @@ class PolyhedronRunManager:
     def start_run(cls, uid, db, hero_id_list, beacon_id_list, difficulty):
         """cs_18010 -> 开启新一轮多维探索（首战直接进场）"""
         cfg = get_poly_cfg()
+        old=cls.load_run(uid,db)
+        require(not old or old.get('state')==1,'请先结束或重置当前多维探索')
+        require(len(hero_id_list)==1 and len(set(hero_id_list))==1,'多维开局需要一名队长')
+        require(str(hero_id_list[0]) in cfg.get('poly_heroes',{}),'多维队长配置不存在')
+        require(db.query('SELECT 1 FROM polyhedron_hero WHERE uid=? AND hero_id=?',(uid,hero_id_list[0])), '多维队长尚未解锁')
+        require(len(beacon_id_list)==len(set(beacon_id_list)) and all(str(i) in cfg.get('beacons',{}) for i in beacon_id_list),'多维信标配置无效')
+        unlocked={r['beacon_id'] for r in db.query('SELECT beacon_id FROM polyhedron_beacon WHERE uid=?',(uid,))}
+        require(set(beacon_id_list)<=unlocked,'多维信标尚未解锁')
+        from polyhedron_flow import CONTRACT
+        require(str(difficulty) in CONTRACT['difficulties'],'多维难度配置无效')
+        cleared={r['difficulty_id'] for r in db.query('SELECT difficulty_id FROM polyhedron_difficulty WHERE uid=?',(uid,))}
+        required=CONTRACT['difficulties'][str(difficulty)]['unlock_difficulty']
+        require(required==0 or max(cleared,default=0)>=required,'多维难度尚未解锁')
+        selected_terminals={r['terminal_id'] for r in db.query('SELECT terminal_id FROM polyhedron_terminal WHERE uid=?',(uid,))}
+        # PolyhedronData.GetBeaconMaxBeaconSelect: one slot per unlocked node.
+        max_beacons=len(selected_terminals & {3001,3005,3011})
+        require(len(beacon_id_list)<=max_beacons,'多维信标数量超限')
         leader_hero_id = hero_id_list[0] if hero_id_list else 1084
 
         # 1. 组装队长 snapshot
@@ -173,6 +210,11 @@ class PolyhedronRunManager:
             initial_rolls += 2
 
         run_data = {
+            "run_id": uuid.uuid4().hex,
+            "settlement_version": 1,
+            "latest": None,
+            "receipt": None,
+            "cleared_tiers": [],
             "state": 2,  # STARTED
             "tier_id": tier_id,
             "difficulty": difficulty,
@@ -220,9 +262,7 @@ class PolyhedronRunManager:
     @classmethod
     def select_gate(cls, uid, db, gate_index):
         """cs_18014 -> 玩家选择大门，正式推进至所选关卡"""
-        run_data = cls.load_run(uid, db)
-        if not run_data:
-            return None
+        run_data = cls.active(uid, db, 3)
 
         current_stage = run_data.get("current_stage") or {}
         current_gates = current_stage.get("gate_list") or []
@@ -232,11 +272,10 @@ class PolyhedronRunManager:
             if g.get("index") == gate_index:
                 chosen_gate = g
                 break
-        if not chosen_gate and current_gates:
-            chosen_gate = current_gates[0]
-
-        if not chosen_gate:
-            return run_data
+        require(chosen_gate is not None,'多维大门不存在')
+        require(not run_data.get('latest') or run_data['latest'].get('interaction'),'多维场景尚有待结算战斗')
+        run_data['latest']=None
+        run_data['receipt']=None
 
         # 选门传送：统一在此处推进至目标关卡层级！
         current_tier = run_data.get("tier_id", 1001)
@@ -245,6 +284,9 @@ class PolyhedronRunManager:
         tier_id = next_tier
 
         event_info = chosen_gate.get("event", {})
+        selected_stage=int(event_info.get('stage_id') or 0)
+        from polyhedron_flow import CONTRACT
+        require(str(selected_stage) in CONTRACT['stages'],'多维大门场景不存在')
         event_id = event_info.get("id", 1001)
         reward_type = event_info.get("reward_type", 0)
 
@@ -279,7 +321,7 @@ class PolyhedronRunManager:
 
         # 1. 补给商店节点 (非战斗交互关，save_point = 3)
         if event_type == 5:
-            cur_stage_id = cls._pick_stage_id(tier_id, 5)
+            cur_stage_id = selected_stage
             shop_data = cls._generate_shop_data(run_data)
             run_data["current_event"] = {
                 "id": event_id,
@@ -298,7 +340,7 @@ class PolyhedronRunManager:
 
         # 2. 同伴招募干预节点 (save_point = 1 BATTLE + reward_type = 2 TEAMMATE，触发 C# 展台 NPC 生成与交互 UI)
         elif event_type == 2:
-            cur_stage_id = cls._pick_stage_id(tier_id, 2)
+            cur_stage_id = selected_stage
             candidate_heroes = cls._pick_recruit_heroes(run_data)
             params = []
             # 招募类型：1=试炼战斗招募, 2=花费金币招募, 3=免费直接招募
@@ -323,7 +365,7 @@ class PolyhedronRunManager:
 
         # 3. 战斗节点 (普通小怪战 / 精英战 / 珍宝战 / 打字机战 / 升级战 / Boss战 / 异常挑战)
         else:
-            stage_id = cls._pick_stage_id(tier_id, event_type)
+            stage_id = selected_stage
             run_data["current_event"] = {
                 "id": event_id,
                 "stage_id": stage_id,
@@ -340,14 +382,15 @@ class PolyhedronRunManager:
             }
 
         cls.save_run(uid, db, run_data)
+        from polyhedron_account import add_progress
+        if event_type==8:add_progress(db,uid,upgrade_gates=1)
         return run_data
 
     @classmethod
     def on_battle_finish(cls, uid, db, is_win=True, damage_info=None):
         """战斗通关结算（由 cs_54032 触发）"""
-        run_data = cls.load_run(uid, db)
-        if not run_data:
-            return None
+        run_data = cls.active(uid, db, 1)
+        require(is_win is True,'失败或退出不能推进多维探索')
 
         tier_id = run_data.get("tier_id", 1001)
         event_info = run_data.get("current_event", {})
@@ -357,6 +400,10 @@ class PolyhedronRunManager:
         cfg = get_poly_cfg()
         event_cfg = cfg.get("events", {}).get(str(event_id), {})
         event_type = event_cfg.get("event_type", 1)
+        require(event_type not in (2,5),'多维交互场景不能作为战斗结算')
+        cleared=run_data.setdefault('cleared_tiers',[])
+        require(tier_id not in cleared,'该多维节点已经结算')
+        cleared.append(tier_id)
 
         stats = run_data.setdefault("stats", {})
         stats["battle_count"] = stats.get("battle_count", 0) + 1
@@ -370,48 +417,12 @@ class PolyhedronRunManager:
             stats["elite_count"] = stats.get("elite_count", 0) + 1
 
         run_data["coins"] = run_data.get("coins", 600) + coin_gain
+        from polyhedron_account import add_progress
+        add_progress(db,uid,coins=coin_gain)
         cur_stage_id = event_info.get("stage_id") or cls._pick_stage_id(tier_id, event_type)
 
-        # 累计出战英雄本场输出伤害、承伤与治疗量
-        fight_hero_ids = run_data.get("fight_hero_id_list") or [h["hero_id"] for h in run_data.get("hero_list", [])[:3]]
-        b_injured = int(damage_info.get("injured_num") or 0) if damage_info else 0
-        b_kills = int(damage_info.get("enemy_dead_num") or 1) if damage_info else 1
-        b_time_sec = max(1.0, (damage_info.get("battle_time") or 10000) / 1000.0) if damage_info else 10.0
-
-        tier_major = tier_id // 1000 if tier_id > 1000 else 1
-        if tier_id in BOSS_TIERS or event_type in (6, 7):
-            stage_total_damage = int((tier_major * 1500000 + 1000000) * (1.0 + (b_time_sec / 30.0)))
-        elif event_type in (1002, 3002) or event_id >= 1002000:
-            stage_total_damage = int((tier_major * 600000 + 300000) * max(1, b_kills) * 0.5)
-        else:
-            stage_total_damage = int((tier_major * 300000 + 150000) * max(1, b_kills) * 0.4)
-
-        num_fighters = max(1, len(fight_hero_ids))
-        for idx, hid in enumerate(fight_hero_ids):
-            for h in run_data.get("hero_list", []):
-                if h.get("hero_id") == hid:
-                    if idx == 0:
-                        h_dmg = int(stage_total_damage * (0.65 if num_fighters >= 2 else 1.0))
-                        h_inj = int(b_injured * 0.7)
-                        h_heal = int(h_inj * 0.2)
-                    elif idx == 1:
-                        h_dmg = int(stage_total_damage * 0.25)
-                        h_inj = int(b_injured * 0.2)
-                        h_heal = int(h_inj * 0.3)
-                    else:
-                        h_dmg = int(stage_total_damage * 0.10)
-                        h_inj = int(b_injured * 0.1)
-                        h_heal = int(stage_total_damage * 0.05) if hid in (1084, 1061, 1056) else 0
-
-                    if hid in (1084, 1056):
-                        h_heal += int(stage_total_damage * 0.15) + 50000
-                    elif hid == 1061:
-                        h_heal += int(stage_total_damage * 0.08) + 20000
-
-                    h["damage"] = h.get("damage", 0) + max(1000, h_dmg)
-                    h["injured"] = h.get("injured", 0) + h_inj
-                    h["heal"] = h.get("heal", 0) + h_heal
-                    break
+        # UDP exposes aggregate counters, not per-hero damage/heal. Preserve
+        # measured hero HP in polyhedron_battle; never synthesize statistics.
 
         # 1. 打字机强化关 (event_type == 4 / event_id in (4001, 4002, 4003))
         if event_type == 4 or event_id in (4001, 4002, 4003):
@@ -487,14 +498,16 @@ class PolyhedronRunManager:
     @classmethod
     def select_reward(cls, uid, db, reward_index):
         """cs_18012 -> 挑选珍宝/强化 (index=1~3) 或 放弃领金币 (index=0)"""
-        run_data = cls.load_run(uid, db)
-        if not run_data:
-            return None
+        run_data = cls.active(uid, db, 2)
+        require(not run_data.get('latest') or run_data['latest'].get('interaction'),'多维战斗尚未结算')
+        run_data['latest']=None
+        run_data['receipt']=None
 
         tier_id = run_data.get("tier_id", 1001)
         cur_stage = run_data.get("current_stage", {})
         cur_stage_id = cur_stage.get("stage_id") or cls._pick_stage_id(tier_id, 1)
         reward_items = cur_stage.get("reward", {}).get("item_list", [])
+        require(bool(reward_items) and type(reward_index) is int and 0<=reward_index<=len(reward_items),'多维待选奖励或索引无效')
 
         # 官方配置基础 150 金币 (PolyhedronSettingCfg[21]) + 属性 28 (财富密码/终端天赋加成)
         give_up_coins = 150
@@ -524,6 +537,8 @@ class PolyhedronRunManager:
                     eff_list.append({"id": eff_id})
         else:
             run_data["coins"] = run_data.get("coins", 600) + give_up_coins
+            from polyhedron_account import add_progress
+            add_progress(db,uid,coins=give_up_coins)
 
         if tier_id == 3010:
             run_data["state"] = 3  # SETTLEMENT
@@ -547,12 +562,10 @@ class PolyhedronRunManager:
     @classmethod
     def reroll_reward(cls, uid, db):
         """cs_18030 -> 重骰 3 选 1 珍宝"""
-        run_data = cls.load_run(uid, db)
-        if not run_data:
-            return None
-
-        if run_data.get("rolls", 0) <= 0:
-            return run_data
+        run_data = cls.active(uid, db, 2)
+        items=run_data.get('current_stage',{}).get('reward',{}).get('item_list',[])
+        require(items and all(i.get('class')==6 for i in items),'该奖励不能重骰')
+        require(run_data.get('rolls',0)>0,'多维重骰次数已用尽')
 
         run_data["rolls"] -= 1
         reward_type = run_data.get("current_event", {}).get("reward_type", 3001)
@@ -568,26 +581,20 @@ class PolyhedronRunManager:
     @classmethod
     def buy_shop_item(cls, uid, db, shop_index):
         """cs_18022 -> 购买商店货架珍宝道具"""
-        run_data = cls.load_run(uid, db)
-        if not run_data:
-            return None
+        run_data = cls.active(uid, db, 3)
 
         shop = run_data.get("current_stage", {}).get("shop")
-        if not shop or "item_list" not in shop:
-            return run_data
+        require(shop and 'item_list' in shop,'当前不是多维商店')
 
         items = shop["item_list"]
-        if shop_index < 1 or shop_index > len(items):
-            return run_data
+        require(1<=shop_index<=len(items),'多维商品不存在')
 
         target_item = items[shop_index - 1]
-        if target_item.get("is_available") != 1:
-            return run_data
+        require(target_item.get('is_available')==1,'多维商品已售出')
 
         price = target_item.get("price", 0)
         current_coins = run_data.get("coins", 0)
-        if current_coins < price:
-            return run_data
+        require(0<=price<=current_coins,'多维货币不足')
 
         run_data["coins"] = current_coins - price
         target_item["is_available"] = 0
@@ -606,16 +613,16 @@ class PolyhedronRunManager:
             cls._heal_team(run_data, 50)
 
         cls.save_run(uid, db, run_data)
+        from polyhedron_account import add_progress
+        add_progress(db,uid,shop_buys=1)
         return run_data
 
     @classmethod
     def refresh_shop(cls, uid, db):
         """cs_18024 -> 刷新商店货架"""
-        run_data = cls.load_run(uid, db)
-        if not run_data:
-            return None
-
-        shop = run_data.setdefault("current_stage", {}).setdefault("shop", {})
+        run_data = cls.active(uid, db, 3)
+        shop = run_data['current_stage'].get('shop')
+        require(isinstance(shop,dict),'当前不是多维商店')
         refresh_times = shop.get("refresh_times", 0)
 
         attrs = cls._compute_active_attributes(run_data)
@@ -627,8 +634,7 @@ class PolyhedronRunManager:
             elif a["id"] == 16:
                 max_refreshes = max(max_refreshes, a["value"])
 
-        if refresh_times >= max_refreshes:
-            return run_data
+        require(refresh_times<max_refreshes,'多维商店刷新次数用尽')
 
         cost = 0
         if refresh_times >= free_refreshes:
@@ -636,8 +642,7 @@ class PolyhedronRunManager:
             cost = 100 * paid_count
 
         current_coins = run_data.get("coins", 0)
-        if current_coins < cost:
-            return run_data
+        require(current_coins>=cost,'多维货币不足')
 
         if cost > 0:
             run_data["coins"] = current_coins - cost
@@ -652,11 +657,9 @@ class PolyhedronRunManager:
     @classmethod
     def recover_shop_blood(cls, uid, db):
         """cs_18026 -> 生命泉水全员恢复"""
-        run_data = cls.load_run(uid, db)
-        if not run_data:
-            return None
-
-        shop = run_data.setdefault("current_stage", {}).setdefault("shop", {})
+        run_data = cls.active(uid, db, 3)
+        shop=run_data['current_stage'].get('shop')
+        require(isinstance(shop,dict),'当前不是多维商店')
         recover_times = shop.get("recover_times", 0)
 
         attrs = cls._compute_active_attributes(run_data)
@@ -665,13 +668,11 @@ class PolyhedronRunManager:
             if a["id"] == 17:
                 max_recover = max(max_recover, a["value"])
 
-        if recover_times >= max_recover:
-            return run_data
+        require(recover_times<max_recover,'多维商店回复次数用尽')
 
         cost = 100 * recover_times
         current_coins = run_data.get("coins", 0)
-        if current_coins < cost:
-            return run_data
+        require(current_coins>=cost,'多维货币不足')
 
         if cost > 0:
             run_data["coins"] = current_coins - cost
@@ -684,18 +685,21 @@ class PolyhedronRunManager:
     @classmethod
     def enlist_hero(cls, uid, db, hero_id):
         """cs_18020 -> 招募同伴加入局内队伍（保持招募房间数据完整）"""
-        run_data = cls.load_run(uid, db)
-        if not run_data:
-            return None
+        run_data = cls.active(uid, db, 1)
+        require(run_data.get('current_event',{}).get('reward_type')==2,'当前不是多维招募阶段')
+        require(not run_data.get('latest') or run_data['latest'].get('interaction'),'多维场景尚有待结算战斗')
+        run_data['latest']=None
 
         cfg = get_poly_cfg()
         if hero_id > 0:
             params = run_data.get("current_stage", {}).get("params", [])
-            enlist_type = 2
+            enlist_type = None
             for i in range(0, len(params), 2):
                 if params[i] == hero_id and i + 1 < len(params):
                     enlist_type = params[i + 1]
                     break
+            require(enlist_type in (2,3),'多维招募候选不存在或需要试炼')
+            require(not any(h.get('hero_id')==hero_id for h in run_data.get('hero_list',[])),'多维角色已加入')
 
             if enlist_type == 2:  # PAY (花钱招募)
                 need_coin = 800
@@ -703,8 +707,8 @@ class PolyhedronRunManager:
                 if str(hero_id) in poly_hero_cfgs:
                     need_coin = poly_hero_cfgs[str(hero_id)].get("need_coin", 800)
                 current_coins = run_data.get("coins", 0)
-                if current_coins >= need_coin:
-                    run_data["coins"] = current_coins - need_coin
+                require(current_coins>=need_coin,'多维招募货币不足')
+                run_data['coins']=current_coins-need_coin
 
             std_id = 3051000 + (hero_id % 1000)
             poly_hero_cfgs = cfg.get("poly_heroes", {})
@@ -732,28 +736,36 @@ class PolyhedronRunManager:
         # 招募完成后，保持场景与门列表，将 save_point 设为 3 (OPTION) 激活离开传送门
         if "current_stage" in run_data and isinstance(run_data["current_stage"], dict):
             run_data["current_stage"]["save_point"] = 3
+            run_data['current_stage']['params']=[]
         cls.save_run(uid, db, run_data)
         return run_data
 
     @classmethod
     def switch_team(cls, uid, db, fight_id_list):
         """cs_18028 -> 调整当前出战 3 人编队"""
-        run_data = cls.load_run(uid, db)
-        if not run_data:
-            return None
+        run_data = cls.active(uid, db)
 
         available_hids = {h["hero_id"] for h in run_data.get("hero_list", [])}
-        valid_fight_list = [hid for hid in fight_id_list if hid in available_hids][:3]
-        if valid_fight_list:
-            run_data["fight_hero_id_list"] = valid_fight_list
+        leader=run_data['start_info']['leader']['hero_id']
+        require(1<=len(fight_id_list)<=3 and len(set(fight_id_list))==len(fight_id_list) and set(fight_id_list)<=available_hids and leader in fight_id_list,'多维编队无效或缺少队长')
+        require(not run_data.get('latest') or run_data['latest'].get('interaction'),'多维战斗期间不能换队')
+        run_data['latest']=None
+        run_data['receipt']=None
+        run_data['fight_hero_id_list']=fight_id_list
 
         cls.save_run(uid, db, run_data)
         return run_data
 
     @classmethod
-    def settle_run(cls, uid, db):
+    def settle_run(cls, uid, db, ctx=None):
         """cs_18018 / 终局通关 -> 动态计算发放历程经验(45)、多维终端经验(46)、对局积分(29)"""
         run_data = cls.load_run(uid, db)
+        require(run_data and run_data.get('state') in (2,3),'没有可结算的多维探索')
+        if run_data.get('settled'):
+            return run_data['end_info']
+        # 18018 is the native lobby's explicit abandonment action, including
+        # a disconnected scene. End that scene and invalidate its later report.
+        run_data['latest']=None
         now = int(time.time())
 
         tier_id = run_data.get("tier_id", 1001) if run_data else 1001
@@ -775,7 +787,7 @@ class PolyhedronRunManager:
         else:
             cleared_stages = 15 + tier_level
         cleared_stages = min(25, max(1, cleared_stages))
-        is_full_clear = (tier_id == 3010)
+        is_full_clear = tier_id==3010 and 3010 in run_data.get('cleared_tiers',[]) and run_data.get('state')==3
 
         # 2. 难度系数 (难度 1~20 动态放大)
         diff_mult = 1.0 + (max(1, difficulty) - 1) * 0.15
@@ -805,28 +817,31 @@ class PolyhedronRunManager:
         terminal_exp = int((base_terminal_exp + terminal_art_bonus) * exp_diff_mult * bounty_mult)
 
         # 写入数据库货币累加
-        db.execute("INSERT INTO currency (uid, id, num) VALUES (?, 45, ?) ON CONFLICT(uid, id) DO UPDATE SET num = num + excluded.num",
-                   (uid, decision_exp))
-        db.execute("INSERT INTO currency (uid, id, num) VALUES (?, 46, ?) ON CONFLICT(uid, id) DO UPDATE SET num = num + excluded.num",
-                   (uid, terminal_exp))
-        db.execute("INSERT INTO currency (uid, id, num) VALUES (?, 29, ?) ON CONFLICT(uid, id) DO UPDATE SET num = num + excluded.num",
-                   (uid, point))
+        from inventory_service import InventoryService
+        for iid,num in ((45,decision_exp),(46,terminal_exp),(29,point)):
+            InventoryService.add_item(ctx or db,uid,iid,num)
+        from polyhedron_account import add_progress,record_clear
+        add_progress(db,uid,score=point)
 
         # 通关记录难度
-        if is_full_clear or tier_id in BOSS_TIERS:
+        if is_full_clear:
+            record_clear(db,uid,run_data)
             db.execute("INSERT OR REPLACE INTO polyhedron_difficulty (uid, difficulty_id, update_ts) VALUES (?, ?, ?)",
                        (uid, difficulty, now))
 
         if run_data:
             run_data["state"] = 3  # SETTLEMENT
+            run_data['settled']=True
+            run_data['settlement_version']=1
+            run_data['end_info']=dict(point=point,decision_exp=decision_exp,terminal_exp=terminal_exp)
             cls.save_run(uid, db, run_data)
 
         # 广播多维变量终局结算事件（驱动成就系统实时弹窗）
-        try:
+        if ctx is not None:
             import event_bus
-            event_bus.bus.emit(
+            event_bus.bus.emit_required(
                 event_bus.Events.POLYHEDRON_PASS,
-                None,
+                ctx,
                 uid,
                 difficulty=difficulty,
                 artifacts=artifacts,
@@ -836,8 +851,6 @@ class PolyhedronRunManager:
                 is_full_clear=is_full_clear,
                 times=1
             )
-        except Exception:
-            pass
 
         end_info = {
             "point": point,
@@ -854,12 +867,10 @@ class PolyhedronRunManager:
         db.execute("UPDATE polyhedron_meta SET game_state = 1, update_ts = ? WHERE uid = ?", (now, uid))
 
     @classmethod
-    def get_policy_cycle_id(cls, now_ts=None, base_anchor=1700000000):
+    def get_policy_cycle_id(cls, now_ts=None):
         """计算当前历程周期 ID（以每周一 05:00:00 为基准 7 天轮换周期）"""
-        if now_ts is None:
-            now_ts = int(time.time())
-        # 604800 秒 = 7 天
-        return int((now_ts - base_anchor) // 604800)
+        from weekly_challenge_service import get_polyhedron_cycle
+        return get_polyhedron_cycle(now_ts)[0]
 
     @classmethod
     def check_and_refresh_policy_cycle(cls, uid, db, activity_id=4307301, force_cycle_id=None):
@@ -871,32 +882,30 @@ class PolyhedronRunManager:
         now = int(time.time())
         current_cycle_id = force_cycle_id if force_cycle_id is not None else cls.get_policy_cycle_id(now)
 
-        meta = db.get("polyhedron_meta", uid, "AND activity_id=?", (activity_id,))
-        last_cycle_id = meta.get("cycle_id", 0) if meta else 0
-
-        if meta and last_cycle_id != 0 and last_cycle_id == current_cycle_id and force_cycle_id is None:
-            return False  # 同一周期内，无需刷新
-
-        if last_cycle_id == 0 and force_cycle_id is None:
-            # 首次记录周期锚点，保留已有经验与领取状态
+        # 45号经验为账号共享；切换229/321活动不能再次清掉本周所得经验。
+        with db.transaction():
+            meta = db.get('polyhedron_meta', uid, 'AND activity_id=?', (activity_id,))
+            rows = db.query('SELECT MAX(policy_cycle_start) AS start FROM polyhedron_meta WHERE uid=?', (uid,))
+            last_cycle_id = int(rows[0]['start'] or 0)
+            refresh = bool(last_cycle_id and current_cycle_id > last_cycle_id)
+            if force_cycle_id is not None:
+                refresh = True
+            if refresh:
+                db.execute("UPDATE currency SET num=0 WHERE uid=? AND id=45", (uid,))
+                db.execute("DELETE FROM polyhedron_policy_claimed WHERE uid=?", (uid,))
+                db.execute('UPDATE polyhedron_meta SET reset_times=1 WHERE uid=?',(uid,))
+            # 初次加载只建立基线；时钟回退不回滚水位或重开领取资格。
+            cycle = max(last_cycle_id, current_cycle_id)
+            db.execute('UPDATE polyhedron_meta SET policy_cycle_start=? WHERE uid=?', (cycle, uid))
+            remaining=db.query('SELECT MIN(reset_times) AS n FROM polyhedron_meta WHERE uid=?',(uid,))[0]['n']
+            baseline = {} if meta else dict(game_state=1, reset_times=1 if remaining is None else remaining)
             db.upsert("polyhedron_meta", uid, {
+                **baseline,
                 "activity_id": activity_id,
-                "cycle_id": current_cycle_id,
+                "policy_cycle_start": cycle,
                 "update_ts": now
             }, keys=("uid", "activity_id"))
-            return False
-
-        # 跨周期刷新：仅重置历程经验与已领取记录
-        db.execute("UPDATE currency SET num = 0 WHERE uid = ? AND id = 45", (uid,))
-        db.execute("DELETE FROM polyhedron_policy_claimed WHERE uid = ? AND activity_id = ?", (uid, activity_id))
-
-        db.upsert("polyhedron_meta", uid, {
-            "activity_id": activity_id,
-            "cycle_id": current_cycle_id,
-            "update_ts": now
-        }, keys=("uid", "activity_id"))
-
-        return True
+            return refresh
 
     # ---------------- 辅助内部生成算法 ----------------
 

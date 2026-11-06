@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "source": "PC 307/229 original client bundles",
+  "bodies": {
+    "311": {
+      "weapon_slots": 2,
+      "equip_slots": 1,
+      "cost": 8,
+      "source_asset": "summerraceactivity/config/summerracebody_light.ys",
+      "manifest_digest": "787a600166f8b20b326fa469ce98cf61",
+      "source_size": 4604,
+      "source_sha256": "d7240deaa51fd0b9d9a2e7bb8ab9da333131f7050d46bdbbb05d64af48abb453"
+    },
+    "312": {
+      "weapon_slots": 2,
+      "equip_slots": 2,
+      "cost": 10,
+      "source_asset": "summerraceactivity/config/summerracebody_medium.ys",
+      "manifest_digest": "bf88265b20f9a9ceb75407f61902d2b6",
+      "source_size": 4624,
+      "source_sha256": "cb7468da69b0f8085cd6d440aab874eb8a64c4512e99e62af8ab6558aab8cd5e"
+    },
+    "313": {
+      "weapon_slots": 2,
+      "equip_slots": 1,
+      "cost": 7,
+      "source_asset": "summerraceactivity/config/summerracebody_heavy.ys",
+      "manifest_digest": "9bc308d9b21c7ec8a86e5dc3ea6cec7d",
+      "source_size": 4605,
+      "source_sha256": "53c7cb5447ef724604f6f96dd0170aed86e6cab1ece66077b379a4d9fe572019"
+    }
+  }
+}

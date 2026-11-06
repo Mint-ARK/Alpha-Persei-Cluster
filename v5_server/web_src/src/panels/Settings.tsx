@@ -11,6 +11,8 @@ import {
   Undo2,
   Save,
   Zap,
+  Lock,
+  KeyRound,
 } from 'lucide-react'
 import {
   Button,
@@ -45,6 +47,7 @@ import {
   setStoredApiBase,
   type RechargeStatusData,
   type RechargeResetScope,
+  changeAdminPassword,
 } from '../lib/api'
 
 const densityOptions = [
@@ -62,6 +65,7 @@ export default function SettingsPanel() {
     operatorName,
     setOperatorName,
     managedSave,
+    authEnabled,
   } = useServer()
 
   // 基础设置状态与本地持久化
@@ -107,6 +111,52 @@ export default function SettingsPanel() {
     localStorage.setItem('cp_density', density)
     showToast('success', '偏好设置已成功保存并实时更新顶栏与侧边栏')
     if (address !== getStoredApiBase()) setStoredApiBase(address)
+  }
+
+  // 管理密码修改状态
+  const [curPwd, setCurPwd] = useState('')
+  const [newPwd, setNewPwd] = useState('')
+  const [confirmPwd, setConfirmPwd] = useState('')
+  const [pwdBusy, setPwdBusy] = useState(false)
+
+  const handleChangePassword = async () => {
+    if (!curPwd || !newPwd || !confirmPwd) {
+      showToast('warning', '请填写完整密码信息')
+      return
+    }
+    if (newPwd.length < 12) {
+      showToast('warning', '新密码长度至少需要 12 位（防爆破安全铁律）')
+      return
+    }
+    if (newPwd !== confirmPwd) {
+      showToast('warning', '两次输入的新密码不一致')
+      return
+    }
+    setPwdBusy(true)
+    try {
+      const res = await changeAdminPassword(curPwd, newPwd)
+      if (res.ok) {
+        showToast('success', '密码修改成功！所有现有会话已注销，请使用新密码重新登录。')
+        setCurPwd('')
+        setNewPwd('')
+        setConfirmPwd('')
+        setTimeout(() => {
+          window.location.reload()
+        }, 1200)
+      } else {
+        if (res.error === 'invalid_password') {
+          showToast('danger', '当前管理密码不正确')
+        } else if (res.retryAfter) {
+          showToast('warning', `操作过于频繁，请等待 ${res.retryAfter} 秒后再试`)
+        } else {
+          showToast('danger', res.error || '密码修改失败')
+        }
+      }
+    } catch (err: any) {
+      showToast('danger', err.message || '网络请求异常')
+    } finally {
+      setPwdBusy(false)
+    }
   }
 
   const handleResetSettings = () => {
@@ -336,6 +386,48 @@ export default function SettingsPanel() {
                 <Input className="font-mono" placeholder="留空默认同源相对路径 (自动跟随当前访问主机)" />
                 <Description>用于面板连接游戏服务端，保存设置后应用；留空跟随当前页面地址。AI模型接口与密钥请到“AI修正者”配置。</Description>
               </TextField>
+
+              {/* 公网安全管理密码修改卡片 (仅在后台启用密码保护时展示) */}
+              {authEnabled && (
+                <div className="rounded-xl border border-separator/80 bg-default/25 p-3.5 space-y-3">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold">
+                    <Lock className="size-3.5 text-accent" />
+                    <span>公网安全与管理口令 (PBKDF2-SHA256)</span>
+                  </div>
+                  <div className="text-[11px] leading-relaxed text-muted">
+                    修改控制台管理密码将原子替换服务器凭据并立即注销全部已有会话。新密码至少 12 个字符。
+                  </div>
+
+                  <div className="space-y-2">
+                    <TextField fullWidth value={curPwd} onChange={setCurPwd} isDisabled={pwdBusy}>
+                      <Label className="text-xs">当前密码</Label>
+                      <Input type="password" placeholder="请输入当前管理密码" />
+                    </TextField>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <TextField fullWidth value={newPwd} onChange={setNewPwd} isDisabled={pwdBusy}>
+                        <Label className="text-xs">新密码 (≥12位)</Label>
+                        <Input type="password" placeholder="新密码" />
+                      </TextField>
+                      <TextField fullWidth value={confirmPwd} onChange={setConfirmPwd} isDisabled={pwdBusy}>
+                        <Label className="text-xs">确认新密码</Label>
+                        <Input type="password" placeholder="确认新密码" />
+                      </TextField>
+                    </div>
+
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="w-full gap-1.5 mt-1"
+                      isDisabled={pwdBusy || !curPwd || !newPwd || !confirmPwd}
+                      onPress={handleChangePassword}
+                    >
+                      <KeyRound className="size-3.5" />
+                      {pwdBusy ? '正在更新密码…' : '更新管理密码'}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </Card.Content>
           </Card>
         </Section>

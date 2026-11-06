@@ -246,6 +246,8 @@ def is_admin_path(path: str) -> bool:
 
     if path == "/api/gm" or path.startswith("/api/gm/"):
         return True
+    if path == "/api/system/res_version":
+        return True
     if path in {
         "/",
         # These aliases are redirects to the same console in the current
@@ -280,7 +282,11 @@ def _is_normalized_admin_path(path: str) -> bool:
         "/",
         "/web",
         "/web/gm_console.html",
+        "/web/index.html",
+        "/web/control-panel.html",
         "/static_web/gm_console.html",
+        "/static_web/index.html",
+        "/static_web/control-panel.html",
         "/gm_console.html",
         "/control-panel.html",
     }:
@@ -298,6 +304,28 @@ def install_admin_guard(app: Any) -> Any:
     at a missing file, configuration is required and failures raise before
     the application can start serving requests.
     """
+
+    if app.extensions.get('admin_access', {}).get('enabled'):
+        return app
+    validate_environment()
+    from admin_session_auth import PASSWORD_FILE_ENV, load_password_config, install
+    if PASSWORD_FILE_ENV in os.environ:
+        return install(app, load_password_config(os.environ[PASSWORD_FILE_ENV]))
+
+    # Reserve the new credential namespace even while disabled; passwords must
+    # never fall through to the SDK catch-all's request-body diagnostic logger.
+    @app.before_request
+    def _disabled_password_routes():
+        if request.path.startswith('/api/gm/auth/'):
+            from flask import jsonify
+            if request.path == '/api/gm/auth/session' and request.method == 'GET':
+                response = jsonify(enabled=False, authenticated=False)
+            else:
+                response = jsonify(ok=False, error='password_auth_disabled')
+                response.status_code = 404
+            response.headers['Cache-Control'] = 'no-store'
+            return response
+        return None
 
     if AUTH_FILE_ENV not in os.environ:
         return app
@@ -328,6 +356,17 @@ def install_admin_guard(app: Any) -> Any:
     return app
 
 
+def validate_environment() -> None:
+    """Startup preflight: the two explicit modes are mutually exclusive."""
+    from admin_session_auth import PASSWORD_FILE_ENV, load_password_config
+    if PASSWORD_FILE_ENV in os.environ and AUTH_FILE_ENV in os.environ:
+        raise _invalid_config('choose password sessions or legacy Basic, never both')
+    if PASSWORD_FILE_ENV in os.environ:
+        load_password_config(os.environ[PASSWORD_FILE_ENV])
+    elif AUTH_FILE_ENV in os.environ:
+        load_credentials(os.environ[AUTH_FILE_ENV])
+
+
 __all__ = [
     "AUTH_FILE_ENV",
     "AdminAuthConfigError",
@@ -336,4 +375,5 @@ __all__ = [
     "is_admin_path",
     "load_credentials",
     "make_password_hash",
+    "validate_environment",
 ]

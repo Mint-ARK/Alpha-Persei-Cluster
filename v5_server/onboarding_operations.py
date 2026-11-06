@@ -78,9 +78,8 @@ class FreshTaskMixin:
         ack=ctx.codec_encode('sc_'+str(self.sc),dict(result=0,reward_list=result['rewards']))
         if not ack:
             raise ValueError('新手任务必要回执为空')
-        frames=[DownFrame(self.sc,ack)]
-        if result['rewards']:
-            frames+=_refresh_frames(ctx,self.uid,strict=True)
+        frames=_refresh_frames(ctx,self.uid,strict=True) if result['rewards'] else []
+        frames.append(DownFrame(self.sc,ack))
         if fresh.enabled(ctx.db,self.uid):
             for cmd in (28001,59011):
                 payload=ctx.codec_encode('sc_'+str(cmd),fresh.payload(ctx.db,self.uid,cmd))

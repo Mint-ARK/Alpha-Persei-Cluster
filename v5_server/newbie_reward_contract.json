@@ -1,0 +1,1347 @@
+{
+  "versions": {
+    "1": {
+      "task_type": 4,
+      "sign_ids": [
+        2001,
+        2002,
+        2003,
+        2004,
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015
+      ],
+      "progress_thresholds": []
+    },
+    "2": {
+      "task_type": 601,
+      "sign_ids": [
+        2001,
+        2002,
+        2003,
+        2004,
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2015
+      ],
+      "progress_thresholds": [
+        15,
+        30,
+        45,
+        60,
+        75,
+        90,
+        105
+      ]
+    },
+    "3": {
+      "task_type": 603,
+      "sign_ids": [
+        2001,
+        2002,
+        2003,
+        2004,
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2015
+      ],
+      "progress_thresholds": [
+        10,
+        20,
+        30,
+        45,
+        60,
+        75,
+        90
+      ]
+    }
+  },
+  "tasks": {
+    "40100": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40101": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40102": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40103": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40104": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40105": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40106": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40107": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40108": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40109": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40110": {
+      "task_type": 4,
+      "phase": 1
+    },
+    "40111": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40112": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40113": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40114": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40115": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40116": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40117": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40118": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40119": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40120": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40200": {
+      "task_type": 4,
+      "phase": 2
+    },
+    "40201": {
+      "task_type": 4,
+      "phase": 3
+    },
+    "40202": {
+      "task_type": 4,
+      "phase": 3
+    },
+    "40203": {
+      "task_type": 4,
+      "phase": 3
+    },
+    "40204": {
+      "task_type": 4,
+      "phase": 3
+    },
+    "40205": {
+      "task_type": 4,
+      "phase": 3
+    },
+    "40206": {
+      "task_type": 4,
+      "phase": 3
+    },
+    "40207": {
+      "task_type": 4,
+      "phase": 3
+    },
+    "40208": {
+      "task_type": 4,
+      "phase": 3
+    },
+    "40209": {
+      "task_type": 4,
+      "phase": 3
+    },
+    "40210": {
+      "task_type": 4,
+      "phase": 4
+    },
+    "40211": {
+      "task_type": 4,
+      "phase": 4
+    },
+    "40212": {
+      "task_type": 4,
+      "phase": 4
+    },
+    "40213": {
+      "task_type": 4,
+      "phase": 4
+    },
+    "40214": {
+      "task_type": 4,
+      "phase": 4
+    },
+    "40215": {
+      "task_type": 4,
+      "phase": 4
+    },
+    "40216": {
+      "task_type": 4,
+      "phase": 4
+    },
+    "40217": {
+      "task_type": 4,
+      "phase": 4
+    },
+    "40218": {
+      "task_type": 4,
+      "phase": 4
+    },
+    "40219": {
+      "task_type": 4,
+      "phase": 4
+    },
+    "40220": {
+      "task_type": 4,
+      "phase": 5
+    },
+    "40300": {
+      "task_type": 4,
+      "phase": 5
+    },
+    "40301": {
+      "task_type": 4,
+      "phase": 5
+    },
+    "40302": {
+      "task_type": 4,
+      "phase": 5
+    },
+    "40303": {
+      "task_type": 4,
+      "phase": 5
+    },
+    "40304": {
+      "task_type": 4,
+      "phase": 5
+    },
+    "40305": {
+      "task_type": 4,
+      "phase": 5
+    },
+    "40306": {
+      "task_type": 4,
+      "phase": 5
+    },
+    "40307": {
+      "task_type": 4,
+      "phase": 6
+    },
+    "40308": {
+      "task_type": 4,
+      "phase": 6
+    },
+    "40309": {
+      "task_type": 4,
+      "phase": 6
+    },
+    "40310": {
+      "task_type": 4,
+      "phase": 6
+    },
+    "40311": {
+      "task_type": 4,
+      "phase": 6
+    },
+    "40312": {
+      "task_type": 4,
+      "phase": 6
+    },
+    "40313": {
+      "task_type": 4,
+      "phase": 6
+    },
+    "40314": {
+      "task_type": 4,
+      "phase": 6
+    },
+    "40315": {
+      "task_type": 4,
+      "phase": 7
+    },
+    "40316": {
+      "task_type": 4,
+      "phase": 7
+    },
+    "40317": {
+      "task_type": 4,
+      "phase": 7
+    },
+    "40318": {
+      "task_type": 4,
+      "phase": 7
+    },
+    "40319": {
+      "task_type": 4,
+      "phase": 7
+    },
+    "40320": {
+      "task_type": 4,
+      "phase": 7
+    },
+    "40400": {
+      "task_type": 4,
+      "phase": 7
+    },
+    "40401": {
+      "task_type": 4,
+      "phase": 7
+    },
+    "40402": {
+      "task_type": 4,
+      "phase": 8
+    },
+    "40403": {
+      "task_type": 4,
+      "phase": 8
+    },
+    "40404": {
+      "task_type": 4,
+      "phase": 8
+    },
+    "40405": {
+      "task_type": 4,
+      "phase": 8
+    },
+    "40406": {
+      "task_type": 4,
+      "phase": 8
+    },
+    "40407": {
+      "task_type": 4,
+      "phase": 8
+    },
+    "40408": {
+      "task_type": 4,
+      "phase": 8
+    },
+    "40409": {
+      "task_type": 4,
+      "phase": 8
+    },
+    "40410": {
+      "task_type": 4,
+      "phase": 8
+    },
+    "40411": {
+      "task_type": 4,
+      "phase": 9
+    },
+    "40412": {
+      "task_type": 4,
+      "phase": 9
+    },
+    "40413": {
+      "task_type": 4,
+      "phase": 9
+    },
+    "40414": {
+      "task_type": 4,
+      "phase": 9
+    },
+    "40415": {
+      "task_type": 4,
+      "phase": 9
+    },
+    "40416": {
+      "task_type": 4,
+      "phase": 9
+    },
+    "40417": {
+      "task_type": 4,
+      "phase": 9
+    },
+    "40418": {
+      "task_type": 4,
+      "phase": 9
+    },
+    "40419": {
+      "task_type": 4,
+      "phase": 10
+    },
+    "40420": {
+      "task_type": 4,
+      "phase": 10
+    },
+    "40500": {
+      "task_type": 4,
+      "phase": 10
+    },
+    "40501": {
+      "task_type": 4,
+      "phase": 10
+    },
+    "40502": {
+      "task_type": 4,
+      "phase": 10
+    },
+    "40503": {
+      "task_type": 4,
+      "phase": 10
+    },
+    "40504": {
+      "task_type": 4,
+      "phase": 10
+    },
+    "40505": {
+      "task_type": 4,
+      "phase": 10
+    },
+    "40506": {
+      "task_type": 4,
+      "phase": 10
+    },
+    "160001": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160002": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160003": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160004": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160005": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160006": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160007": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160008": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160009": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160010": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160011": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160012": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160013": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160014": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160015": {
+      "task_type": 601,
+      "phase": 1
+    },
+    "160016": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160017": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160018": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160019": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160020": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160021": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160022": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160023": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160024": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160025": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160026": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160027": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160028": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160029": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160030": {
+      "task_type": 601,
+      "phase": 2
+    },
+    "160031": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160032": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160033": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160034": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160035": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160036": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160037": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160038": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160039": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160040": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160041": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160042": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160043": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160044": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160045": {
+      "task_type": 601,
+      "phase": 3
+    },
+    "160046": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160047": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160048": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160049": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160050": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160051": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160052": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160053": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160054": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160055": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160056": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160057": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160058": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160059": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160060": {
+      "task_type": 601,
+      "phase": 4
+    },
+    "160061": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160062": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160063": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160064": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160065": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160066": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160067": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160068": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160069": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160070": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160071": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160072": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160073": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160074": {
+      "task_type": 601,
+      "phase": 5
+    },
+    "160075": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160076": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160077": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160078": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160079": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160080": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160081": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160082": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160083": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160084": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160085": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160086": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160087": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160088": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160089": {
+      "task_type": 601,
+      "phase": 6
+    },
+    "160090": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160091": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160092": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160093": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160094": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160095": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160096": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160097": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160098": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160099": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160100": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160101": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160102": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160103": {
+      "task_type": 601,
+      "phase": 7
+    },
+    "160104": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160105": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160106": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160107": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160108": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160109": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160110": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160111": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160112": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160113": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160114": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160116": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160117": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160118": {
+      "task_type": 601,
+      "phase": 8
+    },
+    "160119": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160120": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160121": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160122": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160123": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160124": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160125": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160126": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160127": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160128": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160129": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160130": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160131": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160132": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160133": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160134": {
+      "task_type": 601,
+      "phase": 9
+    },
+    "160135": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160136": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160137": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160138": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160139": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160140": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160141": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160142": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160143": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160144": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160145": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160146": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160147": {
+      "task_type": 603,
+      "phase": 1
+    },
+    "160148": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160149": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160150": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160151": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160152": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160153": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160154": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160155": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160156": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160157": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160158": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160159": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160160": {
+      "task_type": 603,
+      "phase": 2
+    },
+    "160161": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160162": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160163": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160164": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160165": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160166": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160167": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160168": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160169": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160170": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160171": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160172": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160173": {
+      "task_type": 603,
+      "phase": 3
+    },
+    "160174": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160175": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160176": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160177": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160178": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160179": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160180": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160181": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160182": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160183": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160184": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160185": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160186": {
+      "task_type": 603,
+      "phase": 4
+    },
+    "160187": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160188": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160189": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160190": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160191": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160192": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160193": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160194": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160195": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160196": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160197": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160198": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160199": {
+      "task_type": 603,
+      "phase": 5
+    },
+    "160200": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160201": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160202": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160203": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160204": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160205": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160206": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160207": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160208": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160209": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160210": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160211": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160212": {
+      "task_type": 603,
+      "phase": 6
+    },
+    "160213": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160214": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160215": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160216": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160217": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160218": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160219": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160220": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160221": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160222": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160223": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160224": {
+      "task_type": 603,
+      "phase": 7
+    },
+    "160225": {
+      "task_type": 603,
+      "phase": 7
+    }
+  },
+  "source_sha256": {
+    "noobversioncfg": "3c83936c5e99638753b7109ff6af9465f7f3febfd4aadb7a065c46535f2ca5f4",
+    "assignmentcfg": "e5455ded9e1976c208b5174c3000252ead0185733d10a872be0eed2fb338d28a"
+  }
+}

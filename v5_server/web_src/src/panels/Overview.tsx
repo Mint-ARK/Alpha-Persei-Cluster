@@ -159,10 +159,14 @@ export default function OverviewPanel() {
   const targetToday = status?.sign_in?.today ?? currentDate.day
 
   const signedDays = useMemo(() => {
-    return status?.sign_in?.signed_days || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    return status?.sign_in?.signed_days ?? []
   }, [status?.sign_in?.signed_days])
 
-  const isSignedToday = status?.sign_in?.is_signed_today ?? true
+  const signedDates = useMemo(() => new Set(
+    status?.sign_in?.signed_dates ?? signedDays.map(day => new CalendarDate(targetYear, targetMonth, day).toString()),
+  ), [status?.sign_in?.signed_dates, signedDays, targetYear, targetMonth])
+
+  const isSignedToday = status?.sign_in?.is_signed_today ?? false
   const totalSignedCount = status?.sign_in?.total_signed ?? signedDays.length
 
   const daysInMonth = useMemo(() => {
@@ -624,15 +628,14 @@ export default function OverviewPanel() {
                   <Calendar.GridBody>
                     {(date) => (
                       <Calendar.Cell date={date} className="h-8 p-0.5">
-                        {({ formattedDate }) => {
-                          const isTargetMonth = date.year === targetYear && date.month === targetMonth
-                          const isSigned = isTargetMonth && signedDays.includes(date.day)
-                          const isToday = isTargetMonth && date.day === targetToday
+                        {({ formattedDate, isOutsideMonth }) => {
+                          const isSigned = signedDates.has(date.toString())
+                          const isToday = date.year === targetYear && date.month === targetMonth && date.day === targetToday
 
                           return (
                             <div
                               className={`relative flex size-full items-center justify-center font-mono text-xs rounded-lg transition-all ${
-                                !isTargetMonth
+                                isOutsideMonth
                                   ? 'text-muted/30 select-none'
                                   : isToday
                                   ? 'font-bold ring-1.5 ring-accent bg-accent/15 text-accent shadow-xs'

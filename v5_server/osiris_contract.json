@@ -1,0 +1,406 @@
+{
+  "activity_id": 323801,
+  "parent_activity": 331001,
+  "limited_activities": [
+    330043,
+    330044,
+    330045,
+    330046
+  ],
+  "limited_tasks": [
+    150395,
+    150396,
+    40103001,
+    40103002,
+    40103003,
+    40103004,
+    40103005,
+    40103006,
+    40103007,
+    40103008,
+    40103009,
+    40103010,
+    40103011,
+    40103012,
+    40103013,
+    40103014,
+    40103015,
+    40103016,
+    40103017,
+    40103018,
+    40103019,
+    40103020,
+    40103021,
+    40103022,
+    40108001
+  ],
+  "stages": {
+    "5260131": {
+      "chapter_id": 1,
+      "pre_stage": 0,
+      "generality": 3,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260132": {
+      "chapter_id": 1,
+      "pre_stage": 5260131,
+      "generality": 3,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260133": {
+      "chapter_id": 1,
+      "pre_stage": 5260132,
+      "generality": 3,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260121": {
+      "chapter_id": 2,
+      "pre_stage": 5260133,
+      "generality": 2,
+      "unlock_charactor": 1075,
+      "rank_activity": 0
+    },
+    "5260122": {
+      "chapter_id": 2,
+      "pre_stage": 5260121,
+      "generality": 2,
+      "unlock_charactor": 1133,
+      "rank_activity": 0
+    },
+    "5260123": {
+      "chapter_id": 2,
+      "pre_stage": 5260122,
+      "generality": 2,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260111": {
+      "chapter_id": 3,
+      "pre_stage": 5260123,
+      "generality": 1,
+      "unlock_charactor": 1111,
+      "rank_activity": 0
+    },
+    "5260112": {
+      "chapter_id": 3,
+      "pre_stage": 5260111,
+      "generality": 1,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260113": {
+      "chapter_id": 3,
+      "pre_stage": 5260112,
+      "generality": 1,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260141": {
+      "chapter_id": 4,
+      "pre_stage": 5260113,
+      "generality": 4,
+      "unlock_charactor": 1042,
+      "rank_activity": 0
+    },
+    "5260142": {
+      "chapter_id": 4,
+      "pre_stage": 5260141,
+      "generality": 4,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260143": {
+      "chapter_id": 4,
+      "pre_stage": 5260142,
+      "generality": 4,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260151": {
+      "chapter_id": 5,
+      "pre_stage": 5260143,
+      "generality": 5,
+      "unlock_charactor": 1138,
+      "rank_activity": 0
+    },
+    "5260152": {
+      "chapter_id": 5,
+      "pre_stage": 5260151,
+      "generality": 5,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260153": {
+      "chapter_id": 5,
+      "pre_stage": 5260152,
+      "generality": 5,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260161": {
+      "chapter_id": 6,
+      "pre_stage": 5260153,
+      "generality": 6,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260162": {
+      "chapter_id": 6,
+      "pre_stage": 5260161,
+      "generality": 6,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260163": {
+      "chapter_id": 6,
+      "pre_stage": 5260162,
+      "generality": 6,
+      "unlock_charactor": 0,
+      "rank_activity": 0
+    },
+    "5260114": {
+      "chapter_id": 7,
+      "pre_stage": 5260163,
+      "generality": 1,
+      "unlock_charactor": 0,
+      "rank_activity": 1
+    },
+    "5260124": {
+      "chapter_id": 7,
+      "pre_stage": 5260163,
+      "generality": 2,
+      "unlock_charactor": 0,
+      "rank_activity": 1
+    },
+    "5260134": {
+      "chapter_id": 7,
+      "pre_stage": 5260163,
+      "generality": 3,
+      "unlock_charactor": 0,
+      "rank_activity": 1
+    },
+    "5260144": {
+      "chapter_id": 7,
+      "pre_stage": 5260163,
+      "generality": 4,
+      "unlock_charactor": 0,
+      "rank_activity": 1
+    },
+    "5260154": {
+      "chapter_id": 7,
+      "pre_stage": 5260163,
+      "generality": 5,
+      "unlock_charactor": 0,
+      "rank_activity": 1
+    },
+    "5260164": {
+      "chapter_id": 7,
+      "pre_stage": 5260163,
+      "generality": 6,
+      "unlock_charactor": 0,
+      "rank_activity": 1
+    }
+  },
+  "chapters": {
+    "1": {
+      "type": 1,
+      "stages": [
+        5260131,
+        5260132,
+        5260133
+      ]
+    },
+    "2": {
+      "type": 1,
+      "stages": [
+        5260121,
+        5260122,
+        5260123
+      ]
+    },
+    "3": {
+      "type": 1,
+      "stages": [
+        5260111,
+        5260112,
+        5260113
+      ]
+    },
+    "4": {
+      "type": 1,
+      "stages": [
+        5260141,
+        5260142,
+        5260143
+      ]
+    },
+    "5": {
+      "type": 1,
+      "stages": [
+        5260151,
+        5260152,
+        5260153
+      ]
+    },
+    "6": {
+      "type": 1,
+      "stages": [
+        5260161,
+        5260162,
+        5260163
+      ]
+    },
+    "7": {
+      "type": 2,
+      "stages": [
+        5260114,
+        5260124,
+        5260134,
+        5260144,
+        5260154,
+        5260164
+      ]
+    }
+  },
+  "heroes": {
+    "1211": {
+      "charactor_type": 1,
+      "charactor_id": 121102,
+      "initial_unlock": 1
+    },
+    "1049": {
+      "charactor_type": 1,
+      "charactor_id": 104904,
+      "initial_unlock": 1
+    },
+    "1034": {
+      "charactor_type": 1,
+      "charactor_id": 103403,
+      "initial_unlock": 1
+    },
+    "1020": {
+      "charactor_type": 1,
+      "charactor_id": 102003,
+      "initial_unlock": 1
+    },
+    "1011": {
+      "charactor_type": 2,
+      "charactor_id": 101108,
+      "initial_unlock": 1
+    },
+    "1111": {
+      "charactor_type": 2,
+      "charactor_id": 111108,
+      "initial_unlock": 0
+    },
+    "1075": {
+      "charactor_type": 2,
+      "charactor_id": 107507,
+      "initial_unlock": 0
+    },
+    "1133": {
+      "charactor_type": 2,
+      "charactor_id": 113303,
+      "initial_unlock": 0
+    },
+    "1081": {
+      "charactor_type": 2,
+      "charactor_id": 108106,
+      "initial_unlock": 1
+    },
+    "1139": {
+      "charactor_type": 2,
+      "charactor_id": 113908,
+      "initial_unlock": 1
+    },
+    "1089": {
+      "charactor_type": 2,
+      "charactor_id": 108904,
+      "initial_unlock": 1
+    },
+    "1138": {
+      "charactor_type": 2,
+      "charactor_id": 113807,
+      "initial_unlock": 0
+    },
+    "1042": {
+      "charactor_type": 2,
+      "charactor_id": 104210,
+      "initial_unlock": 0
+    },
+    "1084": {
+      "charactor_type": 2,
+      "charactor_id": 108408,
+      "initial_unlock": 1
+    },
+    "1013": {
+      "charactor_type": 2,
+      "charactor_id": 101304,
+      "initial_unlock": 1
+    },
+    "1095": {
+      "charactor_type": 2,
+      "charactor_id": 109503,
+      "initial_unlock": 1
+    }
+  },
+  "records": {
+    "93": {
+      "type_id": 93,
+      "name": "4.1奥西里斯-损失生命值次数"
+    },
+    "94": {
+      "type_id": 94,
+      "name": "4.1奥西里斯-获得护盾次数"
+    },
+    "95": {
+      "type_id": 95,
+      "name": "4.1奥西里斯-冰冻秒钟数"
+    },
+    "96": {
+      "type_id": 96,
+      "name": "4.1奥西里斯-奥义时用次数"
+    },
+    "97": {
+      "type_id": 97,
+      "name": "4.1奥西里斯-零时空间累计时长"
+    },
+    "98": {
+      "type_id": 98,
+      "name": "4.1奥西里斯-共性伤害累计层数"
+    },
+    "99": {
+      "type_id": 99,
+      "name": "4.1奥西里斯-队友1单局技能触发次数"
+    },
+    "100": {
+      "type_id": 100,
+      "name": "4.1奥西里斯-队友2单局技能触发次数"
+    }
+  },
+  "mechanic_records": {
+    "340004": 93,
+    "340005": 94,
+    "340006": 95,
+    "340007": 96,
+    "340008": 97,
+    "340009": 98
+  },
+  "scoring": {
+    "kind": "private_time_bonus_v1",
+    "base_point": 800000,
+    "base_time": 120000,
+    "base_factor": 5
+  },
+  "sources": {
+    "decompiled_v2/x64/game/config/activitygeneralitystagecfg.lua": "abfeaf18aecb7cd71920574ef06376707e5155e16cc83f4a6326789a2cb4362d",
+    "decompiled_v2/x64/game/config/activitygeneralitychaptercfg.lua": "9cbb03f72c91311b5a7f3fbecf0e6885a4ee183f5b37604b7072ba356e71fa14",
+    "decompiled_v2/x64/game/config/activitygeneralitycharactorcfg.lua": "df39b57ba18cf774095327d2e638943671f650a05d02eb754e8dd6d5cae5c5e5",
+    "decompiled_v2/x64/game/config/gamesetting.lua": "b319e751fcbd59b8ebd54316f231fe6174c51f1462ace55833a3ec2792dd6dce",
+    "archive/enemy_illustration_20261023/native_config.bytes": "7fc168ed5ba4e9035dab91bcad2a8d9f0b3614c1d4bdbf806ddab645be8c3fc3",
+    "v5_server/data/activity_content_cfg.json": "2bc2b4e43e2f247912b4eaec092ceacd51097f975c0efc53ab2240d5c935a2cc"
+  }
+}

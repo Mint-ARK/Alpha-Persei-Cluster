@@ -31,6 +31,18 @@ def _ensure_schema():
     global _SCHEMA_READY
     if not _SCHEMA_READY:
         ds.ensure_schema()
+        # ChangeBossHeroTeam(45108/45110)仍由Lua调用，但基线p45描述缺少
+        # 这四个消息。补充旧服务端入口使用的id + heroes_cfg兼容格式；
+        # 与相邻梦境请求一致采用目标field1、角色数组field2、ACK result field1。
+        # 此兼容格式需由后续实机抓包确认，不能视作已恢复官方描述。
+        for cmd, target in ((45108, 'id'), (45110, 'group_id')):
+            ds.SCHEMA.setdefault('cs_' + str(cmd), {
+                1: {'name': target, 'number': 1, 'type': 'uint32', 'label': 'required'},
+                2: {'name': 'heroes_cfg', 'number': 2, 'type': 'uint32', 'label': 'repeated'},
+            })
+            ds.SCHEMA.setdefault('sc_' + str(cmd + 1), {
+                1: {'name': 'result', 'number': 1, 'type': 'uint32', 'label': 'required'},
+            })
         # p54 uses team_hrl.hero_info_net_rec, not the same-named p32 full hero.
         # Keep the p32 schema intact and resolve only battle-entry references.
         ds.SCHEMA["p54_team_hero_info_net_rec"] = {
@@ -55,6 +67,19 @@ def _ensure_schema():
         ds.SCHEMA.setdefault("sc_50017", {
             1: {"name": "result", "number": 1, "type": "uint32", "label": "required", "ref": None},
         })
+
+        # p85 Summer ChessBoard uses the same bare name as p40/p49 maps.
+        # Scope only85001 to its native six-field map; keep other families intact.
+        ds.SCHEMA["p85_chess_map_net_rec"] = {
+            1: {"name": "turn", "number": 1, "type": "uint32", "label": "required"},
+            2: {"name": "hero", "number": 2, "type": "message", "label": "repeated", "ref": "chess_board_hero_net_rec"},
+            3: {"name": "floor", "number": 3, "type": "message", "label": "repeated", "ref": "chess_board_floor_map_net_rec"},
+            4: {"name": "object", "number": 4, "type": "message", "label": "repeated", "ref": "chess_board_object_map_net_rec"},
+            5: {"name": "ban_dir", "number": 5, "type": "message", "label": "repeated", "ref": "chess_board_ban_dir_map_net_rec"},
+            6: {"name": "task", "number": 6, "type": "message", "label": "repeated", "ref": "chess_board_task_net_rec"},
+        }
+        if "sc_85001" in ds.SCHEMA and 2 in ds.SCHEMA["sc_85001"]:
+            ds.SCHEMA["sc_85001"][2]["ref"] = "p85_chess_map_net_rec"
 
         # 补充/消除因果观测（WarChess 49xxx）协议歧义
         ds.SCHEMA["p49_chess_map_net_rec"] = {

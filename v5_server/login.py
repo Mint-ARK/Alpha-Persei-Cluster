@@ -54,6 +54,21 @@ def single_plot_progress_frame(frames):
     return result
 
 
+def osiris_point_frame(frames, generator):
+    """Replace only this activity's captured 60201; preserve other owners."""
+    from codec import decode
+    from osiris_service import ACTIVITY
+    result=[]
+    for row in frames:
+        if row[1]==60201:
+            data=json.loads(row[5]) if row[5] else decode(zlib.decompress(row[3]) if row[2][2] else row[3],'sc_60201')
+            if data.get('activity_id')==ACTIVITY:continue
+        result.append(row)
+    marker=next((i for i,r in enumerate(result) if r[1]==10201),len(result))
+    result.insert(marker,(0,60201,generator.build_frame(60201,b'')[:11],b'',1,json.dumps(dict(activity_id=ACTIVITY))))
+    return result
+
+
 def reconcile_oath_rights_before_login(db, uid, log):
     """Backfill existing eligible marriages atomically before profile snapshots."""
     if not uid or db is None:
@@ -102,6 +117,7 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
     if not frames:
         log("[login] login_push 表为空，无洪流", "WARN")
         return 0, 0
+    frames = osiris_point_frame(frames, generator)
     try:
         from birthday_service import ensure_official_mail
         if ensure_official_mail(db,uid):
@@ -117,6 +133,10 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
         log(f'[support] 装饰补给暂未完成，下次登录重试: {exc}', 'WARN')
     from paid_entitlement_service import settle as settle_paid_rights
     settle_paid_rights(db, uid, notify=False)
+    # Recover knowledge before currency/task snapshots, without online deltas.
+    if login_policy.allows(28801):
+        from quanzhou_collection import restore_for_login as restore_quanzhou
+        restore_quanzhou(db, uid)
     # Progress is account data even when an older login row is static.
     # Supply missing packets before the login-complete marker as well.
     present_cmds = {row[1] for row in frames}
@@ -124,12 +144,34 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
         missing_fresh=[cmd for cmd in (12009,12011,12111,28001,41001,59011) if cmd not in present_cmds]
         marker=next((i for i,row in enumerate(frames) if row[1]==10201),len(frames))
         frames[marker:marker]=[(0,cmd,generator.build_frame(cmd,b'')[:11],b'',1,None) for cmd in missing_fresh]
-    missing_account_pushes = [cmd for cmd in (47001, 47003, 24029, 24061, 30001, 19029, 34031, 34023, 34101) if cmd not in present_cmds]
+    missing_account_pushes = [cmd for cmd in (47001, 47003, 24029, 24061, 30001, 19029, 34031, 34023, 34101, 52021, 53001, 68181, 12119, 89011, 68171, 24051, 24043, 85035, 49001, 49023, 51001, 83016, 83017, 83020, 83021, 83026, 79601, 28801, 28837, 86035) if cmd not in present_cmds]
     if missing_account_pushes:
         marker = next((i for i, row in enumerate(frames) if row[1] == 10201), len(frames))
         additions = [(0, cmd, generator.build_frame(cmd, b"")[:11], b"", 1, None)
                      for cmd in missing_account_pushes]
         frames[marker:marker] = additions
+    # p49 initializes account-wide progress/time tables. Captured duplicate or
+    # missing rows must never revive another account's exploration state.
+    chess_commands = (49001, 49023)
+    frames = [r for r in frames if r[1] not in chess_commands]
+    marker = next((i for i,r in enumerate(frames) if r[1] == 10201), len(frames))
+    frames[marker:marker] = [(0,cmd,generator.build_frame(cmd,b'')[:11],b'',1,None)
+                             for cmd in chess_commands if login_policy.allows(cmd)]
+    # 83017's Lua reader requires the activity initialized by83016 first.
+    schedules=[r for r in frames if r[1]==83017]
+    if schedules:
+        frames=[r for r in frames if r[1]!=83017]
+        at=next(i for i,r in enumerate(frames) if r[1]==83016)+1
+        frames[at:at]=schedules[:1]
+    # These readers initialize whole tables. Replace captured duplicates with
+    # exactly one account-owned snapshot after the activity topology.
+    quanzhou_commands = (79601, 28801, 28837, 86035)
+    frames = [r for r in frames if r[1] not in quanzhou_commands]
+    marker = next((i for i, r in enumerate(frames) if r[1] == 10201), len(frames))
+    frames[marker:marker] = [(0, cmd, generator.build_frame(cmd, b'')[:11], b'', 1, None)
+                             for cmd in quanzhou_commands if login_policy.allows(cmd)]
+    frames = [(seq, cmd, h, p, 1 if cmd == 15009 else dynamic, pj)
+              for seq, cmd, h, p, dynamic, pj in frames]
     # 一次登录洪流必须只属于一个资源版本。运行中切换只影响下一次洪流，
     # 避免 192 帧发送途中出现 229/311 活动 ID 混发。
     import res_version_manager as _rvm
@@ -178,6 +220,18 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
         marker = next((i for i, row in enumerate(frames) if row[1] == 10201), len(frames))
         frames.insert(marker, (0, 32009, generator.build_frame(32009, b"")[:11], b"", 1, None))
 
+    # Replace captured PVE snapshots as one coherent account-owned sequence.
+    # Replay actions are request-only: 89113 would launch battle during login.
+    from autochess_login import prepare_login_frames as prepare_autochess_login
+    frames, autochess_payloads = prepare_autochess_login(
+        frames, db, uid, generator, login_policy, log)
+    from rogueteam_login import prepare_login_frames as prepare_rogueteam_login
+    frames, rogue_payloads = prepare_rogueteam_login(frames, db, uid, generator, login_policy)
+    from polyhedron_login import prepare_login_frames as prepare_polyhedron_login
+    frames, polyhedron_payloads = prepare_polyhedron_login(
+        frames, db, uid, generator, login_policy, res_version=login_res_version)
+    owned_payloads = {**autochess_payloads, **rogue_payloads, **polyhedron_payloads}
+
     try:
         from codec import encode as _codec_encode
         _c_enc = _codec_encode
@@ -202,20 +256,30 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                     "INFO",
                 )
                 continue
-            gen = None
+            gen = owned_payloads.get(cmd)
+            osiris_point_push = cmd == 60201 and payload_json and json.loads(payload_json).get('activity_id') == 323801
+            if osiris_point_push:
+                from osiris_service import point_payload
+                gen = _codec_encode('sc_60201',point_payload(db,uid))
+                if not gen:
+                    raise RuntimeError('战术研习积分帧生成失败')
 
             # 1. dynamic == 1 时优先使用 generator 业务生成器
-            if (fresh_save or dynamic or cmd in (47001, 47003, 24029, 24061, 30001, 11001, 20007, 20009, 52001, 19029, 34031, 34023, 34025, 34101) or (cmd == 32009 and dynamic_profile)) and generator is not None:
+            if cmd not in owned_payloads and not osiris_point_push and (fresh_save or dynamic or cmd in (47001, 47003, 24029, 24061, 30001, 11001, 18001, 20007, 20009, 52001, 52021, 53001, 19029, 34031, 34023, 34025, 34101, 68181, 12119, 89011, 68171, 24051, 24043, 85035, 49001, 49023, 51001, 83016, 83017, 83020, 83021, 83026, 79601, 28801, 28837, 86035) or (cmd == 32009 and dynamic_profile)) and generator is not None:
                 try:
                     gen = generator.gen_payload(
                         cmd, uid=uid, db=db, res_version=login_res_version
                     )
                 except Exception as e:
                     log(f"[login] sc_{cmd} 业务动态生成异常: {e}", "WARN")
-                    if fresh_save or cmd in (13009, 14009, 46011, 47001, 47003, 24009, 24029, 24061, 30001, 11001, 20007, 20009, 52001, 19029, 34031, 34023, 34025, 34101) or (cmd == 32009 and dynamic_profile):
+                    if fresh_save or cmd in (13009, 14009, 46011, 47001, 47003, 24009, 24029, 24061, 30001, 11001, 18001, 20007, 20009, 52001, 52021, 53001, 19029, 34031, 34023, 34025, 34101, 68181, 12119, 89011, 68171, 24051, 24043, 85035, 49001, 49023, 51001, 83016, 83017, 83020, 83021, 83026, 79601, 28801, 28837, 86035) or (cmd == 32009 and dynamic_profile):
                         raise RuntimeError(f"sc_{cmd} 当前资产读取失败，拒绝回退旧录制资产") from e
+            if cmd in (68181, 12119, 89011, 68171, 24051, 24043, 85035, 49001, 49023, 51001, 83016, 83017, 83020, 83021, 83026, 79601, 28801, 28837, 86035) and gen is None:
+                raise RuntimeError(f'Ash account push {cmd} missing dynamic payload')
             if cmd in (47001, 47003) and gen is None:
                 raise RuntimeError(f"sc_{cmd} 教学进度生成失败")
+            if cmd == 15009 and gen is None:
+                raise RuntimeError('sc_15009 当前货币状态生成失败')
             if cmd in (34031, 34023, 34025, 34101) and gen is None:
                 raise RuntimeError(f'sc_{cmd} 权益状态生成失败，拒绝回退录制状态')
             if cmd in (24029, 24061) and gen is None:
@@ -224,8 +288,14 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                 raise RuntimeError('sc_24009 主支线进度生成失败，拒绝回退旧录制进度')
             if cmd == 52001 and gen is None:
                 raise RuntimeError('sc_52001 图鉴进度生成失败')
+            if cmd == 52021 and gen is None:
+                raise RuntimeError('sc_52021 过场图设置生成失败')
+            if cmd == 53001 and gen is None:
+                raise RuntimeError('sc_53001 成就状态恢复失败')
             if cmd == 30001 and gen is None:
                 raise RuntimeError('sc_30001 邮件摘要生成失败')
+            if cmd == 18001 and gen is None:
+                raise RuntimeError('sc_18001 多维历程生成失败')
             if cmd == 19029 and gen is None:
                 raise RuntimeError('sc_19029 本地角色聊天初始化失败，拒绝回退旧好友记录')
             if cmd == 32009 and dynamic_profile and gen is None:
@@ -323,22 +393,13 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
 
         if login_policy.allows(11003):
             # 多维变量联动下发 sc_11003：活动 ID/theme 与资源版本同步，
-            # stop_time 统一使用远期时间，周常刷新另由玩法状态管理。
+            # stop_time就是客户端展示的刷新时间，与实际历程周期共用一个计算器。
             # 多维变量周期 11003 推送
             try:
                 import weekly_challenge_service as _wcs
                 from codec import encode as _c_enc
-                nxt_mon = _wcs.get_next_monday_5am()
-                version_cfg = _rvm.get_version_config(login_res_version)
                 p11003 = _c_enc("sc_11003", {
-                    "activity": {
-                        "activity_id": int(version_cfg["polyhedron_activity_id"]),
-                        "start_time": nxt_mon - 604800,
-                        "stop_time": _rvm.FAR_FUTURE_TIMESTAMP,
-                        "state": 1,
-                        "theme": int(version_cfg["theme_id"]),
-                        "template": 73
-                    }
+                    "activity": _wcs.get_polyhedron_activity(login_res_version)
                 })
                 if p11003 and generator is not None:
                     frame_11003 = generator.build_frame(11003, p11003)
@@ -347,31 +408,6 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                     dyn_hit += 1
             except Exception as _e:
                 log(f"[login] 多维变量周期 11003 推送异常: {_e}", "WARN")
-
-        # 虚构推演登录状态联动推送：局内 session (sc_88001) 与属性/血量 (sc_88013 / sc_88019)
-        try:
-            from rogueteam_service import RogueTeamService
-            svc = RogueTeamService.get(db=db)
-            session_data = svc.get_session_data(uid)
-            if session_data and session_data.get("in_game", 0) != 0 and generator is not None:
-                p88001 = _c_enc("sc_88001", session_data)
-                if p88001:
-                    sock.sendall(generator.build_frame(88001, p88001))
-                    sent += 1
-                    dyn_hit += 1
-                p88013 = _c_enc("sc_88013", {"attr_list": session_data.get("attr_list", [])})
-                if p88013:
-                    sock.sendall(generator.build_frame(88013, p88013))
-                    sent += 1
-                    dyn_hit += 1
-                p88019 = _c_enc("sc_88019", {"hero_list": session_data.get("hero_list", [])})
-                if p88019:
-                    sock.sendall(generator.build_frame(88019, p88019))
-                    sent += 1
-                    dyn_hit += 1
-                log(f"[login] 虚构推演在局状态已同步下发 (难度={session_data.get('difficult')}, 层数={session_data.get('floor_num')})")
-        except Exception as _re:
-            log(f"[login] 虚构推演登录态推送异常: {_re}", "WARN")
 
         # 好感与人际关系网登录联动推送：sc_73005 (礼物置换限额) + sc_73007 (已领羁绊故事) + sc_73001 (连携技能网)
         try:

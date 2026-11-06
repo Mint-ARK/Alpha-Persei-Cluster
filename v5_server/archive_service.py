@@ -50,6 +50,7 @@ class ArchiveService:
         self.archives = {int(k): v for k, v in config.get("archives", {}).items()}
         self.hero_to_archive = {int(k): int(v) for k, v in config.get("hero_to_archive", {}).items()}
         self.anecdotes = {int(k): v for k, v in config.get("anecdotes", {}).items()}
+        self.first_tier_gift_ids = frozenset(int(x) for x in config.get('first_tier_gift_ids', []))
         if len(self.archives) != 63 or len(self.hero_to_archive) != 84:
             raise RuntimeError("archive_config.json is incomplete; regenerate it before starting the server")
 
@@ -139,12 +140,16 @@ class ArchiveService:
         if not cfg:
             raise ValueError(f"unknown archive_id: {archive_id}")
         self._require_owned_archive(ctx.db, uid, archive_id)
+        # 一阶礼物来自客户端type10/sub_type1及当前本体偏好，库存可消费不等于可赠送。
+        allowed_gifts = self.first_tier_gift_ids | {int(x) for x in cfg.get('gift_like_ids') or []}
         gifts = []
         for item in gift_list or []:
             item_id = int(item.get("id") or item.get("item_id") or 0)
             num = int(item.get("num") or item.get("item_num") or 0)
             if item_id <= 0 or num <= 0:
                 raise ValueError("gift id and count must be positive")
+            if item_id not in allowed_gifts:
+                raise ValueError(f'item {item_id} is not an allowed first-tier archive gift')
             gifts.append({"id": item_id, "num": num})
         if not gifts:
             raise ValueError("gift_list is empty")

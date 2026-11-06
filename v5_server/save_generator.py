@@ -220,6 +220,9 @@ def _seed_player(db, uid, plan, options, catalogs, templates, now):
         max_phase=max_phase, version_id=cfg['noob_version'], now_sign_times=0, last_sign_ts=0, update_ts=now))
     for key, value in {'save.owner_uid': uid, 'save.profile': PROFILE, 'save.initialized_at': now,
                        'save.generation_version': 1, 'save.noob_policy': 'completion',
+                       # Rogue tutorial tier101 is not implemented. All presets
+                       # skip only this mode's tutorial, independently of 501.
+                       'save.rogueteam_tutorial': 'skip',
                        'save.options': json.dumps(asdict(options), ensure_ascii=False),
                        'save.resource_version': plan['resource_version']}.items():
         db.set_system_config(key, str(value))
