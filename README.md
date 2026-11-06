@@ -414,7 +414,7 @@
 
 ## 项目贡献者
 
-感谢 [@Rachel08311](https://github.com/Rachel08311) 通过 [Issue #8](https://github.com/Mint-ARK/Alpha-Persei-Cluster/issues/8) 提供虚构推演修复补丁、后续修正与实测反馈。完整名单见[项目贡献者](CONTRIBUTORS.md)。
+感谢 [@a3164155](https://github.com/a3164155)、[@LingYzh](https://github.com/LingYzh)、[@baixiaoxiao831](https://github.com/baixiaoxiao831)、[@Rachel08311](https://github.com/Rachel08311)、[@qiuyuxc](https://github.com/qiuyuxc) 提供代码补丁、问题报告、排查资料和实测反馈，也感谢 [@Arborsm](https://github.com/Arborsm) 参与讨论与建议。详细贡献与对应 Issue 见[项目贡献者名单](CONTRIBUTORS.md)。
 
 ---
 
