@@ -106,9 +106,11 @@ sh server.sh run --db '新存档_01.db' --no-dns
 
 ## Nginx 安全应用
 
-自动接入要求已安装 Nginx、有配置目录及进程控制权限，使用默认配置入口。向导不会自动安装 Nginx。自定义 `-c/-p/-g` 实例、无法确认的 PID、其他站点已配置游戏域名时停止自动接管，应手动处理。
+自动接入要求已安装 Nginx、有配置目录及进程控制权限，使用默认配置入口。宝塔用 `-c` 指定同一配置文件时可以接入。自定义配置入口或前缀、无法确认的 PID、其他站点已配置游戏域名时应手动处理。
 
-向导只管理指定 include 目录下的 `aethergazer-game.conf`，不干涉主配置和其他网站。默认目录 `/etc/nginx/conf.d` 必须已被主配置加载；会通过 `nginx -T`（含语法检查）验证，运行网站的云服务器在修改NG配置时请务必确认语法校验正确。
+标准 Nginx 模式在已加载的 include 目录写入 `aethergazer-game.conf`，默认目录为 `/etc/nginx/conf.d`。使用自定义面板域名时，先为该域名配置 HTTPS 证书和续签。宝塔半自动选项使用该站点已有的 `extension/<域名>/*.conf` 加载面板规则，宝塔继续负责证书和 ACME 验证。手动选项生成 `nginx_aethergazer_panel.conf`，将它包含到对应域名的 HTTPS 站点内。
+
+面板扩展只处理面板首页、`/web/` 和 `/api/gm/`。游戏 HTTP/HTTPS 仍由独立游戏站点转发，游戏 TCP 和战斗 UDP 由服务端直接监听。两个站点访问本机 HTTPS 后端时使用同一份 `sdk_ca.crt` 校验上游证书。
 
 应用过程：
 

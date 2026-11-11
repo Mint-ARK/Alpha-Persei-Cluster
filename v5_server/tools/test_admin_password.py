@@ -120,8 +120,7 @@ class PasswordTests(unittest.TestCase):
         self.assertEqual(client.post('/api/gm/auth/login', json={'password': PASSWORD}).status_code, 404)
 
     def test_console_aliases_and_unknown_auth_routes_cannot_reach_fallback(self):
-        for path in ('/', '/web', '/web/', '/web/index.html', '/static_web/control-panel.html',
-                     '/web//gm_console.html', '/web/./gm_console.html', '/api/system/res_version',
+        for path in ('/web//gm_console.html', '/web/./gm_console.html', '/api/system/res_version',
                      '/legacy-admin-alias'):
             self.assertEqual(self.request('GET', path).status_code, 401, path)
         self.assertEqual(self.request('POST', '/api/gm/auth/missing', json={'password': PASSWORD}).status_code, 404)
@@ -313,6 +312,18 @@ class PasswordTests(unittest.TestCase):
         with patch.object(gm_api, 'init_gm_api'), patch.object(gm_api, '_global_get_db', side_effect=AssertionError('real DB forbidden')):
             app = server_net.build_https_app(None)
             client = app.test_client()
+            entry = self.request('GET', '/', client=client, follow_redirects=True)
+            self.assertEqual(entry.status_code, 200)
+            self.assertIn(b'<html', entry.data.lower())
+            entry.close()
+            for path in ('/web/gm_console.html', '/static_web/gm_console.html'):
+                head = self.request('HEAD', path, client=client)
+                self.assertEqual(head.status_code, 200)
+                head.close()
+                self.assertEqual(self.request('POST', path, client=client).status_code, 401)
+                self.assertEqual(self.request('GET', path, client=client,
+                                              headers={'Origin': 'https://evil.test'}).status_code, 403)
+            self.assertFalse(self.request('GET', '/api/gm/auth/session', client=client).json['authenticated'])
             count = 0
             for rule in app.url_map.iter_rules():
                 if not rule.endpoint.startswith('gm_api.') and rule.endpoint != 'shell_res_version':

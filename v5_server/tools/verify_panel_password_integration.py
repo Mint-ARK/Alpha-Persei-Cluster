@@ -37,6 +37,12 @@ class PanelPasswordIntegrationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             auth.hash_password("short123")
 
+    def test_config_args_excludes_admin_auth_configured(self):
+        # admin_auth_configured must never be emitted into main.py arguments
+        cfg = dict(lm.DEFAULTS, admin_auth_configured=True)
+        args = lm.config_args(cfg)
+        self.assertNotIn("--admin-auth-configured", args)
+
     def test_static_web_bundle_contains_lock_screen_assets(self):
         # Verify compiled frontend bundle contains lock screen and auth logic
         app_js = ROOT / "static_web/app.js"

@@ -248,11 +248,25 @@ class LinuxSetupTests(unittest.TestCase):
 
     def test_service_template_preserves_python_and_quotes_paths(self):
         target = self.folder() / "中文 $folder %space"
-        with patch.object(lm, "ROOT", target), patch.dict(sys.modules, {"pwd": Mock(getpwuid=Mock(return_value=Mock(pw_name="fixture")))}), patch.object(os, "getuid", return_value=1000, create=True):
+        venv_python = target / ".venv/bin/python"
+        venv_python.parent.mkdir(parents=True)
+        venv_python.touch()
+        original_resolve = Path.resolve
+
+        def resolve(path, *args, **kwargs):
+            if path == venv_python:
+                return Path(sys.executable)
+            return original_resolve(path, *args, **kwargs)
+
+        with (patch.object(lm, "ROOT", target),
+              patch.dict(sys.modules, {"pwd": Mock(getpwuid=Mock(return_value=Mock(pw_name="fixture")))}),
+              patch.object(os, "getuid", return_value=1000, create=True),
+              patch.object(os, "access", return_value=True),
+              patch.object(Path, "resolve", resolve)):
             lm.generate_templates(self.config())
         unit = (target / "linux_generated/aethergazer.service").read_text("utf-8")
         self.assertIn("$$folder %%space", unit)
-        self.assertIn("PYTHON_BIN=", unit)
+        self.assertIn('Environment="PYTHON_BIN=' + venv_python.as_posix().replace('%', '%%') + '"', unit)
         self.assertIn("Restart=on-failure", unit)
         self.assertIn('server.sh" run', unit)
         self.assertNotIn("run_server.sh", unit)
@@ -275,6 +289,7 @@ class LinuxSetupTests(unittest.TestCase):
         stack.enter_context(patch.object(ng, "pid_running", return_value=True))
         stack.enter_context(patch.object(ng, "dump_config", side_effect=lambda: f"# configuration file {path}:\n" + (path.read_text() if path.exists() else "")))
         stack.enter_context(patch.object(ng, "health"))
+        stack.enter_context(patch.object(ng, 'prepare_certificate'))
         stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
         return stack
 
@@ -366,13 +381,16 @@ class LinuxSetupTests(unittest.TestCase):
     def test_nginx_normal_systemd_flags_allowed_custom_entry_rejected(self):
         pid = self.folder() / "nginx.pid"
         pid.write_text("1234")
-        for flags, allowed in (("-g daemon on; master_process on;", True), ("-c/etc/other.conf", False), ("-g pid /tmp/other.pid;", False)):
+        default = pid.with_name('nginx.conf')
+        dump = f'# configuration file {default}:\npid {pid};'
+        for flags, allowed in (("-g daemon on; master_process on;", True), (f'-c {default}', True),
+                               ("-c/etc/other.conf", False), ("-g pid /tmp/other.pid;", False)):
             with self.subTest(flags=flags), patch.object(ng.os, "kill"), patch.object(Path, "exists", return_value=True), patch.object(Path, "read_bytes", return_value=("nginx: master process /usr/sbin/nginx " + flags).encode()):
                 if allowed:
-                    self.assertTrue(ng.pid_running(f"pid {pid};"))
+                    self.assertTrue(ng.pid_running(dump))
                 else:
                     with self.assertRaises(ValueError):
-                        ng.pid_running(f"pid {pid};")
+                        ng.pid_running(dump)
 
 
     def test_wizard_external_proxy_custom_domain_and_acme_config(self):
@@ -381,7 +399,7 @@ class LinuxSetupTests(unittest.TestCase):
             "public", "43.139.154.74",  # 模式与公网 IP
             "1",                         # 外部反向代理
             "ag.moriaruruka.com",        # 自定义域名
-            "3",                         # 不使用 HTTPS (纯 HTTP / 独立生成配置)
+            "2",                         # 已有 HTTPS 站点，手动包含生成的面板片段
             "", "", "", "", "",          # 端口
             "off",                       # CDN
             "AdminPassword123",          # 控制面板管理密码
@@ -405,18 +423,20 @@ class LinuxSetupTests(unittest.TestCase):
         self.assertEqual(config["usage"], "public")
         self.assertEqual(config["host_ip"], "43.139.154.74")
         self.assertEqual(config["custom_domain"], "ag.moriaruruka.com")
-        self.assertEqual(config["domain_proxy_mode"], "no_https")
+        self.assertEqual(config["domain_proxy_mode"], "manual")
+        legacy = lm.validate_config(dict(config, domain_proxy_mode='no_https'))
+        self.assertEqual(legacy['domain_proxy_mode'], 'manual')
         self.assertEqual(config["https_port"], 18443)
 
         conf_file = target / "nginx_aethergazer.conf"
         self.assertTrue(conf_file.is_file())
         conf_text = conf_file.read_text(encoding="utf-8")
-        self.assertIn("ag.moriaruruka.com", conf_text)
+        self.assertNotIn("ag.moriaruruka.com", conf_text)
         self.assertIn("43.139.154.74", conf_text)
         self.assertIn("location ^~ /.well-known/acme-challenge/", conf_text)
 
         out_text = output.getvalue()
-        self.assertIn("http://ag.moriaruruka.com/web/control-panel.html", out_text)
+        self.assertIn("https://ag.moriaruruka.com/web/gm_console.html", out_text)
 
     def test_wizard_semi_auto_proxy_injection(self):
         output = io.StringIO()
@@ -428,17 +448,25 @@ class LinuxSetupTests(unittest.TestCase):
         vhost_dir = target / "vhost_nginx"
         vhost_dir.mkdir()
         site_conf = vhost_dir / "ag.moriaruruka.com.conf"
-        site_conf.write_text("""server {
+        extension = vhost_dir / 'extension/ag.moriaruruka.com'
+        extension.mkdir(parents=True)
+        original = """server {
     listen 80;
     listen 443 ssl;
     server_name ag.moriaruruka.com;
     ssl_certificate /path/to/fullchain.pem;
     ssl_certificate_key /path/to/privkey.pem;
-    location / {
-        root /www/wwwroot/ag.moriaruruka.com;
-    }
 }
-""", encoding="utf-8")
+""".replace('\n}', f'\n    include "{extension / "*.conf"}";\n}}')
+        site_conf.write_text(original, encoding='utf-8')
+        game_conf = vhost_dir / ng.NAME
+        panel_conf = extension / ng.PANEL_NAME
+        for name in ('sdk_cert.pem', 'sdk_key.pem', 'sdk_ca.crt'):
+            (target / name).write_text('fixture', encoding='utf-8')
+
+        def dump():
+            return '\n'.join(f'# configuration file {file}:\n{file.read_text("utf-8")}'
+                             for file in (site_conf, game_conf, panel_conf) if file.exists())
 
         answers = [
             "public", "43.139.154.74",  # 模式与公网 IP
@@ -459,6 +487,13 @@ class LinuxSetupTests(unittest.TestCase):
                 stack.enter_context(patch.object(lm, fn))
             stack.enter_context(patch.object(lm, "is_termux", return_value=False))
             stack.enter_context(patch("builtins.input", side_effect=answers))
+            stack.enter_context(patch.object(lm, 'ask_password_prompt', side_effect=lambda prompt: input(prompt)))
+            stack.enter_context(patch.object(ng.shutil, 'which', return_value='/usr/sbin/nginx'))
+            stack.enter_context(patch.object(ng, 'dump_config', side_effect=dump))
+            stack.enter_context(patch.object(ng, 'pid_running', return_value=True))
+            stack.enter_context(patch.object(ng, 'health'))
+            stack.enter_context(patch.object(ng, 'prepare_certificate'))
+            reload = stack.enter_context(patch.object(ng, 'command'))
             stack.enter_context(contextlib.redirect_stdout(output))
             lm.setup()
 
@@ -466,17 +501,11 @@ class LinuxSetupTests(unittest.TestCase):
         self.assertEqual(config["domain_proxy_mode"], "semi")
         self.assertEqual(config["site_conf_path"], str(site_conf.resolve()))
 
-        # 检查原站点配置是否成功注入反代规则
-        updated_site_text = site_conf.read_text(encoding="utf-8")
-        self.assertIn("# --- AetherGazer Web GM Proxy Start ---", updated_site_text)
-        self.assertIn("proxy_pass https://127.0.0.1:18443;", updated_site_text)
-
-        # 检查是否成功生成备份文件
-        baks = list(vhost_dir.glob("ag.moriaruruka.com.conf.bak.*"))
-        self.assertTrue(len(baks) >= 1)
+        self.assertEqual(site_conf.read_text('utf-8'), original)
+        self.assertIn('location ^~ /web/ {', panel_conf.read_text('utf-8'))
+        reload.assert_called_once_with(['nginx', '-s', 'reload'])
 
         # 检查游戏专用反代配置是否已复制且绝不包含面板域名
-        game_conf = vhost_dir / "nginx_aethergazer.conf"
         self.assertTrue(game_conf.is_file())
         game_conf_text = game_conf.read_text(encoding="utf-8")
         self.assertNotIn("ag.moriaruruka.com", game_conf_text)
@@ -521,7 +550,7 @@ class LinuxSetupTests(unittest.TestCase):
 
         out_text = output.getvalue()
         self.assertIn("[手动配置反向代理指南]", out_text)
-        self.assertIn("宝塔面板用户 (推荐可视化操作)", out_text)
+        self.assertIn("nginx_aethergazer_panel.conf", out_text)
 
     def test_wizard_semi_auto_retry_path(self):
         output = io.StringIO()
@@ -586,32 +615,18 @@ class LinuxSetupTests(unittest.TestCase):
             self.assertEqual(cm.exception.code, 0)
         self.assertIn("已通过 Ctrl+C 中断配置向导", output.getvalue())
 
-    def test_inject_proxy_into_site_conf_unit(self):
+    def test_panel_proxy_paths_and_tls_match_game_proxy(self):
         folder = self.folder()
-        conf = folder / "test_site.conf"
-
-        # Case 1: Existing server block
-        conf.write_text("server {\n    server_name test.com;\n}\n", encoding="utf-8")
-        bak = ng.inject_proxy_into_site_conf(conf, 18443, "test.com")
-        self.assertTrue(bak.is_file())
-        text = conf.read_text(encoding="utf-8")
-        self.assertIn("location ^~ /", text)
-        self.assertIn("proxy_pass https://127.0.0.1:18443;", text)
-
-        # Case 2: Idempotent re-injection replaces existing block
-        ng.inject_proxy_into_site_conf(conf, 19443, "test.com")
-        text2 = conf.read_text(encoding="utf-8")
-        self.assertEqual(text2.count("location ^~ /"), 1)
-        self.assertIn("proxy_pass https://127.0.0.1:19443;", text2)
-
-        # Case 3: Empty file or without server block
-        conf_empty = folder / "empty.conf"
-        conf_empty.write_text("", encoding="utf-8")
-        ng.inject_proxy_into_site_conf(conf_empty, 18443, "empty.com")
-        empty_text = conf_empty.read_text(encoding="utf-8")
-        self.assertIn("server {", empty_text)
-        self.assertIn("server_name empty.com;", empty_text)
-        self.assertIn("proxy_pass https://127.0.0.1:18443;", empty_text)
+        config = dict(self.config(), custom_domain='test.com', https_port=18443)
+        panel = ng.render_panel_config(folder, config)
+        game = ng.render_config(folder, config)
+        self.assertNotIn('location ^~ / {', panel)
+        self.assertNotIn('acme-challenge', panel)
+        self.assertIn('location ^~ /api/gm/ {', panel)
+        self.assertIn('location ^~ /.well-known/acme-challenge/ {', game)
+        for snippet in (panel, game):
+            self.assertIn('proxy_ssl_verify on;', snippet)
+            self.assertIn(f'proxy_ssl_trusted_certificate {ng.quoted_path(folder / "sdk_ca.crt")};', snippet)
 
     def test_is_server_process_validation(self):
         target = self.sandbox / "proc_test"
