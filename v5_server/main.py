@@ -134,6 +134,7 @@ def main(argv=None):
     ap.add_argument("--custom-domain", default="", help="自定义面板访问域名")
     ap.add_argument("--domain-proxy-mode", choices=("none", "semi", "manual", "no_https"), default="none", help="域名反代对接方式")
     ap.add_argument("--site-conf-path", default="", help="外部站点配置文件绝对路径")
+    ap.add_argument("--admin-auth-configured", default=None, help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
 
     if args.list_resource_profiles:

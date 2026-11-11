@@ -14,8 +14,7 @@ import time
 MARKER = "# Managed by AetherGazer Linux setup v2"
 NAME = "aethergazer-game.conf"
 DOMAINS = "ys4fun.com *.ys4fun.com ys4fun.cn *.ys4fun.cn soboten.com *.soboten.com"
-PROXY_MARKER_START = "# --- AetherGazer Web GM Proxy Start ---"
-PROXY_MARKER_END = "# --- AetherGazer Web GM Proxy End ---"
+PANEL_NAME = "aethergazer-panel.conf"
 
 
 def quoted_path(path):
@@ -30,22 +29,11 @@ def get_server_domains(config):
     host_ip = str(config.get("host_ip") or "").strip()
     if host_ip and host_ip not in ("127.0.0.1", "0.0.0.0", "::1"):
         domains.append(host_ip)
-    proxy_mode = str(config.get("domain_proxy_mode") or "none").strip()
-    # 半自动或手动反代模式下，自定义面板域名由外部站点配置接管，游戏客户端专用的反代配置中不可包含该域名，
-    # 彻底杜绝 Nginx duplicate/conflicting server name 警告冲突！
-    if proxy_mode in ("semi", "manual"):
-        return " ".join(domains)
-    custom = str(config.get("custom_domain") or "").strip()
-    if custom:
-        for d in custom.split():
-            if d not in domains:
-                domains.append(d)
     return " ".join(domains)
 
 
-def render_site_proxy_location(https_port):
-    return f"""    {PROXY_MARKER_START}
-    location ^~ / {{
+def upstream_directives(root, https_port):
+    return f"""
         proxy_pass https://127.0.0.1:{https_port};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -53,59 +41,28 @@ def render_site_proxy_location(https_port):
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_ssl_server_name on;
         proxy_ssl_name open.ys4fun.com;
-        proxy_ssl_verify off;
+        proxy_ssl_verify on;
+        proxy_ssl_trusted_certificate {quoted_path(root / 'sdk_ca.crt')};
         proxy_read_timeout 300s;
-        proxy_buffering off;
+        proxy_buffering off;"""
+
+
+def render_panel_config(root, config):
+    domain = config['custom_domain']
+    upstream = upstream_directives(root, config['https_port'])
+    return f'''{MARKER}
+    location = / {{
+        return 302 https://{domain}/web/gm_console.html;
     }}
-    {PROXY_MARKER_END}"""
 
+    location ^~ /web/ {{
+        if ($scheme = http) {{ return 308 https://{domain}$request_uri; }}{upstream}
+    }}
 
-def inject_proxy_into_site_conf(site_conf_path, https_port, custom_domain=""):
-    """安全地向外部 Nginx 站点配置注入或更新反向代理规则，操作前自动备份原文件。"""
-    path = Path(site_conf_path).resolve()
-    if not path.is_file():
-        raise FileNotFoundError(f"配置文件不存在: {path}")
-
-    # 1. 备份原文件
-    backup_path = path.with_name(f"{path.name}.bak.{int(time.time())}")
-    shutil.copy2(path, backup_path)
-
-    content = path.read_text(encoding="utf-8")
-    proxy_block = render_site_proxy_location(https_port)
-
-    # 2. 如果已存在本向导标记块，则精准替换
-    if PROXY_MARKER_START in content and PROXY_MARKER_END in content:
-        pattern = re.compile(
-            re.escape(PROXY_MARKER_START) + r".*?" + re.escape(PROXY_MARKER_END),
-            re.DOTALL
-        )
-        new_content = pattern.sub(proxy_block.strip(), content)
-    elif re.search(r"\bserver\s*\{", content):
-        # 已有 server 块：在末尾反大括号前插入反代规则
-        last_brace_index = content.rfind("}")
-        if last_brace_index != -1:
-            new_content = (
-                content[:last_brace_index].rstrip() +
-                "\n\n" + proxy_block + "\n" +
-                content[last_brace_index:]
-            )
-        else:
-            new_content = content + "\n\n" + proxy_block + "\n"
-    else:
-        # 文件无 server 块（空文件或配置片段）：包裹生成标准完整 server 块
-        domain_str = custom_domain.strip() if custom_domain else "_"
-        new_content = (
-            f"# Managed by AetherGazer semi-auto proxy setup\n"
-            f"server {{\n"
-            f"    listen 80;\n"
-            f"    listen 443 ssl;\n"
-            f"    server_name {domain_str};\n\n"
-            f"{proxy_block}\n"
-            f"}}\n"
-        )
-
-    path.write_text(new_content, encoding="utf-8")
-    return backup_path
+    location ^~ /api/gm/ {{
+        if ($scheme = http) {{ return 308 https://{domain}$request_uri; }}{upstream}
+    }}
+'''
 
 
 def render_config(root, config, token=None):
@@ -131,18 +88,7 @@ server {{
         try_files $uri =404;
     }}
 
-    location / {{
-        proxy_pass https://127.0.0.1:{config['https_port']};
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_ssl_server_name on;
-        proxy_ssl_name open.ys4fun.com;
-        proxy_ssl_verify on;
-        proxy_ssl_trusted_certificate {quoted_path(root / 'sdk_ca.crt')};
-        proxy_read_timeout 300s;
-        proxy_buffering off;
+    location / {{{upstream_directives(root, config['https_port'])}
     }}
 }}
 '''
@@ -220,70 +166,115 @@ def pid_running(dump):
     if not process.exists() or "nginx: master process" not in process.read_bytes().decode(errors="replace"):
         raise ValueError("无法核验默认Nginx主进程；自定义实例请手动应用模板")
     title = process.read_bytes().decode(errors="replace")
-    if re.search(r"(?:^|\s)-(?:c|p)", title):
-        raise ValueError("检测到带自定义配置/前缀的Nginx实例；请手动应用模板，避免操作错误实例")
+    if re.search(r'(?:^|\s)-p', title):
+        raise ValueError('检测到自定义 Nginx 前缀，请手动应用模板')
+    config_option = re.search(r'(?:^|\s)-c\s*([^\s\x00]+)', title)
+    if config_option:
+        active = Path(config_option[1].strip('"\''))
+        default = re.search(r'(?m)^# configuration file (.+):\s*$', dump)
+        if not default or not active.is_absolute() or active.resolve() != Path(default[1]).resolve():
+            raise ValueError('Nginx 主进程使用其他配置文件，请手动应用模板')
     globals_option = re.search(r"(?:^|\s)-g\s*(.*)$", title)
     if globals_option and not re.fullmatch(r"(?:\s*(?:daemon|master_process)\s+(?:on|off)\s*;\s*)+", globals_option[1].strip().strip('\"\'')):
         raise ValueError("Nginx使用了额外全局配置；请手动应用模板，避免PID或配置不一致")
     return True
 
 
-def apply_nginx(root, config, previous, config_path, commit):
+def managed_paths(config):
+    if not config:
+        return None, None
+    if config.get('domain_proxy_mode') == 'semi' and config.get('site_conf_path'):
+        site = Path(config['site_conf_path']).resolve()
+        panel_dir = site.parent / 'extension' / config['custom_domain']
+        return site.parent / NAME, panel_dir / PANEL_NAME
+    if config.get('nginx'):
+        return Path(config['nginx_dir']).resolve() / NAME, None
+    return None, None
+
+
+def check_panel_include(config, sections, panel_path):
+    site = Path(config['site_conf_path']).resolve()
+    body = re.sub(r'(?m)^\s*#.*$', '', sections.get(site, ''))
+    names = re.findall(r'\bserver_name\s+([^;]+);', body)
+    includes = {value.strip().strip('"\'') for value in re.findall(r'\binclude\s+([^;]+);', body)}
+    if (len(re.findall(r'(?m)^\s*server\s*\{', body)) != 1
+            or names != [config['custom_domain']]
+            or str(panel_path.parent / '*.conf') not in includes
+            or panel_path.parent.resolve() != panel_path.parent):
+        raise ValueError('半自动需要宝塔已加载的独立 HTTPS 站点及其 extension/*.conf，请检查路径或选择手动配置')
+    if not re.search(r'(?m)^\s*listen\s+[^;]*\b443\s+[^;]*\bssl\b', body):
+        raise ValueError('请先在宝塔站点启用 HTTPS，再运行半自动配置')
+
+
+def prepare_certificate(root, host_ip):
+    from gen_cert import generate_dual_layer_certs
+
+    # Nginx reads the leaf at reload, before the game process first starts.
+    if not generate_dual_layer_certs(output_dir=root, extra_ips=[host_ip]):
+        raise RuntimeError('Nginx 上游证书准备失败')
+
+
+def apply_nginx(root, config, previous, config_path, commit, *, local_paths=()):
     """Restore only our touched files, not unrelated concurrently edited sites."""
     from linux_manager import backup_write
     if not shutil.which("nginx"):
         raise ValueError("未安装Nginx。请安装后重试，或关闭Nginx选项；未保存配置")
-    old_dir = Path(previous["nginx_dir"]) if previous and previous.get("nginx") else None
-    new_dir = Path(config["nginx_dir"]) if config.get("nginx") else None
-    paths = []
-    if old_dir is not None and old_dir.is_dir():
-        paths.append(old_dir / NAME)
-    if new_dir is not None:
-        if not new_dir.is_dir() or not os.access(new_dir, os.W_OK):
-            raise ValueError(f"Nginx配置目录不存在或不可写: {new_dir}；请检查路径和权限")
-        paths.append(new_dir / NAME)
-    paths = list(dict.fromkeys(paths))
+    game_path, panel_path = managed_paths(config)
+    paths = list(dict.fromkeys(path for path in (*managed_paths(previous), game_path, panel_path) if path))
     for path in paths:
         if path.is_symlink() or (path.exists() and not path.read_text("utf-8").startswith(MARKER)):
             raise ValueError(f"拒绝接管非本向导创建的配置: {path}")
     before = dump_config()
     running = pid_running(before)
-    if config["nginx"]:
+    sections = re.split(r"(?m)^# configuration file (.+):\s*$", before)
+    sections = {Path(name).resolve(): body for name, body in zip(sections[1::2], sections[2::2])}
+    if panel_path:
+        check_panel_include(config, sections, panel_path)
+    for path in (game_path, panel_path):
+        if path and (not path.parent.is_dir() or not os.access(path.parent, os.W_OK)):
+            raise ValueError(f"Nginx配置目录不存在或不可写: {path.parent}")
+    if game_path:
         for file in ("sdk_cert.pem", "sdk_key.pem", "sdk_ca.crt"):
             if not (root / file).is_file():
                 raise ValueError(f"缺少Nginx所需证书: {file}")
         # Reject exact/wildcard game-host ownership in other config files.
-        sections = re.split(r"(?m)^# configuration file (.+):\s*$", before)
-        for index in range(1, len(sections), 2):
-            if Path(sections[index]).resolve() in [p.resolve() for p in paths]:
+        for name, body in sections.items():
+            if name in paths:
                 continue
-            body = re.sub(r"(?m)#.*$", "", sections[index + 1])
+            body = re.sub(r"(?m)#.*$", "", body)
             for names in re.findall(r"\bserver_name\s+([^;]+);", body):
                 if any(re.search(r"(?:ys4fun\.(?:com|cn)|soboten\.com)", name) for name in names.split()):
-                    raise ValueError(f"其他站点已配置游戏域名: {sections[index]}；请手动合并，未改动")
-    snapshots = {path: (path.read_bytes(), path.stat().st_mode & 0o777) if path.exists() else None for path in [*paths, Path(config_path)]}
+                    raise ValueError(f"其他站点已配置游戏域名: {name}；请手动合并，未改动")
+        prepare_certificate(root, config['host_ip'])
+    config_paths = (Path(config_path), *local_paths)
+    snapshots = {path: (path.read_bytes(), path.stat().st_mode & 0o777) if path.exists() else None
+                 for path in [*paths, *config_paths]}
     token = secrets.token_hex(16)
     applied = False
     touched = []
     try:
         for path in paths:
             touched.append(path)
-            if new_dir is not None and path == new_dir / NAME:
+            if path == game_path:
                 backup_write(path, render_config(root, config, token), 0o644)
+            elif path == panel_path:
+                backup_write(path, render_panel_config(root, config), 0o644)
             elif path.exists():
                 archive_file(path)
         after = dump_config()
-        if config["nginx"] and (token not in after or str(new_dir / NAME) not in after):
+        if game_path and (token not in after or str(game_path) not in after):
             raise ValueError("指定目录未被Nginx加载，请选择nginx.conf实际include的目录")
+        if panel_path and str(panel_path) not in after:
+            raise ValueError("面板扩展配置未被 Nginx 加载")
         if running:
             applied = True  # reload may have succeeded even if the command times out.
             command(["nginx", "-s", "reload"])
-        elif config["nginx"]:
+        elif game_path:
             applied = True
             command(["nginx"])
-        if config["nginx"]:
+        if game_path:
             health(root, token)
-        touched.append(Path(config_path))
+        touched.extend(config_paths)
         commit()
     except BaseException as original:
         failures = []
@@ -308,5 +299,7 @@ def apply_nginx(root, config, previous, config_path, commit):
             raise RuntimeError(f"{original}\n" + "\n".join(failures) + "\n备份保存在各文件同级archive，请检查。") from original
         raise
     print("Nginx已提交热加载。" if running else "Nginx配置已应用。")
-    if config["nginx"]:
-        print("游戏域名HTTPS路由验证通过；Python后端尚未启动，本次不宣称游戏连接通过。")
+    if game_path:
+        print(f"游戏反代已加载: {game_path}")
+    if panel_path:
+        print(f"面板站点扩展已加载: {panel_path}")

@@ -138,6 +138,16 @@ def backup_write(path, content, mode=0o600):
     path.chmod(mode)
 
 
+def panel_domain(value):
+    if not isinstance(value, str):
+        raise ValueError('自定义域名必须为字符串')
+    domain = value.strip().lower()
+    label = r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?'
+    if domain and (len(domain) > 253 or not re.fullmatch(rf'{label}(?:\.{label})*', domain)):
+        raise ValueError('请输入一个域名，不含协议、路径或端口')
+    return domain
+
+
 def validate_config(value):
     if not isinstance(value, dict) or value.get("schema") not in (1, 2):
         raise ValueError("Linux 配置版本无效，请重新运行 server.sh setup")
@@ -159,12 +169,15 @@ def validate_config(value):
         raise ValueError("Linux 配置字段缺失或未知")
     if value['cdn_mode'] not in ('off', 'relay', 'cache'):
         raise ValueError('CDN模式必须为off、relay或cache')
-    if not isinstance(value["custom_domain"], str):
-        raise ValueError("自定义域名必须为字符串")
-    if value["domain_proxy_mode"] not in ("none", "semi", "manual", "no_https"):
+    value['custom_domain'] = panel_domain(value['custom_domain'])
+    if value['domain_proxy_mode'] == 'no_https':
+        value['domain_proxy_mode'] = 'manual' if value['custom_domain'] else 'none'
+    if value["domain_proxy_mode"] not in ("none", "semi", "manual"):
         raise ValueError("无效域名反代对接方式")
     if not isinstance(value["site_conf_path"], str):
         raise ValueError("站点配置文件路径必须为字符串")
+    if value['domain_proxy_mode'] == 'semi' and not (value['custom_domain'] and value['site_conf_path']):
+        raise ValueError('半自动配置需要面板域名和宝塔站点文件')
     if not isinstance(value["host_ip"], str) or not isinstance(value["web_bind"], str):
         raise ValueError("IP地址必须为字符串")
     address = ipaddress.IPv4Address(value["host_ip"])
@@ -205,7 +218,7 @@ def load_config(path=None):
 def config_args(config):
     args = []
     for name in DEFAULTS:
-        if name in ("custom_domain", "domain_proxy_mode", "site_conf_path"):
+        if name in ("custom_domain", "domain_proxy_mode", "site_conf_path", "admin_auth_configured"):
             continue
         if name == "dns":
             if config[name]:
@@ -666,7 +679,6 @@ def print_configuration_summary(config, proxy_mode):
     domain_mode_desc = {
         "semi": "半自动注入现有站点配置 (Semi-Auto)",
         "manual": "手动配置反向代理 (Manual)",
-        "no_https": "不使用 HTTPS (纯 HTTP 访问)",
         "none": "未启用 (IP直连)",
     }.get(domain_mode, "未启用")
     domain_display = custom_domain if custom_domain else "未绑定 (仅使用主机IP)"
@@ -689,39 +701,14 @@ def print_completion_guide(config, proxy_mode):
     domain_mode = str(config.get("domain_proxy_mode") or "none").strip()
 
     if domain_mode == "semi" and config.get("site_conf_path"):
-        site_path = Path(config["site_conf_path"])
-        print("\n[半自动反向代理配置已完成]:")
-        print(f"  * 域名站点配置已注入反代 : {site_path}")
-        print(f"  * 游戏端反代配置已复制至 : {site_path.parent / 'nginx_aethergazer.conf'}")
-        print("  * 请执行以下命令平滑热重载生效（或在宝塔面板点击「重载配置」）:")
-        print("    sudo nginx -s reload")
+        print("\n半自动反代已热加载。启动服务后可访问面板。")
     elif domain_mode == "manual":
         print("\n[手动配置反向代理指南]:")
-        print(f"  1. 宝塔面板用户 (推荐可视化操作):")
-        print(f"     * 在宝塔面板进入「网站」-> 找到 [{custom_domain}] -> 点击「设置」;")
-        print("     * 进入左侧「反向代理」-> 点击「添加反向代理」;")
-        print(f"     * 目标 URL 填写: https://127.0.0.1:{config['https_port']} ，发送域名填写: $host ，保存即可;")
-        print("     * 注: 宝塔会自动处理静态资源穿透，无需手动修改规则。")
-        print(f"\n  2. 原生 Linux / 手动编辑配置文件用户:")
-        print(f"     * 请在您的站点配置 ({custom_domain}) 的 server 块中加入以下反代规则:")
-        print(f"       location ^~ / {{")
-        print(f"           proxy_pass https://127.0.0.1:{config['https_port']};")
-        print(f"           proxy_set_header Host $host;")
-        print(f"           proxy_set_header X-Real-IP $remote_addr;")
-        print(f"           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;")
-        print(f"           proxy_set_header X-Forwarded-Proto $scheme;")
-        print(f"           proxy_ssl_server_name on;")
-        print(f"           proxy_ssl_name open.ys4fun.com;")
-        print(f"           proxy_ssl_verify off;")
-        print(f"           proxy_read_timeout 300s;")
-        print(f"           proxy_buffering off;")
-        print(f"       }}")
-        print(f"\n  3. 部署游戏客户端专用反向代理 (已剥离面板域名，绝无冲突):")
-        print(f"     * 复制当前目录下的 {conf_path.name} 至 Nginx 包含目录:")
-        print(f"       sudo cp ./{conf_path.name} /etc/nginx/conf.d/")
-        print("     * 检查语法并平滑热重载生效:")
-        print("       sudo nginx -t && sudo nginx -s reload")
-    else:
+        print(f"  1. 为 {custom_domain} 配置 HTTPS 证书及续签，并在该域名的 server 块内 include {ROOT / 'nginx_aethergazer_panel.conf'}。")
+        if not config['nginx']:
+            print(f"  2. 将 {conf_path} 放入 Nginx 的 http 配置加载目录。")
+        print("  检查语法并热加载: sudo nginx -t && sudo nginx -s reload")
+    elif not config['nginx']:
         if conf_path.is_file():
             print(f"\n已为您在当前目录生成了一份开箱即用的 Nginx 反向代理配置:")
             print(f"  -> {conf_path.name}")
@@ -731,20 +718,9 @@ def print_completion_guide(config, proxy_mode):
             print("  2. 检查语法并执行平滑热重载生效:")
             print("     sudo nginx -t && sudo nginx -s reload")
 
-    if proxy_mode in ("proxy", "managed"):
-        port_suffix = ""
-    else:
-        http_p = config.get("http_port")
-        port_suffix = f":{http_p}" if http_p and http_p != 80 else ""
-
     print("\n" + "=" * 80)
     print("[Web 管理控制面板直达地址]")
-    if custom_domain:
-        if domain_mode == "no_https":
-            print(f"  * 域名访问 (HTTP)  : http://{custom_domain}{port_suffix}/web/control-panel.html")
-        else:
-            print(f"  * 域名访问 (HTTPS) : https://{custom_domain}/web/control-panel.html (权威机构绿锁)")
-    print(f"  * IP 直连          : http://{config['host_ip']}{port_suffix}/web/control-panel.html")
+    print(f"  {derive_admin_origin(config, proxy_mode)}/web/gm_console.html")
     print("=" * 80)
 
     print("\n" + "-" * 80)
@@ -860,19 +836,10 @@ def setup():
             proxy_mode = "direct"
 
         if proxy_mode in ("proxy", "managed"):
-            def domain_input(value):
-                text = str(value or "").strip()
-                if not text:
-                    return ""
-                import re
-                if not re.fullmatch(r"[a-zA-Z0-9.\-_ ]+", text):
-                    raise ValueError("域名格式不合法，仅支持字母、数字、点号和横线")
-                return text
-
             custom_domain = ask(
                 "请输入用于访问 Web 控制面板的域名 (直接回车则仅使用主机IP)",
                 config.get("custom_domain", ""),
-                domain_input
+                panel_domain,
             )
             config["custom_domain"] = custom_domain
             if custom_domain:
@@ -880,36 +847,25 @@ def setup():
                     f"[反向代理与 HTTPS 对接方式说明]\n"
                     f"检测到您配置了 Web 面板独立域名 [{custom_domain}]。\n"
                     f"为了避免与宝塔面板/已有网站的 SSL 证书及域名产生冲突，请选择对接方式：\n\n"
-                    f"  * [1] 半自动配置反向代理 (强烈推荐宝塔/已有站点用户)\n"
-                    f"        您只需输入该域名现有站点的配置文件路径（如 /www/server/panel/vhost/nginx/{custom_domain}.conf）；\n"
-                    f"        向导将自动备份原配置并注入反代规则，同时将游戏客户端专用反代配置复制到位，零冲突。\n\n"
-                    f"  * [2] 手动配置反向代理\n"
-                    f"        向导不修改任何现有文件，向导结束时将输出标准的反代配置规则与宝塔操作指引，由您手动粘贴。\n\n"
-                    f"  * [3] 不使用 HTTPS (纯 HTTP 访问)\n"
-                    f"        该域名仅用于普通 HTTP 访问或作为客户端直连域名（无需在宝塔单独建站申请证书）；\n"
-                    f"        向导直接在当前目录生成包含该域名的 Nginx 配置文件由您复制。\n"
+                    "  * [1] 宝塔半自动：选择已经启用 HTTPS 的宝塔站点。向导写入站点扩展及游戏反代，校验后热加载。\n"
+                    "  * [2] 手动：生成面板站点片段和独立游戏配置，供已有 HTTPS 站点使用。\n"
                 )
-                prev_sub = config.get("domain_proxy_mode", "semi")
-                if prev_sub == "none":
-                    prev_sub = "semi"
+                default_sub = '1' if config.get('domain_proxy_mode') == 'semi' or (
+                    proxy_mode == 'proxy' and config.get('domain_proxy_mode') != 'manual') else '2'
                 sub_choice = interactive_choice(
                     "请选择面板域名的反向代理对接方式",
                     [
-                        ("1", "半自动配置反向代理", "向导自动备份并注入站点配置，最省心"),
-                        ("2", "手动配置反向代理", "向导输出配置代码与宝塔操作提示，手动粘贴"),
-                        ("3", "不使用 HTTPS", "纯 HTTP 访问，不绑定 SSL 证书"),
+                        ("1", "宝塔半自动配置反向代理", "使用现有 HTTPS 站点的扩展目录"),
+                        ("2", "手动配置反向代理", "生成现有 HTTPS 站点可包含的片段"),
                     ],
-                    default_value="1" if prev_sub == "semi" else ("2" if prev_sub == "manual" else "3"),
+                    default_value=default_sub,
                     tips=domain_tips,
-                    extra_aliases={"semi": "1", "auto": "1", "manual": "2", "no_https": "3", "http": "3"}
+                    extra_aliases={"semi": "1", "auto": "1", "manual": "2"}
                 )
                 if sub_choice == "1":
                     config["domain_proxy_mode"] = "semi"
                     default_site_conf = config.get("site_conf_path") or f"/www/server/panel/vhost/nginx/{custom_domain}.conf"
-                    print("\n请输入该域名在 Nginx / 宝塔中的站点配置文件绝对路径。")
-                    print("常见路径参考:")
-                    print(f"  * 宝塔面板: /www/server/panel/vhost/nginx/{custom_domain}.conf")
-                    print(f"  * 原生 Nginx: /etc/nginx/conf.d/{custom_domain}.conf")
+                    print("\n请输入宝塔中已启用 HTTPS 的站点配置文件绝对路径。")
                     print("按 Ctrl+C 可取消当前向导。\n")
                     while True:
                         try:
@@ -925,11 +881,8 @@ def setup():
                         except KeyboardInterrupt:
                             print("\n\n已通过 Ctrl+C 中断配置向导。")
                             sys.exit(0)
-                elif sub_choice == "2":
-                    config["domain_proxy_mode"] = "manual"
-                    config["site_conf_path"] = ""
                 else:
-                    config["domain_proxy_mode"] = "no_https"
+                    config["domain_proxy_mode"] = "manual"
                     config["site_conf_path"] = ""
             else:
                 config["domain_proxy_mode"] = "none"
@@ -1009,6 +962,10 @@ def setup():
         print("已取消，未保存配置。")
         return
 
+    from linux_nginx import apply_nginx, managed_paths, render_config, render_panel_config
+    game_template = ROOT / 'nginx_aethergazer.conf'
+    panel_template = ROOT / 'nginx_aethergazer_panel.conf'
+
     def commit():
         backup_write(CONFIG, json.dumps(config, ensure_ascii=False, indent=2) + "\n")
         # 写入或更新控制面板公网安全认证凭据文件
@@ -1024,41 +981,13 @@ def setup():
             }
             backup_write(ADMIN_AUTH_FILE, json.dumps(auth_data, ensure_ascii=False, indent=2) + "\n", mode=0o600)
             print(f"[公网安全] 控制面板管理密码凭据已安全落盘: {ADMIN_AUTH_FILE.name} (HTTPS 源: {origin})")
-        try:
-            from linux_nginx import render_config
-            (ROOT / "nginx_aethergazer.conf").write_text(render_config(ROOT, config), encoding="utf-8")
-        except Exception:
-            pass
+        backup_write(game_template, render_config(ROOT, config), 0o644)
+        if config['custom_domain']:
+            backup_write(panel_template, render_panel_config(ROOT, config), 0o644)
 
-        # 半自动反向代理配置注入与游戏流量配置复制
-        if config.get("domain_proxy_mode") == "semi" and config.get("site_conf_path"):
-            from linux_nginx import inject_proxy_into_site_conf, render_config
-            site_path = Path(config["site_conf_path"])
-            try:
-                backup_p = inject_proxy_into_site_conf(site_path, config["https_port"], config.get("custom_domain", ""))
-                print(f"\n[半自动反代] 已成功备份原配置至: {backup_p}")
-                print(f"[半自动反代] 已将反向代理规则注入站点配置: {site_path}")
-
-                dest_game_conf = site_path.parent / "nginx_aethergazer.conf"
-                game_conf_text = render_config(ROOT, config)
-                dest_game_conf.write_text(game_conf_text, encoding="utf-8")
-                print(f"[半自动反代] 已将游戏端专用反向代理配置复制至: {dest_game_conf}")
-
-                if shutil.which("nginx"):
-                    try:
-                        res = subprocess.run(["nginx", "-t"], capture_output=True, text=True, timeout=10)
-                        if res.returncode == 0:
-                            print("[Nginx 检查] nginx -t 语法测试通过！配置零冲突！")
-                        else:
-                            print(f"[Nginx 提示] nginx -t 输出:\n{res.stderr.strip() or res.stdout.strip()}")
-                    except Exception:
-                        pass
-            except Exception as exc:
-                print(f"[警告] 半自动注入站点反代配置时出错: {exc}")
-
-    if config["nginx"] or (previous and previous.get("nginx")):
-        from linux_nginx import apply_nginx
-        apply_nginx(ROOT, config, previous, CONFIG, commit)
+    if any((*managed_paths(config), *managed_paths(previous))):
+        apply_nginx(ROOT, config, previous, CONFIG, commit,
+                    local_paths=(ADMIN_AUTH_FILE, game_template, panel_template))
     else:
         commit()
 
@@ -1080,7 +1009,10 @@ def generate_templates(config):
     user = pwd.getpwuid(os.getuid()).pw_name
     root_str = str(ROOT.resolve()).replace('\\', '/').replace('%', '%%')
     sh_str = str((ROOT / 'server.sh').resolve()).replace('\\', '/').replace('%', '%%').replace('$', '$$')
-    py_bin = str(Path(sys.executable).resolve()).replace('\\', '/').replace('%', '%%')
+    venv_py = ROOT / ".venv/bin/python"
+    python = venv_py if venv_py.is_file() and os.access(venv_py, os.X_OK) else Path(sys.executable)
+    # Invoking the venv symlink is what lets Python discover pyvenv.cfg.
+    python_env = systemd_quote(f'PYTHON_BIN={python.absolute().as_posix()}')
     auth_file = ROOT / "linux_admin_auth.json"
     auth_env = f'Environment="AG_ADMIN_PASSWORD_FILE={str(auth_file.resolve()).replace(chr(92), "/").replace("%", "%%")}"\n' if auth_file.is_file() else ""
     unit = f'''[Unit]
@@ -1096,7 +1028,7 @@ User={user}
 WorkingDirectory={root_str}
 ExecStart=/bin/sh "{sh_str}" run
 Environment=PYTHONUNBUFFERED=1
-Environment="PYTHON_BIN={py_bin}"
+Environment={python_env}
 {auth_env}Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30
@@ -1108,9 +1040,11 @@ WantedBy=multi-user.target
 '''
     directory = ROOT / "linux_generated"
     backup_write(directory / SERVICE, unit)
-    if config["nginx"]:
-        from linux_nginx import render_config
+    if config['nginx'] or config.get('domain_proxy_mode') in ('manual', 'semi'):
+        from linux_nginx import render_config, render_panel_config
         backup_write(directory / "nginx.example.conf", render_config(ROOT, config, "preview"))
+        if config['custom_domain']:
+            backup_write(directory / 'nginx.panel.example.conf', render_panel_config(ROOT, config))
 
 
 def check(config):

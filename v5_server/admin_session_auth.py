@@ -23,6 +23,11 @@ PASSWORD_FILE_ENV = 'AG_ADMIN_PASSWORD_FILE'
 COOKIE_NAME = '__Host-v5_admin'
 CSRF_HEADER = 'X-Admin-CSRF'
 AUTH_PREFIX = '/api/gm/auth/'
+CONSOLE_ENTRY_PATHS = frozenset({
+    '/', '/web', '/web/', '/gm_console.html', '/control-panel.html',
+    '/web/gm_console.html', '/web/index.html', '/web/control-panel.html',
+    '/static_web/gm_console.html', '/static_web/index.html', '/static_web/control-panel.html',
+})
 MAX_SESSIONS = 64
 MAX_IP_BUCKETS = 1024
 MAX_VERIFY_IN_FLIGHT = 2
@@ -357,6 +362,9 @@ def install(app, config):
         if request.method == 'OPTIONS':
             # Credential-free preflight contains no account data and cannot mutate.
             return _json(204) if origin == config.origin else _json(403, 'origin_required')
+        if request.method in ('GET', 'HEAD') and request.path in CONSOLE_ENTRY_PATHS and not is_api():
+            # The console loads its sign-in screen before an admin session exists.
+            return None
         if request.path == AUTH_PREFIX + 'login':
             if request.method != 'POST':
                 return _json(405, 'method_not_allowed')
