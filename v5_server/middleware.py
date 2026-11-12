@@ -2565,6 +2565,24 @@ def _settle_battle_session(req, ctx, bid, session):
     mythic_final = mythic_is_final(stage_type, dest, activity_id)
     from mythic_normal_service import is_normal as normal_kind, validate as validate_normal
     mythic_normal = normal_kind(stage_type, dest)
+    panel_cycle = None
+    if boss_kind:
+        panel_cycle = 'dream'
+    elif mythic_final or mythic_normal:
+        panel_cycle = 'mythic'
+    elif polyhedron_battle:
+        panel_cycle = 'polyhedron'
+    elif stage_type == 53 or 3070101 <= int(dest) <= 3070126:
+        panel_cycle = 'seizure'
+    elif stage_type == 67 or 3090001 <= int(dest) <= 3090999 or 10101 <= int(dest) <= 16208:
+        panel_cycle = 'iteration'
+    if ctx.db and panel_cycle:
+        from panel_cycles import CycleChanged, check_battle
+        try:
+            check_battle(ctx.db, req.uid, session, panel_cycle)
+        except CycleChanged as exc:
+            ctx.log(f'[cycle] 拒绝旧战斗 {bid}: {exc}', 'WARN')
+            return CSResponse([DownFrame(54033, _settlement_error_payload(bid, dest))])
     if mythic_normal and 'br' not in session:
         try:
             validate_normal(ctx.db, req.uid, session)

@@ -32,7 +32,7 @@ public sealed partial class MainPage : Page
     private bool _redeployingCertificate;
     private bool _preparingCertificate;
     private const int MaxLogLines = 2500;
-    private const string WebConsoleUrl = "http://127.0.0.1/web/gm_console.html";
+    private static Uri WebConsoleUrl => new(ServerSupervisor.Instance.ConsoleBaseUri, "/web/gm_console.html");
     private static readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromMilliseconds(600) };
 
     private static readonly string[] RequiredHostsDomains =
@@ -226,7 +226,7 @@ public sealed partial class MainPage : Page
         {
             try
             {
-                var res = await _httpClient.GetAsync(WebConsoleUrl);
+                using var res = await _httpClient.GetAsync(WebConsoleUrl);
                 if (res.IsSuccessStatusCode)
                 {
                     DispatcherQueue.TryEnqueue(EnsureConsoleLoaded);
@@ -257,9 +257,9 @@ public sealed partial class MainPage : Page
                 _isWebView2Initialized = true;
             }
 
-            if (ConsoleWebView.Source == null || ConsoleWebView.Source.ToString() == "about:blank")
+            if (ConsoleWebView.Source != WebConsoleUrl)
             {
-                ConsoleWebView.Source = new Uri(WebConsoleUrl);
+                ConsoleWebView.Source = WebConsoleUrl;
             }
         }
         catch (Exception ex)
@@ -272,7 +272,7 @@ public sealed partial class MainPage : Page
     {
         try
         {
-            if (!_isWebView2Initialized || ConsoleWebView.Source == null)
+            if (!_isWebView2Initialized || ConsoleWebView.Source != WebConsoleUrl)
             {
                 EnsureConsoleLoaded();
             }
@@ -290,7 +290,7 @@ public sealed partial class MainPage : Page
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = WebConsoleUrl,
+                FileName = WebConsoleUrl.ToString(),
                 UseShellExecute = true
             });
         }
@@ -484,6 +484,8 @@ public sealed partial class MainPage : Page
         {
             UpdateUIState(isRunning);
             CheckPortStatuses();
+            if (isRunning && ConsoleView.Visibility == Visibility.Visible)
+                _ = PollAndLoadConsoleAsync();
         });
     }
 
@@ -628,7 +630,7 @@ public sealed partial class MainPage : Page
     {
         try
         {
-            var res = await _httpClient.GetAsync("http://127.0.0.1/api/system/res_version");
+            using var res = await _httpClient.GetAsync(new Uri(ServerSupervisor.Instance.ConsoleBaseUri, "/api/system/res_version"));
             if (res.IsSuccessStatusCode)
             {
                 string json = await res.Content.ReadAsStringAsync();

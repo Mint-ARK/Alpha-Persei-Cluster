@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LocalServer;
@@ -23,6 +26,7 @@ public sealed class ServerSupervisor : IDisposable
 
     public string? LastResolvedServerDir { get; private set; }
     public string? CustomServerDir { get; set; }
+    public Uri ConsoleBaseUri { get; private set; } = new("http://127.0.0.1");
 
     public event Action<string>? LogReceived;
     public event Action<bool>? StateChanged;
@@ -385,7 +389,38 @@ public sealed class ServerSupervisor : IDisposable
         return pids.ToList();
     }
 
-    public Task<bool> StartServerAsync(IEnumerable<string>? arguments = null)
+    public Task<bool> StartServerAsync(IEnumerable<string>? arguments = null) =>
+        StartOwnedServer(arguments?.ToArray() ?? [], cleanOldPorts: true);
+
+    private static Uri GetConsoleBaseUri(string serverDir)
+    {
+        int httpPort = 80, httpsPort = 443;
+        string host = "127.0.0.1";
+        try
+        {
+            var path = Path.Combine(serverDir, "data", "launch_overrides.json");
+            using var document = JsonDocument.Parse(File.ReadAllText(path));
+            if (document.RootElement.TryGetProperty("overrides", out var values))
+            {
+                if (values.TryGetProperty("http_port", out var http) && http.TryGetInt32(out var httpValue))
+                    httpPort = httpValue;
+                if (values.TryGetProperty("https_port", out var https) && https.TryGetInt32(out var httpsValue))
+                    httpsPort = httpsValue;
+                if (values.TryGetProperty("web_bind", out var bind) &&
+                    IPAddress.TryParse(bind.GetString(), out var address) &&
+                    address.AddressFamily == AddressFamily.InterNetwork && !address.Equals(IPAddress.Any))
+                    host = address.ToString();
+            }
+            return new UriBuilder(httpPort == 0 ? "https" : "http", host, httpPort == 0 ? httpsPort : httpPort).Uri;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException
+                                   or InvalidOperationException or ArgumentException)
+        {
+            return new Uri("http://127.0.0.1");
+        }
+    }
+
+    private Task<bool> StartOwnedServer(string[] arguments, bool cleanOldPorts)
     {
         lock (_lock)
         {
@@ -395,11 +430,11 @@ public sealed class ServerSupervisor : IDisposable
             }
 
             // 启动前先执行一次端口卫士守护，防止老残留进程霸占端口引发死锁
-            try
+            if (cleanOldPorts)
             {
-                KillPortHolders();
+                try { KillPortHolders(); }
+                catch { }
             }
-            catch { }
 
             string pythonExe = FindPythonPath();
             string? srvDir = FindServerDir();
@@ -412,6 +447,8 @@ public sealed class ServerSupervisor : IDisposable
 
             string mainPy = Path.Combine(srvDir, "main.py");
             var startInfo = ServerProcessStartInfo.Create(pythonExe, mainPy, srvDir, arguments);
+            startInfo.Environment["AG_LAUNCH_SUPERVISOR"] = "windows";
+            ConsoleBaseUri = GetConsoleBaseUri(srvDir);
 
             try
             {
@@ -430,12 +467,23 @@ public sealed class ServerSupervisor : IDisposable
                         LogReceived?.Invoke($"[STDERR] {e.Data}");
                     }
                 };
-                _serverProcess.Exited += (_, _) =>
+                _serverProcess.Exited += (sender, eventArgs) =>
                 {
-                    LogReceived?.Invoke($"[ServerSupervisor] 服务主进程 (PID: {_serverProcess?.Id}) 已退出。");
-                    AppConfigManager.ClearServerState();
-                    IsAttached = false;
-                    StateChanged?.Invoke(false);
+                    var process = (Process)sender!;
+                    lock (_lock)
+                    {
+                        if (!ReferenceEquals(_serverProcess, process)) return;
+                        // main.py returns 75 after a panel-requested graceful shutdown.
+                        bool restart = process.ExitCode == 75;
+                        LogReceived?.Invoke($"[ServerSupervisor] 服务主进程 (PID: {process.Id}) 已退出。");
+                        _serverProcess = null;
+                        process.Dispose();
+                        AppConfigManager.ClearServerState();
+                        IsAttached = false;
+                        StateChanged?.Invoke(false);
+                        if (restart)
+                            _ = StartOwnedServer(arguments, cleanOldPorts: false);
+                    }
                 };
 
                 bool started = _serverProcess.Start();

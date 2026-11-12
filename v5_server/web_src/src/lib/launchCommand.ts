@@ -1,18 +1,23 @@
-import type { LaunchConfigData } from './api'
+import type { LaunchOptions } from './api'
 
 export type LaunchShell = 'cmd' | 'powershell' | 'posix'
 
-export function buildLaunchArguments(config: LaunchConfigData): string[] {
+export function buildLaunchArguments(config: LaunchOptions): string[] {
   const args: string[] = []
   const add = (name: string, value: string) => args.push(name, value.trim())
-  if (config.host_ip?.trim()) add('--host-ip', config.host_ip)
-  if (config.https_port && config.https_port !== 443) add('--https-port', String(config.https_port))
-  if (config.gw_port && config.gw_port !== 8102) add('--gw-port', String(config.gw_port))
-  if (config.game_port && config.game_port !== 8105) add('--game-port', String(config.game_port))
-  if (config.db_path?.trim() && config.db_path.trim() !== 'account.db') add('--db', config.db_path)
-  if (config.log_level && config.log_level !== 'INFO') add('--log-level', config.log_level)
-  if (config.client_assets_dir?.trim()) add('--client-assets-dir', config.client_assets_dir)
-  if (config.replay_enabled && config.replay_path?.trim()) add('--replay', config.replay_path)
+  add('--host-ip', config.host_ip)
+  add('--web-bind', config.web_bind)
+  for (const field of ['https_port', 'http_port', 'gw_port', 'game_port', 'battle_port'] as const) {
+    add('--' + field.replace(/_/g, '-'), String(config[field]))
+  }
+  args.push(config.dns ? '--dns' : '--no-dns')
+  if (config.dns_upstream.length === 0) args.push('--dns-upstream-default')
+  for (const upstream of config.dns_upstream) add('--dns-upstream', upstream)
+  add('--cdn-mode', config.cdn_mode)
+  add('--db', config.db_path)
+  add('--log-level', config.log_level)
+  add('--client-assets-dir', config.client_assets_dir)
+  add('--replay', config.replay_enabled ? config.replay_path : '')
   return args
 }
 
@@ -30,7 +35,7 @@ export function formatLaunchCommand(args: string[], shell: LaunchShell): string 
   // Transfer such values as UTF-8 JSON so the shell only sees an ASCII payload.
   // This also avoids Windows PowerShell 5's native quoting loss for embedded ".
   const transport = shell === 'cmd' ? /[%!"\r\n]/ : /["\r\n]|\\$/
-  if (args.some((arg) => transport.test(arg))) {
+  if (args.some((arg) => transport.test(arg) || (shell === 'powershell' && arg === ''))) {
     const bytes = new TextEncoder().encode(JSON.stringify(['main.py', ...args]))
     const payload = btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(''))
     const code = `import base64,json,subprocess,sys;sys.exit(subprocess.call([sys.executable,'-X','utf8',*json.loads(base64.b64decode('${payload}'))]))`

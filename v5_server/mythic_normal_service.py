@@ -39,8 +39,8 @@ def _empty(cycle, generation=0):
     return dict(cycle=int(cycle), generation=int(generation), stars={}, cleared=[], claimed=[])
 
 
-def load(db, uid):
-    cycle = bounds()[0]
+def load(db, uid, now_ts=None):
+    cycle = bounds(now_ts)[0]
     rows = db.query('SELECT value_json FROM ops_common WHERE uid=? AND kind=? AND item_id=?', (int(uid), KIND, 'state'))
     if rows:
         state = json.loads(rows[0]['value_json'])

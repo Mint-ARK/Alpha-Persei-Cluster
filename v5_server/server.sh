@@ -22,12 +22,14 @@ case "${1:-}" in
 示例：
   sh server.sh setup
   sh server.sh run
+  sh server.sh run --supervised
   sh server.sh run --db '新存档_01.db' --https-port 18443 --http-port 1880
   sh server.sh run --capture-cdn
   sh server.sh run --cdn-mode relay
   sudo sh server.sh install-service
 
-run 附加参数只对本次启动生效；持久配置使用 setup。
+run 附加参数作为本次启动的初始配置；持久配置使用 setup。
+--supervised 启用命令行托管，允许从控制面板保存并重启。
 CDN模式：--cdn-mode off|relay|cache（默认off）。relay仅穿透、不存盘，适合本地设备。
 --capture-cdn兼容开启存盘；--no-capture-cdn强制关闭。云端穿透仍消耗出口带宽。
 Termux 使用系统包准备依赖，不执行 prepare；systemd 命令只用于支持 systemd 的环境。

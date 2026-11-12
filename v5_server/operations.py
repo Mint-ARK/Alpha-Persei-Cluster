@@ -6723,7 +6723,8 @@ class PolyhedronClaimPolicyRewardOp(Operation):
         PolyhedronRunManager.check_and_refresh_policy_cycle(self.uid, ctx.db, activity_id=activity_id)
 
         # 20 级常驻多维历程经验阶梯与奖励表 (Activity 0)
-        policy_exp_steps = [60, 120, 180, 240, 300, 400, 500, 600, 700, 800, 920, 1040, 1160, 1280, 1400, 1520, 1640, 1760, 1880, 2000]
+        from weekly_challenge_service import POLYHEDRON_POLICY_EXP
+        policy_exp_steps = POLYHEDRON_POLICY_EXP
         policy_rewards = {
             1: [{"id": 28, "num": 60}],
             2: [{"id": 28, "num": 60}],

@@ -9,7 +9,6 @@ import json
 import os
 from pathlib import Path
 import re
-import runpy
 import shutil
 import signal
 import socket
@@ -1348,15 +1347,16 @@ def main(argv=None):
         if auth_file.is_file() and "AG_ADMIN_PASSWORD_FILE" not in os.environ:
             os.environ["AG_ADMIN_PASSWORD_FILE"] = str(auth_file.resolve())
             print(f"[安全] 已自动挂载控制面板管理会话保护 ({auth_file.name})")
-        if "--no-dns" in extra:
-            if "--dns" in extra:
-                raise ValueError("--dns 与 --no-dns 不能同时使用")
-            extra.remove("--no-dns")
-            if saved:
-                saved = dict(saved, dns=False)
+        if "--no-dns" in extra and "--dns" in extra:
+            raise ValueError("--dns 与 --no-dns 不能同时使用")
         os.chdir(ROOT)
-        sys.argv = [str(ROOT / "main.py")] + (config_args(saved) if saved else []) + extra
-        runpy.run_path(str(ROOT / "main.py"), run_name="__main__")
+        base = config_args(saved) if saved else []
+        if '--supervised' in extra:
+            from launch_settings import run_supervised
+            extra.remove('--supervised')
+            return run_supervised(base + extra)
+        from main import main as run_game_server
+        return run_game_server(base + extra, launcher_arg_count=len(base))
     elif args.command == "stop":
         stopped, msg = stop_server_process(ROOT)
         print(msg)

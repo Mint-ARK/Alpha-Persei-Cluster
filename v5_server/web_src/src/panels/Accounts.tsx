@@ -12,14 +12,11 @@ import {
   Layers,
   Monitor,
   RefreshCw,
-  Settings2,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
   User,
   X,
-  Copy,
-  Save,
 } from 'lucide-react'
 import {
   Button,
@@ -29,7 +26,7 @@ import {
   Modal,
   SearchField,
 } from '@heroui/react'
-import { PageHeader, PlainSwitch, Section, StatCard } from '../components/kit'
+import { PageHeader, Section, StatCard } from '../components/kit'
 import {
   fetchAccountProfile,
   modifyAccountBasic,
@@ -37,19 +34,13 @@ import {
   modifyAccountBirthday,
   resolveAssetUrl,
   DEFAULT_ACCOUNT_UID,
-  fetchPaySwitch,
-  setPaySwitch,
-  fetchLaunchConfig,
-  saveLaunchConfig,
   type AccountProfileData,
   type StickerWall,
-  type PaySwitchData,
-  type LaunchConfigData,
 } from '../lib/api'
 import { useServer } from '../lib/serverContext'
-import { buildLaunchArguments, formatLaunchCommand, type LaunchShell } from '../lib/launchCommand'
 import { PLAYER_AVATARS, avatarAssetPath, type AvatarItem } from '../lib/avatarAssets'
 import stickersCatalog from '../data/stickersCatalog.json'
+import CycleCards from './CycleCards'
 
 // 预置 8 大官方背景画卷完整数据，支持离线或连线模式下完整无缝翻页浏览
 const DEFAULT_STICKER_WALLS: StickerWall[] = [
@@ -193,7 +184,7 @@ function getStickerFlavorText(desc?: string): string {
 }
 
 export default function AccountsPanel() {
-  const { activeUid, isOnline, resVersionInfo } = useServer()
+  const { activeUid, isOnline, selectedSave } = useServer()
 
   const [profile, setProfile] = useState<AccountProfileData | null>(null)
   const [profileLoading, setProfileLoading] = useState(false)
@@ -329,134 +320,6 @@ export default function AccountsPanel() {
     rememberWall(nextIndex)
     setCurrentWallIndex(nextIndex)
   }
-
-  // 启动参数与运行调谐配置状态
-  const [launchConfig, setLaunchConfig] = useState<LaunchConfigData>({
-    log_level: 'INFO',
-    replay_enabled: false,
-    replay_path: '',
-    host_ip: '',
-    https_port: 443,
-    gw_port: 8102,
-    game_port: 8105,
-    db_path: 'account.db',
-    client_assets_dir: '',
-    available_replays: [],
-    has_replay_material: false,
-    detected_host_ip: '',
-  })
-  const [_launchLoading, setLaunchLoading] = useState(false)
-  const [savingLaunch, setSavingLaunch] = useState(false)
-  const [copiedCommand, setCopiedCommand] = useState(false)
-  const [launchShell, setLaunchShell] = useState<LaunchShell>('cmd')
-
-  const loadLaunchConfig = async () => {
-    setLaunchLoading(true)
-    try {
-      const res = await fetchLaunchConfig()
-      if (res && res.code === 0 && res.data) {
-        setLaunchConfig((prev) => ({
-          ...prev,
-          ...res.data,
-        }))
-      }
-    } catch {
-      // 离线环境优雅降级
-    } finally {
-      setLaunchLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadLaunchConfig()
-  }, [])
-
-  const handleSaveLaunchConfig = async () => {
-    setSavingLaunch(true)
-    try {
-      const res = await saveLaunchConfig(launchConfig)
-      if (res && res.code === 0 && res.data) {
-        setLaunchConfig((prev) => ({ ...prev, ...res.data }))
-        setActionMsg('启动参数配置已保存' + (res.msg ? ` (${res.msg})` : ''))
-      } else {
-        setActionError(res?.msg || '保存启动配置失败')
-      }
-    } catch (e: any) {
-      setActionError(e?.message || '保存启动配置异常')
-    } finally {
-      setSavingLaunch(false)
-    }
-  }
-
-  // 动态生成启动命令
-  const generatedCommand = useMemo(() => {
-    return formatLaunchCommand(buildLaunchArguments(launchConfig), launchShell)
-  }, [launchConfig, launchShell])
-
-  const handleCopyCommand = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(generatedCommand).then(() => {
-        setCopiedCommand(true)
-        setActionMsg('启动命令已复制至剪贴板！')
-        setTimeout(() => setCopiedCommand(false), 2500)
-      }).catch(() => {
-        setActionError('复制失败，请手动复制命令')
-      })
-    }
-  }
-
-  // 开放 PAY 开关状态与控制逻辑
-  const [paySwitchData, setPaySwitchData] = useState<PaySwitchData | null>(null)
-  const [paySwitchLoading, setPaySwitchLoading] = useState(false)
-
-  const loadPaySwitch = async () => {
-    try {
-      const res = await fetchPaySwitch()
-      if (res && res.code === 0 && res.data) {
-        setPaySwitchData(res.data)
-      }
-    } catch {
-      // 离线时不打断
-    }
-  }
-
-  useEffect(() => {
-    loadPaySwitch()
-  }, [])
-
-  const handleTogglePaySwitch = async (val: boolean) => {
-    setPaySwitchLoading(true)
-    try {
-      const res = await setPaySwitch(val)
-      if (res && res.code === 0 && res.data) {
-        setPaySwitchData(res.data)
-        setActionMsg(res.msg || (val ? '已开启游戏内直购 (PAY)' : '已关闭游戏内直购 (PAY)'))
-      } else {
-        setActionError(res?.msg || '操作失败')
-      }
-    } catch (e: any) {
-      setActionError(e?.message || '网络请求异常')
-    } finally {
-      setPaySwitchLoading(false)
-    }
-  }
-
-  // 严格守卫：仅在 iOS 平台 且 229 构建包下允许显示
-  const isPaySwitchVisible = useMemo(() => {
-    // 1. 版本必须严格为 229
-    const isVer229 = (resVersionInfo?.current_version === '229')
-    if (!isVer229) return false
-
-    // 2. 平台必须为 iOS (支持 iOS 访问端 Safari/WebKit，或服务端识别到的 iOS 客户端)
-    const isIOSBrowser = (
-      typeof navigator !== 'undefined' &&
-      (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
-       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
-    )
-    const isIOSClient = (paySwitchData?.client_platform === 'ios')
-
-    return isIOSBrowser || isIOSClient
-  }, [resVersionInfo?.current_version, paySwitchData?.client_platform])
 
   const loadProfile = async (uid = activeUid || DEFAULT_ACCOUNT_UID) => {
     const requestId = ++profileRequestId.current
@@ -911,13 +774,11 @@ export default function AccountsPanel() {
         />
       </div>
 
-      {/* 3. 底部联动功能区：左侧个性化贴纸画卷展示，右侧紧凑开关拓展坞 */}
+      <CycleCards key={selectedSave + ':' + activeUid} uid={activeUid} />
       <Section
-        title="个性化展示与快捷控制"
-        description="玩家贴纸画册空间排版可视化展示与单人沙盒快捷运行环境控制台。"
+        title="个性化展示"
       >
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          {/* 左侧：玩家个性化贴纸画卷展示卡片 (1:1 比例) */}
+        <div>
           <Card className="p-5 flex flex-col justify-between">
             <Card.Header className="pb-3 border-b border-separator/70 flex flex-col gap-1.5">
               {/* 标题栏主行：全部控件水平居中严格单行对齐 */}
@@ -1262,294 +1123,6 @@ export default function AccountsPanel() {
                 </div>
               )}
             </Card.Content>
-          </Card>
-
-          {/* 右侧：服务启动参数与运行调谐中枢 (滚动框形式) */}
-          <Card className="p-5 flex flex-col justify-between">
-            <Card.Header className="pb-3 border-b border-separator/70 flex flex-col gap-1.5">
-              <div className="flex items-center justify-between gap-2 w-full">
-                <div className="flex items-center gap-2 shrink-0">
-                  <Settings2 className="size-4 text-accent shrink-0" />
-                  <span className="text-sm font-bold text-foreground whitespace-nowrap">服务启动参数与运行调谐</span>
-                </div>
-
-                <Chip size="sm" variant="soft" color="accent" className="h-6.5 text-[11px] shrink-0">
-                  <Chip.Label>8 项调谐</Chip.Label>
-                </Chip>
-              </div>
-              <div className="text-[11px] text-muted truncate mt-0.5">
-                服务端端口、日志级别与关键路径配置，保存后热重载或写入启动参数
-              </div>
-            </Card.Header>
-
-            <Card.Content className="pt-3 flex-1 flex flex-col min-h-0">
-              {/* 纵向滚动框：固定高度内部流畅滚动，与左侧 16:9 画幅高度工整对齐 */}
-              <div className="space-y-2.5 overflow-y-auto cp-scroll pr-1.5 max-h-[310px] flex-1">
-                {/* 参数 1: 日志打印调整 */}
-                <div className="rounded-xl border border-separator/70 bg-surface/60 p-3 hover:bg-surface-secondary/40 transition-colors space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-semibold text-foreground">日志打印级别</span>
-                      <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                        即时生效
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 bg-surface-secondary/80 p-0.5 rounded-lg border border-separator/50">
-                      {(['INFO', 'DEBUG', 'WARN', 'ERROR'] as const).map((lvl) => (
-                        <button
-                          key={lvl}
-                          type="button"
-                          onClick={() => setLaunchConfig((prev) => ({ ...prev, log_level: lvl }))}
-                          className={`px-2 py-0.5 text-[10px] font-semibold rounded-md transition-all cursor-pointer ${
-                            launchConfig.log_level === lvl
-                              ? 'bg-accent text-accent-foreground shadow-xs'
-                              : 'text-muted hover:text-foreground'
-                          }`}
-                        >
-                          {lvl}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="text-[11px] text-muted leading-tight">
-                    控制台日志详尽程度，设为 DEBUG 输出 10xxx/14xxx/17xxx 协议负载
-                  </div>
-                </div>
-
-                {/* 参数 2: 重放选择 */}
-                <div className={`rounded-xl border border-separator/70 bg-surface/60 p-3 transition-colors space-y-2 ${
-                  !launchConfig.has_replay_material ? 'opacity-70' : 'hover:bg-surface-secondary/40'
-                }`}>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5 pr-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-semibold text-foreground">全流程重放模式</span>
-                        {!launchConfig.has_replay_material ? (
-                          <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-amber-500/15 text-amber-400 border border-amber-500/30">
-                            无素材不可用
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
-                            检测到 {launchConfig.available_replays?.length || 0} 个素材
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[11px] text-muted leading-tight">
-                        {launchConfig.has_replay_material
-                          ? '重放抓包通信流量以离线模拟真实环境'
-                          : '未检测到可用重放素材 (分析归档包)'}
-                      </div>
-                    </div>
-                    <PlainSwitch
-                      label="重放模式"
-                      isSelected={launchConfig.replay_enabled && !!launchConfig.has_replay_material}
-                      isDisabled={!launchConfig.has_replay_material}
-                      onChange={(val) => {
-                        setLaunchConfig((prev) => ({
-                          ...prev,
-                          replay_enabled: val,
-                          replay_path: val && !prev.replay_path && prev.available_replays?.[0]
-                            ? prev.available_replays[0].path
-                            : prev.replay_path,
-                        }))
-                      }}
-                    />
-                  </div>
-                  {launchConfig.has_replay_material && launchConfig.replay_enabled && (
-                    <div className="pt-1">
-                      <select
-                        value={launchConfig.replay_path}
-                        onChange={(e) => setLaunchConfig((prev) => ({ ...prev, replay_path: e.target.value }))}
-                        className="w-full text-xs rounded-lg border border-separator/80 bg-surface px-2 py-1.5 text-foreground focus:outline-none focus:border-accent"
-                      >
-                        <option value="">请选择重放素材目录...</option>
-                        {launchConfig.available_replays?.map((r) => (
-                          <option key={r.path} value={r.path}>
-                            {r.name} ({r.has_https ? 'HTTPS ' : ''}{r.has_tcp ? 'TCP' : ''})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                </div>
-
-                {/* 参数 3: 宿主机局域网 IP */}
-                <div className="rounded-xl border border-separator/70 bg-surface/60 p-3 hover:bg-surface-secondary/40 transition-colors space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-foreground">宿主机局域网 IP</span>
-                    {launchConfig.detected_host_ip && launchConfig.host_ip !== launchConfig.detected_host_ip && (
-                      <button
-                        type="button"
-                        onClick={() => setLaunchConfig((prev) => ({ ...prev, host_ip: prev.detected_host_ip || '' }))}
-                        className="text-[10px] text-accent hover:underline flex items-center gap-0.5 cursor-pointer"
-                      >
-                        填入检测 IP ({launchConfig.detected_host_ip})
-                      </button>
-                    )}
-                  </div>
-                  <input
-                    type="text"
-                    value={launchConfig.host_ip}
-                    placeholder="例如 192.168.1.100 (留空使用自动探测)"
-                    onChange={(e) => setLaunchConfig((prev) => ({ ...prev, host_ip: e.target.value }))}
-                    className="w-full text-xs rounded-lg border border-separator/80 bg-surface px-2.5 py-1.5 text-foreground placeholder:text-muted/60 focus:outline-none focus:border-accent font-mono"
-                  />
-                  <div className="text-[11px] text-muted leading-tight">
-                    下发给真机客户端的网关接入 IP，真机局域网联调时必填
-                  </div>
-                </div>
-
-                {/* 参数 4: SDK 端口 (HTTPS) */}
-                <div className="rounded-xl border border-separator/70 bg-surface/60 p-3 hover:bg-surface-secondary/40 transition-colors space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-foreground">SDK 端口 (HTTPS)</span>
-                    <span className="text-[10px] text-muted font-mono">默认 443</span>
-                  </div>
-                  <input
-                    type="number"
-                    value={launchConfig.https_port || 443}
-                    onChange={(e) => setLaunchConfig((prev) => ({ ...prev, https_port: parseInt(e.target.value) || 443 }))}
-                    className="w-full text-xs rounded-lg border border-separator/80 bg-surface px-2.5 py-1.5 text-foreground focus:outline-none focus:border-accent font-mono"
-                  />
-                  <div className="text-[11px] text-muted leading-tight">
-                    客户端 SDK 登录验证、公告及热更资源清单分发端口
-                  </div>
-                </div>
-
-                {/* 参数 5: TCP 端口 (Gateway 网关) */}
-                <div className="rounded-xl border border-separator/70 bg-surface/60 p-3 hover:bg-surface-secondary/40 transition-colors space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-foreground">TCP 端口 (网关)</span>
-                    <span className="text-[10px] text-muted font-mono">默认 8102</span>
-                  </div>
-                  <input
-                    type="number"
-                    value={launchConfig.gw_port || 8102}
-                    onChange={(e) => setLaunchConfig((prev) => ({ ...prev, gw_port: parseInt(e.target.value) || 8102 }))}
-                    className="w-full text-xs rounded-lg border border-separator/80 bg-surface px-2.5 py-1.5 text-foreground focus:outline-none focus:border-accent font-mono"
-                  />
-                  <div className="text-[11px] text-muted leading-tight">
-                    客户端握手接入与首登鉴权协议通道端口
-                  </div>
-                </div>
-
-                {/* 参数 6: 主循环 TCP 端口 (Game 业务) */}
-                <div className="rounded-xl border border-separator/70 bg-surface/60 p-3 hover:bg-surface-secondary/40 transition-colors space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-foreground">主循环 TCP 端口 (Game)</span>
-                    <span className="text-[10px] text-muted font-mono">默认 8105</span>
-                  </div>
-                  <input
-                    type="number"
-                    value={launchConfig.game_port || 8105}
-                    onChange={(e) => setLaunchConfig((prev) => ({ ...prev, game_port: parseInt(e.target.value) || 8105 }))}
-                    className="w-full text-xs rounded-lg border border-separator/80 bg-surface px-2.5 py-1.5 text-foreground focus:outline-none focus:border-accent font-mono"
-                  />
-                  <div className="text-[11px] text-muted leading-tight">
-                    游戏主业务长连接通信端口，负责场景指令与角色数据同步
-                  </div>
-                </div>
-
-                {/* 参数 7: 数据库挂载路径 (DB Path) */}
-                <div className="rounded-xl border border-separator/70 bg-surface/60 p-3 hover:bg-surface-secondary/40 transition-colors space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-foreground">数据库挂载路径 (DB Path)</span>
-                    <span className="text-[10px] text-muted font-mono">SQLite 存储</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={launchConfig.db_path}
-                    placeholder="account.db"
-                    onChange={(e) => setLaunchConfig((prev) => ({ ...prev, db_path: e.target.value }))}
-                    className="w-full text-xs rounded-lg border border-separator/80 bg-surface px-2.5 py-1.5 text-foreground focus:outline-none focus:border-accent font-mono"
-                  />
-                  <div className="text-[11px] text-muted leading-tight">
-                    支持中文文件名；切换存档在下次启动时生效
-                  </div>
-                </div>
-
-                {/* 参数 8: 客户端资产位置 (Client Assets) */}
-                <div className="rounded-xl border border-separator/70 bg-surface/60 p-3 hover:bg-surface-secondary/40 transition-colors space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-foreground">客户端资产位置 (Client Assets)</span>
-                    <span className="text-[10px] text-muted">可选</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={launchConfig.client_assets_dir}
-                    placeholder="留空自动检索客户端 StreamingAssets 目录"
-                    onChange={(e) => setLaunchConfig((prev) => ({ ...prev, client_assets_dir: e.target.value }))}
-                    className="w-full text-xs rounded-lg border border-separator/80 bg-surface px-2.5 py-1.5 text-foreground placeholder:text-muted/60 focus:outline-none focus:border-accent font-mono"
-                  />
-                  <div className="text-[11px] text-muted leading-tight">
-                    用于服务端提取热更包哈希及配表校验的客户端解包根路径
-                  </div>
-                </div>
-
-                {/* 附加项: 开放 PAY (游戏内直购) — 严格限定仅在 iOS 且 229 构建包可见 */}
-                {isPaySwitchVisible && (
-                  <div className="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 hover:bg-emerald-500/15 transition-colors">
-                    <div className="space-y-0.5 pr-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-semibold text-emerald-400">开放 PAY (游戏内直购)</span>
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                          iOS 229 特供
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-muted leading-tight">
-                        解除 40035 充值停运并放行 openPay，开放移动端直购与月卡购买
-                      </div>
-                    </div>
-                    <PlainSwitch
-                      label="开放 PAY"
-                      isSelected={!!paySwitchData?.ios_pay_enabled}
-                      isDisabled={paySwitchLoading}
-                      onChange={handleTogglePaySwitch}
-                    />
-                  </div>
-                )}
-              </div>
-            </Card.Content>
-
-            <div className="pt-3 px-1 border-t border-separator/70 flex items-center justify-between gap-2 mt-2">
-              <div className="text-[11px] text-muted truncate">
-                端口与DB配置下次启动生效
-              </div>
-              <div className="flex items-center gap-2">
-                <select
-                  aria-label="启动命令终端"
-                  value={launchShell}
-                  onChange={(e) => { setLaunchShell(e.target.value as LaunchShell); setCopiedCommand(false) }}
-                  className="text-xs rounded-lg border border-separator bg-surface px-2 py-1 text-foreground"
-                >
-                  <option value="cmd">Windows CMD</option>
-                  <option value="powershell">PowerShell</option>
-                  <option value="posix">Linux / macOS</option>
-                </select>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="text-xs h-7.5 px-2.5 cursor-pointer"
-                  onClick={handleCopyCommand}
-                >
-                  {copiedCommand ? (
-                    <Check className="size-3.5 text-emerald-400 mr-1" />
-                  ) : (
-                    <Copy className="size-3.5 mr-1" />
-                  )}
-                  {copiedCommand ? '已复制' : '复制启动命令'}
-                </Button>
-                <Button
-                  size="sm"
-                  className="text-xs h-7.5 px-3 font-semibold cursor-pointer bg-primary text-primary-foreground"
-                  isDisabled={savingLaunch}
-                  onClick={handleSaveLaunchConfig}
-                >
-                  <Save className="size-3.5 mr-1" />
-                  保存配置
-                </Button>
-              </div>
-            </div>
           </Card>
 
         </div>

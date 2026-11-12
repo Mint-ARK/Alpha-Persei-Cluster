@@ -62,7 +62,8 @@ def _bind_save_request():
         return None
     import gm_save_scope
     try:
-        gm_save_scope.bind()
+        if request.path != '/api/gm/system/launch_config':
+            gm_save_scope.bind()
         if not request.path.startswith(('/api/gm/system/', '/api/gm/saves')) and request.path != '/api/gm/res_version':
             import account_db
             import server_net
@@ -2895,76 +2896,97 @@ def _scan_available_replays(base_dir):
     return cands
 
 
-@gm_bp.route("/system/launch_config", methods=["GET"])
-def get_launch_config():
-    """获取当前服务启动参数调谐配置与重放素材可用状态。"""
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    cfg_path = os.path.join(base_dir, "data", "launch_config.json")
-
-    replays = _scan_available_replays(base_dir)
-
-    default_cfg = {
-        "log_level": "INFO",
-        "replay_enabled": False,
-        "replay_path": replays[0]["path"] if replays else "",
-        "host_ip": _context.get("host_ip", ""),
-        "https_port": _context.get("https_port", 443),
-        "gw_port": _context.get("gw_port", 8102),
-        "game_port": _context.get("game_port", 8105),
-        "db_path": "account.db",
-        "client_assets_dir": ""
-    }
-
-    if os.path.isfile(cfg_path):
+@gm_bp.get('/cycles')
+def get_cycles():
+    from types import SimpleNamespace
+    import panel_cycles
+    uid, error = _parse_uid(request.args.get('uid'))
+    if error:
+        return err(GMErrorCode.PARAM_INVALID, error)
+    reader = get_reader()
+    if not reader.query_one('SELECT 1 FROM users WHERE uid=?', (uid,)):
+        return err(GMErrorCode.USER_NOT_FOUND, '当前存档中没有该玩家')
+    now = int(time.time())
+    db = SimpleNamespace(query=reader.query_strict, path=reader.db_path)
+    kinds = panel_cycles.KINDS
+    kind = request.args.get('kind')
+    if kind:
+        if kind not in kinds:
+            return err(GMErrorCode.PARAM_INVALID, '未知玩法')
+        kinds = (kind,)
+    cards = []
+    for kind in kinds:
         try:
-            with open(cfg_path, "r", encoding="utf-8") as f:
-                saved = json.load(f)
-                default_cfg.update(saved)
+            cards.append(panel_cycles.card(db, uid, kind, now))
         except Exception:
-            pass
-
-    # 附带重放素材探测元信息
-    default_cfg["available_replays"] = replays
-    default_cfg["has_replay_material"] = len(replays) > 0
-    default_cfg["detected_host_ip"] = _context.get("host_ip", "127.0.0.1")
-
-    return ok(default_cfg)
+            from flask import current_app
+            current_app.logger.exception('读取玩法周期失败：%s', kind)
+            cards.append(dict(kind=kind, error='读取进度失败', rows=[], token='', reset_at=0))
+    return ok(cards)
 
 
-@gm_bp.route("/system/launch_config", methods=["POST"])
-def post_launch_config():
-    """保存服务启动参数调谐配置，支持部分参数（如 log_level）即时热生效。"""
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    cfg_path = os.path.join(base_dir, "data", "launch_config.json")
-    body = request.get_json(silent=True) or {}
-
-    log_level = str(body.get("log_level") or "INFO").upper()
-    if log_level in ("DEBUG", "INFO", "WARN", "ERROR"):
-        try:
-            import logger
-            logger.set_level(log_level)
-        except Exception:
-            pass
-
-    saved_data = {
-        "log_level": log_level,
-        "replay_enabled": bool(body.get("replay_enabled", False)),
-        "replay_path": str(body.get("replay_path") or "").strip(),
-        "host_ip": str(body.get("host_ip") or "").strip(),
-        "https_port": int(body.get("https_port") or 443),
-        "gw_port": int(body.get("gw_port") or 8102),
-        "game_port": int(body.get("game_port") or 8105),
-        "db_path": str(body.get("db_path") or "account.db").strip(),
-        "client_assets_dir": str(body.get("client_assets_dir") or "").strip()
-    }
-
+@gm_bp.post('/cycles/<kind>/reset')
+def post_reset_cycle(kind):
+    import panel_cycles
+    from server_net import run_while_save_offline
+    body = request.get_json(silent=True)
+    if not isinstance(body, dict) or kind not in panel_cycles.KINDS:
+        return err(GMErrorCode.PARAM_INVALID, '玩法或参数无效')
+    uid, error = _parse_uid(body.get('uid'))
+    token = body.get('token')
+    if error or not isinstance(token, str) or not token or len(token) > 100:
+        return err(GMErrorCode.PARAM_INVALID, error or '请先读取本期进度')
+    if not get_reader().query_one('SELECT 1 FROM users WHERE uid=?', (uid,)):
+        return err(GMErrorCode.USER_NOT_FOUND, '当前存档中没有该玩家')
     try:
-        os.makedirs(os.path.dirname(cfg_path), exist_ok=True)
-        with open(cfg_path, "w", encoding="utf-8") as f:
-            json.dump(saved_data, f, ensure_ascii=False, indent=2)
-        return ok(saved_data, msg="启动调谐参数已成功保存")
-    except Exception as e:
-        return err(GMErrorCode.SERVICE_ERROR, f"写入启动参数失败: {e}")
+        db = get_db()
+        if not db or not db.user_exists(uid):
+            return err(GMErrorCode.DB_NOT_READY, '存档不可用')
+        return ok(run_while_save_offline(db.path, uid, lambda: panel_cycles.reset(db, uid, kind, token)))
+    except ValueError as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    except Exception:
+        from flask import current_app
+        current_app.logger.exception('重置玩法周期失败：%s', kind)
+        return err(GMErrorCode.DB_EXEC_FAILED, '重置失败，请查看服务端日志')
+
+
+def _launch_config_response(replays):
+    import launch_settings
+    return launch_settings.status() | dict(
+        available_replays=replays,
+        has_replay_material=bool(replays),
+        detected_host_ip=_context.get('host_ip', '127.0.0.1'),
+    )
+
+
+@gm_bp.get('/system/launch_config')
+def get_launch_config():
+    try:
+        return ok(_launch_config_response(_scan_available_replays(os.path.dirname(__file__))))
+    except (OSError, ValueError, TypeError):
+        return err(GMErrorCode.SERVICE_ERROR, '读取启动配置失败，请查看启动配置文件')
+
+
+@gm_bp.post('/system/launch_config')
+def post_launch_config():
+    import launch_settings
+    body = request.get_json(silent=True)
+    if not isinstance(body, dict):
+        return err(GMErrorCode.PARAM_INVALID, '启动配置参数无效')
+    restart = body.pop('restart', False)
+    if type(restart) is not bool:
+        return err(GMErrorCode.PARAM_INVALID, '重启参数无效')
+    try:
+        replays = _scan_available_replays(os.path.dirname(__file__))
+        launch_settings.save(body, replays, restart=restart)
+        return ok(_launch_config_response(replays), msg='已请求重启内核' if restart else '启动配置已保存')
+    except (ValueError, TypeError) as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    except OSError:
+        from flask import current_app
+        current_app.logger.exception('写入启动配置失败')
+        return err(GMErrorCode.SERVICE_ERROR, '写入启动配置失败，请查看服务端日志')
 
 
 @gm_bp.route("/system/regenerate_cert", methods=["POST"])
