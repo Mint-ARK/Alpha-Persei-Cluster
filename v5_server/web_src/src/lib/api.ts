@@ -1961,16 +1961,28 @@ export interface ReplayMaterialItem {
   has_tcp: boolean
 }
 
-export interface LaunchConfigData {
+export interface LaunchOptions {
   log_level: 'INFO' | 'DEBUG' | 'WARN' | 'ERROR'
   replay_enabled: boolean
   replay_path: string
   host_ip: string
   https_port: number
+  http_port: number
+  web_bind: string
   gw_port: number
   game_port: number
+  battle_port: number
+  dns: boolean
+  dns_upstream: string[]
+  cdn_mode: 'off' | 'relay' | 'cache'
   db_path: string
   client_assets_dir: string
+}
+
+export interface LaunchConfigData extends LaunchOptions {
+  active: LaunchOptions
+  supervisor: '' | 'cli' | 'windows' | 'systemd'
+  restart_pending: boolean
   available_replays?: ReplayMaterialItem[]
   has_replay_material?: boolean
   detected_host_ip?: string
@@ -1981,11 +1993,42 @@ export async function fetchLaunchConfig(): Promise<ApiResponse<LaunchConfigData>
 }
 
 export async function saveLaunchConfig(
-  data: Partial<LaunchConfigData>
+  data: Partial<LaunchOptions> & { restart?: boolean }
 ): Promise<ApiResponse<LaunchConfigData>> {
   return apiRequest<LaunchConfigData>('/api/gm/system/launch_config', {
     method: 'POST',
     body: JSON.stringify(data),
+  })
+}
+
+export type CycleKind = 'daily' | 'weekly' | 'seizure' | 'dream' | 'iteration' | 'polyhedron' | 'battlepass' | 'mythic'
+
+export interface CycleRow {
+  id: string
+  label: string
+  current: number
+  target: number | null
+  status: 'pending' | 'ready' | 'claimed' | 'progress'
+}
+
+export interface CycleCardData {
+  kind: CycleKind
+  reset_at: number
+  token: string
+  rows: CycleRow[]
+  error?: string
+}
+
+export function fetchCycles(uid: number, kind?: CycleKind, signal?: AbortSignal) {
+  const params = new URLSearchParams({ uid: String(uid) })
+  if (kind) params.set('kind', kind)
+  return apiRequest<CycleCardData[]>(`/api/gm/cycles?${params}`, { signal })
+}
+
+export function resetCycle(uid: number, kind: CycleKind, token: string) {
+  return apiRequest<CycleCardData>(`/api/gm/cycles/${kind}/reset`, {
+    method: 'POST',
+    body: JSON.stringify({ uid, token }),
   })
 }
 

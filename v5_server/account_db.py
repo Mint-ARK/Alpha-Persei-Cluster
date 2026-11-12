@@ -5845,7 +5845,7 @@ class AccountDB:
             (int(uid), mode, cur_area, cur_adv, now)
         )
 
-    def check_and_lazy_refresh_boss_challenge(self, uid, now_ts=None):
+    def check_and_lazy_refresh_boss_challenge(self, uid, now_ts=None, *, reset_current=False):
         """梦境独立原子刷新；BUS与惰性读取共用完成水位和本期种子。"""
         from boss_challenge_cycle import bounds, seed_at
         now_ts = int(time.time() if now_ts is None else now_ts)
@@ -5866,7 +5866,7 @@ class AccountDB:
             last_weekly = int(prog.get('last_weekly_ts') or 0)
             last_daily = int(prog.get('last_daily_ts') or 0)
             changed = False
-            if last_weekly < start:
+            if last_weekly < start or reset_current:
                 for table in ('boss_challenge_normal', 'boss_challenge_advance',
                               'boss_challenge_scores', 'boss_challenge_claimed_rewards'):
                     self.execute(f'DELETE FROM {table} WHERE uid=?', (uid,))
@@ -5876,7 +5876,8 @@ class AccountDB:
                 self.execute(
                     'UPDATE boss_challenge_progress SET cycle_id=?,use_times=0,'
                     'last_daily_ts=?,last_weekly_ts=?,update_ts=? WHERE uid=?',
-                    (seed_at(start), daily, start, now_ts, uid))
+                    (seed_at(start) if last_weekly < start else prog['cycle_id'],
+                     max(daily, last_daily), max(start, last_weekly), now_ts, uid))
                 changed = True
             else:
                 if not adopted:
@@ -6586,7 +6587,7 @@ class AccountDB:
 
     # ----------------- 介质攫取 (Equip Seizure) 数据持久化 -----------------
 
-    def get_equip_seizure_progress(self, uid, now_ts=None):
+    def get_equip_seizure_progress(self, uid, now_ts=None, *, reset_current=False):
         """获取玩家介质攫取进度，支持跨天跨周惰性刷新。"""
         if now_ts is None:
             now_ts = int(time.time())
@@ -6646,8 +6647,8 @@ class AccountDB:
         need_save = False
 
         # 1. 跨周检测 (周四 05:00 刷新)
-        if now_ts >= refresh_ts or refresh_ts != next_weekly_rf:
-            if now_ts >= refresh_ts:
+        if reset_current or refresh_ts != next_weekly_rf:
+            if reset_current or now_ts >= refresh_ts:
                 today_score = 0
                 sum_score = 0
                 got_rewards = []

@@ -62,6 +62,10 @@ def get_weekly_cycle_id(now_ts=None, base_anchor=1700000000):
 _CATALOGS = {}
 
 
+POLYHEDRON_POLICY_EXP = (60, 120, 180, 240, 300, 400, 500, 600, 700, 800,
+                         920, 1040, 1160, 1280, 1400, 1520, 1640, 1760, 1880, 2000)
+
+
 def get_polyhedron_cycle(now_ts=None):
     """多维历程统一按东八区周一05:00轮换，与宿主机时区无关。"""
     now_ts = int(time.time() if now_ts is None else now_ts)
@@ -170,20 +174,20 @@ def get_boss_challenge_reward_items(reward_type, reward_val, area_id=4, mode_id=
     return items
 
 
-def get_boss_challenge_data(uid, db, *, strict=False):
+def get_boss_challenge_data(uid, db, *, strict=False, now_ts=None, selection=None):
     """
     返回梦境再构当期动态数据：
     - sc_45201: mode, next_refresh_time, difficulty_list
     - sc_45001: 普通梦境 (boss_challenge_list, use_times, receive_star_list, area_id)
     - sc_45101: 进阶梦境 (advance_id, boss_list, receive_point_list)
     """
-    now = int(time.time())
+    now = int(time.time() if now_ts is None else now_ts)
     from boss_challenge_cycle import bounds, seed_at
     cycle_start, next_rf, _ = bounds(now)
     cycle = seed_at(cycle_start)
     cat = get_boss_catalog()
     
-    if db and hasattr(db, "check_and_lazy_refresh_boss_challenge"):
+    if selection is None and db and hasattr(db, "check_and_lazy_refresh_boss_challenge"):
         try:
             db.check_and_lazy_refresh_boss_challenge(uid, now)
         except Exception:
@@ -205,16 +209,19 @@ def get_boss_challenge_data(uid, db, *, strict=False):
     area_id = 4 # 默认异相层 (Lv80-100)
     advance_id = 101 # 默认扭曲梦境Ⅰ
     
-    if db:
+    if db or selection:
         try:
-            prog = db.get_boss_challenge_progress(uid) if hasattr(db, "get_boss_challenge_progress") else None
-            if not prog:
+            prog = selection
+            if prog is None and hasattr(db, "get_boss_challenge_progress"):
+                prog = db.get_boss_challenge_progress(uid)
+            if prog is None and db:
                 rows = db.query("SELECT * FROM boss_challenge_progress WHERE uid=?", (uid,))
                 prog = rows[0] if rows else {}
             if prog:
                 # 数据库保存本期有效种子；旧档首次采用时保留当时列表，
                 # 周三不再重新按物理时间计算种子。
-                cycle = int(prog.get('cycle_id') or cycle)
+                if int(prog.get('last_weekly_ts') or 0) >= cycle_start:
+                    cycle = int(prog.get('cycle_id') or cycle)
                 if int(prog.get('last_weekly_ts') or 0) >= next_rf:
                     next_rf = int(prog['last_weekly_ts']) + 604800
                 raw_mode = int(prog.get("mode") or 0)
@@ -236,6 +243,7 @@ def get_boss_challenge_data(uid, db, *, strict=False):
                 raise
             pass
             
+    if db:
         try:
             aff_rows = db.query("SELECT * FROM boss_challenge_affixes WHERE uid=?", (uid,))
             for r in aff_rows:
@@ -630,6 +638,21 @@ def calc_core_verification_super_score(info_id, diff=8, battle_time_ms=0, affix_
     time_bonus = max(0, int(3000 - time_sec * 20))
     return base_score + affix_score + time_bonus
 
+def get_core_verification_stages(cycle):
+    groups = {1: [], 2: []}
+    for info in get_core_verification_catalog().get('cycle_info', {}).values():
+        if int(info.get('cycle', 0)) == cycle:
+            boss = int(info.get('boss_type', 0))
+            if boss in groups:
+                groups[boss].append(info)
+    for boss, stages in groups.items():
+        stages.sort(key=lambda row: int(row.get('difficult', 0)))
+        if not stages:
+            groups[boss] = [dict(id=cycle * 1000 + boss * 100 + diff, boss_type=boss, difficult=diff)
+                            for diff in range(1, 9)]
+    return groups[1], groups[2]
+
+
 def get_core_verification_data(uid, db):
     """
     返回迭代校验常规当期动态数据（构建 sc_75009 字典结构）：
@@ -647,27 +670,7 @@ def get_core_verification_data(uid, db):
     now_cycle = get_core_verification_cycle(now)
     next_cycle = (now_cycle % 16) + 1
 
-    cat = get_core_verification_catalog()
-    cycle_info = cat.get("cycle_info", {})
-
-    b1_stages = []
-    b2_stages = []
-    for sid_str, info in cycle_info.items():
-        if int(info.get("cycle", 0)) == now_cycle:
-            if int(info.get("boss_type", 0)) == 1:
-                b1_stages.append(info)
-            elif int(info.get("boss_type", 0)) == 2:
-                b2_stages.append(info)
-
-    b1_stages.sort(key=lambda x: int(x.get("difficult", 0)))
-    b2_stages.sort(key=lambda x: int(x.get("difficult", 0)))
-
-    if not b1_stages:
-        for d in range(1, 9):
-            b1_stages.append({"id": now_cycle * 1000 + 100 + d, "boss_type": 1, "difficult": d})
-    if not b2_stages:
-        for d in range(1, 9):
-            b2_stages.append({"id": now_cycle * 1000 + 200 + d, "boss_type": 2, "difficult": d})
+    b1_stages, b2_stages = get_core_verification_stages(now_cycle)
 
     records = {}
     locks = {1: [], 2: []}

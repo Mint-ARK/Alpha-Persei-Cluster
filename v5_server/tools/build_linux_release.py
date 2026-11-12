@@ -11,7 +11,7 @@ def main():
             raise FileNotFoundError(f'Missing Linux runtime file: {name}')
         if name.endswith('.sh') and b'\r' in path.read_bytes():
             raise ValueError(f'{name} must use LF line endings')
-    backend.build_release_package('AetherGazer_Server_v5.0.3_Linux_Core.zip', unix_metadata=True)
+    backend.build_release_package('AetherGazer_Server_v5.0.4_Linux_Core.zip', unix_metadata=True)
 
 
 if __name__ == '__main__':

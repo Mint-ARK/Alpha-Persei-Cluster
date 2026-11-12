@@ -85,3 +85,4 @@ linux_generated/
 
 # Host-local admin password hash
 linux_admin_auth.json
+v5_server/data/launch_overrides.json

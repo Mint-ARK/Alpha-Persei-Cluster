@@ -65,7 +65,7 @@ def _mail(db, uid, title, items, content):
     return mid
 
 
-def _bp_id():
+def battlepass_list_id():
     from res_version_manager import get_version_config
     return int(get_version_config()['battlepass_list_id'])
 
@@ -107,11 +107,16 @@ def _premium_gift(db, uid, state, bp):
     return mid
 
 
+def clear_battlepass_progress(db, uid, now):
+    db.set_currency(uid, 14, 0, ts=now)
+    db.execute("UPDATE battlepass SET receive_info='[]',weekly_gain_exp=0 WHERE uid=?", (uid,))
+
+
 def _ensure_bp(db, uid, state, now):
     week = get_weekly_mon_5am_ts(now)
     bp = _row(db, 'battlepass', uid)
     legacy = 'bp_cycle' not in state
-    expected_id = _bp_id()
+    expected_id = battlepass_list_id()
     reset = not legacy and int(state['bp_cycle']) < week
     if not bp:
         db.get_or_create_battlepass(uid)
@@ -121,8 +126,7 @@ def _ensure_bp(db, uid, state, now):
         # Old depth purchases already granted their extra bundle directly.
         state['bp_gift_issued'] = int(bp.get('pay_level') or 0) == 202
     elif reset:
-        db.set_currency(uid, 14, 0, ts=now)
-        db.execute("UPDATE battlepass SET receive_info='[]',weekly_gain_exp=0 WHERE uid=?", (uid,))
+        clear_battlepass_progress(db, uid, now)
         state['bp_gift_issued'] = False
         state.pop('bp_gift_mail', None)
     if not reset and retarget:
@@ -130,10 +134,10 @@ def _ensure_bp(db, uid, state, now):
             int(bp.get('battlepass_list_id') or expected_id), expected_id)
         db.execute('UPDATE battlepass SET receive_info=? WHERE uid=?', (json.dumps(received), uid))
     if legacy or reset or retarget:
-        state['bp_cycle'], state['bp_list'] = week, _bp_id()
+        state['bp_cycle'], state['bp_list'] = week, expected_id
         db.execute('UPDATE battlepass SET battlepass_list_id=?,start_timestamp=?,end_timestamp=?, '
                    'next_refresh_timestamp=?,is_start=1,update_ts=? WHERE uid=?',
-                   (_bp_id(), week, week + 7*DAY, week + 7*DAY, now, uid))
+                   (expected_id, week, week + 7*DAY, week + 7*DAY, now, uid))
         bp = _row(db, 'battlepass', uid)
     if state.get('bp_weekly_mail_cycle') != week:
         state['bp_weekly_mail'] = _mail(db, uid, '每周战令经验补给', [(14, WEEKLY_MAIL_EXP)],

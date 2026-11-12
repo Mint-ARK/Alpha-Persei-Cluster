@@ -32,13 +32,13 @@ Termux 不保证可用，仍在测试中，所以谨慎操作。
 
 ```sh
 curl -fL --retry 3 \
-> -o AetherGazer_Server_v5.0.3_Linux_Core.zip \
-> https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Linux_Core.zip
+> -o AetherGazer_Server_v5.0.4_Linux_Core.zip \
+> https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.4/AetherGazer_Server_v5.0.4_Linux_Core.zip
 ```
 使用unzip工具解压包：
 
 ```sh
-unzip AetherGazer_Server_v5.0.3_Linux_Core.zip
+unzip AetherGazer_Server_v5.0.4_Linux_Core.zip
 ```
 
 使用sh命令运行向导：
@@ -89,6 +89,7 @@ Termux 以同手机使用为目标，非Root设备不可以使用443、80等重�
 sh server.sh environment  # 仅检查环境，不访问存档内容
 sh server.sh check        # 配置、文件权限、完整端口池；应在服务停止时执行
 sh server.sh run          # 前台启动，Ctrl+C 退出
+sh server.sh run --supervised  # 前台托管，支持从控制面板重启内核
 ```
 
 保存后的端口/IP 在下一次启动生效。首次默认挂载 `account.db`，重新配置保留原存档路径。所有运行账号须能写入程序和存档目录。

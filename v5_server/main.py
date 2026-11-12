@@ -93,8 +93,13 @@ def _check_protocol_assets(encoder):
             raise RuntimeError(f"协议数据缺失或不可用: {message}，请检查 lua_proto_messages.json")
 
 
-def main(argv=None):
+def main(argv=None, *, launcher_arg_count=None):
+    import launch_settings
+    raw_args = list(sys.argv[1:] if argv is None else argv)
+    if launcher_arg_count is None and raw_args[:1] == ['--supervised']:
+        return launch_settings.run_supervised(raw_args[1:])
     ap = argparse.ArgumentParser(description="V5 模块化服务器（MAIN 装配）")
+    ap.add_argument("--supervised", action="store_true", help="放在首位，启用命令行托管和面板重启")
     ap.add_argument("--host-ip", default="", help="对外发布 IP（公网或局域网 IPv4，默认自动检测 LAN 地址）")
     ap.add_argument("--https-port", type=int, default=443, help="HTTPS SDK/区服端口（443 需管理员）")
     ap.add_argument("--http-port", type=int, default=80, help="HTTP 辅助端口（0=关闭，反代部署可禁用）")
@@ -107,8 +112,12 @@ def main(argv=None):
     ap.add_argument("--cdn-mode", choices=("off", "relay", "cache"), default="off",
                     help="CDN模式：off关闭，relay仅流式穿透（适合本地设备），cache穿透并存盘")
     ap.add_argument("--dns", action="store_true", help="启动内置轻量 UDP/TCP:53 DNS 服务器（需管理员权限）")
+    ap.add_argument("--no-dns", action="store_false", dest="dns", default=argparse.SUPPRESS,
+                    help="禁用内置 DNS")
     ap.add_argument("--dns-upstream", action="append", type=IPv4Address, metavar="IPv4",
                     help="DNS 转发上游，可重复指定；本机代理改写公共 DNS 时可指定局域网路由器")
+    ap.add_argument("--dns-upstream-default", action="store_const", const=None, dest="dns_upstream",
+                    default=argparse.SUPPRESS, help="使用默认 DNS 上游")
     ap.add_argument("--replay", default="", metavar="素材目录",
                     help="激活重放模块并指定素材目录（如 archive/20260805_全流程_服务器2_蒂卡拉/complete_replay）")
     ap.add_argument("--frame-delay", type=float, default=0.001, help="重放帧间延迟")
@@ -135,7 +144,9 @@ def main(argv=None):
     ap.add_argument("--domain-proxy-mode", choices=("none", "semi", "manual", "no_https"), default="none", help="域名反代对接方式")
     ap.add_argument("--site-conf-path", default="", help="外部站点配置文件绝对路径")
     ap.add_argument("--admin-auth-configured", default=None, help=argparse.SUPPRESS)
-    args = ap.parse_args(argv)
+    args = launch_settings.parse_args(ap, raw_args, launcher_arg_count=launcher_arg_count)
+    if args.supervised:
+        ap.error("--supervised 仅支持直接运行 main.py，并且必须放在首位")
 
     if args.list_resource_profiles:
         import resource_distribution
@@ -546,6 +557,13 @@ def main(argv=None):
     log(f"gateway TCP 服务器池监听 {args.gw_port}..{slot_id_to_port(TOTAL_SLOTS, args.gw_port, args.game_port)} (跳过 {args.game_port}) (下发目标 IP: {host_ip})", module="NET")
 
     # 启动 HTTPS（SDK 层 + HTTP:80 辅助 + 官方 CDN 抓包拦截）
+    restart_requested = threading.Event()
+
+    def request_restart():
+        restart_requested.set()
+        srv.shutdown()
+
+    launch_settings.configure(args, request_restart)
     app = server_net.build_https_app(core, material, args.game_port, args.gw_port, host_ip=host_ip)
     https_thread = threading.Thread(
         target=server_net.start_https, args=(app, args.https_port),
@@ -595,7 +613,7 @@ def main(argv=None):
                 time.sleep(1)
     finally:
         _shutdown_server()
-    return 0
+    return launch_settings.RESTART_EXIT_CODE if restart_requested.is_set() else 0
 
 
 if __name__ == "__main__":

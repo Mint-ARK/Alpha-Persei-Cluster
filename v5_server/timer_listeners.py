@@ -46,24 +46,14 @@ def on_daily_task_and_bp_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwargs
     if now_ts is None:
         now_ts = int(time.time())
     db = ctx.db
-    from task_cycle_notifications import task_cycle_reset, DAILY_TASK_FILTER
+    from task_cycle_notifications import task_cycle_reset, reset_task_progress, reset_activity_points, DAILY_TASK_FILTER
     with task_cycle_reset(ctx, uid, DAILY_TASK_FILTER, weekly=False):
 
         from lazy_timer import get_daily_5am_ts
         next_daily_5am = (cycle_start_ts or get_daily_5am_ts(now_ts)) + 86400
 
         # 1. 重置日常类任务 (task_type: 6=日常, 7=战令每日, 901=游园街每日, 1101=活动随机每日, 3001=活动每日)
-        db.execute(
-            "UPDATE task SET progress=0, complete_flag=0, claimed_ts=0, expired_ts=? "
-            f"WHERE uid=? AND ({DAILY_TASK_FILTER})",
-            (next_daily_5am, uid)
-        )
-
-        # 每日登录任务自动达成 (6001 日常登录, 71001 战令登录)
-        db.execute(
-            "UPDATE task SET progress=1 WHERE uid=? AND task_id IN (6001, 71001)",
-            (uid,)
-        )
+        reset_task_progress(db, uid, DAILY_TASK_FILTER, next_daily_5am, (6001, 71001))
 
         # 防御性清除 claim_ledger 中残存的日常/战令每日类任务记录（防止历史脏数据阻塞后续完成）
         db.execute(
@@ -74,14 +64,7 @@ def on_daily_task_and_bp_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwargs
         )
 
         # 2. 重置每日活跃度 PT (activity_pt_id=1) 并同步清零每日任务评分货币 (currency id=22)
-        db.execute(
-            "UPDATE activity_pt SET active_point=0, get_id_list='[]' WHERE uid=? AND activity_pt_id=1",
-            (uid,)
-        )
-        db.execute(
-            "UPDATE currency SET num=0 WHERE uid=? AND id=22",
-            (uid,)
-        )
+        reset_activity_points(db, uid, 1, 22)
 
         # 3. 重置后宅英雄每日投喂次数 (feed_times)
         db.execute("UPDATE backhome_hero SET feed_times=0 WHERE uid=?", (uid,))
@@ -105,18 +88,14 @@ def on_weekly_task_and_bp_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwarg
     db = ctx.db
     from paid_entitlement_service import settle
     settle(ctx, uid, now_ts)
-    from task_cycle_notifications import task_cycle_reset, WEEKLY_TASK_FILTER
+    from task_cycle_notifications import task_cycle_reset, reset_task_progress, reset_activity_points, WEEKLY_TASK_FILTER
     with task_cycle_reset(ctx, uid, WEEKLY_TASK_FILTER, weekly=True):
 
         from lazy_timer import get_weekly_mon_5am_ts
         next_wk_mon_5am = (cycle_start_ts or get_weekly_mon_5am_ts(now_ts)) + 7 * 86400
 
         # 1. 重置周常类任务 (task_type: 5=周常, 8=战令每周, 902=游园街每周)
-        db.execute(
-            "UPDATE task SET progress=0, complete_flag=0, claimed_ts=0, expired_ts=? "
-            f"WHERE uid=? AND ({WEEKLY_TASK_FILTER})",
-            (next_wk_mon_5am, uid)
-        )
+        reset_task_progress(db, uid, WEEKLY_TASK_FILTER, next_wk_mon_5am)
 
         # 防御性清除 claim_ledger 中残存的周常/战令每周类任务记录
         db.execute(
@@ -133,14 +112,7 @@ def on_weekly_task_and_bp_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwarg
         )
 
         # 3. 重置每周活跃度 PT (activity_pt_id=3) 并同步清零每周任务评分货币 (currency id=35)
-        db.execute(
-            "UPDATE activity_pt SET active_point=0, get_id_list='[]' WHERE uid=? AND activity_pt_id=3",
-            (uid,)
-        )
-        db.execute(
-            "UPDATE currency SET num=0 WHERE uid=? AND id=35",
-            (uid,)
-        )
+        reset_activity_points(db, uid, 3, 35)
 
         # 4. 重置游园街贴票本周获取积分上限 (weekly_point = 0)
         db.execute(

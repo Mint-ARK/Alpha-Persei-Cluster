@@ -241,6 +241,19 @@ def get_online_uids():
         return list(_online_game_conns.keys())
 
 
+def run_while_save_offline(path, uid, action):
+    """Keep game registration and a selected save's offline mutation mutually exclusive."""
+    expected = os.path.normcase(os.path.realpath(path))
+    with _online_conns_lock:
+        for owner, connections in _online_game_conns.items():
+            for connection in connections:
+                mounted = getattr(getattr(connection, 'db', None), 'path', None)
+                if (mounted and os.path.normcase(os.path.realpath(mounted)) == expected
+                        or not mounted and owner == uid):
+                    raise ValueError('请先退出这个存档的游戏账号，再重置本期')
+        return action()
+
+
 def active_version_for_save(path):
     if not path:
         return None

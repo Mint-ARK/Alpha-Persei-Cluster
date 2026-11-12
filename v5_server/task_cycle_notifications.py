@@ -10,6 +10,20 @@ DAILY_TASK_TYPES = (6, 7, 901, 1101, 3001)
 WEEKLY_TASK_TYPES = (5, 8, 902)
 
 
+def reset_task_progress(db, uid, task_filter, expires, login_ids=()):
+    db.execute("UPDATE task SET progress=0,complete_flag=0,claimed_ts=0,expired_ts=? "
+               f"WHERE uid=? AND ({task_filter})", (expires, uid))
+    if login_ids:
+        ids = ','.join('?' for _ in login_ids)
+        db.execute(f"UPDATE task SET progress=1 WHERE uid=? AND task_id IN ({ids})", (uid, *login_ids))
+
+
+def reset_activity_points(db, uid, activity_id, currency_id):
+    db.execute("UPDATE activity_pt SET active_point=0,get_id_list='[]' WHERE uid=? AND activity_pt_id=?",
+               (uid, activity_id))
+    db.execute("UPDATE currency SET num=0 WHERE uid=? AND id=?", (uid, currency_id))
+
+
 def task_expiry_for_type(task_type):
     """只对已有明确日/周重置规则的类型设置当前周期到期时间。"""
     if task_type in DAILY_TASK_TYPES:

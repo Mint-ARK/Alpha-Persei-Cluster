@@ -37,6 +37,7 @@ import SettingsPanel from './panels/Settings'
 import ShopPanel from './panels/Shop'
 import SavesPanel from './panels/Saves'
 import ResourcesPanel from './panels/Resources'
+import LaunchSettings from './panels/LaunchSettings'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import AdminLockScreen from './components/AdminLockScreen'
 
@@ -56,6 +57,7 @@ type NavItem = {
 const NAV: NavItem[] = [
   { id: 'overview', label: '状态总览', icon: LayoutDashboard, Panel: OverviewPanel },
   { id: 'resources', label: '资源分发', icon: Boxes, Panel: ResourcesPanel },
+  { id: 'launch', label: '启动配置', icon: Settings, Panel: LaunchSettings },
   { id: 'accounts', label: '账号数据', icon: Users, Panel: AccountsPanel },
   { id: 'saves', label: '存档管理', icon: Database, Panel: SavesPanel, badge: 'NEW' },
   { id: 'heroes', label: '角色状态', icon: Swords, Panel: HeroesPanel },
@@ -104,6 +106,10 @@ function TopBar({ onSelectTab }: TopBarProps) {
       {
         id: 'resources', title: '资源分发', desc: 'PC、Android、iPhone清单分发、安装包兼容副本与资源更新',
         category: '导航', tabId: 'resources', keywords: ['资源分发', 'iOS', 'iPhone', '清单', '307', '308', '331', '版本', '更新'], icon: Boxes,
+      },
+      {
+        id: 'launch', title: '启动配置', desc: '管理监听端口、启动存档、CDN 和内核重启',
+        category: '导航', tabId: 'launch', keywords: ['启动参数', '端口', 'DNS', 'CDN', '重启', '日志'], icon: Settings,
       },
       {
         id: 'accounts',

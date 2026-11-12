@@ -490,6 +490,9 @@ class GMReader:
             # 查询容错兜底
             return []
 
+    def query_strict(self, sql, params=()):
+        return [dict(row) for row in self._get_ro_conn().execute(sql, params)]
+
     def query_one(self, sql, params=()):
         """执行无锁只读 SQL 单行查询，返回字典或 None。"""
         try:
