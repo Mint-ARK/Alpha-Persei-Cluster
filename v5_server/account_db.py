@@ -63,6 +63,12 @@ HERO_TO_ARCHIVE = {
 }
 
 SCHEMA = """
+CREATE TABLE IF NOT EXISTS draw_feedback_state (
+    uid INTEGER NOT NULL,
+    pool_group TEXT NOT NULL,
+    residual_ema REAL NOT NULL DEFAULT 0,
+    PRIMARY KEY (uid, pool_group)
+);
 CREATE TABLE IF NOT EXISTS users (
     uid               INTEGER PRIMARY KEY,
     account           TEXT,
@@ -2506,6 +2512,12 @@ class AccountDB:
     def init_schema(self):
         c = self._conn()
         self.migrate_legacy_qworld_tasks()
+        if self.path != ':memory:':
+            existing_tables = {row[0] for row in c.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )}
+            if 'users' in existing_tables and 'draw_feedback_state' not in existing_tables:
+                self.backup_save_file(self.path, purpose='draw_feedback_migration')
         # 权威建库来源：lib/db_schema.sql（从实库导出的 217 张表，全部 IF NOT EXISTS，幂等）。
         # 内嵌的 SCHEMA 字符串已严重落后（实测新建库会缺 17 张表、hero 少 24 列，
         # `SELECT level FROM hero` 直接 no such column），只作为找不到 SQL 文件时的兜底。

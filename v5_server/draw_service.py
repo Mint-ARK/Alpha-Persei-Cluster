@@ -30,14 +30,15 @@ import logging
 import os
 import random
 import time
+from dataclasses import dataclass, replace
 
 from middleware import DownFrame
+import draw_models
 
 logger = logging.getLogger("DrawService")
 
-# ==================== 官方基准概率与软保底参数 ====================
-# 权威来源：decompiled_v2/x64/game/config/tipscfg.lua (359001 ~ 359034)
-# 角色池官方告示：S 级 1.60%（含保底 2.40%）、A 级 7.80%（含保底 14.00%）、B 级 6.00%、3 星钥从 84.60%
+# 基础出率来自客户端公告文本（TipsCfg 359001 ~ 359034）。
+# SR 的条件抽样和软保底曲线由本项目定义。
 BASE_RATE_SSR = 0.016            # S 级修正者 / 5 星钥从基础出率 (1.60%)
 BASE_RATE_SR_HERO = 0.078        # A 级修正者基础出率 (7.80%)
 BASE_RATE_SR_WEAPON = 0.1108     # 4 星钥从基础出率 (11.08%)
@@ -46,6 +47,37 @@ BASE_RATE_R_WEAPON = 0.846       # 3 星钥从基础出率 (84.60%)
 
 # 兼容旧引用
 _DRAW_SSR_RATE = BASE_RATE_SSR
+
+
+@dataclass(frozen=True)
+class DrawProbabilityRules:
+    """Rates in [0, 1]. SR is conditional on missing SSR; B on missing both."""
+
+    ssr_rate: float
+    sr_rate_after_ssr_miss: float
+    soft_pity_start: int
+    b_rate_after_sr_miss: float = BASE_RATE_R_HERO / (BASE_RATE_R_HERO + BASE_RATE_R_WEAPON)
+
+    def __post_init__(self):
+        for rate in (self.ssr_rate, self.sr_rate_after_ssr_miss, self.b_rate_after_sr_miss):
+            if type(rate) not in (float, int) or not 0 <= rate <= 1:
+                raise ValueError('抽卡概率必须为 0 到 1 之间的有限数值')
+        if type(self.soft_pity_start) is not int or not 1 <= self.soft_pity_start <= 90:
+            raise ValueError('软保底起点必须是 1 到 90 间的整数抽数')
+
+    @classmethod
+    def default_for(cls, pool_group):
+        return cls(
+            ssr_rate=BASE_RATE_SSR,
+            sr_rate_after_ssr_miss=BASE_RATE_SR_WEAPON if pool_group == 'weapon_servant_70' else BASE_RATE_SR_HERO,
+            soft_pity_start=81 if pool_group == 'hero_precision_90' else 66,
+        )
+
+    def validate_for(self, pool_group):
+        hard_pity = 90 if pool_group == 'hero_precision_90' else 70
+        if self.soft_pity_start > hard_pity:
+            raise ValueError(f'软保底起点不能超过本系列的 {hard_pity} 抽硬保底')
+        return hard_pity
 
 # 6 大阵营 5 星沉睡之子（钥从池唯一 SSR 产物）
 SLEEPING_CHILDREN = [2510000, 2520000, 2530000, 2540000, 2550000, 2590000]
@@ -285,13 +317,24 @@ class DrawService:
 
     @classmethod
     def get_instance(cls, db=None):
-        if cls._instance is None:
-            cls._instance = cls(db=db)
-        elif db is not None:
-            if cls._instance.db is not db:
-                cls._instance.db = db
-                cls._instance._init_db_schema()
-        return cls._instance
+        current = cls._instance
+        if current is not None and (db is None or current.db is db):
+            return current
+        from account_db import _db as active_db
+        if db is not None and db is not active_db and (current is not None or active_db is not None):
+            # Request-bound saves must never rebind the live singleton.
+            service = cls.__new__(cls)
+            service.db = db
+            service._pool_up_cfg = current._pool_up_cfg if current is not None else None
+            service._init_db_schema()
+            return service
+        # Give in-flight draws their original DB even when a new save is mounted.
+        service = cls(db=db)
+        cls._instance = service
+        if current is not None:
+            from res_version_manager import unregister_version_change_listener
+            unregister_version_change_listener(current._on_version_changed)
+        return service
 
     def __init__(self, db=None):
         self.db = db
@@ -366,6 +409,10 @@ class DrawService:
             self.sync_active_pool_activities()
         except Exception as e:
             logger.warning(f"[DrawService] 初始化 active_draw_pool / draw_record 数据表异常: {e}")
+
+    def model_settings(self):
+        read_config = getattr(self.db, 'get_system_config', None)
+        return draw_models.Settings.decode(read_config(draw_models.CONFIG_KEY) if read_config else '')
 
     # ==================== 卡池元数据与分类判定 ====================
 
@@ -540,46 +587,22 @@ class DrawService:
     # ==================== 概率与软保底动态计算引擎 ====================
 
     @staticmethod
-    def calc_ssr_prob(pool_group, since_ssr):
-        """计算当前第 since_ssr 抽的 SSR (S级修正者/5星钥从) 动态命中概率（含软保底平滑爬升）
-        官方公示基础概率: 1.60%, 含保底综合出率: 2.40%
-        1. 70 抽系列 (hero_precision_70, hero_standard_70, weapon_servant_70):
-           - 1 ~ 65 抽: 1.60% 基础出率
-           - 66 ~ 69 抽: 软保底线性阶梯爬升 (递增约 19.68% / 抽)
-           - 70 抽: 100.0% 硬保底必出
-           -> 模拟大样本收敛值严格稳定于 2.40% ~ 2.44%
-        2. 90 抽系列 (hero_precision_90):
-           - 1 ~ 80 抽: 1.60% 基础出率
-           - 81 ~ 89 抽: 软保底线性阶梯爬升 (递增约 9.84% / 抽)
-           - 90 抽: 100.0% 硬保底必出
-        """
-        if pool_group == "hero_precision_90":
-            if since_ssr >= 90:
-                return 1.0
-            elif since_ssr <= 80:
-                return BASE_RATE_SSR
-            else:
-                return BASE_RATE_SSR + (since_ssr - 80) * ((1.0 - BASE_RATE_SSR) / (90 - 80))
-        else:
-            if since_ssr >= 70:
-                return 1.0
-            elif since_ssr <= 65:
-                return BASE_RATE_SSR
-            else:
-                return BASE_RATE_SSR + (since_ssr - 65) * ((1.0 - BASE_RATE_SSR) / (70 - 65))
+    def calc_ssr_prob(pool_group, since_ssr, *, rules=None):
+        """Probability for the next numbered pull under the project's pity curve."""
+        rules = rules if rules is not None else DrawProbabilityRules.default_for(pool_group)
+        hard_pity = rules.validate_for(pool_group)
+        if since_ssr >= hard_pity:
+            return 1.0
+        if since_ssr < rules.soft_pity_start:
+            return rules.ssr_rate
+        floor = rules.soft_pity_start - 1
+        return rules.ssr_rate + (since_ssr - floor) * ((1.0 - rules.ssr_rate) / (hard_pity - floor))
 
     @staticmethod
-    def calc_sr_prob(pool_group, since_sr):
-        """计算当前第 since_sr 抽的 SR (A级修正者/4星钥从) 命中概率
-        - 角色池基础出率: 7.80% (综合 14.00%)
-        - 钥从池基础出率: 11.08% (综合 16.00%)
-        - since_sr >= 10: 100.0% 保底必出
-        """
-        if since_sr >= 10:
-            return 1.0
-        if pool_group == "weapon_servant_70":
-            return BASE_RATE_SR_WEAPON
-        return BASE_RATE_SR_HERO
+    def calc_sr_prob(pool_group, since_sr, *, rules=None):
+        """SR probability after the same pull has missed SSR."""
+        rules = rules if rules is not None else DrawProbabilityRules.default_for(pool_group)
+        return 1.0 if since_sr >= 10 else rules.sr_rate_after_ssr_miss
 
     # ==================== 保底与卡池状态存取 ====================
 
@@ -755,8 +778,7 @@ class DrawService:
            - 歪卡列表 s_other_item 严格排除 33 位常驻老 S 角色！
            - 歪卡列表 = 26 位限定 S 角色 剔除 本期 UP S 角色！
            - S UP 率 50 (客户端模板直接拼接 '%' 字符展示为 '50%')
-        3. 90精准角色池：
-           - S UP 率 100 (展示为 '100%' 必出 UP，绝不歪)，s_other_item = []
+        3. 90精准角色池的 UP 概率和非 UP 名单跟随当前抽卡模型。
         4. 常态/标准角色池 (10001 / 4080101)：
            - s_other_item = 33 位常驻标准 S 角色（剔除玩家自选目标）
            - pool 4080101 针对 DRAW_POOL_DESC_TEMP_11，s_up_item 默认指向 1066 大国主（DrawItemCfg 1001）
@@ -807,11 +829,12 @@ class DrawService:
 
         # 根据系列构造详情（全量转换为 DrawItemCfg 条目 ID）
         if pool_group == "hero_precision_90":
-            s_up_probability = 100
+            corrected = self.model_settings().corrected_anchor(pool_group)
+            s_up_probability = draw_models.ANCHOR_UP_PERCENT if corrected else 100
             target_hero = target_up_s if target_up_s else 1083
             target_did = DRAW_ITEM_LTD_S.get(target_hero) or DRAW_ITEM_STD_S.get(target_hero, 2050)
             s_up_item = [target_did]
-            s_other_item = []  # 90抽绝不歪
+            s_other_item = [DRAW_ITEM_LTD_S[hero] for hero in self.anchor_off_up(target_hero)] if corrected else []
             a_up_probability = 0
             a_up_item = []
             a_other_item = list(ALL_A_DRAW_ITEMS)
@@ -1080,8 +1103,12 @@ class DrawService:
 
     # ==================== 抽卡核心业务调度 ====================
 
-    def draw(self, ctx, uid, pool_id, dtype=10):
-        """执行单抽或十连抽卡核心逻辑，返回封装好的全部下行帧"""
+    @staticmethod
+    def anchor_off_up(target):
+        return [hero for hero in LIMITED_S_HEROES if hero != target]
+
+    def draw(self, ctx, uid, pool_id, dtype=10, *, probability_rules=None, feedback_bias=None):
+        """执行单抽或十连，可传入该次请求使用的服务端概率规则"""
         pool_id = int(pool_id)
         dtype = int(dtype)
         pool = self.db.query("SELECT * FROM draw_pool WHERE pool_id=?", (pool_id,))
@@ -1101,6 +1128,22 @@ class DrawService:
             cost_id = int(dj.get("cost_id", 38))
             cost_num = int(dj.get("cost_ten", 10) if dtype == 10 else dj.get("cost_once", 1))
 
+        pool_group = self.get_pool_group(pool_id, dj)
+        settings = self.model_settings()
+        corrected_anchor = settings.corrected_anchor(pool_group)
+        if feedback_bias is not None:
+            if type(feedback_bias) not in (int, float) or not -100 <= feedback_bias <= 100:
+                raise ValueError('单笔反馈偏置须在 -100～100 个百分点之间')
+            settings = replace(settings, mode=3)
+            if pool_group == draw_models.ANCHOR_GROUP:
+                settings = replace(settings, anchor_legacy=not corrected_anchor)
+        force_ssr = feedback_bias == 100
+        curve = draw_models.curve_for(settings, pool_group) if settings.mode >= 2 and not force_ssr else None
+        rules = probability_rules if probability_rules is not None else DrawProbabilityRules.default_for(pool_group)
+        if probability_rules is None and settings.mode < 2 and settings.legacy_base != 100 * rules.ssr_rate:
+            rules = replace(rules, ssr_rate=settings.legacy_base / 100)
+        pity_threshold = rules.validate_for(pool_group)
+
         # 验资
         cnt = self._item_balance(uid, cost_id)
         if cnt < cost_num:
@@ -1111,15 +1154,16 @@ class DrawService:
         if hasattr(ctx, "touched_items") and ctx.touched_items is not None:
             ctx.touched_items.add(cost_id)
 
-        pool_group = self.get_pool_group(pool_id, dj)
         state = self.get_draw_state(uid, pool_group)
         since = state["since_ssr"]
         since_sr = state.get("since_sr", 0)
         total_draws = state["total_draws"]
         is_up_guaranteed = state["is_up_guaranteed"]
+        residual = self.db.query("SELECT residual_ema FROM draw_feedback_state WHERE uid=? AND pool_group=?",
+                                 (uid, pool_group))
+        ema = residual[0]["residual_ema"] if residual else 0.0
 
         is_keyong_pool = (pool_group == "weapon_servant_70")
-        pity_threshold = 90 if (pool_group == "hero_precision_90") else 70
 
         # 获取 UP S 角色
         pool_cfg_all = self.load_pool_up_cfg()
@@ -1136,6 +1180,8 @@ class DrawService:
             target_up = user_up if user_up else default_up_s
         else:
             target_up = default_up_s
+        if corrected_anchor and not target_up:
+            target_up = 1083
 
         up_a_list = official_up_a or dj.get("up_a_heroes") or []
         if not isinstance(up_a_list, list):
@@ -1158,12 +1204,24 @@ class DrawService:
             since_sr += 1
             total_draws += 1
 
-            prob_ssr = self.calc_ssr_prob(pool_group, since)
+            if force_ssr:
+                prob_ssr = 1.0
+            elif settings.mode == 3:
+                prob_ssr = draw_models.feedback_probability(settings, pool_group, curve, since, ema, feedback_bias)
+            elif curve is not None:
+                prob_ssr = curve[min(since, pity_threshold) - 1]
+            else:
+                prob_ssr = self.calc_ssr_prob(pool_group, since, rules=rules)
             is_ssr = (random.random() < prob_ssr) or (since >= pity_threshold)
+            ema = draw_models.observe_feedback(ema, is_ssr, 1.0 if since >= pity_threshold else prob_ssr)
 
             if is_ssr:
-                since = 0
                 got_ssr = True
+                off_anchor = corrected_anchor and since < pity_threshold and target_up and (
+                    random.random() >= draw_models.ANCHOR_UP_PERCENT / 100
+                )
+                if not off_anchor:
+                    since = 0
                 if is_keyong_pool:
                     target_child = self.get_servant_sleeping_child(target_up)
                     selected_child = target_child if target_child else random.choice(SLEEPING_CHILDREN)
@@ -1177,7 +1235,10 @@ class DrawService:
                     rec_items.append({"id": selected_child, "num": 1})
                 else:
                     if pool_group == "hero_precision_90":
-                        chosen_hero = target_up if target_up else random.choice(LIMITED_S_HEROES)
+                        if off_anchor:
+                            chosen_hero = random.choice(self.anchor_off_up(target_up))
+                        else:
+                            chosen_hero = target_up if target_up else random.choice(LIMITED_S_HEROES)
                     elif pool_group == "hero_precision_70":
                         if is_up_guaranteed or random.random() < 0.5:
                             chosen_hero = target_up if target_up else random.choice(LIMITED_S_HEROES)
@@ -1214,7 +1275,7 @@ class DrawService:
                             "convert_from": {"id": chosen_hero, "num": 1}
                         })
             else:
-                prob_sr = self.calc_sr_prob(pool_group, since_sr)
+                prob_sr = self.calc_sr_prob(pool_group, since_sr, rules=rules)
                 is_sr = (since_sr >= 10) or (random.random() < prob_sr)
                 if is_sr:
                     since_sr = 0
@@ -1264,7 +1325,7 @@ class DrawService:
                         rec_items.append({"id": kid, "num": 1})
                     else:
                         # 角色池副产物：B 级角色 (6.00%) vs 3 星通用钥从 (84.60%)
-                        if random.random() < (BASE_RATE_R_HERO / (BASE_RATE_R_HERO + BASE_RATE_R_WEAPON)):
+                        if random.random() < rules.b_rate_after_sr_miss:
                             chosen_b = random.choice(HERO_B_LIST)
                             _, rebate = self.calc_draw_rebate(chosen_b)
                             total_huimang += rebate
@@ -1301,6 +1362,11 @@ class DrawService:
         state["total_draws"] = total_draws
         state["is_up_guaranteed"] = is_up_guaranteed
         self.save_draw_state(uid, pool_group, state, pool_id)
+        self.db.execute(
+            "INSERT INTO draw_feedback_state (uid, pool_group, residual_ema) VALUES (?,?,?) "
+            "ON CONFLICT(uid, pool_group) DO UPDATE SET residual_ema=excluded.residual_ema",
+            (uid, pool_group, ema),
+        )
 
         # 标品资产（重复碎片、钥从、附属辉芒）统一移交材料管理器 InventoryService 入库
         if total_huimang > 0:
