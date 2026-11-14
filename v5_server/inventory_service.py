@@ -15,6 +15,27 @@ from enchant_slots_util import default_slot_list
 
 logger = logging.getLogger("inventory_service")
 
+FLOWER_CURRENCY_IDS = (32, 31, 30)
+
+
+def flower_cost_breakdown(ctx, uid, total):
+    """Spend free flowers first, then paid flowers from both platforms."""
+    from core import OperationError
+
+    paid_ids = (30, 31) if getattr(ctx, 'client_platform', None) == 'ios' else (31, 30)
+    balances = {iid: max(0, InventoryService.get_item_balance(ctx, uid, iid)[1])
+                for iid in (32, *paid_ids)}
+    available = sum(balances.values())
+    if available < total:
+        raise OperationError(2104, f'移转之花不足（拥有 {available}，需要 {total}）')
+    breakdown = {}
+    for iid, balance in balances.items():
+        amount = min(balance, total)
+        if amount > 0:
+            breakdown[iid] = amount
+            total -= amount
+    return breakdown
+
 _DIR = os.path.dirname(os.path.abspath(__file__))
 _EQUIP_MAP_CACHE = None
 _USER_LEVEL_SETTINGS_CACHE = None
