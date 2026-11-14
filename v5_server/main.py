@@ -466,6 +466,12 @@ def main(argv=None, *, launcher_arg_count=None):
             except Exception:
                 pass
 
+        try:
+            from cdn_download_queue import close_manager
+            close_manager()
+        except Exception as error:
+            log(f"主动下载队列退出失败: {error}", "WARN", module="CDN")
+
         log("服务端已安全停止，端口与资源已释放。", module="MAIN")
         if signum is not None:
             os._exit(0)

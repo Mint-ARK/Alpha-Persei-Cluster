@@ -18,10 +18,11 @@ import cdn_active_downloads as active
 import cdn_integrity as integrity
 import cdn_proxy
 import cdn_transfer_control as transfers
-from cdn_download_index import IndexManager, MANIFEST_NAME, SCOPES, freeze_source
+from cdn_download_index import IndexManager, MANIFEST_NAME, SCOPES, VOICE_LANGUAGES, freeze_source
 
 TERMINAL = {'completed', 'warnings', 'failed', 'cancelled'}
 RUNNING = {'indexing', 'downloading', 'waiting_passive'}
+KINDS = ('assets', 'voice', 'manifest')
 
 
 class DownloadQueue:
@@ -55,7 +56,7 @@ class DownloadQueue:
                 self.parallel_tasks = self._parallel(data.get('parallel_tasks', 1))
                 self.paused = bool(data.get('paused', False))
                 for job in data['tasks']:
-                    if not isinstance(job, dict) or not isinstance(job.get('id'), str) or job.get('kind') not in ('assets', 'manifest'):
+                    if not isinstance(job, dict) or not isinstance(job.get('id'), str) or job.get('kind') not in KINDS:
                         raise ValueError('Invalid queue entry')
                     integrity.platform(job['platform'])
                     if job['state'] not in TERMINAL | {'ready', 'paused'}:
@@ -103,9 +104,18 @@ class DownloadQueue:
         platform = integrity.platform(data.get('platform'))
         scope = data.get('scope', 'all')
         kind = data.get('kind', 'assets')
-        if scope not in SCOPES or kind not in ('assets', 'manifest'):
+        if scope not in SCOPES or kind not in KINDS:
             raise ValueError('任务类型或下载范围无效')
+        languages = data.get('voice_languages', [])
+        if not isinstance(languages, list) or any(lang not in VOICE_LANGUAGES for lang in languages):
+            raise ValueError('语音只支持中文和日语')
+        languages = [lang for lang in VOICE_LANGUAGES if lang in languages]
+        if kind == 'voice' and not languages:
+            raise ValueError('请选择至少一种语音')
         approved = data.get('download', kind == 'manifest')
+        for_distribution = data.get('for_distribution', False)
+        if type(for_distribution) is not bool or (for_distribution and kind != 'manifest'):
+            raise ValueError('只有清单任务可以登记分发方案')
         if type(approved) is not bool:
             raise ValueError('请选择分析或下载')
         with self._condition:
@@ -114,9 +124,9 @@ class DownloadQueue:
                 raise ValueError('待处理任务已达100条，请先处理现有任务')
             if len(self._jobs) >= 500:
                 raise ValueError('任务记录已达500条，请先移除已完成记录')
-            if kind == 'assets':
+            if kind != 'manifest':
                 try:
-                    source = freeze_source(self.root, platform, data.get('profile_id'), data.get('filename'))
+                    source = freeze_source(self.root, platform, data.get('profile_id'), data.get('filename'), languages)
                 except ValueError:
                     name=data.get('filename')
                     if not data.get('prepare_manifest') or data.get('profile_id') or not isinstance(name,str) or not MANIFEST_NAME.fullmatch(name):
@@ -130,6 +140,10 @@ class DownloadQueue:
             job = dict(id=uuid.uuid4().hex, platform=platform, scope=scope, kind=kind,
                 source=source, label=source['label'], approved=approved, state='queued',
                 created_at=int(time.time()), message='已加入全局队列', stats={}, wire_bytes=0)
+            if languages:
+                job['voice_languages'] = languages
+            if for_distribution:
+                job['for_distribution'] = True
             self._normalize_idle_pause()
             self._jobs.append(job)
             try:
@@ -234,7 +248,7 @@ class DownloadQueue:
                 job.update(speed_bps=round(speeds.get(job['id'], 0)),
                     progress_percent=round(100*completed/total, 1) if total else 100 if job['state'] in {'completed','warnings'} else 0,
                     group_id=self._group_id if job['id'] in self._active_ids else '')
-                job['source'].pop('snapshot', None)
+                self._hide_snapshots(job['source'])
             return dict(tasks=jobs, parallel_tasks=self.parallel_tasks, max_parallel_tasks=8,
                 paused=self.paused, total_speed_bps=round(sum(speeds.values())),
                 active_group_id=self._group_id, active_task_ids=list(self._active_ids),
@@ -246,10 +260,18 @@ class DownloadQueue:
             job=next((j for j in self._jobs if j['id']==ident),None)
             if not job: raise ValueError('任务不存在')
             result=copy.deepcopy(job)
-            result['source'].pop('snapshot',None)
+            self._hide_snapshots(result['source'])
             return dict(version=1,task=result,scope='server_shared_cache',
                 failure_detail_limit=1000,unresolved_detail_limit=200,
                 note='统计为去重后的文件对象；跨任务共享对象的网络流量只归属实际接收任务。')
+
+    @staticmethod
+    def _hide_snapshots(source):
+        source.pop('snapshot', None)
+        if 'voice_package' in source:
+            source['voice_package'] = {k: v for k, v in source['voice_package'].items() if k != 'snapshot'}
+            source['voice_hashes'] = {lang: {k: v for k, v in voice.items() if k != 'snapshot'}
+                                      for lang, voice in source['voice_hashes'].items()}
 
     def _loop(self):
         try:
@@ -293,8 +315,9 @@ class DownloadQueue:
                     integrity.checkpoint(session)
                     if job['kind'] == 'manifest':
                         if not job['approved']:
-                            job.update(state='ready', message='等待确认开始准备主清单',
-                                stats=dict(total_files=1, cached_files=0, done_files=0))
+                            languages = VOICE_LANGUAGES if job.get('for_distribution') else job.get('voice_languages', [])
+                            job.update(state='ready', message='等待确认开始准备清单',
+                                stats=dict(total_files=2+len(languages) if languages else 1, cached_files=0, done_files=0))
                             continue
                         try:
                             self._manifest(job, session)
@@ -307,7 +330,10 @@ class DownloadQueue:
                             import res_version_manager as versions
                             try:
                                 versions.download_official_manifest(job['platform'],job['source']['filename'],versions.PLATFORM_CHANNEL_IDS[job['platform']])
-                                job['source']=freeze_source(self.root,job['platform'],filename=job['source']['filename'])
+                                languages = job.get('voice_languages', [])
+                                if languages:
+                                    versions.prepare_voice_manifests(job['platform'], job['source']['filename'], languages)
+                                job['source']=freeze_source(self.root,job['platform'],filename=job['source']['filename'],languages=languages)
                             except integrity.Cancelled:
                                 raise
                             except Exception as error:
@@ -321,7 +347,13 @@ class DownloadQueue:
                         job.update(state='failed', message=str(error))
                 assets = [j for j in assets if j['id'] in prepared]
                 if assets:
-                    missing, summaries = self.index.build(assets, session, prepared)
+                    def index_progress(checked, total):
+                        with self._condition:
+                            for job in assets:
+                                if job['state'] == 'indexing':
+                                    job['message'] = f'正在核对目标目录文件 {checked} / {total}（当前执行组）'
+
+                    missing, summaries = self.index.build(assets, session, prepared, progress=index_progress)
                     with self._condition:
                         for job in assets:
                             if job['state'] != 'indexing':
@@ -360,6 +392,7 @@ class DownloadQueue:
                     if job['state'] in RUNNING:
                         job.update(state='failed', message=str(error))
         finally:
+            self.index.checkpoint_receipts(force=True)
             with self._condition:
                 self._session=None; self._objects={}; self._active_ids=[]; self._group_id=''
                 self._save()
@@ -377,9 +410,31 @@ class DownloadQueue:
             if job['state'] != 'downloading':
                 return
             valid=result['valid']
-            job.update(state='completed' if valid else 'failed', message='清单已存在，已跳过' if result['skipped'] and valid else '清单已保存' if valid else '同名文件异常，未覆盖')
-            job['stats']=dict(total_files=1,total_bytes=0,cached_files=int(result['skipped']),done_files=int(result['downloaded']),
-                cached_bytes=0,done_bytes=0,failed_files=int(not valid),unresolved_count=0,failures=[],unresolved_paths=[])
+            languages = VOICE_LANGUAGES if job.get('for_distribution') else job.get('voice_languages', [])
+            for_distribution = set(languages) == set(VOICE_LANGUAGES)
+            voice_total = 1 + len(languages) if languages else 0
+            if valid and for_distribution and not result.get('official_verified'):
+                versions._check_official_manifest_target(job['platform'], job['source']['filename'])
+            voice_done = 0
+            if valid and languages:
+                voice_done = versions.prepare_voice_manifests(job['platform'], job['source']['filename'], languages,
+                                                             target_checked=for_distribution)
+            integrity.checkpoint(session)
+            with self._condition:
+                integrity.checkpoint(session)
+                if job['state'] != 'downloading':
+                    return
+                if valid and for_distribution:
+                    versions.register_downloaded_distribution(job['platform'], job['source']['filename'])
+                downloaded = int(result['downloaded']) + voice_done
+                message = '清单已保存' if downloaded else '清单已存在，已跳过'
+                if for_distribution:
+                    message = '分发方案已就绪，可手动应用'
+                job.update(state='completed' if valid else 'failed', message=message if valid else '同名文件异常，未覆盖')
+                job['stats']=dict(total_files=1+voice_total,total_bytes=0,
+                    cached_files=int(result['skipped'] and valid)+(voice_total-voice_done if valid else 0),
+                    done_files=downloaded,
+                    cached_bytes=0,done_bytes=0,failed_files=int(not valid),unresolved_count=0,failures=[],unresolved_paths=[])
         finally:
             session.progress=None
 
@@ -395,9 +450,9 @@ class DownloadQueue:
             token=item['token']
             with transfers.bind(token):
                 platform,filename=item['key']
-                return cdn_proxy.download_verified(platform,filename,expected_size=item['spec'].size,
+                return cdn_proxy.download_verified(platform,filename,directory=item['output_dir'],expected_size=item['spec'].size,
                     expected_md5=item['spec'].md5,cancel=token,indexed=True,
-                    progress=lambda n:self._received(item['owner'],n))
+                    progress=lambda n:self._received(item['owner'],n), on_published=self.index.record_verified)
         with ThreadPoolExecutor(max_workers=active.MAX_CONCURRENCY,thread_name_prefix='cdn-object') as pool:
             try:
                 while pending or rotation:
@@ -415,6 +470,7 @@ class DownloadQueue:
                     if not pending:
                         break
                     done,_=wait(pending,timeout=.1,return_when=FIRST_COMPLETED)
+                    self.index.checkpoint_receipts()
                     for future in done:
                         item=pending.pop(future)
                         failure=None
@@ -469,3 +525,9 @@ def get_manager():
         if _manager is None:
             _manager=DownloadQueue()
         return _manager
+
+
+def close_manager():
+    with _manager_lock:
+        if _manager is not None:
+            _manager.close()

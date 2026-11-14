@@ -3,7 +3,7 @@ import { RefreshCw } from 'lucide-react'
 import { Button } from '@heroui/react'
 import { PageHeader } from '../components/kit'
 import { useServer } from '../lib/serverContext'
-import { fetchResourceDistribution, type DownloadQueueHint, type ResourceDistributionData } from '../lib/api'
+import { fetchResourceDistribution, type EnqueuedDownload, type ResourceDistributionData } from '../lib/api'
 import ResourceManifestManager from './ResourceManifestManager'
 import ResourceDownloadControls from './ResourceDownloadControls'
 import ResourceDownloadQueue from './ResourceDownloadQueue'
@@ -14,7 +14,7 @@ export default function ResourcesPanel() {
   const { isOnline, resVersionInfo } = useServer()
   const [distribution, setDistribution] = useState<ResourceDistributionData | null>(null)
   const [error, setError] = useState('')
-  const [hint, setHint] = useState<DownloadQueueHint | null>(null)
+  const [queuedManifest, setQueuedManifest] = useState<EnqueuedDownload | null>(null)
   const load = async () => {
     setError('')
     try {
@@ -29,9 +29,9 @@ export default function ResourcesPanel() {
       actions={<><ResourceStorage online={isOnline} /><Button variant="secondary" isDisabled={!isOnline} onPress={load}><RefreshCw className="size-4" />刷新配置</Button></>} />
     {error && <p role="alert" className="text-danger">{error}</p>}
     {!distribution && !error && <p className="text-muted">{isOnline ? '正在读取资源分发配置…' : '请先启动服务器'}</p>}
-    {distribution && <ResourceManifestManager data={distribution} onSaved={setDistribution} disabled={!isOnline}
+    {distribution && <ResourceManifestManager data={distribution} onSaved={setDistribution} onQueued={setQueuedManifest} disabled={!isOnline}
       downloadControls={<ResourceDownloadControls online={isOnline} progress={null} />} />}
-    <ResourceDownloadQueue online={isOnline} distribution={distribution} hint={hint} />
-    <OfficialResourceProbe online={isOnline} onQueue={setHint} />
+    <ResourceDownloadQueue online={isOnline} distribution={distribution} queuedManifest={queuedManifest} onCatalogueChanged={load} />
+    <OfficialResourceProbe online={isOnline} onQueued={setQueuedManifest} />
   </div>
 }

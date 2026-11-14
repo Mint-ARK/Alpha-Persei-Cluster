@@ -41,6 +41,7 @@ _validation_local = threading.local()
 if os.name == 'nt':
     import ctypes
     import msvcrt
+    import struct
     from ctypes import wintypes
 
     class _FileBasicInfo(ctypes.Structure):
@@ -51,6 +52,62 @@ if os.name == 'nt':
     _file_info = ctypes.WinDLL('kernel32', use_last_error=True).GetFileInformationByHandleEx
     _file_info.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
     _file_info.restype = wintypes.BOOL
+    _kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+    _open_directory = _kernel.CreateFileW
+    _open_directory.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, ctypes.c_void_p,
+                                wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    _open_directory.restype = wintypes.HANDLE
+    _close_handle = _kernel.CloseHandle
+    _close_handle.argtypes = [wintypes.HANDLE]
+    _close_handle.restype = wintypes.BOOL
+    _volume_info = _kernel.GetVolumeInformationByHandleW
+    _volume_info.argtypes = [wintypes.HANDLE, wintypes.LPWSTR, wintypes.DWORD, ctypes.c_void_p,
+                             ctypes.c_void_p, ctypes.c_void_p, wintypes.LPWSTR, wintypes.DWORD]
+    _volume_info.restype = wintypes.BOOL
+    # FILE_ID_BOTH_DIR_INFO through FileId; variable UTF-16 name follows.
+    _dir_entry = struct.Struct('<I4xq8xqqq8xII32xQ')
+    _windows_epoch = 116444736000000000
+
+    def windows_directory_files(directory, cancel):
+        """Enumerate file IDs and change times with FileIdBothDirectoryInfo."""
+        handle = _open_directory(directory, 1, 7, None, 3, 0x02000000, None)
+        if handle == ctypes.c_void_p(-1).value:
+            raise ctypes.WinError(ctypes.get_last_error())
+        try:
+            filesystem = ctypes.create_unicode_buffer(32)
+            if not _volume_info(handle, None, 0, None, None, None, filesystem, len(filesystem)):
+                raise ctypes.WinError(ctypes.get_last_error())
+            if filesystem.value != 'NTFS':
+                raise OSError('Bulk 64-bit file IDs require NTFS')
+            device = os.stat(directory).st_dev
+            buffer = ctypes.create_string_buffer(64 * 1024)
+            while True:
+                checkpoint(cancel)
+                if not _file_info(handle, 10, buffer, len(buffer)):
+                    error = ctypes.get_last_error()
+                    if error == 18:  # ERROR_NO_MORE_FILES
+                        return
+                    raise ctypes.WinError(error)
+                offset = 0
+                while True:
+                    next_offset, creation, write, change, size, attributes, name_size, file_id = _dir_entry.unpack_from(buffer, offset)
+                    if not attributes & (0x10 | 0x400):  # directory or reparse point
+                        start = offset + _dir_entry.size
+                        name = buffer[start:start + name_size].decode('utf-16-le', errors='surrogatepass')
+                        yield name, (device, file_id, size,
+                                     (write - _windows_epoch) * 100,
+                                     (creation - _windows_epoch) * 100, change)
+                    if not next_offset:
+                        break
+                    offset += next_offset
+        finally:
+            _close_handle(handle)
+
+    def windows_directory_identity_matches(listed, receipt):
+        if listed[:4] != receipt[:4] or listed[5] != receipt[5]:
+            return False
+        # Python versions have reported either creation time or change time as st_ctime.
+        return receipt[4] in (listed[4], (listed[5] - _windows_epoch) * 100)
 
 
 class IntegrityError(ValueError):
@@ -401,8 +458,7 @@ def _publish(part, destination, spec, cancel, deadline):
     with open(destination, 'rb') as handle:
         final_stat = os.fstat(handle.fileno())
         final_key = _verification_key(destination, spec, final_stat, handle)
-    if (final_stat.st_ino, final_stat.st_size, final_stat.st_mtime_ns) != (
-            validated_stat.st_ino, validated_stat.st_size, validated_stat.st_mtime_ns):
+    if final_key[-1][:4] != validated_key[-1][:4]:
         raise IntegrityError('Published object changed unexpectedly')
     # Rename preserves the validated bytes. Adopt the new path/stat identity so
     # the first client does not hash the same large file a second time.
@@ -411,6 +467,7 @@ def _publish(part, destination, spec, cancel, deadline):
         _verified[final_key] = actual
         if len(_verified) > 16384:
             _verified.popitem(last=False)
+    return final_key[-1]
 
 
 def _headers(response, spec):
@@ -441,7 +498,7 @@ def _headers(response, spec):
 
 def ensure_file(spec, directory, opener, *, cancel=None, deadline=None,
                 max_attempts=MAX_ATTEMPTS, force=False, indexed=False,
-                discard_partial=False, progress=None):
+                discard_partial=False, progress=None, bandwidth=None, on_published=None):
     """opener(attempt, timeout) -> (connection, response); caller owns identity.
 
     Only full identity-encoded GET responses are accepted. A client's Range is
@@ -471,13 +528,24 @@ def ensure_file(spec, directory, opener, *, cancel=None, deadline=None,
                 if shutil.disk_usage(directory).free < needed + old_size + FREE_RESERVE:
                     raise OSError('Insufficient CDN storage space')
                 total = 0
+                length = expected if expected is not None else spec.size
                 # read1 returns after one buffered/raw read. A peer trickling
                 # bytes cannot hold read(CHUNK_SIZE) open across the job budget.
                 read_chunk = getattr(response, 'read1', response.read)
                 with open(part, 'xb') as handle:
                     while True:
                         checkpoint(cancel, deadline)
-                        chunk = read_chunk(CHUNK_SIZE)
+                        read_size = CHUNK_SIZE
+                        if bandwidth is not None:
+                            if length is not None:
+                                read_size = max(1, min(read_size, length - total))
+                            waiting_since = time.monotonic()
+                            read_size, reservation = bandwidth.reserve(read_size, cancel)
+                            # Intentional bandwidth waits do not consume the I/O budget.
+                            deadline += time.monotonic() - waiting_since
+                        chunk = read_chunk(read_size)
+                        if bandwidth is not None:
+                            bandwidth.refund(read_size - len(chunk), reservation)
                         if not chunk:
                             break
                         total += len(chunk)
@@ -493,7 +561,9 @@ def ensure_file(spec, directory, opener, *, cancel=None, deadline=None,
                     os.fsync(handle.fileno())
                 if expected is not None and total != expected:
                     raise IntegrityError('Incomplete HTTP body')
-                _publish(part, destination, spec, cancel, deadline)
+                identity = _publish(part, destination, spec, cancel, deadline)
+                if on_published is not None:
+                    on_published(destination, identity)
                 return destination
             except Cancelled:
                 raise

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Gauge, RefreshCw, Save } from 'lucide-react'
-import { Button, Card, Chip, Label, NumberField, Slider } from '@heroui/react'
+import { Button, Card, Chip, Input, Label, NumberField, Slider } from '@heroui/react'
 import { fetchResourceDownloadSettings, saveResourceDownloadSettings,
   type ResourceDownloadSettings, type UpdateProgressData } from '../lib/api'
 
@@ -9,6 +9,7 @@ export default function ResourceDownloadControls({ online, progress }: {
 }) {
   const [settings, setSettings] = useState<ResourceDownloadSettings | null>(null)
   const [value, setValue] = useState(32)
+  const [bandwidth, setBandwidth] = useState('0')
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -21,6 +22,7 @@ export default function ResourceDownloadControls({ online, progress }: {
       if (result.code !== 0 || !result.data) throw new Error(result.msg || '读取下载设置失败')
       setSettings(result.data)
       setValue(result.data.max_concurrency)
+      setBandwidth(String((result.data.max_bandwidth_kibps ?? 0) / 1024))
     } catch (e: any) { setError(e.message || '读取下载设置失败') }
     finally { setLoading(false) }
   }
@@ -31,29 +33,33 @@ export default function ResourceDownloadControls({ online, progress }: {
       setNotice('')
     }
   }
+  const bandwidthKiB = Math.round(Number(bandwidth) * 1024)
+  const invalidBandwidth = !bandwidth.trim() || !Number.isFinite(bandwidthKiB)
+    || Number(bandwidth) < 0 || (Number(bandwidth) > 0 && bandwidthKiB === 0)
   const apply = async () => {
     setSaving(true)
     setError('')
     setNotice('')
     try {
-      const result = await saveResourceDownloadSettings(value)
+      const result = await saveResourceDownloadSettings(value, bandwidthKiB)
       if (result.code !== 0 || !result.data) throw new Error(result.msg || '保存下载设置失败')
       setSettings(result.data)
       setValue(result.data.max_concurrency)
+      setBandwidth(String((result.data.max_bandwidth_kibps ?? 0) / 1024))
       setNotice('已应用，当前任务与后续任务均使用此设置')
     } catch (e: any) { setError(e.message || '保存下载设置失败') }
     finally { setSaving(false) }
   }
   const disabled = !online || !settings || loading || saving
-  const changed = settings !== null && value !== settings.max_concurrency
+  const bandwidthSupported = settings?.max_bandwidth_kibps !== undefined
+  const changed = settings !== null && (value !== settings.max_concurrency || bandwidthKiB !== (settings.max_bandwidth_kibps ?? 0))
   const busy = progress && ['checking', 'downloading', 'cancelling', 'registering'].includes(progress.status)
 
   return <Card className="p-5 space-y-4 lg:col-span-2">
     <div className="flex items-start justify-between gap-3">
       <div className="flex items-center gap-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-accent/10 text-accent"><Gauge className="size-5" /></span>
-        <div><h3 className="font-semibold text-foreground">主动下载并发</h3>
-          <p className="mt-0.5 text-xs text-muted">控制同时处理的资源数量，适用于主动资源同步。</p></div>
+        <h3 className="font-semibold text-foreground">主动下载设置</h3>
       </div>
       <Button isIconOnly size="sm" variant="ghost" aria-label="刷新下载设置" onPress={load} isDisabled={!online || loading || saving}>
         <RefreshCw className={loading ? 'size-4 animate-spin' : 'size-4'} />
@@ -78,12 +84,27 @@ export default function ResourceDownloadControls({ online, progress }: {
         <Label>并发上限</Label><NumberField.Group><NumberField.DecrementButton /><NumberField.Input /><NumberField.IncrementButton /></NumberField.Group>
       </NumberField>
     </div>
+    <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_9rem]">
+      <div className="space-y-1 text-xs text-muted">
+        {bandwidthSupported && <Chip size="sm" variant="soft" color="accent">
+          {settings?.max_bandwidth_kibps ? `已限速 ${settings.max_bandwidth_kibps / 1024} MiB/s` : '不限速'}
+        </Chip>}
+        <p id="download-bandwidth-help">{settings && !bandwidthSupported
+          ? '服务端重启后可设置总限速。' : '所有主动下载共用这个上限。填 0 表示不限速。'}</p>
+      </div>
+      <div className="space-y-1">
+        <Label htmlFor="download-bandwidth">总限速 (MiB/s)</Label>
+        <Input id="download-bandwidth" type="number" inputMode="decimal" min={0} step="any"
+          value={bandwidth} disabled={disabled || !bandwidthSupported} aria-invalid={invalidBandwidth}
+          aria-describedby="download-bandwidth-help" onChange={event => { setBandwidth(event.target.value); setNotice('') }} />
+      </div>
+    </div>
     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-separator pt-4">
-      <p className="max-w-lg text-xs leading-relaxed text-muted">游戏客户端的被动下载不受此项限制。调低后，正在处理的文件会正常完成。</p>
+      <p className="max-w-lg text-xs leading-relaxed text-muted">保存后立即调整下载速度。调低并发时，已开始的文件会继续下载。游戏客户端的被动下载不计入限额。</p>
       <div className="flex shrink-0 gap-2">
-        <Button size="sm" variant="secondary" isDisabled={disabled || value === (settings?.default_concurrency ?? 32)}
-          onPress={() => change(settings?.default_concurrency ?? 32)}>恢复默认</Button>
-        <Button size="sm" variant="primary" isDisabled={disabled || !changed} onPress={apply}>
+        <Button size="sm" variant="secondary" isDisabled={disabled || (value === (settings?.default_concurrency ?? 32) && bandwidth === '0')}
+          onPress={() => { change(settings?.default_concurrency ?? 32); setBandwidth('0') }}>恢复默认</Button>
+        <Button size="sm" variant="primary" isDisabled={disabled || !changed || invalidBandwidth} onPress={apply}>
           <Save className="size-3.5" />{saving ? '正在保存…' : '应用并保存'}
         </Button>
       </div>

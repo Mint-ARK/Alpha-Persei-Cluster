@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Button, Card, Checkbox, Description, Input, Label, ListBox, NumberField, Select, TextField } from '@heroui/react'
-import { Database, Plus, RefreshCw } from 'lucide-react'
-import { createSave, type SaveOptions } from '../lib/api'
+import { Button, Card, Checkbox, Description, Input, Label, ListBox, Modal, NumberField, Select, TextField } from '@heroui/react'
+import { Database, Plus, RefreshCw, Trash2 } from 'lucide-react'
+import { createSave, deleteSave, type SaveEntry, type SaveOptions } from '../lib/api'
 import { useServer } from '../lib/serverContext'
 import { applySavePreset, changeSaveOptions, matchSavePreset, saveFormError, saveFormPayload,
   saveNameLength, acceptUidInput, UID_MAX_DIGITS, SAVE_NAME_MAX_CHARS } from '../lib/saveForm'
@@ -17,6 +17,9 @@ export default function SavesPanel() {
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [preview, setPreview] = useState<any>(null)
+  const [removing, setRemoving] = useState<SaveEntry | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
   const preset = matchSavePreset(options, presets, explicitCustom)
   const customEditing = preset === 'custom'
   const formError = saveFormError(options, name)
@@ -31,19 +34,61 @@ export default function SavesPanel() {
     } catch (e: any) { setMessage(e.message) }
     finally { setBusy(false) }
   }
+  const remove = async () => {
+    if (!removing || deleting) return
+    setDeleting(true)
+    setDeleteError('')
+    setMessage('')
+    try {
+      const { data } = await deleteSave(removing)
+      setRemoving(null)
+      setMessage(`已备份「${removing.name}」并移入${data.destination}。`)
+      await refreshSaves().catch(() => undefined)
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : '存档回收失败')
+    } finally {
+      setDeleting(false)
+    }
+  }
   return <div className="space-y-5">
     <div className="flex items-center justify-between"><h1 className="flex items-center gap-2 text-xl font-bold"><Database />存档管理</h1>
       <Button isDisabled={saveCatalogLoading} onPress={() => refreshSaves().catch(e => setMessage(e.message))}><RefreshCw className="size-4" />刷新</Button></div>
     <p className="text-sm text-muted">选择存档后，控制面板各页与 API 配置跟随切换。进入游戏时，在选区界面选择对应存档。</p>
     {message && <p role="status" className="rounded-xl bg-accent-soft p-3 text-sm whitespace-pre-wrap">{message}</p>}
     <div className="grid gap-3 lg:grid-cols-2">
-      {saves.map(save => <Card key={save.filename} className={`p-4 ${selectedSave === save.filename ? 'ring-2 ring-accent' : ''}`}>
-        <div className="flex items-center justify-between gap-3"><div><h2 className="font-semibold">{save.name}</h2>
-          <p className="text-sm text-muted">{save.nick} · Lv.{save.level} · UID {save.uid}</p>
-          <p className="text-xs text-muted">{save.mounted ? '游戏当前挂载 · ' : ''}{save.port ? `网关 ${save.port}` : '等待选区扫描登记'}</p></div>
-          <Button isDisabled={selectedSave === save.filename} onPress={() => selectSave(save.filename)}>{selectedSave === save.filename ? '管理中' : '管理此存档'}</Button></div>
-      </Card>)}
+      {saves.map(save => {
+        const protectedSave = save.filename.toLowerCase() === 'account.db'
+        return <Card key={save.filename} className={`p-4 ${selectedSave === save.filename ? 'ring-2 ring-accent' : ''}`}>
+          <div className="flex flex-wrap items-center justify-between gap-3"><div className="min-w-0"><h2 className="break-all font-semibold">{save.name}</h2>
+            <p className="text-sm text-muted">{save.nick} · Lv.{save.level} · UID {save.uid}</p>
+            <p className="text-xs text-muted">{protectedSave ? '默认主存档 · ' : ''}{save.mounted ? '游戏当前挂载 · ' : ''}{save.port ? `网关 ${save.port}` : '等待选区扫描登记'}</p></div>
+            <div className="flex flex-wrap gap-2">
+              <Button isDisabled={selectedSave === save.filename} onPress={() => selectSave(save.filename)}>{selectedSave === save.filename ? '管理中' : '管理此存档'}</Button>
+              <Button variant="danger-soft" isDisabled={protectedSave || save.mounted || busy || deleting || saveCatalogLoading}
+                aria-label={`删除存档 ${save.name}`} onPress={() => { setDeleteError(''); setRemoving(save) }}>
+                <Trash2 className="size-4" />删除
+              </Button>
+            </div>
+          </div>
+        </Card>
+      })}
     </div>
+    <Modal.Root isOpen={!!removing} onOpenChange={open => { if (!open && !deleting) setRemoving(null) }}>
+      <Modal.Backdrop isDismissable={!deleting} isKeyboardDismissDisabled={deleting}>
+        <Modal.Container><Modal.Dialog className="max-w-lg p-5">
+          <Modal.Header><Modal.Heading>删除存档</Modal.Heading></Modal.Header>
+          <Modal.Body className="space-y-3 py-4">
+            <p className="break-all font-medium">{removing?.filename} · UID {removing?.uid}</p>
+            <p className="text-sm text-muted">服务器会先备份存档，再移入回收区。完成后，此存档会从面板和游戏选区列表中移除。</p>
+            {deleteError && <p role="alert" className="text-sm text-danger">{deleteError}</p>}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button autoFocus variant="secondary" isDisabled={deleting} onPress={() => setRemoving(null)}>取消</Button>
+            <Button variant="danger" isDisabled={deleting} onPress={remove}>{deleting ? '正在回收…' : '确认删除'}</Button>
+          </Modal.Footer>
+        </Modal.Dialog></Modal.Container>
+      </Modal.Backdrop>
+    </Modal.Root>
     <Card className="space-y-4 p-5"><h2 className="flex items-center gap-2 font-semibold"><Plus className="size-4" />生成新存档</h2>
       <div className="grid gap-4 md:grid-cols-2">
         <Select fullWidth selectedKey={preset} isDisabled={busy} onSelectionChange={key => {

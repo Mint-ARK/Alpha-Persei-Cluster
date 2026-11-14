@@ -2,9 +2,9 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { FilePlus2, RotateCcw, Save, Trash2, X } from 'lucide-react'
 import { Button, Card, Chip, Input, Label, ListBox, Modal, Select, TextField } from '@heroui/react'
 import { Section } from '../components/kit'
-import { generateManifest, previewManifest, removeManifest, restoreManifest, saveResourceDistribution,
+import { enqueueDownload, generateManifest, previewManifest, removeManifest, restoreManifest, saveResourceDistribution,
   type ChannelManifestSelection, type ManifestGenerateInput, type ManifestPreview, type ManifestProfile,
-  type ResourceDistributionData, type ResourcePlatform } from '../lib/api'
+  type EnqueuedDownload, type ResourceDistributionData, type ResourcePlatform } from '../lib/api'
 import ResourcePlatformCard, { platformNames, platformChannels as channels } from './ResourcePlatformCard'
 
 const platforms = ['pc', 'android', 'ios'] as const
@@ -14,14 +14,14 @@ const fromSaved = (data: ResourceDistributionData): Draft => Object.fromEntries(
   fallback_id: data.platforms[p].fallback_id,
   app_version: data.platforms[p].app_version || (p === 'pc' ? '307' : '308'),
 }])) as Draft
-const equal = (a: Draft, b: Draft) => platforms.every(p =>
-  a[p].selected_id === b[p].selected_id &&
-  a[p].fallback_id === b[p].fallback_id &&
-  (a[p].app_version || '') === (b[p].app_version || '')
-)
+const sameSelection = (a: ChannelManifestSelection, b: ChannelManifestSelection) =>
+  a.selected_id === b.selected_id && a.fallback_id === b.fallback_id &&
+  (a.app_version || '') === (b.app_version || '')
+const equal = (a: Draft, b: Draft) => platforms.every(p => sameSelection(a[p], b[p]))
 
-export default function ResourceManifestManager({ data, onSaved, disabled, downloadControls }: {
+export default function ResourceManifestManager({ data, onSaved, onQueued, disabled, downloadControls }: {
   data: ResourceDistributionData; onSaved: (data: ResourceDistributionData) => void; disabled: boolean
+  onQueued: (result: EnqueuedDownload) => void
   downloadControls: ReactNode
 }) {
   const [draft, setDraft] = useState<Draft>(() => fromSaved(data))
@@ -40,9 +40,7 @@ export default function ResourceManifestManager({ data, onSaved, disabled, downl
     const old = fromSaved(previousData.current)
     setDraft(current => Object.fromEntries(platforms.map(p => {
       const valid = current[p].selected_id === 'auto' || data.profiles.some(r => r.id === current[p].selected_id && r.ready)
-      const clean = current[p].selected_id === old[p].selected_id &&
-                    current[p].fallback_id === old[p].fallback_id &&
-                    (current[p].app_version || '') === (old[p].app_version || '')
+      const clean = sameSelection(current[p], old[p])
       return [p, clean || !valid ? fromSaved(data)[p] : current[p]]
     })) as Draft)
     previousData.current = data
@@ -61,7 +59,9 @@ export default function ResourceManifestManager({ data, onSaved, disabled, downl
   const apply = async () => {
     setBusy(true); setError(''); setNotice('')
     try {
-      const result = await saveResourceDistribution(draft)
+      const saved = fromSaved(data)
+      const changes = Object.fromEntries(platforms.filter(p => !sameSelection(draft[p], saved[p])).map(p => [p, draft[p]]))
+      const result = await saveResourceDistribution(changes)
       onSaved(result.data); setNotice('渠道选择已应用，下次客户端版本检查生效')
     } catch (e: any) { setError(e.message || '应用失败') }
     finally { setBusy(false) }
@@ -83,6 +83,15 @@ export default function ResourceManifestManager({ data, onSaved, disabled, downl
   }
   const openGenerator = (platform: ResourcePlatform, base = '') => {
     setGeneratorPlatform(platform); setGeneratorBase(base); setGenerator(true)
+  }
+  const prepareDistribution = async (platform: ResourcePlatform, filename: string) => {
+    setBusy(true); setError(''); setNotice('')
+    try {
+      const result = await enqueueDownload({ platform, filename, kind: 'manifest', scope: 'all',
+        download: false, for_distribution: true })
+      onQueued(result.data)
+    } catch (e: any) { setError(e.message || '分发准备任务入队失败') }
+    finally { setBusy(false) }
   }
   return <>
     <Section title="分发与下载" description="选择渠道分发预设并调整主动下载参数。">
@@ -113,6 +122,7 @@ export default function ResourceManifestManager({ data, onSaved, disabled, downl
     <Section title="渠道分发方案" description="各渠道独立选择清单与保险方案。">
       <div className="grid items-start gap-4 lg:grid-cols-3">{platforms.map(platform =>
         <ResourcePlatformCard key={platform} platform={platform} data={data} value={draft[platform]}
+          onPrepare={filename => prepareDistribution(platform, filename)}
           disabled={disabled || busy} onChange={value => { setDraft(d => ({ ...d, [platform]: value })); setCustom(false); setNotice('') }} />
       )}</div>
       {error && <p role="alert" className="mt-3 text-sm text-danger">{error}</p>}

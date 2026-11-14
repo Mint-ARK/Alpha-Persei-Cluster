@@ -8,6 +8,7 @@ import sys
 import unittest
 import uuid
 from unittest.mock import patch
+from urllib.parse import urlsplit
 
 sys.dont_write_bytecode = True
 SERVER = Path(__file__).resolve().parents[1]
@@ -229,7 +230,9 @@ class ManifestChecks(unittest.TestCase):
         app = server_net.build_https_app(None, host_ip='127.0.0.1')
         client = app.test_client()
         for platform in manager.PLATFORMS:
-            row = self.generate(platform); self.apply(row)
+            row = self.generate(platform)
+            manager.save_platform(dict(platform=platform, selected_id=row['id'], app_version='308',
+                                       fallback_id=self.native(platform, '321')['id']))
             for method in ('get','post'):
                 values = dict(platformType=platform, channelId=manager.CHANNELS[platform], appVersion='308')
                 kwargs = {'query_string':values} if method == 'get' else {'json':values}
@@ -249,6 +252,115 @@ class ManifestChecks(unittest.TestCase):
                 response.close()
         mismatch=client.get('/mix-sdk-api/pass/game/updateversion/getLatest?platformType=pc&channelId=7').get_json()
         self.assertNotEqual(mismatch['errorCode'],'0')
+
+    def test_mobile_install_auto_follows_reported_build_and_skips_unknown_build(self):
+        import server_net
+
+        client = server_net.build_https_app(None, host_ip='127.0.0.1').test_client()
+        url = '/mix-sdk-api/pass/game/updateversion/getLatest'
+        for platform in ('android', 'ios'):
+            native = self.native(platform, '229')
+            selection = dict(platform=platform, selected_id=native['id'], fallback_id=native['id'])
+            manager.save_platform({**selection, 'app_version': 'auto'})
+            params = dict(platformType=platform, channelId=manager.CHANNELS[platform])
+            requests = (
+                (client.get, dict(query_string={**params, 'appVersion': '307'}), '307'),
+                (client.post, dict(data={**params, 'appVersion': '307'}), '307'),
+                (client.post, dict(json={**params, 'appVersion': 308}), '308'),
+                (client.get, dict(query_string=params), None),
+                (client.post, dict(json={**params, 'appVersion': True}), None),
+            )
+            for send, kwargs, expected in requests:
+                with self.subTest(platform=platform, request=kwargs):
+                    result = send(url, **kwargs).get_json()
+                    self.assertEqual(result['errorCode'], '0')
+                    rows = {row['type']: row for row in result['data']}
+                    self.assertEqual(rows['noInstall']['matchedAppVersion'], expected or '307')
+                    self.assertEqual(rows['noInstall']['assethash'], native['assethash'])
+                    self.assertEqual(rows['noInstall']['platformType'], platform)
+                    if expected is None:
+                        self.assertNotIn('install', rows)
+                    else:
+                        self.assertEqual(rows['install']['version'], expected)
+
+            for build in ('307', '308'):
+                manager.save_platform({**selection, 'app_version': build})
+                rows = client.get(url, query_string=params).get_json()['data']
+                install = next(row for row in rows if row['type'] == 'install')
+                self.assertEqual((install['version'], install['platformType']), (build, platform))
+                self.assertNotIn('/packagepc/', install['downloadUrl'])
+
+    def test_ios_base_change_selects_one_matching_manifest_with_android_auto(self):
+        import server_net
+
+        android = self.native('android', '321')
+        ios = self.native('ios', '229')
+        compat = self.generate('ios')
+        initial = manager.save_platform(dict(platform='android', selected_id='auto',
+                                             fallback_id=android['id'], app_version='auto'))
+        client = server_net.build_https_app(None, host_ip='127.0.0.1').test_client()
+        url = '/mix-sdk-api/pass/game/updateversion/getLatest'
+        for build, expected in (('307', ios), ('308', compat)):
+            saved = manager.save_platform({'selections': {'ios': dict(selected_id=compat['id'],
+                                          fallback_id=ios['id'], app_version=build)}})
+            self.assertEqual(saved['platforms']['android'], initial['platforms']['android'])
+            for platform in ('ios', 'android'):
+                response = client.post(url, data=dict(channelId='7', platformType=platform)).get_json()
+                self.assertEqual(response['errorCode'], '0')
+                entries = response['data']
+                if platform == 'ios':
+                    self.assertEqual([entry['type'] for entry in entries], ['noInstall', 'install'])
+                    self.assertEqual(entries[0]['assethash'], expected['assethash'])
+                    self.assertEqual(entries[0]['matchedAppVersion'], build)
+                    self.assertEqual(entries[1]['version'], build)
+                else:
+                    self.assertEqual([entry['type'] for entry in entries], ['noInstall'])
+                    self.assertEqual(entries[0]['assethash'], android['assethash'])
+
+    def test_windows_auto_uses_startup_build_when_sdk_omits_app_version(self):
+        import server_net
+
+        native = self.native('pc', '321')
+        selection = dict(platform='pc', selected_id=native['id'], fallback_id=native['id'])
+        manager.save_platform({**selection, 'app_version': 'auto'})
+        client = server_net.build_https_app(None, host_ip='127.0.0.1').test_client()
+        base = '/skzy-activity/gateway/get?action=base&version=308'
+        url = '/mix-sdk-api/pass/game/updateversion/getLatest?platformType=pc&channelId=9'
+        self.assertEqual(client.get(base, headers={'Host': 'prod-api-activity.ys4fun.com'}).get_json()['errorCode'], '0')
+
+        def response(path=url, **kwargs):
+            result = client.get(path, **kwargs).get_json()
+            self.assertEqual(result['errorCode'], '0')
+            return {row['type']: row for row in result['data']}
+
+        rows = response()
+        self.assertEqual(rows['noInstall']['matchedAppVersion'], '308')
+        self.assertEqual(rows['noInstall']['assethash'], native['assethash'])
+        self.assertEqual(rows['install']['version'], '308')
+        self.assertIn('/packagepc/prod/308/', rows['install']['downloadUrl'])
+
+        prefix = urlsplit(rows['noInstall']['downloadUrl'].split(';')[0]).path
+        host = {'Host': 'download-eo.ys4fun.com'}
+        sealed = self.root / 'static_resources' / 'pc' / 'native' / native['id']
+        for name in (native['assethash'], *sorted(native['voice_files'], reverse=True)):
+            requested = name.replace('307', '308', 1) if name.startswith('voice_') else name
+            with client.get(prefix + requested, headers=host) as received:
+                self.assertEqual(received.status_code, 200, requested)
+                self.assertEqual(received.data, (sealed / name).read_bytes())
+        self.assertEqual(manager.resolve_resource('/pc/resources/voice_package_list_308_321.bytes', 'pc'),
+                         (False, None))
+        with client.get(prefix + 'voice_package_list_308_229.bytes', headers=host) as received:
+            self.assertEqual(received.status_code, 404)
+
+        self.assertEqual(response(url + '&appVersion=307')['install']['version'], '307')
+        client.get(base.replace('308', '307'), headers={'User-Agent': 'iPhone Darwin'})
+        self.assertEqual(response()['install']['version'], '308')
+        self.assertNotIn('install', response(environ_overrides={'REMOTE_ADDR': '192.0.2.8'}))
+
+        manager.save_platform({**selection, 'app_version': '308'})
+        manual = response(url + '&appVersion=307')
+        self.assertEqual(manual['noInstall']['matchedAppVersion'], '308')
+        self.assertIn('/packagepc/prod/308/', manual['install']['downloadUrl'])
 
     def test_14_public_api_never_accepts_derived_base(self):
         app=Flask(__name__);app.register_blueprint(gm_api.gm_bp,url_prefix='/api/gm');client=app.test_client()
@@ -292,6 +404,93 @@ class ManifestChecks(unittest.TestCase):
         self.assertEqual(len(candidates),2)
         self.assertTrue(all(p['ready'] for p in candidates))
         self.assertNotEqual(status['platforms']['ios']['effective_id'],source['id'])
+
+    def test_bilingual_manifest_download_becomes_selectable_in_distribution(self):
+        import copy
+        import cdn_download_queue as downloads
+        import cdn_transfer_control as transfers
+
+        platform, build = 'ios', '332'
+        folder = manager._folder(platform)
+        source = self.native(platform, '321')
+        data = json.loads((folder/source['assethash']).read_bytes())
+        data.update(buildCode=int(build), versionName='v5.3.6')
+        raw = manager._json_bytes(data)
+        filename = f'assethash_307_{build}_{hashlib.md5(raw).hexdigest()}.bytes'
+        (folder/filename).write_bytes(raw)
+        gate = transfers.PriorityGate(self.root/'transfer')
+        self.stack.enter_context(patch.object(transfers, 'gate', gate))
+        self.stack.enter_context(patch.object(versions, 'STATIC_RESOURCES_DIR', str(folder.parent)))
+        self.stack.enter_context(patch.object(cdn_proxy, 'DEFAULT_STATIC_DIR', str(folder.parent)))
+        configs = copy.deepcopy(versions.VERSION_CONFIGS)
+        configs.pop(build, None)
+        self.stack.enter_context(patch.object(versions, 'VERSION_CONFIGS', configs))
+        supported = [version for version in versions.SUPPORTED_VERSIONS if version != build]
+        self.stack.enter_context(patch.object(versions, 'SUPPORTED_VERSIONS', supported))
+        self.stack.enter_context(patch.object(versions, '_save_persisted_dynamic_versions'))
+        queue = downloads.DownloadQueue(self.root/'queue', gate=gate, autostart=False)
+        self.addCleanup(queue.close)
+        self.stack.enter_context(patch.object(downloads, 'get_manager', return_value=queue))
+        app = Flask(__name__)
+        app.register_blueprint(gm_api.gm_bp, url_prefix='/api/gm')
+        client = app.test_client()
+        status_url = '/api/gm/system/resource_distribution'
+        queue_url = '/api/gm/system/download_queue'
+        row = dict(platform=platform, filename=filename)
+        self.assertIn(row, client.get(queue_url+'/catalogue').get_json()['data']['files'])
+        self.assertIn(row, client.get(status_url).get_json()['data']['saved_downloads'])
+
+        def enqueue(languages, **options):
+            result = client.post(queue_url, json={**row, 'kind': 'manifest', 'download': False,
+                'voice_languages': languages, **options}).get_json()
+            self.assertEqual(result['code'], 0, result)
+            ident = result['data']['task_id']
+            queue.run_once()
+            self.assertEqual(queue.report(ident)['task']['state'], 'ready')
+            return ident
+
+        def start(ident):
+            result = client.post(queue_url+'/action', json=dict(action='start', task_id=ident)).get_json()
+            self.assertEqual(result['code'], 0, result)
+            queue.run_once()
+            task = queue.report(ident)['task']
+            self.assertEqual(task['state'], 'completed', task)
+            return task
+
+        def fetch_voice(plat, name, directory, **kwargs):
+            self.assertEqual(plat, platform)
+            version = 30700332
+            payload = (dict(infos=[dict(name=lang, version=version, size=100) for lang in ('zh', 'ja')])
+                       if name.startswith('voice_package_list') else dict(version=version, assetHashList=[]))
+            (Path(directory)/name).write_bytes(manager._json_bytes(payload))
+
+        info = dict(assethash=filename, channel_id='7', app_version='307', version=build)
+        with patch.object(versions, 'probe_official_latest', return_value=(True, info, '')) as probe, \
+             patch.object(cdn_proxy, 'download_verified', side_effect=fetch_voice) as fetch:
+            single = enqueue(['zh'])
+            fetch.assert_not_called()
+            start(single)
+            self.assertIn(row, client.get(status_url).get_json()['data']['saved_downloads'])
+            self.assertNotIn(build, versions.SUPPORTED_VERSIONS)
+            task = start(enqueue(['zh', 'ja']))
+            self.assertEqual((task['stats']['cached_files'], task['stats']['done_files']), (3, 1))
+            self.assertEqual(task['message'], '分发方案已就绪，可手动应用')
+            retry = start(enqueue(['zh', 'ja']))
+            explicit = start(enqueue([], for_distribution=True))
+            self.assertEqual(retry['stats']['cached_files'], 4)
+            self.assertEqual(explicit['stats']['cached_files'], 4)
+        self.assertEqual(probe.call_count, 4)
+        self.assertEqual(fetch.call_count, 3)
+        status = client.get(status_url).get_json()['data']
+        self.assertNotIn(row, status['saved_downloads'])
+        profiles = [p for p in status['profiles'] if p['platform'] == platform and p['assethash'] == filename]
+        self.assertEqual(len(profiles), 1)
+        profile = profiles[0]
+        self.assertTrue(profile['ready'])
+        self.assertEqual(status['platforms'][platform]['effective']['resource_version'], '321')
+        self.assertEqual(self.apply(profile)['platforms'][platform]['effective_id'], profile['id'])
+        self.assertEqual(manager.resolve_connection_version(platform)['version'], build)
+        self.assertEqual(versions.get_assethash(platform, build), filename)
 
     def test_18_legacy_alias_migrates_without_losing_other_channel_choices(self):
         base=self.native('ios','229')

@@ -47,8 +47,8 @@ STATE_NORMAL = "NORMAL"
 STATE_DELETE_MODE = "DELETE_MODE"
 STATE_CREATE_MODE = "CREATE_MODE"
 STATE_TIMEOUT_SECONDS = 60.0
-# List queries never execute actions. A rapid follow-up gets a longer bounded
-# observation window for the SDK version check and WAN gateway connection.
+# Remote SDK follow-ups allow time for the WAN gateway connection. Local
+# queries use the short window so a retained SDK session can reach the gateway.
 REGION_REFRESH_WINDOW_SECONDS = 0.35
 REGION_REFRESH_FOLLOWUP_GAP_SECONDS = 3.0
 REGION_REFRESH_FOLLOWUP_WINDOW_SECONDS = 3.0
@@ -60,22 +60,48 @@ logger = logging.getLogger('save_slot_manager')
 def _recycle_save_files(paths):
     """Windows recycle-bin only: never fall back to permanent deletion."""
     import ctypes
-    from ctypes import wintypes
-    class FileOperation(ctypes.Structure):
-        _fields_ = [('hwnd', wintypes.HWND), ('wFunc', wintypes.UINT),
-                    ('pFrom', wintypes.LPCWSTR), ('pTo', wintypes.LPCWSTR),
-                    ('fFlags', ctypes.c_ushort), ('fAnyOperationsAborted', wintypes.BOOL),
-                    ('hNameMappings', ctypes.c_void_p), ('lpszProgressTitle', wintypes.LPCWSTR)]
-    operation = FileOperation()
-    operation.wFunc = 3  # FO_DELETE with FOF_ALLOWUNDO routes to the recycle bin.
-    operation.pFrom = '\0'.join(str(path) for path in paths) + '\0\0'
-    operation.fFlags = 0x0040 | 0x0010 | 0x0400 | 0x0004
-    shell_operation = ctypes.windll.shell32.SHFileOperationW
-    shell_operation.argtypes = [ctypes.POINTER(FileOperation)]
-    shell_operation.restype = ctypes.c_int
-    result = shell_operation(ctypes.byref(operation))
-    if result or operation.fAnyOperationsAborted or any(path.exists() for path in paths):
-        raise OSError(f'移入Windows回收站失败或被取消: {result}')
+    from ctypes import wintypes as win
+    from uuid import UUID
+
+    def guid(value):
+        return (ctypes.c_ubyte * 16).from_buffer_copy(UUID(value).bytes_le)
+
+    def check(result):
+        if result < 0:
+            raise OSError(f'移入Windows回收站失败 (0x{result & 0xffffffff:08X})')
+
+    def method(obj, index, result, *types):
+        vtable = ctypes.cast(obj, ctypes.POINTER(ctypes.POINTER(ctypes.c_void_p)))[0]
+        return ctypes.WINFUNCTYPE(result, ctypes.c_void_p, *types)(vtable[index])
+
+    ole = ctypes.windll.ole32
+    shell = ctypes.windll.shell32
+    operation = ctypes.c_void_p()
+    clsid = guid('3ad05575-8857-4850-9277-11b85bdb8e09')  # FileOperation
+    operation_iid = guid('947aab5f-0a5c-4c13-b4d6-4bf7836fc9f8')  # IFileOperation
+    item_iid = guid('43826d1e-e718-42ee-bc55-a1e261c37bfe')  # IShellItem
+    check(ole.CoInitializeEx(None, 2))  # COINIT_APARTMENTTHREADED
+    try:
+        check(ole.CoCreateInstance(ctypes.byref(clsid), None, 1, ctypes.byref(operation_iid), ctypes.byref(operation)))
+        # Recycle only, fail early and suppress Shell dialogs after panel confirmation.
+        flags = 0x00080000 | 0x00100000 | 0x0400 | 0x0010 | 0x0004
+        check(method(operation, 5, win.LONG, win.DWORD)(operation, flags))  # SetOperationFlags
+        for path in paths:
+            item = ctypes.c_void_p()
+            check(shell.SHCreateItemFromParsingName(win.LPCWSTR(os.path.abspath(path)), None, ctypes.byref(item_iid), ctypes.byref(item)))
+            try:
+                check(method(operation, 18, win.LONG, ctypes.c_void_p, ctypes.c_void_p)(operation, item, None))  # DeleteItem
+            finally:
+                method(item, 2, win.ULONG)(item)  # Release
+        check(method(operation, 21, win.LONG)(operation))  # PerformOperations
+        aborted = win.BOOL()
+        check(method(operation, 22, win.LONG, ctypes.POINTER(win.BOOL))(operation, ctypes.byref(aborted)))
+        if aborted.value or any(path.exists() for path in paths):
+            raise OSError('移入Windows回收站失败或被取消')
+    finally:
+        if operation:
+            method(operation, 2, win.ULONG)(operation)
+        ole.CoUninitialize()
 
 
 def slot_id_to_port(slot_id: int, base_port: int = BASE_GW_PORT, game_port: int = DEFAULT_GAME_PORT) -> int:
@@ -209,12 +235,12 @@ def _inspect_save_owner(path):
 def switch_active_database(target_db_path: str, core: Any = None, game_server: Any = None) -> Tuple[bool, str]:
     """Prepare and validate a save before publishing its runtime bindings."""
     target_db_path = os.path.abspath(target_db_path)
-    if not os.path.isfile(target_db_path):
-        return False, f"数据库文件不存在: {target_db_path}"
     import account_db
     import gm_reader
     import generator as _gen
     with _DATABASE_SWITCH_LOCK:
+        if not os.path.isfile(target_db_path):
+            return False, f"数据库文件不存在: {target_db_path}"
         new_db = None
         previous = None
         try:
@@ -288,6 +314,7 @@ class SaveSlotManager:
         self._host_ip = ""
         # 当前全局/主活动数据库路径
         self._active_db_path: Optional[str] = None
+        self._panel_requests: Dict[str, int] = {}
 
     def _load_registry(self) -> Dict[int, str]:
         """从 slot_registry.json 读取持久化槽位映射 {slot_id: filename}"""
@@ -306,7 +333,7 @@ class SaveSlotManager:
         except Exception:
             return {}
 
-    def _save_registry(self, reg: Dict[int, str]) -> None:
+    def _save_registry(self, reg: Dict[int, str], *, strict=False) -> None:
         """原子写入 slot_registry.json"""
         try:
             self.registry_file.parent.mkdir(parents=True, exist_ok=True)
@@ -316,7 +343,8 @@ class SaveSlotManager:
                 json.dump(data, f, ensure_ascii=False, indent=2)
             tmp_path.replace(self.registry_file)
         except Exception:
-            pass
+            if strict:
+                raise
 
     def sync_slot_registry(self) -> Dict[int, str]:
         """
@@ -409,6 +437,18 @@ class SaveSlotManager:
                 return str(default_acc.resolve())
             return ""
 
+    def hold_panel_save(self, path):
+        with self._lock:
+            key = os.path.normcase(str(path))
+            self._panel_requests[key] = self._panel_requests.get(key, 0) + 1
+
+    def release_panel_save(self, path):
+        with self._lock:
+            key = os.path.normcase(str(path))
+            self._panel_requests[key] -= 1
+            if not self._panel_requests[key]:
+                del self._panel_requests[key]
+
     def configure_host(self, host_ip: str) -> None:
         """Use the explicit listener host to identify this machine's two paths."""
         # Readers use this immutable scalar without the registry lock too.
@@ -481,8 +521,8 @@ class SaveSlotManager:
                                  timeout: float = REGION_REFRESH_TIMEOUT_SECONDS) -> str:
         """Observe a following gateway action; never run one from a list GET.
 
-        Returns idle/completed/timeout. Initial/isolated queries use the short
-        window; a rapid follow-up after an idle reply allows WAN login latency.
+        Returns idle/completed/timeout. Local and initial queries use the short
+        window; a rapid remote follow-up after an idle reply allows WAN latency.
         Once a gateway is observed, wait for all actions
         for that client, up to the total deadline. No retry or background poll.
         """
@@ -493,7 +533,8 @@ class SaveSlotManager:
             entry = self._refresh_client(key)
             if window is None:
                 last_reply = entry.get('last_list_reply')
-                followup = (last_reply is not None and entry.get('last_list_result') == 'idle'
+                followup = (key != '__local_client__' and last_reply is not None
+                            and entry.get('last_list_result') == 'idle'
                             and 0.0 <= started - last_reply <= REGION_REFRESH_FOLLOWUP_GAP_SECONDS)
                 window = (REGION_REFRESH_FOLLOWUP_WINDOW_SECONDS if followup
                           else REGION_REFRESH_WINDOW_SECONDS)
@@ -722,64 +763,82 @@ class SaveSlotManager:
     def delete_slot_save(self, slot_id: int, client_ip: str) -> Tuple[bool, str]:
         """仅在删除模式中备份并回收非活跃存档，完成后释放其固定槽位。"""
         key = self._session_key(client_ip)
-        with self._lock:
+        with _DATABASE_SWITCH_LOCK, self._lock:
             if self.get_session_state(key) != STATE_DELETE_MODE:
                 return False, "删除模式未开启或已超时，请重新选择删除入口。"
             mapping = self.get_slot_mapping()
             slot_info = mapping.get(slot_id)
             if not slot_info or not slot_info.db_path or slot_info.is_action_item:
                 return False, "❌ 所选槽位无效或非真实存档！"
-
-            # 安全检查：禁止删除当前正在挂载活跃的数据库
-            active_path = self.get_active_db()
-            if active_path and os.path.exists(slot_info.db_path) and os.path.exists(active_path):
-                try:
-                    if os.path.samefile(slot_info.db_path, active_path):
-                        return False, (
-                            "⚠️ 该存档【当前正在运行挂载中】，无法直接删除！\n"
-                            "请先在列表中切换登录其他存档，再执行删除。"
-                        )
-                except OSError:
-                    return False, "暂时无法确认存档是否正在使用，请稍后重试。"
-
-            target_path = Path(slot_info.db_path)
-            if not target_path.exists():
-                return False, "❌ 存档物理文件不存在，可能已被移除！"
-            target_path = target_path.resolve()
-            if target_path.parent != self.server_dir.resolve() or target_path.suffix.lower() != '.db':
-                return False, "所选存档不在允许的存档目录。"
-
-            # Snapshot through AccountDB before removing any file. This is a
-            # readonly source connection, not a gameplay database mount.
             try:
-                from account_db import AccountDB
-                AccountDB.backup_save_file(target_path)
-                paths = [target_path] + [p for ext in ('-wal', '-shm')
-                        if (p := target_path.with_name(target_path.name + ext)).exists()]
-                if os.name == 'nt':
-                    _recycle_save_files(paths)
-                else:
-                    # Non-Windows keeps the existing recoverable Trash policy.
-                    import uuid
-                    suffix = time.strftime('%Y%m%d_%H%M%S') + '_' + uuid.uuid4().hex[:8]
-                    trash_dest = self.trash_dir / f'{target_path.stem}_deleted_{suffix}.db'
-                    if any(Path(str(trash_dest) + p.name[len(target_path.name):]).exists() for p in paths):
-                        raise FileExistsError('存档归档目标已存在，原文件保持不变')
-                    for source in paths:
-                        sidecar = source.name[len(target_path.name):]
-                        shutil.move(str(source), str(trash_dest) + sidecar)
+                destination = self.delete_save(Path(slot_info.db_path), slot_info.uid)
             except Exception as e:
                 return False, f"❌ 删除存档失败: {e}"
-
-            # 从注册表中释放该槽位，空出该位置给后续新存档（其他槽位绝对保持不动）
-            reg = self._load_registry()
-            reg.pop(slot_id, None)
-            self._save_registry(reg)
-
-            # 成功删除后，自动复位回正常模式
             self.reset_session(key)
-            destination = "Windows回收站" if os.name == 'nt' else "Trash归档目录"
             return True, f"✅ 存档【{slot_info.save_name}】已备份并移入{destination}！\n重新获取区服列表后可查看剩余存档。"
+
+    def delete_save(self, path: Path, uid: int) -> str:
+        """Back up and recycle a save under the same locks used by the gateway."""
+        from account_db import AccountDB
+        from server_net import run_while_save_offline
+        from uuid import uuid4
+
+        with _DATABASE_SWITCH_LOCK, self._lock:
+            if path.is_symlink() or not path.is_file():
+                raise ValueError('所选存档不存在，请刷新存档列表')
+            target = path.resolve()
+            if target.parent != self.server_dir.resolve() or target.suffix.lower() != '.db':
+                raise ValueError('所选存档不在允许的存档目录')
+            if target.name.lower() == 'account.db':
+                raise ValueError('默认主存档不可删除')
+            active = self.get_active_db()
+            if active and os.path.samefile(target, active):
+                raise ValueError('存档当前已挂载，请在游戏选区切换到其他存档后再删除')
+            if self._panel_requests.get(os.path.normcase(str(target))):
+                raise ValueError('控制面板正在读取或修改该存档，请稍后重试')
+            if not is_valid_save_db(str(target)) or extract_save_metadata(str(target))[0] != uid:
+                raise ValueError('存档已变更或不可用，请刷新存档列表')
+
+            def recycle():
+                AccountDB.backup_save_file(target)
+                paths = [target.with_name(target.name + ext) for ext in ('-wal', '-shm', '-journal')]
+                paths = [p for p in paths if p.exists() or p.is_symlink()]
+                if any(p.is_symlink() or not p.is_file() for p in paths):
+                    raise ValueError('存档附属文件类型无效')
+                paths.append(target)
+                registry = self._load_registry()
+                remaining = {slot: name for slot, name in registry.items() if name != target.name}
+                if remaining != registry:
+                    backup = self.server_dir / 'archive' / 'slot_registry'
+                    backup.mkdir(parents=True, exist_ok=True)
+                    with self.registry_file.open('rb') as src, (backup / f'{uuid4().hex}.json').open('xb') as dst:
+                        shutil.copyfileobj(src, dst)
+                folder = self.trash_dir / uuid4().hex
+                if not folder.resolve().is_relative_to(self.server_dir.resolve()):
+                    raise ValueError('存档回收目录不在服务器目录内')
+                folder.mkdir()
+                moved = []
+                try:
+                    for source in paths:
+                        source.rename(folder / source.name)
+                        moved.append(source)
+                    if os.name == 'nt':
+                        _recycle_save_files([folder])
+                except OSError:
+                    for source in reversed(moved):
+                        staged = folder / source.name
+                        if staged.exists():
+                            staged.rename(source)
+                    raise
+                destination = 'Windows 回收站' if os.name == 'nt' else 'Trash 归档目录'
+                if remaining != registry:
+                    try:
+                        self._save_registry(remaining, strict=True)
+                    except OSError:
+                        logger.exception('存档已回收，槽位注册表将在下次选区扫描时同步')
+                return destination
+
+            return run_while_save_offline(target, uid, recycle, busy_message='请先退出该存档的游戏账号，再删除存档')
 
     def build_zones_response(self, client_ip: str, host_ip: str, game_port: int = DEFAULT_GAME_PORT) -> List[Dict[str, Any]]:
         """为 /gateway/get?action=server 生成自适应的区服列表下行数据"""

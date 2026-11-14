@@ -285,6 +285,7 @@
   ],
   "required_groups": {
     "角色挖掘/hero_*.json": 84,
+    "static_web/extracted_assets/items/native/*.webp": 1,
     "static_resources/pc/assethash_307_321_*.bytes": 1,
     "static_resources/ios/assethash_307_321_*.bytes": 1,
     "static_resources/android/assethash_307_321_*.bytes": 1,

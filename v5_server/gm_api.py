@@ -15,7 +15,7 @@ import time
 import json
 import shutil
 import re
-from flask import Blueprint, request, jsonify, Response, g, has_request_context
+from flask import Blueprint, current_app, request, jsonify, Response, g, has_request_context
 
 # 确保 v5_server 内部模块导入正常
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -62,7 +62,7 @@ def _bind_save_request():
         return None
     import gm_save_scope
     try:
-        if request.path != '/api/gm/system/launch_config':
+        if request.path != '/api/gm/system/launch_config' and request.endpoint != 'gm_api.post_delete_save':
             gm_save_scope.bind()
         if not request.path.startswith(('/api/gm/system/', '/api/gm/saves')) and request.path != '/api/gm/res_version':
             import account_db
@@ -310,6 +310,19 @@ def post_create_save():
         return err(GMErrorCode.PARAM_INVALID, str(exc))
     except Exception:
         return err(GMErrorCode.SERVICE_ERROR, '生成未完成，请检查服务端日志和存档列表')
+
+
+@gm_bp.route('/saves/delete', methods=['POST'])
+def post_delete_save():
+    import gm_save_scope
+    try:
+        result = gm_save_scope.delete(request.get_json(silent=True))
+        return ok(result, msg=f"存档已备份并移入{result['destination']}")
+    except ValueError as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    except Exception:
+        current_app.logger.exception('存档回收失败')
+        return err(GMErrorCode.SERVICE_ERROR, '存档回收未完成，请刷新存档列表并检查服务端日志')
 
 
 @gm_bp.route('/aichat/apis', methods=['GET', 'POST'])
@@ -2046,15 +2059,16 @@ def resource_manifest_operation(action):
 
 @gm_bp.route("/system/resource_download_settings", methods=["GET", "POST"])
 def resource_download_settings():
-    """Server-local active download window; independent of player databases."""
+    """Server-local active download settings; independent of player databases."""
     try:
         import cdn_active_downloads
         if request.method == 'POST':
             body = request.get_json(silent=True)
-            if not isinstance(body, dict) or 'max_concurrency' not in body:
-                return err(GMErrorCode.PARAM_INVALID, '请提供主动下载并发数')
-            return ok(cdn_active_downloads.settings.save(body['max_concurrency']),
-                      msg='下载并发已应用并保存')
+            fields = ('max_concurrency', 'max_bandwidth_kibps')
+            if not isinstance(body, dict) or not any(field in body for field in fields):
+                return err(GMErrorCode.PARAM_INVALID, '请提供主动下载并发或总限速')
+            changes = {field: body[field] for field in fields if field in body}
+            return ok(cdn_active_downloads.settings.save(**changes), msg='下载设置已应用并保存')
         return ok(cdn_active_downloads.settings.status())
     except ValueError as error:
         return err(GMErrorCode.PARAM_INVALID, str(error))
@@ -2070,8 +2084,9 @@ def get_check_update():
         import res_version_manager
         plat = request.args.get("platform", "pc")
         import resource_distribution
-        source = resource_distribution.get_platform_config(plat)["version"]
-        diff_res = res_version_manager.calculate_manifest_diff(local_ver=source, platform=plat, allow_download=False)
+        source = resource_distribution.get_platform_config(plat)
+        diff_res = res_version_manager.calculate_manifest_diff(local_ver=source['version'], platform=plat,
+            local_assethash=source.get('assethash', {}).get(plat), allow_download=False)
         saved = res_version_manager.manifest_download_status(plat, diff_res.get('remote_assethash'))
         diff_res.update(remote_manifest_present=saved['present'], remote_manifest_valid=saved['valid'])
         if not diff_res.get("success"):
@@ -2232,15 +2247,10 @@ def resource_download_queue_settings():
 def resource_download_queue_catalogue():
     try:
         import cdn_proxy
-        from cdn_download_index import MANIFEST_NAME
-        files=[]
-        for platform in ('pc','android','ios'):
-            folder=os.path.join(cdn_proxy.DEFAULT_STATIC_DIR,platform)
-            if not os.path.isdir(folder): continue
-            with os.scandir(folder) as entries:
-                files.extend(dict(platform=platform,filename=e.name) for e in entries
-                             if MANIFEST_NAME.fullmatch(e.name) and e.is_file(follow_symlinks=False))
-        return ok(dict(files=sorted(files,key=lambda row:(row['platform'],row['filename']))))
+        from cdn_download_index import saved_main_manifests
+        return ok(dict(files=[dict(platform=platform, filename=name)
+                             for platform in ('android', 'ios', 'pc')
+                             for name in saved_main_manifests(os.path.join(cdn_proxy.DEFAULT_STATIC_DIR, platform))]))
     except Exception as error:
         return err(GMErrorCode.SERVICE_ERROR,f'读取清单目录失败: {error}')
 

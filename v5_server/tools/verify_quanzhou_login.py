@@ -9,6 +9,7 @@ import zlib
 
 from verify_report_small_fixes import MemoryTests, UID
 import codec
+from core import OperationError
 import generator
 import login
 import new_player_service
@@ -102,6 +103,32 @@ class QuanzhouLoginTests(MemoryTests):
         self.assert_sequence(packets)
         self.assertEqual(self.stored_quests(), before)
         self.assertEqual({cmd: obj for cmd, obj, _ in packets}[28801], quest.quest_payload(self.db, UID))
+
+    def test_migrate_transposed_capture_tasks_before_login(self):
+        other_uid = UID + 1
+        self.db.execute('INSERT INTO users(uid) VALUES(?)', (other_uid,))
+        for uid, parent_status in ((UID, 9), (other_uid, 3)):
+            for parent, task, successor in ((11103, 11103004, 11103005), (11202, 11202003, 11202006)):
+                self.db.execute('INSERT INTO qworld_quest(uid,main_quest_id,status) VALUES(?,?,?)',
+                                (uid, parent, parent_status))
+                self.db.executemany(
+                    'INSERT INTO qworld_quest_task(uid,main_quest_id,task_id,status,progress,update_ts) '
+                    'VALUES(?,?,?,?,?,?)', [(uid, parent, task, 3, 1, 7), (uid, parent, successor, 1, 1, 8)])
+        with self.assertRaises(OperationError):
+            quest.quest_payload(self.db, UID)
+
+        self.assertEqual(self.db.migrate_legacy_qworld_tasks(), 2)
+        self.assertEqual(self.db.migrate_legacy_qworld_tasks(), 0)
+        self.assertEqual(self.db.query('SELECT uid,update_ts FROM qworld_quest_task WHERE status=3'),
+                         [{'uid': other_uid, 'update_ts': 7}] * 2)
+        self.assertEqual(self.db.query('SELECT status,progress FROM qworld_quest_task WHERE uid=? AND update_ts=7', (UID,)),
+                         [{'status': 1, 'progress': 3}] * 2)
+        packets, _ = self.flood()
+        self.assert_sequence(packets)
+        packet = next(obj for cmd, obj, _ in packets if cmd == 28801)
+        tasks = {t['id']: t for m in packet['quest_list'] for t in m['task_list']}
+        for tid in (11103004, 11202003):
+            self.assertEqual(tasks[tid], dict(id=tid, status=1, progress=3))
 
     def test_saved_position_functions_and_voyage_receipts_restore_from_account(self):
         position = dict(stage_id=1110101, map_status=0, position_x=1, position_y=2, position_z=3,

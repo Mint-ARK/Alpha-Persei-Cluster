@@ -8,6 +8,7 @@ export interface ItemSlotProps {
   rare: number // 1 ~ 5
   iconFile: string
   qualityFrame: string
+  strictIcon?: boolean
   count?: number
   size?: 'sm' | 'md' | 'lg' | 'xl'
   showCount?: boolean
@@ -60,6 +61,7 @@ export function ItemSlot({
   rare = 5,
   iconFile,
   qualityFrame = 'Item_yellow.png',
+  strictIcon = false,
   count,
   size = 'md',
   showCount = true,
@@ -80,7 +82,9 @@ export function ItemSlot({
 
   // 多级智能素材回退
   let iconUrl = ''
-  if (failStage === 0) {
+  if (strictIcon) {
+    iconUrl = iconFile && failStage === 0 ? resolveAssetUrl(iconFile) : ''
+  } else if (failStage === 0) {
     let normalizedIcon = iconFile || `${id}.png`
     let iconRelPath = `extracted_assets/items/${normalizedIcon}`
     if (normalizedIcon.startsWith('extracted_assets/')) {
@@ -134,13 +138,13 @@ export function ItemSlot({
 
       {/* 2. 中层：物品主体图标 */}
       <div className="absolute inset-0 flex items-center justify-center p-1">
-        <img
+        {iconUrl && <img
           src={iconUrl}
           alt={name}
           onError={handleImgError}
           className={`${config.iconSize} object-contain drop-shadow-md transition-transform duration-200 group-hover:scale-105 pointer-events-none`}
           loading="lazy"
-        />
+        />}
       </div>
 
       {/* 3. 顶层右下角：持有数量角标 */}

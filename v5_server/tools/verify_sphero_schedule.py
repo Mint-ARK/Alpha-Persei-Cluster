@@ -203,6 +203,35 @@ class ScheduleTests(MemoryTests):
         values=history();self.assertTrue(all(values[i]==90 for i in (112061,112062,112063)))
         self.assertEqual(values[990001],7);self.assertEqual(sp.max_slots(self.db,UID,sp.read(self.db,UID)),3)
 
+    def test_legacy_history_wrapper_preserves_login_and_future_grants(self):
+        import new_player_service
+
+        legacy = json.dumps({'data': 22260, 'name': '累计获得「墨兰德流行纪念品」数量（item 53100）'}, ensure_ascii=False)
+        for cid, value in ((112061, legacy), (112062, '12'), (112063, '{"data":true}')):
+            self.db.execute("INSERT INTO history_cmd(uid,kind,key_id,data) VALUES(?,'history',?,?)",
+                            (UID, str(cid), value))
+        self.db.execute('INSERT INTO task_cfg(task_id,task_type,condition,need,activity_id,additional_parameter) '
+                        'VALUES(202826,1,302,1000,240046,?)', ('[53100]',))
+        self.db.execute('INSERT INTO task(uid,task_id,task_type) VALUES(?,202826,1)', (UID,))
+        before = self.db.query('SELECT * FROM history_cmd ORDER BY key_id')
+
+        with patch.object(new_player_service, 'enabled', return_value=False):
+            tasks = codec.decode(generator.gen_payload(28001, uid=UID, db=self.db), 'sc_28001')
+        self.assertEqual(next(row['progress'] for row in tasks['assignment_list'] if row['id'] == 202826), 1000)
+
+        def history():
+            payload = codec.decode(generator.gen_payload(51001, uid=UID, db=self.db), 'sc_51001')
+            return {row['id']: row['data'] for row in payload['data_list'] if row['id'] in (112061, 112062, 112063)}
+
+        self.assertEqual(history(), dict.fromkeys((112061, 112062, 112063), 22260))
+        self.assertEqual(self.db.query('SELECT * FROM history_cmd ORDER BY key_id'), before)
+        self.assertEqual(sp.max_slots(self.db, UID, sp.read(self.db, UID)), 6)
+
+        self.dispatch()
+        self.now += 480 * 60
+        self.assertEqual(self.claim()[0]['reward_list'], [dict(id=53100, num=90)])
+        self.assertEqual(history(), dict.fromkeys((112061, 112062, 112063), 22350))
+
     def test_locked_training_and_forged_finished_schedule_are_rejected(self):
         for entries in ([dict(index=1,schedule_id=2428402,is_finish=False)],
                         [dict(index=1,schedule_id=2428408,is_finish=True)],

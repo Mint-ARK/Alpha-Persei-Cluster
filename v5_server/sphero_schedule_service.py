@@ -6,6 +6,7 @@ untouched for investigation; the versioned ops_common record is authoritative.
 from collections import Counter
 from copy import deepcopy
 import json
+import logging
 from pathlib import Path
 import random
 import time
@@ -21,6 +22,7 @@ KIND='sphero_schedule_v1'
 SET=CFG['settings']
 SCHEDULES={int(i):v for i,v in CFG['schedules'].items()}
 ENTRUSTS={int(i):v for i,v in CFG['entrusts'].items()}
+_log = logging.getLogger(__name__)
 
 
 def uint(value):return type(value) is int and 0<=value<=0xffffffff
@@ -70,7 +72,22 @@ def ensure_pool(state):
 
 def history_value(db,uid,cid):
     rows=db.query("SELECT data FROM history_cmd WHERE uid=? AND kind='history' AND key_id=?",(uid,str(cid)))
-    return int(rows[0]['data'] or 0) if rows else 0
+    if not rows or rows[0]['data'] in (None, ''):
+        return 0
+
+    value = rows[0]['data']
+    try:
+        if isinstance(value, str) and value.lstrip().startswith('{'):
+            # Older saves stored the counter together with its display name.
+            value = json.loads(value).get('data')
+        if isinstance(value, str):
+            value = int(value, 10)
+        if uint(value):
+            return value
+    except (ValueError, RecursionError):
+        pass
+    _log.warning('日程历史计数格式无效，已跳过该条记录 (uid=%s, key_id=%s)', uid, cid)
+    return 0
 
 
 def earned(db,uid,state):

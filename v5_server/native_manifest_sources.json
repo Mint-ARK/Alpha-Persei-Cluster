@@ -96,6 +96,60 @@
         "voice_hash_zh_30700321.bytes": "c3785aa94114cbe0b8394fff74ed241136de84ce1bea869a72d62ee4958c3550"
       },
       "provenance": "bundled-official"
+    },
+    {
+      "id": "native-android-bb51ec611772",
+      "platform": "android",
+      "channel_id": "7",
+      "app_version": "307",
+      "resource_version": "332",
+      "version_name": "v5.3.6",
+      "assethash": "assethash_307_332_786eea5d9aab90de88af804268d57823.bytes",
+      "sha256": "430c2241fc0be2050ed4e8948c451e51af1428af28330158f6cb73bfe9fc47e8",
+      "voice_files": {
+        "voice_package_list_307_332.bytes": "e365b6ff134dddcc9f5c9a933d5afb5eab0dd03ace9e894313631d7888bd6739",
+        "voice_hash_zh_30700332.bytes": "e5ba14efa150fca44051c9fa636861286292bc7cd782d00866edc832235fec8d",
+        "voice_hash_ja_30700332.bytes": "24452d1ef486970412254bea17ca101231ee09034b58c9e0431037a50c284b4c"
+      },
+      "provenance": "official-download",
+      "registered_at": 1794570173587,
+      "manual_only": true
+    },
+    {
+      "id": "native-ios-453434552bf1",
+      "platform": "ios",
+      "channel_id": "7",
+      "app_version": "307",
+      "resource_version": "332",
+      "version_name": "v5.3.6",
+      "assethash": "assethash_307_332_85c6d9a803085ae093731a64d3fdf118.bytes",
+      "sha256": "7f58bb807d1b2270a8547180eae543c0f78f58f903616a0c514ea22a4a1ab327",
+      "voice_files": {
+        "voice_package_list_307_332.bytes": "e365b6ff134dddcc9f5c9a933d5afb5eab0dd03ace9e894313631d7888bd6739",
+        "voice_hash_zh_30700332.bytes": "e5ba14efa150fca44051c9fa636861286292bc7cd782d00866edc832235fec8d",
+        "voice_hash_ja_30700332.bytes": "24452d1ef486970412254bea17ca101231ee09034b58c9e0431037a50c284b4c"
+      },
+      "provenance": "official-download",
+      "registered_at": 1794570187374,
+      "manual_only": true
+    },
+    {
+      "id": "native-pc-2aa906ca92fa",
+      "platform": "pc",
+      "channel_id": "9",
+      "app_version": "307",
+      "resource_version": "332",
+      "version_name": "v5.3.6",
+      "assethash": "assethash_307_332_01dcedc85c5973144b76d25c64e289e9.bytes",
+      "sha256": "5ca62a34276532fc0712cd83ca07a010693f94f4ac624e721287b3c3b6516089",
+      "voice_files": {
+        "voice_package_list_307_332.bytes": "08531a717cc1b95745168351e8329c96bb49c1e781d49af5008b1d8587508e2e",
+        "voice_hash_zh_30700332.bytes": "e5ba14efa150fca44051c9fa636861286292bc7cd782d00866edc832235fec8d",
+        "voice_hash_ja_30700332.bytes": "25223d6d168a4cbae6377c234701292daa8632c22ff2923a18754a75990804d9"
+      },
+      "provenance": "official-download",
+      "registered_at": 1794569564295,
+      "manual_only": true
     }
   ],
   "excluded_candidates": [
