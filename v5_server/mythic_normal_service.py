@@ -5,6 +5,7 @@ import time
 from mythic_cycle import bounds, check_session, MythicPeriodExpired
 
 KIND = 'mythic_normal_v1'
+OMEGA_DIFFICULTY = 1001
 
 
 def is_normal(stage_type, stage):
@@ -23,15 +24,23 @@ def partition(stage):
     raise ValueError('常规黑区关卡不存在')
 
 
-def difficulty(db, uid):
+def selected_difficulty(db, uid):
+    """Read the shared black-zone selection, including the native Ω entry."""
     rows = db.query('SELECT current_difficulty FROM mythic_public WHERE uid=?', (int(uid),))
     if rows:
         result = int(rows[0]['current_difficulty'] or 0)
     else:
         from new_player_service import enabled
         result = 1 if enabled(db, uid) else 10
-    if result not in range(1, 14):
+    if result not in range(1, 14) and result != OMEGA_DIFFICULTY:
         raise ValueError('常规黑区难度无效')
+    return result
+
+
+def difficulty(db, uid):
+    result = selected_difficulty(db, uid)
+    if result == OMEGA_DIFFICULTY:
+        raise ValueError('当前选中失序深区，请先切换到常规黑区难度')
     return result
 
 
@@ -72,8 +81,9 @@ def payload(db, uid):
     if db is None:
         return dict(clear_partition_id_list=[], main_partition_star_list=[], star_reward_provide_list=[])
     state = load(db, uid)
+    selected = selected_difficulty(db, uid)
     return dict(clear_partition_id_list=state['cleared'],
-                main_partition_star_list=state['stars'].get(str(difficulty(db, uid)), []),
+                main_partition_star_list=state['stars'].get(str(selected), []),
                 star_reward_provide_list=state['claimed'])
 
 

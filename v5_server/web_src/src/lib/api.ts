@@ -466,6 +466,11 @@ export async function fetchSaveCatalog(): Promise<ApiResponse<SaveCatalog>> {
 export const createSave = (payload: { name: string; options: SaveOptions; preview?: boolean }) =>
   apiRequest<any>('/api/gm/saves/create', { method: 'POST', body: JSON.stringify(payload) })
 
+export const deleteSave = ({ filename, uid }: Pick<SaveEntry, 'filename' | 'uid'>) =>
+  apiRequest<{ filename: string; destination: string }>('/api/gm/saves/delete', {
+    method: 'POST', body: JSON.stringify({ filename, uid }),
+  })
+
 export interface ApiProfile extends AIChatConfigData { id: string; name: string; type: string }
 export interface ApiProfiles { storage: string; active_id: string; profiles: ApiProfile[]; routes: Record<string, string> }
 export const fetchApiProfiles = () => apiRequest<ApiProfiles>('/api/gm/aichat/apis')
@@ -1718,6 +1723,7 @@ export interface ResourceDistributionData {
   gameplay_version: string; scope: 'server'; native_only_base: boolean
   operation_notice?: string
   profiles: ManifestProfile[]
+  saved_downloads?: { platform: ResourcePlatform; filename: string }[]
   platforms: Record<ResourcePlatform, ChannelManifestSelection & {
     channel_id: string; effective_id: string; effective: ManifestProfile; latest_native_id: string
     fallback_active: boolean; notice: string
@@ -1735,9 +1741,9 @@ export interface ManifestPreview {
   preview_token: string; voice_files: string[]; voice_source: string
 }
 export async function fetchResourceDistribution(): Promise<ApiResponse<ResourceDistributionData>> {
-  return apiRequest('/api/gm/system/resource_distribution')
+  return apiRequest('/api/gm/system/resource_distribution', { cache: 'no-store' })
 }
-export async function saveResourceDistribution(selections: Record<ResourcePlatform, ChannelManifestSelection>): Promise<ApiResponse<ResourceDistributionData>> {
+export async function saveResourceDistribution(selections: Partial<Record<ResourcePlatform, ChannelManifestSelection>>): Promise<ApiResponse<ResourceDistributionData>> {
   return apiRequest('/api/gm/system/resource_distribution', {
     method: 'POST', body: JSON.stringify({ selections }),
   })
@@ -1828,6 +1834,7 @@ export interface ResourceDownloadSettings {
   default_concurrency: number
   min_concurrency: number
   max_allowed: number
+  max_bandwidth_kibps?: number
   warning: string
 }
 
@@ -1835,14 +1842,14 @@ export async function fetchResourceDownloadSettings(): Promise<ApiResponse<Resou
   return apiRequest<ResourceDownloadSettings>('/api/gm/system/resource_download_settings')
 }
 
-export async function saveResourceDownloadSettings(max_concurrency: number): Promise<ApiResponse<ResourceDownloadSettings>> {
+export async function saveResourceDownloadSettings(max_concurrency: number, max_bandwidth_kibps: number): Promise<ApiResponse<ResourceDownloadSettings>> {
   return apiRequest<ResourceDownloadSettings>('/api/gm/system/resource_download_settings', {
-    method: 'POST', body: JSON.stringify({ max_concurrency }),
+    method: 'POST', body: JSON.stringify({ max_concurrency, max_bandwidth_kibps }),
   })
 }
 
 export async function checkOfficialUpdate(platform = 'pc'): Promise<ApiResponse<CheckUpdateData>> {
-  return apiRequest<CheckUpdateData>(`/api/gm/system/check_update?platform=${platform}`)
+  return apiRequest<CheckUpdateData>(`/api/gm/system/check_update?platform=${platform}`, { cache: 'no-store' })
 }
 
 export async function startSyncUpdate(params?: {
@@ -1867,8 +1874,12 @@ export async function cancelUpdateTask(): Promise<ApiResponse<{ cancelled: boole
 }
 
 export type DownloadScope = 'required' | 'extended' | 'all'
+export type DownloadKind = 'assets' | 'voice' | 'manifest'
+export type VoiceLanguage = 'zh' | 'ja'
 export interface DownloadTask {
-  id: string; platform: ResourcePlatform; kind: 'assets' | 'manifest'; scope: DownloadScope
+  id: string; platform: ResourcePlatform; kind: DownloadKind; scope: DownloadScope
+  voice_languages?: VoiceLanguage[]
+  for_distribution?: boolean
   label: string; approved: boolean; state: string; created_at: number; message: string
   source: { filename: string; label: string; sha256?: string }
   group_id: string; progress_percent: number; speed_bps: number; wire_bytes: number
@@ -1886,13 +1897,16 @@ export interface DownloadQueueData {
   file_concurrency: number; warning: string
 }
 export interface DownloadQueueInput {
-  platform: ResourcePlatform; kind: 'assets' | 'manifest'; scope: DownloadScope
-  profile_id?: string; filename?: string; download: boolean
+  platform: ResourcePlatform; kind: DownloadKind; scope: DownloadScope
+  profile_id?: string; filename?: string; download: boolean; voice_languages?: VoiceLanguage[]
+  for_distribution?: boolean
 }
-export interface DownloadQueueHint { platform: ResourcePlatform; filename: string; kind: 'assets' | 'manifest' }
 export const fetchDownloadQueue = () => apiRequest<DownloadQueueData>('/api/gm/system/download_queue')
-export const fetchDownloadCatalogue = () => apiRequest<{ files: { platform: ResourcePlatform; filename: string }[] }>('/api/gm/system/download_queue/catalogue')
-export const enqueueDownload = (body: DownloadQueueInput) => apiRequest<{ task_id: string; queue: DownloadQueueData }>('/api/gm/system/download_queue', { method: 'POST', body: JSON.stringify(body) })
+export const fetchDownloadCatalogue = () => apiRequest<{ files: { platform: ResourcePlatform; filename: string }[] }>('/api/gm/system/download_queue/catalogue', { cache: 'no-store' })
+export interface EnqueuedDownload { task_id: string; queue: DownloadQueueData }
+export const enqueueDownload = (body: DownloadQueueInput) => apiRequest<EnqueuedDownload>('/api/gm/system/download_queue', { method: 'POST', body: JSON.stringify(body) })
+export const enqueueOfficialManifest = (platform: ResourcePlatform, filename: string, voice_languages: VoiceLanguage[] = []) =>
+  enqueueDownload({ platform, filename, kind: 'manifest', scope: 'all', download: false, voice_languages })
 export const operateDownload = (action: string, task_id?: string) => apiRequest<DownloadQueueData>('/api/gm/system/download_queue/action', { method: 'POST', body: JSON.stringify({ action, task_id }) })
 export const setDownloadQueueSettings = (parallel_tasks: number) => apiRequest<DownloadQueueData>('/api/gm/system/download_queue/settings', { method: 'POST', body: JSON.stringify({ parallel_tasks }) })
 export const fetchDownloadReport = (id: string) => apiRequest<Record<string, unknown>>(`/api/gm/system/download_queue/report/${encodeURIComponent(id)}`)

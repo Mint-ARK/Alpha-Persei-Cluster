@@ -2505,6 +2505,7 @@ class AccountDB:
 
     def init_schema(self):
         c = self._conn()
+        self.migrate_legacy_qworld_tasks()
         # 权威建库来源：lib/db_schema.sql（从实库导出的 217 张表，全部 IF NOT EXISTS，幂等）。
         # 内嵌的 SCHEMA 字符串已严重落后（实测新建库会缺 17 张表、hero 少 24 列，
         # `SELECT level FROM hero` 直接 no such column），只作为找不到 SQL 文件时的兜底。
@@ -2530,6 +2531,33 @@ class AccountDB:
         # 启动时自动初始化因果观测（WarChess）章节数据
         self.init_warchess_chapters()
         self._ensure_default_account()
+
+    def migrate_legacy_qworld_tasks(self):
+        """Correct two captured child tasks imported with swapped status/progress."""
+        tables = self.query(
+            "SELECT name FROM sqlite_master WHERE type='table' "
+            "AND name IN ('qworld_quest', 'qworld_quest_task')"
+        )
+        if len(tables) != 2:
+            return 0
+        candidates = """
+            SELECT task.uid, task.main_quest_id, task.task_id
+            FROM qworld_quest_task AS task
+            JOIN qworld_quest AS parent USING (uid, main_quest_id)
+            JOIN qworld_quest_task AS successor USING (uid, main_quest_id)
+            WHERE (task.main_quest_id, task.task_id, successor.task_id)
+                  IN ((11103, 11103004, 11103005), (11202, 11202003, 11202006))
+              AND task.status=3 AND task.progress=1
+              AND parent.status=9 AND successor.status=1
+        """
+        if not self.query(f'SELECT 1 FROM ({candidates}) LIMIT 1'):
+            return 0
+        if self.path != ':memory:':
+            self.backup_save_file(self.path, purpose='qworld_task_migration')
+        return self.execute(
+            'UPDATE qworld_quest_task SET status=1, progress=3 '
+            f'WHERE (uid, main_quest_id, task_id) IN ({candidates})'
+        ).rowcount
 
     def _ensure_default_account(self):
         """旧库保留管理员种子；单账号实验库只保留已绑定的存档主人。"""
@@ -2671,28 +2699,28 @@ class AccountDB:
     # ---------- 通用 CRUD（uid 隔离） ----------
 
     @staticmethod
-    def backup_save_file(path):
+    def backup_save_file(path, *, purpose='save_delete'):
         """Snapshot a save including committed WAL without mounting/migrating it."""
         from pathlib import Path
         import uuid
         source = Path(path).resolve(strict=True)
         backup_root = Path(__file__).resolve().parent.parent / 'db_backup'
         backup_root.mkdir(parents=True, exist_ok=True)
-        backup = backup_root / ('save_delete_pre_' + source.stem + '_' + str(time.time_ns()) + '_' + uuid.uuid4().hex[:8] + '.db')
+        backup = backup_root / f'{purpose}_pre_{source.stem}_{time.time_ns()}_{uuid.uuid4().hex[:8]}.db'
         # Exclusive creation preserves earlier backups even on a name collision.
         with backup.open('xb'):
             pass
         started = time.monotonic()
         def progress(status, remaining, total):
             if time.monotonic() - started > 10:
-                raise TimeoutError('存档备份超过10秒，未删除原文件')
+                raise TimeoutError('存档备份超过10秒')
         source_conn = sqlite3.connect(source.as_uri() + '?mode=ro', uri=True, timeout=2)
         try:
             target_conn = sqlite3.connect(backup)
             try:
                 source_conn.backup(target_conn, pages=128, progress=progress, sleep=0.02)
                 if target_conn.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
-                    raise ValueError('存档备份完整性检查失败，未删除原文件')
+                    raise ValueError('存档备份完整性检查失败')
             finally:
                 target_conn.close()
         finally:

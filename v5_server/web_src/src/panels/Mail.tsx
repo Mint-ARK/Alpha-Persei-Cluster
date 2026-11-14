@@ -39,7 +39,7 @@ import {
   type GMMailRecord,
   type DBMailRecord,
 } from '../lib/api'
-import defaultCatalog from '../data/items_catalog.json'
+import { itemById as catalogMap, itemCatalog, itemName, itemSearchScore, quickMailItems, refreshDraftAttachment } from '../data/itemCatalog'
 import { useElementSize } from '../lib/useElementSize'
 
 // 附件草稿条目结构（支持独立勾选状态）
@@ -63,8 +63,8 @@ function loadSavedDraft(): MailDraftAttachment[] {
     const parsed = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
     const filtered = parsed
-      .filter((it: any) => !isDisplayOnlyItem(Number(it.id), undefined, it.name))
-      .map((it: any) => ({ ...it, selected: it.selected !== false }))
+      .map(refreshDraftAttachment<MailDraftAttachment>)
+      .filter((it) => !isDisplayOnlyItem(it.id, catalogMap.get(it.id)?.type, it.name))
     if (filtered.length !== parsed.length) {
       saveDraft(filtered)
     }
@@ -113,18 +113,6 @@ function highlightMatch(text: string, query: string) {
     </span>
   )
 }
-
-// 快捷追加常用调试资产
-const QUICK_PRESETS = [
-  { id: 1, name: '移转之辉', count: 1000 },
-  { id: 2, name: '精准探测凭证', count: 10 },
-  { id: 3, name: '常规探测凭证', count: 10 },
-  { id: 5, name: '艾因索菲币', count: 100000 },
-  { id: 41710, name: '纯金誓约之戒', count: 1 },
-  { id: 40101, name: '特供体力药剂', count: 5 },
-  { id: 40801, name: '高级作战记录', count: 20 },
-  { id: 41301, name: '源质结晶', count: 10 },
-]
 
 export default function MailPanel() {
   const { activeUid } = useServer()
@@ -234,20 +222,6 @@ export default function MailPanel() {
   }
   const [toast, setToast] = useState<{ show: boolean; msg: string; tone: 'success' | 'danger' } | null>(null)
 
-  // 物品字典极速倒排索引
-  const catalogMap = useMemo(() => {
-    const map = new Map<number, { name: string; rare: number; icon_file: string; quality_frame: string }>()
-    for (const it of defaultCatalog as any[]) {
-      map.set(Number(it.id), {
-        name: it.name,
-        rare: Number(it.rare) || 4,
-        icon_file: it.icon_file || `${it.id}.png`,
-        quality_frame: it.quality_frame || 'Item_purple.png',
-      })
-    }
-    return map
-  }, [])
-
   // 监听窗口聚焦与草稿同步事件，跨面板无缝同步草稿
   useEffect(() => {
     const handleSync = () => {
@@ -341,8 +315,6 @@ export default function MailPanel() {
       return []
     }
 
-    const isNumeric = /^\d+$/.test(q)
-    const targetId = isNumeric ? parseInt(q, 10) : null
     const matches: Array<{
       id: number
       name: string
@@ -352,38 +324,10 @@ export default function MailPanel() {
       score: number
     }> = []
 
-    for (const it of defaultCatalog as any[]) {
-      const itId = Number(it.id)
-      const itName = String(it.name || '')
-      if (isDisplayOnlyItem(itId, Number(it.type), itName)) {
-        continue
-      }
-      const itIdStr = String(it.id)
-      const itNameLower = itName.toLowerCase()
-
-      let score = 0
-      if (itId === targetId) {
-        score = 100 // ID 完全匹配
-      } else if (itNameLower === q) {
-        score = 90 // 名称完全匹配
-      } else if (itNameLower.startsWith(q)) {
-        score = 70 // 名称前缀匹配
-      } else if (itNameLower.includes(q)) {
-        score = 50 // 名称包含匹配
-      } else if (itIdStr.includes(q)) {
-        score = 30 // ID 包含匹配
-      }
-
-      if (score > 0) {
-        matches.push({
-          id: itId,
-          name: itName,
-          rare: Number(it.rare) || 4,
-          icon_file: it.icon_file || `${it.id}.png`,
-          quality_frame: it.quality_frame || 'Item_purple.png',
-          score,
-        })
-      }
+    for (const item of itemCatalog) {
+      if (isDisplayOnlyItem(item.id, item.type, item.name)) continue
+      const score = itemSearchScore(item, q)
+      if (score > 0) matches.push({ ...item, name: itemName(item), score })
     }
 
     // 按匹配评分降序，同分优先高品质与低 ID
@@ -428,10 +372,10 @@ export default function MailPanel() {
         const info = catalogMap.get(idNum)
         target = {
           id: idNum,
-          name: info?.name || `道具 ${idNum}`,
-          rare: info?.rare || 4,
-          icon_file: info?.icon_file || `${idNum}.png`,
-          quality_frame: info?.quality_frame || 'Item_purple.png',
+          name: info ? itemName(info) : `道具 #${idNum}`,
+          rare: info?.rare ?? 0,
+          icon_file: info?.icon_file ?? '',
+          quality_frame: info?.quality_frame || 'Item_box.webp',
         }
       } else if (searchSuggestions.length > 0) {
         // 2. 存在匹配结果时默认取第一项
@@ -441,7 +385,7 @@ export default function MailPanel() {
 
     if (!target) return
 
-    if (isDisplayOnlyItem(target.id, undefined, target.name)) {
+    if (isDisplayOnlyItem(target.id, catalogMap.get(target.id)?.type, target.name)) {
       const isFilm = isTrialSkinFilm(target.id, target.name)
       setToast({
         show: true,
@@ -481,8 +425,7 @@ export default function MailPanel() {
     setIsDropdownOpen(false)
   }
 
-  const handlePresetAdd = (preset: { id: number; name: string; count: number }) => {
-    const info = catalogMap.get(preset.id)
+  const handlePresetAdd = (preset: MailDraftAttachment) => {
     const existingIndex = attachments.findIndex((a) => a.id === preset.id)
 
     if (existingIndex >= 0) {
@@ -491,16 +434,7 @@ export default function MailPanel() {
       copy[existingIndex].selected = true
       updateAttachments(copy)
     } else {
-      const item: MailDraftAttachment = {
-        id: preset.id,
-        name: info?.name || preset.name,
-        rare: info?.rare || 4,
-        icon_file: info?.icon_file || `${preset.id}.png`,
-        quality_frame: info?.quality_frame || 'Item_purple.png',
-        count: preset.count,
-        selected: true,
-      }
-      updateAttachments([...attachments, item])
+      updateAttachments([...attachments, { ...preset, selected: true }])
     }
   }
 
@@ -566,7 +500,7 @@ export default function MailPanel() {
   const handleSend = async () => {
     if (!isFormValid || isSubmitting) return
 
-    const forbidden = checkedAttachments.find((a) => isDisplayOnlyItem(a.id, undefined, a.name))
+    const forbidden = checkedAttachments.find((a) => isDisplayOnlyItem(a.id, catalogMap.get(a.id)?.type, a.name))
     if (forbidden) {
       const isFilm = isTrialSkinFilm(forbidden.id, forbidden.name)
       setToast({
@@ -810,6 +744,7 @@ export default function MailPanel() {
                               >
                                 <div className="shrink-0 pointer-events-none">
                                   <ItemSlot
+                                    strictIcon
                                     id={item.id}
                                     name={item.name}
                                     rare={item.rare}
@@ -853,7 +788,7 @@ export default function MailPanel() {
                       <span>常用调试资产（点击直接装入待发清单）：</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
-                      {QUICK_PRESETS.map((preset) => (
+                      {quickMailItems.map((preset) => (
                         <button
                           key={preset.id}
                           type="button"
@@ -940,6 +875,7 @@ export default function MailPanel() {
                         {/* 正版品质框槽位 */}
                         <div className="shrink-0">
                           <ItemSlot
+                            strictIcon
                             id={item.id}
                             name={item.name}
                             rare={item.rare}
@@ -1143,7 +1079,7 @@ export default function MailPanel() {
                                   return (
                                     <Chip key={idx} size="sm" variant="soft" color="default" className="text-[10px]">
                                       <Chip.Label>
-                                        {att.name || info?.name || `ID ${att.id}`} ×{att.number?.toLocaleString('en-US') ?? 0}
+                                        {info ? itemName(info) : `ID ${att.id}`} ×{att.number?.toLocaleString('en-US') ?? 0}
                                       </Chip.Label>
                                     </Chip>
                                   )
@@ -1205,7 +1141,7 @@ export default function MailPanel() {
                                 return (
                                   <Chip key={aIdx} size="sm" variant="soft" color="default" className="text-[10px]">
                                     <Chip.Label>
-                                      {att.name || info?.name || `ID ${att.id}`} ×{att.number?.toLocaleString('en-US') ?? 0}
+                                      {info ? itemName(info) : `ID ${att.id}`} ×{att.number?.toLocaleString('en-US') ?? 0}
                                     </Chip.Label>
                                   </Chip>
                                 )
@@ -1321,11 +1257,12 @@ export default function MailPanel() {
                             >
                               <div className="shrink-0 pointer-events-none">
                                 <ItemSlot
+                                  strictIcon
                                   id={att.id}
-                                  name={att.name || info?.name || `ID ${att.id}`}
-                                  rare={info?.rare || 4}
-                                  iconFile={info?.icon_file || `${att.id}.png`}
-                                  qualityFrame={info?.quality_frame || 'Item_purple.png'}
+                                  name={info ? itemName(info) : `ID ${att.id}`}
+                                  rare={info?.rare ?? 0}
+                                  iconFile={info?.icon_file ?? ''}
+                                  qualityFrame={info?.quality_frame || 'Item_box.webp'}
                                   size="sm"
                                   showCount={false}
                                   showAddButton={false}
@@ -1333,7 +1270,7 @@ export default function MailPanel() {
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="text-xs truncate font-medium text-foreground">
-                                  {att.name || info?.name || `道具 ${att.id}`}
+                                  {info ? itemName(info) : `道具 #${att.id}`}
                                 </div>
                                 <div className="mt-0.5 flex items-center justify-between text-[11px] font-mono text-muted">
                                   <span>ID: {att.id}</span>

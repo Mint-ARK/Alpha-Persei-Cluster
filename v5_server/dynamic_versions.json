@@ -1,1 +1,46 @@
-{}
+{
+  "332": {
+    "theme_id": 44,
+    "matched_app_version": "307",
+    "battlepass_season": 33,
+    "entry_activity_id": 4410001,
+    "sign_activity_id": 4400101,
+    "battlepass_list_id": 20033,
+    "heart_demon_activity_id": 4435001,
+    "core_verification_activity_id": 4443501,
+    "core_verification_active_activity_ids": [
+      4443301,
+      4443401,
+      4443501
+    ],
+    "polyhedron_activity_id": 4407301,
+    "suppressed_cmds": [
+      89013
+    ],
+    "deprecated_shops": [
+      16,
+      18,
+      24,
+      25,
+      34,
+      35,
+      36,
+      37,
+      42
+    ],
+    "description": "v5.3+ 演进基线 (Theme 44)，支持 33 赛季战令、核心验证第 4 轮与 sc_89013 协议抑制。",
+    "version": "332",
+    "version_name": "v5.3.6",
+    "display_name": "Build 332 (v5.3.6)",
+    "assethash": {
+      "pc": "assethash_307_332_01dcedc85c5973144b76d25c64e289e9.bytes",
+      "android": "assethash_307_332_786eea5d9aab90de88af804268d57823.bytes",
+      "ios": "assethash_307_332_85c6d9a803085ae093731a64d3fdf118.bytes"
+    },
+    "voice_package_list": "voice_package_list_307_332.bytes",
+    "voice_hashes": {
+      "zh": "voice_hash_zh_30700332.bytes",
+      "ja": "voice_hash_ja_30700332.bytes"
+    }
+  }
+}

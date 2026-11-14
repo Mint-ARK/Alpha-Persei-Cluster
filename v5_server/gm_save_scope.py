@@ -5,24 +5,25 @@ import os
 from flask import g, has_request_context, request
 
 
-def catalog():
+def catalog(manager=None):
     from save_slot_manager import get_slot_manager, is_valid_save_db, extract_save_metadata, slot_id_to_port
-    manager = get_slot_manager()
-    registry = manager._load_registry()  # Listing must not rewrite the slot registry.
-    slots = {name: sid for sid, name in registry.items()}
-    active = manager.get_active_db()
+    manager = manager or get_slot_manager()
     rows = []
-    for path in sorted(manager.server_dir.glob('*.db')):
-        name = path.name.lower()
-        if path.is_symlink() or name.startswith(('_', '.', 'test_')) or '_bak_' in name or '_backup_' in name:
-            continue
-        if not is_valid_save_db(str(path)):
-            continue
-        uid, nick, level = extract_save_metadata(str(path))
-        sid = slots.get(path.name)
-        rows.append(dict(name=path.stem, filename=path.name, uid=uid, nick=nick, level=level,
-                         slot_id=sid, port=slot_id_to_port(sid, manager.base_port, manager.game_port) if sid else None,
-                         mounted=bool(active and os.path.normcase(os.path.abspath(active)) == os.path.normcase(str(path.resolve())))))
+    with manager._lock:
+        registry = manager._load_registry()  # Listing must not rewrite the slot registry.
+        slots = {name: sid for sid, name in registry.items()}
+        active = manager.get_active_db()
+        for path in sorted(manager.server_dir.glob('*.db')):
+            name = path.name.lower()
+            if path.is_symlink() or name.startswith(('_', '.', 'test_')) or '_bak_' in name or '_backup_' in name:
+                continue
+            if not is_valid_save_db(str(path)):
+                continue
+            uid, nick, level = extract_save_metadata(str(path))
+            sid = slots.get(path.name)
+            rows.append(dict(name=path.stem, filename=path.name, uid=uid, nick=nick, level=level,
+                             slot_id=sid, port=slot_id_to_port(sid, manager.base_port, manager.game_port) if sid else None,
+                             mounted=bool(active and os.path.normcase(os.path.abspath(active)) == os.path.normcase(str(path.resolve())))))
     return rows
 
 
@@ -33,12 +34,16 @@ def bind():
     filename = unquote(filename, errors='strict')
     if Path(filename).name != filename or '/' in filename or '\\' in filename:
         raise ValueError('存档名称不能包含路径')
-    selected = next((row for row in catalog() if row['filename'] == filename), None)
-    if selected is None:
-        raise ValueError('所选存档不存在，请刷新存档列表')
     from save_slot_manager import get_slot_manager
-    g.gm_save_path = str((get_slot_manager().server_dir / filename).resolve(strict=True))
-    g.gm_save_uid = selected['uid']
+    manager = get_slot_manager()
+    with manager._lock:
+        selected = next((row for row in catalog(manager) if row['filename'] == filename), None)
+        if selected is None:
+            raise ValueError('所选存档不存在，请刷新存档列表')
+        g.gm_save_path = str((manager.server_dir / filename).resolve(strict=True))
+        manager.hold_panel_save(g.gm_save_path)
+        g.gm_save_manager = manager
+        g.gm_save_uid = selected['uid']
     # Explicit account IDs must belong to this save; never silently fall back.
     body = request.get_json(silent=True) if request.is_json else None
     uid = request.args.get('uid', (body or {}).get('uid') if isinstance(body, dict) else None)
@@ -86,12 +91,30 @@ def get_reader(fallback):
 
 
 def close(_exc=None):
-    if getattr(g, 'gm_save_owns_db', False):
-        g.gm_save_db.close()
-    reader = getattr(g, 'gm_save_reader', None)
-    conn = getattr(reader._local, 'conn', None) if reader else None
-    if conn is not None:
-        conn.close()
+    try:
+        if getattr(g, 'gm_save_owns_db', False):
+            g.gm_save_db.close()
+        reader = getattr(g, 'gm_save_reader', None)
+        conn = getattr(reader._local, 'conn', None) if reader else None
+        if conn is not None:
+            conn.close()
+    finally:
+        manager = g.pop('gm_save_manager', None)
+        if manager is not None:
+            manager.release_panel_save(g.gm_save_path)
+
+
+def delete(data):
+    from save_slot_manager import get_slot_manager
+    if not isinstance(data, dict) or not isinstance(data.get('filename'), str) or type(data.get('uid')) is not int:
+        raise ValueError('请提供要删除的存档名称和 UID')
+    filename = data['filename']
+    manager = get_slot_manager()
+    selected = next((row for row in catalog(manager) if row['filename'] == filename and row['uid'] == data['uid']), None)
+    if selected is None:
+        raise ValueError('存档不存在或已变更，请刷新存档列表')
+    destination = manager.delete_save(manager.server_dir / filename, selected['uid'])
+    return dict(filename=filename, destination=destination)
 
 
 def create(data):

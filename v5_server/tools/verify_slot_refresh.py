@@ -1,6 +1,7 @@
 """Concurrent SDK HTTP refresh + actual gateway/codec, without player files."""
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+from dataclasses import replace
 from types import SimpleNamespace
 from unittest.mock import patch
 import threading
@@ -8,6 +9,7 @@ import time
 import unittest
 
 import verify_slot_delete_ui as base
+import verify_slot_gateway_actions as gateway_actions
 from server_net import build_https_app
 
 slots = base.slots
@@ -25,12 +27,13 @@ class SlotRefreshTests(unittest.TestCase):
             cls.app = build_https_app(SimpleNamespace(log=lambda *a, **k: None), host_ip=HOST)
         cls.app.testing = True
 
-    def request(self):
+    def request(self, peer='127.0.0.1'):
         with self.app.test_client() as client:
-            return client.get('/gateway/get?action=server&mixId=42')
+            return client.get('/gateway/get?action=server&version=308&mixId=42',
+                              environ_overrides={'REMOTE_ADDR': peer})
 
     @contextmanager
-    def pending_request(self):
+    def pending_request(self, peer='127.0.0.1'):
         observed = threading.Event()
         original = self.manager._refresh_client
         def entered(key):
@@ -40,7 +43,7 @@ class SlotRefreshTests(unittest.TestCase):
         with patch.object(slots, 'get_slot_manager', return_value=self.manager), \
              patch.object(self.manager, '_refresh_client', side_effect=entered), \
              ThreadPoolExecutor(max_workers=1) as pool:
-            future = pool.submit(self.request)
+            future = pool.submit(self.request, peer)
             self.assertTrue(observed.wait(1), 'HTTP did not enter refresh wait')
             yield future
 
@@ -172,13 +175,14 @@ class SlotRefreshTests(unittest.TestCase):
         self.assertIn('active', self.manager._refresh_clients)
 
 
-    def test_followup_query_waits_for_gateway_beyond_initial_window(self):
-        self.assertEqual(self.manager.wait_for_gateway_refresh(HOST, window=0), 'idle')
+    def test_remote_followup_query_waits_for_gateway_beyond_initial_window(self):
+        peer = '192.168.0.104'
+        self.assertEqual(self.manager.wait_for_gateway_refresh(peer, window=0), 'idle')
         with patch.object(slots, 'REGION_REFRESH_FOLLOWUP_WINDOW_SECONDS', 1.5), \
-             self.pending_request() as response:
+             self.pending_request(peer) as response:
             with self.assertRaises(FutureTimeout):
                 response.result(0.5)
-            self.gateway(port=8102)
+            self.gateway(port=8102, peer=peer)
             rows = self.rows(response.result(1))
         self.assertEqual([row['serverId'] for row in rows], ['1','2','3','4'])
         self.assertIn('返回', rows[0]['serverName'])
@@ -192,12 +196,37 @@ class SlotRefreshTests(unittest.TestCase):
             self.assertLess(time.monotonic()-started, 0.2)
 
     def test_followup_wait_is_bounded_without_gateway(self):
-        self.manager.wait_for_gateway_refresh(HOST, window=0)
+        peer = '192.168.0.104'
+        self.manager.wait_for_gateway_refresh(peer, window=0)
         with patch.object(slots, 'REGION_REFRESH_WINDOW_SECONDS', 0.001), \
              patch.object(slots, 'REGION_REFRESH_FOLLOWUP_WINDOW_SECONDS', 0.03):
             started = time.monotonic()
-            self.assertEqual(self.manager.wait_for_gateway_refresh(HOST), 'idle')
-            self.assertLess(time.monotonic()-started, 0.3)
+            self.assertEqual(self.manager.wait_for_gateway_refresh(peer), 'idle')
+            elapsed = time.monotonic() - started
+            self.assertGreaterEqual(elapsed, 0.025)
+            self.assertLess(elapsed, 0.3)
+
+    def test_restart_with_retained_sdk_account_can_fetch_then_enter_gateway(self):
+        mapping = self.manager.get_slot_mapping()
+        path = str(gateway_actions.SERVER / 'account.db')
+        mapping[3] = replace(mapping[3], db_path=path)
+        with patch.object(slots, 'get_slot_manager', return_value=self.manager), \
+             patch.object(slots, 'REGION_REFRESH_WINDOW_SECONDS', 0.01), \
+             patch.object(slots, 'REGION_REFRESH_FOLLOWUP_WINDOW_SECONDS', 0.6), \
+             patch.object(self.manager, 'get_active_db', return_value=path), \
+             patch.object(slots.os.path, 'isfile', return_value=True), \
+             patch.object(slots.os.path, 'exists', return_value=True), \
+             patch.object(slots.os.path, 'samefile', return_value=True), \
+             patch('new_player_service.gateway_new_player', return_value=False):
+            # Retained mixId, fresh server-side state, and no new SDK login.
+            self.rows(self.request())
+            for peer in (HOST, '127.0.0.1', HOST):
+                started = time.monotonic()
+                rows = self.rows(self.request(peer))
+                self.assertLess(time.monotonic() - started, 0.3)
+            selected = next(row for row in rows if row['serverId'] == '3')
+            _, frames = gateway_actions.GatewayActions.exchange(self, selected['port'], commands=(10038, 10042))
+        self.assertEqual([(cmd, packet['result']) for cmd, packet in frames], [(10039, 0), (10043, 0)])
 
 
 if __name__ == '__main__':

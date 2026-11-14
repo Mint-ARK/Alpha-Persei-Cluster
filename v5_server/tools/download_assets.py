@@ -28,13 +28,18 @@ def main(argv=None, default_platform=None):
     source.add_argument('--manifest',help='本渠道完整主清单文件名')
     parser.add_argument('--scope',choices=('required','extended','all'),default='all')
     parser.add_argument('--manifest-only',action='store_true',help='仅准备官方主清单')
+    parser.add_argument('--voice', action='append', choices=('zh', 'ja'), help='附加语音，可重复；准备清单时包含对应语音索引')
+    parser.add_argument('--voice-only', action='store_true', help='只下载 --voice 指定的语音资源')
     parser.add_argument('--analyze',action='store_true',help='只分析，不启动资产下载')
     parser.add_argument('--standalone',action='store_true',help='无服务端时本地执行，仍遵守跨进程门控')
     parser.add_argument('--server-url',default='http://127.0.0.1')
     parser.add_argument('--workers',type=int,help='设置全局文件并发数1–128')
     args=parser.parse_args(argv)
-    payload=dict(platform=args.platform,scope=args.scope,kind='manifest' if args.manifest_only else 'assets',
-        profile_id=args.profile,filename=args.manifest,download=not args.analyze)
+    if args.voice_only and (args.manifest_only or not args.voice):
+        parser.error('--voice-only 需要 --voice，且不能与 --manifest-only 同时使用')
+    kind = 'manifest' if args.manifest_only else 'voice' if args.voice_only else 'assets'
+    payload=dict(platform=args.platform,scope=args.scope,kind=kind,
+        profile_id=args.profile,filename=args.manifest,download=not args.analyze,voice_languages=args.voice or [])
     manager=None
     try:
         import cdn_active_downloads as active

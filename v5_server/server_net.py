@@ -48,7 +48,10 @@ def set_host_ip(ip):
 
 
 _LATEST_CLIENT_PLATFORM = ["pc"]
-_CLIENT_APP_VERSIONS = {}
+_PC_INSTALL_URLS = {
+    '307': 'https://packaging.ys4fun.com/packagepc/prod/307/AetherGazer_zh_cn_ali_prod_307_210_3_windows_limit_sdk_release_W12000000_5FF9A0158EA7C050D03D419F16DB8625.zip',
+    '308': 'https://packaging.ys4fun.com/packagepc/prod/308/AetherGazer_zh_cn_ali_prod_308_301_6_windows_limit_sdk_release_W12000000_5A998C200FB8FBDB86E4D28EE49B942A.zip',
+}
 
 
 def get_latest_client_platform() -> str:
@@ -241,7 +244,7 @@ def get_online_uids():
         return list(_online_game_conns.keys())
 
 
-def run_while_save_offline(path, uid, action):
+def run_while_save_offline(path, uid, action, *, busy_message='请先退出这个存档的游戏账号，再重置本期'):
     """Keep game registration and a selected save's offline mutation mutually exclusive."""
     expected = os.path.normcase(os.path.realpath(path))
     with _online_conns_lock:
@@ -250,7 +253,7 @@ def run_while_save_offline(path, uid, action):
                 mounted = getattr(getattr(connection, 'db', None), 'path', None)
                 if (mounted and os.path.normcase(os.path.realpath(mounted)) == expected
                         or not mounted and owner == uid):
-                    raise ValueError('请先退出这个存档的游戏账号，再重置本期')
+                    raise ValueError(busy_message)
         return action()
 
 
@@ -951,6 +954,14 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
     install_admin_guard(app)
     idx = material.get("http_index") or {} if (material and isinstance(material, dict)) else {}
     lan_ip = host_ip or _HOST_IP[0] or get_host_ip()
+    pc_base_versions = collections.OrderedDict()
+    pc_base_lock = threading.Lock()
+
+    def pc_startup_peer():
+        peer = request.remote_addr or ''
+        local = peer in ('127.0.0.1', '::1')
+        forwarded = request.headers.get('X-Real-IP') if local else None
+        return forwarded or peer, local and not forwarded and not request.headers.get('X-Forwarded-For')
 
     # 注册 GM 控制台统一 API 蓝图
     try:
@@ -1513,13 +1524,20 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
         # 13. 区服与客户端基础配置接口：gateway/get (action=base 或 action=server)
         if "gateway/get" in path or path.endswith("/gateway/get") or path.endswith("/gateway/get/"):
             action = request.args.get("action", "")
-            req_ver = request.args.get("version")
-            c_ip = (request.headers.get("X-Real-IP") or
-                    request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or
-                    request.remote_addr or "")
-            if req_ver and c_ip:
-                _CLIENT_APP_VERSIONS[c_ip] = str(req_ver).strip()
             if action == "base" or "action=base" in qs:
+                version = request.args.get('version', '').strip()
+                peer, direct_local = pc_startup_peer()
+                platform_hint = request.args.get('platformType', '').lower()
+                agent = ua.lower()
+                windows = platform_hint == 'pc' or (not platform_hint and 'windows' in agent)
+                local_unknown = direct_local and not platform_hint and not any(
+                    marker in agent for marker in ('iphone', 'ipad', 'ios', 'darwin', 'android', 'cfnetwork'))
+                if peer and version.isascii() and version.isdecimal() and 0 < len(version) <= 4 and (windows or local_unknown):
+                    with pc_base_lock:
+                        pc_base_versions[peer] = (version, time.monotonic() + 120)
+                        pc_base_versions.move_to_end(peer)
+                        if len(pc_base_versions) > 1024:
+                            pc_base_versions.popitem(last=False)
                 return jsonify({
                     "errorCode": "0",
                     "data": {
@@ -1912,7 +1930,8 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
         # 14. 资源版本更新检查（根据客户端平台定向分发：PC / iOS / Android）
         if path.endswith("/pass/game/updateversion/getLatest"):
             req_json = request.get_json(silent=True) or {}
-            plat = (
+            req_json = req_json if isinstance(req_json, dict) else {}
+            plat = str(
                 request.args.get("platformType")
                 or request.form.get("platformType")
                 or req_json.get("platformType")
@@ -1933,8 +1952,16 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             import resource_distribution
             explicit_app = (request.args.get('appVersion') or request.form.get('appVersion')
                             or req_json.get('appVersion'))
+            if explicit_app is None and cur_plat == 'pc':
+                peer, _ = pc_startup_peer()
+                with pc_base_lock:
+                    hint = pc_base_versions.get(peer)
+                    if hint and hint[1] > time.monotonic():
+                        explicit_app = hint[0]
             try:
                 manifests = resource_distribution.distribution_entries(cur_plat, explicit_app)
+                target_install_version = (manifests[0]['install_version'] if manifests else
+                                          resource_distribution.get_effective_app_version(cur_plat, explicit_app))
             except (ValueError, OSError) as error:
                 return jsonify({'errorCode': '1', 'errorMsg': str(error), 'data': []})
             now_ms = int(time.time() * 1000)
@@ -1949,15 +1976,19 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                     enableWhiteList=False, enableFullPub=True, enableGrayPub=True,
                     assethash=manifest['assethash'], batchId=0))
             print(f'[SDK] {cur_plat} 渠道{chid or resource_distribution.CHANNELS[cur_plat]} '
-                  f'资源方案: {[m["profile_id"] for m in manifests]}', flush=True)
-            # Keep installation metadata aligned with effective base app version.
-            target_install_version = manifests[0]['app_version'] if manifests else resource_distribution.get_effective_app_version(cur_plat, explicit_app)
+                  f'资源方案: {[m["profile_id"] for m in manifests]} '
+                  f'匹配底包: {[m["app_version"] for m in manifests]} 安装包: {target_install_version or "无"}', flush=True)
+            # An auto request without an installed build cannot be offered an update.
+            if target_install_version is None:
+                return jsonify({'errorCode': '0', 'data': entries})
             if is_ios:
                 install_url = 'https://apps.apple.com/cn/app/id1507863649'
             elif is_android:
                 install_url = 'https://download-eo.ys4fun.com/android/resources/'
             else:
-                install_url = 'https://packaging.ys4fun.com/packagepc/prod/307/AetherGazer_zh_cn_ali_prod_307_210_3_windows_limit_sdk_release_W12000000_5FF9A0158EA7C050D03D419F16DB8625.zip'
+                install_url = _PC_INSTALL_URLS.get(target_install_version)
+                if not install_url:
+                    return jsonify({'errorCode': '0', 'data': entries})
             entries.append(dict(createDate=now_ms, modifyDate=now_ms, sortWeight=0, type='install',
                 version=target_install_version, versionName=target_install_version, forceUpdate=False, fileSize=0,
                 disDate=now_ms, downloadUrl=install_url, platformType=cur_plat,

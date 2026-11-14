@@ -73,7 +73,7 @@ class QueueChecks(unittest.TestCase):
         self.stack.enter_context(patch.object(cdn,'DEFAULT_STATIC_DIR',str(self.root/'static')))
         import res_version_manager as versions
         self.stack.enter_context(patch.object(versions,'STATIC_RESOURCES_DIR',str(self.root/'static')))
-        self.stack.enter_context(patch.object(cdn,'get_data_dir',side_effect=lambda p:str(self.root/'data'/p)))
+        self.stack.enter_context(patch.object(cdn,'PLATFORM_DIRS', {p: str(self.root/'data'/p) for p in ('pc', 'android', 'ios')}))
         self.stack.enter_context(patch.object(cdn,'cache_roots',side_effect=lambda p:[str(self.root/'data'/p),str(self.root/'static'/p)]))
         self.stack.enter_context(patch.object(transfers,'recycle_partial',side_effect=lambda p:Path(p).replace(str(p)+'.recycled')))
         self.settings=active.DownloadSettings(self.root/'settings.json')
@@ -249,8 +249,17 @@ class QueueChecks(unittest.TestCase):
         ident=self.add(); self.queue.run_once(); job=self.job(ident)
         self.assertEqual(job['state'],'failed'); self.assertEqual(job['stats']['failed_files'],1)
         self.assertEqual(job['stats']['done_files'],1)
-        self.payloads[filename]=body; self.queue.action('retry',ident); self.queue.run_once(); job=self.job(ident)
+        self.payloads[filename]=body
+        self.opens.clear()
+        self.queue.action('retry',ident)
+        with patch.object(core, '_verified', core.OrderedDict()), \
+             patch.object(core, '_validate_uncached_file', wraps=core._validate_uncached_file) as verify:
+            self.queue.run_once()
+        job=self.job(ident)
         self.assertEqual(job['state'],'completed'); self.assertEqual(job['stats']['cached_files'],1)
+        self.assertEqual(self.opens, [f'/pc/resources/{filename}'])
+        hashed = [call.args[1].filename for call in verify.call_args_list if call.args[1].filename.endswith('.ys')]
+        self.assertEqual(hashed, [filename])
     def test_21_empty_or_finished_queue_cannot_latch_pause(self):
         self.queue.action('pause_all')
         self.assertFalse(self.queue.status()['paused'])
@@ -285,6 +294,10 @@ class QueueChecks(unittest.TestCase):
         second=self.add(download=False)
         self.assertTrue(self.queue.status()['paused']); self.assertFalse(self.queue.run_once())
         self.assertEqual(self.job(first)['state'],'paused'); self.assertEqual(self.job(second)['state'],'queued')
+        status = self.queue.action('resume', first)
+        self.assertTrue(status['paused'])
+        self.assertTrue(all(task['state'] == 'queued' for task in status['tasks']))
+        self.assertFalse(self.queue.run_once())
         self.queue.action('resume_all'); self.queue.run_once(); self.queue.run_once()
         self.assertTrue(all(self.job(ident)['state']=='ready' for ident in (first,second)))
         self.assertEqual(self.opens,[])
@@ -301,6 +314,315 @@ class QueueChecks(unittest.TestCase):
         ident=self.add(); self.queue.run_once()
         self.assertEqual(self.job(ident)['state'],'completed'); self.assertEqual(path.read_bytes(),body)
         self.assertTrue(any(p.read_bytes()==bad for p in path.parent.glob(filename+'.before_publish_*')))
+    def test_24_start_reindexes_selected_storage_after_switch(self):
+        import resource_storage
+
+        old_root = self.root/'data'
+        new_root = self.root/'新缓存'
+        config = self.root/'server_config.json'
+        config.write_text(json.dumps({'storage': {'cdn_cache_dir': str(old_root)}}), encoding='utf-8')
+        first, second = self.payloads
+        (old_root/'pc'/first).write_bytes(self.payloads[first])
+        app = Flask(__name__)
+        app.register_blueprint(gm_api.gm_bp, url_prefix='/api/gm')
+        client = app.test_client()
+        with patch.dict(os.environ, dict.fromkeys(('CDN_CACHE_DIR', 'CDN_PC_DIR', 'CDN_IOS_DIR', 'CDN_ANDROID_DIR'), '')):
+            storage = resource_storage.Storage(config)
+            with patch.object(resource_storage, 'storage', storage), \
+                 patch.object(cdn.cache_roots, 'side_effect', lambda p: [cdn.PLATFORM_DIRS[p], *storage.history(p)]):
+                ident = self.add(download=False)
+                self.queue.run_once()
+                self.assertEqual(self.job(ident)['stats']['needed_bytes'], len(self.payloads[second]))
+
+                result = client.post('/api/gm/system/resource_storage', json={'root': str(new_root)}).get_json()
+                self.assertEqual(result['code'], 0)
+                self.assertEqual(result['data']['read_roots'], [str(old_root)])
+                (new_root/'pc'/second).write_bytes(self.payloads[second])
+
+                self.queue.action('start', ident)
+                self.queue.run_once()
+                job = self.job(ident)
+                self.assertEqual(job['state'], 'completed')
+                self.assertEqual(job['stats']['output_dir'], str(new_root/'pc'))
+                self.assertEqual(job['stats']['cached_files'], 1)
+                self.assertEqual(job['stats']['needed_bytes'], len(self.payloads[first]))
+                self.assertEqual(job['stats']['done_files'], 1)
+                self.assertEqual(self.opens, [f'/pc/resources/{first}'])
+                self.assertEqual((new_root/'pc'/first).read_bytes(), self.payloads[first])
+
+    def voice_fixture(self, platform='pc', *, write_companions=True):
+        folder = self.root/'static'/platform
+        base = json.loads((folder/self.names[platform]).read_bytes())
+        base['assetPendDict']['allVoice'] = ['story.awb', 'absent-from-this-language.awb']
+        raw = json.dumps(base).encode()
+        name = 'assethash_307_321_'+hashlib.md5(raw).hexdigest()+'.bytes'
+        (folder/name).write_bytes(raw)
+        core_body = b'CORE'
+        story_body = b'VOICE-STORY'
+        japanese_body = b'VOICE-JA'
+        files = {hashlib.md5(body).hexdigest()+'.ys': body for body in (core_body, story_body, japanese_body)}
+        self.payloads.update(files)
+        def line(name, body):
+            return f'{name}|{hashlib.md5(body).hexdigest()}|{len(body)}'
+        companions = {'voice_package_list_307_321.bytes': {'infos': [
+            {'name': lang, 'size': 1, 'version': 30700321} for lang in ('zh', 'ja')]},
+            'voice_hash_zh_30700321.bytes': {'version': 30700321,
+                'assetHashList': [line('base.acb', core_body), line('story.awb', story_body)]},
+            'voice_hash_ja_30700321.bytes': {'version': 30700321,
+                'assetHashList': [line('japanese.acb', japanese_body)]}}
+        for filename, value in companions.items():
+            encoded = json.dumps(value).encode()
+            self.payloads[filename] = encoded
+            if write_companions:
+                (folder/filename).write_bytes(encoded)
+        return name, list(files), list(companions)
+
+    def test_25_voice_scope_and_approval_through_api(self):
+        import cdn_download_queue
+        main, files, _ = self.voice_fixture()
+        app = Flask(__name__)
+        app.register_blueprint(gm_api.gm_bp, url_prefix='/api/gm')
+        client = app.test_client()
+        with patch.object(cdn_download_queue, 'get_manager', return_value=self.queue):
+            for scope, count in [('required', 2), ('extended', 1), ('all', 3)]:
+                result = client.post('/api/gm/system/download_queue', json=dict(platform='pc', kind='voice',
+                    filename=main, scope=scope, voice_languages=['zh', 'ja'], download=False)).get_json()
+                self.assertEqual(result['code'], 0, result)
+                ident = result['data']['task_id']
+                self.queue.run_once()
+                job = self.job(ident)
+                self.assertEqual((job['state'], job['stats']['total_files'], job['stats']['unresolved_count']), ('ready', count, 0))
+            self.assertEqual(self.opens, [])
+            result = client.post('/api/gm/system/download_queue/action', json=dict(action='start', task_id=ident)).get_json()
+            self.assertEqual(result['code'], 0)
+            self.queue.run_once()
+            self.assertEqual(self.job(ident)['state'], 'completed')
+            self.assertCountEqual(self.opens, [f'/pc/resources/{name}' for name in files])
+            for name in files:
+                self.assertEqual((self.root/'data/pc'/name).read_bytes(), self.payloads[name])
+            report = self.queue.report(ident)['task']
+            self.assertEqual(report['voice_languages'], ['zh', 'ja'])
+            self.assertNotIn('snapshot', report['source']['voice_hashes']['ja'])
+
+    def test_26_voice_snapshot_and_asset_overlap_survive_restart(self):
+        main, files, _ = self.voice_fixture()
+        folder = self.root/'static/pc'
+        job = self.queue.enqueue(dict(platform='pc', kind='assets', filename=main,
+                                      voice_languages=['zh'], download=False))
+        ident = job['task_id']
+        self.queue.run_once()
+        self.assertEqual(self.job(ident)['stats']['total_files'], 3)
+        self.queue.close()
+        original = folder/'voice_hash_zh_30700321.bytes'
+        original.rename(original.with_suffix('.before_fixture'))
+        original.write_bytes(b'changed source')
+        restored = DownloadQueue(self.root/'queue', gate=self.gate, autostart=False)
+        self.addCleanup(restored.close)
+        restored.action('start', ident)
+        restored.run_once()
+        result = restored.report(ident)['task']
+        self.assertEqual((result['state'], result['stats']['done_files']), ('completed', 3))
+        self.assertIn(f'/pc/resources/{files[1]}', self.opens)
+        self.assertNotIn(f'/pc/resources/{files[2]}', self.opens)
+
+    def test_27_prepare_companion_indexes_after_confirmation(self):
+        import res_version_manager as versions
+        main, _, companions = self.voice_fixture(write_companions=False)
+        ident = self.queue.enqueue(dict(platform='pc', kind='manifest', filename=main,
+            voice_languages=['zh', 'ja'], download=False))['task_id']
+        self.queue.run_once()
+        self.assertEqual((self.job(ident)['state'], self.job(ident)['stats']['total_files']), ('ready', 4))
+        self.assertEqual(self.opens, [])
+        with patch.object(versions, 'probe_official_latest', return_value=(True,
+                dict(channel_id='9', assethash=main, app_version='307', version='321'), '')) as probe, \
+             patch.object(versions, 'register_downloaded_distribution') as register:
+            self.queue.action('start', ident)
+            self.queue.run_once()
+        probe.assert_called_once_with(platform='pc')
+        register.assert_called_once_with('pc', main)
+        job = self.job(ident)
+        self.assertEqual((job['state'], job['stats']['cached_files'], job['stats']['done_files']), ('completed', 1, 3))
+        self.assertCountEqual(self.opens, [f'/pc/resources/{name}' for name in companions])
+        for name in companions:
+            self.assertEqual((self.root/'static/pc'/name).read_bytes(), self.payloads[name])
+        self.assertFalse(list((self.root/'data/pc').glob('*.ys')))
+
+    def test_28_derived_profile_uses_native_voice_snapshot(self):
+        import resource_manifests as manifests
+        main, files, companions = self.voice_fixture('ios')
+        folder = self.root/'static/ios'
+        base = dict(id='native-ios-fixture', platform='ios', origin='native', ready=True, label='base', assethash=main,
+                    voice_files={name: hashlib.sha256(self.payloads[name]).hexdigest() for name in companions})
+        raw = json.loads((folder/main).read_bytes())
+        raw['appVersion'] = 308
+        raw = json.dumps(raw).encode()
+        derived = dict(id='derived-fixture', platform='ios', origin='derived', ready=True, label='alias',
+                       assethash='assethash_308_321_'+hashlib.md5(raw).hexdigest()+'.bytes', base_id=base['id'])
+        snapshot = folder/'native'/base['id']
+        snapshot.mkdir(parents=True)
+        for name in companions:
+            (folder/name).rename(snapshot/name)
+        path = folder/'generated'/derived['id']/derived['assethash']
+        path.parent.mkdir(parents=True)
+        path.write_bytes(raw)
+        with patch.object(manifests, '_state', return_value={}), \
+             patch.object(manifests, '_records', return_value={base['id']:base, derived['id']:derived}), \
+             patch.object(manifests, '_folder', return_value=folder):
+            ident = self.queue.enqueue(dict(platform='ios', kind='voice', profile_id=derived['id'],
+                voice_languages=['ja'], download=True))['task_id']
+        self.queue.run_once()
+        job = self.job(ident)
+        self.assertEqual(job['state'], 'completed', job)
+        self.assertEqual(job['source']['voice_hashes']['ja']['filename'], 'voice_hash_ja_30700321.bytes')
+        self.assertEqual(self.opens, [f'/ios/resources/{files[2]}'])
+
+    def test_29_missing_and_tampered_voice_indexes_fail_without_download(self):
+        main, _, _ = self.voice_fixture(write_companions=False)
+        params = dict(platform='pc', kind='voice', filename=main, voice_languages=['ja'], download=True)
+        with self.assertRaisesRegex(ValueError, '缺少 voice_package_list'):
+            self.queue.enqueue(params)
+        self.voice_fixture()
+        ident = self.queue.enqueue(params)['task_id']
+        frozen = self.queue.root/self.queue._jobs[0]['source']['voice_hashes']['ja']['snapshot']
+        frozen.rename(frozen.with_suffix('.before_fixture'))
+        frozen.write_bytes(b'{"version":30700321,"assetHashList":[]}')
+        self.queue.run_once()
+        self.assertEqual(self.job(ident)['state'], 'failed')
+        self.assertIn('蓝图已被修改', self.job(ident)['message'])
+        self.assertEqual(self.opens, [])
+
+    def reopen_queue(self):
+        root = self.queue.root
+        self.queue.close()
+        self.queue = DownloadQueue(root, gate=self.gate, autostart=False)
+        self.addCleanup(self.queue.close)
+
+    def test_30_persisted_index_covers_existing_and_downloaded_assets(self):
+        filename, body = next(iter(self.payloads.items()))
+        (self.root/'data/pc'/filename).write_bytes(body)
+        ident = self.add()
+        self.queue.run_once()
+        self.assertEqual(self.job(ident)['stats']['cached_files'], 1)
+        self.assertEqual(self.job(ident)['stats']['done_files'], 1)
+        self.assertEqual(len(self.opens), 1)
+        self.reopen_queue()
+        analysis = self.add(download=False)
+        original = core._validate_uncached_file
+
+        def verify_metadata_only(handle, spec, key):
+            self.assertFalse(spec.filename.endswith('.ys'), 'existing asset was reread')
+            return original(handle, spec, key)
+
+        with patch.object(core, '_verified', core.OrderedDict()), \
+             patch.object(core, '_validate_uncached_file', side_effect=verify_metadata_only):
+            self.queue.run_once()
+        self.assertEqual(self.job(analysis)['state'], 'ready')
+        self.assertEqual(self.job(analysis)['stats']['cached_files'], 2)
+        self.assertEqual(len(self.opens), 1)
+
+    def test_31_persisted_index_revalidates_changed_file(self):
+        self.add()
+        self.queue.run_once()
+        self.reopen_queue()
+        filename, body = next(iter(self.payloads.items()))
+        path = self.root/'data/pc'/filename
+        before = path.stat()
+        path.write_bytes(b'X' * len(body))
+        os.utime(path, ns=(before.st_atime_ns, before.st_mtime_ns))
+        ident = self.add()
+        self.opens.clear()
+        with patch.object(core, '_verified', core.OrderedDict()):
+            self.queue.run_once()
+        self.assertEqual(self.job(ident)['state'], 'completed')
+        self.assertEqual(self.job(ident)['stats']['cached_files'], 1)
+        self.assertEqual(self.opens, [f'/pc/resources/{filename}'])
+        self.assertEqual(path.read_bytes(), body)
+
+    def test_32_damaged_index_falls_back_to_verification(self):
+        self.add()
+        self.queue.run_once()
+        index_path = self.queue.index.receipt_path
+        index_path.rename(index_path.with_suffix('.before_fixture'))
+        index_path.write_bytes(b'{"version":1,"files":')
+        self.reopen_queue()
+        ident = self.add(download=False)
+        with patch.object(core, '_verified', core.OrderedDict()), \
+             patch.object(core, '_validate_uncached_file', wraps=core._validate_uncached_file) as verify:
+            self.queue.run_once()
+        self.assertEqual(sum(call.args[1].filename.endswith('.ys') for call in verify.call_args_list), 2)
+        self.assertEqual(self.job(ident)['stats']['cached_files'], 2)
+        self.assertEqual(len(json.loads(index_path.read_bytes())['files']), 2)
+
+    def test_33_index_checkpoints_during_download(self):
+        self.settings.save(1)
+        entered, release = threading.Event(), threading.Event()
+        open_response = cdn._upstream_opener.side_effect
+
+        def block_second(*args, **kwargs):
+            if self.opens:
+                self.block = entered, release
+            return open_response(*args, **kwargs)
+
+        self.add()
+        with patch('cdn_download_index.RECEIPT_CHECKPOINT_SECONDS', 0), \
+             patch.object(cdn, '_upstream_opener', side_effect=block_second):
+            worker = threading.Thread(target=self.queue.run_once)
+            worker.start()
+            try:
+                self.assertTrue(entered.wait(3))
+                recorded = json.loads(self.queue.index.receipt_path.read_bytes())['files']
+                self.assertEqual(len(recorded), 1)
+                self.assertEqual(Path(next(iter(recorded))).name, self.opens[0].rsplit('/', 1)[-1])
+            finally:
+                release.set()
+                worker.join(4)
+        self.assertFalse(worker.is_alive())
+
+    def test_34_shutdown_persists_completed_objects_before_resume(self):
+        import cdn_download_queue
+
+        self.settings.save(1)
+        self.queue.autostart = True
+        entered, release = threading.Event(), threading.Event()
+        opener = cdn._upstream_opener.side_effect
+
+        def block_second(*args, **kwargs):
+            if self.opens:
+                self.block = entered, release
+            return opener(*args, **kwargs)
+
+        with patch.object(cdn, '_upstream_opener', side_effect=block_second), \
+             patch.object(cdn_download_queue, '_manager', self.queue):
+            ident = self.add()
+            try:
+                self.assertTrue(entered.wait(4))
+            finally:
+                cdn_download_queue.close_manager()
+                release.set()
+
+        state = json.loads((self.queue.root/'queue.json').read_bytes())['tasks'][0]
+        self.assertEqual(state['state'], 'paused')
+        self.assertEqual(state['stats']['done_files'], 1)
+        self.reopen_queue()
+        self.block = None
+        self.queue.action('resume', ident)
+        self.queue.run_once()
+        self.assertEqual(self.job(ident)['state'], 'completed')
+        self.assertEqual(self.job(ident)['stats']['cached_files'], 1)
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows bulk directory metadata')
+    def test_35_windows_directory_matches_persisted_identities(self):
+        self.add()
+        self.queue.run_once()
+        self.reopen_queue()
+        ident = self.add(download=False)
+        with patch.object(self.queue.index, 'record_verified', side_effect=AssertionError('asset reopened')), \
+             patch.object(core, '_fingerprint', wraps=core._fingerprint) as fingerprint:
+            self.queue.run_once()
+        self.assertEqual(self.job(ident)['stats']['cached_files'], 2)
+        self.assertFalse(any(str(call.args[1].name).endswith('.ys') for call in fingerprint.call_args_list
+                             if len(call.args) > 1 and call.args[1] is not None))
+
     def test_12_api_get_has_no_task_side_effect_and_actions_roundtrip(self):
         import cdn_download_queue
         app=Flask(__name__); app.register_blueprint(gm_api.gm_bp,url_prefix='/api/gm')

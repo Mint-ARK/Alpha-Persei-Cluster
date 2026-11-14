@@ -228,7 +228,8 @@ def _records(state):
 
 
 def _latest(rows, platform):
-    candidates = [r for r in rows.values() if r['platform'] == platform and r['origin'] == 'native' and r['ready']]
+    candidates = [r for r in rows.values() if r['platform'] == platform and r['origin'] == 'native'
+                  and r['ready'] and not r.get('manual_only')]
     if not candidates:
         raise ValueError(f'{platform}没有完整且已验证的原生清单组')
     return max(candidates, key=lambda r: (int(r['resource_version']), int(r['app_version']), r.get('registered_at', 0), r['id']))
@@ -249,7 +250,7 @@ def _selection(state, rows, platform, use_startup=True):
             choice = aliases[0]['id']
         elif old.get('source_version'):
             match = next((r for r in rows.values() if r['platform'] == platform and r['origin'] == 'native'
-                          and r['resource_version'] == old['source_version'] and r['ready']), None)
+                          and r['resource_version'] == old['source_version'] and r['ready'] and not r.get('manual_only')), None)
             choice = match['id'] if match else 'auto'
     selected = rows.get(choice) if choice != 'auto' else rows.get(_pc_hint) if platform == 'pc' and _pc_hint else latest
     reason = ''
@@ -275,6 +276,14 @@ def _public(row, rows):
     return result
 
 
+def _saved_downloads(rows):
+    from cdn_download_index import saved_main_manifests
+    registered = {(row['platform'], row['assethash']) for row in rows.values() if row['ready'] or row.get('removed')}
+    return [dict(platform=platform, filename=filename)
+            for platform in PLATFORMS for filename in saved_main_manifests(_folder(platform))
+            if (platform, filename) not in registered]
+
+
 def get_status():
     import res_version_manager
     with _LOCK:
@@ -287,7 +296,7 @@ def get_status():
                                    'latest_native_id': _latest(rows, platform)['id']}
         return dict(scope='server', gameplay_version=res_version_manager.get_current_version(),
                     platforms=platforms, profiles=[_public(r, rows) for r in rows.values()],
-                    native_only_base=True)
+                    saved_downloads=_saved_downloads(rows), native_only_base=True)
 
 
 def _materialize(state, rows):
@@ -531,30 +540,28 @@ def resolve_connection_version(platform, reported=''):
                     advertised=row['resource_version'], reason=reason)
 
 
+def _install_target(configured_app, client_app):
+    if configured_app != 'auto':
+        return str(configured_app)
+    requested = str(client_app).strip() if type(client_app) in (str, int) else ''
+    return requested if re.fullmatch(r'[1-9][0-9]{0,3}', requested) else None
+
+
 def get_effective_app_version(platform, client_app=None):
     with _LOCK:
         state = _state()
         saved = state.get('selections', {}).get(platform, {})
         cfg_app = saved.get('app_version') or ('307' if platform == 'pc' else '308')
-        if cfg_app == 'auto':
-            if client_app:
-                return str(client_app).strip()
-            return '307' if platform == 'pc' else '308'
-        return str(cfg_app)
+        return _install_target(cfg_app, client_app)
 
 
 def distribution_entries(platform, app_version=None):
     """Use explicit installation metadata when available, otherwise a list."""
     with _LOCK:
-        state, rows, selection, selected = _effective(platform)
+        _, rows, selection, selected = _effective(platform)
         base = selected if selected['origin'] == 'native' else rows[selected['base_id']]
 
-        # Determine target app version for client matching
-        cfg_app = selection.get('app_version') or ('307' if platform == 'pc' else '308')
-        if cfg_app == 'auto':
-            target_app = str(app_version).strip() if app_version else ('307' if platform == 'pc' else '308')
-        else:
-            target_app = str(cfg_app).strip()
+        target_app = _install_target(selection['app_version'], app_version)
 
         candidates = [selected]
         if base['id'] != selected['id']:
@@ -562,21 +569,15 @@ def distribution_entries(platform, app_version=None):
         candidates.extend(r for r in rows.values() if r.get('bundled_compat') and r['ready']
                           and r['base_id'] == selected['id'] and r['platform'] == platform)
 
-        seen = set()
-        unique = []
-        for r in candidates:
-            if r['id'] not in seen:
-                seen.add(r['id'])
-                unique.append(r)
-
-        for row in unique:
-            _seal_base(row if row['origin'] == 'native' else rows[row['base_id']])
-
-        return [dict(app_version=target_app, manifest_app_version=r['app_version'],
-            resource_version=r['resource_version'], version_name=r['version_name'],
-            assethash=r['assethash'], profile_id=r['id'],
-            download_path=f'/{platform}/resources/profiles/{r["id"]}/', source_version=base['resource_version'])
-            for r in unique]
+        # Advertise one resource entry. Relabeling both the native and derived
+        # manifests for the same app build leaves SDK selection ambiguous.
+        row = next((r for r in candidates if r['app_version'] == target_app), selected)
+        _seal_base(row if row['origin'] == 'native' else rows[row['base_id']])
+        return [dict(app_version=target_app or row['app_version'], install_version=target_app,
+            manifest_app_version=row['app_version'],
+            resource_version=row['resource_version'], version_name=row['version_name'],
+            assethash=row['assethash'], profile_id=row['id'],
+            download_path=f'/{platform}/resources/profiles/{row["id"]}/', source_version=base['resource_version'])]
 
 
 def get_ios_manifest(_cfg, app_version):
@@ -584,7 +585,7 @@ def get_ios_manifest(_cfg, app_version):
     return entries[0] if entries else None
 
 
-def resolve_resource(path, platform):
+def resolve_resource(path, platform, *, allow_install_alias=True):
     """Return (handled, local path). None path means deny, never recapture."""
     match = re.fullmatch(r'/(pc|android|ios)/resources/profiles/([a-zA-Z0-9_-]+)/([^/]+)', path)
     if not match:
@@ -608,7 +609,8 @@ def resolve_resource(path, platform):
                     and r['platform'] == platform and r['base_id'] == selected['id']]
                 for row in candidates:
                     handled, resolved = resolve_resource(
-                        f'/{platform}/resources/profiles/{row["id"]}/{filename}', platform)
+                        f'/{platform}/resources/profiles/{row["id"]}/{filename}', platform,
+                        allow_install_alias=False)
                     if handled and resolved:
                         return True, resolved
         return False, None
@@ -632,12 +634,17 @@ def resolve_resource(path, platform):
         base = row if row['origin'] == 'native' else _route_rows.get(row['base_id'])
         if not base:
             return True, None
-        voice_version = f'{base["app_version"]}00{base["resource_version"]}'
-        aliases = {f'voice_package_list_{row["app_version"]}_{row["resource_version"]}.bytes':
-                   f'voice_package_list_{base["app_version"]}_{base["resource_version"]}.bytes'}
-        aliases.update({f'voice_hash_{lang}_{row["app_version"]}00{row["resource_version"]}.bytes':
-                        f'voice_hash_{lang}_{voice_version}.bytes' for lang in ('ja', 'zh')})
-        actual = aliases.get(filename, filename)
+        actual = filename
+        if filename not in base.get('voice_files', {}):
+            # The SDK can advertise a different installation build for the
+            # same profile. Only alias filenames for this resource build.
+            build = re.escape(row['resource_version'])
+            app = r'[1-9][0-9]{0,3}' if allow_install_alias else re.escape(row['app_version'])
+            voice_hash = re.fullmatch(rf'voice_hash_(ja|zh)_{app}00{build}\.bytes', filename)
+            if re.fullmatch(rf'voice_package_list_{app}_{build}\.bytes', filename):
+                actual = f'voice_package_list_{base["app_version"]}_{base["resource_version"]}.bytes'
+            elif voice_hash:
+                actual = f'voice_hash_{voice_hash[1]}_{base["app_version"]}00{base["resource_version"]}.bytes'
         if actual not in base.get('voice_files', {}):
             return True, None
         actual_path = _source_file(base, actual)
@@ -656,15 +663,23 @@ def register_official_bundle(platform, info):
     if digest not in filename:
         raise ValueError('官方主清单摘要错误')
     app, build = str(data['appVersion']), str(data['buildCode'])
-    voice = [f'voice_package_list_{app}_{build}.bytes', *[f'voice_hash_{lang}_{app}00{build}.bytes' for lang in ('ja', 'zh')]]
+    from cdn_download_index import voice_manifest_names, VOICE_LANGUAGES
+    package, voice_hashes = voice_manifest_names(filename, VOICE_LANGUAGES)
+    voice = [package, *voice_hashes.values()]
     record = dict(id=f'native-{platform}-{digest[:12]}', platform=platform, channel_id=CHANNELS[platform],
         app_version=app, resource_version=build, version_name=data['versionName'], assethash=filename,
         sha256=hashlib.sha256(raw).hexdigest(), voice_files={}, provenance='official-download',
         registered_at=time.time_ns() // 1_000_000)
+    if info.get('manual_only'):
+        record['manual_only'] = True
     for name in voice:
         if not integrity.valid_file(folder / name, integrity.ObjectSpec(name)):
             raise ValueError('官方语音清单未完整就绪')
         record['voice_files'][name] = hashlib.sha256((folder / name).read_bytes()).hexdigest()
+    if info.get('manual_only'):
+        package_data = integrity.decode_manifest((folder / package).read_bytes(), package)
+        if {item['name'] for item in package_data['infos']} != set(VOICE_LANGUAGES):
+            raise ValueError('语音包总表缺少中日语索引')
     with _LOCK:
         state = _state()
         declared = _read_json(NATIVE_PATH, {'sources': []}).get('sources', [])
@@ -672,6 +687,8 @@ def register_official_bundle(platform, info):
         same = next((r for r in declared if r['platform'] == platform and r['sha256'] == record['sha256']
                      and r['voice_files'] == record['voice_files']), None)
         if same:
+            if info.get('manual_only') and not same.get('manual_only'):
+                return
             record['id'] = same['id']
         else:
             identity = hashlib.sha256(_json_bytes([record['sha256'], record['voice_files']])).hexdigest()
@@ -708,7 +725,7 @@ def configure_startup(selector='auto', client_dir=None, profiles=()):
         if _windows_host() and str(selector).lower() == 'auto':
             info = versions.detect_client_resource_version(client_dir)
             _pc_hint = next((r['id'] for r in rows.values() if r['origin'] == 'native'
-                and r['platform'] == 'pc' and r['ready'] and r['sha256'] == info.get('sha256')), None)
+                and r['platform'] == 'pc' and r['ready'] and not r.get('manual_only') and r['sha256'] == info.get('sha256')), None)
         elif str(selector).isdigit():
             for platform in PLATFORMS:
                 found = next((r for r in rows.values() if r['origin'] == 'native' and r['ready']

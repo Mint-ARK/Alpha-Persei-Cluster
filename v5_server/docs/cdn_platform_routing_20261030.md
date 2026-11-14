@@ -6,6 +6,8 @@
 
 主机Windows+auto时可扫描本机PC资产作为pc_hint；Linux无此扫描，但仍正常按客户端HTTP字段和平台路径分发。云端多平台与Termux单机均可使用这套规则，无需按Linux另建固定平台。
 
-待讨论边界：缺平台路径且UA无信息会默认为PC；SDK/config与通用http_platform优先顺序和版本接口不完全一致（/config不读channelId且主要看query/UA）；appVersion未命中可能返回空候选；安装条目PC/Android仍硬编码307、iOS308，与动态资源条目独立。源地址完整fallback及gen_cert虚构192.168.0.105尚未改动，本轮先隔离默认启动依赖。
+待讨论边界：缺平台路径且UA无信息会默认为PC；SDK/config与通用http_platform优先顺序和版本接口不完全一致（/config不读channelId且主要看query/UA）；appVersion未命中可能返回空候选；安装条目PC/Android仍硬编码307、iOS308，与动态资源条目独立。
+
+2026-11-13 补充：CDN 出站地址在使用前检查公网 IPv4 路由，跳过没有出站路由的虚拟网卡。关闭被动回源时，主动联网仍按需选择地址。地址或路由失效后重新选择并清空 DNS 缓存；元数据请求重试失败时记录上游主机和系统错误码。
 
 17项AST隔离检查通过：默认关闭且不调用出站选择、显式开启、关闭优先、出站失败降级；同一127来源下三平台GET/form/JSON正确分流、渠道矛盾拒绝、三平台资源路径识别。真实分发配置/数据库/网络/服务均未操作；未重启/封包/上传。证据archive/cdn_default_off_20261030/probe_result.json；源码与说明备份同目录。

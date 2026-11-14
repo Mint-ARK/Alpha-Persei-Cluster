@@ -1,22 +1,25 @@
-import { Card, Chip, Label, ListBox, Select } from '@heroui/react'
+import { Button, Card, Chip, Label, ListBox, Select } from '@heroui/react'
 import type { ChannelManifestSelection, ResourceDistributionData, ResourcePlatform } from '../lib/api'
 
 export const platformNames = { pc: 'PC · Windows', android: 'Android 官服', ios: 'iPhone / iPad' }
 export const platformChannels = { pc: '9', android: '7', ios: '7' }
 
-export default function ResourcePlatformCard({ platform, data, value, onChange, disabled }: {
+export default function ResourcePlatformCard({ platform, data, value, onChange, onPrepare, disabled }: {
   platform: ResourcePlatform; data: ResourceDistributionData; value: ChannelManifestSelection
   onChange: (value: ChannelManifestSelection) => void; disabled: boolean
+  onPrepare: (filename: string) => void
 }) {
   const row = data.platforms[platform]
   const available = data.profiles.filter(p => p.platform === platform && p.ready && !p.removed)
   const natives = available.filter(p => p.origin === 'native')
+  const saved = (data.saved_downloads || []).filter(row => row.platform === platform)
   const pending = value.selected_id === 'auto' ? null : available.find(p => p.id === value.selected_id)
   const currentAppVer = value.app_version || (platform === 'pc' ? '307' : '308')
+  const basePlatform = platform === 'pc' ? 'Windows' : platformNames[platform]
   const baseAppOptions = [
     { id: 'auto', label: '自动 (跟随客户端请求免更)' },
-    { id: '308', label: 'Build 308 (移动端主流底包)' },
-    { id: '307', label: 'Build 307 (PC端/兼容底包)' },
+    { id: '307', label: `Build 307 (${basePlatform})` },
+    { id: '308', label: `Build 308 (${basePlatform})` },
   ]
   const hasCurrentInOptions = baseAppOptions.some(o => o.id === currentAppVer)
   const appOptions = hasCurrentInOptions ? baseAppOptions : [...baseAppOptions, { id: currentAppVer, label: `Build ${currentAppVer} (自定义)` }]
@@ -34,6 +37,14 @@ export default function ResourcePlatformCard({ platform, data, value, onChange, 
         {available.map(p => <ListBox.Item key={p.id} id={p.id} textValue={p.label}>{p.label}</ListBox.Item>)}
       </ListBox></Select.Popover>
     </Select>
+
+    {saved.length > 0 && <div className="space-y-2">
+      <p className="text-xs text-muted">已保存的主清单可补齐中日语索引后登记为分发方案。</p>
+      {saved.map(({ filename }) => <div key={filename} className="flex flex-wrap items-center gap-2">
+        <span className="min-w-0 flex-1 break-all font-mono text-xs" title={filename}>{filename.split('_').slice(1, 3).join(' / ')} · {filename.slice(-14, -6)}</span>
+        <Button size="sm" variant="secondary" isDisabled={disabled} onPress={() => onPrepare(filename)}>准备分发</Button>
+      </div>)}
+    </div>}
 
     <Select aria-label={`${platformNames[platform]}底包版本`} selectedKey={currentAppVer}
       onSelectionChange={key => { if (key) onChange({ ...value, app_version: String(key) }) }} isDisabled={disabled}>

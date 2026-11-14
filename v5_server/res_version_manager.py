@@ -459,7 +459,12 @@ def get_all_version_configs() -> List[dict]:
 def get_assethash(platform: str = "pc", ver: Optional[str] = None) -> str:
     cfg = get_version_config(ver)
     plat = str(platform).lower() if platform else "pc"
-    return cfg["assethash"].get(plat, cfg["assethash"]["pc"])
+    return _version_manifest(cfg, plat)
+
+
+def _version_manifest(config, platform):
+    manifests = config['assethash']
+    return manifests.get(platform) or manifests.get('pc') or next(iter(manifests.values()))
 
 
 def get_voice_package_list(ver: Optional[str] = None) -> str:
@@ -610,10 +615,10 @@ def download_official_manifest(platform, filename, channel_id=None):
         raise ValueError('请提供官方返回的完整资源清单文件名')
     folder = os.path.join(STATIC_RESOURCES_DIR, plat)
     path = integrity.safe_path(folder, filename)
-    def result(downloaded, skipped):
+    def result(downloaded, skipped, official_verified=False):
         return dict(platform=plat, channel_id=channel, filename=filename,
                     relative_path=f'static_resources/{plat}/{filename}',
-                    downloaded=downloaded, skipped=skipped,
+                    downloaded=downloaded, skipped=skipped, official_verified=official_verified,
                     **manifest_download_status(plat, filename))
     if os.path.lexists(path):
         return result(False, True)
@@ -621,18 +626,11 @@ def download_official_manifest(platform, filename, channel_id=None):
     if current_token() is None:
         with gate.active(deadline=time.monotonic()+120):
             return download_official_manifest(platform, filename, channel_id)
-    success, info, message = probe_official_latest(platform=plat)
-    if not success:
-        raise integrity.IntegrityError(message)
-    if info.get('assethash') != filename or str(info.get('channel_id')) != channel:
-        raise ValueError('官方清单已变化或渠道不匹配，请重新检测')
-    match = ASSETHASH_PATTERN.fullmatch(filename)
-    if (match[1], match[2]) != (str(info.get('app_version')), str(info.get('version'))):
-        raise integrity.IntegrityError('官方元数据与清单身份不一致')
+    _check_official_manifest_target(plat, filename)
     # The metadata request above may race another save. Existing files remain
     # untouched, including invalid files which must not be silently overwritten.
     if os.path.lexists(path):
-        return result(False, True)
+        return result(False, True, official_verified=True)
     cached = cdn_proxy.find_cached_file(filename, platform=plat)
     if cached:
         integrity.copy_verified(cached, folder, integrity.ObjectSpec(filename))
@@ -640,10 +638,77 @@ def download_official_manifest(platform, filename, channel_id=None):
         cdn_proxy.download_verified(plat, filename, folder, deadline=time.monotonic()+90, max_attempts=3)
     if not manifest_download_status(plat, filename)['valid']:
         raise integrity.IntegrityError('清单保存后校验失败')
-    return result(True, False)
+    return result(True, False, official_verified=True)
 
 
-def calculate_manifest_diff(local_ver: Optional[str] = None, remote_ver: Optional[str] = None, platform: str = "pc", *, remote_metadata: Optional[dict] = None, allow_download=True) -> dict:
+def _check_official_manifest_target(platform, filename):
+    success, info, message = probe_official_latest(platform=platform)
+    if not success:
+        raise integrity.IntegrityError(message)
+    if info.get('assethash') != filename or str(info.get('channel_id')) != PLATFORM_CHANNEL_IDS[platform]:
+        raise ValueError('官方清单已变化或渠道不匹配，请重新检测')
+    match = ASSETHASH_PATTERN.fullmatch(filename)
+    if (match[1], match[2]) != (str(info.get('app_version')), str(info.get('version'))):
+        raise integrity.IntegrityError('官方元数据与清单身份不一致')
+
+
+def prepare_voice_manifests(platform, main_filename, languages, *, target_checked=False):
+    """Save missing companion indexes for the exact official main manifest."""
+    import cdn_proxy
+    from cdn_download_index import voice_manifest_names
+
+    platform = integrity.platform(platform)
+    if not ASSETHASH_PATTERN.fullmatch(main_filename):
+        raise ValueError('请提供官方主清单文件名')
+    folder = os.path.join(STATIC_RESOURCES_DIR, platform)
+    package, hashes = voice_manifest_names(main_filename, languages)
+    missing = []
+    for name in (package, *hashes.values()):
+        path = integrity.safe_path(folder, name)
+        if not os.path.lexists(path):
+            missing.append(name)
+        elif not integrity.valid_file(path, integrity.ObjectSpec(name)):
+            raise ValueError(f'同名语音清单校验失败：{name}')
+    if missing:
+        if not target_checked:
+            _check_official_manifest_target(platform, main_filename)
+        for name in missing:
+            cdn_proxy.download_verified(platform, name, folder, deadline=time.monotonic()+90)
+    with open(integrity.safe_path(folder, package), 'rb') as handle:
+        entries = integrity.decode_manifest(handle.read(integrity.MAX_MANIFEST_BYTES + 1), package)['infos']
+    if not set(languages).issubset(entry['name'] for entry in entries):
+        raise ValueError('语音包总表缺少所选语种')
+    return len(missing)
+
+
+def register_downloaded_distribution(platform, filename):
+    """Publish a verified manifest bundle and its supported connection build."""
+    import resource_distribution
+    from cdn_download_index import voice_manifest_names, VOICE_LANGUAGES
+
+    _, app, build, _ = filename.split('_')
+    path = integrity.safe_path(os.path.join(STATIC_RESOURCES_DIR, platform), filename)
+    with open(path, 'rb') as handle:
+        manifest = integrity.decode_manifest(handle.read(integrity.MAX_MANIFEST_BYTES + 1), filename)
+    version_name = normalize_version_name(manifest.get('versionName'))
+    voice_package, voices = voice_manifest_names(filename, VOICE_LANGUAGES)
+
+    def commit():
+        previous = VERSION_CONFIGS.get(build, {})
+        config = {**get_baseline_for_build(int(build)), **previous, 'version': build,
+                  'version_name': previous.get('version_name', version_name),
+                  'display_name': previous.get('display_name', f'Build {build} ({version_name})'),
+                  'matched_app_version': previous.get('matched_app_version', app),
+                  'assethash': {**previous.get('assethash', {}), platform: filename},
+                  'voice_package_list': previous.get('voice_package_list', voice_package),
+                  'voice_hashes': previous.get('voice_hashes', voices)}
+        if config != previous:
+            register_version(build, config)
+
+    resource_distribution.commit_official_bundles({platform: {'assethash': filename, 'manual_only': True}}, commit)
+
+
+def calculate_manifest_diff(local_ver: Optional[str] = None, remote_ver: Optional[str] = None, platform: str = "pc", *, remote_metadata: Optional[dict] = None, allow_download=True, local_assethash=None) -> dict:
     """
     比对指定本地版本与远端最新版本的 assethash 清单，
     输出详细差异报表（修改/新增/删除文件清单及总下载字节数）。
@@ -654,7 +719,7 @@ def calculate_manifest_diff(local_ver: Optional[str] = None, remote_ver: Optiona
 
     # 获取本地清单
     local_cfg = get_version_config(local_ver)
-    local_hash_fn = local_cfg["assethash"].get(plat, local_cfg["assethash"]["pc"])
+    local_hash_fn = local_assethash or _version_manifest(local_cfg, plat)
     load_options = {} if allow_download else {'allow_download': False}
     local_manifest = _load_manifest_content(plat, local_hash_fn, **load_options)
 
@@ -665,7 +730,7 @@ def calculate_manifest_diff(local_ver: Optional[str] = None, remote_ver: Optiona
         remote_hash_fn = remote_info.get("assethash")
     elif remote_ver and remote_ver in VERSION_CONFIGS:
         rem_cfg = get_version_config(remote_ver)
-        remote_hash_fn = rem_cfg["assethash"].get(plat, rem_cfg["assethash"]["pc"])
+        remote_hash_fn = _version_manifest(rem_cfg, plat)
         remote_info = {
             "version": remote_ver,
             "version_name": rem_cfg.get("version_name", remote_ver),

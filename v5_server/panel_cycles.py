@@ -214,12 +214,14 @@ def _battlepass(db, uid, now, start):
 def _mythic(db, uid, now, start):
     import mythic_normal_service as normal
     import mythic_final_service as final
-    state = normal.load(db, uid, now_ts=now)
-    difficulty = normal.difficulty(db, uid)
-    partition_ids = [difficulty, *(difficulty * 100 + index for index in range(1, 4))]
-    rows = [_row(f'partition-{part}', '常规 · 主分区' if not index else f'常规 · 子分区 {index}',
-                 int(part in state['cleared']), 1) for index, part in enumerate(partition_ids)]
-    rows.extend(_tiers('常规星级奖励', range(1, 4), len(state['stars'].get(str(difficulty), [])), state['claimed']))
+    selected = normal.selected_difficulty(db, uid)
+    rows = []
+    if selected != normal.OMEGA_DIFFICULTY:
+        state = normal.load(db, uid, now_ts=now)
+        partition_ids = [selected, *(selected * 100 + index for index in range(1, 4))]
+        rows.extend(_row(f'partition-{part}', '常规 · 主分区' if not index else f'常规 · 子分区 {index}',
+                         int(part in state['cleared']), 1) for index, part in enumerate(partition_ids))
+        rows.extend(_tiers('常规星级奖励', range(1, 4), len(state['stars'].get(str(selected), [])), state['claimed']))
     saved = _one(db, 'SELECT * FROM mythic_final_progress WHERE uid=?', (uid,))
     key = f'mythic.final_cycle_v1.{uid}'
     marker = _one(db, 'SELECT value FROM server_global_config WHERE key=?', (key,))

@@ -74,6 +74,9 @@ CAPTURE_MODES = ('off', 'relay', 'cache')
 _DNS_CACHE = {}
 _DNS_LOCK = threading.Lock()
 _SOURCE_IP = None
+_AUTO_SOURCE_IP = None
+_SOURCE_LOCK = threading.Lock()
+_ROUTE_ERRORS = {errno.EADDRNOTAVAIL, errno.ENETUNREACH, errno.EHOSTUNREACH, 10049, 10051, 10065}
 
 # 官方常用域名备用静态 IP（防止极端情况下 DoH 不可用）
 FALLBACK_IPS = {
@@ -176,40 +179,49 @@ def _validated_source_ip(value):
 
 
 def select_source_ip(advertised_ip):
-    """Keep a locally bindable host address; NAT public IPs use a real local NIC."""
-    def bindable(value):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+    """Prefer the advertised address when it has an outbound IPv4 route."""
+    def routed(value):
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as probe:
             probe.bind((value, 0))
+            # UDP connect selects a route without sending a packet.
+            probe.connect(('223.5.5.5', 53))
         return value
 
-    import gen_cert
-    for value in dict.fromkeys([advertised_ip, *gen_cert.get_all_lan_ips()]):
+    def candidates():
+        yield advertised_ip
+        import gen_cert
+        yield from (ip for ip in gen_cert.get_all_lan_ips() if ip != advertised_ip)
+
+    for value in candidates():
         try:
             value = _validated_source_ip(value)
         except ValueError:
             continue
         try:
-            return bindable(value)
+            return routed(value)
         except OSError as exc:
-            if exc.errno not in (errno.EADDRNOTAVAIL, 10049):
+            if (getattr(exc, 'winerror', None) or exc.errno) not in _ROUTE_ERRORS:
                 raise
-    raise OSError(errno.EADDRNOTAVAIL, "找不到可绑定的本机 CDN 出站 IPv4")
+    raise OSError(errno.ENETUNREACH, "找不到具有出站路由的本机 CDN IPv4")
 
 
 def set_source_ip(value):
     """使用 main 已确认的 LAN 地址，不更改系统路由或代理。"""
     value = _validated_source_ip(value)
-    global _SOURCE_IP
-    _SOURCE_IP = value
+    global _SOURCE_IP, _AUTO_SOURCE_IP
+    with _SOURCE_LOCK:
+        _SOURCE_IP = value
+        _AUTO_SOURCE_IP = None
     with _DNS_LOCK:
         _DNS_CACHE.clear()
 
 
 def _source_ip():
-    if _SOURCE_IP:
-        return _SOURCE_IP
-    import gen_cert
-    return gen_cert.get_default_lan_ip()
+    global _AUTO_SOURCE_IP
+    with _SOURCE_LOCK:
+        if _AUTO_SOURCE_IP is None:
+            _AUTO_SOURCE_IP = select_source_ip(_SOURCE_IP)
+        return _AUTO_SOURCE_IP
 
 
 def _resolve_lan_dns_ipv4(host):
@@ -296,21 +308,30 @@ def resolve_doh(host):
 
 def create_direct_socket(target_ip, port=443, timeout=30):
     """创建直接物理局域网网卡直连 Socket，绕过 Clash TUN 虚拟网卡环回拦截。"""
+    global _AUTO_SOURCE_IP
     if not _is_public_ipv4(target_ip):
         raise OSError(f"拒绝将官方请求发送到非公网地址: {target_ip}")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     from cdn_transfer_control import current_token
     token=current_token()
     detach=token.attach(sock,sock) if token else None
+    source = None
     try:
         integrity.checkpoint(token)
-        sock.bind((_source_ip(), 0))
+        source = _source_ip()
+        sock.bind((source, 0))
         sock.settimeout(timeout)
         sock.connect((target_ip, port))
         integrity.checkpoint(token)
         return sock
-    except Exception:
+    except BaseException as error:
         sock.close()
+        if isinstance(error, OSError) and (getattr(error, 'winerror', None) or error.errno) in _ROUTE_ERRORS:
+            with _SOURCE_LOCK:
+                if _AUTO_SOURCE_IP == source:
+                    _AUTO_SOURCE_IP = None
+            with _DNS_LOCK:
+                _DNS_CACHE.clear()
         raise
     finally:
         if detach: detach()
@@ -401,14 +422,11 @@ def _upstream_opener(host, path, query='', headers=None, method='GET', body=None
         raise integrity.IntegrityError('Untrusted CDN upstream authority')
     if not path.startswith('/') or path.startswith('//') or any(c in path + query for c in '\r\n\x00'):
         raise integrity.IntegrityError('Invalid upstream request target')
-    ips = None
     def open_response(attempt, timeout):
-        nonlocal ips
         from cdn_transfer_control import current_token
         token = current_token()
         integrity.checkpoint(token)
-        if ips is None:
-            ips = resolve_doh(host)
+        ips = resolve_doh(host)
         integrity.checkpoint(token)
         if not ips:
             raise OSError('No upstream address')
@@ -450,10 +468,11 @@ def _upstream_opener(host, path, query='', headers=None, method='GET', body=None
 def download_verified(platform, filename, directory=None, *, expected_size=None,
                       expected_md5=None, host='download-eo.ys4fun.com', cancel=None,
                       deadline=None, max_attempts=3, force=False, indexed=False,
-                      progress=None, passive=False):
+                      progress=None, passive=False, on_published=None):
     """The shared entry point used by runtime, Web, preparation and CLI tools."""
     integrity.platform(platform)
     spec = integrity.ObjectSpec(filename, expected_size, expected_md5)
+    from cdn_active_downloads import settings
     from cdn_transfer_control import gate, current_token
     from contextlib import nullcontext
     deadline = deadline if deadline is not None else time.monotonic() + 7200
@@ -468,7 +487,8 @@ def download_verified(platform, filename, directory=None, *, expected_size=None,
                 opener = _upstream_opener(host, f'/{platform}/resources/{filename}')
                 return integrity.ensure_file(spec, target_directory, opener, cancel=token or cancel, deadline=deadline,
                     max_attempts=max_attempts, force=force, indexed=indexed,
-                    discard_partial=bool(token and token.discard_partials), progress=progress or (token.progress if token else None))
+                    discard_partial=bool(token and token.discard_partials), progress=progress or (token.progress if token else None),
+                    bandwidth=None if passive else settings.bandwidth, on_published=on_published)
         except integrity.Cancelled:
             # A standalone active request yields to foreground traffic, then
             # retries within its original deadline. Managed groups handle yield.
@@ -649,6 +669,7 @@ def fetch_upstream(host, path, query='', headers=None, method='GET', body=None, 
     except (ValueError, OSError):
         return 502, {}, b''
     deadline = time.monotonic() + max(1, min(float(timeout), 90))
+    failures = []
     for attempt in range(3):
         conn = None
         try:
@@ -671,12 +692,13 @@ def fetch_upstream(host, path, query='', headers=None, method='GET', body=None, 
             if length is not None and (not length.isdigit() or len(data) != int(length)):
                 raise integrity.IntegrityError('Incomplete metadata response')
             return response.status, response_headers, bytes(data)
-        except (OSError, ValueError, http.client.HTTPException):
-            pass
+        except (OSError, ValueError, http.client.HTTPException) as error:
+            code = getattr(error, 'winerror', None) or getattr(error, 'errno', None)
+            failures.append(f'{type(error).__name__}({code})' if code is not None else type(error).__name__)
         finally:
             if conn is not None:
                 conn.close()
-    log('[CDN_PROXY] 上游元数据请求失败（已结束有限重试）')
+    log(f'[CDN_PROXY] 上游元数据请求失败（{host}；{", ".join(failures)}）')
     return 502, {}, b''
 
 
