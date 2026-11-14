@@ -22,7 +22,7 @@ import logging
 from codec import encode, decode
 from middleware import DownFrame
 from event_bus import bus, Events
-from inventory_service import InventoryService, ItemType
+from inventory_service import FLOWER_CURRENCY_IDS, InventoryService, ItemType, flower_cost_breakdown
 from core import OperationError
 from lazy_timer import get_daily_5am_ts, get_weekly_mon_5am_ts, get_monthly_5am_ts, get_next_monthly_5am_ts
 from periodic_gift_service import PeriodicGiftService
@@ -589,42 +589,15 @@ class ShopService:
         if total <= 0:
             return {}
 
-        # 如果商品显式指定扣除移转之花 (ID 30, 31, 32)，精准扣减移转之花 (优先免费花32，再付费花31)
-        if cid in (30, 31, 32):
-            out = {}
-            rem = total
-            have32 = self._get_balance(ctx, uid, 32)
-            have31 = self._get_balance(ctx, uid, 31)
-            if have32 + have31 < rem:
-                raise OperationError(12, f"移转之花不足 (拥有 {have32 + have31}, 需要 {total})")
-            pay32 = min(have32, rem)
-            if pay32 > 0:
-                out[32] = pay32
-                rem -= pay32
-            if rem > 0:
-                out[31] = rem
-            return out
+        if cid in FLOWER_CURRENCY_IDS:
+            return flower_cost_breakdown(ctx, uid, total)
 
         # 如果扣费目标为移转之辉 (ID 1) 或 cost_type == 2 且未指定其他货币：优先扣移转之辉，不足以移转之花补齐
         if int(cost_type or 0) == 2 or cid == 1:
-            have1 = self._get_balance(ctx, uid, 1)
-            out = {}
-            if have1 >= total:
-                out[1] = total
-            else:
-                if have1 > 0:
-                    out[1] = have1
-                rem = total - max(0, have1)
-                have32 = self._get_balance(ctx, uid, 32)
-                have31 = self._get_balance(ctx, uid, 31)
-                if have32 + have31 < rem:
-                    raise OperationError(12, f"移转之辉与移转之花不足 (缺 {rem - have32 - have31})")
-                pay32 = min(have32, rem)
-                if pay32 > 0:
-                    out[32] = pay32
-                    rem -= pay32
-                if rem > 0:
-                    out[31] = rem
+            pay_diamond = min(total, max(0, self._get_balance(ctx, uid, 1)))
+            out = {1: pay_diamond} if pay_diamond else {}
+            if pay_diamond < total:
+                out.update(flower_cost_breakdown(ctx, uid, total - pay_diamond))
             return out
 
         have = self._get_balance(ctx, uid, cid)
@@ -750,16 +723,19 @@ class ShopService:
 
             # 3. 计算价格与扣款
             client_cost_items = [] if g.get('_skin_draw_ticket') else (b.get("cost_items") or [])
+
+            def charge(breakdown):
+                for cid, amount in breakdown.items():
+                    if not InventoryService.cost_item(ctx, uid, cid, amount):
+                        raise OperationError(12, f"货币/材料 {cid} 不足（需要 {amount}）")
+                    cost_items.append({"item_id": cid, "item_num": amount})
+
             if client_cost_items:
                 for c in client_cost_items:
                     cid = int(c.get("id") or 0)
                     cnum = int(c.get("num") or 0)
                     if cid and cnum > 0:
-                        bal = self._get_balance(ctx, uid, cid)
-                        if bal < cnum:
-                            raise OperationError(12, f"货币/材料 {cid} 不足 (拥有 {bal}, 需要 {cnum})")
-                        InventoryService.cost_item(ctx, uid, cid, cnum)
-                        cost_items.append({"item_id": cid, "item_num": cnum})
+                        charge(flower_cost_breakdown(ctx, uid, cnum) if cid in FLOWER_CURRENCY_IDS else {cid: cnum})
             else:
                 use_cheap = (
                     (btype == 1 and g.get("cheap_cost")) or
@@ -774,10 +750,7 @@ class ShopService:
                     unit = g.get("cost")
 
                 total_cost = int(unit or 0) * buy_num
-                srv_cost = self._cost_breakdown(ctx, uid, cost_id, total_cost, g.get("cost_type"))
-                for cid, cnum in srv_cost.items():
-                    InventoryService.cost_item(ctx, uid, cid, cnum)
-                    cost_items.append({"item_id": cid, "item_num": cnum})
+                charge(self._cost_breakdown(ctx, uid, cost_id, total_cost, g.get("cost_type")))
 
             # 4. 获得道具解析并入库发奖
             give_unit = int(dj.get("give") or g.get("give_num") or 1)

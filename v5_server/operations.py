@@ -1744,81 +1744,6 @@ class ServantDecomposeOp(Operation):
 
 # ---------------- 20012 商店购买 ----------------
 
-# [Old logic commented out by Gemini 3.7-flash]
-# def _deduct_flower(ctx, uid, num):
-#     """扣除移转之花：优先扣除 31 (非iOS充值) 与 32 (免费)，并同步更新 5 (总和)。"""
-#     _, have31 = _item_balance(ctx, uid, 31)
-#     _, have32 = _item_balance(ctx, uid, 32)
-#     left = num
-#     out = {}
-#     if have31 > 0:
-#         pay31 = min(have31, left)
-#         out[31] = pay31
-#         left -= pay31
-#     if left > 0 and have32 > 0:
-#         pay32 = min(have32, left)
-#         out[32] = pay32
-#         left -= pay32
-#     if left > 0:
-#         out[5] = left
-#     return out
-# 
-# def _cost_breakdown(ctx, uid, cost_id, total, cost_type=None):
-#     cid = int(cost_id or 0)
-#     if int(cost_type or 0) == 2 or cid == 5:
-#         return _deduct_flower(ctx, uid, int(total))
-#     return {cid: int(total)}
-
-def _cost_breakdown(ctx, uid, cost_id, total, cost_type=None):
-    """[Fix by Gemini 3.7-flash] 精确按客户端标准分流扣费：
-    1. cost_type == 2: 移转之辉 (1) 档。优先扣除免费移转之辉 (1)；若不足，差额由移转之花 (32 免费 / 31 充值) 补足。
-    2. cid in (30, 31, 32): 移转之花专属档。优先扣 32，次扣 31。
-    3. 其他常规货币/材料 (金币 2、抽卡券 5、材料等): 严格扣除对应 cost_id，禁止误扣抽卡券。
-    """
-    cid = int(cost_id or 0)
-    total = int(total or 0)
-    if total <= 0:
-        return {}
-
-    if int(cost_type or 0) == 2:
-        _, have1 = _item_balance(ctx, uid, 1)
-        out = {}
-        if have1 >= total:
-            out[1] = total
-        else:
-            if have1 > 0:
-                out[1] = have1
-            rem = total - max(0, have1)
-            _, have32 = _item_balance(ctx, uid, 32)
-            _, have31 = _item_balance(ctx, uid, 31)
-            if have32 + have31 < rem:
-                raise OperationError(12, f"移转之辉与移转之花不足 (缺 {rem - have32 - have31})")
-            pay32 = min(have32, rem)
-            if pay32 > 0:
-                out[32] = pay32
-                rem -= pay32
-            if rem > 0:
-                out[31] = rem
-        return out
-
-    if cid in (30, 31, 32):
-        out = {}
-        rem = total
-        _, have32 = _item_balance(ctx, uid, 32)
-        _, have31 = _item_balance(ctx, uid, 31)
-        if have32 + have31 < rem:
-            raise OperationError(12, f"移转之花不足 (缺 {rem - have32 - have31})")
-        pay32 = min(have32, rem)
-        if pay32 > 0:
-            out[32] = pay32
-            rem -= pay32
-        if rem > 0:
-            out[31] = rem
-        return out
-
-    return {cid: total}
-
-
 _RECHARGE_PACKS = None
 
 def _get_recharge_packs():
@@ -2115,25 +2040,23 @@ class UseItemOp(Operation):
 
 @operation
 class CurrencyBuyDiamondOp(Operation):
-    """[Fix by Gemini 3.7-flash] 移转之花兑换移转之辉：cs_15020 {num} → sc_15021 {result, reward_list} + sc_15009。"""
+    """移转之花兑换移转之辉，先刷新两种余额再确认兑换。"""
 
     cmd = 15020
     sc = 15021
+    prepare_response_in_transaction = True
 
     def validate(self, data, ctx):
         num = int(data.get("num") or 0)
         if num <= 0:
             raise OperationError(2, "兑换数量必须大于0")
-        _, cur31 = _item_balance(ctx, self.uid, 31)
-        _, cur32 = _item_balance(ctx, self.uid, 32)
-        have_flower = cur31 + cur32
-        if have_flower < num:
-            raise OperationError(402, f"移转之花不足（拥有 {have_flower}，需要 {num}）")
         return data
 
     def apply(self, data, ctx):
+        from inventory_service import flower_cost_breakdown
+
         num = int(data.get("num") or 0)
-        flow_cost = _cost_breakdown(ctx, self.uid, 32, num)
+        flow_cost = flower_cost_breakdown(ctx, self.uid, num)
         for cid, cnt in flow_cost.items():
             _item_deduct(ctx, self.uid, cid, cnt)
         _item_add(ctx, self.uid, 1, num)
@@ -2143,9 +2066,11 @@ class CurrencyBuyDiamondOp(Operation):
         payload = ctx.codec_encode("sc_15021", {
             "result": 0,
             "reward_list": [{"id": 1, "num": result["num"]}]
-        }) or b"\x08\x00"
+        })
+        if not payload:
+            raise ValueError('移转之花兑换响应为空')
         ctx.log(f"cs_15020 -> 移转之花兑换移转之辉成功: {result['num']} 朵")
-        return _refresh_frames(ctx, self.uid) + [DownFrame(self.sc, payload)]
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
 
 
 @operation
