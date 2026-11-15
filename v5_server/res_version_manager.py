@@ -249,6 +249,7 @@ def _find_default_client_streaming_assets_dir() -> str:
             client_install = cfg.get("client", {}).get("game_install_dir", "").strip()
             if client_install:
                 sub_candidates = [
+                    os.path.join(client_install, "AetherGazer_Bili_Data", "StreamingAssets", "Windows"),
                     os.path.join(client_install, "AetherGazer_Data", "StreamingAssets", "Windows"),
                     os.path.join(client_install, "StreamingAssets", "Windows"),
                     os.path.join(client_install, "StreamingAssets"),
@@ -261,6 +262,7 @@ def _find_default_client_streaming_assets_dir() -> str:
         pass
 
     candidates = [
+        r"C:\Program Files\AetherGazerStarter_Bili\AetherGazer_Bili\AetherGazer_Bili_Data\StreamingAssets\Windows",
         r"D:\AtherGazer\AetherGazerLauncher\AetherGazer\AetherGazer_Data\StreamingAssets\Windows",
         r"C:\Program Files\AetherGazer\AetherGazerLauncher\AetherGazer\AetherGazer_Data\StreamingAssets\Windows",
         r"D:\AetherGazer\AetherGazerLauncher\AetherGazer\AetherGazer_Data\StreamingAssets\Windows",
@@ -299,7 +301,8 @@ def detect_client_resource_version(custom_dir: Optional[str] = None) -> dict:
     target = (custom_dir or os.environ.get(ENV_CLIENT_STREAMING_ASSETS_DIR) or DEFAULT_CLIENT_STREAMING_ASSETS_DIR or '').strip()
     info = dict(detected=False, version=None, matched_file=None, file_mtime=0,
                 file_mtime_str='', client_dir=target, detail='客户端目录未配置或不存在')
-    folders = [target, os.path.join(target, 'AetherGazer_Data', 'StreamingAssets', 'Windows'),
+    folders = [target, os.path.join(target, 'AetherGazer_Bili_Data', 'StreamingAssets', 'Windows'),
+               os.path.join(target, 'AetherGazer_Data', 'StreamingAssets', 'Windows'),
                os.path.join(target, 'StreamingAssets', 'Windows'), os.path.join(target, 'StreamingAssets')]
     for folder in folders:
         if not folder or not os.path.isdir(folder):
@@ -318,7 +321,7 @@ def detect_client_resource_version(custom_dir: Optional[str] = None) -> dict:
                 integrity.manifest_items(data)
                 name = normalize_version_name(data.get('versionName'))
                 stamp = os.path.getmtime(path)
-                info.update(detected=True, version=str(data['buildCode']), app_version=str(data['appVersion']),
+                info.update(detected=True, client_dir=folder, version=str(data['buildCode']), app_version=str(data['appVersion']),
                     version_name=name, matched_file=os.path.basename(path), sha256=hashlib.sha256(raw).hexdigest(),
                     md5=hashlib.md5(raw).hexdigest(), file_mtime=stamp,
                     file_mtime_str=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stamp)),

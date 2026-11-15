@@ -3,6 +3,7 @@ from contextlib import ExitStack
 import hashlib
 import json
 import os
+import subprocess
 from pathlib import Path
 import sys
 import unittest
@@ -16,6 +17,8 @@ import resource_storage as module
 import cdn_proxy as cdn
 import cdn_transfer_control as transfers
 import cdn_integrity as integrity
+import resource_distribution
+import res_version_manager as versions
 from flask import Flask
 import gm_api
 
@@ -110,6 +113,57 @@ class StorageChecks(unittest.TestCase):
         self.assertEqual(cdn.find_cached_file(name,'pc'), str(source))
         self.assertIsNone(cdn.find_cached_file(name,'ios'))
         self.assertEqual(cdn.get_data_dir('pc'), str(self.root/'new/pc'))
+
+    def test_15_installed_pc_shards_are_verified_readonly_sources(self):
+        client = self.root/'client'
+        windows = client/'AetherGazer_Bili_Data/StreamingAssets/Windows'
+        body = b'installed PC resource'; name = hashlib.md5(body).hexdigest()+'.ys'
+        source = windows/name[0]/name[1]/name
+        source.parent.mkdir(parents=True); source.write_bytes(body)
+        raw = json.dumps(dict(appVersion=307,buildCode=332,versionName='v5.3.6',
+            assetHashList=['asset|'+name[:-3]+'|'+str(len(body))])).encode()
+        (windows/'AssetHash_Info.bytes').write_bytes(raw)
+        self.stack.enter_context(patch.object(versions,'_DETECTED_CLIENT_INFO',{}))
+        info = versions.detect_client_resource_version(str(client))
+        self.assertTrue(info['detected'])
+        self.assertEqual(Path(info['client_dir']),windows)
+        config = dict(version='332',assethash={'pc':'assethash_307_332_'+hashlib.md5(raw).hexdigest()+'.bytes'})
+        self.stack.enter_context(patch.object(resource_distribution,'get_platform_config',return_value=config))
+        self.assertEqual(cdn.find_cached_file(name,'pc'),str(source))
+        preferred=self.root/'preferred'/name; preferred.parent.mkdir(); preferred.write_bytes(body)
+        with patch.object(cdn,'cache_roots',return_value=[str(preferred.parent)]):
+            self.assertEqual(cdn.find_cached_file(name,'pc'),str(preferred))
+        voice=b'installed Chinese voice'; voice_name=hashlib.md5(voice).hexdigest()+'.ys'
+        voice_path=windows.parent/'Voice/zh'/voice_name[0]/voice_name[1]/voice_name
+        voice_path.parent.mkdir(parents=True); voice_path.write_bytes(voice)
+        self.assertEqual(cdn.find_cached_file(voice_name,'pc'),str(voice_path))
+        self.assertIsNone(cdn.find_cached_file(name,'ios'))
+        config['version']='321'
+        self.assertIsNone(cdn.find_cached_file(name,'pc'))
+        config['version']='332'; config['assethash']['pc']='assethash_307_332_'+'0'*32+'.bytes'
+        self.assertIsNone(cdn.find_cached_file(name,'pc'))
+        config['assethash']['pc']='assethash_307_332_'+hashlib.md5(raw).hexdigest()+'.bytes'
+        source.write_bytes(b'corrupted resource')
+        self.assertIsNone(cdn.find_cached_file(name,'pc'))
+        self.assertEqual(source.read_bytes(),b'corrupted resource')
+        self.assertEqual(sorted(p.name for p in windows.iterdir()),['AssetHash_Info.bytes',name[0]])
+
+    def test_16_installed_shard_symlink_cannot_escape_streaming_assets(self):
+        windows = self.root/'client/Windows'; windows.mkdir(parents=True)
+        outside = self.root/'outside'; outside.mkdir()
+        body=b'outside resource'; name=hashlib.md5(body).hexdigest()+'.ys'
+        target=outside/name[1]; target.mkdir(); (target/name).write_bytes(body)
+        if os.name == 'nt':
+            subprocess.run(['cmd','/c','mklink','/J',str(windows/name[0]),str(outside)],
+                           check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        else:
+            os.symlink(outside,windows/name[0],target_is_directory=True)
+        info=dict(detected=True,version='332',md5='1'*32,client_dir=str(windows))
+        config=dict(version='332',assethash={'pc':'assethash_307_332_'+'1'*32+'.bytes'})
+        with patch.object(versions,'get_detected_client_info',return_value=info), \
+                patch.object(resource_distribution,'get_platform_config',return_value=config):
+            self.assertIsNone(cdn.find_cached_file(name,'pc'))
+        self.assertEqual((target/name).read_bytes(),body)
 
     def test_08_browser_is_server_directory_only(self):
         (self.root/'文件夹').mkdir(); (self.root/'a.txt').write_bytes(b'a'); (self.root/'.hidden').mkdir()

@@ -355,6 +355,27 @@ def find_cached_file(filename: str, platform: str = "pc"):
         candidate = integrity.safe_path(root, filename)
         if integrity.valid_file(candidate, spec):
             return candidate
+    if platform == 'pc' and re.fullmatch(r'[0-9a-fA-F]{32}\.ys', filename):
+        import res_version_manager
+        import resource_distribution
+        detected = res_version_manager.get_detected_client_info()
+        if detected.get('detected'):
+            selected = resource_distribution.get_platform_config('pc')
+            if (selected['version'] == detected['version'] and
+                    selected['assethash']['pc'].endswith('_' + detected['md5'] + '.bytes')):
+                windows = os.path.realpath(detected['client_dir'])
+                streaming = os.path.dirname(windows)
+                for root in (windows, os.path.join(streaming, 'Voice', 'ja'),
+                             os.path.join(streaming, 'Voice', 'zh')):
+                    root = os.path.realpath(root)
+                    if os.path.commonpath((streaming, root)) != streaming:
+                        continue
+                    shard = os.path.join(root, filename[0], filename[1])
+                    if os.path.commonpath((root, os.path.realpath(shard))) != root:
+                        continue
+                    candidate = integrity.safe_path(shard, filename)
+                    if integrity.valid_file(candidate, spec):
+                        return candidate
     return None
 
 
