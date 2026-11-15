@@ -20,6 +20,9 @@ import json
 import plistlib
 import shutil
 import time
+import tempfile
+
+from cdn_integrity import object_lock
 
 try:
     from cryptography import x509
@@ -48,8 +51,18 @@ def _write_with_backup(path, data):
             if source.read() == data:
                 return
         shutil.copy2(path, f"{path}.before_cert_{time.time_ns()}")
-    with open(path, "wb") as target:
-        target.write(data)
+    descriptor, temporary = tempfile.mkstemp(
+        prefix=os.path.basename(path) + '.', suffix='.tmp',
+        dir=os.path.dirname(os.path.abspath(path)))
+    try:
+        with os.fdopen(descriptor, 'wb') as target:
+            target.write(data)
+            target.flush()
+            os.fsync(target.fileno())
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.remove(temporary)
 
 
 def _public_key_bytes(key):
@@ -273,185 +286,186 @@ def generate_dual_layer_certs(output_dir=None, extra_ips=None, log=print, force=
     out_dir = output_dir or os.path.dirname(os.path.abspath(__file__))
     os.makedirs(out_dir, exist_ok=True)
 
-    ca_key_path = os.path.join(out_dir, "sdk_ca.key")
-    ca_crt_path = os.path.join(out_dir, "sdk_ca.crt")
-    server_key_path = os.path.join(out_dir, "sdk_key.pem")
-    server_crt_path = os.path.join(out_dir, "sdk_cert.pem")
-    mobileconfig_path = os.path.join(out_dir, "AetherGazer.mobileconfig")
-    cer_path = os.path.join(out_dir, "sdk_cert.cer")
-    crt_path = os.path.join(out_dir, "sdk_cert.crt")
+    with object_lock(os.path.join(out_dir, ".certgen")):
+        ca_key_path = os.path.join(out_dir, "sdk_ca.key")
+        ca_crt_path = os.path.join(out_dir, "sdk_ca.crt")
+        server_key_path = os.path.join(out_dir, "sdk_key.pem")
+        server_crt_path = os.path.join(out_dir, "sdk_cert.pem")
+        mobileconfig_path = os.path.join(out_dir, "AetherGazer.mobileconfig")
+        cer_path = os.path.join(out_dir, "sdk_cert.cer")
+        crt_path = os.path.join(out_dir, "sdk_cert.crt")
 
-    now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now(datetime.timezone.utc)
 
-    status = inspect_certificate_files(out_dir, extra_ips)
-    all_ips = _required_ips(extra_ips)
-    # 网络接口暂时消失时保留原地址，避免来回切换网络重复签发。
-    try:
-        with open(server_crt_path, "rb") as source:
-            old_leaf = x509.load_pem_x509_certificate(source.read())
-        all_ips.update(str(value) for value in old_leaf.extensions.get_extension_for_class(
-            x509.SubjectAlternativeName).value.get_values_for_type(x509.IPAddress))
-    except Exception:
-        pass
+        status = inspect_certificate_files(out_dir, extra_ips)
+        all_ips = _required_ips(extra_ips)
+        # 网络接口暂时消失时保留原地址，避免来回切换网络重复签发。
+        try:
+            with open(server_crt_path, "rb") as source:
+                old_leaf = x509.load_pem_x509_certificate(source.read())
+            all_ips.update(str(value) for value in old_leaf.extensions.get_extension_for_class(
+                x509.SubjectAlternativeName).value.get_values_for_type(x509.IPAddress))
+        except Exception:
+            pass
 
-    # 2. 检查并持久化复用 Root CA（关键保护：即使 force，只要非 force_ca，一律严格复用既有 Root CA）
-    ca_key = None
-    ca_cert = None
-    is_new_ca = False
-    if not force_ca:
-        if status["root_usable"]:
-            with open(ca_key_path, "rb") as source:
-                ca_key = serialization.load_pem_private_key(source.read(), password=None)
-            with open(ca_crt_path, "rb") as source:
-                ca_cert = x509.load_pem_x509_certificate(source.read())
-            if not force and not status["needs_leaf_renewal"]:
-                if status["needs_distribution_sync"]:
-                    _sync_root_distribution(out_dir, ca_cert)
-                    log("[CERT] 已同步 Windows 安装证书及两份 iOS 描述文件；根指纹不变。")
-                else:
-                    log("[CERT] [EXISTING] 根证书、服务证书和 iOS 描述文件检查通过，保持既有证书。")
-                return True
-            log("[CERT] [REUSE] 复用现有根证书，仅更新服务证书。")
-        elif any(os.path.exists(os.path.join(out_dir, filename)) for filename in (
-                "sdk_ca.key", "sdk_ca.crt", "sdk_cert.pem", "sdk_key.pem",
-                "AetherGazer.mobileconfig", "sdk_ca.mobileconfig", "sdk_cert.crt", "sdk_cert.cer")):
-            log("[CERT] [ERROR] " + "; ".join(status["issues"]))
-            log("[CERT] 请在启动壳点击重新部署；普通启动不会自动替换现有根证书。")
-            return False
+        # 2. 检查并持久化复用 Root CA（关键保护：即使 force，只要非 force_ca，一律严格复用既有 Root CA）
+        ca_key = None
+        ca_cert = None
+        is_new_ca = False
+        if not force_ca:
+            if status["root_usable"]:
+                with open(ca_key_path, "rb") as source:
+                    ca_key = serialization.load_pem_private_key(source.read(), password=None)
+                with open(ca_crt_path, "rb") as source:
+                    ca_cert = x509.load_pem_x509_certificate(source.read())
+                if not force and not status["needs_leaf_renewal"]:
+                    if status["needs_distribution_sync"]:
+                        _sync_root_distribution(out_dir, ca_cert)
+                        log("[CERT] 已同步 Windows 安装证书及两份 iOS 描述文件；根指纹不变。")
+                    else:
+                        log("[CERT] [EXISTING] 根证书、服务证书和 iOS 描述文件检查通过，保持既有证书。")
+                    return True
+                log("[CERT] [REUSE] 复用现有根证书，仅更新服务证书。")
+            elif any(os.path.exists(os.path.join(out_dir, filename)) for filename in (
+                    "sdk_ca.key", "sdk_ca.crt", "sdk_cert.pem", "sdk_key.pem",
+                    "AetherGazer.mobileconfig", "sdk_ca.mobileconfig", "sdk_cert.crt", "sdk_cert.cer")):
+                log("[CERT] [ERROR] " + "; ".join(status["issues"]))
+                log("[CERT] 请在启动壳点击重新部署；普通启动不会自动替换现有根证书。")
+                return False
 
-    if ca_key is None or ca_cert is None:
-        is_new_ca = True
-        log(f"[CERT] 正在生成全新的持久化 Root CA 根证书 (有效期 10 年)...")
-        ca_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        ca_name = x509.Name([
+        if ca_key is None or ca_cert is None:
+            is_new_ca = True
+            log(f"[CERT] 正在生成全新的持久化 Root CA 根证书 (有效期 10 年)...")
+            ca_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+            ca_name = x509.Name([
+                x509.NameAttribute(NameOID.COUNTRY_NAME, "CN"),
+                x509.NameAttribute(NameOID.ORGANIZATION_NAME, "YongShi AetherGazer V5 Private CA"),
+                x509.NameAttribute(NameOID.COMMON_NAME, "AetherGazer V5 Root CA (open.ys4fun.com)"),
+            ])
+
+            ca_cert = (
+                x509.CertificateBuilder()
+                .subject_name(ca_name)
+                .issuer_name(ca_name)
+                .public_key(ca_key.public_key())
+                .serial_number(x509.random_serial_number())
+                .not_valid_before(now - datetime.timedelta(days=1))
+                .not_valid_after(now + datetime.timedelta(days=3650))
+                .add_extension(
+                    x509.BasicConstraints(ca=True, path_length=None),
+                    critical=True,
+                )
+                .add_extension(
+                    x509.KeyUsage(
+                        digital_signature=True,
+                        content_commitment=False,
+                        key_encipherment=False,
+                        data_encipherment=False,
+                        key_agreement=False,
+                        key_cert_sign=True,
+                        crl_sign=True,
+                        encipher_only=False,
+                        decipher_only=False,
+                    ),
+                    critical=True,
+                )
+                .add_extension(
+                    x509.SubjectKeyIdentifier.from_public_key(ca_key.public_key()),
+                    critical=False,
+                )
+                .sign(ca_key, hashes.SHA256())
+            )
+
+        # 2. 生成 Server Leaf 证书 (由上述固定的 Root CA 签发，有效 365 天 <= 398 天)
+        log(f"[CERT] 正在生成 Server Leaf 服务端证书 (有效期 365 天, 符合 Apple ATS 规范)...")
+        server_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        server_name = x509.Name([
             x509.NameAttribute(NameOID.COUNTRY_NAME, "CN"),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "YongShi AetherGazer V5 Private CA"),
-            x509.NameAttribute(NameOID.COMMON_NAME, "AetherGazer V5 Root CA (open.ys4fun.com)"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "YongShi AetherGazer V5 Server"),
+            x509.NameAttribute(NameOID.COMMON_NAME, "open.ys4fun.com"),
         ])
 
-        ca_cert = (
+        # 构造完整 SAN 列表（全量包含 PC 端与移动端全部业务域名及泛域名）
+        san_names = [x509.DNSName(name) for name in CERT_DNS_NAMES]
+
+        for ip_str in sorted(all_ips):
+            try:
+                san_names.append(x509.IPAddress(ipaddress.ip_address(ip_str)))
+            except ValueError:
+                pass
+
+        server_cert = (
             x509.CertificateBuilder()
-            .subject_name(ca_name)
-            .issuer_name(ca_name)
-            .public_key(ca_key.public_key())
+            .subject_name(server_name)
+            .issuer_name(ca_cert.subject)
+            .public_key(server_key.public_key())
             .serial_number(x509.random_serial_number())
             .not_valid_before(now - datetime.timedelta(days=1))
-            .not_valid_after(now + datetime.timedelta(days=3650))
+                .not_valid_after(min(now + datetime.timedelta(days=365), ca_cert.not_valid_after_utc))
             .add_extension(
-                x509.BasicConstraints(ca=True, path_length=None),
+                x509.BasicConstraints(ca=False, path_length=None),
                 critical=True,
             )
             .add_extension(
                 x509.KeyUsage(
                     digital_signature=True,
                     content_commitment=False,
-                    key_encipherment=False,
+                    key_encipherment=True,
                     data_encipherment=False,
                     key_agreement=False,
-                    key_cert_sign=True,
-                    crl_sign=True,
+                    key_cert_sign=False,
+                    crl_sign=False,
                     encipher_only=False,
                     decipher_only=False,
                 ),
                 critical=True,
             )
             .add_extension(
-                x509.SubjectKeyIdentifier.from_public_key(ca_key.public_key()),
+                x509.ExtendedKeyUsage([
+                    ExtendedKeyUsageOID.SERVER_AUTH,
+                    ExtendedKeyUsageOID.CLIENT_AUTH,
+                ]),
+                critical=False,
+            )
+            .add_extension(
+                x509.SubjectAlternativeName(san_names),
+                critical=False,
+            )
+            .add_extension(
+                x509.AuthorityKeyIdentifier.from_issuer_public_key(ca_key.public_key()),
                 critical=False,
             )
             .sign(ca_key, hashes.SHA256())
         )
 
-    # 2. 生成 Server Leaf 证书 (由上述固定的 Root CA 签发，有效 365 天 <= 398 天)
-    log(f"[CERT] 正在生成 Server Leaf 服务端证书 (有效期 365 天, 符合 Apple ATS 规范)...")
-    server_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    server_name = x509.Name([
-        x509.NameAttribute(NameOID.COUNTRY_NAME, "CN"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "YongShi AetherGazer V5 Server"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "open.ys4fun.com"),
-    ])
+        # 3. 写入文件（若复用已有 Root CA，绝不重复覆写原版根证书私钥与证书）
+        if is_new_ca:
+            _write_with_backup(ca_key_path, ca_key.private_bytes(
+                    serialization.Encoding.PEM,
+                    serialization.PrivateFormat.TraditionalOpenSSL,
+                    serialization.NoEncryption(),
+                ))
+            _write_with_backup(ca_crt_path, ca_cert.public_bytes(serialization.Encoding.PEM))
 
-    # 构造完整 SAN 列表（全量包含 PC 端与移动端全部业务域名及泛域名）
-    san_names = [x509.DNSName(name) for name in CERT_DNS_NAMES]
-
-    for ip_str in sorted(all_ips):
-        try:
-            san_names.append(x509.IPAddress(ipaddress.ip_address(ip_str)))
-        except ValueError:
-            pass
-
-    server_cert = (
-        x509.CertificateBuilder()
-        .subject_name(server_name)
-        .issuer_name(ca_cert.subject)
-        .public_key(server_key.public_key())
-        .serial_number(x509.random_serial_number())
-        .not_valid_before(now - datetime.timedelta(days=1))
-            .not_valid_after(min(now + datetime.timedelta(days=365), ca_cert.not_valid_after_utc))
-        .add_extension(
-            x509.BasicConstraints(ca=False, path_length=None),
-            critical=True,
-        )
-        .add_extension(
-            x509.KeyUsage(
-                digital_signature=True,
-                content_commitment=False,
-                key_encipherment=True,
-                data_encipherment=False,
-                key_agreement=False,
-                key_cert_sign=False,
-                crl_sign=False,
-                encipher_only=False,
-                decipher_only=False,
-            ),
-            critical=True,
-        )
-        .add_extension(
-            x509.ExtendedKeyUsage([
-                ExtendedKeyUsageOID.SERVER_AUTH,
-                ExtendedKeyUsageOID.CLIENT_AUTH,
-            ]),
-            critical=False,
-        )
-        .add_extension(
-            x509.SubjectAlternativeName(san_names),
-            critical=False,
-        )
-        .add_extension(
-            x509.AuthorityKeyIdentifier.from_issuer_public_key(ca_key.public_key()),
-            critical=False,
-        )
-        .sign(ca_key, hashes.SHA256())
-    )
-
-    # 3. 写入文件（若复用已有 Root CA，绝不重复覆写原版根证书私钥与证书）
-    if is_new_ca:
-        _write_with_backup(ca_key_path, ca_key.private_bytes(
+        _write_with_backup(server_key_path, server_key.private_bytes(
                 serialization.Encoding.PEM,
                 serialization.PrivateFormat.TraditionalOpenSSL,
                 serialization.NoEncryption(),
             ))
-        _write_with_backup(ca_crt_path, ca_cert.public_bytes(serialization.Encoding.PEM))
 
-    _write_with_backup(server_key_path, server_key.private_bytes(
-            serialization.Encoding.PEM,
-            serialization.PrivateFormat.TraditionalOpenSSL,
-            serialization.NoEncryption(),
-        ))
+        # 服务端证书链（Server Cert + Root CA）
+        _write_with_backup(server_crt_path, server_cert.public_bytes(serialization.Encoding.PEM)
+                           + ca_cert.public_bytes(serialization.Encoding.PEM))
 
-    # 服务端证书链（Server Cert + Root CA）
-    _write_with_backup(server_crt_path, server_cert.public_bytes(serialization.Encoding.PEM)
-                       + ca_cert.public_bytes(serialization.Encoding.PEM))
+        # 同时输出 .crt 后缀和 .cer 副本便于 Windows 与移动端直接双击安装
+        _sync_root_distribution(out_dir, ca_cert)
 
-    # 同时输出 .crt 后缀和 .cer 副本便于 Windows 与移动端直接双击安装
-    _sync_root_distribution(out_dir, ca_cert)
-
-    log(f"[CERT] 证书体系构建成功！")
-    log(f"  - Root CA (供手机/系统安装): {ca_crt_path} {'[全新创建]' if is_new_ca else '[已安全复用既有指纹]'}")
-    log(f"  - Windows 证书 (供直接导入): {cer_path}")
-    log(f"  - iPhone 描述文件: {mobileconfig_path}")
-    log(f"  - Server Cert (供 HTTPS 服务加载): {server_crt_path} (有效期 365 天, SANs: {[s.value if hasattr(s, 'value') else str(s) for s in san_names]})")
-    return True
+        log(f"[CERT] 证书体系构建成功！")
+        log(f"  - Root CA (供手机/系统安装): {ca_crt_path} {'[全新创建]' if is_new_ca else '[已安全复用既有指纹]'}")
+        log(f"  - Windows 证书 (供直接导入): {cer_path}")
+        log(f"  - iPhone 描述文件: {mobileconfig_path}")
+        log(f"  - Server Cert (供 HTTPS 服务加载): {server_crt_path} (有效期 365 天, SANs: {[s.value if hasattr(s, 'value') else str(s) for s in san_names]})")
+        return True
 
 
 if __name__ == "__main__":
