@@ -884,14 +884,14 @@ export async function addInventoryItem(itemId: number, num: number, uid: number 
   })
 }
 
-export async function addEquipSuit(suitId: number, count: number = 1, uid: number = getActiveUid()): Promise<ApiResponse<any>> {
+export async function addEquipSuit(suitId: number, star: number = 5, uid: number = getActiveUid()): Promise<ApiResponse<{ slots_generated: number[] }>> {
   return apiRequest('/api/gm/inventory/add_suit', {
     method: 'POST',
-    body: JSON.stringify({ uid, suit_id: suitId, count }),
+    body: JSON.stringify({ uid, suit_id: suitId, star }),
   })
 }
 
-export async function clearInventory(category?: string, uid: number = getActiveUid()): Promise<ApiResponse<any>> {
+export async function clearInventory(category: 'material', uid: number = getActiveUid()): Promise<ApiResponse<{ deleted: { material: number } }>> {
   return apiRequest('/api/gm/inventory/clear', {
     method: 'POST',
     body: JSON.stringify({ uid, category }),

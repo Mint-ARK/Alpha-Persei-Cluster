@@ -40,6 +40,13 @@ _DIR = os.path.dirname(os.path.abspath(__file__))
 _EQUIP_MAP_CACHE = None
 _USER_LEVEL_SETTINGS_CACHE = None
 
+# Audited consumers: docs/plans/2026-11-13-material-clear-contract.md.
+_CLEARABLE_MATERIAL_IDS = frozenset({
+    40101, 40102, 40103, 40104, 40201, 40202, 40203, 40301,
+    40501, 40502, 40503, 40701, 40801, 40802, 40803,
+    41002, 41201, 41301, 41302, 41303, 41401,
+})
+
 
 def _get_user_level_cfg():
     global _USER_LEVEL_SETTINGS_CACHE
@@ -890,6 +897,46 @@ class InventoryService:
                 (uid, hero_id, new_cnt),
             )
             return False, True, hero_id, piece_add
+
+    @classmethod
+    def grant_equip_suit(cls, ctx, uid, suit_id, star):
+        """Grant six configured positions atomically, without prefab heuristics."""
+        db = getattr(ctx, 'db', ctx)
+        with open(os.path.join(_DIR, 'data/hero_details_catalog.json'), encoding='utf-8') as stream:
+            prefabs = json.load(stream)['equip_prefabs']
+        positions = {}
+        eq_map = _get_equip_map()
+        for key, info in prefabs.items():
+            if info['suit_id'] != suit_id or info['star'] != star:
+                continue
+            iid, pos = int(key), info['pos']
+            if eq_map.get(key) != {'suit': suit_id, 'pos': pos}:
+                raise ValueError('刻印目录与槽位配置不一致')
+            positions[pos] = min(iid, positions.get(pos, iid))
+        if set(positions) != set(range(1, 7)):
+            raise ValueError('此套装星档没有完整的 1～6 槽配置')
+        for iid in positions.values():
+            catalog = db.query('SELECT type FROM item_catalog WHERE id=?', (iid,))
+            if not catalog or catalog[0]['type'] != 7 or cls.classify_item(db, iid) != ItemType.EQUIP:
+                raise ValueError('刻印不在当前存档目录中')
+        with db.transaction():
+            return cls.grant_items(ctx, uid, [(positions[pos], 1) for pos in range(1, 7)], source='gm')
+
+    @classmethod
+    def clear_material(cls, ctx, uid):
+        """Delete audited consumables; retained and unknown assets take precedence."""
+        from birthday_service import commemorative_items
+        from save_generator import generation_config
+        db = getattr(ctx, 'db', ctx)
+        protected = set(commemorative_items()) | set(generation_config()['permanent_replay_items'])
+        deleted = 0
+        with db.transaction():
+            for iid in sorted(_CLEARABLE_MATERIAL_IDS - protected):
+                rows = db.query('SELECT type FROM item_catalog WHERE id=?', (iid,))
+                if not rows or cls.classify_item(db, iid) != ItemType.MATERIAL:
+                    continue
+                deleted += db.execute('DELETE FROM material WHERE uid=? AND id=?', (uid, iid)).rowcount
+        return {'material': deleted}
 
     @classmethod
     def _grant_equips_batch(cls, ctx, db, uid, equip_items, now_ts):

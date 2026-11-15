@@ -27,6 +27,8 @@ import { ItemSlot } from '../components/ItemSlot'
 import { useServer } from '../lib/serverContext'
 import {
   fetchInventoryItems,
+  addEquipSuit,
+  clearInventory,
   isTrialSkinFilm,
   isDisplayOnlyItem,
 } from '../lib/api'
@@ -211,6 +213,14 @@ export default function InventoryPanel() {
   const hasHoldings = canLoadInventory && holdings?.scope === inventoryScope
   const ownedMap = useMemo(() => hasHoldings ? holdings.counts : {}, [hasHoldings, holdings])
 
+  const [isWriting, setIsWriting] = useState(false)
+  const [writeMessage, setWriteMessage] = useState('')
+  const [suitId, setSuitId] = useState('1')
+  const [suitStar, setSuitStar] = useState('3')
+  const [clearTarget, setClearTarget] = useState<{ uid: number; save: string } | null>(null)
+  const currentIdentity = useRef('')
+  currentIdentity.current = inventoryScope
+
   // 2. 筛选与视图状态
   const [view, setView] = useState<ViewMode>('grid')
   const [query, setQuery] = useState('')
@@ -232,7 +242,7 @@ export default function InventoryPanel() {
     setInventoryError('')
     try {
       const res = await fetchInventoryItems(activeUid)
-      if (request !== inventoryRequest.current) return
+      if (request !== inventoryRequest.current) return false
       if (res.code !== 0 || !Array.isArray(res.data?.items)) throw new Error(res.msg || '读取库存失败')
       const counts: Record<number, number> = {}
       for (const item of res.data.items) {
@@ -244,16 +254,55 @@ export default function InventoryPanel() {
         setHoldings(null)
         setInventoryError(err instanceof Error ? err.message : '读取库存失败')
       }
+      return false
     } finally {
       if (request === inventoryRequest.current) setIsRefreshing(false)
     }
+    return true
   }
 
   useEffect(() => {
+    setClearTarget(null)
+    setWriteMessage('')
     if (canLoadInventory) void loadInventory()
     else { setHoldings(null); setIsRefreshing(false); setInventoryError('') }
     return () => { inventoryRequest.current++ }
   }, [inventoryScope, canLoadInventory])
+
+  const handleGrantSuit = async () => {
+    const identity = currentIdentity.current
+    setIsWriting(true)
+    try {
+      const res = await addEquipSuit(Number(suitId), Number(suitStar), activeUid)
+      if (identity !== currentIdentity.current) return
+      if (res.code !== 0) throw new Error(res.msg)
+      if (await loadInventory()) setWriteMessage('已发放 6 件刻印，库存已刷新')
+    } catch (err) {
+      if (identity === currentIdentity.current) setWriteMessage(err instanceof Error ? err.message : '套装发放失败')
+    } finally {
+      setIsWriting(false)
+    }
+  }
+
+  const handleClearMaterial = async () => {
+    if (!clearTarget || clearTarget.uid !== activeUid || clearTarget.save !== selectedSave) {
+      setClearTarget(null)
+      return
+    }
+    const identity = currentIdentity.current
+    setIsWriting(true)
+    try {
+      const res = await clearInventory('material', activeUid)
+      if (identity !== currentIdentity.current) return
+      if (res.code !== 0) throw new Error(res.msg)
+      setClearTarget(null)
+      if (await loadInventory()) setWriteMessage(`已清理 ${res.data.deleted.material} 条普通材料，库存已刷新`)
+    } catch (err) {
+      if (identity === currentIdentity.current) setWriteMessage(err instanceof Error ? err.message : '普通材料清理失败')
+    } finally {
+      setIsWriting(false)
+    }
+  }
 
   // 将 catalog 与 ownedMap O(1) 融合
   const mergedItems = useMemo<InventoryDisplayItem[]>(() => {
@@ -652,6 +701,49 @@ export default function InventoryPanel() {
           </div>
         }
       />
+
+      <Card className="p-5 shadow-surface">
+        <Card.Content className="space-y-3">
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="space-y-1 text-xs">
+              <span className="block text-muted">刻印套装 ID</span>
+              <input aria-label="刻印套装 ID" type="number" min={1} max={82} value={suitId}
+                onChange={(event) => setSuitId(event.target.value)}
+                className="w-28 rounded-md border border-separator bg-background px-3 py-2" />
+            </label>
+            <label className="space-y-1 text-xs">
+              <span className="block text-muted">刻印星级</span>
+              <select aria-label="刻印星级" value={suitStar} onChange={(event) => setSuitStar(event.target.value)}
+                className="rounded-md border border-separator bg-background px-3 py-2">
+                {[3, 4, 5].map((star) => <option key={star} value={star}>{star} 星</option>)}
+              </select>
+            </label>
+            <Button size="sm" onPress={handleGrantSuit} isDisabled={isWriting || !hasHoldings}>发放 1～6 槽套装</Button>
+            <Button size="sm" variant="secondary" onPress={() => setClearTarget({ uid: activeUid, save: selectedSave })}
+              isDisabled={isWriting || !hasHoldings}>清理普通材料</Button>
+          </div>
+          <p className="text-xs text-muted">操作当前所选存档。请先退出该存档的游戏账号。</p>
+          {writeMessage && <p role="status" className="text-sm">{writeMessage}</p>}
+        </Card.Content>
+      </Card>
+
+      <Modal.Root isOpen={clearTarget !== null} onOpenChange={(open) => { if (!open) setClearTarget(null) }}>
+        <Modal.Backdrop className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <Modal.Container className="w-full max-w-lg">
+            <Modal.Dialog className="space-y-4 rounded-2xl border border-separator bg-surface p-5 shadow-2xl">
+              <Modal.Header><Modal.Heading>确认清理普通材料</Modal.Heading></Modal.Header>
+              <Modal.Body className="space-y-2 text-sm">
+                <p>存档：{clearTarget?.save || '当前挂载存档'}，UID：{clearTarget?.uid}</p>
+                <p>删除已核实用途的养成材料。保留回放纪念品、换装券、礼包、表情和用途未知的物品。</p>
+              </Modal.Body>
+              <Modal.Footer className="flex justify-end gap-2">
+                <Button variant="secondary" onPress={() => setClearTarget(null)} isDisabled={isWriting}>取消</Button>
+                <Button onPress={handleClearMaterial} isDisabled={isWriting}>确认清理</Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal.Root>
 
       {/* 2. 参照 Warehouse 架构的数据规模与搜索管理卡片 */}
       <Card className="p-5 shadow-surface">

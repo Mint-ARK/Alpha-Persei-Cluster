@@ -753,7 +753,9 @@ def post_unlock_hero():
     if err_msg:
         return err(GMErrorCode.PARAM_INVALID, err_msg)
 
-    all_heroes = bool(req.get("all", False))
+    all_heroes = req.get("all", False)
+    if type(all_heroes) is not bool:
+        return err(GMErrorCode.PARAM_INVALID, "all 只接受 JSON 布尔值")
     hero_id = req.get("hero_id")
 
     if not all_heroes and hero_id is None:
@@ -771,40 +773,34 @@ def post_unlock_hero():
     if err_resp:
         return err_resp
 
-    return ok({"uid": uid, "hero_id": hero_id, "all": all_heroes}, msg="修正者解锁指令已执行")
+    try:
+        from inventory_service import InventoryService
+        from server_net import run_while_save_offline
+        from core import Connection
+        import codec
+        ctx = Connection(uid=uid, db=db, generator=_gen, codec_encode=codec.encode, codec_decode=codec.decode).to_handler_ctx()
+        def unlock():
+            with db.transaction():
+                legal = {row['hero_id'] for row in db.query('SELECT hero_id FROM hero_cfg')}
+                if not all_heroes and hero_id not in legal:
+                    raise ValueError('hero_id 不在当前角色目录中')
+                wanted = legal if all_heroes else {hero_id}
+                owned = {row['id'] for row in db.query('SELECT id FROM hero WHERE uid=? AND unlock=1', (uid,))}
+                granted = sorted(wanted - owned)
+                InventoryService.grant_items(ctx, uid, [(hid, 1) for hid in granted], source='gm')
+                return granted
+        unlocked = run_while_save_offline(db.path, uid, unlock)
+    except ValueError as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    except Exception as exc:
+        return err(GMErrorCode.SERVICE_ERROR, f'角色解锁失败: {exc}')
+    return ok({"uid": uid, "hero_id": hero_id, "all": all_heroes, "unlocked": unlocked}, msg="修正者解锁完成")
 
 
 @gm_bp.route("/heroes/graduate", methods=["POST"])
 def post_graduate_hero():
-    """【写通道·核心神技】一键将指定修正者满级(80)、满技能(10)、Ω神格、专属5阶钥从。"""
-    req = request.get_json(silent=True)
-    if not isinstance(req, dict):
-        return err(GMErrorCode.PARAM_INVALID, "请求体必须为有效 JSON 对象")
-
-    uid, err_msg = _parse_uid(req.get("uid"), default=DEFAULT_UID)
-    if err_msg:
-        return err(GMErrorCode.PARAM_INVALID, err_msg)
-
-    hero_id = req.get("hero_id") or 1084
-    try:
-        hero_id = int(hero_id)
-        if hero_id <= 0:
-            return err(GMErrorCode.PARAM_OUT_OF_RANGE, "hero_id 必须为正整数")
-    except (ValueError, TypeError):
-        return err(GMErrorCode.PARAM_INVALID, "hero_id 格式非法，必须为整数")
-
-    db, err_resp = _require_user(uid)
-    if err_resp:
-        return err_resp
-
-    return ok({
-        "uid": uid,
-        "hero_id": hero_id,
-        "level": 80,
-        "grade": "Omega",
-        "skills": 10,
-        "servant": "Sync-5",
-    }, msg=f"修正者 [{hero_id}] 已一键毕业！")
+    """Reject unsupported graduation without opening a writer."""
+    return err(GMErrorCode.SERVICE_ERROR, "一键毕业未支持")
 
 
 # ===========================================================================
@@ -860,16 +856,16 @@ def post_add_inventory_item():
 
     try:
         from inventory_service import InventoryService
-        InventoryService.grant_item(db, uid, item_id, count=num, source="gm")
+        from server_net import run_while_save_offline
+        from core import Connection
+        import codec
+        ctx = Connection(uid=uid, db=db, generator=_gen, codec_encode=codec.encode, codec_decode=codec.decode).to_handler_ctx()
+        def grant():
+            with db.transaction():
+                return InventoryService.grant_item(ctx, uid, item_id, count=num, source="gm")
+        run_while_save_offline(db.path, uid, grant)
     except Exception as e_svc:
-        # 降级由 account_db 执行基础货币增发
-        if hasattr(db, "add_currency"):
-            try:
-                db.add_currency(uid, item_id, num)
-            except Exception as e_db:
-                return err(GMErrorCode.SERVICE_ERROR, f"道具发放失败: {e_svc} (降级落库异常: {e_db})")
-        else:
-            return err(GMErrorCode.SERVICE_ERROR, f"道具发放失败: {e_svc}")
+        return err(GMErrorCode.SERVICE_ERROR, f"道具发放失败: {e_svc}")
 
     return ok({"uid": uid, "item_id": item_id, "num": num}, msg=f"道具 {item_id} × {num} 发放成功")
 
@@ -905,6 +901,17 @@ def post_add_equip_suit():
     if err_resp:
         return err_resp
 
+    try:
+        from inventory_service import InventoryService
+        from server_net import run_while_save_offline
+        from core import Connection
+        import codec
+        ctx = Connection(uid=uid, db=db, generator=_gen, codec_encode=codec.encode, codec_decode=codec.decode).to_handler_ctx()
+        run_while_save_offline(db.path, uid, lambda: InventoryService.grant_equip_suit(ctx, uid, suit_id, star))
+    except ValueError as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    except Exception as exc:
+        return err(GMErrorCode.SERVICE_ERROR, f'刻印套装发放失败: {exc}')
     return ok({
         "uid": uid,
         "suit_id": suit_id,
@@ -924,12 +931,22 @@ def post_clear_inventory():
     if err_msg:
         return err(GMErrorCode.PARAM_INVALID, err_msg)
 
+    if req.get('category') != 'material':
+        return err(GMErrorCode.PARAM_INVALID, 'category 只接受 material')
+
     db, err_resp = _require_user(uid)
     if err_resp:
         return err_resp
 
-    category = req.get("category", "all")
-    return ok({"uid": uid, "category": category}, msg="背包清理操作已执行")
+    try:
+        from inventory_service import InventoryService
+        from server_net import run_while_save_offline
+        deleted = run_while_save_offline(db.path, uid, lambda: InventoryService.clear_material(db, uid))
+    except ValueError as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    except Exception as exc:
+        return err(GMErrorCode.SERVICE_ERROR, f'普通材料清理失败: {exc}')
+    return ok({"uid": uid, "category": 'material', 'deleted': deleted}, msg="普通材料清理完成")
 
 
 # ===========================================================================
@@ -1350,46 +1367,14 @@ def post_unlock_stage_chapter():
 
 @gm_bp.route("/stages/complete_achievements", methods=["POST"])
 def post_complete_achievements():
-    """【写通道】委托 AchievementService 一键全成就达成入库。"""
-    req = request.get_json(silent=True)
-    if not isinstance(req, dict):
-        return err(GMErrorCode.PARAM_INVALID, "请求体必须为有效 JSON 对象")
-
-    uid, err_msg = _parse_uid(req.get("uid"), default=DEFAULT_UID)
-    if err_msg:
-        return err(GMErrorCode.PARAM_INVALID, err_msg)
-
-    db, err_resp = _require_user(uid)
-    if err_resp:
-        return err_resp
-
-    return ok({"uid": uid, "total_unlocked": 350}, msg="全成就已达成并入库！")
+    """Reject unsupported achievement completion."""
+    return err(GMErrorCode.SERVICE_ERROR, "全成就未支持")
 
 
 @gm_bp.route("/stages/set_polyhedron", methods=["POST"])
 def post_set_polyhedron():
-    """【写通道】多维变量（肉鸽模式）预设神格与通关存档。"""
-    req = request.get_json(silent=True)
-    if not isinstance(req, dict):
-        return err(GMErrorCode.PARAM_INVALID, "请求体必须为有效 JSON 对象")
-
-    uid, err_msg = _parse_uid(req.get("uid"), default=DEFAULT_UID)
-    if err_msg:
-        return err(GMErrorCode.PARAM_INVALID, err_msg)
-
-    difficulty = req.get("difficulty", 5)
-    try:
-        difficulty = int(difficulty)
-        if difficulty < 1 or difficulty > 10:
-            return err(GMErrorCode.PARAM_OUT_OF_RANGE, "多维变量难度必须在 1~10 范围内")
-    except (ValueError, TypeError):
-        return err(GMErrorCode.PARAM_INVALID, "difficulty 格式非法，必须为整数")
-
-    db, err_resp = _require_user(uid)
-    if err_resp:
-        return err_resp
-
-    return ok({"uid": uid, "difficulty": difficulty}, msg=f"多维变量预设档案已注入（难度 {difficulty}）")
+    """Reject unsupported polyhedron presets."""
+    return err(GMErrorCode.SERVICE_ERROR, "多维预设未支持")
 
 
 # ===========================================================================
@@ -1957,7 +1942,7 @@ def toggle_capture_mode():
 @gm_bp.route("/server/hot_reload", methods=["POST"])
 def post_hot_reload():
     """热重载服务配置。"""
-    return ok({"reloaded_modules": ["notice_cfg", "draw_service", "gm_api", "gm_reader", "shop_service"]}, msg="配置已热重载")
+    return err(GMErrorCode.SERVICE_ERROR, "热重载未支持")
 
 
 @gm_bp.route("/system/res_version", methods=["GET"])
@@ -2486,7 +2471,7 @@ def post_buy_shop_goods():
             # GM 特权免代币扣减直发
             g = svc._find_goods_cfg(goods_id, shop_id)
             if not g:
-                return err(GMErrorCode.ITEM_NOT_FOUND, f"商品 {goods_id} 不在商店 {shop_id} 中")
+                return err(GMErrorCode.NOT_FOUND, f"商品 {goods_id} 不在商店 {shop_id} 中")
 
             item_target = int(g.get("item_id") or 0)
             give_unit = int(g.get("give_num") or 1)
