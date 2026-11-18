@@ -33,6 +33,60 @@ logger = logging.getLogger("shop_service")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 POOL_PATH = os.path.join(BASE_DIR, "daily_shop_pool.json")
+SHOP32_V321_GOODS_PATH = os.path.join(BASE_DIR, "data", "shop32_v321_goods.json")
+_SHOP32_V321_GOODS_CACHE = None
+
+
+def _get_shop32_v321_goods_map():
+    """加载 v321 刻印研发商店（Shop 32）补齐商品配置（32000400~32000459）。"""
+    global _SHOP32_V321_GOODS_CACHE
+    if _SHOP32_V321_GOODS_CACHE is None:
+        items = {}
+        if os.path.exists(SHOP32_V321_GOODS_PATH):
+            try:
+                with open(SHOP32_V321_GOODS_PATH, "r", encoding="utf-8") as f:
+                    for row in json.load(f):
+                        items[int(row["goods_id"])] = row
+            except Exception as e:
+                logger.error(f"加载 shop32_v321_goods.json 失败: {e}")
+        _SHOP32_V321_GOODS_CACHE = items
+    return _SHOP32_V321_GOODS_CACHE
+
+
+def ensure_shop32_v321_goods(db):
+    """幂等补齐 shop_goods 中缺失的 v321 刻印研发商品（含 32000426 无罪之罪者Ⅳ）。"""
+    items = _get_shop32_v321_goods_map()
+    if not items or db is None:
+        return 0
+    try:
+        rows = db.query(
+            "SELECT goods_id FROM shop_goods WHERE shop_id=32 AND goods_id BETWEEN ? AND ?",
+            (min(items), max(items)),
+        )
+        existing = {int(r["goods_id"]) for r in (rows or [])}
+        missing = [row for gid, row in sorted(items.items()) if gid not in existing]
+        if not missing:
+            return 0
+        db.executemany(
+            """INSERT OR IGNORE INTO shop_goods
+               (goods_id,item_id,name,cost_type,cost_id,cost,cheap_cost,discount,
+                limit_num,refresh_cycle,open_time,close_time,tag,detail_json,shop_id)
+               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            [
+                (
+                    int(r["goods_id"]), int(r["item_id"]), r["name"],
+                    int(r["cost_type"]), int(r["cost_id"]), int(r["cost"]),
+                    int(r["cheap_cost"]), int(r["discount"]), int(r["limit_num"]),
+                    int(r["refresh_cycle"]), r["open_time"], r["close_time"],
+                    int(r["tag"]), r["detail_json"], int(r["shop_id"]),
+                )
+                for r in missing
+            ],
+        )
+        return len(missing)
+    except Exception as e:
+        logger.warning(f"[ShopService] 补齐 Shop 32 v321 商品异常: {e}")
+        return 0
 
 # 常规代币商店（交易区）：依赖客户端本地 ShopCfg，严禁向 sc_20007 下发以防客户端崩溃
 NORMAL_SHOP_IDS = {2, 10, 11, 12, 13, 14, 20, 22, 23, 32, 41, 42, 99}
@@ -570,7 +624,15 @@ class ShopService:
         from skin_draw_service import merge_ticket_shop_states
         from activity_content_service import merge_shop_states
         states = merge_ticket_shop_states(merge_shop_states([shop_state], self.db, uid), self.db, uid)
-        return {"changed_shop_info": next(s for s in states if s['shop_id'] == sid)}
+        changed = next(s for s in states if s['shop_id'] == sid)
+        if sid in NORMAL_SHOP_IDS and sid != 2 and changed.get("goods_list"):
+            # 客户端 ShopData.SingleShopUpdate 会无条件再次插入所有 shop_refresh==2 商品且不去重；
+            # 若 sc_20005 再下发这些常驻条目会导致前端列表整批重复（如情报兑换 40902）。
+            changed["goods_list"] = [
+                g for g in changed["goods_list"]
+                if not self._is_static_refresh_goods(int(g["goods_id"]))
+            ]
+        return {"changed_shop_info": changed}
 
     # ==================== 4. 购买核心业务引擎 (buy_goods) ====================
 
@@ -644,6 +706,8 @@ class ShopService:
         touched_scene = False
         granted_equips = []
         purchase_counts = {}
+        pre_purchase_counts = {}
+        timed_goods = set()
         has_ticket_purchase = False
 
         def grant_shop_items(item_list, source):
@@ -907,6 +971,10 @@ class ShopService:
                 nr_ts = 0
 
             item_sid = int(g.get("shop_id") or sid or 0)
+            if item_sid == sid and sid in NORMAL_SHOP_IDS:
+                pre_purchase_counts.setdefault(gid, bought)
+                if refresh_cycle in (5, 6) and limit_num > 0 and nr_ts:
+                    timed_goods.add(gid)
             if self.db:
                 self.db.upsert(
                     "store_purchase",
@@ -965,18 +1033,22 @@ class ShopService:
             if not equip_payload:
                 raise RuntimeError("商店刻印发放后无法编码 sc_17023 差量帧")
             frames.append(DownFrame(17023, equip_payload))
-        frames.append(DownFrame(20013, p20013))
 
-        # 追加 sc_20005 商店变动帧（仅常规代币货架商店需下发；充值礼包/补给商店严禁下发，以防客户端 SingleShopUpdate 遍历非 ShopCfg 道具崩溃）
-        if sid in NORMAL_SHOP_IDS and sid != 3:
-            try:
-                p20005_data = self.get_single_shop_payload(uid, sid)
-                if p20005_data:
-                    p20005 = encode("sc_20005", p20005_data)
-                    if p20005:
-                        frames.append(DownFrame(20005, p20005))
-            except Exception:
-                pass
+        # 滚动限购需要服务端到期时间。弹窗关闭前先同步货架，并保留本单购买前的次数，
+        # 让客户端处理 sc_20013 时只累加一次。普通购买不需要重建货架。
+        if timed_goods:
+            shelf = self.get_single_shop_payload(uid, sid)
+            goods_list = shelf["changed_shop_info"]["goods_list"]
+            if timed_goods.intersection(g["goods_id"] for g in goods_list):
+                for goods in goods_list:
+                    gid = goods["goods_id"]
+                    if gid in pre_purchase_counts:
+                        goods["buy_times"] = pre_purchase_counts[gid]
+                p20005 = encode("sc_20005", shelf)
+                if not p20005:
+                    raise ValueError("必要商店限购时间 sc_20005 为空")
+                frames.append(DownFrame(20005, p20005))
+        frames.append(DownFrame(20013, p20013))
 
         # 追加 sc_30001 邮件未读红点摘要，若周期礼包下发邮件则即刻点亮邮箱红点
         try:
@@ -1042,6 +1114,26 @@ class ShopService:
             return 0
         return int(rows[0]["buy_times"] or 0)
 
+    def _is_static_refresh_goods(self, gid):
+        """判断商品是否为客户端 ShopCfg shop_refresh==2 常驻兑换项。"""
+        gid = int(gid)
+        if gid in _get_shop32_v321_goods_map():
+            return True
+        from activity_content_service import catalog
+        native = catalog()['goods'].get(str(gid))
+        if native and int(native.get('shop_refresh') or 0) == 2:
+            return True
+        if self.db:
+            r = self.db.query("SELECT detail_json FROM shop_goods WHERE goods_id=?", (gid,))
+            if r and r[0].get("detail_json"):
+                try:
+                    dj = json.loads(r[0]["detail_json"])
+                    if int(dj.get("shop_refresh") or 0) == 2:
+                        return True
+                except Exception:
+                    pass
+        return False
+
     def _find_goods_cfg(self, goods_id, shop_id):
         """寻找商品元数据（优先 shop_goods，其次 daily_shop_pool）"""
         gid = int(goods_id)
@@ -1059,6 +1151,9 @@ class ShopService:
             r = self.db.query("SELECT * FROM shop_goods WHERE goods_id=?", (gid,))
             if r:
                 return r[0]
+        extra32 = _get_shop32_v321_goods_map().get(gid)
+        if extra32:
+            return dict(extra32)
 
         pool = self._get_daily_shop_pool()
         for pos, cands in pool.items():

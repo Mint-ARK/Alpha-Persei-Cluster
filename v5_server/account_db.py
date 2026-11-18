@@ -2542,6 +2542,9 @@ class AccountDB:
         self.init_ai_characters()
         # 启动时自动初始化因果观测（WarChess）章节数据
         self.init_warchess_chapters()
+        if "shop_goods" in tables:
+            from shop_service import ensure_shop32_v321_goods
+            ensure_shop32_v321_goods(self)
         self._ensure_default_account()
 
     def migrate_legacy_qworld_tasks(self):
