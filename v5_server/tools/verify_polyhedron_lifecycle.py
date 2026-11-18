@@ -6,6 +6,7 @@ import hero_codec
 import middleware as mw
 import codec
 import generator
+import battle_server as wire
 from types import SimpleNamespace
 from polyhedron_service import PolyhedronRunManager as M
 
@@ -215,6 +216,24 @@ class PolyhedronTests(MemoryTests):
         self.assertEqual(self.call(54032,dict(battle_id=bid),54033)[0]['result'],0)
         hero=self.saved()['hero_list'][0]
         self.assertEqual((hero['health'],hero['max_health'],hero['damage'],hero['heal'],hero['injured']),(4000,10000,0,0,0))
+
+    def test_pc332_report_with_vacant_party_slots_advances_after_battle(self):
+        self.assertEqual(self.enter()[0]['result'],0)
+        bid=self.conn.battle_id[0]
+        # PC 332: one occupied slot followed by two empty character messages.
+        report=bytes.fromhex(
+            '10d6ae02200428da0b3802521008bc0810b64218904e20a78c5428da0b520052005809'
+            '7210183d0a0b02070395b10c14040585c70c7a0f8d4e040196cf09040704060c08130680018d0a')
+        packet=wire._f_varint2(1,bid)+wire._f_varint2(3,1)+wire._f_bytes(4,report)
+        _,_,result,info=wire.parse_battle_result(packet)
+        mw.get_battle_session(bid)['result_data']=dict(result=result,info=info)
+        self.assertEqual(self.call(54032,dict(battle_id=bid),54033)[0]['result'],0)
+        hero=self.saved()['hero_list'][0]
+        self.assertEqual((hero['health'],hero['max_health']),(8502,10000))
+        self.assertEqual(self.call(18012,dict(index=1),18013)[0]['result'],0)
+        selected=self.saved()['current_stage']['gate_list'][0]['event']['stage_id']
+        self.assertEqual(self.call(18014,dict(index=1),18015)[0]['result'],0)
+        self.assertEqual(self.saved()['current_stage']['stage_id'],selected)
 
     def test_account_unlock_and_astrolabe_guards(self):
         self.db.set_currency(UID,44,2);before=self.state()

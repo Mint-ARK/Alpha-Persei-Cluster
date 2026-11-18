@@ -21,7 +21,7 @@ import core
 import generator
 import operations
 import task_listener
-import test_battle_entry_timing as timing
+import test_pr15_battle_entry_timing as timing
 from event_bus import bus, Events
 from inventory_service import InventoryService
 from shop_service import ShopService

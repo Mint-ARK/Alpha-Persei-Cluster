@@ -63,7 +63,7 @@ class ChallengeTests(HodurTests):
 
     def test_native_udp_malformed_character_never_becomes_an_empty_full_health_team(self):
         malformed=wire._f_bytes(10,b'\x08\x80')
-        for body in [malformed,wire._f_bytes(10,wire._f_varint2(1,1084)),wire._f_bytes(10,wire._f_varint2(1,1084)+wire._f_varint2(1,1048))]:
+        for body in [wire._f_bytes(10,b'')*3,malformed,wire._f_bytes(10,wire._f_varint2(1,1084)),wire._f_bytes(10,wire._f_varint2(1,1084)+wire._f_varint2(1,1048))]:
             with self.assertRaises((ValueError,IndexError)):wire.parse_battle_characters(body)
 
     def test_initial_challenge_snapshot_and_start_publication_order(self):

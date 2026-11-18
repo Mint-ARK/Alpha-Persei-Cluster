@@ -243,11 +243,15 @@ def _character_fields(payload):
 
 
 def parse_battle_characters(payload):
-    """Keep every field-10 character, including explicit/proto3 zero HP."""
+    """Read occupied native party slots, including explicit/proto3 zero HP."""
     characters=[]
+    slots=0
     for field,wire,raw in _character_fields(payload):
         if field!=10:continue
+        slots+=1
+        if slots>32:raise ValueError('Too many battle characters')
         if wire!=2:raise ValueError('Battle character must be a message')
+        if not raw:continue
         fields={}
         for key,kind,value in _character_fields(raw):
             if key in (1,2,3):
@@ -259,7 +263,7 @@ def parse_battle_characters(payload):
         if not (0<hero<=0x7fffffff and -0x8000000000000000<=hp<=maximum<=0x7fffffffffffffff and maximum>0):
             raise ValueError('Invalid battle character HP')
         characters.append(dict(hero_id=hero,hero_blood=hp,hero_max_blood=maximum))
-        if len(characters)>32:raise ValueError('Too many battle characters')
+    if slots and not characters:raise ValueError('Battle report has no occupied character slots')
     return characters
 
 
