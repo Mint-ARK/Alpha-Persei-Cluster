@@ -1,6 +1,6 @@
 """Current 60054 registrations, SQL, Inventory and native codec in memory."""
 import json
-from contextlib import closing
+import re
 from pathlib import Path
 from unittest.mock import patch
 import unittest
@@ -9,19 +9,17 @@ import codec
 import core
 import generator
 from inventory_service import InventoryService
-from account_db import AccountDB
 import minigame_service as mini
 import minigame_point_service as point
 import operations
 import multiplayer_policy
 
-# Runtime fixtures use the shipped static catalog. Native export audits remain
-# separate checks and still require their original Lua sources.
-with closing(AccountDB.open_existing(
-        Path(__file__).resolve().parents[1] / 'account.db', readonly=True)) as catalog_db:
-    usable = json.loads((Path(__file__).resolve().parents[1] / 'item_usable_cfg.json').read_text('utf-8'))
-    ITEM_TYPES = {row['id']: (row['type'], usable.get(str(row['id']), {}).get('sub_type', 0))
-                  for row in catalog_db.query('SELECT id,type FROM item_catalog')}
+ITEM_TYPES={}
+for source in (Path(__file__).resolve().parents[2]/'decompiled_v2/x64/game/config').glob('itemcfg*.lua'):
+    for raw_id,body in re.findall(r'^\t\[(\d+)\] = \{\n(.*?)^\t\}',source.read_text('utf-8-sig'),re.M|re.S):
+        kind=re.search(r'^\t\ttype = (\d+)',body,re.M)
+        subtype=re.search(r'^\t\tsub_type = (\d+)',body,re.M)
+        if kind:ITEM_TYPES[int(raw_id)]=(int(kind[1]),int(subtype[1]) if subtype else 0)
 
 
 class PointRewardTests(MemoryTests):

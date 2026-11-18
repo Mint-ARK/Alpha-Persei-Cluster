@@ -130,5 +130,22 @@ class BattleEntryTests(unittest.TestCase):
         self.assertEqual(self.packets, [])
 
 
+class BattlePartySlotTests(unittest.TestCase):
+    def test_zero_hp_character_in_32_slots(self):
+        empty = battle._f_bytes(10, b"")
+        character = battle._f_bytes(10, battle._f_varint2(1, 101) + battle._f_varint2(3, 100))
+
+        self.assertEqual(battle.parse_battle_characters(empty * 31 + character), [
+            {"hero_id": 101, "hero_blood": 0, "hero_max_blood": 100},
+        ])
+
+    def test_33rd_slot_counts_even_if_empty(self):
+        empty = battle._f_bytes(10, b"")
+        character = battle._f_bytes(10, battle._f_varint2(1, 101) + battle._f_varint2(3, 100))
+
+        with self.assertRaisesRegex(ValueError, "Too many battle characters"):
+            battle.parse_battle_characters(character + empty * 32)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -4,7 +4,6 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 from verify_report_small_fixes import MemoryTests, UID, NOW
-import verify_minigame_point_rewards as item_types
 from account_db import AccountDB
 import codec
 import core
@@ -19,6 +18,8 @@ from event_bus import bus,Events
 
 ROOT=Path(__file__).resolve().parents[2]
 TASKS=json.loads((ROOT/'v5_server/data/activity_content_cfg.json').read_text('utf-8'))['versions']['229']['tasks']
+ITEM_CATALOG = ROOT / 'v5_server/web_src/src/data/items_catalog.json'
+ITEM_TYPES = {item['id']: item['type'] for item in json.loads(ITEM_CATALOG.read_text('utf-8'))}
 
 
 class HodurTests(MemoryTests):
@@ -32,7 +33,8 @@ class HodurTests(MemoryTests):
         self.native_tasks=[t for t in TASKS.values() if 400001<=t['condition']<=400005 or t['id'] in hodur.LIMITED_TASKS]
         for t in self.native_tasks:self.add_task(t)
         for iid in {i for t in self.native_tasks for i,n in t['reward']}:
-            self.db.execute('INSERT OR REPLACE INTO item_catalog(id,type) VALUES(?,?)',(iid,1 if iid in (1,2,14) else item_types.ITEM_TYPES[iid][0]))
+            self.db.execute('INSERT OR REPLACE INTO item_catalog(id,type) VALUES(?,?)',
+                            (iid, 1 if iid in (1, 2, 14) else ITEM_TYPES[iid]))
         self.db.execute('UPDATE users SET level=70 WHERE uid=?',(UID,))
         self.db.upsert('hero',UID,hero_codec.initial_hero_row(1084,100),keys=('uid','id'))
         self.conn.resource_version='229'
@@ -221,9 +223,14 @@ class HodurTests(MemoryTests):
         other=AccountDB.new_save_workspace();self.addCleanup(other.close)
         self.assertEqual(hodur.read(other,UID)[1]['clears'],{});self.assertEqual(hodur.read(self.db,UID+1)[1]['clears'],{})
 
-    def test_contract_native_export_and_sweep_rejection(self):
+    def test_native_export_matches_runtime_contract(self):
+        if not all((ROOT / source).is_file() for source in hodur.CFG['sources']):
+            self.skipTest('Native Lua inputs are unavailable in this checkout')
         from export_hodur_contract import build
-        self.assertEqual(hodur.CFG,build());self.assertEqual(len(hodur.NORMAL),8)
+        self.assertEqual(hodur.CFG, build())
+
+    def test_runtime_contract_and_sweep_rejection(self):
+        self.assertEqual(len(hodur.NORMAL), 8)
         before=self.state()
         with self.assertRaises(ValueError):mw._settle_frames(self.conn.to_handler_ctx(),UID,1,1,5310220,stage_type=92,activity_id=3941101,sweep=True)
         self.assertEqual(self.state(),before)
