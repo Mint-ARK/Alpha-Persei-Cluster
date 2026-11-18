@@ -23,150 +23,19 @@
 > 📖 **Developer's Note / Behind the Scenes**:  
 > Want to know the journey, motivations, and musings behind this project? Welcome to read the blog post: [About LocalServer - MoriaRuRuka (Chinese)](https://moriaruruka.com/2026/09/24/411/).
 
-## 🚀 Changelog (2026.11.06)
+## 📦 Current Release & Changelog
 
-## Current Release: v5.0.3 (2026-11-06)
+* **Current Release**: `v5.0.5` (2026-11-18) — Visit the [**GitHub Releases Page**](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases) to download the latest portable archive, installer, Linux core package, and `SHA256SUMS` checksums
+* **Recommended Downloads**: For Windows, download the portable archive (`AetherGazer_Server_v5.x.x_Portable.zip`) from the [Releases Page](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases) and launch via `LocalServer.exe` / `启动离线单机服务(GUI界面).bat` or `启动离线单机服务(控制台).bat`; for Linux, download `AetherGazer_Server_v5.x.x_Linux_Core.zip` from the same page and run `sh server.sh setup`.
+* **Changelog**: Detailed release notes have been moved to 👉 [**Detailed Changelog (`README_CHANGELOG_EN.md`)**](./README_CHANGELOG_EN.md) | [Concise Changelog (`CHANGELOG.md`)](./CHANGELOG.md)
 
-This release introduces password protection for the web management console in public network deployments and deep fixes for minigames and core gameplay systems. To download validated portable packages, installer packages, or Linux core archives, visit the [v5.0.3 Release Page](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/tag/v5.0.3); see [Changelog](CHANGELOG.md) for full commit records and verify downloaded archives using [`SHA256SUMS_v5.0.3.txt`](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/SHA256SUMS_v5.0.3.txt).
-
-**We strongly recommend downloading the portable archive [`AetherGazer_Server_v5.0.3_Portable.zip`](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Portable.zip), which requires no installation.** After extraction, you can launch it via `启动离线单机服务(控制台).bat` for command-line mode, or run `LocalServer.exe` / `启动离线单机服务(GUI界面).bat` for the desktop host. For Linux users, please use [`AetherGazer_Server_v5.0.3_Linux_Core.zip`](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Linux_Core.zip) and execute `sh server.sh setup` to complete the interactive setup and set an administrator security password.
-
-### Key Update Highlights:
-
-1. **Web Console Password Authentication**: Added an administrative password protection mechanism designed for public server deployments. Please remember the password set during initialization.
-2. **Windows Core Source Package**: Released a lightweight core package containing pre-built web assets without bundled desktop launchers or pre-installed Python environments.
-3. **Overhauled Linux Deployment Wizard**: The streamlined setup script is now fully compatible with WSL 2 (Ubuntu 20.04+), Termux (Android 8.1+ Rooted), and OpenCloudOS 9.
-4. **Minigame Gameplay Logic Completion**:
-   1. **Citong Alley (Quanzhou)**: 53 main quests, 129 sub-quests, 11 sailing stages, and 2 character battles; quest milestone rewards yield **2.7x** the requirement for max level, allowing players to claim all rewards without exhausting all exploration.
-   2. **Battle of Dojo (Autochess)**: Players can now directly challenge the configured boss after four consecutive wins and claim victory rewards properly.
-   3. **Verthandi Resident Event**: Passing stages now directly awards full scores, eliminating repetitive grinding.
-   4. **Resident Events**: Fixed erroneous deliveries of expired limited-time rewards.
-5. **Fictional Deduction (RogueTeam) Iteration**:
-   Incorporated the community patch from **[Issue #8](https://github.com/Mint-ARK/Alpha-Persei-Cluster/issues/8)** and overhauled the finite state machine:
-   - Unified ownership of run sessions, floors, main/hidden maps, nodes, and pending choices to prevent illegal phase skipping, stale session requests, and duplicate settlements.
-   - Fixed drop deduplication, merchant pricing, immediate purchase effects, milestone points, mechanism selection, and reward queues.
-   - Connected transitions for hidden island entries, story battles, reward claims, and returning to the main board.
-   - Fixed the sequencing of endgame battles, story confirmations, settlements, reward distribution, and reconnect recoveries.
-   - Restored 7 active effects across 5 relics, program upgrades, and immediate chain triggers.
-   - Correctly activated, saved, and restored tactical directives upon collecting 6 identical school programs; the first activated school is locked for the run.
-   - Recorded post-battle residual energy and tracked single-directive kill statistics based on genuine battle reports.
-   - Reconnected 17 verified RogueTeam achievements (10 clear/possession, 6 tactical acquisition, 1 single kill).
-   - New saves automatically skip the unready 101 tutorial while retaining 501 story and onboarding guides.
-   *(Note: Per-character HP persistence and remaining relics/tech perks will be polished in subsequent updates; the core state machine, endgame settlements, and achievements are now fully hooked up.)*
-6. **Reward and Achievement System Hardening**:
-   - Deduplicated batched achievement requests and verified eligibility in atomic transactions, preventing duplicate claims or claiming unearned rewards.
-   - Fixed legacy achievement thresholds to avoid faking unread content as fully read.
-   - Fixed gacha ticket deductions and reward granting when essential server responses fail.
-   - Fixed target banner cross-contamination under shared pity pools.
-   - 4-star Functors are now generated strictly according to the currently selected Gen-zone.
-   - Fixed pre-built but unowned characters from being misidentified as owned and prematurely converted to Intel shards.
-   - Aligned displayed rewards with actual inventory increments for permanent items and capacity caps.
-   - Employed delta/instance frames for new functors, sigils, and characters, reducing full-sync overhead.
-   - Prevented fallback SQL insertions when public reward pipelines fail, eliminating duplicate deliveries.
-   - Validated package consumption and candidate choices prior to item usage to prevent empty consumption or out-of-bounds selections.
-7. **Character Progression & Admin Cat Fixes**:
-   - **Sigils**: Fixed slot ownership, double slot occupation, breakthrough costs/experience checks, gen-zone reconstruction confirmations, and invalid enchantment preview indexes.
-   - **Functors**: Fixed awakening targets, materials, and instance handling while preserving transcendence and equip references.
-   - **Chips**: Fixed invalid presets, misaligned characters/slots, and missing prerequisites; achievements now tally real ownership.
-   - **Battles**: Prevented duplicate battle IDs within the same millisecond; concurrent settlements only award assets once.
-   - **Sweeps & Tasks**: Preserved gameplay, team, and combo contexts, preventing battle progression from misfiring lobby interaction quests.
-   - **Mood & Collection**: Restored battle, sweep, and daily reset mood sync; added missing 7-tier faction collection rewards.
-   - **Admin Cat**: Fixed early termination, log config referencing, 05:00 day boundary and weekend claim windows; fixed UI freeze after dispatch.
-8. **Onboarding, Monthly Pass & Customization Fixes**:
-   - Fixed game days, final days, and duplicate claiming in newbie check-in.
-   - Fixed eligibility, claimed records, and task status for newbie level and cumulative progress rewards.
-   - Persistently cleared 5 categories of newbie notification badges.
-   - Prevented base status from overriding active 30-day monthly passes; synchronized online status upon claiming.
-   - Fixed response sequence and failure rollbacks for uncollected battlepass tier rewards.
-   - Fixed loss of stamina recovery baseline when system clocks rollback.
-   - Fixed custom loading wallpapers resetting to default 3 images upon reconnect.
-   - Synchronized illustration reward claim states.
-   - Fixed cross-month blue dot misalignment on the web check-in calendar.
-9. **Linux / WSL / Termux Deployment & CDN Overhaul**:
-   - Unified legacy shell scripts into **`sh server.sh`**, offering interactive setup, env checks, dependency installation, start, stop, and status querying.
-   - Guided setup checks dependencies and ports, captures local/LAN/public IPs, and persists configurations.
-   - Integrated optional Nginx templates with syntax validation, hot reload, and failure rollbacks.
-   - Termux optimizations: high-port defaults, local IP binding, and system package guidance.
-   - Three CDN modes: **off, relay-only, and relay-with-cache** (default: off).
-   - Eliminated invalid outbound IP blocks and fixed HTTP/TLS stream truncation errors.
-   - Resolved Chinese filename encoding issues inside Linux ZIP archives.
-   - **Standardized Official Android Channel to 7** (Channel 8 for Bilibili), synchronizing SDKs, asset probing, and web parameters.
-   - Fixed server selection delays when creating/deleting saves on public iOS instances.
-10. **Recurring Dream, Dark Zone, Polyhedron & WarChess Advancements**:
-
-    | Mode | Key Changes |
-    | :---: | :--- |
-    | **Recurring Dream** | Unified Thursday 05:00 refresh; fixed reward eligibility, boss score collisions, stale cross-period battle reports, post-claim resets, and cross-boss character locks. |
-    | **Hazard Zone (Final)** | Unified Monday/Thursday 05:00 semi-weekly reset; enabled team-relay handoffs and isolated challenge reports across saves. |
-    | **Regular Dark Zone** | Preserved exact star requirements; fixed star rewards eligibility and repeat claims without blindly treating runs as 3-star clears. |
-    | **Iterative Verification** | Added Mode 4 reward eligibility, history tracking, and task rollback logic; remaining modes and 5-team totals will follow. |
-    | **Dimensional Variable** | Fixed "refresh in 7000+ days" bug to **every Monday 05:00**; refined opening, door selection, shops, recruitment, battles, weekly rewards, and reconnect recovery. |
-    | **WarChess (Casualties Observation)** | Completed 14 battles, 3 small chests, 2 large chests, mechanisms, 100% progress, and mission recovery on the initial map. |
-
-11. **Resident Minigames Completion List**:
-
-    | Minigame | Major Improvements |
-    | :---: | :--- |
-    | **Mecha Gear Challenge** | Added stage prerequisites, vehicle unlocks, and archive rewards; fixed kill/retrofit/archive quests; added login state recovery. |
-    | **Night Tales** | Separated main storyline and challenge save slots; fixed exit, interruptions, stale games, and duplicate settlements; added challenge and reading tasks. |
-    | **Climbing Ladder** | Blocked multiplayer matchmaking while granting 4 permanent quest rewards with anti-duplication records. |
-    | **Muted Light Chronicle** | Added normal chapter exploration, prerequisites, resets, and tasks; implemented Extreme Study 4-chain battles with affix, lineup, and HP inheritance. |
-    | **Remote Village / Hela Pinball** | Fixed skill slots and equipped skill validation; separated normal and challenge scores; hooked up Stage 5 battle and mission trackers. |
-    | **Fleeting Melodies (Rhythm)** | Matched songs with tasks; fixed high scores, completion flags, and reconnect recovery; rewards validated against target score thresholds. |
-    | **PVE Autochess (Dojo)** | Overhauled card pools, exp, synthesis, enemy teams, skills, props, shields, summons, ties, coins, retries, replays, and persistence. |
-    | **Train Heist** | Fixed duplicate movie progress rewards, fixed dummy scores, and score collisions; added skill prerequisites, tasks, and dialogue recovery. |
-    | **Food & Another World** | Fixed mismatches between logical stages and asset IDs; resolved first-clear food delivery omissions; added pinballs, companions, and cooking tasks. |
-    | **Tactical Study Records** | Added 18 tutorial stages and 6 sandbox stages with prerequisites, hero locks, and tasks; fixed score caching and first-clear refresh. |
-    | **Citong Alley (Quanzhou)** | Added quest state machine, map positions, feature unlocks, sea battles, character duels, photos, milestone levels, and rewards. |
-    | **Dream Catcher** | Fixed node and plot asset IDs, puzzle prerequisites, and first-clear logic; added 36 node tasks and 9 chapter archive rewards. |
-    | **Summer Board Game** | Added 13 map grids, movement, dice, terrain events, NPCs, shops, 12 item types, QTEs, nested minigames, tasks, and clear history. |
-    | **Verthandi Resident Event** | Added schedule, commissions, acceleration, story, training, boss, barbecue, 20 puzzle stages, garland exchange, and tasks. |
-    | **Kadas Holiday Race** | Fixed course routing, modding slots, setups, and challenge scores; clearly distinguished current limited rewards from resident rewards. |
-
-**Platform and Resource Support Matrix:**
+### Platform and Resource Support Matrix
 
 | Platform | Supported Builds | Notes |
 | --- | --- | --- |
 | **PC** | **All three: 229 / 311 / 321** | Resource manifests are configured and verified for all three client builds. |
 | **iOS** | **229 / 321; 311 is invalid** | **Build 229 supports the in-app purchase simulation**. iOS 311 resource manifests were omitted during initial capture and are currently unavailable. |
 | **Android & Other Platforms** | **Manual configuration required** | Due to limited test devices, internal asset manifests require manual configuration and importing by users. |
-
-## v5.0.2 Detailed Changelog (Included in v5.0.3)
-
-1. **Save Slot Management Module**: Real-time selection, creation, and deletion of independent save slots via **Web Panel, Launch Arguments, and In-Game Server Selection**.
-   - Consolidated newbie and Lv.70 generation routines; supports fully customized save creation.
-   - One database per account, establishing clean character, inventory, quest, and gameplay states.
-   - Adjustable starting level from **Lv.1 to Lv.100**, matching cumulative exp and stamina limits to client tables.
-   - Custom or random UID support (numeric, up to 12 digits).
-   - Save names support UTF-8 characters including Chinese and spaces, up to 32 characters.
-   - Independent toggling for the opening 501 storyline and onboarding tutorials.
-   - Supports pre-clearing Prologue through Chapter 5 with first-clear rewards granted directly.
-2. **Three Preset Saves & Support Mail**:
-   - *Full Exploration*: Lv.1, keeps 501 story and feature guides, no pre-cleared stages.
-   - *Skip Prologue*: Lv.1, skips 501, pre-clears Prologue, keeps feature guides.
-   - *Quick Start*: Lv.70, pre-clears Chapters 1~5, skips guides, newbie tasks ready to claim.
-   - Bundles **18 support letters** with stamina props, anniversary characters, signature functors, cosmetics, currency, and materials.
-3. **In-Game Server Selection Converted to Save Slot Manager**:
-   - Create, switch, and delete save slots directly from the server selection screen.
-   - Switch saves without restarting the client; automated backups are preserved before slot deletion.
-4. **Web Management Console Upgrades**:
-   - Independent save management tab with global save switcher in the top navigation bar.
-   - Two-way binding between preset configurations and individual form controls.
-5. **Per-Save AI Profiles & Proactive Greetings**:
-   - Each save maintains its own LLM API keys and model configurations.
-   - Automatic morning greetings upon the first login of each day, dynamically merging solar terms, birthdays, and relationship context.
-6. **Storyline, Gacha, and Battlepass Fixes**:
-   - Fixed trial character battle payloads in Chapter 23, Chapter 19 scanning clues, and stage star chests.
-   - Handled 26 cosmetic/scene gacha pools across builds 311 and 321 with pity carryover.
-   - Weekly battlepass refreshes every Monday at 05:00 with enhanced exp supply mail.
-
-## v5.0.2 Source & Local Build Update: 2026-10-26
-
-Integrated independent save generation, in-game save switching, UTF-8 launch arguments, resident activities and shop restorations, first-clear rewards and battle timer fixes, birthday mail, AI daily greetings, and chat history recovery. Portable packages allow choosing CMD or desktop launchers; Linux uses the core package. See [Save and AI Guide](docs/save_and_ai_guide.md).
-
-## v5.0.2 Addendum: 2026-10-28
-
-Added multi-channel manifest management, active download queues, and unified cache storage. Fixed Build 229 login loading hangs and preserved cross-version battlepass progress. See [Resource Download Guide](docs/resource_download_guide.md).
 
 ---
 
@@ -263,7 +132,7 @@ This project is an experimental local simulation environment for offline study a
 ### 3.2 Windows Deployment & Running (GUI / CLI)
 
 1. **Portable GUI Mode (Recommended)**:
-   Extract [`AetherGazer_Server_v5.0.3_Portable.zip`](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Portable.zip) and double-click `LocalServer.exe` (or run `启动离线单机服务(GUI界面).bat`).
+   Download the latest portable archive (`AetherGazer_Server_v5.x.x_Portable.zip`) from the [GitHub Releases Page](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases), extract it, and double-click `LocalServer.exe` (or run `启动离线单机服务(GUI界面).bat`).
    > **Note**: Initial server startup may take a few seconds. On first run, Windows Firewall will request network access permissions for Python; please click **"Allow access"**.
 
 2. **Install Local Root Certificate**:
@@ -319,18 +188,19 @@ This project is an experimental local simulation environment for offline study a
      # 1. Create and enter deployment directory
      mkdir -p aethergazer && cd aethergazer
 
-     # 2. Download v5.0.3 Linux Core archive
-     curl -fL --retry 3 -o AetherGazer_Server_v5.0.3_Linux_Core.zip        https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Linux_Core.zip
+     # 2. Download the Linux Core archive (check the Releases page for the latest version)
+     curl -fL --retry 3 -o AetherGazer_Server_v5.0.5_Linux_Core.zip \
+       https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.5/AetherGazer_Server_v5.0.5_Linux_Core.zip
 
      # 3. Extract release package
-     unzip AetherGazer_Server_v5.0.3_Linux_Core.zip
+     unzip AetherGazer_Server_v5.0.5_Linux_Core.zip
 
      # 4. Run interactive setup wizard
      sh server.sh setup
      ```
 
 2. **Cross-Platform Transfer Alternative (If GitHub access is constrained)**:
-   * Download [`AetherGazer_Server_v5.0.3_Linux_Core.zip`](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Linux_Core.zip) on a Windows computer.
+   * Download the latest `Linux_Core.zip` archive from the [GitHub Releases Page](https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases) on a Windows computer.
    * Transfer via SCP:
      ```bash
      scp file_path user@ip:server_path
@@ -491,11 +361,12 @@ This project is an experimental local simulation environment for offline study a
      # 1. Create directory
      mkdir -p aethergazer && cd aethergazer
 
-     # 2. Download release package
-     curl -fL --retry 3 -o AetherGazer_Server_v5.0.3_Linux_Core.zip        https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.3/AetherGazer_Server_v5.0.3_Linux_Core.zip
+     # 2. Download release package (check the Releases page for the latest version)
+     curl -fL --retry 3 -o AetherGazer_Server_v5.0.5_Linux_Core.zip \
+       https://github.com/Mint-ARK/Alpha-Persei-Cluster/releases/download/v5.0.5/AetherGazer_Server_v5.0.5_Linux_Core.zip
 
      # 3. Extract
-     unzip AetherGazer_Server_v5.0.3_Linux_Core.zip
+     unzip AetherGazer_Server_v5.0.5_Linux_Core.zip
 
      # 4. Launch setup wizard
      sh server.sh setup
