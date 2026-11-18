@@ -1534,6 +1534,7 @@ def gen_payload(cmd, uid=None, db=None, **kw):
                     enabled.append(int(r["item_id"]))
         except Exception:
             pass
+        return encode("sc_13057", {"type_list": enabled})
     if cmd == 35011:
         # 介质攫取主进度与增益词缀（weekly_challenge_service 驱动 → sc_35011）
         import weekly_challenge_service as _wcs

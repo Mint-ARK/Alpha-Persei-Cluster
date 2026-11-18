@@ -417,7 +417,10 @@ def on_dorm_action(ctx, uid, action_type="visit", times=1, attribute_index=None,
 @bus.subscribe(Events.POLYHEDRON_PASS)
 def on_polyhedron_pass(ctx, uid, times=1, **kwargs):
     """多维变量 (cond=423: 100007 需1次)"""
-    c = _trigger_task_condition(ctx.db, uid, condition=423, delta=times)
+    db = getattr(ctx, "db", None)
+    if db is None:
+        return
+    c = _trigger_task_condition(db, uid, condition=423, delta=times)
     _push_task_diff(ctx, uid, c)
 
 
