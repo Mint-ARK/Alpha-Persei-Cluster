@@ -1,6 +1,6 @@
 ; -- AetherGazer_Server Inno Setup Script Template --
 #define MyAppName "深空之眼 离线单机服务"
-#define MyAppVersion "5.0.4"
+#define MyAppVersion "5.0.5"
 #define MyAppPublisher "TwilightStation"
 #define MyAppExeName "LocalServer.exe"
 #define MySourceDir "__SOURCE_DIR__"
