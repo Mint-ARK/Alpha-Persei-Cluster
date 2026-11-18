@@ -1534,6 +1534,20 @@ def gen_payload(cmd, uid=None, db=None, **kw):
                     enabled.append(int(r["item_id"]))
         except Exception:
             pass
+        return encode("sc_13057", {"type_list": enabled})
+    if cmd == 12097:
+        # 培养攻略 / 刻印推荐全量参考配置（新档与旧档均需完整下发 sc_12097）
+        import json as _j97
+        try:
+            rows = db.query("SELECT payload_json FROM login_push WHERE cmd=12097 LIMIT 1")
+            if rows and rows[0].get("payload_json"):
+                return encode("sc_12097", _j97.loads(rows[0]["payload_json"]))
+        except Exception:
+            pass
+        _cg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "culture_gravure_12097.json")
+        if os.path.exists(_cg_path):
+            with open(_cg_path, "r", encoding="utf-8") as _f97:
+                return encode("sc_12097", _j97.load(_f97))
     if cmd == 35011:
         # 介质攫取主进度与增益词缀（weekly_challenge_service 驱动 → sc_35011）
         import weekly_challenge_service as _wcs

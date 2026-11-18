@@ -386,6 +386,38 @@ export interface MailEntry {
   items?: Array<{ id: number; num: number }>
 }
 
+export interface GachaModelSettings {
+  mode: 0 | 1 | 2 | 3
+  legacy_base: number
+  main_base: number
+  main_target: number
+  main_margin: number
+  anchor_legacy: boolean
+  feedback_strength: number
+  feedback_bias: number
+}
+
+export function fetchGachaModel(signal?: AbortSignal) {
+  return apiRequest<GachaModelSettings>('/api/gm/gacha/model', { signal })
+}
+
+export interface GachaModelRange {
+  minimum: number
+  maximum: number
+}
+
+export function fetchGachaModelRange(base: number, anchorLegacy: boolean, signal: AbortSignal) {
+  const query = new URLSearchParams({ main_base: String(base), anchor_legacy: anchorLegacy ? '1' : '0' })
+  return apiRequest<GachaModelRange>(`/api/gm/gacha/model/range?${query}`, { signal })
+}
+
+export function saveGachaModel(settings: GachaModelSettings) {
+  return apiRequest<GachaModelSettings>('/api/gm/gacha/model', {
+    method: 'POST',
+    body: JSON.stringify(settings),
+  })
+}
+
 export interface GachaPoolEntry {
   id: number
   name: string

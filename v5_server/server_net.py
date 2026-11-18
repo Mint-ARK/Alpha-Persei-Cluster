@@ -1883,7 +1883,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             return jsonify({
                 "errorCode": "0",
                 "data": {
-                    "adCodeReportEnable": True,
+                    "adCodeReportEnable": False,
                     "iosModelMap": {}
                 }
             })

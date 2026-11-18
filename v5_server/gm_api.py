@@ -1141,6 +1141,46 @@ def post_send_mail():
 # 6. 卡池管理 (/gacha)
 # ===========================================================================
 
+@gm_bp.route("/gacha/model", methods=["GET", "POST"])
+def gacha_model():
+    """Save-scoped probability settings, shared by accounts in this save."""
+    from dataclasses import asdict
+    from draw_models import CONFIG_KEY, Settings
+
+    try:
+        if request.method == "GET":
+            row = get_reader().query_one(
+                "SELECT value FROM server_global_config WHERE key=?", (CONFIG_KEY,)
+            )
+            return ok(asdict(Settings.decode(row["value"] if row else "")))
+
+        settings = Settings.parse(request.get_json(silent=True))
+        db = get_db()
+        if db is None:
+            return err(GMErrorCode.DB_NOT_READY, "数据库连接未就绪")
+        db.set_system_config(CONFIG_KEY, json.dumps(asdict(settings)))
+        return ok(asdict(settings), msg="抽卡模型已保存，下笔抽卡生效")
+    except ValueError as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    except Exception as exc:
+        return err(GMErrorCode.SERVICE_ERROR, f"抽卡模型配置操作失败: {exc}")
+
+
+@gm_bp.route("/gacha/model/range", methods=["GET"])
+def get_gacha_model_range():
+    from draw_models import main_target_range
+
+    try:
+        base = float(request.args.get("main_base", ""))
+        legacy = request.args.get("anchor_legacy", "0")
+        if legacy not in ("0", "1"):
+            raise ValueError("90 抽旧规则须为开关值")
+        minimum, maximum = main_target_range(base, legacy == "1")
+    except ValueError as exc:
+        return err(GMErrorCode.PARAM_INVALID, str(exc))
+    return ok({"minimum": minimum, "maximum": maximum})
+
+
 @gm_bp.route("/gacha/pools", methods=["GET"])
 def get_gacha_pools():
     """【只读通道】读取当前在架卡池信息与配置及四大保底监控。"""

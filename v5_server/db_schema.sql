@@ -1070,6 +1070,14 @@ CREATE TABLE IF NOT EXISTS dorm_information (        -- sc_58063 宿舍资讯（
     PRIMARY KEY (uid, info_id, param_idx)
 );
 
+-- 表: draw_feedback_state
+CREATE TABLE IF NOT EXISTS draw_feedback_state (
+    uid INTEGER NOT NULL,
+    pool_group TEXT NOT NULL,
+    residual_ema REAL NOT NULL DEFAULT 0,
+    PRIMARY KEY (uid, pool_group)
+);
+
 -- 表: draw_group_state
 CREATE TABLE IF NOT EXISTS draw_group_state (
     uid INTEGER NOT NULL,

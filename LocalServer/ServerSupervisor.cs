@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using Microsoft.Win32;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -65,9 +66,27 @@ public sealed class ServerSupervisor : IDisposable
             }
         }
 
-        // 2. 检查本机标准用户及系统 Python 安装目录 (避免踩入 WindowsApps 0 字节别名陷阱)
+        // 便携版随附 Python 3.14，开发环境优先使用在本机注册的同版解释器。
+        var standardCandidates = new List<string>();
+        try
+        {
+            using var machine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            using var installPath = machine.OpenSubKey(@"SOFTWARE\Python\PythonCore\3.14\InstallPath");
+            string? executablePath = installPath?.GetValue("ExecutablePath") as string;
+            string? installDirectory = installPath?.GetValue(null) as string;
+            if (!string.IsNullOrWhiteSpace(executablePath))
+                standardCandidates.Add(Environment.ExpandEnvironmentVariables(executablePath.Trim('"')));
+            if (!string.IsNullOrWhiteSpace(installDirectory))
+                standardCandidates.Add(Path.Combine(Environment.ExpandEnvironmentVariables(installDirectory.Trim('"')), "python.exe"));
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException
+            or System.Security.SecurityException or ArgumentException)
+        {
+            Debug.WriteLine($"[Python] 无法读取系统安装记录：{error.Message}");
+        }
+
         string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        string[] standardCandidates = [
+        standardCandidates.AddRange([
             Path.Combine(localAppData, "Python", "bin", "python.exe"),
             Path.Combine(localAppData, "Programs", "Python", "Python314", "python.exe"),
             Path.Combine(localAppData, "Programs", "Python", "Python313", "python.exe"),
@@ -79,11 +98,11 @@ public sealed class ServerSupervisor : IDisposable
             @"C:\Program Files\Python312\python.exe",
             @"C:\Program Files\Python311\python.exe",
             @"C:\Program Files\Python310\python.exe"
-        ];
+        ]);
 
         foreach (var candidate in standardCandidates)
         {
-            if (File.Exists(candidate))
+            if (Path.IsPathFullyQualified(candidate) && File.Exists(candidate))
             {
                 try
                 {
@@ -151,6 +170,7 @@ public sealed class ServerSupervisor : IDisposable
 
         // 3. 向上逐级回溯寻找源码工作区（开发与调试形态）
         DirectoryInfo? dir = new DirectoryInfo(current);
+        string? repositoryServerDir = null;
         for (int i = 0; i < 7 && dir != null; i++)
         {
             string probeV5 = Path.Combine(dir.FullName, "lua解析", "v5_server");
@@ -174,6 +194,14 @@ public sealed class ServerSupervisor : IDisposable
                 return LastResolvedServerDir;
             }
 
+            string repositoryProject = Path.Combine(dir.FullName, "LocalServer", "LocalServer.csproj");
+            string repositoryV5Server = Path.Combine(dir.FullName, "v5_server");
+            if (repositoryServerDir == null && File.Exists(repositoryProject)
+                && File.Exists(Path.Combine(repositoryV5Server, "main.py")))
+            {
+                repositoryServerDir = repositoryV5Server;
+            }
+
             dir = dir.Parent;
         }
 
@@ -182,6 +210,12 @@ public sealed class ServerSupervisor : IDisposable
         if (!string.IsNullOrWhiteSpace(envServer) && Directory.Exists(envServer) && File.Exists(Path.Combine(envServer, "main.py")))
         {
             LastResolvedServerDir = Path.GetFullPath(envServer);
+            return LastResolvedServerDir;
+        }
+
+        if (repositoryServerDir != null)
+        {
+            LastResolvedServerDir = Path.GetFullPath(repositoryServerDir);
             return LastResolvedServerDir;
         }
 

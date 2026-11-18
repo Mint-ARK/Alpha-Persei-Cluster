@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useCallback, useState, useEffect, useMemo } from 'react'
 import {
   AlertCircle,
   CheckCircle2,
@@ -31,11 +31,17 @@ import { IconBadge, PageHeader, PlainSwitch, Section } from '../components/kit'
 import { useServer } from '../lib/serverContext'
 import {
   fetchGachaPools,
+  fetchGachaModel,
+  fetchGachaModelRange,
+  saveGachaModel,
+  getSelectedSave,
   toggleGachaPool,
   setGachaPity,
   applyGachaPreset,
   resolveAssetUrl,
   type GachaPoolEntry,
+  type GachaModelSettings,
+  type GachaModelRange,
   type PityGroupState,
   type DrawRecordItem,
 } from '../lib/api'
@@ -81,9 +87,9 @@ const CATEGORIES: CategoryMeta[] = [
   {
     id: 'precision_90',
     seriesKey: 'hero_precision_90',
-    title: '90 抽必中精准池',
+    title: '90 抽锚定探测池',
     subTag: '特殊精准探测',
-    desc: '90 抽大保底必出当期 UP 修正者，绝不歪卡；软保底 81~89 抽阶梯平滑爬升。',
+    desc: '最多 90 抽获得指定 UP。命中规则和概率曲线由当前模型决定。',
     pityCap: 90,
     softPityStart: 81,
     softPityEnd: 89,
@@ -132,8 +138,180 @@ const CATEGORIES: CategoryMeta[] = [
   },
 ]
 
+const MODEL_LABELS = ['0 · 现行规则', '1 · 锚定规则修正', '2 · 查表校准', '3 · 手气反馈']
+
+function DrawModelPanel({ isOnline, onApplied }: {
+  isOnline: boolean
+  onApplied: (settings: GachaModelSettings | null) => void
+}) {
+  const [draft, setDraft] = useState<GachaModelSettings | null>(null)
+  const [applied, setApplied] = useState<GachaModelSettings | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState('')
+  const [failed, setFailed] = useState(false)
+  const [rangeResult, setRangeResult] = useState<{ key: string; range?: GachaModelRange } | null>(null)
+  const base = draft?.main_base
+  const anchorLegacy = draft?.anchor_legacy ?? false
+  const usesMainTable = draft !== null && draft.mode >= 2
+  const rangeKey = `${base}/${anchorLegacy}`
+  const currentRange = rangeResult?.key === rangeKey ? rangeResult : null
+  const range = currentRange?.range
+  const fittedTarget = draft ? draft.main_target + draft.main_margin : NaN
+  const fits = range && Number.isFinite(fittedTarget) &&
+    fittedTarget > 0 && fittedTarget < 100 &&
+    fittedTarget >= range.minimum - 1e-10 && fittedTarget <= range.maximum + 1e-10
+
+  useEffect(() => {
+    if (!isOnline) return
+    const controller = new AbortController()
+    fetchGachaModel(controller.signal).then(({ data }) => {
+      if (!controller.signal.aborted && data) {
+        setDraft(data)
+        setApplied(data)
+        onApplied(data)
+      }
+    }).catch((error: Error) => {
+      if (!controller.signal.aborted) {
+        setFailed(true)
+        setMessage(error.message)
+      }
+    })
+    return () => controller.abort()
+  }, [isOnline, onApplied])
+
+  useEffect(() => {
+    if (!isOnline || !usesMainTable || base === undefined || !Number.isFinite(base) || base < 0 || base > 100) return
+    const controller = new AbortController()
+    const timer = window.setTimeout(() => {
+      fetchGachaModelRange(base, anchorLegacy, controller.signal).then(({ data }) => {
+        if (!controller.signal.aborted) setRangeResult({ key: rangeKey, range: data })
+      }).catch(() => {
+        if (!controller.signal.aborted) setRangeResult({ key: rangeKey })
+      })
+    }, 180)
+    return () => {
+      window.clearTimeout(timer)
+      controller.abort()
+    }
+  }, [isOnline, usesMainTable, base, anchorLegacy, rangeKey])
+
+  const save = async () => {
+    if (!draft) return
+    setBusy(true)
+    setMessage('')
+    try {
+      const { data, msg } = await saveGachaModel(draft)
+      if (data) {
+        setDraft(data)
+        setApplied(data)
+        onApplied(data)
+        setFailed(false)
+        setMessage(msg || '已保存')
+      }
+    } catch (error) {
+      setFailed(true)
+      setMessage(error instanceof Error ? error.message : '保存失败')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const numberInput = (field: 'legacy_base' | 'main_base' | 'main_target' | 'main_margin' |
+    'feedback_strength' | 'feedback_bias', label: string, min: number, max: number, step: number) => (
+    <label className="flex flex-col gap-1 text-sm">
+      <span>{label}</span>
+      <input type="number" min={min} max={max} step={step} required
+        className="rounded-xl border border-separator bg-surface px-3 py-2"
+        value={draft && Number.isFinite(draft[field]) ? draft[field] : ''}
+        onChange={(event) => {
+          const value = event.currentTarget.valueAsNumber
+          setDraft((prev) => prev && { ...prev, [field]: value })
+        }}
+      />
+    </label>
+  )
+
+  return (
+    <Section title="抽卡模型" description="设置应用于当前存档，从下一笔抽卡生效。">
+      <Card className="p-4">
+        {draft && isOnline ? (
+          <form className="space-y-4" onSubmit={(event) => { event.preventDefault(); void save() }}>
+            <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <label className="flex flex-col gap-1 text-sm">
+                <span>模型</span>
+                <select className="rounded-xl border border-separator bg-surface px-3 py-2"
+                  value={draft.mode} onChange={(event) => {
+                    const mode = Number(event.currentTarget.value) as GachaModelSettings['mode']
+                    setDraft({ ...draft, mode })
+                  }}>
+                  {MODEL_LABELS.map((label, index) => <option key={label} value={index}>{label}</option>)}
+                </select>
+              </label>
+              {draft.mode < 2 ? numberInput('legacy_base', '0／1 号基础出金率 (%)', 0, 100, 0.01) : (
+                <>
+                  {numberInput('main_base', '主表基础出金率 (%)', 0, 100, 0.01)}
+                  {numberInput('main_target', '主表综合目标 (%)', 0, 100, 0.001)}
+                  {numberInput('main_margin', '主表补正 (百分点)', 0, 100, 0.001)}
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={draft.anchor_legacy}
+                      onChange={(event) => setDraft({ ...draft, anchor_legacy: event.currentTarget.checked })} />
+                    90 池出金即 UP
+                  </label>
+                </>
+              )}
+              {draft.mode === 3 && (
+                <>
+                  {numberInput('feedback_strength', '反馈强度', 0, 1, 0.01)}
+                  {numberInput('feedback_bias', '手动偏置 (百分点)', -100, 100, 0.01)}
+                </>
+              )}
+            </fieldset>
+            {usesMainTable && (
+              <p role="status" className={cn('text-xs text-muted', range && !fits && 'text-danger')}>
+                综合目标与补正相加后，须落在 70 池与当前 90 池规则的共同可达范围。
+                {range && range.minimum < 100 && range.minimum <= range.maximum && (
+                  <>当前范围约 <strong>{range.minimum.toFixed(4)}%～{range.maximum.toFixed(4)}%</strong>。
+                    {Number.isFinite(fittedTarget) && <> 拟合值 {fittedTarget.toFixed(3)}%。</>}
+                    {!fits && ' 请调整输入至可达范围。'}</>
+                )}
+                {range && (range.minimum >= 100 || range.minimum > range.maximum) && ' 当前基础率下没有可用的综合目标，请调低基础率。'}
+                {!range && currentRange && ' 暂时无法读取范围，保存时由服务端校验。'}
+              </p>
+            )}
+            {draft.mode === 3 && (
+              <p className="text-xs text-muted">默认配置用离线校准参数，目标为 2.40%。自定义主表时，反馈直接叠加在新表上，实际出率会变化。偏置 +100 时每抽出金。</p>
+            )}
+            <div className="flex flex-wrap items-center gap-3">
+              <Button type="submit" size="sm" isDisabled={busy || JSON.stringify(draft) === JSON.stringify(applied)}>
+                {busy ? '保存中' : '应用并保存'}
+              </Button>
+              {applied && <span className="text-xs text-muted">当前生效 {MODEL_LABELS[applied.mode]}</span>}
+            </div>
+          </form>
+        ) : isOnline && !message ? <p className="text-sm text-muted">正在读取模型配置…</p> :
+          !isOnline ? <p className="text-sm text-muted">连接服务后可调整抽卡模型。</p> : null}
+        {message && <p role={failed ? 'alert' : 'status'} className={cn('mt-2 text-sm', failed && 'text-danger')}>{message}</p>}
+      </Card>
+    </Section>
+  )
+}
+
 export default function GachaPanel() {
-  const { activeUid, isOnline, resVersionInfo } = useServer()
+  const { activeUid, isOnline, resVersionInfo, selectedSave } = useServer()
+  const [modelState, setModelState] = useState<{ save: string; settings: GachaModelSettings } | null>(null)
+  const model = isOnline && modelState?.save === selectedSave ? modelState.settings : null
+  const correctedAnchor = model?.mode === 1 || (model && model.mode >= 2 && !model.anchor_legacy)
+  const setModel = useCallback((settings: GachaModelSettings | null) => {
+    if (getSelectedSave() === selectedSave) {
+      setModelState(settings ? { save: selectedSave, settings } : null)
+    }
+  }, [selectedSave])
+  const softPityStart = (category: CategoryMeta) =>
+    category.id === 'precision_90' && model && model.mode >= 2 && model.anchor_legacy ? 66 :
+      category.id !== 'precision_90' && model?.mode === 3 &&
+      model.main_base === 1.6 && model.main_target === 2.4 && model.main_margin === 0.005 &&
+      (model.feedback_strength > 0 || model.feedback_bias !== 0) ? 61 :
+        category.softPityStart
   const currentVersion = resVersionInfo?.current_version || '229'
   const isVer311 = currentVersion === '311'
 
@@ -490,6 +668,8 @@ export default function GachaPanel() {
         }
       />
 
+      <DrawModelPanel key={selectedSave} isOnline={isOnline} onApplied={setModel} />
+
       {/* 飘字提示 */}
       {toastMsg && (
         <Alert status={toastMsg.type === 'success' ? 'success' : toastMsg.type === 'warning' ? 'warning' : 'danger'}>
@@ -739,7 +919,7 @@ export default function GachaPanel() {
                       <div
                         className={cn(
                           'h-full rounded-full transition-all duration-300',
-                          pState.since_ssr >= cat.softPityStart
+                          pState.since_ssr + 1 >= softPityStart(cat)
                             ? 'bg-warning'
                             : pState.since_ssr >= cat.pityCap
                               ? 'bg-danger'
@@ -807,7 +987,7 @@ export default function GachaPanel() {
                     <div
                       className={cn(
                         'h-full rounded-full transition-all duration-300',
-                        curPityState.since_ssr >= curCatMeta.softPityStart
+                        curPityState.since_ssr + 1 >= softPityStart(curCatMeta)
                           ? 'bg-warning'
                           : curPityState.since_ssr >= curCatMeta.pityCap
                             ? 'bg-danger'
@@ -821,11 +1001,11 @@ export default function GachaPanel() {
 
                   {/* 软保底说明 */}
                   <div className="text-[11px] leading-relaxed text-muted pt-0.5">
-                    软保底区间为{' '}
+                    软保底区间{' '}
                     <span className="font-semibold text-foreground font-mono">
-                      {curCatMeta.softPityStart} ~ {curCatMeta.softPityEnd}
+                      {softPityStart(curCatMeta)} ~ {curCatMeta.softPityEnd}
                     </span>{' '}
-                    抽阶梯爬升。官方基准出率 1.60%，大数综合出金率收敛至 2.40%。
+                    抽。第 {curCatMeta.pityCap} 抽硬保底。
                   </div>
 
                   {/* 70 扩充池专属：大保底触发状态显示 */}
@@ -942,9 +1122,11 @@ export default function GachaPanel() {
                 {curCatMeta.id === 'precision_90' && (
                   <div className="rounded-xl border border-separator p-2.5 text-[11px] text-muted space-y-1">
                     <div className="font-semibold text-foreground flex items-center gap-1.5">
-                      <CheckCircle2 className="size-3.5 text-accent" /> 90 抽大保底绝对防歪
+                      <CheckCircle2 className="size-3.5 text-accent" /> 90 抽保底规则
                     </div>
-                    <div>该卡池出金 100% 必定命中当期 UP 修正者，规则上不存在歪卡逻辑。</div>
+                    <div>{model === null ? '连接服务后显示当前模型的锚定规则。' : correctedAnchor
+                      ? '保底前出金时有 55% 概率命中 UP，非 UP 不清零，第 90 抽必出 UP。'
+                      : '每次出金均命中当期 UP。'}</div>
                     {activePoolIds.includes(5030601) && (
                       <div className="text-secondary font-medium pt-1 border-t border-separator/60">
                         ★ 当前已在架 311 全自选锚定探测池（#5030601），在 311 客户端内自由自选目标，垫抽数严格计入 hero_precision_90 序列，绝不污染常驻池！
