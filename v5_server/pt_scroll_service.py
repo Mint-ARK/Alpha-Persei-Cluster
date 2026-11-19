@@ -11,6 +11,7 @@ from middleware import DownFrame
 
 STAGE_TYPE = 61
 MAX_MULTIPLE = 10  # challenge_multiple_count_unlock_level has ten entries.
+TICKET_CLEAR_COUNT = 2  # GameSetting.activity_pt_roulette_task_times
 CATALOG = {int(aid): row for aid, row in
            json.loads(Path(__file__).with_name("pt_scroll_cfg.json").read_text("utf-8")).items()}
 STAGE_KEYS = frozenset(number for activity in CATALOG.values() for key, stage in activity["stages"].items()
@@ -23,6 +24,14 @@ def reserved(stage_type, dest):
 
 def _open(row, now):
     return row["activity_id"] in CATALOG and row["state"] == 1 and row["start_time"] <= now < row["stop_time"]
+
+
+def require_activity(db, uid, aid, now):
+    from generator import get_activity_list
+    if aid not in CATALOG or not any(row["activity_id"] == aid and _open(row, now)
+                                     for row in get_activity_list(db, uid)):
+        raise OperationError(2, "联防协议活动未开放")
+    return CATALOG[aid]
 
 
 def _progress(db, uid, aid):
@@ -54,13 +63,10 @@ def login_frames(db, uid, activities, encode):
 
 
 def validate(db, uid, stage_type, aid, dest, times, *, sweep=False, check_cost=True):
-    from generator import get_activity_list
     stage = CATALOG.get(aid, {}).get("stages", {}).get(str(dest))
     if stage_type != STAGE_TYPE or not stage or not 1 <= times <= MAX_MULTIPLE:
         raise OperationError(2, "联防协议活动、关卡或次数无效")
-    now = int(time.time())
-    if not any(row["activity_id"] == aid and _open(row, now) for row in get_activity_list(db, uid)):
-        raise OperationError(2, "联防协议活动未开放")
+    require_activity(db, uid, aid, int(time.time()))
     progress = _progress(db, uid, aid)
     cleared = set(json.loads(progress.get("clear_stage_list") or "[]"))
     if sweep and stage["stage_id"] not in cleared:
@@ -69,6 +75,35 @@ def validate(db, uid, stage_type, aid, dest, times, *, sweep=False, check_cost=T
     if check_cost and InventoryService.get_item_balance(db, uid, item)[1] < count * times:
         raise OperationError(3, "联防协议入场资源不足")
     return stage, cleared
+
+
+def claim_tickets(ctx, uid, aid, times, task_ids):
+    from operations import TaskSubmitOp
+    now = int(time.time())
+    cfg = require_activity(ctx.db, uid, aid, now)
+    progress = _progress(ctx.db, uid, aid)
+    available = max(0, progress.get("clear_times") or 0) // TICKET_CLEAR_COUNT
+    if times != available or (times == 0 and not task_ids) or len(set(task_ids)) != len(task_ids):
+        raise OperationError(2, "联防协议任务奖励次数无效")
+    task_submit = TaskSubmitOp()
+    task_submit.uid = uid
+    for tid in task_ids:
+        rows = ctx.db.query("SELECT activity_id FROM task_cfg WHERE task_id=?", (tid,))
+        if not rows or rows[0]["activity_id"] != cfg["task_activity_id"]:
+            raise OperationError(2, "任务不属于本期联防协议")
+        # The native client displays assignment rewards from its task config.
+        task_submit.apply({"id": tid}, ctx)
+    if not times:
+        return []
+
+    ticket, count = next(stage["cost"] for stage in cfg["stages"].values() if stage["mode"] == 2)
+    left = progress["clear_times"] - times * TICKET_CLEAR_COUNT
+    ctx.db.execute("UPDATE pt_roulette_progress SET clear_times=?,update_ts=? WHERE uid=? AND activity_id=?",
+                   (left, now, uid, aid))
+    items = [(ticket, count * times)]
+    summary = InventoryService.grant_items(ctx, uid, items, source="pt_scroll_task")
+    return [{"id": iid, "num": amount}
+            for iid, amount in InventoryService.rewards_after_overflow(items, summary)]
 
 
 def settle(ctx, uid, bid, result, stage_type, aid, dest, times, heroes, battle_info, sweep):

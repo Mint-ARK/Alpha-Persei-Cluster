@@ -6119,6 +6119,23 @@ operation(HeroTaskClaimOp)
 operation(DailyTaskClaimOp)
 
 
+@operation
+class PtScrollTaskClaimOp(Operation):
+    cmd, sc = 76154, 76155
+    prepare_response_in_transaction = True
+
+    def apply(self, data, ctx):
+        from pt_scroll_service import claim_tickets
+        return claim_tickets(ctx, self.uid, int(data.get("activity_id") or 0),
+                             int(data.get("times") or 0), data.get("assignment_id_list") or [])
+
+    def respond(self, result, data, ctx):
+        payload = ctx.codec_encode("sc_76155", {"result": 0, "reward_list": result})
+        if not payload:
+            raise ValueError("联防协议领奖回执为空")
+        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
+
+
 # ==============================================================================
 #                      四大高难周常玩法系统操作 (@operation 调度)
 # ==============================================================================

@@ -98,6 +98,26 @@ class PtScrollTests(MemoryTests):
         self.assertEqual(self.finish()[0]["result"], 0)
         self.assertEqual(self.balance(53214), 600)
 
+    def test_normal_clears_fund_final_stage_and_ticket_reward_is_one_time(self):
+        self.db.set_currency(UID, 54129, 0)
+        for item in (40803, 40103, 40203, 22003):
+            self.db.execute("INSERT INTO item_catalog(id,type) VALUES(?,5)", (item,))
+        claim = dict(activity_id=ALPHA, times=1)
+        self.assertNotEqual(self.battle(dest=502201)[0]["result"], 0)
+        self.assertNotEqual(self.call(76154, claim, 76155)[0]["result"], 0)
+        self.assertEqual(self.battle(times=2)[0]["result"], 0)
+        self.assertEqual(self.finish()[0]["result"], 0)
+        bad_task = dict(claim, assignment_id_list=[381890101])
+        self.assertNotEqual(self.call(76154, bad_task, 76155)[0]["result"], 0)
+        self.assertEqual(self.balance(54129), 0)
+        award = self.call(76154, claim, 76155)[0]
+        self.assertEqual(award["result"], 0)
+        self.assertEqual(award["reward_list"], [{"id": 54129, "num": 2}])
+        self.assertNotEqual(self.call(76154, claim, 76155)[0]["result"], 0)
+        self.assertEqual(self.battle(dest=502201)[0]["result"], 0)
+        self.assertEqual(self.finish()[0]["result"], 0)
+        self.assertEqual(self.balance(54129), 0)
+
 
 if __name__ == "__main__":
     unittest.main()
