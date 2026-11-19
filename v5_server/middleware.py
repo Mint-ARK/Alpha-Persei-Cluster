@@ -879,7 +879,7 @@ def _weighted_pick(entries, rng):
     return e[0], e[1]
 
 
-def stage_drop(dest, rng=None, first_clear=False):
+def stage_drop(dest, rng=None, first_clear=False, *, drop_lib=None):
     """按客户端 DropCfg 契约选择首通 base 或重复 random/weight。
 
     None 表示没有掉落库，可使用旧奖励配置；[] 表示该分支没有奖励，
@@ -888,7 +888,7 @@ def stage_drop(dest, rng=None, first_clear=False):
     import random as _r
     rng = rng or _r
     drop_cfg, stage_drop_map, _, _, _, _ = _load_battle_cfgs()
-    lib = stage_drop_map.get(str(dest)) or stage_drop_map.get(dest)
+    lib = drop_lib if drop_lib is not None else stage_drop_map.get(str(dest)) or stage_drop_map.get(dest)
     if lib is not None:
         d = drop_cfg.get(str(lib)) or drop_cfg.get(lib)
         if d:
@@ -1376,6 +1376,10 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
     battle_info = battle_info or {}
 
     dest_int = int(dest or 0)
+    from pt_scroll_service import reserved as pt_reserved, settle as settle_pt
+    if pt_reserved(stage_type, dest_int):
+        return settle_pt(ctx, uid, bid, result, stage_type, activity_id, dest_int,
+                         times, heroes, battle_info, sweep)
     from summer_board_nested import reserved as board_reserved,settle as settle_board
     board_session=battle_context or get_battle_session(bid) or {}
     if board_session.get('summer_board_context') or board_reserved(stage_type,dest_int):
@@ -2236,6 +2240,9 @@ def _boss_period_rejection(ctx, uid, bid, dest, reason):
 def h_54034(req, ctx):
     """剧情战斗入口 → sc_54035（result=0 + battle_id f2 varint）。会话登记供结算。"""
     dest = _pkt_session_id({"payload": req.payload})
+    from pt_scroll_service import reserved as pt_reserved
+    if pt_reserved(0, dest):
+        return CSResponse([DownFrame(54035, b"\x08\x02")])
     from skuld_service import CFG as skuld_cfg, battle_entry as skuld_entry, ACTIVITY as skuld_activity
     if str(dest) in skuld_cfg['battles']:
         data=ctx.codec_decode(req.payload,'cs_54034')
@@ -2341,8 +2348,16 @@ def h_54030(req, ctx):
     if info.get('type') == 603:
         from pinball_service import battle_entry
         battle_entry(ctx.db, req.uid, info['dest'], info.get('activity_id'))
+    from pt_scroll_service import reserved as pt_reserved, validate as validate_pt
+    pt_scroll_battle = pt_reserved(info["type"], info["dest"])
+    if pt_scroll_battle:
+        from core import OperationError
+        try:
+            validate_pt(ctx.db, req.uid, info["type"], info["activity_id"], info["dest"], info["battle_times"])
+        except OperationError as exc:
+            return CSResponse([DownFrame(54031, b"\x08" + _varint(exc.code))])
     from new_player_service import enabled, stage_available
-    if board_context is None and sphero_context is None and quanzhou_context is None and polyhedron_context is None and warchess_context is None and enabled(ctx.db,req.uid) and not stage_available(ctx.db,req.uid,int(info.get('dest') or 0)):
+    if not pt_scroll_battle and board_context is None and sphero_context is None and quanzhou_context is None and polyhedron_context is None and warchess_context is None and enabled(ctx.db,req.uid) and not stage_available(ctx.db,req.uid,int(info.get('dest') or 0)):
         raise ValueError('关卡尚未解锁')
     from boss_challenge_team import BossTeamError
     try:
@@ -2532,6 +2547,8 @@ def _settle_battle_session(req, ctx, bid, session):
     pub_battle = stage_type == 87
     skuld_battle = stage_type == 602
     pinball_battle = stage_type == 603
+    from pt_scroll_service import reserved as pt_reserved
+    pt_scroll_battle = pt_reserved(stage_type, dest)
     board_battle = bool(session.get('summer_board_context'))
     from sphero_battle_service import STAGES as sphero_stages
     sphero_battle = stage_type==66 or int(dest) in sphero_stages
@@ -2624,7 +2641,7 @@ def _settle_battle_session(req, ctx, bid, session):
         # 兼容旧会话中仍有 extra 的情况，但不再读取或重发它。
         br, extra = session["br"], []
     else:
-        if boss_kind or mythic_final or rogue_battle or pinball_battle or hodur_battle or ash_battle or pub_battle or osiris_battle or skuld_battle or board_battle or sphero_battle or quanzhou_battle or polyhedron_battle or warchess_battle or mythic_normal:
+        if pt_scroll_battle or boss_kind or mythic_final or rogue_battle or pinball_battle or hodur_battle or ash_battle or pub_battle or osiris_battle or skuld_battle or board_battle or sphero_battle or quanzhou_battle or polyhedron_battle or warchess_battle or mythic_normal:
             from account_db import savepoint_transaction
             from operation_notifications import checkpoint_notifications, restore_notifications
             checkpoint = checkpoint_notifications(ctx)
@@ -2645,7 +2662,7 @@ def _settle_battle_session(req, ctx, bid, session):
                         validate_chess(ctx.db,req.uid,session)
                     br, extra = _settle_frames(ctx, req.uid, bid, result, dest, times=times, heroes=heroes,
                                               battle_info=b_info, stage_type=stage_type, activity_id=activity_id)
-                    if rogue_battle or pinball_battle or hodur_battle or ash_battle or pub_battle or osiris_battle or skuld_battle or board_battle or sphero_battle or quanzhou_battle or polyhedron_battle or warchess_battle or mythic_normal:
+                    if pt_scroll_battle or rogue_battle or pinball_battle or hodur_battle or ash_battle or pub_battle or osiris_battle or skuld_battle or board_battle or sphero_battle or quanzhou_battle or polyhedron_battle or warchess_battle or mythic_normal:
                         pinball_ack = ctx.codec_encode('sc_54033', dict(result=0, battle_result=br))
                         if not isinstance(pinball_ack, (bytes, bytearray, memoryview)) or not pinball_ack:
                             raise ValueError('小游戏战斗结算回执为空')
@@ -2664,6 +2681,9 @@ def _settle_battle_session(req, ctx, bid, session):
                         validate_chess(ctx.db,req.uid,session,after=True)
             except BaseException as exc:
                 restore_notifications(ctx, checkpoint)
+                from core import OperationError
+                if pt_scroll_battle and isinstance(exc, OperationError):
+                    return CSResponse([DownFrame(54033, _settlement_error_payload(bid, dest))])
                 if isinstance(exc, (BattlePeriodExpired, BossIdentityError)):
                     return _boss_period_rejection(ctx, req.uid, bid, dest, str(exc))
                 if isinstance(exc, MythicPeriodExpired):
@@ -2765,8 +2785,9 @@ def _sweep_settlement(req, ctx):
     import reserve_codec
     import battle_payload
     info = _parse_battle_common(req, ctx)
+    from pt_scroll_service import reserved as pt_reserved
     from new_player_service import enabled, stage_available
-    if enabled(ctx.db,req.uid):
+    if not pt_reserved(info["type"], info["dest"]) and enabled(ctx.db,req.uid):
         if not stage_available(ctx.db,req.uid,int(info.get('dest') or 0)):
             raise ValueError('关卡尚未解锁')
         cleared=ctx.db.query('SELECT 1 FROM chapter WHERE uid=? AND id=? AND clear_times>0 UNION ALL '

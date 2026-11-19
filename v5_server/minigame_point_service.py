@@ -60,10 +60,13 @@ def _claim(ctx,uid,reward_ids):
         claimed.update(values)
     require(not claimed.intersection(reward_ids),'积分奖励已领取')
 
+    from cultivate_hero_service import CATALOG as cultivate_catalog
     balances={}
     for rid,row in selected:
         activity=int(row['activity_id']);require(activity in visible,'积分奖励所属活动未开放')
         item=int(row['need_item_id'])
+        if activity in cultivate_catalog:
+            item = cultivate_catalog[activity]["coin_id"]
         if activity==1101:
             from rogueteam_service import RogueTeamConfig
             item=int(RogueTeamConfig.get().cfg['main']['point_item'])

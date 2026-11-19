@@ -208,6 +208,9 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
         # Skip before pool initialization as well as before transmission.
         skin_frames, skin_draw_profile = [], False
     frames = [row for row in frames if row[1] not in DRAW_STATE_COMMANDS]
+    # 限期委培与联防协议状态由当前活动列表和存档生成。
+    activity_state_commands = (64077, 64081, 64083, 76151)
+    frames = [row for row in frames if row[1] not in activity_state_commands]
     marker = next((i for i, row in enumerate(frames) if row[1] == 10201), len(frames))
     if skin_frames:
         for cmd in (20007, 20009, 11001):
@@ -368,6 +371,18 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
 
             sock.sendall(frame)
             sent += 1
+
+            if cmd == 11001 and gen:
+                from codec import decode
+                from cultivate_hero_service import login_frames as cultivate_login_frames
+                from pt_scroll_service import login_frames as pt_scroll_login_frames
+                activities = decode(gen, "sc_11001").get("activity_list", [])
+                for command, prepare in ((64077, cultivate_login_frames), (76151, pt_scroll_login_frames)):
+                    if login_policy.allows(command):
+                        for packet in prepare(db, uid, activities, _codec_encode):
+                            sock.sendall(generator.build_frame(packet.cmd, packet.payload))
+                            sent += 1
+                            dyn_hit += 1
 
             # 梦境再构联动补发 45001（普通首领列表）与 45101（进阶首领列表）
             if cmd == 45201 and generator is not None:

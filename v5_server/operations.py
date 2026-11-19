@@ -6113,6 +6113,12 @@ class ActivityPointTierRewardOp(_ActivityPointClaimOp):
     cmd, sc = 60054, 60055
 
 
+from cultivate_hero_service import DailyTaskClaimOp, HeroTaskClaimOp
+
+operation(HeroTaskClaimOp)
+operation(DailyTaskClaimOp)
+
+
 # ==============================================================================
 #                      四大高难周常玩法系统操作 (@operation 调度)
 # ==============================================================================
