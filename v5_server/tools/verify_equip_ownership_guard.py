@@ -3,6 +3,10 @@ import json
 import unittest
 from unittest.mock import patch
 from verify_report_small_fixes import MemoryTests, UID
+import battle_payload
+from battle_server import parse_pb_top
+import codec
+from equip_service import INHERIT_COST_DEFAULT
 from hero_service import HeroService
 
 
@@ -76,21 +80,90 @@ class OwnershipTests(MemoryTests):
         self.reject(quick=True,items=[dict(equip_id=101,pos=1),dict(equip_id=999999,pos=2)])
         self.reject(quick=True,items=[dict(equip_id=101,pos=1),dict(equip_id=102,pos=7)])
 
-    def test_cross_hero_transfer_detaches_old_and_replaced_owner(self):
-        self.assertEqual(self.single()[0]['result'],0)
-        self.assertEqual(self.slots(1084),{})
+    def test_cross_hero_exchange_matches_the_client_callback(self):
+        answer, response = self.single()
+        self.assertEqual(answer['result'], 0)
+        self.assertLess(response.scs.index(13013), response.scs.index(14007))
+        self.assertEqual(self.slots(1084),{'1':201})
         self.assertEqual(self.slots(1039),{'1':101})
-        self.assertEqual((self.owner(101),self.owner(201)),(1039,0))
+        self.assertEqual((self.owner(101),self.owner(201)),(1039,1084))
+
+    def test_single_unload_clears_wear_and_preserves_binding(self):
+        self.db.execute('UPDATE equip SET race_hero=1084, is_lock=1 WHERE uid=? AND id=101', (UID,))
+        answer, response = self.single(hid=1084, eid=0)
+        self.assertEqual(answer['result'], 0)
+        self.assertLess(response.scs.index(13013), response.scs.index(14007))
+        self.assertEqual(self.slots(1084), {})
+        equip = self.db.get('equip', UID, 'AND id=101')
+        self.assertEqual((equip['hero_id'], equip['race_hero'], equip['is_lock']), (0, 1084, 1))
+        self.assertEqual(self.single(hid=1084, eid=0)[0]['result'], 0)
+
+    def test_unload_all_keeps_lock_but_clears_slot(self):
+        self.db.execute('UPDATE equip SET is_lock=1 WHERE uid=? AND id=101', (UID,))
+        answer, response = self.call(13018, dict(hero_id=1084), 13019)
+        self.assertEqual(answer['result'], 0)
+        self.assertLess(response.scs.index(13019), response.scs.index(14007))
+        self.assertEqual(self.slots(1084), {})
+        self.assertEqual(self.owner(101), 0)
+        self.assertEqual(self.db.get('equip', UID, 'AND id=101')['is_lock'], 1)
+
+    def test_inherit_reindexes_same_instance_with_its_training(self):
+        for prefab_id in (512068, 519051):
+            self.db.execute('INSERT INTO equip_cfg(prefab_id,starlevel) VALUES(?,5)', (prefab_id,))
+        for item_id, count in INHERIT_COST_DEFAULT:
+            item_type = 1 if item_id == 2 else 5
+            self.db.execute('INSERT INTO item_catalog(id,type) VALUES(?,?)', (item_id, item_type))
+            if item_type == 1:
+                self.db.set_currency(UID, item_id, count)
+            else:
+                self.db.add_item(UID, item_id, count)
+        self.db.execute('UPDATE equip SET prefab_id=512068, exp=123, is_lock=1, race_hero=1084 '
+                        'WHERE uid=? AND id=101', (UID,))
+        answer, response = self.call(13052, dict(new_equip_id=101, inherit_equip_prefab_id=519051), 13053)
+        self.assertEqual(answer['result'], 0)
+        self.assertEqual(response.scs[-3:], [17023, 13009, 13053])
+        removal = codec.decode(response.frames[-3]['payload'], 'sc_17023')['equip_list'][0]
+        self.assertEqual((removal['equip_id'], removal['prefab_id'], removal['num']), (101, 512068, 0))
+        refreshed = codec.decode(response.frames[-2]['payload'], 'sc_13009')['equip_list'][0]
+        self.assertEqual((refreshed['equip_id'], refreshed['prefab_id'], refreshed['exp'],
+                          refreshed['hero_id'], refreshed['race'], refreshed['is_lock']),
+                         (101, 519051, 123, 1084, 1084, True))
+        self.assertEqual(self.single(hid=1084, eid=0)[0]['result'], 0)
 
     def test_valid_six_slots_quick_batch_has_one_item_per_position(self):
         items=[dict(equip_id=100+p,pos=p) for p in range(1,7)]
         answer,response=self.quick(items)
         self.assertEqual(answer['result'],[dict(equip_id=100+p,result=0) for p in range(1,7)])
         self.assertEqual(self.slots(1039),{str(p):100+p for p in range(1,7)})
-        self.assertEqual(self.slots(1084),{})
+        self.assertEqual(self.slots(1084),{'1':201})
         self.assertTrue(all(self.owner(100+p)==1039 for p in range(1,7)))
-        self.assertEqual(self.owner(201),0)
-        self.assertEqual(response.scs[-1],13027)
+        self.assertEqual(self.owner(201),1084)
+        self.assertLess(response.scs.index(13027), response.scs.index(14007))
+
+    def test_battle_uses_omega_and_only_mutually_worn_equipment(self):
+        self.db.execute('UPDATE hero SET star=600 WHERE uid=? AND id=1039', (UID,))
+        items = [dict(equip_id=100+p, pos=p) for p in range(1, 7)]
+        self.quick(items)
+        self.db.execute('UPDATE equip SET race=1, race_hero=1039, exp=123, now_break_level=2 '
+                        'WHERE uid=? AND id=101', (UID,))
+
+        def read_start():
+            payload = battle_payload.build_sc_54003_dynamic(self.db, UID, [1039])
+            player = parse_pb_top(parse_pb_top(payload)[1])
+            hero = parse_pb_top(player[2])[4]
+            return codec.decode(hero, 'battle_hero_net_rec')
+
+        hero = read_start()
+        equips = hero['equip_list']
+        self.assertEqual(hero['hero_base_info']['star'], 600)
+        self.assertEqual([equip['equip_id'] for equip in equips], list(range(101, 107)))
+        self.assertEqual((equips[0]['race'], equips[0]['exp'], equips[0]['now_break_level']),
+                         (1039, 123, 2))
+        self.assertEqual([slot['id'] for slot in equips[0]['enchant_slot_list']], [1, 2])
+
+        # An old snapshot points to a piece that is already wearing another hero.
+        self.db.execute('UPDATE equip SET hero_id=1084 WHERE uid=? AND id=101', (UID,))
+        self.assertEqual([equip['equip_id'] for equip in read_start()['equip_list']], list(range(102, 107)))
 
     def test_sql_failure_rolls_back_and_quick_error_is_repeated_message(self):
         real=self.db.execute

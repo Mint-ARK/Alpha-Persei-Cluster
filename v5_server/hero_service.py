@@ -1724,38 +1724,48 @@ class HeroService:
 
     def _swap_equip(self, ctx, uid, hero_id, equip_id, pos):
         """
-        刻印穿戴/置换：cs_13012 -> sc_13013
-        - 验证 pos 1~6
-        - 若刻印原本装在其他角色身上，自动从对方槽位中卸下
-        - 同步更新 equip.hero_id 与双方 hero.equip_slot，确保双端绝对一致
+        刻印穿戴、交换或单槽卸下：cs_13012 -> sc_13013。
         """
         db = getattr(ctx, "db", self.db)
         hid = int(hero_id)
         eid = int(equip_id)
         p = int(pos)
         self._check_equip_wear_target(db, uid, hid)
-        eq = self._check_equip_wear_item(db, uid, eid, p)
+        if not 1 <= p <= 6:
+            raise OperationError(2, '刻印槽位越界')
+        eq = self._check_equip_wear_item(db, uid, eid, p) if eid else None
         slots = self.get_hero_equip_slots(uid, hid, db=db)
-        prev_owner = int(eq['hero_id'] or 0)
+        prev_owner = int(eq['hero_id'] or 0) if eq else 0
         old_eid = int(slots.get(str(p)) or 0)
-        if prev_owner == hid and old_eid == eid and sum(int(v or 0) == eid for v in slots.values()) == 1:
+        if (eid == old_eid == 0 or
+            (prev_owner == hid and old_eid == eid and sum(int(v or 0) == eid for v in slots.values()) == 1)):
             return dict(hero_id=hid, equip_id=eid, pos=p, replaced=old_eid, prev_owner=prev_owner)
 
-        # 1. 若曾属于别的角色，从原拥有者槽位卸下
+        # 客户端成功回调会交换两边同位置的刻印。
+        new_old_owner = 0
         if prev_owner and prev_owner != hid:
             other_slots = self.get_hero_equip_slots(uid, prev_owner, db=db)
+            if int(other_slots.get(str(p)) or 0) == eid and old_eid and old_eid != eid:
+                from inventory_service import _get_equip_map
+                old_rows = db.query("SELECT prefab_id FROM equip WHERE uid=? AND id=? AND hero_id=?",
+                                    (uid, old_eid, hid))
+                if old_rows and _get_equip_map().get(str(old_rows[0]["prefab_id"]), {}).get("pos") == p:
+                    new_old_owner = prev_owner
             other_slots = {k: v for k, v in other_slots.items() if int(v or 0) != eid}
+            if new_old_owner:
+                other_slots[str(p)] = old_eid
             db.execute("UPDATE hero SET equip_slot=?, update_ts=? WHERE uid=? AND id=?",
                        (json.dumps({str(k): int(v) for k, v in other_slots.items() if v}), int(time.time()), uid, prev_owner))
 
-        # 2. 若当前槽位已有刻印，卸下原刻印
         if old_eid and old_eid != eid:
-            db.execute("UPDATE equip SET hero_id=0 WHERE uid=? AND id=? AND hero_id=?", (uid, old_eid, hid))
+            db.execute("UPDATE equip SET hero_id=? WHERE uid=? AND id=? AND hero_id=?",
+                       (new_old_owner, uid, old_eid, hid))
 
-        # 3. 装配新刻印
-        db.execute("UPDATE equip SET hero_id=? WHERE uid=? AND id=?", (hid, uid, eid))
-        slots = {k: v for k, v in slots.items() if int(v or 0) != eid}
-        slots[str(p)] = eid
+        slots.pop(str(p), None)
+        if eid:
+            db.execute("UPDATE equip SET hero_id=? WHERE uid=? AND id=?", (hid, uid, eid))
+            slots = {k: v for k, v in slots.items() if int(v or 0) != eid}
+            slots[str(p)] = eid
         saved = db.execute("UPDATE hero SET equip_slot=?, update_ts=? WHERE uid=? AND id=?",
                    (json.dumps({str(k): int(v) for k, v in slots.items() if v}), int(time.time()), uid, hid))
         if saved.rowcount != 1:
@@ -1811,23 +1821,16 @@ class HeroService:
                    (json.dumps({str(k): int(v) for k, v in slots.items() if v}), int(time.time()), uid, int(hero_id)))
 
     def unload_all_equips(self, ctx, uid, hero_id):
-        """
-        全部卸下刻印：cs_13018 -> sc_13019
-        - 保留已锁定 (is_lock=1) 的刻印
-        - 卸下所有未锁刻印并清空 hero.equip_slot 对应槽位
-        """
+        """全部卸下刻印，保留刻印自身的锁定及绑定状态。"""
+        from account_db import savepoint_transaction
         db = getattr(ctx, "db", self.db)
         hid = int(hero_id)
-        slots = self.get_hero_equip_slots(uid, hid)
-        locked_rows = db.query("SELECT id FROM equip WHERE uid=? AND hero_id=? AND is_lock=1", (uid, hid))
-        locked = {r["id"] for r in locked_rows} if locked_rows else set()
-
-        db.execute("UPDATE equip SET hero_id=0 WHERE uid=? AND hero_id=? AND is_lock=0", (uid, hid))
-        kept = {p: e for p, e in slots.items() if int(e or 0) in locked}
-        db.execute("UPDATE hero SET equip_slot=?, update_ts=? WHERE uid=? AND id=?",
-                   (json.dumps({str(k): int(v) for k, v in kept.items() if v}), int(time.time()), uid, hid))
-
-        return {"hero_id": hid, "removed": len(slots) - len(kept), "kept_locked": len(kept)}
+        with savepoint_transaction(db):
+            self._check_equip_wear_target(db, uid, hid)
+            changed = db.execute("UPDATE equip SET hero_id=0 WHERE uid=? AND hero_id=?", (uid, hid))
+            db.execute("UPDATE hero SET equip_slot='{}', update_ts=? WHERE uid=? AND id=?",
+                       (int(time.time()), uid, hid))
+        return {"hero_id": hid, "removed": changed.rowcount}
 
     def bind_equip_hero(self, ctx, uid, equip_id, hero_id):
         """

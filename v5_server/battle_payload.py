@@ -98,8 +98,9 @@ def build_battle_equip_bytes(eq_row):
         slot_b = build_enchant_slot_bytes(es)
         body += _pb_msg(7, slot_b)
 
-    if eq_row.get("race"):
-        body += _pb_varint(8, int(eq_row["race"]))
+    race = eq_row.get("race_hero") or eq_row.get("race")
+    if race:
+        body += _pb_varint(8, int(race))
     return bytes(body)
 
 
@@ -266,7 +267,7 @@ def build_battle_hero_bytes(db_conn, uid, hid):
     if not h:
         return None
 
-    # 1. 玩家自持角色：完整角色共用登录侧 DB 映射；未知配置角色保留原最小形态。
+    # 玩家自持角色共用登录侧养成映射，含没有捕获模板的角色。
     exp = hero_codec.load_hero_expanded(hid)
     try:
         saved = dict(db_conn.execute("SELECT key,value FROM server_global_config WHERE key IN ('save.profile','save.owner_uid')"))
@@ -277,54 +278,24 @@ def build_battle_hero_bytes(db_conn, uid, hid):
     is_fresh = saved.get('save.profile') == 'new_player_v1' and str(saved.get('save.owner_uid')) == str(uid)
     h = hero_codec._initial_defaults_for_save(h, enabled=is_fresh)
     mapped_record = hero_codec.build_hero_net_rec_from_db(h, template=exp)
-    hero_type_val = 1
-    if hero_codec.is_hero_payload_candidate(hid):
-        hbi = next((it[2] for it in mapped_record if it[0] == 1 and it[1] == "m"), None)
-        hbi_body = hero_codec.encode_expanded(hbi) if hbi else b""
-    else:
-        # 兜底最小 hero_base_info
-        skin_id = int(h.get("using_skin") or hid)
-        b_lv = int(h.get("break_level") or 0)
-        weapon_b = _pb_varint(1, int(h.get("weapon_exp") or 0)) + _pb_varint(2, int(h.get("weapon_break") or 0)) + _pb_varint(3, int(h.get("weapon_servant_uid") or 0))
-        servant_b = _pb_varint(1, 0) + _pb_varint(2, 0)
-        hbi_body = (_pb_varint(1, hid) + _pb_varint(2, int(h.get("level") or 1)) +
-                    _pb_varint(3, int(h.get("star") or 100)) + _pb_varint(4, int(h.get("exp") or 0)) +
-                    _pb_msg(6, weapon_b) + _pb_msg(7, servant_b) +
-                    _pb_varint(10, skin_id) + _pb_varint(11, b_lv) +
-                    _pb_varint(13, 0) + _pb_varint(15, skin_id))
+    hbi = next(it[2] for it in mapped_record if it[0] == 1 and it[1] == "m")
 
     body = bytearray()
-    body += _pb_msg(1, hbi_body)
-    body += _pb_varint(2, hero_type_val)  # hero_type (1=自有角色)
+    body += _pb_msg(1, hero_codec.encode_expanded(hbi))
+    body += _pb_varint(2, 1)  # 自有角色
 
-    # 2. 玩家自持角色刻印装备（按 1~6 槽位提取）
-    cur.execute("SELECT * FROM equip WHERE uid=? AND hero_id=?;", (uid, hid))
-    equips = [dict(r) for r in cur.fetchall()]
-    es_json = h.get("equip_slot")
-    if es_json:
-        if isinstance(es_json, str):
-            try:
-                es_json = json.loads(es_json)
-            except Exception:
-                es_json = {}
-        if isinstance(es_json, dict) and es_json:
-            eq_map = {eq["id"]: eq for eq in equips}
-            sorted_equips = []
-            for pos in range(1, 7):
-                eid = es_json.get(str(pos))
-                if eid and eid in eq_map:
-                    sorted_equips.append(eq_map[eid])
-                elif eid:
-                    cur.execute("SELECT * FROM equip WHERE uid=? AND id=?;", (uid, eid))
-                    eq_r = cur.fetchone()
-                    if eq_r:
-                        sorted_equips.append(dict(eq_r))
-            if sorted_equips:
-                equips = sorted_equips
-
-    for eq in equips:
-        eq_bytes = build_battle_equip_bytes(eq)
-        body += _pb_msg(3, eq_bytes)
+    # 装配槽、实际佩戴者和 prefab 固定位置都须一致。
+    from inventory_service import _get_equip_map
+    equip_cfg = _get_equip_map()
+    cur.execute("SELECT * FROM equip WHERE uid=? AND hero_id=? ORDER BY id", (uid, hid))
+    owned = {row["id"]: dict(row) for row in cur.fetchall()}
+    slots = {
+        entry[2][0][2]: entry[2][1][2] for entry in mapped_record if entry[0] == 3
+    }
+    for pos in range(1, 7):
+        equip = owned.get(slots.get(pos))
+        if equip and equip_cfg.get(str(equip["prefab_id"]), {}).get("pos") == pos:
+            body += _pb_msg(3, build_battle_equip_bytes(equip))
 
     # 3. 宿舍等级
     body += _pb_varint(4, 0)

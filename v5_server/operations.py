@@ -3825,6 +3825,7 @@ class EquipUnloadAllOp(Operation):
 
     cmd = 13018
     sc = 13019
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         hid = int(data.get("hero_id") or 0)
@@ -3833,10 +3834,12 @@ class EquipUnloadAllOp(Operation):
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_13019", {"result": 0}) or b"\x08\x00"
-        ctx.log(f"cs_13018 -> 全部卸下刻印 hero={result['hero_id']} "
-                f"卸下{result.get('removed', 0)}件 保留锁定{result.get('kept_locked', 0)}件")
+        ctx.log(f"cs_13018 -> 全部卸下刻印 hero={result['hero_id']} 卸下{result['removed']}件")
         from equip_service import EquipService
-        return EquipService.get_instance(db=ctx.db).build_equip_refresh_frames(ctx, self.uid, hero_id=result["hero_id"]) + [DownFrame(self.sc, payload)]
+        # ACK 先用旧槽位清掉客户端的 equip_id -> hero_id 索引。
+        return [DownFrame(self.sc, payload)] + EquipService.get_instance(db=ctx.db).build_equip_refresh_frames(
+            ctx, self.uid, hero_id=result["hero_id"]
+        )
 
 
 @operation
@@ -3845,6 +3848,7 @@ class EquipSwapOp(Operation):
 
     cmd = 13012
     sc = 13013
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         uid = self.uid
@@ -3863,7 +3867,10 @@ class EquipSwapOp(Operation):
         hids = [result["hero_id"]]
         if result.get("prev_owner"):
             hids.append(result["prev_owner"])
-        return EquipService.get_instance(db=ctx.db).build_equip_refresh_frames(ctx, self.uid, hero_id=hids) + [DownFrame(self.sc, payload)]
+        # HeroData:EquipSwap 依赖变更前的槽位和佩戴者索引。
+        return [DownFrame(self.sc, payload)] + EquipService.get_instance(db=ctx.db).build_equip_refresh_frames(
+            ctx, self.uid, hero_id=hids
+        )
 
 
 @operation
@@ -3872,6 +3879,7 @@ class EquipQuickDressOp(Operation):
 
     cmd = 13026
     sc = 13027
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         hid = int(data.get("hero_id") or 0)
@@ -3898,9 +3906,9 @@ class EquipQuickDressOp(Operation):
         if result.get('failed') or not result['result']:
             return [DownFrame(self.sc, payload)]
         from equip_service import EquipService
-        return EquipService.get_instance(db=ctx.db).build_equip_refresh_frames(
+        return [DownFrame(self.sc, payload)] + EquipService.get_instance(db=ctx.db).build_equip_refresh_frames(
             ctx, self.uid, hero_id=result.get("affected_heroes")
-        ) + [DownFrame(self.sc, payload)]
+        )
 
 
 @operation
@@ -3909,6 +3917,7 @@ class EquipInheritOp(Operation):
 
     cmd = 13052
     sc = 13053
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
         eid = int(data.get("new_equip_id") or 0)
@@ -3924,9 +3933,14 @@ class EquipInheritOp(Operation):
         from equip_service import EquipService
         frames = EquipService.get_instance(db=ctx.db).build_equip_refresh_frames(ctx, self.uid, hero_id=hero_id if hero_id else None)
         import generator as _gen
+        # EquipData:AddEquip 会保留旧 prefab 的索引。先移除客户端的旧条目，
+        # 再用完整记录恢复同一实例的等级、锁定、赋能和绑定。
+        old = {"equip_id": eid, "prefab_id": result["old_prefab_id"], "num": 0}
+        p17 = _gen.gen_payload(17023, uid=self.uid, db=ctx.db, touched_items=set(), equip_list=[old])
         p13 = _gen.gen_payload(13009, uid=self.uid, db=ctx.db, equip_id=eid)
-        if p13:
-            frames.append(DownFrame(13009, p13))
+        if not p17 or not p13:
+            raise ValueError("刻印继承刷新编码失败")
+        frames.extend([DownFrame(17023, p17), DownFrame(13009, p13)])
         frames.append(DownFrame(self.sc, payload))
         return frames
 
