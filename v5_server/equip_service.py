@@ -813,9 +813,6 @@ class EquipService:
 
         slots, idx, slot = self._get_enchant_slot(db, uid, eid, sid)
         effs = [e for e in (slot.get("effect_list") or []) if isinstance(e, dict) and e.get("id")]
-        for eff in effs:
-            if eff.get("id") == target_sk:
-                raise OperationError(2, f"技能 {target_sk} 已存在于该槽位")
 
         from inventory_service import InventoryService
         inv = InventoryService.get_instance(db=db)

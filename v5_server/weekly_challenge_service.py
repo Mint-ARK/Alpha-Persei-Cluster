@@ -872,8 +872,31 @@ def get_core_verification_challenge_data(uid, db, activity_id=None):
 
 # ----------------- 7. 介质攫取 (Equip Seizure) 数据构建与调度 -----------------
 
+SEIZURE_TIMEZONE = datetime.timezone(datetime.timedelta(hours=8))
+
+
+def get_seizure_day_start(now_ts):
+    now = datetime.datetime.fromtimestamp(now_ts, SEIZURE_TIMEZONE)
+    start = now.replace(hour=5, minute=0, second=0, microsecond=0)
+    if now < start:
+        start -= datetime.timedelta(days=1)
+    return int(start.timestamp())
+
+
 def get_equip_seizure_catalog():
     return _load_catalog("equip_seizure_catalog.json")
+
+def get_seizure_period(now_ts=None):
+    """积分和领奖在东八区周一、周四 05:00 刷新。"""
+    from mythic_cycle import bounds
+    return bounds(now_ts)
+
+
+def is_seizure_progress_expired(progress, now_ts, period_start):
+    expires = int(progress.get("refresh_ts") or 0)
+    last_day = int(progress.get("last_day_tag") or 0)
+    return 0 < expires <= now_ts or 0 < last_day < period_start
+
 
 def get_next_seizure_affix_refresh(now_ts=None):
     """
@@ -881,7 +904,7 @@ def get_next_seizure_affix_refresh(now_ts=None):
     """
     if now_ts is None:
         now_ts = int(time.time())
-    dt = datetime.datetime.fromtimestamp(now_ts)
+    dt = datetime.datetime.fromtimestamp(now_ts, SEIZURE_TIMEZONE)
     candidates = []
     for target_weekday in [0, 3, 5]: # Mon=0, Thu=3, Sat=5
         days_ahead = target_weekday - dt.weekday()
@@ -899,7 +922,7 @@ def get_seizure_challenge_rate(now_ts=None):
     """
     if now_ts is None:
         now_ts = int(time.time())
-    dt = datetime.datetime.fromtimestamp(now_ts)
+    dt = datetime.datetime.fromtimestamp(now_ts, SEIZURE_TIMEZONE)
     if dt.hour < 5:
         eff_dt = dt - datetime.timedelta(days=1)
     else:
@@ -920,7 +943,7 @@ def get_daily_seizure_stage_id(now_ts=None):
         3070111, 3070112, 3070113, 3070114, 3070115, 3070116, 3070117, 3070118, 3070119, 3070120,
         3070121, 3070122, 3070123, 3070124, 3070125, 3070126
     ]
-    dt = datetime.datetime.fromtimestamp(now_ts)
+    dt = datetime.datetime.fromtimestamp(now_ts, SEIZURE_TIMEZONE)
     if dt.hour < 5:
         eff_dt = dt - datetime.timedelta(days=1)
     else:
@@ -935,7 +958,7 @@ def get_seizure_cycle_index(now_ts=None):
     """
     if now_ts is None:
         now_ts = int(time.time())
-    dt = datetime.datetime.fromtimestamp(now_ts)
+    dt = datetime.datetime.fromtimestamp(now_ts, SEIZURE_TIMEZONE)
     if dt.hour < 5:
         eff_dt = dt - datetime.timedelta(days=1)
     else:
@@ -966,7 +989,7 @@ def get_seizure_affixes(now_ts=None):
     shield_affix = 9215 + elem_idx
     return [attr_affix, shield_affix]
 
-def get_equip_seizure_data(uid, db):
+def get_equip_seizure_data(uid, db, now_ts=None, *, strict=False):
     """
     返回介质攫取当期动态数据（构建 sc_35011 字典结构）：
     - stage_id
@@ -977,8 +1000,8 @@ def get_equip_seizure_data(uid, db):
     - refresh_timestamp
     - got_reward_id_list
     """
-    now = int(time.time())
-    next_weekly_rf = get_next_thursday_5am(now)
+    now = int(time.time()) if now_ts is None else int(now_ts)
+    _, next_score_refresh = get_seizure_period(now)
     next_affix_rf = get_next_seizure_affix_refresh(now)
     current_rate = get_seizure_challenge_rate(now)
     current_stage = get_daily_seizure_stage_id(now)
@@ -991,9 +1014,9 @@ def get_equip_seizure_data(uid, db):
         "affix_refresh_ts": next_affix_rf,
         "today_max_score": 0,
         "sum_score": 0,
-        "refresh_ts": next_weekly_rf,
+        "refresh_ts": next_score_refresh,
         "got_reward_id_list": [],
-        "last_day_tag": get_daily_5am(now)
+        "last_day_tag": get_seizure_day_start(now)
     }
     
     if db:
@@ -1001,7 +1024,8 @@ def get_equip_seizure_data(uid, db):
             if hasattr(db, "get_equip_seizure_progress"):
                 prog = db.get_equip_seizure_progress(uid, now)
         except Exception:
-            pass
+            if strict:
+                raise
             
     sc_35011_obj = {
         "stage_id": int(prog.get("stage_id") or current_stage),
@@ -1012,16 +1036,28 @@ def get_equip_seizure_data(uid, db):
         },
         "today_max_score": int(prog.get("today_max_score") or 0),
         "sum_score": int(prog.get("sum_score") or 0),
-        "refresh_timestamp": int(prog.get("refresh_ts") or next_weekly_rf),
+        "refresh_timestamp": int(prog.get("refresh_ts") or next_score_refresh),
         "got_reward_id_list": prog.get("got_reward_id_list") or []
     }
     return sc_35011_obj
 
 
-def calc_equip_seizure_score(enemy_dead=0, battle_time_ms=0, explicit_score=0, is_win=False):
+def get_equip_seizure_reported_waves(battle_info):
+    """原生 battle_record_data_type 42：介质攫取波数统计。"""
+    ids = battle_info.get("record_data_ids")
+    values = battle_info.get("record_data_numbers")
+    if not isinstance(ids, list) or not isinstance(values, list) or len(ids) != len(values):
+        return None
+    waves = [value for key, value in zip(ids, values) if key == 42]
+    if len(waves) == 1 and type(waves[0]) is int and waves[0] >= 0:
+        return waves[0]
+    return None
+
+
+def calc_equip_seizure_score(enemy_dead=0, explicit_score=0, reported_waves=None):
     """
-    核算介质攫取作战得分（基于击杀怪物量/波次与时间阶梯折算 + Boss 累进悬赏）。
-    对齐实机核心战绩锚点：
+    波次优先用战报记录，缺记录时才从击杀估算。基础分和 Boss 悬赏仍采用拟合。
+    当前拟合参考点：
     - 13 波（~60怪）：约 3,000 分；
     - 31 波（~142怪）：约 11,400 分；
     - 35 波（~156怪）：约 13,800 分；
@@ -1030,48 +1066,44 @@ def calc_equip_seizure_score(enemy_dead=0, battle_time_ms=0, explicit_score=0, i
     - 45+ 波极限冲层：达 20,000 ~ 24,000 满档。
     """
     if explicit_score > 0:
-        return int(explicit_score), 0
-        
-    if enemy_dead > 0:
-        if enemy_dead <= 91:
-            est_waves = max(1, int(round(enemy_dead / 4.8)))
-        else:
-            # 20波及以上（每5波包含4波杂兵+1波单体Boss）
-            rem_dead = enemy_dead - 91
-            cycles = rem_dead / 20.2
-            est_waves = max(1, int(round(19 + cycles * 5)))
-    elif battle_time_ms > 0:
-        sec = battle_time_ms / 1000.0 if battle_time_ms > 1000 else float(battle_time_ms)
-        est_waves = max(1, int(sec / 15.0))
-    elif is_win:
-        est_waves = 40
+        return int(explicit_score), reported_waves or 0
+    if reported_waves is not None:
+        waves = reported_waves
+    elif enemy_dead <= 0:
+        waves = 0
+    elif enemy_dead <= 91:
+        waves = max(1, int(round(enemy_dead / 4.8)))
     else:
-        est_waves = 1
+        # 20波及以上（每5波包含4波杂兵+1波单体Boss）
+        rem_dead = enemy_dead - 91
+        cycles = rem_dead / 20.2
+        waves = max(1, int(round(19 + cycles * 5)))
+
+    if waves == 0:
+        return 0, 0
 
     score = 0
     # 基础波次分（阶梯递进）
     # 1-10 波: 220/波
-    score += min(est_waves, 10) * 220
+    score += min(waves, 10) * 220
     # 11-20 波: 280/波
-    if est_waves > 10:
-        score += min(est_waves - 10, 10) * 280
+    if waves > 10:
+        score += min(waves - 10, 10) * 280
     # 21-30 波: 420/波
-    if est_waves > 20:
-        score += min(est_waves - 20, 10) * 420
+    if waves > 20:
+        score += min(waves - 20, 10) * 420
     # 31-40 波: 400/波
-    if est_waves > 30:
-        score += min(est_waves - 30, 10) * 400
+    if waves > 30:
+        score += min(waves - 30, 10) * 400
     # 41+ 波: 500/波
-    if est_waves > 40:
-        score += (est_waves - 40) * 500
+    if waves > 40:
+        score += (waves - 40) * 500
 
     # Boss / 精英专属击杀悬赏（从 20 波开始，每 5 波一个 Boss）
-    boss_bonus = 0
-    for bw in range(20, est_waves + 1, 5):
-        idx = (bw - 20) // 5
-        boss_bonus += (500 + idx * 100)
+    bosses = max(0, (waves - 15) // 5)
+    boss_bonus = 500 * bosses + 50 * bosses * (bosses - 1)
 
     total_score = score + boss_bonus
-    return min(24000, max(200, total_score)), est_waves
+    return min(24000, max(200, total_score)), waves
 
 

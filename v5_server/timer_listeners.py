@@ -167,6 +167,23 @@ def on_boss_challenge_thu_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwarg
         ctx.log(f"[LazyTimer] 用户 {uid} 梦境再构周期已刷新")
 
 
+@bus.subscribe(Events.DAILY_RESET_5AM)
+def on_seizure_daily_reset(ctx, uid, now_ts=None, **kwargs):
+    """刷新已在线客户端的关卡、今日积分和到期的两类倒计时。"""
+    if not uid or getattr(ctx, 'db', None) is None:
+        return
+    if not ctx.db.query("SELECT 1 FROM equip_seizure_progress WHERE uid=?", (uid,)):
+        return
+    from middleware import DownFrame
+    from weekly_challenge_service import get_equip_seizure_data
+
+    data = get_equip_seizure_data(uid, ctx.db, now_ts, strict=True)
+    payload = ctx.codec_encode("sc_35011", data)
+    if not payload:
+        raise ValueError("介质攫取刷新帧 sc_35011 编码失败")
+    ctx.append_frame(DownFrame(35011, payload))
+
+
 # ==================== 5. 商店限购周期重置监听器 ====================
 
 @bus.subscribe(Events.DAILY_RESET_5AM)

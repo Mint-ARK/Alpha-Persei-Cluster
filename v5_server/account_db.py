@@ -6631,16 +6631,16 @@ class AccountDB:
     # ----------------- 介质攫取 (Equip Seizure) 数据持久化 -----------------
 
     def get_equip_seizure_progress(self, uid, now_ts=None, *, reset_current=False):
-        """获取玩家介质攫取进度，支持跨天跨周惰性刷新。"""
+        """获取玩家介质攫取进度，按游戏日和积分周期惰性刷新。"""
         if now_ts is None:
             now_ts = int(time.time())
         import weekly_challenge_service as _wcs
-        next_weekly_rf = _wcs.get_next_thursday_5am(now_ts)
+        period_start, next_score_refresh = _wcs.get_seizure_period(now_ts)
         next_affix_rf = _wcs.get_next_seizure_affix_refresh(now_ts)
         current_rate = _wcs.get_seizure_challenge_rate(now_ts)
         current_stage = _wcs.get_daily_seizure_stage_id(now_ts)
         current_affixes = _wcs.get_seizure_affixes(now_ts)
-        today_tag = _wcs.get_daily_5am(now_ts)
+        today_tag = _wcs.get_seizure_day_start(now_ts)
 
         rows = self.query("SELECT * FROM equip_seizure_progress WHERE uid=?", (int(uid),))
         if not rows:
@@ -6652,7 +6652,7 @@ class AccountDB:
                 "affix_refresh_ts": next_affix_rf,
                 "today_max_score": 0,
                 "sum_score": 0,
-                "refresh_ts": next_weekly_rf,
+                "refresh_ts": next_score_refresh,
                 "got_reward_id_list": [],
                 "last_day_tag": today_tag,
                 "team_heroes": []
@@ -6662,7 +6662,7 @@ class AccountDB:
                 "affix_refresh_ts, today_max_score, sum_score, refresh_ts, got_reward_id_list, "
                 "last_day_tag, team_heroes, update_ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (int(uid), current_stage, current_rate, json.dumps(current_affixes),
-                 next_affix_rf, 0, 0, next_weekly_rf, json.dumps([]), today_tag, json.dumps([]), now_ts)
+                 next_affix_rf, 0, 0, next_score_refresh, json.dumps([]), today_tag, json.dumps([]), now_ts)
             )
             return prog
 
@@ -6676,7 +6676,7 @@ class AccountDB:
             prog_affixes = current_affixes
         today_score = int(r.get("today_max_score") or 0)
         sum_score = int(r.get("sum_score") or 0)
-        refresh_ts = int(r.get("refresh_ts") or next_weekly_rf)
+        refresh_ts = int(r.get("refresh_ts") or next_score_refresh)
         try:
             got_rewards = json.loads(r.get("got_reward_id_list") or "[]")
         except Exception:
@@ -6689,13 +6689,14 @@ class AccountDB:
 
         need_save = False
 
-        # 1. 跨周检测 (周四 05:00 刷新)
-        if reset_current or refresh_ts != next_weekly_rf:
-            if reset_current or now_ts >= refresh_ts:
-                today_score = 0
-                sum_score = 0
-                got_rewards = []
-            refresh_ts = next_weekly_rf
+        # 旧档可能还指向下个周四。用保存的游戏日补判漏掉的周一边界。
+        if reset_current or _wcs.is_seizure_progress_expired(r, now_ts, period_start):
+            today_score = 0
+            sum_score = 0
+            got_rewards = []
+            need_save = True
+        if refresh_ts != next_score_refresh:
+            refresh_ts = next_score_refresh
             need_save = True
 
         # 2. 跨日检测 (每日 05:00 刷新)
@@ -6754,7 +6755,7 @@ class AccountDB:
         save_team = team_heroes if team_heroes is not None else prog.get("team_heroes", [])
 
         import weekly_challenge_service as _wcs
-        today_tag = _wcs.get_daily_5am(now_ts)
+        today_tag = _wcs.get_seizure_day_start(now_ts)
 
         self.execute(
             "UPDATE equip_seizure_progress SET today_max_score=?, sum_score=?, team_heroes=?, last_day_tag=?, update_ts=? WHERE uid=?",

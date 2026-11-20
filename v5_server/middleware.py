@@ -1905,7 +1905,9 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
     use_sec = int(battle_info.get("battle_time") or 0)
     if use_sec > 1000:
         use_sec = int(round(use_sec / 1000.0))
-    br = build_battle_result(bid, result, dest, clear_times=ct, drops=drops, heroes=heroes,
+    # 旧客户端 GotoTeam 只接受 1–3。介质攫取超时(4)走失败后的积分界面。
+    client_result = 2 if is_equip_seizure and result == 4 else result
+    br = build_battle_result(bid, client_result, dest, clear_times=ct, drops=drops, heroes=heroes,
                              use_seconds=use_sec, star_list_pb=star_list_pb)
     if is_mythic_normal:
         # Native GotoSettlement accepts collection conditions even on loss/quit.
@@ -2084,18 +2086,18 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
             except Exception as _e:
                 ctx.log(f"[settle] 剧情与插图图鉴推送异常: {_e}", "WARN")
 
-    # 介质攫取全状态积分核算（波次/击杀/时间转换，胜利/失败/退出/超时均精准生效并推送 sc_35013）
+    # 介质攫取根据战报核算积分并推送 sc_35013。
     if is_equip_seizure:
         try:
             import weekly_challenge_service as _wcs
             enemy_dead = int(battle_info.get("enemy_dead_num") or battle_info.get("target_count") or 0)
             raw_btime = int(battle_info.get("battle_time") or 0)
             explicit_score = int(battle_info.get("score") or battle_info.get("point") or 0)
-            raw_score, est_waves = _wcs.calc_equip_seizure_score(
+            reported_waves = _wcs.get_equip_seizure_reported_waves(battle_info)
+            raw_score, scored_waves = _wcs.calc_equip_seizure_score(
                 enemy_dead=enemy_dead,
-                battle_time_ms=raw_btime,
                 explicit_score=explicit_score,
-                is_win=win
+                reported_waves=reported_waves,
             )
             
             rate = _wcs.get_seizure_challenge_rate()
@@ -2104,7 +2106,10 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
             if hasattr(ctx.db, "save_equip_seizure_battle_score") and ctx.db is not None:
                 ctx.db.save_equip_seizure_battle_score(uid, final_score, team_heroes=heroes)
             
-            ctx.log(f"[settle] 介质攫取作战结算: dest={dest_int} win={win} dead={enemy_dead} est_waves={est_waves} use_sec={use_sec} raw_score={raw_score} rate={rate} final_score={final_score}")
+            ctx.log(f"[settle] 介质攫取作战结算: bid={bid} dest={dest_int} result={result} "
+                    f"dead={enemy_dead} battle_ms={raw_btime} reported_score={explicit_score} "
+                    f"reported_waves={reported_waves} scored_waves={scored_waves} "
+                    f"raw_score={raw_score} rate={rate} final_score={final_score}")
             
             if ctx.codec_encode and ctx.db is not None:
                 prog = ctx.db.get_equip_seizure_progress(uid)
@@ -2489,6 +2494,26 @@ def h_54300(req, ctx):
     """战斗初始化 Push → 明确不回包（C# Launcher 直连战斗服 UDP，回包触发 Protocol 解析异常）"""
     ctx.log("cs_54300（战斗初始化，不回包）")
     return CSResponse(reply=False)
+
+
+def h_38014(req, ctx):
+    """Trace SendQuitBattle for Equip Seizure using the connection's battle ID."""
+    response = CSResponse(reply=False)
+    bid = ctx.battle_id[0]
+    session = get_battle_session(bid) if bid else None
+    if not session or session['uid'] != req.uid or ctx.codec_decode is None:
+        return response
+    if session['stage_type'] != 53 and not 3070101 <= session['dest'] <= 3070126:
+        return response
+    try:
+        payload = ctx.codec_decode(req.payload, 'cs_38014')
+    except (ValueError, TypeError, IndexError, UnicodeError, struct.error):
+        return response
+    if any(event.get('event_name') == 'load_time_before_battle'
+           for event in payload.get('log_list', [])):
+        # Telemetry JSON numbers can round large IDs. Never log client-supplied JSON.
+        ctx.log(f'cs_38014 load_time_before_battle bid={bid} dest={session["dest"]}', module='BATTLE')
+    return response
 
 
 def _take_trust_mood_frames(ctx, uid):
@@ -4041,6 +4066,7 @@ CORE_HANDLERS = {
     43002: h_43002,   # 战斗装备
     54030: h_54030,   # 普通战斗入口
     54300: h_54300,   # 战斗初始化（不回包）
+    38014: h_38014,   # 客户端遥测（不回包）
     54038: h_54038,   # 扫荡
     56002: h_56002,   # 红点已读上报（写库+回空包）
     63000: h_63000,   # 保存编队（写库+sc_63001）
@@ -4074,7 +4100,7 @@ CORE_HANDLERS = {
 }
 
 # 不回包白名单（契约 §9.3，LUA 挖掘确认 sc_None，客户端不期待响应）
-DROP_NO_REPLY = {81002, 40012, 38014, 78012, 54300, 19036}
+DROP_NO_REPLY = {81002, 40012, 78012, 54300, 19036}
 # 56002 例外：回空包防重试（已由 h_56002 处理，不回 DROP）
 
 

@@ -67,7 +67,9 @@ def _bounds(kind, now):
     if kind in ('weekly', 'battlepass'):
         start = get_weekly_mon_5am_ts(now)
         return start, start + WEEK
-    if kind in ('seizure', 'iteration'):
+    if kind == 'seizure':
+        return weekly.get_seizure_period(now)
+    if kind == 'iteration':
         end = weekly.get_next_thursday_5am(now)
         return end - WEEK, end
     if kind == 'dream':
@@ -109,9 +111,9 @@ def _tasks(db, uid, now, kind, start):
 
 def _seizure(db, uid, now, start):
     progress = _one(db, 'SELECT * FROM equip_seizure_progress WHERE uid=?', (uid,))
-    if 0 < _int(progress, 'refresh_ts') <= now:
+    if weekly.is_seizure_progress_expired(progress, now, start):
         progress = {}
-    today = _int(progress, 'today_max_score') if _int(progress, 'last_day_tag') == weekly.get_daily_5am(now) else 0
+    today = _int(progress, 'today_max_score') if _int(progress, 'last_day_tag') == weekly.get_seizure_day_start(now) else 0
     total = _int(progress, 'sum_score')
     claimed = set(_json(progress, 'got_reward_id_list'))
     rows = [_row('today', '今日最高分', today), _row('total', '本期累计积分', total)]

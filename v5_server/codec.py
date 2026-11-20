@@ -52,6 +52,13 @@ def _ensure_schema():
         }
         if "enter_battle_common_info" in ds.SCHEMA:
             ds.SCHEMA["enter_battle_common_info"][1]["ref"] = "p54_team_hero_info_net_rec"
+        # p38 telemetry and p49 map history both declare log_net_rec.
+        ds.SCHEMA["p38_event_log_net_rec"] = {
+            1: {"name": "event_name", "number": 1, "type": "string", "label": "required"},
+            2: {"name": "attribute_json", "number": 2, "type": "string", "label": "required"},
+        }
+        if "cs_38014" in ds.SCHEMA:
+            ds.SCHEMA["cs_38014"][1]["ref"] = "p38_event_log_net_rec"
         # 补充芯片协议 (50006, 50007, 50016, 50017)
         ds.SCHEMA.setdefault("cs_50006", {
             1: {"name": "kernel_id", "number": 1, "type": "uint32", "label": "required", "ref": None},
