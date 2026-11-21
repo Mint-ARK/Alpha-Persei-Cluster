@@ -21,7 +21,8 @@ import json
 import time
 import logging
 import threading
-from inventory_service import InventoryService
+from functools import lru_cache
+from inventory_service import InventoryService, ItemType, _get_equip_map
 from event_bus import bus, Events
 from operation_notifications import checkpoint_notifications, restore_notifications
 
@@ -35,6 +36,33 @@ TEMPLATES_PATH = os.path.join(BASE_DIR, "mail_archive", "mail_templates.json")
 
 # 远未来过期时间戳常量（2033-05-18 11:33:20），防止客户端 timeout_timestamp <= server_time 触发 MAIL_EXPIRED 弹窗
 DEFAULT_FAR_FUTURE_EXPIRE = 2000000000
+
+
+def mail_attachment_restriction(db, item_id):
+    """Return the display-only reason for an attachment."""
+    if item_id == 30054 or 1000000000 <= item_id <= 2000000000:
+        return f"物品 ID {item_id} 属于试衣底片类道具，禁止通过邮件发送"
+    if 830000 <= item_id <= 859999:
+        return f"物品 ID {item_id} 属于旧刻印套装盒，禁止通过邮件发送"
+    if 200000 <= item_id <= 600000 and (
+        str(item_id) not in _get_equip_map() or InventoryService.classify_item(db, item_id) != ItemType.EQUIP
+    ):
+        return f"物品 ID {item_id} 缺少可发放的刻印配置，禁止通过邮件发送"
+    return None
+
+
+@lru_cache(maxsize=1)
+def _load_panel_historical_items():
+    with open(os.path.join(BASE_DIR, "panel_historical_items.json"), encoding="utf-8") as stream:
+        config = json.load(stream)
+    return tuple(config["hidden_ranges"]), frozenset(config["visible_ids"])
+
+
+def gm_mail_attachment_restriction(db, item_id):
+    hidden_ranges, visible_ids = _load_panel_historical_items()
+    if item_id not in visible_ids and any(first <= item_id <= last for first, last in hidden_ranges):
+        return f"物品 ID {item_id} 是历史活动物品，仅供查看，无法加入 GM 邮件"
+    return mail_attachment_restriction(db, item_id)
 
 
 class MailService:
@@ -439,11 +467,9 @@ class MailService:
                     else:
                         continue
                     if aid > 0 and anum > 0:
-                        if (200000 <= aid <= 600000) or (830000 <= aid <= 859999):
-                            logger.warning(f"[MailService] 拦截不可邮寄的刻印类物品 ID={aid}，已安全跳过")
-                            continue
-                        if aid == 30054 or (1000000000 <= aid <= 2000000000):
-                            logger.warning(f"[MailService] 拦截不可邮寄的试衣底片类道具 ID={aid}，已安全跳过")
+                        reason = mail_attachment_restriction(_db, aid)
+                        if reason:
+                            logger.warning("[MailService] %s，已跳过附件", reason)
                             continue
                         norm_attachments.append({"id": aid, "number": anum})
 

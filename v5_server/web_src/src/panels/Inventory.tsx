@@ -27,16 +27,35 @@ import { ItemSlot } from '../components/ItemSlot'
 import { useServer } from '../lib/serverContext'
 import {
   fetchInventoryItems,
+  isSigilSetBox,
   isTrialSkinFilm,
   isDisplayOnlyItem,
+  isHistoricalInventoryItem,
 } from '../lib/api'
 import { useElementSize } from '../lib/useElementSize'
-import { itemById, itemCatalog, itemName, itemSearchScore, refreshDraftAttachment, type CatalogItem } from '../data/itemCatalog'
+import { itemById, itemCatalog, itemSearchScore, refreshDraftAttachment, type CatalogItem } from '../data/itemCatalog'
 
 // 展现层融合结构
 interface InventoryDisplayItem extends CatalogItem {
   category: string
   ownedCount: number
+  historical: boolean
+}
+
+function InventoryItemName({ item, className }: { item: InventoryDisplayItem; className?: string }) {
+  return (
+    <span className={cn('flex min-w-0 items-center gap-1.5 text-xs', className)}>
+      <span
+        className={cn('truncate', item.historical ? 'text-muted' : 'text-foreground group-hover:text-accent')}
+        title={item.name}
+      >
+        {item.name}
+      </span>
+      {item.historical && (
+        <span className="shrink-0 text-[10px] text-muted" title="历史物品，仅供查看">历史</span>
+      )}
+    </span>
+  )
 }
 
 // 邮件草稿箱暂存项结构
@@ -75,8 +94,44 @@ function saveDraft(draft: MailDraftAttachment[]) {
   }
 }
 
-// 保留的历史活动素材最新款（求援通讯α/β、补给清单Ⅰ/Ⅱ、锤炼之证、限时凭证），作为素材预览展示
-const EVENT_PREVIEW_TOKEN_IDS = new Set([54128, 54129, 53214, 53221, 54096, 83, 85, 69, 78])
+const HIDDEN_INVENTORY_ITEM_IDS = new Set([
+  3, 7, 8, 9, 10, 11, 13, 22, // 背包不展示的货币与每日任务评分
+  58, 59, 62, 63, 64, 65, 66, 67, 68, 81, 84, 85, // 限时精确探测凭证
+  48, 49, 50, 51, 52, 83, 53004, 53005, 53009, 53018, // 限时常规探测凭证
+  69, // 限时联动探测凭证
+  78, // 限时特殊探测凭证
+  4002, 6000, // 默认背景和综合科办公室
+  ...itemCatalog.filter(item => item.type === 5 && item.name.includes('测试')).map(item => item.id),
+])
+
+const HIDDEN_INVENTORY_ITEM_ID_RANGES = [
+  [31100, 31199], [31500, 31599], // 按等级的商店物资包
+  [32001, 32018], [33101, 33105], [34001, 34099], [34100, 34153], [34501, 34517],
+  [35002, 35005], [35101, 35106], [36434, 36443], // 刻印掉落预览和套装道具
+] as const
+
+for (const [firstId, lastId] of HIDDEN_INVENTORY_ITEM_ID_RANGES) {
+  for (let id = firstId; id <= lastId; id++) HIDDEN_INVENTORY_ITEM_IDS.add(id)
+}
+
+function isInventoryCatalogItem(id: number) {
+  const item = itemById.get(id)
+  if (!item?.name.trim() || item.name.includes('道具')) return false
+  return !HIDDEN_INVENTORY_ITEM_IDS.has(id) && !isSigilSetBox(id)
+}
+
+function isSigilFactionVariant(item: CatalogItem) {
+  // 单件刻印的 prefab_id 千位对应 EquipCfg.race。
+  return item.type === 7 && Math.floor(item.id / 1000) % 10 !== 0
+}
+
+const inventoryCatalog = itemCatalog.filter(item => isInventoryCatalogItem(item.id))
+const defaultCatalogCount = inventoryCatalog.filter(
+  item => !isSigilFactionVariant(item) && !isHistoricalInventoryItem(item.id),
+).length
+
+// 保留的活动素材（求援通讯、补给清单、锤炼之证）
+const EVENT_PREVIEW_TOKEN_IDS = new Set([54129, 53221, 54096])
 
 // 官方物品类型映射分类标签（礼物纠正并合并归类，移除独立的赋能模块；试衣底片统一以培养材料/素材展示）
 function getCategoryLabel(type: number, id?: number, name?: string): string {
@@ -216,6 +271,7 @@ export default function InventoryPanel() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('全部')
   const [quality, setQuality] = useState('all')
+  const [showHistorical, setShowHistorical] = useState(false)
   const [onlyOwned, setOnlyOwned] = useState(false)
 
   // 3. 数据规模控制器与分页
@@ -236,7 +292,9 @@ export default function InventoryPanel() {
       if (res.code !== 0 || !Array.isArray(res.data?.items)) throw new Error(res.msg || '读取库存失败')
       const counts: Record<number, number> = {}
       for (const item of res.data.items) {
-        if (Number.isInteger(item.id) && item.num > 0) counts[item.id] = (counts[item.id] || 0) + item.num
+        if (Number.isInteger(item.id) && item.num > 0 && isInventoryCatalogItem(item.id)) {
+          counts[item.id] = (counts[item.id] || 0) + item.num
+        }
       }
       setHoldings({ scope: inventoryScope, counts })
     } catch (err) {
@@ -256,23 +314,23 @@ export default function InventoryPanel() {
   }, [inventoryScope, canLoadInventory])
 
   // 将 catalog 与 ownedMap O(1) 融合
-  const mergedItems = useMemo<InventoryDisplayItem[]>(() => {
-    const unlisted = Object.keys(ownedMap).map(Number).filter(id => !itemById.has(id))
-      .map(id => ({ id, name: '', type: 0, rare: 0, icon_file: '', quality_frame: '' }))
-    return [...itemCatalog, ...unlisted].map((cat) => ({
+  const mergedItems = useMemo<InventoryDisplayItem[]>(() =>
+    inventoryCatalog.map((cat) => ({
       ...cat,
-      name: itemName(cat),
       category: getCategoryLabel(cat.type, cat.id, cat.name),
       ownedCount: ownedMap[cat.id] || 0,
-    }))
-  }, [ownedMap])
+      historical: isHistoricalInventoryItem(cat.id),
+    })), [ownedMap])
 
   // 多维筛选计算
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const q = query.trim().toLowerCase().replace(/^#(?=\d+$)/, '')
     const matches = mergedItems.filter((item) => {
+      if (item.historical && !showHistorical) return false
+
       // 1. 仅看已拥有
       if (onlyOwned && item.ownedCount <= 0) return false
+      if (!onlyOwned && isSigilFactionVariant(item) && q !== String(item.id)) return false
 
       // 2. 分类筛选
       if (category !== '全部' && item.category !== category) return false
@@ -284,7 +342,7 @@ export default function InventoryPanel() {
     })
     if (q) matches.sort((a, b) => itemSearchScore(b, q) - itemSearchScore(a, q))
     return matches
-  }, [mergedItems, query, category, quality, onlyOwned])
+  }, [mergedItems, query, category, quality, onlyOwned, showHistorical])
 
   // 单页规模数值
   const activePageSize = useMemo(() => {
@@ -351,7 +409,7 @@ export default function InventoryPanel() {
   }
 
   // 控制项变动时重置页码与滚动位置
-  const controlKey = `${query}|${category}|${quality}|${onlyOwned}|${view}|${pageSizeOption}`
+  const controlKey = `${query}|${category}|${quality}|${onlyOwned}|${showHistorical}|${view}|${pageSizeOption}`
   useEffect(() => {
     setPage(1)
     if (viewportRef.current) viewportRef.current.scrollTop = 0
@@ -365,7 +423,9 @@ export default function InventoryPanel() {
   }, [page])
 
   // 统计指标
-  const ownedTotalTypes = Object.keys(ownedMap).length
+  const ownedTotalTypes = mergedItems.filter(
+    item => item.ownedCount > 0 && (showHistorical || !item.historical),
+  ).length
 
   // 添加/移除邮件附件草稿
   const handleToggleDraft = (item: InventoryDisplayItem) => {
@@ -445,12 +505,7 @@ export default function InventoryPanel() {
 
         {/* 下半部：科技信息底牌（标题居中醒目 + 规整胶囊标签） */}
         <div className="w-full min-w-0 px-0.5 pb-0.5">
-          <div
-            className="truncate text-xs font-semibold text-foreground group-hover:text-accent transition-colors"
-            title={item.name}
-          >
-            {item.name}
-          </div>
+          <InventoryItemName item={item} className="justify-center font-semibold" />
           <div className="mt-1.5 flex items-center justify-between gap-1 text-[10px]">
             <span className="inline-flex items-center rounded px-1.5 py-0.5 font-mono font-medium text-muted-foreground bg-muted/20 border border-separator/40 leading-none">
               #{item.id}
@@ -490,9 +545,7 @@ export default function InventoryPanel() {
             size="sm"
             showCount={false}
           />
-          <span className="truncate text-xs font-medium text-foreground" title={item.name}>
-            {item.name}
-          </span>
+          <InventoryItemName item={item} className="font-medium" />
         </div>
         <div className="truncate px-4 font-mono text-xs text-muted">{item.id}</div>
         <div className="truncate px-4 text-xs text-muted">{item.category}</div>
@@ -569,9 +622,7 @@ export default function InventoryPanel() {
             size="sm"
             showCount={false}
           />
-          <span className="truncate text-xs font-medium text-foreground" title={item.name}>
-            {item.name}
-          </span>
+          <InventoryItemName item={item} className="font-medium" />
         </div>
         <div className="truncate px-4 text-xs text-muted">{item.category}</div>
         <div className="px-4">
@@ -622,7 +673,7 @@ export default function InventoryPanel() {
       {/* 1. 顶部 Header */}
       <PageHeader
         title="资源背包 · 资产监控"
-        description="直通游戏数据库真实货币、素材与刻印持仓。官方 1,757 项全图鉴覆盖，精准匹配原生品质框与图标，支持附件快捷加入邮件草稿池。"
+        description="查看当前存档的货币、材料与刻印持仓，可将支持发放的物品加入邮件草稿。历史活动物品默认隐藏，显示后带有「历史」标记，仅供查看。"
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -661,9 +712,9 @@ export default function InventoryPanel() {
             {/* 核心统计指标 */}
             <div className="flex flex-wrap items-center gap-4 text-xs">
               <div className="flex items-center gap-1.5">
-                <span className="text-muted">全服图鉴</span>
+                <span className="text-muted">默认图鉴</span>
                 <span className="font-mono font-semibold tabular-nums text-foreground">
-                  {itemCatalog.length.toLocaleString('en-US')} 项
+                  {defaultCatalogCount.toLocaleString('en-US')} 项
                 </span>
               </div>
               <Separator orientation="vertical" className="h-3.5" />
@@ -801,8 +852,26 @@ export default function InventoryPanel() {
               </Select.Popover>
             </Select>
 
+            <Select
+              aria-label="历史活动物品显示"
+              className="w-[145px]"
+              selectedKey={showHistorical ? 'show' : 'hide'}
+              onSelectionChange={(key) => setShowHistorical(key === 'show')}
+            >
+              <Select.Trigger>
+                <Select.Value />
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox>
+                  <ListBox.Item id="hide">隐藏历史物品</ListBox.Item>
+                  <ListBox.Item id="show">显示历史物品</ListBox.Item>
+                </ListBox>
+              </Select.Popover>
+            </Select>
+
             {/* 快捷清空重置 */}
-            {(query || category !== '全部' || quality !== 'all' || onlyOwned) && (
+            {(query || category !== '全部' || quality !== 'all' || onlyOwned || showHistorical) && (
               <Button
                 size="sm"
                 variant="ghost"
@@ -811,6 +880,7 @@ export default function InventoryPanel() {
                   setQuery('')
                   setCategory('全部')
                   setQuality('all')
+                  setShowHistorical(false)
                   setOnlyOwned(false)
                 }}
               >
@@ -854,7 +924,7 @@ export default function InventoryPanel() {
               <div className="flex h-full min-h-[460px] flex-col items-center justify-center gap-2 text-center p-8">
                 <Inbox className="size-8 text-muted opacity-60" />
                 <p className="text-sm font-medium">未找到符合条件的物品</p>
-                <p className="text-xs text-muted">可尝试清空搜索词或切换品质与分类过滤</p>
+                <p className="text-xs text-muted">可调整搜索和筛选条件，或选择显示历史物品。</p>
               </div>
             ) : (
               <>

@@ -292,10 +292,6 @@ class EquipService:
             from inventory_service import InventoryService
             InventoryService.get_instance(db=db).deduct_item(ctx, uid, 2, gold_cost, db=db)
             touched_items.add(2)
-            try:
-                event_bus.bus.emit(event_bus.Events.GOLD_COST, ctx, uid, amount=gold_cost)
-            except Exception:
-                pass
 
         db.execute("UPDATE equip SET exp=?, update_ts=? WHERE uid=? AND id=?",
                    (new_exp, int(time.time()), uid, eid))
@@ -531,12 +527,6 @@ class EquipService:
             ctx.removed_equips.append(dict(equip_id=food['id'], prefab_id=int(food['prefab_id']), num=0))
         for rm in refund_mats:
             inv.add_item(ctx, uid, rm['id'], rm['num'], db=db)
-        if gold_cost > 0:
-            try:
-                event_bus.bus.emit(event_bus.Events.GOLD_COST, ctx, uid, amount=gold_cost)
-            except Exception:
-                pass
-
         db.execute("UPDATE equip SET exp=?, now_break_level=?, update_ts=? WHERE uid=? AND id=?",
                    (new_exp, final_break, int(time.time()), uid, eid))
 
@@ -627,6 +617,70 @@ class EquipService:
         """一键卸下全套刻印：cs_13018 -> sc_13019。委托并协调 HeroService"""
         from hero_service import HeroService
         return HeroService.get_instance(db=getattr(ctx, "db", self.db)).unload_all_equips(ctx, uid, hero_id)
+
+    @staticmethod
+    def proposals(db, uid):
+        rows = db.query("SELECT id,name,slots_json FROM equip_proposal WHERE uid=? ORDER BY id", (uid,))
+        return [
+            {"id": row["id"], "name": row["name"],
+             "equip": [{"pos": pos, "equip_id": eid}
+                       for pos, eid in enumerate(json.loads(row["slots_json"]), 1)]}
+            for row in rows
+        ]
+
+    def save_proposal(self, ctx, uid, data, *, common=False):
+        from hero_service import HeroService
+
+        db = ctx.db
+        hero_service = HeroService.get_instance(db=db)
+        name = self._proposal_name(data)
+        slots = [0] * 6
+        if common:
+            entries = data.get("equip") or []
+        else:
+            hero_id = int(data.get("hero_id") or 0)
+            hero_service._check_equip_wear_target(db, uid, hero_id)
+            equipped = hero_service.get_hero_equip_slots(uid, hero_id, db=db)
+            entries = [{"pos": pos, "equip_id": eid} for pos, eid in equipped.items()]
+        seen_positions = set()
+        for entry in entries:
+            pos, eid = int(entry.get("pos") or 0), int(entry.get("equip_id") or 0)
+            if pos not in range(1, 7) or pos in seen_positions or eid < 0:
+                raise OperationError(2, "刻印方案槽位无效")
+            seen_positions.add(pos)
+            if eid:
+                hero_service._check_equip_wear_item(db, uid, eid, pos)
+                slots[pos - 1] = eid
+        if not any(slots):
+            raise OperationError(2, "刻印方案为空")
+        rows = db.query("SELECT id,slots_json FROM equip_proposal WHERE uid=?", (uid,))
+        if len(rows) >= 20:
+            raise OperationError(2200, "刻印方案数量达上限")
+        if any(json.loads(row["slots_json"]) == slots for row in rows):
+            raise OperationError(2201, "刻印方案已经存在")
+        proposal_id = max((row["id"] for row in rows), default=0) + 1
+        db.execute("INSERT INTO equip_proposal(uid,id,name,slots_json) VALUES (?,?,?,?)",
+                   (uid, proposal_id, name, json.dumps(slots)))
+        return {"result": 0, "proposal_id": proposal_id}
+
+    @staticmethod
+    def _proposal_name(data):
+        name = data.get("proposal_name") or ""
+        if not name.strip() or len(name.encode("utf-8")) > 120:
+            raise OperationError(2, "刻印方案名称无效")
+        return name
+
+    def modify_proposal(self, ctx, uid, data, *, delete=False):
+        db = ctx.db
+        proposal_id = int(data.get("proposal_id") or 0)
+        if not db.query("SELECT 1 FROM equip_proposal WHERE uid=? AND id=?", (uid, proposal_id)):
+            raise OperationError(2202, "刻印方案不存在")
+        if delete:
+            db.execute("DELETE FROM equip_proposal WHERE uid=? AND id=?", (uid, proposal_id))
+        else:
+            db.execute("UPDATE equip_proposal SET name=? WHERE uid=? AND id=?",
+                       (self._proposal_name(data), uid, proposal_id))
+        return {"result": 0}
 
     def bind_equip_hero(self, ctx, uid, equip_id, hero_id):
         """刻印专属修正者祈生绑定：cs_13046 -> sc_13047。消耗重构秘典 41102 并绑定 race_hero"""

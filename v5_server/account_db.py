@@ -1776,10 +1776,18 @@ CREATE TABLE IF NOT EXISTS idol_trainee (            -- sc_58169 练舞房总览
     attack_hero_id INTEGER DEFAULT 0,                -- 进攻阵容 1084
     defend_hero_id INTEGER DEFAULT 0,                -- 防守阵容 1084
     exercise_use_times INTEGER DEFAULT 0,            -- 已用训练次数 0
+    exercise_day_tag INTEGER NOT NULL DEFAULT 0,
     camp_list TEXT DEFAULT '',                       -- 阵营 buff（逗号分隔 2,5）
     pvp_stage_id INTEGER DEFAULT 0,                  -- PVP 舞台 10013
     pvp_refresh_ts INTEGER DEFAULT 0,                -- 1786482000
     update_ts INTEGER DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS equip_proposal (
+    uid INTEGER NOT NULL,
+    id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    slots_json TEXT NOT NULL,
+    PRIMARY KEY (uid, id)
 );
 CREATE TABLE IF NOT EXISTS idol_trainee_hero (       -- sc_58169 练舞五维属性（行化）
     uid INTEGER NOT NULL,
@@ -2326,7 +2334,7 @@ CREATE TABLE IF NOT EXISTS user_recharge (
 );
 CREATE TABLE IF NOT EXISTS admin_cat_explore_data (
     uid                      INTEGER PRIMARY KEY,
-    weekly_time              INTEGER DEFAULT 0,    -- 本周累计探索天数 (0~7)
+    weekly_time              INTEGER DEFAULT 0,    -- 待领取倍率累计天数 (0~7，跨周保留)
     daily_time               INTEGER DEFAULT 0,    -- 今日探索时间戳 (秒)
     weekly_reward_state      INTEGER DEFAULT 0,    -- 本周周常大奖领取状态 (0: 未领, 1: 已领)
     weekly_scene_open        INTEGER DEFAULT 0,    -- 每周首次进入场景标记 (0: 未进, 1: 已进)
@@ -2355,6 +2363,7 @@ CREATE TABLE IF NOT EXISTS admin_cat_explore_queue (
 
 # 列迁移（幂等：已存在则跳过）——新表建表走 SCHEMA，加列走这里
 _COLUMN_MIGRATIONS = [
+    ("idol_trainee", "exercise_day_tag", "INTEGER NOT NULL DEFAULT 0"),
     ("currency", "last_fatigue_recover_time", "INTEGER DEFAULT 0"),  # 活力(货币id=4)恢复时间点
     ("currency", "update_ts", "INTEGER DEFAULT 0"),                   # 更新时间戳（最新值仲裁）
     ("material", "update_ts", "INTEGER DEFAULT 0"),                   # 更新时间戳（最新值仲裁）
@@ -4389,11 +4398,26 @@ class AccountDB:
                     new_f = min(120, cur_f + rec)
                     self.execute("UPDATE backhome_hero SET fatigue=?, update_ts=? WHERE uid=? AND archives_id=?", (new_f, now_ts, uid, aid))
 
-    def _calculate_canteen_dishes(self, uid):
-        """[Phase 3] 惰性计算在售招牌菜的制作与售卖进度，融合在岗英雄做菜加速、售价上浮、体力减耗技能并遵守 14000 收益上限。"""
+    def get_canteen_storage_cap(self, uid):
+        """GameSetting 基础容量加餐厅家具当前等级对应的存储容量。"""
+        rows = self.query("SELECT type_id,level FROM backhome_canteen_furniture WHERE uid=?", (uid,))
+        cap = 8000
+        for row in rows:
+            type_id = int(row["type_id"] or 0)
+            level = int(row["level"] or 0)
+            if level not in (2, 3):
+                continue
+            if 941001 <= type_id <= 941004:
+                cap += {2: 500, 3: 1000}[level]
+            elif 941010 <= type_id <= 941017:
+                cap += {2: 200, 3: 500}[level]
+        return cap
+
+    def _calculate_canteen_dishes(self, uid, now_ts=None):
+        """按在岗角色、在售菜品和当前餐厅存储容量结算产出。"""
         c_dishes = self.query("SELECT * FROM backhome_canteen_dish WHERE uid=?", (uid,))
-        now_ts = int(time.time())
-        MAX_EARNINGS_CAP = 14000
+        now_ts = int(time.time()) if now_ts is None else int(now_ts)
+        max_earnings_cap = self.get_canteen_storage_cap(uid)
         BASE_FATIGUE_COST_PER_MEAL = 0.05
 
         # 1. 查询岗位英雄当前疲劳度
@@ -4411,6 +4435,8 @@ class AccountDB:
                     hero_info["hero_id"] = hid
                     hero_info["archives_id"] = aid
                     duty_heroes.append(hero_info)
+                elif (ctype, hid) in ((1, 9601), (2, 9602), (3, 9603)):
+                    duty_heroes.append({"job_type": ctype, "hero_id": hid, "archives_id": hid, "npc": True})
 
         # 2. 查询技能影响
         effects = self.get_canteen_skill_effects(duty_heroes)
@@ -4421,9 +4447,11 @@ class AccountDB:
         # 3. 计算三位英雄能够支撑的最大营业时间（以最先体力耗尽者为准）
         t_arrival = 56.0  # 客流基准间隔 56 秒
         max_work_seconds = 0
-        if duty_heroes:
+        if {hero["job_type"] for hero in duty_heroes} == {1, 2, 3}:
             hero_work_capacities = []
             for h in duty_heroes:
+                if h.get("npc"):
+                    continue
                 aid = h["archives_id"]
                 cur_f = float(h.get("fatigue") or 0)
                 red_pct = min(90, fatigue_reduce.get(aid, 0))
@@ -4434,11 +4462,11 @@ class AccountDB:
                     hero_work_capacities.append(max_meals * t_arrival)
                 else:
                     hero_work_capacities.append(999999)
-            max_work_seconds = int(min(hero_work_capacities)) if hero_work_capacities else 0
+            max_work_seconds = int(min(hero_work_capacities, default=now_ts))
 
         food_cfgs = self._get_canteen_food_cfg()
 
-        # 4. 查询当前未领取的收益总额（纳管已有待领取与本轮增量，确保硬封顶 14000）
+        # 4. 查询当前未领取的收益总额。
         meta = self.query("SELECT * FROM backhome_canteen_meta WHERE uid=?", (uid,))
         existing_pending = int(meta[0]["pending_earnings"] or 0) if meta else 0
         cur_unclaimed = 0
@@ -4467,8 +4495,7 @@ class AccountDB:
 
             if sell_num > sold_num and up_ts > 0 and max_work_seconds > 0:
                 elapsed = max(0, min(now_ts - up_ts, max_work_seconds))
-                # 计算受 14000 上限限制的剩余可售卖份数（扣除已有待领取与本轮增量）
-                remaining_cap_money = max(0, MAX_EARNINGS_CAP - (existing_pending + cur_unclaimed))
+                remaining_cap_money = max(0, max_earnings_cap - (existing_pending + cur_unclaimed))
                 max_dishes_by_cap = remaining_cap_money // actual_sell_price if actual_sell_price > 0 else 99999
 
                 incremental_sold = min(sell_num - sold_num, int(elapsed // actual_cost_time), max_dishes_by_cap)
@@ -4495,8 +4522,12 @@ class AccountDB:
 
         # 5. 扣减工作英雄体力（考虑英雄各自的减耗技能）
         if total_time_spent > 0 and duty_heroes:
+            charged_archives = set()
             for h in duty_heroes:
                 aid = h["archives_id"]
+                if h.get("npc") or aid in charged_archives:
+                    continue
+                charged_archives.add(aid)
                 cur_f = float(h.get("fatigue") or 0)
                 red_pct = min(90, fatigue_reduce.get(aid, 0))
                 hero_fatigue_rate = (BASE_FATIGUE_COST_PER_MEAL / t_arrival) * ((100.0 - red_pct) / 100.0)
@@ -4519,7 +4550,7 @@ class AccountDB:
         """lazy 结算并返回当前待领取营收总额（58003 下发 / 58106 领取共用）。
 
         结算规则在 _calculate_canteen_dishes：按菜品 sold 推进（受
-        min(岗位体力)/成本耗时/14000 上限 三重停止条件约束），增量累进 meta.pending_earnings。
+        min(岗位体力)/成本耗时/餐厅容量三重停止条件约束），增量累进 meta.pending_earnings。
         """
         self._calculate_canteen_dishes(uid)
         rows = self.query("SELECT pending_earnings FROM backhome_canteen_meta WHERE uid=?", (uid,))
@@ -4730,6 +4761,20 @@ class AccountDB:
     def set_canteen_career(self, uid, ctype, hero_id):
         """[Fix by Gemini 3.7-flash] 设置餐厅岗位安排（cs_58104 -> sc_58105）。"""
         now_ts = int(time.time())
+        previous = self.query(
+            "SELECT hero_id FROM backhome_canteen_career WHERE uid=? AND ctype=?", (uid, ctype)
+        )
+        previous_hero = int(previous[0]["hero_id"] or 0) if previous else 0
+        if previous_hero == hero_id:
+            return
+        # Apply the elapsed work and rest using the old assignment first.
+        self._calculate_canteen_dishes(uid, now_ts=now_ts)
+        self.calculate_dorm_hero_fatigue_recovery(uid, now_ts=now_ts)
+        for archives_id in {self.get_archive_id(hid) for hid in (previous_hero, hero_id) if hid}:
+            self.execute("UPDATE backhome_hero SET update_ts=? WHERE uid=? AND archives_id=?",
+                         (now_ts, uid, archives_id))
+        self.execute("UPDATE backhome_canteen_dish SET update_ts=? WHERE uid=? AND update_ts<?",
+                     (now_ts, uid, now_ts))
         self.execute("""
             INSERT OR REPLACE INTO backhome_canteen_career (uid, ctype, hero_id, update_ts)
             VALUES (?, ?, ?, ?)

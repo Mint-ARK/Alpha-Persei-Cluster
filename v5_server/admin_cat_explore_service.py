@@ -151,7 +151,7 @@ class AdminCatExploreService:
         data = db.get_admin_cat_explore_data(uid)
         now = int(time.time())
 
-        # 和全局周期消费者共用周一05:00边界，保留旧队列及永久产出。
+        # 和全局周期消费者共用周一05:00边界。倍率天数由成功领奖消耗。
         mon_0500 = get_weekly_mon_5am_ts(now)
 
         if data is None:
@@ -174,7 +174,6 @@ class AdminCatExploreService:
             # 跨周重置检测
             last_reset = data.get("last_weekly_reset_ts", 0)
             if last_reset < mon_0500:
-                data["weekly_time"] = 0
                 data["weekly_reward_state"] = 0
                 data["weekly_scene_open"] = 0
                 data["last_weekly_reset_ts"] = mon_0500
@@ -277,11 +276,10 @@ class AdminCatExploreService:
         # 6. 落库保存挂机队列
         db.save_admin_cat_queue(uid, area_id, mimir_id, now, stop_time, hour_time, events)
 
-        # 7. 累计今日探索与每周天数
+        # 7. 每个游戏日的首个派遣累计一个倍率天数，直至领取。
         exp_data = self.get_or_create_explore_data(db, uid)
         last_daily = exp_data.get("daily_time", 0)
         # daily_time保留成功派遣的真实时间；是否已计天按05:00游戏日比较。
-        # 周一05:00前的旧派遣属于上周，不能挡住本周首次计数。
         is_same_day = last_daily > 0 and get_daily_5am_ts(last_daily) == get_daily_5am_ts(now)
 
         if not is_same_day:
@@ -497,7 +495,8 @@ class AdminCatExploreService:
         # 发放奖励
         InventoryService.grant_items(ctx, uid, [(r["id"], r["num"]) for r in reward_list], source="admin_cat_weekly_reward")
 
-        # 标记已领取
+        # 奖励和倍率消耗一同提交，由 67008 的事务覆盖回包失败。
+        exp_data["weekly_time"] = 0
         exp_data["weekly_reward_state"] = 1
         db.save_admin_cat_explore_data(uid, exp_data)
 

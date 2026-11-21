@@ -1,3 +1,5 @@
+import historicalInventory from '../../../panel_historical_items.json'
+
 /**
  * GM 控制台 API 统一通信客户端
  * 遵循 CQRS 读写分离架构：
@@ -1408,18 +1410,8 @@ export async function updatePaidRights(changes: PaidRightsPatch, uid: number = g
   })
 }
 
-/**
- * 校验是否为刻印类物品（刻印套装、单件刻印或已废弃套装盒）
- * 规则：
- * 1. type === 7（刻印套装）
- * 2. 200000 <= id <= 600000（单件刻印与虚拟套装区间）
- * 3. 830000 <= id <= 859999（刻印套装盒区间）
- */
-export function isEquipOrSigil(id: number, type?: number): boolean {
-  if (type === 7) return true
-  if (id >= 200000 && id <= 600000) return true
-  if (id >= 830000 && id <= 859999) return true
-  return false
+export function isSigilSetBox(id: number): boolean {
+  return id >= 830000 && id <= 859999
 }
 
 /**
@@ -1436,11 +1428,18 @@ export function isTrialSkinFilm(id: number, name?: string): boolean {
   return false
 }
 
-/**
- * 校验是否为仅供图鉴展示、禁止邮寄的受限物品（刻印类 + 试衣底片类）
- */
+const visibleEventItemIds = new Set(historicalInventory.visible_ids)
+
+export function isHistoricalInventoryItem(id: number): boolean {
+  return !visibleEventItemIds.has(id) && historicalInventory.hidden_ranges.some(
+    ([first, last]) => id >= first && id <= last,
+  )
+}
+
+/** 历史活动物品、旧套装盒与试衣底片仅供展示。 */
 export function isDisplayOnlyItem(id: number, type?: number, name?: string): boolean {
-  return isEquipOrSigil(id, type) || isTrialSkinFilm(id, name)
+  return isHistoricalInventoryItem(id) || isTrialSkinFilm(id, name) || isSigilSetBox(id)
+    || (id >= 200000 && id <= 600000 && type !== 7)
 }
 
 // ===========================================================================

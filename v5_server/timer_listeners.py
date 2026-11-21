@@ -131,17 +131,29 @@ def on_weekly_task_and_bp_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwarg
             (cycle_start_ts or now_ts, uid)
         )
 
-        # 7. 重置管理员猫咪探索周常累计天数与宝箱领取状态
-        try:
+        # 7. 刷新探索领取资格和场景提示，累计倍率由成功领取清零。
+        week_start = cycle_start_ts or get_weekly_mon_5am_ts(now_ts)
+        if db.query("SELECT 1 FROM admin_cat_explore_data WHERE uid=? AND COALESCE(last_weekly_reset_ts,0)<?",
+                    (uid, week_start)):
             db.execute(
-                "UPDATE admin_cat_explore_data SET weekly_time=0, weekly_reward_state=0, weekly_scene_open=0, last_weekly_reset_ts=?, update_ts=? WHERE uid=?",
-                (cycle_start_ts or now_ts, now_ts, uid)
+                "UPDATE admin_cat_explore_data SET weekly_reward_state=0, weekly_scene_open=0, "
+                "last_weekly_reset_ts=?, update_ts=? WHERE uid=?",
+                (week_start, now_ts, uid)
             )
-        except Exception:
-            pass
+            encoder = getattr(ctx, "codec_encode", None)
+            append = getattr(ctx, "append_frame", None)
+            if callable(encoder) and callable(append):
+                from admin_cat_explore_service import AdminCatExploreService
+                from middleware import DownFrame
+
+                data = AdminCatExploreService.get_instance().generate_sc_67001_dict(db, uid)
+                snapshot = encoder("sc_67001", data)
+                if not snapshot:
+                    raise ValueError("探索派遣周重置状态帧为空")
+                append(DownFrame(67001, snapshot))
 
         if hasattr(ctx, 'log'):
-            ctx.log(f"[LazyTimer] 用户 {uid} 触发每周一 05:00 周常重置（周常任务/战令每周/战令周经验/游园街周积分/猫咪探索周宝箱已清空更新）")
+            ctx.log(f"[LazyTimer] 用户 {uid} 触发每周一 05:00 周常重置（周常任务/战令每周/战令周经验/游园街周积分/猫咪探索领取资格已刷新）")
 
 
 # ==================== 4. 梦境再构（Boss Challenge）周期轮换监听器 ====================

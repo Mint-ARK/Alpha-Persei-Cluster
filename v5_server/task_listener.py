@@ -277,10 +277,17 @@ def on_stage_pass(ctx, uid, times=1, stage_id=0, stage_type=None, **kwargs):
                                      param=stage_id, set_value=True)
     # 2. 通关任意关卡 (cond=402: 6002 需1次, 6004 需5次)
     c1 = _trigger_task_condition(db, uid, condition=402, delta=times)
-    # 3. 历战轮回 (cond=405)
+    # Condition 405 uses chapter IDs, while 1014 uses the 联防作战 category.
     c2 = []
-    if stage_type == "regular" or (isinstance(stage_id, int) and 100000 <= stage_id < 200000):
-        c2 = _trigger_task_condition(db, uid, condition=405, delta=times)
+    stage_kind = kwargs.get('stage_kind')
+    if stage_kind in ('dream_normal', 'dream_advance'):
+        c2 = _trigger_task_condition(db, uid, condition=405, delta=times, param=301)
+    elif isinstance(stage_id, int) and stage_id // 10000 == 203:
+        c2 = _trigger_task_condition(db, uid, condition=405, delta=times, param=203)
+    elif stage_type == "regular" or (isinstance(stage_id, int) and 100000 <= stage_id < 200000):
+        c2 += _trigger_task_condition(db, uid, condition=405, delta=times)
+    if kwargs.get('stage_type_id') == 8:
+        c2 += _trigger_task_condition(db, uid, condition=1014, delta=times, param=8)
     # 4. 黑区净化 (cond=453)
     c3 = []
     if stage_type == "black_zone" or (isinstance(stage_id, int) and 200000 <= stage_id < 300000):
@@ -325,6 +332,8 @@ def on_shop_buy(ctx, uid, count=1, shop_id=None, **kwargs):
     """商店购买物品 (cond=600: 6005 需1次)"""
     c = _trigger_task_condition(ctx.db, uid, condition=600, delta=count, param=shop_id)
     _push_task_diff(ctx, uid, c)
+    if shop_id == 15:
+        on_dorm_action(ctx, uid, action_type="furniture_purchase", times=count)
 
 
 @bus.subscribe(Events.BUY_FATIGUE)
@@ -343,10 +352,23 @@ def on_main_interact(ctx, uid, hero_id=0, **kwargs):
     _push_task_diff(ctx, uid, c)
 
 
-@bus.subscribe(Events.EQUIP_REFORGE)
-def on_equip_reforge(ctx, uid, times=1, **kwargs):
-    """刻印赋能/重构 (cond=350 消耗模块100018)。cond9属于管理喵派遣。"""
-    changed = _trigger_task_condition(ctx.db, uid, condition=350, delta=times)
+@bus.subscribe(Events.ITEM_COST)
+def on_item_cost(ctx, uid, item_id, amount, **kwargs):
+    if amount <= 0:
+        return
+    changed = _trigger_task_condition(ctx.db, uid, condition=350, delta=amount, param=item_id)
+    _push_task_diff(ctx, uid, changed)
+
+
+@bus.subscribe(Events.EQUIP_SEIZURE_SCORE)
+def on_equip_seizure_score(ctx, uid, amount, **kwargs):
+    if amount <= 0:
+        return
+    # Config's extra parameter is the score threshold, not a mode or item ID.
+    changed = _trigger_task_condition(
+        ctx.db, uid, condition=1012, delta=amount,
+        param_candidates=(15000, 20000), activity_zero_only=True,
+    )
     _push_task_diff(ctx, uid, changed)
 
 
@@ -358,10 +380,9 @@ def on_admin_cat_explore_start(ctx, uid, **kwargs):
 
 @bus.subscribe(Events.DISPATCH_FINISH)
 def on_dispatch_finish(ctx, uid, times=1, **kwargs):
-    """修正者派遣 (cond=10: 6015 需1次; cond=1014: 100015 需5次)"""
+    """修正者派遣 (cond=10: 6015 需1次)。"""
     c1 = _trigger_task_condition(ctx.db, uid, condition=10, delta=times)
-    c2 = _trigger_task_condition(ctx.db, uid, condition=1014, delta=times)
-    _push_task_diff(ctx, uid, c1 + c2)
+    _push_task_diff(ctx, uid, c1)
 
 
 @bus.subscribe(Events.DORM_ACTION)
@@ -377,7 +398,8 @@ def on_dorm_action(ctx, uid, action_type="visit", times=1, attribute_index=None,
              若传 attribute_index 则同步推进 cond=2017; 若传 personality 则同步推进 cond=2016
     - battle: 挑战其他玩家 (cond=2011: 10002 挑战1次, 10005 挑战3次, 10006 挑战6次, 150197)
     - battle_win: 对战胜利 (cond=2010: 10007 胜利3次)
-    - furniture: 家具购买/交互 (cond=601: 100017 购买家具)
+    - furniture: 家具库存图鉴更新
+    - furniture_purchase: 商店 15 的家具购买 (cond=601)
     """
     changed = []
     if action_type in ("feed", "dine"):
@@ -401,8 +423,9 @@ def on_dorm_action(ctx, uid, action_type="visit", times=1, attribute_index=None,
         changed += _trigger_task_condition(ctx.db, uid, condition=2010, delta=times)
     elif action_type == "battle_win":
         changed += _trigger_task_condition(ctx.db, uid, condition=2010, delta=times)
-    elif action_type == "furniture":
-        changed += _trigger_task_condition(ctx.db, uid, condition=601, delta=times)
+    elif action_type in ("furniture", "furniture_purchase"):
+        if action_type == "furniture_purchase":
+            changed += _trigger_task_condition(ctx.db, uid, condition=601, delta=times, param=15)
         try:
             changed += sync_dorm_illu_tasks(ctx.db, uid)
         except Exception:

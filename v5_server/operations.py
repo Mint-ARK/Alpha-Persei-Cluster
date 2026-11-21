@@ -3988,6 +3988,56 @@ class RaceConfirmOp(Operation):
         return EquipService.get_instance(db=ctx.db).build_equip_refresh_frames(ctx, self.uid) + [DownFrame(self.sc, payload)]
 
 
+class EquipProposalOp(Operation):
+    prepare_response_in_transaction = True
+
+    def respond(self, result, data, ctx):
+        payload = ctx.codec_encode(f"sc_{self.sc}", result)
+        if not payload:
+            raise ValueError("刻印方案回执为空")
+        return [DownFrame(self.sc, payload)]
+
+
+@operation
+class SaveEquipProposalOp(EquipProposalOp):
+    cmd = 13036
+    sc = 13037
+
+    def apply(self, data, ctx):
+        from equip_service import EquipService
+        return EquipService.get_instance(ctx.db).save_proposal(ctx, self.uid, data)
+
+
+@operation
+class SaveCommonEquipProposalOp(EquipProposalOp):
+    cmd = 13042
+    sc = 13043
+
+    def apply(self, data, ctx):
+        from equip_service import EquipService
+        return EquipService.get_instance(ctx.db).save_proposal(ctx, self.uid, data, common=True)
+
+
+@operation
+class RenameEquipProposalOp(EquipProposalOp):
+    cmd = 13038
+    sc = 13039
+
+    def apply(self, data, ctx):
+        from equip_service import EquipService
+        return EquipService.get_instance(ctx.db).modify_proposal(ctx, self.uid, data)
+
+
+@operation
+class DeleteEquipProposalOp(EquipProposalOp):
+    cmd = 13040
+    sc = 13041
+
+    def apply(self, data, ctx):
+        from equip_service import EquipService
+        return EquipService.get_instance(ctx.db).modify_proposal(ctx, self.uid, data, delete=True)
+
+
 @operation
 class EquipBindHeroOp(Operation):
     """刻印专属修正者祈生绑定：cs_13046 {equip_id, hero_id} → sc_13047 {result}。"""
@@ -5200,8 +5250,10 @@ class SetCharacterJobOp(Operation):
         ctx.log(f"cs_58104 -> 设置食堂工作安排 ctype={result.get('type')} hero={result.get('hero_id')} res={res_code}")
         if res_code != 0:
             return [DownFrame(self.sc, payload)]
-        from operations import _refresh_frames
-        return [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
+        from backhome_service import BackHomeService
+        fatigue = BackHomeService.get_instance().get_fatigue_push_payload(self.uid, ctx.db)
+        frames = [DownFrame(58027, fatigue)] if fatigue else []
+        return [DownFrame(self.sc, payload)] + frames + _refresh_frames(ctx, self.uid)
 
 
 @operation
@@ -5209,7 +5261,7 @@ class ReceiveCanteenAutoAwardOp(Operation):
     """58106 领取食堂营业收入：cs_58106 {architecture_id} → sc_58107 {result, earnings}。
 
     earnings 来自 db.settle_canteen_earnings() 的 lazy 结算（_calculate_canteen_dishes：
-    按菜品推进 sold，受岗位体力/成本耗时/14000 上限停止约束），增量持久化在
+    按菜品推进 sold，受岗位体力、成本耗时和餐厅容量约束），增量持久化在
     meta.pending_earnings。此前读不存在的 last_receive_earnings_time 列 → elapsed 恒 0 → 恒领 0。"""
 
     cmd = 58106
@@ -5529,13 +5581,7 @@ class TrainHeroPropertyOp(Operation):
         frames = [DownFrame(self.sc, payload)] + _refresh_frames(ctx, self.uid)
         # 附带推送 sc_58171 训练次数更新帧
         try:
-            use_times = int((result or {}).get("use_times") or 0)
-            p58171 = ctx.codec_encode("sc_58171", {
-                "exercise_times_info": {
-                    "use_times": use_times,
-                    "camp_list": []
-                }
-            })
+            p58171 = ctx.codec_encode("sc_58171", {"exercise_times_info": result["exercise_times_info"]})
             if p58171:
                 frames.append(DownFrame(58171, p58171))
         except Exception as e:
@@ -6117,6 +6163,22 @@ from cultivate_hero_service import DailyTaskClaimOp, HeroTaskClaimOp
 
 operation(HeroTaskClaimOp)
 operation(DailyTaskClaimOp)
+
+
+@operation
+class PtScrollSelectSuitOp(Operation):
+    cmd, sc = 76152, 76153
+    prepare_response_in_transaction = True
+
+    def apply(self, data, ctx):
+        from pt_scroll_service import select_suit
+        select_suit(ctx, self.uid, int(data.get("activity_id") or 0), int(data.get("up_select") or 0))
+
+    def respond(self, result, data, ctx):
+        payload = ctx.codec_encode("sc_76153", {"result": 0})
+        if not payload:
+            raise ValueError("联防协议刻印选择回执为空")
+        return [DownFrame(self.sc, payload)]
 
 
 @operation

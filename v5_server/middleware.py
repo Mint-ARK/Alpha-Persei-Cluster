@@ -1614,8 +1614,9 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
         res_times = int(battle_info.get("resurrect_times", 0))
         if res_times > 0 and ctx.db is not None:
             try:
-                ctx.db.execute("UPDATE currency SET num = MAX(0, num - ?) WHERE uid=? AND id=2",
-                               (res_times * 100, uid))
+                from inventory_service import InventoryService
+                available = InventoryService.get_item_balance(ctx.db, uid, 2)[1]
+                InventoryService.cost_item(ctx, uid, 2, min(res_times * 100, available))
             except Exception:
                 pass
 
@@ -2104,7 +2105,14 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
             final_score = int(round(raw_score * rate))
             
             if hasattr(ctx.db, "save_equip_seizure_battle_score") and ctx.db is not None:
-                ctx.db.save_equip_seizure_battle_score(uid, final_score, team_heroes=heroes)
+                from event_bus import Events, bus
+                score_ts = int(time.time())
+                old_score = ctx.db.get_equip_seizure_progress(uid, score_ts).get("today_max_score") or 0
+                _, _, new_score, _ = ctx.db.save_equip_seizure_battle_score(
+                    uid, final_score, team_heroes=heroes, now_ts=score_ts
+                )
+                if new_score > old_score:
+                    bus.emit(Events.EQUIP_SEIZURE_SCORE, ctx, uid, amount=new_score - old_score)
             
             ctx.log(f"[settle] 介质攫取作战结算: bid={bid} dest={dest_int} result={result} "
                     f"dead={enemy_dead} battle_ms={raw_btime} reported_score={explicit_score} "

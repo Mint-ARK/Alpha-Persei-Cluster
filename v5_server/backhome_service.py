@@ -453,6 +453,8 @@ class BackHomeService:
         ctx.uid = uid
         ctype = int(data.get("type") or 1)
         hid = int(data.get("hero_id") or 0)
+        if ctype not in (1, 2, 3) or hid < 0:
+            return {"result": 2, "type": ctype, "hero_id": hid}
         if ctx.db:
             if hid > 0:
                 aid = ctx.db.get_archive_id(hid)
@@ -460,7 +462,6 @@ class BackHomeService:
                 if h_rows and int(h_rows[0].get("is_lock") or 0) == 1:
                     return {"result": 210297, "type": ctype, "hero_id": hid}
             ctx.db.set_canteen_career(uid, ctype, hid)
-            _emit_dorm_action(ctx, uid, "commission")
         return {"result": 0, "type": ctype, "hero_id": hid}
 
     def receive_canteen_auto_award(self, ctx, uid, data=None):
@@ -472,7 +473,7 @@ class BackHomeService:
         now_ts = int(time.time())
         earnings = 0
         if ctx.db:
-            earnings = min(14000, max(0, ctx.db.settle_canteen_earnings(uid)))
+            earnings = max(0, ctx.db.settle_canteen_earnings(uid))
             if earnings > 0:
                 ctx.db.add_currency(uid, 39, earnings)
                 if hasattr(ctx, "touched_items") and ctx.touched_items is not None:
@@ -883,6 +884,17 @@ class BackHomeService:
             })
         return encode("sc_58195", {"sequence_list": sequence_list, "shared_sequence_list": []})
 
+    @staticmethod
+    def exercise_times_info(db, uid, now_ts=None):
+        from lazy_timer import get_daily_5am_ts
+
+        rows = db.query("SELECT exercise_use_times,exercise_day_tag,camp_list FROM idol_trainee WHERE uid=?", (uid,))
+        row = rows[0] if rows else {}
+        day = get_daily_5am_ts(now_ts)
+        count = max(0, int(row.get("exercise_use_times") or 0)) if row.get("exercise_day_tag") == day else 0
+        camp_list = [int(value) for value in (row.get("camp_list") or "").split(",") if value.strip().isdigit()]
+        return {"use_times": count, "camp_list": camp_list}
+
     def get_idol_trainee_overview_payload(self, uid, db):
         """生成 sc_58169 练舞房总览（站位、训练次数、属性、阵容）下行帧。"""
         if not db:
@@ -891,9 +903,6 @@ class BackHomeService:
         it_data = row[0] if row else {}
         attack_hero_id = int(it_data.get("attack_hero_id") or 1084)
         defend_hero_id = int(it_data.get("defend_hero_id") or 1084)
-        use_times = int(it_data.get("exercise_use_times") or 0)
-        camp_list_str = it_data.get("camp_list") or ""
-        camp_list = [int(x.strip()) for x in camp_list_str.split(",") if x.strip().isdigit()]
         pvp_stage_id = int(it_data.get("pvp_stage_id") or 10013)
         pvp_refresh_ts = int(it_data.get("pvp_refresh_ts") or 1786482000)
 
@@ -924,10 +933,7 @@ class BackHomeService:
             "attack_hero_id_list": [attack_hero_id],
             "defend_hero_id_list": [defend_hero_id],
             "hero_list": hero_list,
-            "exercise_times_info": {
-                "use_times": use_times,
-                "camp_list": camp_list
-            },
+            "exercise_times_info": self.exercise_times_info(db, uid),
             "pvp_stage_info": {
                 "stage_id": pvp_stage_id,
                 "refresh_timestamp": pvp_refresh_ts
@@ -1079,10 +1085,19 @@ class BackHomeService:
         if not ctx.db or not hid:
             return {"result": 1, "fatigue": 0, "attribute_value": 100}
 
+        from lazy_timer import get_daily_5am_ts
+        exercise_info = self.exercise_times_info(ctx.db, uid, now_ts)
+        room_count = ctx.db.query("SELECT COUNT(*) AS n FROM backhome_dorm WHERE uid=? AND dorm_id>=6", (uid,))[0]["n"]
+        limit = max(6, min(10, room_count + 4))
+        if exercise_info["use_times"] >= limit:
+            return {"result": 210264}
+
         aid = ctx.db.get_archive_id(hid)
         # 1. 查找英雄疲劳度
         row = ctx.db.query("SELECT fatigue FROM backhome_hero WHERE uid=? AND archives_id=?", (uid, aid))
-        cur_fatigue = int(row[0]["fatigue"] if row else 140)
+        if not row:
+            return {"result": 2}
+        cur_fatigue = int(row[0]["fatigue"] or 0)
 
         # 2. 读取英雄配置（基准属性与成长上限）
         cfg_all = _get_backhome_hero_cfg()
@@ -1138,23 +1153,19 @@ class BackHomeService:
         ctx.db.execute(f"UPDATE idol_trainee_hero SET attr{attr_idx}=?, update_ts=? WHERE uid=? AND hero_id=?",
                        (new_attr_val, now_ts, uid, target_hid))
 
-        # 7.5 累加训练次数并持久化
-        new_use_times = 1
-        if ctx.db:
-            row_it = ctx.db.query("SELECT exercise_use_times FROM idol_trainee WHERE uid=?", (uid,))
-            if row_it:
-                new_use_times = int(row_it[0]["exercise_use_times"] or 0) + 1
-                ctx.db.execute("UPDATE idol_trainee SET exercise_use_times=?, update_ts=? WHERE uid=?",
-                               (new_use_times, now_ts, uid))
-            else:
-                new_use_times = 1
-                ctx.db.execute("INSERT INTO idol_trainee (uid, exercise_use_times, update_ts) VALUES (?, ?, ?)",
-                               (uid, new_use_times, now_ts))
+        exercise_info["use_times"] += 1
+        ctx.db.execute(
+            "INSERT INTO idol_trainee(uid,exercise_use_times,exercise_day_tag,update_ts) VALUES (?,?,?,?) "
+            "ON CONFLICT(uid) DO UPDATE SET exercise_use_times=excluded.exercise_use_times,"
+            "exercise_day_tag=excluded.exercise_day_tag,update_ts=excluded.update_ts",
+            (uid, exercise_info["use_times"], get_daily_5am_ts(now_ts), now_ts),
+        )
 
         # 8. 发送行为通知
         _emit_dorm_action(ctx, uid, "train", times=1, attribute_index=attr_idx)
 
-        return {"result": 0, "fatigue": new_fatigue, "attribute_value": new_attr_val, "use_times": new_use_times}
+        return {"result": 0, "fatigue": new_fatigue, "attribute_value": new_attr_val,
+                "exercise_times_info": exercise_info}
 
     def claim_idol_trainee_rank_reward(self, ctx, uid, data=None):
         """58192 领取游园街贴票任务积分档位奖励：
@@ -1436,6 +1447,22 @@ class BackHomeService:
 
 # ==================== 游园街时间推演监听（原 timer_listeners.on_dorm_tick） ====================
 
+@bus.subscribe(Events.DAILY_RESET_5AM)
+def on_dorm_training_reset(ctx, uid, now_ts=None, **kwargs):
+    db = getattr(ctx, "db", None)
+    append = getattr(ctx, "append_frame", None)
+    if not uid or db is None or not callable(append):
+        return
+    if not db.query("SELECT 1 FROM idol_trainee WHERE uid=?", (uid,)):
+        return
+    from middleware import DownFrame
+
+    info = BackHomeService.exercise_times_info(db, uid, now_ts)
+    payload = encode("sc_58171", {"exercise_times_info": info})
+    if payload:
+        append(DownFrame(58171, payload))
+
+
 @bus.subscribe(Events.TIME_TICK)
 def on_dorm_tick(ctx, uid, delta_seconds=0, now_ts=None, **kwargs):
     """连续时间流逝驱动食堂做菜与后宅英雄疲劳度恢复。"""
@@ -1453,7 +1480,7 @@ def on_dorm_tick(ctx, uid, delta_seconds=0, now_ts=None, **kwargs):
     # 2. 后宅英雄休息疲劳恢复（好感等级 Lv 1~10 动态倍率恢复模型）
     if hasattr(db, 'calculate_dorm_hero_fatigue_recovery'):
         try:
-            db.calculate_dorm_hero_fatigue_recovery(uid)
+            db.calculate_dorm_hero_fatigue_recovery(uid, now_ts=now_ts)
         except Exception as e:
             logger.debug(f"[LazyTimer] 后宅英雄疲劳恢复异常: {e}")
 

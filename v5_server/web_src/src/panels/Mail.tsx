@@ -391,7 +391,7 @@ export default function MailPanel() {
         show: true,
         msg: isFilm
           ? `物品「${target.name}」(ID: ${target.id}) 属于限时试衣底片，未实现对应协议，仅供图鉴展示，禁止通过邮件发送！`
-          : `物品「${target.name}」(ID: ${target.id}) 属于刻印类物品，仅供图鉴展示，禁止通过邮件发送！`,
+          : `物品「${target.name}」(ID: ${target.id}) 仅供图鉴展示，无法通过邮件发送！`,
         tone: 'danger',
       })
       return
@@ -507,7 +507,7 @@ export default function MailPanel() {
         show: true,
         msg: isFilm
           ? `待发附件包含限时试衣底片「${forbidden.name}」(ID: ${forbidden.id})，系统禁止通过邮件发送！`
-          : `待发附件包含刻印类物品「${forbidden.name}」(ID: ${forbidden.id})，系统禁止通过邮件发送！`,
+          : `待发附件包含仅供图鉴展示的「${forbidden.name}」(ID: ${forbidden.id})，无法通过邮件发送！`,
         tone: 'danger',
       })
       return

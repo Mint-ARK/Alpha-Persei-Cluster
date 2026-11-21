@@ -71,10 +71,10 @@ class CalendarTests(MemoryTests):
         self.two_dispatches('2026-11-05T04:59:59', '2026-11-05T05:00:00', 2)
         self.assertEqual(self.data()['daily_time'], self.now)
 
-    def test_monday_resets_week_and_counts_first_new_day_preserving_old_queue_total(self):
+    def test_monday_reopens_claim_and_counts_new_day_without_losing_multiplier(self):
         self.now = stamp('2026-11-09T04:59:59')
         self.seed(weekly_time=6, weekly_reward_state=1, weekly_scene_open=1, total_explore_c=987)
-        old = self.two_dispatches('2026-11-09T04:59:59', '2026-11-09T05:00:00', 1)
+        old = self.two_dispatches('2026-11-09T04:59:59', '2026-11-09T05:00:00', 7)
         data = self.data()
         self.assertEqual((data['weekly_reward_state'], data['weekly_scene_open'], data['total_explore_c']), (0, 0, 987))
         self.assertEqual(data['last_weekly_reset_ts'], self.now)
@@ -142,11 +142,15 @@ class CalendarTests(MemoryTests):
                 self.assertEqual({r['id']: r['num'] for r in packet['reward_list']}, {54: 3600, 55: 1800})
                 self.assertEqual(response.scs, [17023, 67009, 67001])
                 self.assertEqual({iid: self.balance(iid)-before[iid] for iid in before}, {54: 3600, 55: 1800})
+                live = codec.decode(response.frames[-1]['payload'], 'sc_67001')
+                self.assertEqual((live['weekly_time'], live['weekly_reward_state']), (0, 1))
+                cold = codec.decode(generator.gen_payload(67001, uid=UID, db=self.db), 'sc_67001')
+                self.assertEqual(cold, live)
                 state = self.state()
                 self.assertNotEqual(self.claim()[0]['result'], 0)
                 self.assertEqual(self.state(), state)
 
-    def test_monday_cold_reset_preserves_queue_daily_and_permanent_total(self):
+    def test_monday_cold_refresh_preserves_multiplier_queue_daily_and_total(self):
         self.now = stamp('2026-11-08T12:00:00')
         self.assertEqual(self.dispatch()[0]['result'], 0)
         self.seed(weekly_reward_state=1, weekly_scene_open=1, total_explore_c=987)
@@ -155,11 +159,22 @@ class CalendarTests(MemoryTests):
         self.now = stamp('2026-11-09T05:00:00')
         for _ in range(2):
             state = codec.decode(generator.gen_payload(67001, uid=UID, db=self.db), 'sc_67001')
-            self.assertEqual((state['weekly_time'], state['weekly_reward_state'], state['weekly_scene_open']), (0, 0, 0))
+            self.assertEqual((state['weekly_time'], state['weekly_reward_state'], state['weekly_scene_open']), (1, 0, 0))
             self.assertEqual((state['daily_time'], state['total_explore_c']), (last_daily, 987))
         self.assertEqual(self.db.get_admin_cat_queues(UID), before_queue)
 
-    def test_weekend_with_no_current_week_days_stays_locked(self):
+    def test_two_missed_weekends_keep_multiplier_until_successful_claim(self):
+        self.now = stamp('2026-11-07T12:00:00')
+        self.seed(weekly_time=5, weekly_reward_state=0)
+        self.now = stamp('2026-11-21T12:00:00')
+        state = codec.decode(generator.gen_payload(67001, uid=UID, db=self.db), 'sc_67001')
+        self.assertEqual((state['weekly_time'], state['weekly_reward_state']), (5, 0))
+        packet, response = self.claim()
+        self.assertEqual(packet['result'], 0)
+        self.assertEqual({r['id']: r['num'] for r in packet['reward_list']}, {54: 3600, 55: 1800})
+        self.assertEqual((self.data()['weekly_time'], self.data()['weekly_reward_state']), (0, 1))
+
+    def test_weekend_with_no_pending_days_stays_locked(self):
         self.now = stamp('2026-11-07T12:00:00'); self.seed(weekly_time=0)
         before = self.state()
         self.assertNotEqual(self.claim()[0]['result'], 0)

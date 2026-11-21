@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS activity_score (          -- sc_60105 常驻积分
 -- 表: admin_cat_explore_data
 CREATE TABLE IF NOT EXISTS admin_cat_explore_data (
     uid                      INTEGER PRIMARY KEY,
-    weekly_time              INTEGER DEFAULT 0,    -- 本周累计探索天数 (0~7)
+    weekly_time              INTEGER DEFAULT 0,    -- 待领取倍率累计天数 (0~7，跨周保留)
     daily_time               INTEGER DEFAULT 0,    -- 今日探索时间戳 (秒)
     weekly_reward_state      INTEGER DEFAULT 0,    -- 本周周常大奖领取状态 (0: 未领, 1: 已领)
     weekly_scene_open        INTEGER DEFAULT 0,    -- 每周首次进入场景标记 (0: 未进, 1: 已进)
@@ -1545,11 +1545,19 @@ CREATE TABLE IF NOT EXISTS idol_pvp_stage (          -- sc_58173 偶像练习生
 );
 
 -- 表: idol_trainee
+CREATE TABLE IF NOT EXISTS equip_proposal (
+    uid INTEGER NOT NULL,
+    id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    slots_json TEXT NOT NULL,
+    PRIMARY KEY (uid, id)
+);
 CREATE TABLE IF NOT EXISTS idol_trainee (            -- sc_58169 练舞房总览
     uid INTEGER PRIMARY KEY,
     attack_hero_id INTEGER DEFAULT 0,                -- 进攻阵容 1084
     defend_hero_id INTEGER DEFAULT 0,                -- 防守阵容 1084
     exercise_use_times INTEGER DEFAULT 0,            -- 已用训练次数 0
+    exercise_day_tag INTEGER NOT NULL DEFAULT 0,
     camp_list TEXT DEFAULT '',                       -- 阵营 buff（逗号分隔 2,5）
     pvp_stage_id INTEGER DEFAULT 0,                  -- PVP 舞台 10013
     pvp_refresh_ts INTEGER DEFAULT 0,                -- 1786482000

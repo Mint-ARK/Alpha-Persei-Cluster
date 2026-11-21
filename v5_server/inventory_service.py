@@ -1002,6 +1002,8 @@ class InventoryService:
                 )
             if hasattr(ctx_or_db, "touched_items") and ctx_or_db.touched_items is not None:
                 ctx_or_db.touched_items.add(iid)
+            if iid == 2 and hasattr(ctx_or_db, "db"):
+                event_bus.bus.emit(event_bus.Events.GOLD_COST, ctx_or_db, uid, amount=count)
             return True
 
         elif t == ItemType.MATERIAL:
@@ -1011,6 +1013,8 @@ class InventoryService:
             )
             if hasattr(ctx_or_db, "touched_items") and ctx_or_db.touched_items is not None:
                 ctx_or_db.touched_items.add(iid)
+            if iid == 40603 and hasattr(ctx_or_db, "db"):
+                event_bus.bus.emit(event_bus.Events.ITEM_COST, ctx_or_db, uid, item_id=iid, amount=count)
             return True
 
         elif t == ItemType.HERO_PIECE:

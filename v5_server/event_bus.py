@@ -48,6 +48,7 @@ class Events:
 
     STAMINA_COST     = 'stamina_cost'     # 消耗体力/吨吨值 (amount)
     GOLD_COST        = 'gold_cost'        # 消耗金币/艾因索菲币 (amount)
+    ITEM_COST        = 'item_cost'        # 道具消耗 (item_id, amount)
     SHOP_BUY         = 'shop_buy'         # 商店购买物品 (shop_id, goods_id, count)
     PERIODIC_GIFT_BUY = 'periodic_gift_buy' # 连续周期礼包购买 (goods_id, desc_id, buy_num)
     BUY_FATIGUE      = 'buy_fatigue'      # 移转之辉购买体力 (times, count)
@@ -57,6 +58,7 @@ class Events:
     ADMIN_CAT_EXPLORE_START = 'admin_cat_explore_start'  # 管理喵观测站成功派遣一次
     DORM_ACTION         = 'dorm_action'         # 游园街后宅交互 (action_type: visit, game, train, commission, furniture)
     POLYHEDRON_PASS          = 'polyhedron_pass'          # 多维变量通关/参与 (times)
+    EQUIP_SEIZURE_SCORE      = 'equip_seizure_score'      # 介质攫取本日最高分的新增积分 (amount)
     POLYHEDRON_TACTIC_KILL   = 'polyhedron_tactic_kill'   # 虚构推演战术击杀预留 (tactic_type: 1..6, kill_count)
     DISORDER_ABYSS_PASS      = 'disorder_abyss_pass'      # 失序深阱通关预留 (tier: 1..6)
     SUMMER_PARK_ACTION       = 'summer_park_action'       # 盛夏乐园活动专属预留 (oper)

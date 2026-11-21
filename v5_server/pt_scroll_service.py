@@ -1,6 +1,7 @@
 """Serve the configured 联防协议 battle rewards and account progress."""
 import json
 from pathlib import Path
+import random
 import time
 
 from core import OperationError
@@ -39,21 +40,41 @@ def _progress(db, uid, aid):
     return rows[0] if rows else {}
 
 
+def _rotation(config, now):
+    # TimeMgr:GetGameServerWeek uses the server time anchor (316800) and 05:00.
+    day = str((now - 316800 - 5 * 3600) // 86400 % 7 + 1)
+    return config["rotation"][day]
+
+
+def _selected_suit(progress, rotation):
+    suit = progress.get("up_select")
+    return suit if progress.get("pool_id") == rotation["id"] and suit in rotation["suits"] else 0
+
+
+def select_suit(ctx, uid, aid, suit):
+    now = int(time.time())
+    rotation = _rotation(require_activity(ctx.db, uid, aid, now), now)
+    if suit not in rotation["suits"]:
+        raise OperationError(2, "刻印不属于本期联防协议的当前掉落池")
+    ctx.db.execute(
+        "INSERT INTO pt_roulette_progress(uid,activity_id,pool_id,up_select,update_ts) VALUES (?,?,?,?,?) "
+        "ON CONFLICT(uid,activity_id) DO UPDATE SET pool_id=excluded.pool_id,"
+        "up_select=excluded.up_select,update_ts=excluded.update_ts",
+        (uid, aid, rotation["id"], suit, now),
+    )
+
+
 def login_frames(db, uid, activities, encode):
     now = int(time.time())
-    # TimeMgr:GetGameServerWeek uses the server time anchor (316800) and refresh offset (05:00).
-    day = str((now - 316800 - 5 * 3600) // 86400 % 7 + 1)
     frames = []
     for entry in activities:
         if not _open(entry, now):
             continue
         aid = entry["activity_id"]
         progress = _progress(db, uid, aid)
-        rotation = CATALOG[aid]["rotation"][day]
-        selected = progress.get("up_select", 0)
-        valid = progress.get("pool_id") == rotation["id"] and selected in rotation["suits"]
+        rotation = _rotation(CATALOG[aid], now)
         data = dict(activity_id=aid, index=rotation["id"], buff_id=rotation["default_buff"],
-                    up_select=selected if valid else 0, clear_times=progress.get("clear_times") or 0,
+                    up_select=_selected_suit(progress, rotation), clear_times=progress.get("clear_times") or 0,
                     clear_stage_list=json.loads(progress.get("clear_stage_list") or "[]"))
         raw = encode("sc_76151", data)
         if not raw:
@@ -118,12 +139,27 @@ def settle(ctx, uid, bid, result, stage_type, aid, dest, times, heroes, battle_i
     stage_id = stage["stage_id"]
     first_clear = stage_id not in cleared
     item, count = stage["cost"]
+    now = int(time.time())
+    suit = 0
+    if stage["mode"] == 2:
+        from inventory_service import _get_equip_map
+        rotation = _rotation(CATALOG[aid], now)
+        suit = _selected_suit(_progress(ctx.db, uid, aid), rotation) or rotation["suits"][0]
+        equip_map = _get_equip_map()
+        parts = [500000 + pos * 10000 + suit for pos in range(1, 7)]
+        if not all(equip_map.get(str(part), {}).get("suit") == suit for part in parts):
+            raise ValueError("联防协议五星刻印套装配置不完整")
     InventoryService.deduct_item(ctx, uid, item, count * times)
     drops = []
     for index in range(times):
         items = stage_drop(stage_id, first_clear=first_clear and index == 0, drop_lib=stage["drop_lib"])
         if items is None:
             raise ValueError("联防协议掉落库缺失")
+        if suit:
+            # DropCfg's 35005 is a generic preview. The activity resolves the
+            # actual set and position on both first clears and repeat clears.
+            items = [reward for reward in items if reward[0] not in (35004, 35005)]
+            items.append([random.choice(parts), 1])
         summary = InventoryService.grant_items(ctx, uid, items, source="pt_scroll_stage")
         drops.append(InventoryService.rewards_after_overflow(items, summary))
 
@@ -133,7 +169,7 @@ def settle(ctx, uid, bid, result, stage_type, aid, dest, times, heroes, battle_i
                    "clear_stage_list=excluded.clear_stage_list, "
                    "clear_times=COALESCE(pt_roulette_progress.clear_times,0)+excluded.clear_times, "
                    "update_ts=excluded.update_ts",
-                   (uid, aid, json.dumps(sorted(cleared)), times if stage["mode"] == 1 else 0, int(time.time())))
+                   (uid, aid, json.dumps(sorted(cleared)), times if stage["mode"] == 1 else 0, now))
     bus.emit(Events.STAGE_PASS, ctx, uid, times=times, stage_id=stage_id, stage_type_id=STAGE_TYPE,
              stage_kind="pt_scroll", heroes=heroes, sweep=sweep, battle_id=bid, b_info=battle_info)
     if first_clear:

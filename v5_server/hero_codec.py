@@ -738,7 +738,8 @@ def build_hero_payload(db, uid):
 
     结构（schema sc_14009）：
       f1 hero_info_list（repeated hero_net_rec，展开模板+库覆盖）
-      f3 archives（repeated archive，账号资产静态模板 hero_14009_extra.json）
+      f2 proposal_list（repeated proposal_info）
+      f3 archives（repeated archive）
       f4 piece_list（repeated piece_info）
       f5 favorites（repeated uint32）
     已解锁角色按模板（若存在）与数据库行统一映射；缺模板的已配置角色由数据库行构建。
@@ -800,6 +801,9 @@ def _encode_extra_fields(db=None, uid=None):
     if not extra and not dynamic:
         return b""
     out = bytearray()
+    if dynamic:
+        from equip_service import EquipService
+        out += _enc("sc_14009", {"proposal_list": EquipService.proposals(db, uid)}) or b""
     # f3 archives（repeated archive，tag 0x1a）
     # 动态从数据库 hero_archive 读取规范档案数据（63 档案 / 84 战斗形态）。
     # 历史库只有 hero 行时，按已解锁英雄的本体映射补齐空档案。

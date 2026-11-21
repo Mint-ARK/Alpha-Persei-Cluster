@@ -1142,6 +1142,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
         # 5. GM 控制台后端 API：发送邮件 (/api/gm/send_mail)
         if path == "/api/gm/send_mail":
             from account_db import get_db
+            from mail_service import gm_mail_attachment_restriction
             db = get_db()
             data = request.get_json(silent=True) or {}
             target_uid = data.get("uid") or _gen.DEFAULT_UID
@@ -1150,10 +1151,9 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             attachments = data.get("attachments") or []
             for it in attachments:
                 aid = int(it.get("id") or it.get("item_id") or 0) if isinstance(it, dict) else (int(it[0]) if isinstance(it, (list, tuple)) and len(it) > 0 else 0)
-                if (200000 <= aid <= 600000) or (830000 <= aid <= 859999):
-                    return jsonify({"code": 10001, "msg": f"物品 ID {aid} 属于刻印或刻印套装类物品，仅供图鉴展示，禁止通过邮件发送"})
-                if aid == 30054 or (1000000000 <= aid <= 2000000000):
-                    return jsonify({"code": 10001, "msg": f"物品 ID {aid} 属于试衣底片类道具，未实现对应协议，仅供图鉴展示，禁止通过邮件发送"})
+                reason = gm_mail_attachment_restriction(db, aid)
+                if reason:
+                    return jsonify({"code": 10001, "msg": reason})
             if db:
                 mid = db.send_gm_mail(target_uid, title, content, attachments)
                 print(f"[GM] 成功向 UID {target_uid} 发送邮件 mid={mid}: {title} (附件={len(attachments)} 项)", flush=True)

@@ -113,6 +113,7 @@
     "*.lock"
   ],
   "required_files": [
+    "panel_historical_items.json",
     "cdn_transfer_control.py",
     "resource_storage.py",
     "client_version.py",

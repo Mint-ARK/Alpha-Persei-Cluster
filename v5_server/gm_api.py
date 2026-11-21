@@ -1042,17 +1042,13 @@ def post_send_mail():
     if not isinstance(attachments, list):
         return err(GMErrorCode.PARAM_INVALID, "attachments 附件必须为数组列表")
 
-    # 规范化附件列表与受限物品校验（刻印类、试衣底片类全链路禁止邮寄）
+    # 规范化附件列表，随后用目标存档的物品配置校验。
     norm_attachments = []
     for it in attachments:
         if isinstance(it, dict):
             aid = int(it.get("id") or it.get("item_id") or 0)
             anum = int(it.get("number") or it.get("count") or it.get("num") or 0)
             if aid > 0 and anum > 0:
-                if (200000 <= aid <= 600000) or (830000 <= aid <= 859999):
-                    return err(GMErrorCode.PARAM_INVALID, f"物品 ID {aid} 属于刻印或刻印套装类物品，仅供图鉴展示，禁止通过邮件发送")
-                if aid == 30054 or (1000000000 <= aid <= 2000000000):
-                    return err(GMErrorCode.PARAM_INVALID, f"物品 ID {aid} 属于试衣底片类道具，未实现对应协议，仅供图鉴展示，禁止通过邮件发送")
                 norm_attachments.append({
                     "id": aid,
                     "name": str(it.get("name") or ""),
@@ -1061,15 +1057,18 @@ def post_send_mail():
         elif isinstance(it, (list, tuple)) and len(it) >= 2:
             aid, anum = int(it[0]), int(it[1])
             if aid > 0 and anum > 0:
-                if (200000 <= aid <= 600000) or (830000 <= aid <= 859999):
-                    return err(GMErrorCode.PARAM_INVALID, f"物品 ID {aid} 属于刻印或刻印套装类物品，仅供图鉴展示，禁止通过邮件发送")
-                if aid == 30054 or (1000000000 <= aid <= 2000000000):
-                    return err(GMErrorCode.PARAM_INVALID, f"物品 ID {aid} 属于试衣底片类道具，未实现对应协议，仅供图鉴展示，禁止通过邮件发送")
                 norm_attachments.append({"id": aid, "name": "", "number": anum})
 
     db, err_resp = _require_user(uid)
     if err_resp:
         return err_resp
+
+    from mail_service import gm_mail_attachment_restriction
+
+    for item in norm_attachments:
+        reason = gm_mail_attachment_restriction(db, item["id"])
+        if reason:
+            return err(GMErrorCode.PARAM_INVALID, reason)
 
     now_ts = int(time.time())
     now_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(now_ts))
