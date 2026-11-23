@@ -178,6 +178,73 @@ def on_boss_challenge_thu_reset(ctx, uid, cycle_start_ts=0, now_ts=None, **kwarg
     if changed and hasattr(ctx, 'log'):
         ctx.log(f"[LazyTimer] 用户 {uid} 梦境再构周期已刷新")
 
+    from boss_challenge_cycle import ADVANCE_GROUP_ROTATION_START
+    if now_ts >= ADVANCE_GROUP_ROTATION_START:
+        _push_boss_challenge_state(ctx, uid, now_ts)
+
+
+def _push_boss_challenge_state(ctx, uid, now_ts=None):
+    from middleware import DownFrame
+    from weekly_challenge_service import get_boss_challenge_data
+
+    overview, normal, advance = get_boss_challenge_data(uid, ctx.db, strict=True, now_ts=now_ts)
+    frames = []
+    # 45001 会通知两个客户端列表刷新，先推送概览与扭曲梦境。
+    for cmd, data in ((45201, overview), (45101, advance), (45001, normal)):
+        payload = ctx.codec_encode(f"sc_{cmd}", data)
+        if not payload:
+            raise ValueError(f"梦境再构刷新帧 sc_{cmd} 编码失败")
+        frames.append(DownFrame(cmd, payload))
+    for frame in frames:
+        ctx.append_frame(frame)
+
+
+@bus.subscribe(Events.PLAYER_LEVEL_UP)
+def on_boss_challenge_unlock(ctx, uid, old_lv=1, new_lv=1, **kwargs):
+    """管理员等级首次达到 30 时下发当周常规梦境档位。"""
+    if uid and getattr(ctx, 'db', None) is not None and old_lv < 30 <= new_lv:
+        _push_boss_challenge_state(ctx, uid)
+
+
+@bus.subscribe(Events.WEEKLY_RESET_THU_5AM)
+def on_core_verification_thu_reset(ctx, uid, now_ts=None, **kwargs):
+    """向在线玩家下发新的一期和对应前瞻。"""
+    if not uid or getattr(ctx, 'db', None) is None:
+        return
+    from middleware import DownFrame
+    from weekly_challenge_service import get_core_verification_data
+
+    payload = ctx.codec_encode("sc_75009", get_core_verification_data(uid, ctx.db, now_ts))
+    if not payload:
+        raise ValueError("回归测试刷新帧 sc_75009 编码失败")
+    ctx.append_frame(DownFrame(75009, payload))
+
+
+@bus.subscribe(Events.WEEKLY_RESET_THU_5AM)
+def on_special_challenge_rotation(ctx, uid, cycle_start_ts=0, now_ts=None, **kwargs):
+    from core_special_challenge import ANCHOR, COMMANDS, active_groups, activity_rows, period
+
+    if not uid or getattr(ctx, 'db', None) is None or not hasattr(ctx, 'append_frame'):
+        return
+    start, _, _ = period(now_ts)
+    if start <= ANCHOR or cycle_start_ts != start:
+        return
+
+    from generator import gen_payload
+    from middleware import DownFrame
+
+    version = getattr(ctx, 'resource_version', None)
+    packets = [(11003, ctx.codec_encode('sc_11003', {'activity': row}))
+               for row in activity_rows(version, now_ts)]
+    for group in active_groups(version, now_ts):
+        cmd = COMMANDS[group.mode]
+        packets.append((cmd, gen_payload(cmd, uid=uid, db=ctx.db, res_version=version,
+                                        special_now=now_ts)))
+    if not all(payload for _, payload in packets):
+        raise ValueError('特殊挑战轮换状态帧编码失败')
+    for cmd, payload in packets:
+        ctx.append_frame(DownFrame(cmd, payload))
+
 
 @bus.subscribe(Events.DAILY_RESET_5AM)
 def on_seizure_daily_reset(ctx, uid, now_ts=None, **kwargs):

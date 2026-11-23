@@ -182,7 +182,7 @@ def get_boss_challenge_data(uid, db, *, strict=False, now_ts=None, selection=Non
     - sc_45101: 进阶梦境 (advance_id, boss_list, receive_point_list)
     """
     now = int(time.time() if now_ts is None else now_ts)
-    from boss_challenge_cycle import bounds, seed_at
+    from boss_challenge_cycle import ADVANCE_GROUP_ROTATION_START, WEEK, bounds, seed_at
     cycle_start, next_rf, _ = bounds(now)
     cycle = seed_at(cycle_start)
     cat = get_boss_catalog()
@@ -307,22 +307,22 @@ def get_boss_challenge_data(uid, db, *, strict=False, now_ts=None, selection=Non
                 raise
             pass
 
-    # 2. 进阶/扭曲梦境 BOSS 抽取（按周期确定性抽取 3 或 4 位首领）
+    # 2. 扭曲梦境按周轮换。每组首位是特化首领，梦境Ⅰ只启用三位副首领。
     adv_pool = cat.get("advance_pool") or cat.get("advance_boss_pool", {})
-    pool_keys = [int(k) for k in adv_pool.keys() if str(k).isdigit()]
-    if not pool_keys:
-        pool_keys = [20001, 20002, 20003, 20004]
-    pool_keys.sort()
-        
-    b_nums = 4 if advance_id == 102 else 3
-    rnd_adv = random.Random(cycle * 10007 + 45101)
-    selected_pool_ids = rnd_adv.sample(pool_keys, min(b_nums, len(pool_keys)))
+    groups = cat.get("advance_rotation_groups", [])
+    if groups and cycle_start >= ADVANCE_GROUP_ROTATION_START:
+        week_index = (cycle_start - ADVANCE_GROUP_ROTATION_START) // WEEK
+        group = groups[week_index % len(groups)]
+        selected_pool_ids = group if advance_id == 102 else group[1:]
+    else:
+        # 保留生效前的周内名单，也兼容没有分组配置的旧目录。
+        pool_keys = sorted(int(k) for k in adv_pool if str(k).isdigit()) or [20001, 20002, 20003, 20004]
+        boss_count = 4 if advance_id == 102 else 3
+        rnd_adv = random.Random(cycle * 10007 + 45101)
+        selected_pool_ids = rnd_adv.sample(pool_keys, min(boss_count, len(pool_keys)))
 
     adv_boss_list = []
     for bid in selected_pool_ids:
-        b_info = adv_pool.get(str(bid), adv_pool.get(bid, {}))
-        aff_pool_raw = b_info.get("affix_pool", [])
-        aff_pool = [x.get("id", x) if isinstance(x, dict) else x for x in aff_pool_raw]
         aff_conf = user_saved_affixes.get(bid, {
             "affix_list": [],
             "time_list": [],
@@ -348,15 +348,23 @@ def get_boss_challenge_data(uid, db, *, strict=False, now_ts=None, selection=Non
     rnd_norm = random.Random(cycle * 10007 + 45001)
     selected_groups = rnd_norm.sample(area_groups, min(area_boss_nums, len(area_groups)))
     
-    stage_groups_cat = cat.get("stage_groups", {})
+    from boss_battle_identity import normal_boss_stages
     normal_boss_list = []
     for gid in selected_groups:
         nd = normal_db_map.get(gid, {})
-        g_info = stage_groups_cat.get(str(gid), stage_groups_cat.get(gid, {}))
-        g_stages = g_info.get("stages", [])
-        
+        g_stages = normal_boss_stages(cat, area_id, gid)
         finish_stg = nd.get("finish_stage") or 0
         star_inf = nd.get("star_info") or []
+        # 兼容曾直接存入结算明细的旧档；45001 和领奖都需要 0/1 星标。
+        for row in star_inf:
+            row["star_list"] = [
+                star.get("is_achieve", 0) if isinstance(star, dict) else star
+                for star in row.get("star_list", [])
+            ]
+        if area_id in (1, 2):
+            star_inf = [row for row in star_inf if row.get("stage_id") in g_stages]
+            if finish_stg not in g_stages:
+                finish_stg = max((row["stage_id"] for row in star_inf), default=0)
         if not star_inf and finish_stg > 0 and g_stages:
             star_inf = [{"stage_id": finish_stg, "star_list": [1, 1, 1]}]
             
@@ -372,7 +380,7 @@ def get_boss_challenge_data(uid, db, *, strict=False, now_ts=None, selection=Non
     sc_45201_obj = {
         "mode": int(user_mode),
         "next_refresh_time": next_rf,
-        "difficulty_list": [3, 4, 101, 102]
+        "difficulty_list": [] if area_id in (1, 2) else [3, 4, 101, 102]
     }
     
     sc_45001_obj = {
@@ -617,14 +625,9 @@ def get_core_verification_custom_affix_catalog():
     return _load_catalog("core_verification_affix_custom.json")
 
 def get_core_verification_cycle(now_ts=None):
-    """
-    计算当前迭代校验周期（1~16 轮换）。
-    """
-    if now_ts is None:
-        now_ts = int(time.time())
-    base_anchor = 1700000000
-    cycle_idx = int((now_ts - base_anchor) // 604800)
-    return (cycle_idx % 16) + 1
+    """迭代校验按东八区周四 05:00 轮换原生编号 1–16。"""
+    from core_verification_cycle import period
+    return period(now_ts)[2]
 
 def calc_core_verification_super_score(info_id, diff=8, battle_time_ms=0, affix_list=None):
     """
@@ -653,7 +656,7 @@ def get_core_verification_stages(cycle):
     return groups[1], groups[2]
 
 
-def get_core_verification_data(uid, db):
+def get_core_verification_data(uid, db, now_ts=None):
     """
     返回迭代校验常规当期动态数据（构建 sc_75009 字典结构）：
     - now_cycle: 1~16
@@ -665,10 +668,9 @@ def get_core_verification_data(uid, db):
     - affix_list: 玩家保存的自选词缀
     - max_score_info: {lock_list: [{boss_type: 1, hero_list: [...], score: ...}, ...]}
     """
-    now = int(time.time())
-    next_rf = get_next_thursday_5am(now)
-    now_cycle = get_core_verification_cycle(now)
-    next_cycle = (now_cycle % 16) + 1
+    from core_verification_cycle import ROTATIONS, boss_key, period
+    week, next_rf, now_cycle = period(now_ts)
+    next_cycle = (now_cycle % ROTATIONS) + 1
 
     b1_stages, b2_stages = get_core_verification_stages(now_cycle)
 
@@ -677,19 +679,22 @@ def get_core_verification_data(uid, db):
     claimed_rewards = []
     affixes = []
     super_scores = {}
+    boss_progress = {}
 
     if db:
         try:
             if hasattr(db, "get_core_verification_stage_records"):
-                records = db.get_core_verification_stage_records(uid, now_cycle)
+                records = db.get_core_verification_stage_records(uid, week)
             if hasattr(db, "get_core_verification_hero_locks"):
-                locks = db.get_core_verification_hero_locks(uid, now_cycle)
+                locks = db.get_core_verification_hero_locks(uid, week)
             if hasattr(db, "get_core_verification_claimed_tasks"):
-                claimed_rewards = db.get_core_verification_claimed_tasks(uid, now_cycle)
+                claimed_rewards = db.get_core_verification_claimed_tasks(uid, week)
             if hasattr(db, "get_core_verification_affixes"):
                 affixes = db.get_core_verification_affixes(uid)
             if hasattr(db, "get_core_verification_super_scores"):
                 super_scores = db.get_core_verification_super_scores(uid)
+            if hasattr(db, "get_core_verification_boss_progress"):
+                boss_progress = db.get_core_verification_boss_progress(uid)
         except Exception:
             pass
 
@@ -704,11 +709,14 @@ def get_core_verification_data(uid, db):
                 "min_time": int(rec.get("min_time", 0)),
                 "score": int(rec.get("score", 0))
             })
+        elif s["difficult"] <= boss_progress.get(boss_key(s.get("stage_id")), 0):
+            # 原生解锁读取上一难度是否有记录；sign=0 不计入本期通关与奖励。
+            stage_info_list.append({"id": sid, "sign": 0, "min_time": 0, "score": 0})
 
     b1_super_stage = b1_stages[-1]["id"] if b1_stages else 0
     b2_super_stage = b2_stages[-1]["id"] if b2_stages else 0
-    b1_score = super_scores.get(b1_super_stage) or records.get(b1_super_stage, {}).get("score", 0)
-    b2_score = super_scores.get(b2_super_stage) or records.get(b2_super_stage, {}).get("score", 0)
+    b1_score = int(records.get(b1_super_stage, {}).get("score", 0))
+    b2_score = int(records.get(b2_super_stage, {}).get("score", 0))
 
     sc_75009_obj = {
         "now_cycle": int(now_cycle),
@@ -723,8 +731,8 @@ def get_core_verification_data(uid, db):
         "affix_list": affixes,
         "max_score_info": {
             "lock_list": [
-                {"boss_type": 1, "hero_list": locks.get(1, []), "score": int(b1_score)},
-                {"boss_type": 2, "hero_list": locks.get(2, []), "score": int(b2_score)}
+                {"boss_type": 1, "hero_list": locks.get(1, []), "score": max(b1_score, super_scores.get(b1_super_stage, 0))},
+                {"boss_type": 2, "hero_list": locks.get(2, []), "score": max(b2_score, super_scores.get(b2_super_stage, 0))}
             ]
         }
     }
@@ -795,12 +803,12 @@ def get_core_verification_challenge_data(uid, db, activity_id=None):
     main_stage_cfg = challenge_stages_cfg[0] if challenge_stages_cfg else {}
     main_sid = int(main_stage_cfg.get("stage_id", 3093001))
     main_prog = prog.get(main_sid, {})
-    selected_buffs = main_prog.get("select_buffs", [])
+    selected_buffs = main_prog.get("select_buffs", prog.get(0, {}).get("select_buffs", []))
 
     task_items = [{"assignment_id": int(tid), "state": 2} for tid in claimed_tasks]
     formatted_buffs = [
         {"buff_id": int(b), "level": 1, "type": 1} if isinstance(b, int) else b
-        for b in set(unlocked_buffs)
+        for b in sorted(set(unlocked_buffs) - {0})
     ]
     formatted_badges = [
         {"illustrated_id": int(b.get("id", b.get("illustrated_id", 0))), "time": int(b.get("unlock_timestamp", b.get("time", 0)))}
@@ -808,15 +816,24 @@ def get_core_verification_challenge_data(uid, db, activity_id=None):
     ]
 
     if mode_num == 1:
+        from core_special_challenge import DAWN_CLEAR_TASKS, LEGACY
+        if activity_id == LEGACY[1].stage:
+            claimed = set(claimed_tasks)
+            if db and hasattr(db, "get_core_verification_cl_claimed_tasks"):
+                claimed.update(db.get_core_verification_cl_claimed_tasks(uid, LEGACY[1].main))
+            ready = {tid for tid, sid in DAWN_CLEAR_TASKS.items() if prog.get(sid, {}).get("is_cleared")}
+            task_items = [{"assignment_id": tid, "state": 2 if tid in claimed else 1}
+                          for tid in sorted(claimed | ready)]
         sc_obj = {
             "challenge_stage": {
                 "stage_id": main_sid,
                 "max_challenge_value": int(main_prog.get("score", 0)),
                 "recently_challenge_value": int(main_prog.get("score", 0)),
-                "challenge_lock": [],
-                "challenge_buff": selected_buffs
+                "challenge_lock": main_prog.get("heroes", []),
+                "challenge_buff": [b["buff_id"] if isinstance(b, dict) else b for b in selected_buffs]
             },
-            "common_stage": [{"stage_id": s["stage_id"], "common_lock_id": []} for s in common_stage_data_list],
+            "common_stage": [{"stage_id": s["stage_id"], "common_lock_id": s["heroes"]}
+                             for s in common_stage_data_list],
             "buff_list": formatted_buffs,
             "finish_assignment_list": task_items,
             "first_enter": False
@@ -851,7 +868,7 @@ def get_core_verification_challenge_data(uid, db, activity_id=None):
         from core_mode4_reward_service import task_states
         task_items = task_states(db, uid, activity_id) if db is not None else []
         c_stages = []
-        for s in common_stage_data_list:
+        for s in common_stage_data_list + challenge_stages_cfg:
             c_stages.append({
                 "stage_id": s["stage_id"],
                 "common_locks": []
@@ -899,22 +916,10 @@ def is_seizure_progress_expired(progress, now_ts, period_start):
 
 
 def get_next_seizure_affix_refresh(now_ts=None):
-    """
-    计算介质攫取增益词缀刷新（周一 05:00 / 周四 05:00 / 周六 05:00）的下一个时间戳。
-    """
+    """词缀与关卡同时在东八区每天 05:00 轮换。"""
     if now_ts is None:
         now_ts = int(time.time())
-    dt = datetime.datetime.fromtimestamp(now_ts, SEIZURE_TIMEZONE)
-    candidates = []
-    for target_weekday in [0, 3, 5]: # Mon=0, Thu=3, Sat=5
-        days_ahead = target_weekday - dt.weekday()
-        cand = dt.replace(hour=5, minute=0, second=0, microsecond=0) + datetime.timedelta(days=days_ahead)
-        if cand.timestamp() > now_ts:
-            candidates.append(cand.timestamp())
-        else:
-            cand_next = cand + datetime.timedelta(days=7)
-            candidates.append(cand_next.timestamp())
-    return int(min(candidates))
+    return get_seizure_day_start(now_ts) + 24 * 60 * 60
 
 def get_seizure_challenge_rate(now_ts=None):
     """
@@ -931,50 +936,18 @@ def get_seizure_challenge_rate(now_ts=None):
         return 1.2
     return 1.0
 
-def get_daily_seizure_stage_id(now_ts=None):
-    """
-    每日 05:00 轮换一个关卡（从 26 个关卡中循环）。
-    """
-    if now_ts is None:
-        now_ts = int(time.time())
-    cat = get_equip_seizure_catalog()
-    stages = cat.get("stages") or [
-        3070101, 3070102, 3070103, 3070104, 3070105, 3070106, 3070107, 3070108, 3070109, 3070110,
-        3070111, 3070112, 3070113, 3070114, 3070115, 3070116, 3070117, 3070118, 3070119, 3070120,
-        3070121, 3070122, 3070123, 3070124, 3070125, 3070126
-    ]
-    dt = datetime.datetime.fromtimestamp(now_ts, SEIZURE_TIMEZONE)
-    if dt.hour < 5:
-        eff_dt = dt - datetime.timedelta(days=1)
-    else:
-        eff_dt = dt
-    base_date = datetime.date(2026, 1, 1)
-    day_idx = (eff_dt.date() - base_date).days
-    return stages[day_idx % len(stages)]
-
 def get_seizure_cycle_index(now_ts=None):
-    """
-    计算介质攫取词缀轮换期次索引（每周3期：周一 05:00、周四 05:00、周六 05:00 切换）。
-    """
+    """地图与词缀共用的游戏日索引，沿用地图轮换的起始日期。"""
     if now_ts is None:
         now_ts = int(time.time())
-    dt = datetime.datetime.fromtimestamp(now_ts, SEIZURE_TIMEZONE)
-    if dt.hour < 5:
-        eff_dt = dt - datetime.timedelta(days=1)
-    else:
-        eff_dt = dt
-    # 基准锚点：2026-01-05（周一）
-    base_monday = datetime.date(2026, 1, 5)
-    days = (eff_dt.date() - base_monday).days
-    weeks = days // 7
-    weekday = eff_dt.weekday()  # 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
-    if weekday in (0, 1, 2):
-        sub_period = 0  # 周一 05:00 ~ 周四 05:00
-    elif weekday in (3, 4):
-        sub_period = 1  # 周四 05:00 ~ 周六 05:00
-    else:
-        sub_period = 2  # 周六 05:00 ~ 周一 05:00
-    return weeks * 3 + sub_period
+    game_day = datetime.datetime.fromtimestamp(get_seizure_day_start(now_ts), SEIZURE_TIMEZONE).date()
+    return (game_day - datetime.date(2026, 1, 1)).days
+
+
+def get_daily_seizure_stage_id(now_ts=None):
+    """按游戏日轮换原生关卡。"""
+    stages = get_equip_seizure_catalog().get("stages") or range(3070101, 3070127)
+    return stages[get_seizure_cycle_index(now_ts) % len(stages)]
 
 def get_seizure_affixes(now_ts=None):
     """

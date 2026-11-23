@@ -966,6 +966,14 @@ CREATE TABLE IF NOT EXISTS core_verification_stage_record ( -- 迭代校验常�
     PRIMARY KEY (uid, cycle, info_id)
 );
 
+-- 表: core_verification_boss_progress
+CREATE TABLE IF NOT EXISTS core_verification_boss_progress (
+    uid             INTEGER NOT NULL,
+    boss_stage_id   INTEGER NOT NULL,
+    max_difficulty  INTEGER NOT NULL,
+    PRIMARY KEY (uid, boss_stage_id)
+);
+
 -- 表: core_verification_stage_score
 CREATE TABLE IF NOT EXISTS core_verification_stage_score ( -- sc_23477 关卡阶段小计分（行化）
     uid INTEGER NOT NULL,
@@ -2735,12 +2743,12 @@ CREATE TABLE IF NOT EXISTS stage_team (             -- 关卡现役编队表（t
     cooperate_skill      INTEGER NOT NULL DEFAULT 0,-- 本场使用连携 ID
     mimir_id             INTEGER NOT NULL DEFAULT 0,-- 助战弥弥尔（管理器钥从）id
     mimir_chips          TEXT NOT NULL DEFAULT '',   -- 弥弥尔携带芯片（逗号分隔）
+    hero_chip_id         INTEGER NOT NULL DEFAULT 0,-- 角色芯片基底 ID
     hero_chips           TEXT NOT NULL DEFAULT '',   -- 助战英雄芯片（逗号分隔）
     clear_times          INTEGER NOT NULL DEFAULT 0, -- 该关卡现役队伍累计通关次数
     update_ts            INTEGER DEFAULT 0,
     PRIMARY KEY (uid, stage_type, activity_id, team_index)
 );
-
 -- 表: store_purchase
 CREATE TABLE IF NOT EXISTS store_purchase (
     uid INTEGER NOT NULL,

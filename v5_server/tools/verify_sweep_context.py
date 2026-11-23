@@ -54,7 +54,7 @@ class SweepTests(MemoryTests):
             common['mimir_info'] = dict(mimir_id=1, chip_list=[1, 2])
         return self.call(54038, dict(common_info=common), 54039)
 
-    def test_real_sweep_retains_context_and_stage_team(self):
+    def test_legacy_sweep_retains_context_without_creating_a_challenge_team(self):
         answer, response = self.sweep()
         self.assertEqual(answer['result'], 0)
         self.assertTrue(self.events)
@@ -64,15 +64,57 @@ class SweepTests(MemoryTests):
         self.assertTrue(event['sweep'])
         self.assertEqual(event['times'], 3)
         team = self.team.get_stage_team(self.db, UID, 1, STAGE)
-        self.assertIsNotNone(team)
-        self.assertEqual((team['hero_list'], team['cooperate_skill'], team['mimir_id'], team['mimir_chips'], team['clear_times']),
-                         ([1284], COMBO, 1, '1,2', 3))
+        self.assertIsNone(team)
         self.assertFalse(self.db.query('SELECT * FROM stage_team WHERE uid=? AND stage_type=0', (UID,)))
         self.assertEqual(self.combo.get_counter(self.db, UID, COMBO)['normal_times'], 3)
         hero = self.db.get('hero', UID, 'AND id=1284')
         self.assertEqual((hero['clear_times'], hero['battle_win_times']), (3, 3))
         self.assertEqual(self.db.get('hero_archive', UID, 'AND archive_id=1084')['exp'], 15)
         self.assertIn(54039, response.scs)
+
+    def challenge(self, hero, result, *, kind=1, stage=STAGE, activity=0, options=(), mimir=None):
+        common = dict(type=kind, dest=stage, activity_id=activity, battle_times=1,
+                      hero_list=[dict(hero_type=1, hero_id=hero)], opts=list(options))
+        if mimir:
+            common["mimir_info"] = [mimir]
+        answer, _ = self.call(54030, dict(common_info=common), 54031)
+        self.assertEqual(answer["result"], 0)
+        if result is not None:
+            bid = self.conn.to_handler_ctx().battle_id[0]
+            mw.get_battle_session(bid)["result_data"] = dict(result=result, info=dict(battle_time=45000))
+            self.assertEqual(self.call(54032, dict(battle_id=bid), 54033)[0]["result"], 0)
+
+    def test_sweep_uses_last_winning_team_after_failure_and_quit(self):
+        from hero_codec import initial_hero_row
+        self.db.upsert("hero", UID, initial_hero_row(1011, 1), keys=("uid", "id"))
+        self.challenge(1011, 1)
+        for result in (2, 3):
+            self.challenge(1284, result)
+            self.assertEqual(self.team.get_last_clear_heroes(self.db, UID, STAGE), [1011])
+            self.assertEqual(self.team.get_stage_heroes(self.db, UID, 1, STAGE), [1284])
+        self.assertEqual(self.sweep()[0]["result"], 0)
+        self.assertEqual(self.events[-1][1]["heroes"], [1011])
+        self.assertEqual(self.team.get_stage_heroes(self.db, UID, 1, STAGE), [1284])
+
+    def test_mode4_team_slots_and_chips_round_trip(self):
+        from core_special_challenge import ANCHOR
+        from reserve_codec import build_sc_63005
+
+        self.conn.resource_version = "229"
+        with patch("time.time", return_value=ANCHOR + 60):
+            for index, chip in ((1, 102), (2, 103)):
+                self.challenge(1284, None, kind=93, stage=3093111, activity=4343301,
+                               options=[dict(key=2, value=[index])],
+                               mimir=dict(mimir_id=2, chip_list=[chip], hero_id=109451,
+                                          hero_chip_list=[109452, 109453]))
+        data = codec.decode(build_sc_63005(self.db, UID), "sc_63005")
+        group = next(row for row in data["teams_info_list"] if row["team_type"] == 431)
+        teams = next(row["teams"] for row in group["cont_teams"] if row["cont_id"] == 4)
+        self.assertEqual([team["team_index"] for team in teams], [1, 2])
+        for team, chip in zip(teams, (102, 103)):
+            self.assertEqual(team["hero_list"][0]["hero_id"], 1284)
+            self.assertEqual(team["mimir_info"], dict(mimir_id=2, chip_list=[chip],
+                                                    hero_id=109451, hero_chip_list=[109452, 109453]))
 
     def test_sweep_passes_activity_and_does_not_read_unrelated_session(self):
         original = mw._settle_frames

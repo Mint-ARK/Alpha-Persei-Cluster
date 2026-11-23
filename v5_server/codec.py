@@ -52,6 +52,16 @@ def _ensure_schema():
         }
         if "enter_battle_common_info" in ds.SCHEMA:
             ds.SCHEMA["enter_battle_common_info"][1]["ref"] = "p54_team_hero_info_net_rec"
+        # The p63 reserve record and an older battle record share the name teams_net_rec.
+        ds.SCHEMA["p63_reserve_teams_net_rec"] = {
+            1: {"name": "team_index", "number": 1, "type": "uint32", "label": "required"},
+            2: {"name": "hero_list", "number": 2, "type": "message", "label": "repeated",
+                "ref": "p54_team_hero_info_net_rec"},
+            3: {"name": "cooperate_unique_skill_id", "number": 3, "type": "uint32", "label": "required"},
+            4: {"name": "mimir_info", "number": 4, "type": "message", "label": "required", "ref": "mimir_net_rec"},
+        }
+        if "single_cont_teams_net_rec" in ds.SCHEMA:
+            ds.SCHEMA["single_cont_teams_net_rec"][2]["ref"] = "p63_reserve_teams_net_rec"
         # p38 telemetry and p49 map history both declare log_net_rec.
         ds.SCHEMA["p38_event_log_net_rec"] = {
             1: {"name": "event_name", "number": 1, "type": "string", "label": "required"},

@@ -602,7 +602,7 @@ def _sign_reward(db, month, n):
     return (1, 100)
 
 
-def get_activity_list(db, uid, res_version=None):
+def get_activity_list(db, uid, res_version=None, *, now_ts=None):
     # 活动全量列表（sc_11001 activity_list）
     # 保证全量支线与常驻活动、以及在架卡池的 activity_id 处于开启激活状态，解除客户端时间锁与置灰
     from stage_service import StageService
@@ -645,18 +645,6 @@ def get_activity_list(db, uid, res_version=None):
         4435003: {"theme": 44, "template": 350, "sub_activity_id_list": []},
         4435004: {"theme": 44, "template": 350, "sub_activity_id_list": []},
         4435005: {"theme": 44, "template": 350, "sub_activity_id_list": []},
-        4443301: {"theme": 44, "template": 433, "sub_activity_id_list": [4443401, 4443501]},
-        4443302: {"theme": 44, "template": 433, "sub_activity_id_list": [4443402, 4443502]},
-        4443303: {"theme": 44, "template": 433, "sub_activity_id_list": [4443403, 4443503]},
-        4443304: {"theme": 44, "template": 433, "sub_activity_id_list": [4443404, 4443504]},
-        4443401: {"theme": 44, "template": 434, "sub_activity_id_list": []},
-        4443402: {"theme": 44, "template": 434, "sub_activity_id_list": []},
-        4443403: {"theme": 44, "template": 434, "sub_activity_id_list": []},
-        4443404: {"theme": 44, "template": 434, "sub_activity_id_list": []},
-        4443501: {"theme": 44, "template": 435, "sub_activity_id_list": []},
-        4443502: {"theme": 44, "template": 435, "sub_activity_id_list": []},
-        4443503: {"theme": 44, "template": 435, "sub_activity_id_list": []},
-        4443504: {"theme": 44, "template": 435, "sub_activity_id_list": []},
         # 皮肤抽奖 (Toggle 53006~53010) 与全部实体子活动
         312211: {"theme": 31, "template": 221, "sub_activity_id_list": [312221, 312222, 310049, 311465, 312231, 312233]},
         312221: {"theme": 31, "template": 222, "sub_activity_id_list": []},
@@ -698,16 +686,6 @@ def get_activity_list(db, uid, res_version=None):
     theme44_native_ids = {
         aid for aid, cfg in theme44_config.items() if int(cfg["theme"]) == 44
     }
-    # 311_CORE_VERIFICATION_GUARD:
-    # 4443301..4 共用 template=433，同时开启会使客户端缓存被最后一轮覆盖。
-    # 保留全部轮次的远期 stop_time，但只将版本配置指定的首轮设为 state=1。
-    core_verification_active_ids = set(
-        int(aid) for aid in version_cfg.get("core_verification_active_activity_ids", [])
-    )
-    core_verification_round_ids = {
-        aid for aid, cfg in theme44_config.items()
-        if int(cfg["template"]) in (433, 434, 435)
-    }
 
     act_rows = db.query("SELECT activity_id, start_time, stop_time, state, theme, template, sub_activity_id_list FROM activity WHERE uid=?", (uid,))
     act_list = []
@@ -748,20 +726,11 @@ def get_activity_list(db, uid, res_version=None):
                     sub_list = list(cfg["sub_activity_id_list"])
             elif aid in theme44_config:
                 cfg = theme44_config[aid]
-                state = (
-                    1
-                    if aid not in core_verification_round_ids
-                    or aid in core_verification_active_ids
-                    else 0
-                )
+                state = 1
                 et = far_future_ts
                 theme = cfg["theme"]
                 template = cfg["template"]
                 sub_list = list(cfg["sub_activity_id_list"])
-            elif aid == 111:
-                state = 1
-                et = far_future_ts
-                sub_list = [4443301, 4443302, 4443303, 4443304]
             elif aid == 4310001 or str(aid).startswith("43") or theme == 43:
                 # 在 311/321 下关闭 Theme 43 专属大厅与剧情关卡活动，确保大厅入口完全切换至 Theme 44
                 state = 0
@@ -775,10 +744,6 @@ def get_activity_list(db, uid, res_version=None):
                 # 卡池活动严格受控于在架状态，未在架卡池置 0 消除白屏与噪点
                 state = 1 if is_pool else 0
                 et = far_future_ts
-            elif aid == 111:
-                state = 1
-                et = far_future_ts
-                sub_list = [4243301, 4339301, 4343301]
             elif aid == 4310001 or str(aid).startswith("43") or theme == 43 or is_sub:
                 state = 1
                 et = far_future_ts
@@ -802,12 +767,7 @@ def get_activity_list(db, uid, res_version=None):
                 if caid in all_pool_aids:
                     c_state = 1 if (caid in pool_act_map) else 0
                 else:
-                    c_state = (
-                        1
-                        if caid not in core_verification_round_ids
-                        or caid in core_verification_active_ids
-                        else 0
-                    )
+                    c_state = 1
                 act_list.append({
                     "activity_id": caid,
                     "start_time": 1577836800,
@@ -877,7 +837,8 @@ def get_activity_list(db, uid, res_version=None):
     poly_activity = get_polyhedron_activity(cur_ver)
     act_list = [a for a in act_list if a['activity_id'] != poly_activity['activity_id']]
     act_list.append(poly_activity)
-    return act_list
+    from core_special_challenge import overlay_activities
+    return overlay_activities(act_list, cur_ver, now_ts)
 
 
 def gen_payload(cmd, uid=None, db=None, **kw):
@@ -1506,7 +1467,8 @@ def gen_payload(cmd, uid=None, db=None, **kw):
             lst = [{"id": r.get("hero_id"), "num": r.get("num") or 0} for r in rows]
             return encode("sc_14019", {"piece_list": lst})
     if cmd == 11001:
-        return encode("sc_11001", {"activity_list": get_activity_list(db, uid, kw.get("res_version") or kw.get("cur_ver"))})
+        return encode("sc_11001", {"activity_list": get_activity_list(
+            db, uid, kw.get("res_version") or kw.get("cur_ver"), now_ts=kw.get("special_now"))})
     if cmd == 24009:
         # 章节与剧情进度（StageService 统管驱动 → sc_24009 user_chapter_list）
         # 覆盖全量主线与支线剧情关卡，自愈上下篇与星级对账
@@ -2107,21 +2069,15 @@ def gen_payload(cmd, uid=None, db=None, **kw):
                 "info_list": [],
                 "max_score_list": []
             })
-        if cmd == 89013:
-            _, p, _ = _wcs.get_core_verification_challenge_data(uid, db, 3539501)
-            return encode("sc_89013", p)
-        if cmd == 89025:
-            _, p, _ = _wcs.get_core_verification_challenge_data(uid, db, 3640501)
-            return encode("sc_89025", p)
-        if cmd == 89431:
-            _, p, _ = _wcs.get_core_verification_challenge_data(uid, db, 3943101)
-            return encode("sc_89431", p)
-        if cmd == 89801:
-            import res_version_manager
-            version_cfg = res_version_manager.get_version_config(kw.get("res_version"))
-            act_id = int(version_cfg["core_verification_activity_id"])
-            _, p, _ = _wcs.get_core_verification_challenge_data(uid, db, act_id)
-            return encode("sc_89801", p)
+        if cmd in (89013, 89025, 89431, 89801):
+            from core_special_challenge import COMMANDS, active_groups
+            for group in active_groups(kw.get("res_version"), kw.get("special_now")):
+                if COMMANDS[group.mode] == cmd:
+                    mode, payload, _ = _wcs.get_core_verification_challenge_data(uid, db, group.stage)
+                    if mode != group.mode:
+                        raise ValueError(f"特殊挑战关卡目录缺失: {group.stage}")
+                    return encode(f"sc_{cmd}", payload)
+            return None
         if cmd == 89021:
             _, _, p = _wcs.get_core_verification_challenge_data(uid, db)
             return encode("sc_89021", p)

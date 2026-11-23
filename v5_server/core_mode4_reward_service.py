@@ -13,11 +13,12 @@ def catalog():
     return json.loads(Path(__file__).with_name('core_mode4_rewards_cfg.json').read_text('utf-8'))
 
 
-def definition(activity,*,version=None):
-    import res_version_manager as versions
-    current=int(versions.get_version_config(version)['core_verification_activity_id'])
-    profile=next((p for p in catalog()['profiles'].values() if p['activity']==current),None)
-    if profile is None or int(activity) not in (profile['parent'],profile['activity']):
+def definition(activity,*,version=None,now_ts=None):
+    from core_special_challenge import group_for_activity
+
+    group = group_for_activity(int(activity), 4, version, now_ts)
+    profile = next((p for p in catalog()['profiles'].values() if p['activity'] == group.stage), None)
+    if profile is None:
         raise OperationError(2,'迭代校验Mode4活动不匹配')
     return profile
 
@@ -39,7 +40,7 @@ def qualified(task,cleared):
 
 
 def task_states(db,uid,activity):
-    # Snapshot requests can explicitly target either served resource baseline.
+    # Snapshots can explicitly target any group in either resource baseline.
     profile=next((p for p in catalog()['profiles'].values() if p['activity']==int(activity)),None)
     if profile is None:return []
     cleared,claimed=facts(db,uid,profile)
@@ -49,14 +50,15 @@ def task_states(db,uid,activity):
 
 def claim(ctx,uid,activity,ids):
     if ctx.db is None:raise OperationError(2,'迭代校验Mode4存档不可用')
-    profile=definition(activity)
+    version = getattr(ctx, 'resource_version', None)
+    now=int(time.time())
+    profile=definition(activity, version=version, now_ts=now)
     if (not isinstance(ids,list) or not ids or len(ids)>len(profile['tasks'])
             or any(type(tid) is not int or str(tid) not in profile['tasks'] for tid in ids)
             or len(set(ids))!=len(ids)):
         raise OperationError(2,'迭代校验Mode4任务列表无效')
     import generator
-    now=int(time.time())
-    visible={int(a['activity_id']) for a in generator.get_activity_list(ctx.db,uid)
+    visible={int(a['activity_id']) for a in generator.get_activity_list(ctx.db,uid,version,now_ts=now)
              if int(a.get('state') or 0)==1 and int(a.get('start_time') or 0)<=now
              and (not a.get('stop_time') or now<int(a['stop_time']))}
     if profile['parent'] not in visible or profile['activity'] not in visible:

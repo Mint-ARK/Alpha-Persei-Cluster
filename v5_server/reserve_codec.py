@@ -56,8 +56,7 @@ def build_hero_info_bytes(hero_id, owner_id=0, hero_type=1):
 def build_mimir_bytes(mimir_id=0, chip_ids_str="", hero_chip_ids_str="", hero_id=0):
     """构建钥从与芯片 mimir_net_rec (f1=mimir_id, f2=repeated chip_list, f3=hero_id, f4=repeated hero_chip_list)"""
     b = bytearray()
-    if mimir_id:
-        b += _pb_varint(1, int(mimir_id))
+    b += _pb_varint(1, int(mimir_id or 0))
     
     if chip_ids_str:
         for c in str(chip_ids_str).split(","):
@@ -65,8 +64,7 @@ def build_mimir_bytes(mimir_id=0, chip_ids_str="", hero_chip_ids_str="", hero_id
             if c and c.isdigit() and int(c) > 0:
                 b += _pb_varint(2, int(c))
                 
-    if hero_id:
-        b += _pb_varint(3, int(hero_id))
+    b += _pb_varint(3, int(hero_id or 0))
         
     if hero_chip_ids_str:
         for hc in str(hero_chip_ids_str).split(","):
@@ -77,7 +75,7 @@ def build_mimir_bytes(mimir_id=0, chip_ids_str="", hero_chip_ids_str="", hero_id
 
 
 def build_teams_net_rec_bytes(team_index, heroes, cooperate_skill=0,
-                              mimir_id=0, chip_ids="", hero_chip_ids=""):
+                              mimir_id=0, chip_ids="", hero_chip_ids="", hero_chip_id=0):
     """构建单个队伍 teams_net_rec (f1=team_index, f2=repeated hero_list, f3=cooperate_unique_skill_id, f4=mimir_info)"""
     b = bytearray()
     b += _pb_varint(1, int(team_index or 0))
@@ -89,12 +87,10 @@ def build_teams_net_rec_bytes(team_index, heroes, cooperate_skill=0,
         htype = h.get("hero_type") or 1
         b += _pb_msg(2, build_hero_info_bytes(hid, oid, htype))
         
-    if cooperate_skill:
-        b += _pb_varint(3, int(cooperate_skill))
+    b += _pb_varint(3, int(cooperate_skill or 0))
         
-    mimir_b = build_mimir_bytes(mimir_id, chip_ids, hero_chip_ids)
-    if mimir_b:
-        b += _pb_msg(4, mimir_b)
+    mimir_b = build_mimir_bytes(mimir_id, chip_ids, hero_chip_ids, hero_id=hero_chip_id)
+    b += _pb_msg(4, mimir_b)
     return bytes(b)
 
 
@@ -121,10 +117,17 @@ def build_sc_63005(db, uid):
 
     # 1. 关卡现役编队（TEAM SERVER 数据源）
     cur.execute(
-        "SELECT stage_type, activity_id, team_index, hero_json, cooperate_skill, "
-        "mimir_id, mimir_chips, hero_chips FROM stage_team WHERE uid=? "
+        "SELECT * FROM stage_team WHERE uid=? "
         "ORDER BY stage_type, activity_id, team_index;", (uid,))
     team_rows = [dict(r) for r in cur.fetchall()]
+
+    from team_server import legacy_reserve_key
+    native_keys = {(row["stage_type"], row["activity_id"], row["team_index"]) for row in team_rows}
+    for row in sorted(team_rows, key=lambda item: item.get("update_ts") or 0, reverse=True):
+        key = legacy_reserve_key(row["stage_type"], row["activity_id"])
+        if key and key not in native_keys:
+            team_rows.append(dict(row, stage_type=key[0], activity_id=key[1], team_index=key[2]))
+            native_keys.add(key)
 
     # 2. 英雄次序化（hero_json 有序数组，[0]=队长位；槽位从 1 起）
     for tr in team_rows:
@@ -159,7 +162,8 @@ def build_sc_63005(db, uid):
                     cooperate_skill=tr.get("cooperate_skill") or 0,
                     mimir_id=tr.get("mimir_id") or 0,
                     chip_ids=tr.get("mimir_chips") or "",
-                    hero_chip_ids=tr.get("hero_chips") or ""
+                    hero_chip_ids=tr.get("hero_chips") or "",
+                    hero_chip_id=tr.get("hero_chip_id") or 0,
                 )
                 single_b += _pb_msg(2, t_bytes)
 

@@ -6213,6 +6213,12 @@ class BossChallengeSelectModeOp(Operation):
     def apply(self, data, ctx):
         mode = int(data.get("select") or 2)
         if ctx.db and hasattr(ctx.db, "set_boss_challenge_mode"):
+            ctx.db.check_and_lazy_refresh_boss_challenge(self.uid)
+            progress = ctx.db.get_boss_challenge_progress(self.uid) or {}
+            if int(progress.get("area_id") or 0) in (1, 2):
+                if mode != 1:
+                    raise OperationError(2, "本期已进入低等级常规梦境，不能更换档位")
+                return {"result": 0}
             ctx.db.set_boss_challenge_mode(self.uid, mode)
         return {"result": 0}
 
@@ -6241,6 +6247,8 @@ def _reset_boss_challenge(ctx, uid, kind, target=None):
     if ctx.db is None:
         raise OperationError(2, '梦境存档不可用')
     overview, normal, advance = weekly.get_boss_challenge_data(uid, ctx.db, strict=True)
+    if not kind and int(normal['area_id']) in (1, 2):
+        raise OperationError(2, '当前低等级档位只支持重置常规首领')
     if kind and int(overview['mode']) != kind:
         raise OperationError(2, '当前梦境模式不匹配')
     if kind == 1 and target not in {int(b['group_id']) for b in normal['boss_challenge_list']}:
@@ -6859,13 +6867,14 @@ class CoreVerificationGetRewardOp(Operation):
         if isinstance(r_list, (int, str)):
             r_list = [int(r_list)]
         
-        now_cycle = _wcs.get_core_verification_cycle()
+        from core_verification_cycle import period
+        week, _, now_cycle = period()
         rew_cat = _wcs.get_core_verification_rewards_catalog()
 
         # 读取当前周期通关战绩，计算 Boss 1 和 Boss 2 当前最高通关难度
         records = {}
         if ctx.db and hasattr(ctx.db, "get_core_verification_stage_records"):
-            records = ctx.db.get_core_verification_stage_records(self.uid, now_cycle)
+            records = ctx.db.get_core_verification_stage_records(self.uid, week)
         
         max_diff1 = max([r["difficult"] for r in records.values() if r["boss_type"] == 1 and r["sign"] == 1] or [0])
         max_diff2 = max([r["difficult"] for r in records.values() if r["boss_type"] == 2 and r["sign"] == 1] or [0])
@@ -6876,6 +6885,8 @@ class CoreVerificationGetRewardOp(Operation):
             t_id = int(t_id_raw)
             t_obj = rew_cat.get(str(t_id)) or {}
             rtype = int(t_obj.get("reward_type") or 0)
+            if rtype in (1, 2) and int(t_obj.get("cycle") or 0) != now_cycle:
+                continue
 
             # 1. 检查是否已领过
             if rtype == 4:
@@ -6886,7 +6897,7 @@ class CoreVerificationGetRewardOp(Operation):
             else:
                 # 常规周常奖励（回归测试α、回归测试β、难度奖励）：按当前周期 cycle 检查
                 if ctx.db and hasattr(ctx.db, "is_core_verification_task_claimed"):
-                    if ctx.db.is_core_verification_task_claimed(self.uid, t_id, cycle=now_cycle):
+                    if ctx.db.is_core_verification_task_claimed(self.uid, t_id, cycle=week):
                         continue
 
             # 2. 校验达成条件
@@ -6934,7 +6945,7 @@ class CoreVerificationGetRewardOp(Operation):
                 granted_items.append(it)
 
             if ctx.db and hasattr(ctx.db, "claim_core_verification_task"):
-                claim_cycle = 0 if rtype == 4 else now_cycle
+                claim_cycle = 0 if rtype == 4 else week
                 ctx.db.claim_core_verification_task(self.uid, t_id, cycle=claim_cycle)
 
         return {"items": granted_items}
@@ -6963,11 +6974,11 @@ class CoreVerificationResetChallengeOp(Operation):
     sc = 75011
 
     def apply(self, data, ctx):
-        import weekly_challenge_service as _wcs
+        from core_verification_cycle import period
         r_type = int(data.get("type") or 0)
-        cycle = _wcs.get_core_verification_cycle()
+        week = period()[0]
         if ctx.db and hasattr(ctx.db, "reset_core_verification_challenge"):
-            ctx.db.reset_core_verification_challenge(self.uid, cycle, r_type)
+            ctx.db.reset_core_verification_challenge(self.uid, week, r_type)
         return {"result": 0, "type": r_type}
 
     def respond(self, result, data, ctx):
@@ -7012,10 +7023,11 @@ class CoreVerificationChallengeSetAffixOp(Operation):
     sc = 89015
 
     def apply(self, data, ctx):
-        act_id = int(data.get("activity_id") or 0)
+        from core_special_challenge import group_for_activity
+        group = group_for_activity(int(data.get("activity_id") or 0), 1, getattr(ctx, 'resource_version', None))
         buffs = data.get("buff_list") or []
         if ctx.db and hasattr(ctx.db, "save_core_verification_cl_buffs"):
-            ctx.db.save_core_verification_cl_buffs(self.uid, act_id, buffs)
+            ctx.db.save_core_verification_cl_buffs(self.uid, group.stage, buffs)
         return {"result": 0}
 
     def respond(self, result, data, ctx):
@@ -7029,31 +7041,35 @@ class CoreVerificationChallengeGetRewardOp(Operation):
     """cs_89018 {activity_id, assignment_id} -> sc_89019 {result: 0, reward_list} Mode 1 领取任务奖励"""
     cmd = 89018
     sc = 89019
+    prepare_response_in_transaction = True
 
     def apply(self, data, ctx):
+        from core_special_challenge import DAWN_CLEAR_TASKS, group_for_activity
         import weekly_challenge_service as _wcs
-        act_id = int(data.get("activity_id") or 0)
+        group = group_for_activity(int(data.get("activity_id") or 0), 1, getattr(ctx, 'resource_version', None))
         ass_id = data.get("assignment_id") or []
         if isinstance(ass_id, (int, str)):
             ass_id = [int(ass_id)]
-        
-        cl_cat = _wcs.get_core_verification_cl_catalog()
-        rewards_map = cl_cat.get("rewards", {})
+        if ctx.db is None or not ass_id or len(set(ass_id)) != len(ass_id):
+            raise OperationError(2, '奇点演算领奖参数无效')
+        rewards_map = _wcs.get_core_verification_cl_catalog().get("rewards", {})
+        claimed = set(ctx.db.get_core_verification_cl_claimed_tasks(self.uid, group.stage))
+        claimed.update(ctx.db.get_core_verification_cl_claimed_tasks(self.uid, group.main))
+        progress = ctx.db.get_core_verification_cl_progress(self.uid, group.stage)
         granted_items = []
         for tid in ass_id:
             r_info = rewards_map.get(str(tid)) or {}
-            items = r_info.get("rewards") or [{"id": 1, "num": 100}]
+            items = r_info.get("rewards")
+            if r_info.get("activity_id") != group.stage or not items:
+                raise OperationError(2, '奇点演算任务不属于当前活动')
+            if tid in claimed:
+                raise OperationError(2013, '奇点演算任务已领取')
+            if tid in DAWN_CLEAR_TASKS and not progress.get(DAWN_CLEAR_TASKS[tid], {}).get("is_cleared"):
+                raise OperationError(2005, '奇点演算任务尚未达成')
             for it in items:
                 _item_add(ctx, self.uid, it["id"], it["num"])
                 granted_items.append(it)
-            if ctx.db and hasattr(ctx.db, "claim_core_verification_cl_task"):
-                ctx.db.claim_core_verification_cl_task(self.uid, act_id, int(tid))
-        
-        if not granted_items:
-            granted_items = [{"id": 1, "num": 100}]
-            for it in granted_items:
-                _item_add(ctx, self.uid, it["id"], it["num"])
-
+            ctx.db.claim_core_verification_cl_task(self.uid, group.stage, tid)
         return {"items": granted_items}
 
     def respond(self, result, data, ctx):
@@ -7072,9 +7088,10 @@ class CoreVerificationChallengeResetOp(Operation):
     sc = 89017
 
     def apply(self, data, ctx):
-        act_id = int(data.get("activity_id") or 0)
+        from core_special_challenge import group_for_activity
+        group = group_for_activity(int(data.get("activity_id") or 0), 1, getattr(ctx, 'resource_version', None))
         if ctx.db and hasattr(ctx.db, "reset_core_verification_cl"):
-            ctx.db.reset_core_verification_cl(self.uid, act_id, stage_id=0)
+            ctx.db.reset_core_verification_cl(self.uid, group.stage, stage_id=0)
         return {"result": 0}
 
     def respond(self, result, data, ctx):
@@ -7090,10 +7107,11 @@ class CoreVerificationChallengeResetCurStageOp(Operation):
     sc = 89023
 
     def apply(self, data, ctx):
-        act_id = int(data.get("activity_id") or 0)
+        from core_special_challenge import group_for_activity
+        group = group_for_activity(int(data.get("activity_id") or 0), 1, getattr(ctx, 'resource_version', None))
         stg_id = int(data.get("stage_id") or 0)
         if ctx.db and hasattr(ctx.db, "reset_core_verification_cl"):
-            ctx.db.reset_core_verification_cl(self.uid, act_id, stage_id=stg_id)
+            ctx.db.reset_core_verification_cl(self.uid, group.stage, stage_id=stg_id)
         return {"result": 0}
 
     def respond(self, result, data, ctx):
@@ -7364,10 +7382,11 @@ class CoreVerificationMode4ResetStageOp(Operation):
     sc = 89807
 
     def apply(self, data, ctx):
-        act_id = int(data.get("activity_id") or 0)
+        from core_special_challenge import group_for_activity
+        group = group_for_activity(int(data.get("activity_id") or 0), 4, getattr(ctx, 'resource_version', None))
         stg_id = int(data.get("stage_id") or 0)
         if ctx.db and hasattr(ctx.db, "reset_core_verification_cl"):
-            ctx.db.reset_core_verification_cl(self.uid, act_id, stage_id=stg_id)
+            ctx.db.reset_core_verification_cl(self.uid, group.stage, stage_id=stg_id)
         return {"result": 0}
 
     def respond(self, result, data, ctx):

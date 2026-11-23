@@ -2176,6 +2176,12 @@ CREATE TABLE IF NOT EXISTS core_verification_stage_record ( -- 迭代校验常�
     update_ts       INTEGER DEFAULT 0,
     PRIMARY KEY (uid, cycle, info_id)
 );
+CREATE TABLE IF NOT EXISTS core_verification_boss_progress (
+    uid             INTEGER NOT NULL,
+    boss_stage_id   INTEGER NOT NULL,
+    max_difficulty  INTEGER NOT NULL,
+    PRIMARY KEY (uid, boss_stage_id)
+);
 CREATE TABLE IF NOT EXISTS core_verification_hero_lock ( -- 迭代校验出战锁定
     uid             INTEGER NOT NULL,
     cycle           INTEGER NOT NULL,
@@ -2297,10 +2303,25 @@ CREATE TABLE IF NOT EXISTS stage_team (             -- 关卡现役编队表（t
     cooperate_skill      INTEGER NOT NULL DEFAULT 0,-- 本场使用连携 ID
     mimir_id             INTEGER NOT NULL DEFAULT 0,-- 助战弥弥尔（管理器钥从）id
     mimir_chips          TEXT NOT NULL DEFAULT '',   -- 弥弥尔携带芯片（逗号分隔）
+    hero_chip_id         INTEGER NOT NULL DEFAULT 0,-- 角色芯片基底 ID
     hero_chips           TEXT NOT NULL DEFAULT '',   -- 助战英雄芯片（逗号分隔）
     clear_times          INTEGER NOT NULL DEFAULT 0, -- 该关卡现役队伍累计通关次数
     update_ts            INTEGER DEFAULT 0,
     PRIMARY KEY (uid, stage_type, activity_id, team_index)
+);
+CREATE TABLE IF NOT EXISTS stage_clear_team (
+    uid INTEGER NOT NULL,
+    stage_id INTEGER NOT NULL,
+    hero_json TEXT NOT NULL DEFAULT '[]',
+    hero_count INTEGER NOT NULL DEFAULT 0,
+    cooperate_skill INTEGER NOT NULL DEFAULT 0,
+    mimir_id INTEGER NOT NULL DEFAULT 0,
+    mimir_chips TEXT NOT NULL DEFAULT '',
+    hero_chips TEXT NOT NULL DEFAULT '',
+    clear_times INTEGER NOT NULL DEFAULT 0,
+    last_clear_ts INTEGER DEFAULT 0,
+    update_ts INTEGER DEFAULT 0,
+    PRIMARY KEY (uid, stage_id)
 );
 CREATE TABLE IF NOT EXISTS user_periodic_gift (
     id                 INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -2363,6 +2384,7 @@ CREATE TABLE IF NOT EXISTS admin_cat_explore_queue (
 
 # 列迁移（幂等：已存在则跳过）——新表建表走 SCHEMA，加列走这里
 _COLUMN_MIGRATIONS = [
+    ("stage_team", "hero_chip_id", "INTEGER NOT NULL DEFAULT 0"),
     ("idol_trainee", "exercise_day_tag", "INTEGER NOT NULL DEFAULT 0"),
     ("currency", "last_fatigue_recover_time", "INTEGER DEFAULT 0"),  # 活力(货币id=4)恢复时间点
     ("currency", "update_ts", "INTEGER DEFAULT 0"),                   # 更新时间戳（最新值仲裁）
@@ -2525,6 +2547,11 @@ class AccountDB:
             existing_tables = {row[0] for row in c.execute(
                 "SELECT name FROM sqlite_master WHERE type='table'"
             )}
+            if 'stage_team' in existing_tables and (
+                'stage_clear_team' not in existing_tables or
+                not any(r[1] == 'hero_chip_id' for r in c.execute('PRAGMA table_info(stage_team)'))
+            ):
+                self.backup_save_file(self.path, purpose='stage_team_migration')
             if 'users' in existing_tables and 'draw_feedback_state' not in existing_tables:
                 self.backup_save_file(self.path, purpose='draw_feedback_migration')
         # 权威建库来源：lib/db_schema.sql（从实库导出的 217 张表，全部 IF NOT EXISTS，幂等）。
@@ -5899,6 +5926,15 @@ class AccountDB:
         rows = self.query("SELECT * FROM boss_challenge_progress WHERE uid=?", (int(uid),))
         return rows[0] if rows else None
 
+    def _boss_challenge_newcomer_area(self, uid):
+        row = self.get("users", uid) or {}
+        level = int(row.get("level") or 0)
+        if 30 <= level < 50:
+            return 1
+        if 50 <= level < 70:
+            return 2
+        return None
+
     def set_boss_challenge_mode(self, uid, select_mode):
         """切换梦境再构模式与子模式：
         select in (3, 4) -> area_id = select, mode = 1 (常规梦境)
@@ -5944,15 +5980,40 @@ class AccountDB:
             prog = self.get_boss_challenge_progress(uid)
             # 此处不能调用吞查询错误的get_system_config，失败不等同首次迁移。
             adopted = self.query('SELECT value FROM server_global_config WHERE key=?', (key,))
+            newcomer_area = self._boss_challenge_newcomer_area(uid)
             if not prog:
                 self.execute(
                     'INSERT INTO boss_challenge_progress '
                     '(uid,mode,cycle_id,area_id,use_times,last_daily_ts,last_weekly_ts,update_ts) '
-                    'VALUES (?,0,?,4,0,?,?,?)', (uid, seed_at(start), daily, start, now_ts))
+                    'VALUES (?,?,?,?,0,?,?,?)',
+                    (uid, int(newcomer_area is not None), seed_at(start),
+                     newcomer_area or 4, daily, start, now_ts))
                 self.set_system_config(key, '1')
                 return True
             last_weekly = int(prog.get('last_weekly_ts') or 0)
             last_daily = int(prog.get('last_daily_ts') or 0)
+            old_area = int(prog.get('area_id') or 4)
+            old_mode = int(prog.get('mode') or 0)
+            area, mode = old_area, old_mode
+            if last_weekly < start:
+                if newcomer_area:
+                    area, mode = newcomer_area, 1
+                elif old_area in (1, 2):
+                    area, mode = 4, 0
+            elif old_area in (1, 2):
+                # 档位按周锁定，升到 50 或 70 不丢本周领奖进度。
+                mode = 1
+            elif newcomer_area and not self.query(
+                "SELECT 1 FROM boss_challenge_normal WHERE uid=?1 AND (finish_stage>0 OR star_info NOT IN ('','[]')) "
+                "UNION ALL SELECT 1 FROM boss_challenge_advance WHERE uid=?1 AND score>0 "
+                "UNION ALL SELECT 1 FROM boss_challenge_scores WHERE uid=?1 AND score>0 "
+                "UNION ALL SELECT 1 FROM boss_challenge_claimed_rewards WHERE uid=?1 LIMIT 1", (uid,)
+            ):
+                # 已有旧档成绩的账号在下一次周四切换。
+                area, mode = newcomer_area, 1
+            if (area, mode) != (old_area, old_mode):
+                self.execute('UPDATE boss_challenge_progress SET area_id=?,mode=?,update_ts=? WHERE uid=?',
+                             (area, mode, now_ts, uid))
             changed = False
             if last_weekly < start or reset_current:
                 for table in ('boss_challenge_normal', 'boss_challenge_advance',
@@ -6378,18 +6439,22 @@ class AccountDB:
 
     def is_core_verification_task_claimed(self, uid, task_id, cycle=0):
         """判断任务在指定周期（或永久首通 cycle=0）是否已领。"""
+        from core_verification_cycle import weekly_rows
+        where, args = weekly_rows(int(cycle))
         rows = self.query(
-            "SELECT 1 FROM core_verification_claimed_tasks WHERE uid=? AND task_id=? AND cycle=? LIMIT 1",
-            (int(uid), int(task_id), int(cycle))
+            f"SELECT 1 FROM core_verification_claimed_tasks WHERE uid=? AND task_id=? AND {where} LIMIT 1",
+            (int(uid), int(task_id), *args)
         )
         return len(rows) > 0
 
     def get_core_verification_claimed_tasks(self, uid, current_cycle=None):
         """获取迭代校验常规已领任务 ID 列表（包含永久首通 cycle=0 及当前周期 cycle 已领）。"""
         if current_cycle is not None and int(current_cycle) > 0:
+            from core_verification_cycle import weekly_rows
+            where, args = weekly_rows(int(current_cycle))
             rows = self.query(
-                "SELECT task_id FROM core_verification_claimed_tasks WHERE uid=? AND (cycle=0 OR cycle=?)",
-                (int(uid), int(current_cycle))
+                f"SELECT task_id FROM core_verification_claimed_tasks WHERE uid=? AND (cycle=0 OR {where})",
+                (int(uid), *args)
             )
         else:
             rows = self.query("SELECT task_id FROM core_verification_claimed_tasks WHERE uid=?", (int(uid),))
@@ -6399,6 +6464,7 @@ class AccountDB:
         """清空指定玩家的全部迭代校验测试与战绩数据（恢复纯净全新状态）。"""
         u = int(uid)
         self.execute("DELETE FROM core_verification_stage_record WHERE uid=?", (u,))
+        self.execute("DELETE FROM core_verification_boss_progress WHERE uid=?", (u,))
         self.execute("DELETE FROM core_verification_hero_lock WHERE uid=?", (u,))
         self.execute("DELETE FROM core_verification_super_score WHERE uid=?", (u,))
         self.execute("DELETE FROM core_verification_claimed_tasks WHERE uid=?", (u,))
@@ -6408,7 +6474,10 @@ class AccountDB:
 
     def get_core_verification_stage_records(self, uid, cycle):
         """获取玩家指定周期的迭代校验关卡战绩。"""
-        rows = self.query("SELECT * FROM core_verification_stage_record WHERE uid=? AND cycle=?", (int(uid), int(cycle)))
+        from core_verification_cycle import weekly_rows
+        where, args = weekly_rows(int(cycle))
+        rows = self.query(f"SELECT * FROM core_verification_stage_record WHERE uid=? AND {where} ORDER BY cycle",
+                          (int(uid), *args))
         records = {}
         for r in rows:
             records[int(r["info_id"])] = {
@@ -6423,7 +6492,10 @@ class AccountDB:
 
     def get_core_verification_hero_locks(self, uid, cycle):
         """获取玩家当前周期的锁定出战修正者列表 {1: [hero_ids], 2: [hero_ids]}。"""
-        rows = self.query("SELECT boss_type, hero_id FROM core_verification_hero_lock WHERE uid=? AND cycle=?", (int(uid), int(cycle)))
+        from core_verification_cycle import weekly_rows
+        where, args = weekly_rows(int(cycle))
+        rows = self.query(f"SELECT boss_type, hero_id FROM core_verification_hero_lock WHERE uid=? AND {where}",
+                          (int(uid), *args))
         locks = {1: [], 2: []}
         for r in rows:
             bt = int(r["boss_type"])
@@ -6440,6 +6512,32 @@ class AccountDB:
             scores[int(r["stage_id"])] = int(r["score"])
         return scores
 
+    def get_core_verification_boss_progress(self, uid):
+        """按首领读取永久难度进度，并兼容旧轮换号中的真实通关记录。"""
+        from core_verification_cycle import boss_key
+        from weekly_challenge_service import get_core_verification_catalog
+
+        progress = {row["boss_stage_id"]: row["max_difficulty"] for row in self.query(
+            "SELECT boss_stage_id,max_difficulty FROM core_verification_boss_progress WHERE uid=?", (int(uid),)
+        )}
+        catalog = get_core_verification_catalog().get("cycle_info", {})
+        for row in self.query(
+            "SELECT cycle,info_id FROM core_verification_stage_record WHERE uid=? AND sign=1 AND cycle BETWEEN 1 AND 16",
+            (int(uid),)
+        ):
+            stage = catalog.get(str(row["info_id"]), {})
+            if stage.get("stage_id") and stage.get("cycle") == row["cycle"]:
+                key = boss_key(stage["stage_id"])
+                progress[key] = max(progress.get(key, 0), stage["difficult"])
+        return progress
+
+    def _save_core_verification_boss_progress(self, uid, key, difficult):
+        self.execute(
+            "INSERT INTO core_verification_boss_progress(uid,boss_stage_id,max_difficulty) VALUES(?,?,?) "
+            "ON CONFLICT(uid,boss_stage_id) DO UPDATE SET max_difficulty=MAX(max_difficulty,excluded.max_difficulty)",
+            (int(uid), key, difficult)
+        )
+
     def record_core_verification_stage_clear(self, uid, cycle, info_id, boss_type, difficult, min_time_ms, score=0, heroes=None):
         """通关迭代校验关卡：标记 sign=1，更新 min_time 与 score，锁定修正者。"""
         now = int(time.time())
@@ -6451,9 +6549,13 @@ class AccountDB:
         score = int(score)
         heroes = heroes or []
 
+        from core_verification_cycle import ROTATIONS, boss_key, period, weekly_rows
+        from weekly_challenge_service import get_core_verification_catalog, get_core_verification_stages
+        rotation = period(cycle)[2] if cycle > ROTATIONS else cycle
+        where, args = weekly_rows(cycle)
         old_rows = self.query(
-            "SELECT min_time, score FROM core_verification_stage_record WHERE uid=? AND cycle=? AND info_id=?",
-            (int(uid), cycle, info_id)
+            f"SELECT min_time,score FROM core_verification_stage_record WHERE uid=? AND info_id=? AND {where} "
+            "ORDER BY cycle DESC LIMIT 1", (int(uid), info_id, *args)
         )
         best_time = min_time_ms
         best_score = score
@@ -6471,18 +6573,25 @@ class AccountDB:
         )
 
         # 向上向下兼容：通关高难度 D 时，自动补齐该 BOSS 低难度 (1..D-1) 的通关标记 (sign=1)
-        for lower_d in range(1, difficult):
-            lower_info_id = cycle * 1000 + boss_type * 100 + lower_d
+        for lower in get_core_verification_stages(rotation)[boss_type - 1]:
+            lower_d = lower["difficult"]
+            if lower_d >= difficult:
+                break
+            lower_info_id = lower["id"]
             chk = self.query(
-                "SELECT sign FROM core_verification_stage_record WHERE uid=? AND cycle=? AND info_id=?",
-                (int(uid), cycle, lower_info_id)
+                f"SELECT 1 FROM core_verification_stage_record WHERE uid=? AND info_id=? AND sign=1 AND {where}",
+                (int(uid), lower_info_id, *args)
             )
-            if not chk or int(chk[0].get("sign") or 0) != 1:
+            if not chk:
                 self.execute(
                     "INSERT OR REPLACE INTO core_verification_stage_record (uid, cycle, info_id, boss_type, difficult, sign, min_time, score, update_ts) "
                     "VALUES (?, ?, ?, ?, ?, 1, ?, 0, ?)",
                     (int(uid), cycle, lower_info_id, boss_type, lower_d, best_time, now)
                 )
+
+        stage = get_core_verification_catalog().get("cycle_info", {}).get(str(info_id), {})
+        if stage.get("stage_id") and stage.get("cycle") == rotation:
+            self._save_core_verification_boss_progress(uid, boss_key(stage["stage_id"]), difficult)
 
         for hid in heroes:
             hid = int(hid)
@@ -6494,7 +6603,8 @@ class AccountDB:
 
         if difficult == 8 or score > 0:
             self.execute(
-                "INSERT OR REPLACE INTO core_verification_super_score (uid, stage_id, score, update_ts) VALUES (?, ?, ?, ?)",
+                "INSERT INTO core_verification_super_score(uid,stage_id,score,update_ts) VALUES(?,?,?,?) "
+                "ON CONFLICT(uid,stage_id) DO UPDATE SET score=MAX(score,excluded.score),update_ts=excluded.update_ts",
                 (int(uid), info_id, best_score, now)
             )
 
@@ -6502,11 +6612,13 @@ class AccountDB:
         """重置迭代校验挑战：type=0 重置全部关卡与出战锁定，type=1 仅重置出战锁定。"""
         cycle = int(cycle)
         reset_type = int(reset_type)
+        from core_verification_cycle import weekly_rows
+        where, args = weekly_rows(cycle)
         if reset_type == 0:
-            self.execute("DELETE FROM core_verification_stage_record WHERE uid=? AND cycle=?", (int(uid), cycle))
-            self.execute("DELETE FROM core_verification_hero_lock WHERE uid=? AND cycle=?", (int(uid), cycle))
-        else:
-            self.execute("DELETE FROM core_verification_hero_lock WHERE uid=? AND cycle=?", (int(uid), cycle))
+            for key, difficult in self.get_core_verification_boss_progress(uid).items():
+                self._save_core_verification_boss_progress(uid, key, difficult)
+            self.execute(f"DELETE FROM core_verification_stage_record WHERE uid=? AND {where}", (int(uid), *args))
+        self.execute(f"DELETE FROM core_verification_hero_lock WHERE uid=? AND {where}", (int(uid), *args))
 
     # ----------------- 迭代校验·挑战模式 (Challenge Mode 1~4) 数据持久化 -----------------
 

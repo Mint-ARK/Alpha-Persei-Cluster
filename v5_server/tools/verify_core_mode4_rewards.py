@@ -115,6 +115,26 @@ class Mode4RewardTests(MemoryTests):
         states={row['assignment_id']:row['state'] for row in packet['finish_assignment_list']}
         self.assertEqual(states[50301],2);self.assertEqual(states[50302],1)
 
+    def test_rotated_group_uses_its_own_progress_and_rewards(self):
+        from core_special_challenge import ANCHOR, PERIOD_SECONDS
+
+        now = ANCHOR + PERIOD_SECONDS
+        self.visible = [dict(activity_id=aid, state=1, start_time=now, stop_time=now + PERIOD_SECONDS)
+                        for aid in (4443302, 4443502)]
+        with patch('time.time', return_value=now):
+            self.seed(3092131, 4443502)
+            self.reject([50301], 4443301, 2)
+            profile = rewards.definition(4443302, version='311')
+            task = next(int(tid) for tid, info in profile['tasks'].items()
+                        if info['condition_type'] == 11304 and info['params'] == [3092131])
+            snapshot = codec.decode(generator.gen_payload(89801, uid=UID, db=self.db, res_version='311'),
+                                    'sc_89801')
+            self.assertEqual([row['stage_id'] for row in snapshot['common_stages']],
+                             [3092131, 3092132, 3092133, 3093131])
+            self.assertEqual(self.snapshot(4443502)[task], 1)
+            self.assertEqual(self.claim([task], 4443302)[0]['result'], 0)
+            self.assertEqual(self.snapshot(4443502)[task], 2)
+
     def test_actual_login_flood_serializes_state1_and_state2_before_10201(self):
         import login
         import new_player_service

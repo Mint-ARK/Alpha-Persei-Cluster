@@ -235,6 +235,27 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
         frames, db, uid, generator, login_policy, res_version=login_res_version)
     owned_payloads = {**autochess_payloads, **rogue_payloads, **polyhedron_payloads}
 
+    from core_special_challenge import COMMANDS as special_commands, active_groups
+    special_now = int(time.time())
+    topology_index = next((i for i, row in enumerate(frames) if row[1] == 11001), -1)
+    marker_index = next((i for i, row in enumerate(frames) if row[1] == 10201), len(frames))
+    special_slot = next((i for i in range(topology_index + 1, marker_index)
+                         if frames[i][1] in special_commands.values()), marker_index)
+    special_insert_at = sum(row[1] not in special_commands.values() for row in frames[:special_slot])
+    frames = [row for row in frames if row[1] not in special_commands.values()]
+    if generator is not None:
+        special_rows = []
+        for group in active_groups(login_res_version, special_now):
+            cmd = special_commands[group.mode]
+            if login_policy.allows(cmd) and cmd not in suppressed_cmds:
+                payload = generator.gen_payload(cmd, uid=uid, db=db, res_version=login_res_version,
+                                                special_now=special_now)
+                if not payload:
+                    raise RuntimeError(f"特殊挑战状态 sc_{cmd} 生成失败")
+                owned_payloads[cmd] = payload
+                special_rows.append((0, cmd, generator.build_frame(cmd, b"")[:11], payload, 0, None))
+        frames[special_insert_at:special_insert_at] = special_rows
+
     try:
         from codec import encode as _codec_encode
         _c_enc = _codec_encode
@@ -270,8 +291,11 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
             # 1. dynamic == 1 时优先使用 generator 业务生成器
             if cmd not in owned_payloads and not osiris_point_push and (fresh_save or dynamic or cmd in (47001, 47003, 24029, 24061, 30001, 11001, 18001, 20007, 20009, 52001, 52021, 53001, 19029, 34031, 34023, 34025, 34101, 68181, 12119, 89011, 68171, 24051, 24043, 85035, 49001, 49023, 51001, 83016, 83017, 83020, 83021, 83026, 79601, 28801, 28837, 86035) or (cmd == 32009 and dynamic_profile)) and generator is not None:
                 try:
+                    version_args = {"res_version": login_res_version}
+                    if cmd == 11001:
+                        version_args["special_now"] = special_now
                     gen = generator.gen_payload(
-                        cmd, uid=uid, db=db, res_version=login_res_version
+                        cmd, uid=uid, db=db, **version_args
                     )
                 except Exception as e:
                     log(f"[login] sc_{cmd} 业务动态生成异常: {e}", "WARN")
@@ -303,6 +327,10 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                 raise RuntimeError('sc_19029 本地角色聊天初始化失败，拒绝回退旧好友记录')
             if cmd == 32009 and dynamic_profile and gen is None:
                 raise RuntimeError("sc_32009 装扮状态生成失败")
+            if cmd == 63005 and gen is None and generator is not None:
+                gen = generator.gen_payload(cmd, uid=uid, db=db, res_version=login_res_version)
+                if not gen:
+                    raise RuntimeError("sc_63005 编队状态生成失败")
             if cmd in (11001, 20007, 20009) and gen is None:
                 raise RuntimeError(f"sc_{cmd} 抽取活动/票券配置生成失败")
 

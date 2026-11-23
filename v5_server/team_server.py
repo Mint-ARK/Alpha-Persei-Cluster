@@ -2,17 +2,9 @@
 """
 team_server.py — 关卡现役编队领域服务（编队数据唯一管理者）
 
-官方生命周期（decompiled_v2 协议分析定稿）：
-- 客户端选人界面的编队按关卡键 GetHeroTeamActivityID(type, dest) 分立（BattleTeamData.battleTeam_ 内存缓存）
-- 出战 cs_54030 上报当前关卡的完整编队（hero_list 次序不可乱、连携、弥弥尔+芯片）
-- 矩阵/多维的连携选择额外 Push(63006) 上阵即存
-- 服务器按 (uid, stage_type, activity_id, team_index) 原子保存「每关一条现役队伍」，
-  再次出战/通关直接覆盖更新（不保留历史版本），跨会话为客户端 63005 初始化提供底稿
-
-职责：
-- record_stage_team：出战/63006/结算统一写入入口（试用英雄 hero_type=2 不持久化）
-- get_stage_team / get_activity_id：关卡现役队伍查询与关卡键换算（扫荡兜底/63005 组帧用）
-- 订阅 STAGE_PASS：胜利结算覆盖更新现役队伍并累计通关次数
+- 接受 cs_54030 后按客户端的编队类型、组键和队伍槽位保存最近挑战。
+- cs_63006 维持原生上阵保存语义，sc_63005 恢复已保存编队。
+- STAGE_PASS 将胜利阵容单独保存在 stage_clear_team，供扫荡发放经验使用。
 """
 
 import json
@@ -27,10 +19,6 @@ logger = logging.getLogger("team_server")
 # （梦境 10/进阶 100、矩阵 14、公会 Boss 32/33、刻印突破 40、多维 52 等）
 _SHARED_KEY_STAGE_TYPES = {10, 100, 14, 32, 33, 40, 52}
 
-# 试用英雄类型（客户端 battlecontroller 组装：hero_type=2 为试玩/援助位，不持久化）
-_TRIAL_HERO_TYPE = 2
-
-
 def hero_team_activity_id(stage_type, dest):
     """复刻客户端 GetHeroTeamActivityID(stage_type, dest)：
     - 共享型玩法 → 返回 stage_type（该玩法全体关卡共用一个编队键）
@@ -43,6 +31,63 @@ def hero_team_activity_id(stage_type, dest):
     if stage_type in _SHARED_KEY_STAGE_TYPES:
         return stage_type
     return dest
+
+
+def battle_reserve_key(info, *, regression=None, special=None, boss=None, mythic=None, mythic_normal=False):
+    """Match the stock ReserveParams used by the corresponding selection screens."""
+    stage_type, dest = info["type"], info["dest"]
+    if stage_type in (12, 13, 16, 19, 20, 21, 76):
+        return None  # Tutorial, story experience, and trial formations are temporary.
+    if regression:
+        return 67, regression["boss_type"], 0
+    if special:
+        group, stage = special
+        cont_id = 4 if stage["stage_type"] == 2 else dest % 10
+        team_index = 0
+        if group.mode == 4:
+            indices = next((row.get("value") or [] for row in info.get("opts", [])
+                            if row.get("key") == 2), [])
+            team_index = int(indices[0]) if indices else 0
+            if not 0 <= team_index < stage["stage_team"]:
+                return None
+        return 431, cont_id, team_index
+    if boss:
+        return 102, boss["boss_id"], 0
+    if mythic_normal:
+        return 103, 1, 0
+    if mythic:
+        index = int(info.get("index") or 0)
+        return (103, 2, mythic["team_id"]) if index else (103, 3, 0)
+    if stage_type == 53:
+        return 11, 0, 0
+    activity_id = hero_team_activity_id(stage_type, dest)
+    return (stage_type, activity_id, 0) if activity_id else None
+
+
+def own_hero_ids(heroes):
+    result = []
+    for hero in heroes or []:
+        if isinstance(hero, dict):
+            if int(hero.get("hero_type") or 1) != 1:
+                continue
+            hero = hero.get("hero_id") or hero.get("id") or 0
+        if hero:
+            result.append(int(hero))
+    return result
+
+
+def legacy_reserve_key(stage_type, dest):
+    """Recover old saved rows when the original submission identifies the native slot."""
+    if stage_type == 67 and dest > 2:
+        from weekly_challenge_service import get_core_verification_catalog
+        stage = get_core_verification_catalog().get("cycle_info", {}).get(str(dest))
+        if stage:
+            return 67, stage["boss_type"], 0
+    if stage_type == 53 and 3070101 <= dest <= 3070126:
+        return 11, 0, 0
+    if stage_type == 88 and 3092001 <= dest <= 3093199:
+        return 431, 4 if dest >= 3093001 else dest % 10, 0
+    return None
 
 
 class TeamServer:
@@ -64,8 +109,9 @@ class TeamServer:
 
     def record_stage_team(self, ctx, uid, stage_type, dest, heroes=None,
                           cooperate_skill=0, mimir_id=0, mimir_chips="",
-                          team_index=0, add_clear_times=0, activity_key=None):
-        """原子保存/更新关卡现役队伍（出战、63006 上阵即存、胜利结算三路统一入口）。
+                          team_index=0, add_clear_times=0, activity_key=None,
+                          hero_chip_id=0, hero_chips=""):
+        """原子保存/更新关卡现役队伍。
 
         heroes: 出战修正者列表（保持上报次序，[0]=队长位；元素为 int、{"id": x} 或
                 {"hero_id": x, "hero_type": n}——hero_type=2 试用英雄不持久化）
@@ -82,48 +128,42 @@ class TeamServer:
             activity_id = int(activity_key or 0)
         else:
             activity_id = hero_team_activity_id(stage_type, dest)
-        if not activity_id:
+        if activity_key is None and not activity_id:
             return None
-
-        hero_ids = []
-        for h in (heroes or []):
-            if isinstance(h, dict):
-                if int(h.get("hero_type") or 1) == _TRIAL_HERO_TYPE:
-                    continue  # 试用英雄不持久化
-                hid = int(h.get("hero_id") or h.get("id") or 0)
-            else:
-                hid = int(h)
-            if hid:
-                hero_ids.append(hid)
+        hero_ids = own_hero_ids(heroes)
         if not hero_ids:
             return None
 
         now = int(time.time())
         db.execute(
             "INSERT INTO stage_team (uid, stage_type, activity_id, team_index, hero_json, "
-            "cooperate_skill, mimir_id, mimir_chips, hero_chips, clear_times, update_ts) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            "cooperate_skill, mimir_id, mimir_chips, hero_chip_id, hero_chips, clear_times, update_ts) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
             "ON CONFLICT(uid, stage_type, activity_id, team_index) DO UPDATE SET "
             "hero_json=excluded.hero_json, cooperate_skill=excluded.cooperate_skill, "
             "mimir_id=excluded.mimir_id, mimir_chips=excluded.mimir_chips, "
-            "hero_chips=excluded.hero_chips, "
+            "hero_chip_id=excluded.hero_chip_id, hero_chips=excluded.hero_chips, "
             "clear_times = clear_times + ?, update_ts = ?",
             (uid, int(stage_type or 0), activity_id, int(team_index or 0),
              json.dumps(hero_ids), int(cooperate_skill or 0), int(mimir_id or 0),
-             str(mimir_chips or ""), "", add_clear_times, now, add_clear_times, now))
-        return self.get_stage_team(db, uid, stage_type, dest, team_index=team_index)
+             str(mimir_chips or ""), int(hero_chip_id or 0), str(hero_chips or ""),
+             add_clear_times, now, add_clear_times, now))
+        return self.get_stage_team(db, uid, stage_type, dest, team_index=team_index,
+                                   activity_key=activity_id)
 
     def _resolve_key(self, stage_type, dest):
         """(stage_type, dest) → (stage_type, activity_id)"""
         stage_type = int(stage_type or 0)
         return stage_type, hero_team_activity_id(stage_type, dest)
 
-    def get_stage_team(self, db, uid, stage_type, dest, team_index=0):
+    def get_stage_team(self, db, uid, stage_type, dest, team_index=0, *, activity_key=None):
         """查询关卡现役队伍"""
         if db is None:
             return None
         st, aid = self._resolve_key(stage_type, dest)
-        if not aid:
+        if activity_key is not None:
+            aid = int(activity_key)
+        elif not aid:
             return None
         rows = db.query(
             "SELECT * FROM stage_team WHERE uid=? AND stage_type=? AND activity_id=? AND team_index=?",
@@ -138,9 +178,15 @@ class TeamServer:
         return r
 
     def get_stage_heroes(self, db, uid, stage_type, dest, team_index=0):
-        """查询关卡现役队伍的英雄 id 列表（扫荡兜底用），无记录返回 []"""
+        """查询关卡现役队伍的英雄 id 列表，无记录返回 []"""
         rec = self.get_stage_team(db, uid, stage_type, dest, team_index=team_index)
         return list(rec["hero_list"]) if rec else []
+
+    def get_last_clear_heroes(self, db, uid, dest):
+        rows = db.query(
+            "SELECT hero_json FROM stage_clear_team WHERE uid=? AND stage_id=?",
+            (uid, dest))
+        return json.loads(rows[0]["hero_json"]) if rows else None
 
     def list_teams(self, db, uid, limit=200):
         """列出玩家全部关卡现役编队（控制台/GM 用）"""
@@ -169,6 +215,28 @@ class TeamServer:
             if not stage_id:
                 return
             try:
+                if "battle_team_key" in kwargs:
+                    key = kwargs["battle_team_key"]
+                    if key is not None:
+                        ctx.db.execute(
+                            "UPDATE stage_team SET clear_times=clear_times+? "
+                            "WHERE uid=? AND stage_type=? AND activity_id=? AND team_index=?",
+                            (max(1, int(kwargs.get("times", 1))), uid, *key))
+                        if not kwargs.get("sweep"):
+                            heroes = own_hero_ids(kwargs.get("hero_details") or kwargs.get("heroes"))
+                            now = int(time.time())
+                            ctx.db.execute(
+                                "INSERT INTO stage_clear_team(uid,stage_id,hero_json,hero_count,"
+                                "cooperate_skill,mimir_id,mimir_chips,clear_times,last_clear_ts,update_ts) "
+                                "VALUES(?,?,?,?,?,?,?,1,?,?) ON CONFLICT(uid,stage_id) DO UPDATE SET "
+                                "hero_json=excluded.hero_json,hero_count=excluded.hero_count,"
+                                "cooperate_skill=excluded.cooperate_skill,mimir_id=excluded.mimir_id,"
+                                "mimir_chips=excluded.mimir_chips,clear_times=clear_times+1,"
+                                "last_clear_ts=excluded.last_clear_ts,update_ts=excluded.update_ts",
+                                (uid, stage_id, json.dumps(heroes), len(heroes),
+                                 int(kwargs.get("cooperate_skill") or 0),
+                                 int(kwargs.get("mimir_id") or 0), kwargs.get("mimir_chips") or "", now, now))
+                    return
                 rec = self.record_stage_team(
                     ctx, uid, int(kwargs.get("stage_type_id") or 0), int(stage_id),
                     heroes=kwargs.get("heroes") or [],

@@ -785,6 +785,9 @@ def register_battle_session(bid, uid, dest=0, activity_id=0, battle_times=1, her
                                  "is_story": bool(is_story),
                                  "map_backtrack_token": str(map_backtrack_token or ''),
                                  "boss_context": dict(boss_context) if boss_context else None,
+                                 "iteration_week": kwargs.get('iteration_week'),
+                                 "battle_team_key": kwargs.get('battle_team_key'),
+                                 "hero_details": kwargs.get('hero_details'),
                                  "mythic_context": dict(mythic_context) if mythic_context else None,
                                  "rogue_run_id": str(rogue_run_id or ''),
                                  "rogue_floor_num": kwargs.get('rogue_floor_num'),
@@ -1499,8 +1502,18 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
         else:
             boss_identity = _require_boss_battle_identity(ctx, uid, battle_context or get_battle_session(bid) or {})
     is_equip_seizure = (stage_type == 53) or (3070101 <= dest_int <= 3070126)
-    is_core_verification = (stage_type == 67) or (3090001 <= dest_int <= 3090999) or (10101 <= dest_int <= 16208)
-    is_core_verification_cl = (stage_type in (88, 90)) or (3092001 <= dest_int <= 3093099)
+    iteration = _iteration_battle_identity(
+        stage_type, dest_int, None if sweep else battle_context or get_battle_session(bid) or {}
+    )
+    is_core_verification = iteration is not None
+    from core_special_challenge import is_challenge_battle
+    is_core_verification_cl = is_challenge_battle(stage_type, dest_int)
+    if is_core_verification_cl:
+        from core_verification_cycle import IterationPeriodError
+        if sweep:
+            raise IterationPeriodError('特殊挑战不支持扫荡')
+        challenge_group, challenge_stage = _special_challenge_battle_identity(
+            ctx, stage_type, dest_int, activity_id, battle_context or get_battle_session(bid) or {})
     is_equip_stage = (2020000 <= dest_int <= 2020099)
     is_polyhedron = (stage_type == 52) or (3035000 <= dest_int <= 3036000) or (dest_int in (5001, 5002, 5003))
     is_rogue_team = (stage_type == 78) or (4100000 <= dest_int <= 4199999) or (100 <= dest_int <= 999)
@@ -1554,9 +1567,9 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
             # 连携技能（协作技能网 p73）结算上下文：出战上报的本场连携 id + 关卡类别
             _combo_id = 0
             _mimir_id, _mimir_chips = 0, ""
+            # Sweeps use their request context. Normal settlement uses the accepted battle.
+            _b_sess = board_session
             try:
-                # 扫荡没有出战会话，使用本次已解析的上下文；普通结算继续读取原会话。
-                _b_sess = battle_context if battle_context is not None else (get_battle_session(bid) or {})
                 _combo_id = int(_b_sess.get("cooperate_skill") or 0)
                 _mi = _b_sess.get("mimir_info") or {}
                 _mimir_id = int(_mi.get("mimir_id") or 0)
@@ -1597,7 +1610,9 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                      cooperate_skill=_combo_id, combo_stage_kind=_combo_kind,
                      stage_kind=_stage_kind, stage_type_id=int(stage_type or 0), sweep=bool(sweep),
                      grant_exp=grant_exp,
-                     battle_id=bid, mimir_id=_mimir_id, mimir_chips=_mimir_chips,
+                      battle_id=bid, mimir_id=_mimir_id, mimir_chips=_mimir_chips,
+                      battle_team_key=_b_sess.get("battle_team_key"),
+                      hero_details=_b_sess.get("hero_details"),
                      b_info=battle_info)
             if first_clear:
                 bus.emit(Events.STAGE_FIRST_CLEAR, ctx, uid, stage_id=dest_int, stage_type=st_type,
@@ -1808,7 +1823,7 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                 # 消费通关广播前已校验的开战归属，禁止固定组兜底。
                 matched_gid = boss_identity['boss_id']
                 if hasattr(ctx.db, "record_boss_challenge_normal_clear"):
-                    ctx.db.record_boss_challenge_normal_clear(uid, matched_gid, dest_int, star_list=star_list_pb, heroes=heroes)
+                    ctx.db.record_boss_challenge_normal_clear(uid, matched_gid, dest_int, star_list=star_achieved, heroes=heroes)
             elif is_boss_advance:
                 matched_pid = boss_identity['boss_id']
                 earned_score = boss_identity['score']
@@ -1818,21 +1833,9 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
             elif is_core_verification:
                 # 迭代校验常规关卡结算
                 import weekly_challenge_service as _wcs
-                cur_cycle = _wcs.get_core_verification_cycle()
+                week, stage = iteration
+                matched_info_id, b_type, diff = stage["id"], stage["boss_type"], stage["difficult"]
                 raw_btime = int(battle_info.get("battle_time") or 30000)
-                
-                cat = _wcs.get_core_verification_catalog()
-                cycle_info = cat.get("cycle_info", {})
-                
-                matched_info_id = dest_int
-                b_type = 1
-                diff = 1
-                for iid_str, info in cycle_info.items():
-                    if int(info.get("stage_id", 0)) == dest_int or int(iid_str) == dest_int:
-                        matched_info_id = int(iid_str)
-                        b_type = int(info.get("boss_type", 1))
-                        diff = int(info.get("difficult", 1))
-                        break
                 
                 stage_score = 0
                 if diff == 8:
@@ -1846,28 +1849,16 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                 
                 if hasattr(ctx.db, "record_core_verification_stage_clear"):
                     ctx.db.record_core_verification_stage_clear(
-                        uid, cur_cycle, matched_info_id, b_type, diff, raw_btime, score=stage_score, heroes=heroes
+                        uid, week, matched_info_id, b_type, diff, raw_btime, score=stage_score, heroes=heroes
                     )
-                ctx.log(f"[settle] 迭代校验通关: cycle={cur_cycle} info_id={matched_info_id} boss={b_type} diff={diff} score={stage_score} heroes={heroes}")
+                ctx.log(f"[settle] 迭代校验通关: cycle={stage.get('cycle')} info_id={matched_info_id} boss={b_type} diff={diff} score={stage_score} heroes={heroes}")
 
             elif is_core_verification_cl:
                 # 迭代校验·挑战模式关卡结算
-                import weekly_challenge_service as _wcs
-                cl_cat = _wcs.get_core_verification_cl_catalog()
                 raw_btime = int(battle_info.get("battle_time") or 30000)
-                
-                target_act = int(activity_id or 3539501)
-                mode_num = 1
-                stg_cfg = {}
-                for mkey in ["mode1", "mode2", "mode3", "mode4"]:
-                    m_stgs = cl_cat.get(mkey, {})
-                    if str(dest_int) in m_stgs:
-                        stg_cfg = m_stgs[str(dest_int)]
-                        mode_num = int(stg_cfg.get("mode", 1))
-                        target_act = int(stg_cfg.get("activity_id", target_act))
-                        break
-                
-                stg_type = int(stg_cfg.get("stage_type", 1))
+                target_act = challenge_group.stage
+                mode_num = challenge_group.mode
+                stg_type = challenge_stage["stage_type"]
                 cl_score = 0
                 if stg_type == 2:
                     time_sec = raw_btime / 1000.0 if raw_btime > 1000 else float(raw_btime)
@@ -1875,8 +1866,13 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                     cl_score = 10000 + time_bonus
                 
                 if hasattr(ctx.db, "record_core_verification_cl_stage_clear"):
+                    selected_buffs = None
+                    if mode_num == 1 and stg_type == 2:
+                        progress = ctx.db.get_core_verification_cl_progress(uid, target_act)
+                        selected_buffs = progress.get(dest_int, progress.get(0, {})).get("select_buffs", [])
                     ctx.db.record_core_verification_cl_stage_clear(
-                        uid, target_act, mode_num, dest_int, min_time_ms=raw_btime, score=cl_score, heroes=heroes
+                        uid, target_act, mode_num, dest_int, min_time_ms=raw_btime,
+                        score=cl_score, heroes=heroes, select_buffs=selected_buffs
                     )
                 ctx.log(f"[settle] 迭代校验挑战模式通关: act={target_act} mode={mode_num} stage={dest_int} score={cl_score} heroes={heroes}")
 
@@ -2021,9 +2017,8 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
                 p75009 = ctx.codec_encode("sc_75009", sc_75009)
                 if p75009: extra_frames.append(DownFrame(75009, p75009))
                 
-                max_sc_info = sc_75009.get("max_score_info") or {}
-                if max_sc_info:
-                    p75015 = ctx.codec_encode("sc_75015", max_sc_info)
+                if iteration[1]["difficult"] == 8:
+                    p75015 = ctx.codec_encode("sc_75015", {"id": iteration[1]["id"], "score": stage_score})
                     if p75015: extra_frames.append(DownFrame(75015, p75015))
             except Exception as _ce:
                 ctx.log(f"[settle] 迭代校验常规推送异常: {_ce}", "WARN")
@@ -2032,19 +2027,13 @@ def _settle_frames(ctx, uid, bid, result, dest, times=1, heroes=None, sweep=Fals
         if is_core_verification_cl and ctx.codec_encode and ctx.db:
             try:
                 import weekly_challenge_service as _wcs
-                m_num, sc_cl_obj, sc_ill_obj = _wcs.get_core_verification_challenge_data(uid, ctx.db, activity_id=activity_id)
-                if m_num == 1:
-                    p = ctx.codec_encode("sc_89013", sc_cl_obj)
-                    if p: extra_frames.append(DownFrame(89013, p))
-                elif m_num == 2:
-                    p = ctx.codec_encode("sc_89025", sc_cl_obj)
-                    if p: extra_frames.append(DownFrame(89025, p))
-                elif m_num == 3:
-                    p = ctx.codec_encode("sc_89431", sc_cl_obj)
-                    if p: extra_frames.append(DownFrame(89431, p))
-                elif m_num == 4:
-                    p = ctx.codec_encode("sc_89801", sc_cl_obj)
-                    if p: extra_frames.append(DownFrame(89801, p))
+                from core_special_challenge import COMMANDS
+                m_num, sc_cl_obj, sc_ill_obj = _wcs.get_core_verification_challenge_data(
+                    uid, ctx.db, activity_id=challenge_group.stage)
+                cmd = COMMANDS[m_num]
+                p = ctx.codec_encode(f"sc_{cmd}", sc_cl_obj)
+                if p:
+                    extra_frames.append(DownFrame(cmd, p))
                 
                 p_ill = ctx.codec_encode("sc_89021", sc_ill_obj)
                 if p_ill: extra_frames.append(DownFrame(89021, p_ill))
@@ -2153,6 +2142,33 @@ def _chapter_map_battle_token(ctx, uid, dest):
         return ''
     from chapter_v2_map_service import service
     return service.battle_token(ctx.db, uid, dest)
+
+
+def _special_challenge_battle_identity(ctx, stage_type, dest, activity_id, session=None):
+    from core_special_challenge import battle_stage, period
+    from core_verification_cycle import IterationPeriodError
+
+    now = time.time()
+    if session is not None:
+        started = session.get("ts", 0)
+        if not 0 < started <= now or period(started)[0] != period(now)[0]:
+            raise IterationPeriodError('特殊挑战战斗已跨期，请重新进入')
+    return battle_stage(stage_type, dest, activity_id, getattr(ctx, 'resource_version', None), now)
+
+
+def _iteration_battle_identity(stage_type, dest, session=None):
+    from core_verification_cycle import IterationPeriodError, battle_stage, is_regression_battle, period
+
+    if not is_regression_battle(stage_type, dest):
+        return None
+    now = time.time()
+    week, _, rotation = period(now)
+    if session is not None:
+        started = float(session.get('ts') or 0)
+        if (not 0 < started <= now or period(started)[0] != week
+                or (session.get('iteration_week') or week) != week):
+            raise IterationPeriodError('回归测试已换期，请重新开始挑战')
+    return week, battle_stage(dest, rotation)
 
 
 def _boss_mode_signature(prog):
@@ -2390,6 +2406,18 @@ def h_54030(req, ctx):
     normal_context = normal_entry(ctx.db, req.uid, info['dest']) if normal_kind(info.get('type'), info['dest']) else None
 
     dest_num = int(info.get('dest') or 0)
+    from core_verification_cycle import IterationPeriodError, period as iteration_period
+    from core_special_challenge import is_challenge_battle, period as special_period
+    special_start = None
+    special = None
+    try:
+        iteration = _iteration_battle_identity(info.get('type'), dest_num)
+        if is_challenge_battle(info['type'], dest_num):
+            special_start = special_period()[0]
+            special = _special_challenge_battle_identity(ctx, info['type'], dest_num, info['activity_id'])
+    except IterationPeriodError as exc:
+        ctx.log(f'[iteration] 拒绝开战: {exc}', 'WARN')
+        return CSResponse([DownFrame(54031, b'\x08\x02')])
     polyhedron_initial = poly_entry_frames(ctx,req.uid) if polyhedron_context is not None else []
 
     # Prepare every required battle packet before publishing a session or team.
@@ -2432,6 +2460,14 @@ def h_54030(req, ctx):
             raise BattlePeriodExpired('梦境初始化期间已刷新，请重新选择首领')
     if mythic_start is not None and mythic_start != mythic_bounds()[0]:
         raise ValueError('失序深区初始化期间已刷新，请重新进入')
+    if iteration and iteration[0] != iteration_period()[0]:
+        return CSResponse([DownFrame(54031, b'\x08\x02')])
+    if special_start is not None and special_start != special_period()[0]:
+        return CSResponse([DownFrame(54031, b'\x08\x02')])
+    from team_server import TeamServer, battle_reserve_key
+    team_key = battle_reserve_key(info, regression=iteration[1] if iteration else None,
+                                  special=special, boss=boss_context, mythic=mythic_context,
+                                  mythic_normal=normal_context is not None)
     from mythic_final_service import publication
     from hodur_challenge import publication as hodur_publication
     from sphero_battle_service import publication as sphero_publication
@@ -2460,6 +2496,8 @@ def h_54030(req, ctx):
                                 node_id=rogue_node_id,
                                 cooperate_skill=info.get("cooperate_skill", 0),
                                 mimir_info=info.get("mimir_info") or {},
+                                iteration_week=iteration[0] if iteration else None,
+                                battle_team_key=team_key, hero_details=info["hero_details"],
                                 map_backtrack_token=_chapter_map_battle_token(ctx, effective_uid, info['dest']),
                                 boss_context=boss_context, index=info.get('index', 0), mythic_context=mythic_context, rogue_run_id=rogue_run_id, hodur_context=hodur_context,summer_board_context=board_context,sphero_context=sphero_context,quanzhou_context=quanzhou_context,polyhedron_context=polyhedron_context,warchess_context=warchess_context,**rogue_snapshot)
     if normal_context is not None:
@@ -2472,16 +2510,19 @@ def h_54030(req, ctx):
     # 编队记录由下方 TEAM SERVER 关卡现役编队接管（sync_stage_battle_team 保留备回滚）
 
     # 关卡现役编队原子保存（TEAM SERVER 接管：按官方关卡键分立，试用英雄过滤）
-    if ctx.db and info.get("heroes"):
+    if ctx.db and team_key and info.get("heroes"):
         try:
-            from team_server import TeamServer as _TS
             _mi = info.get("mimir_info") or {}
-            _TS.get_instance().record_stage_team(
-                ctx, effective_uid, info.get("type", 0), info["dest"],
+            reserve_type, cont_id, team_index = team_key
+            TeamServer.get_instance().record_stage_team(
+                ctx, effective_uid, reserve_type, info["dest"],
                 heroes=info.get("hero_details") or info["heroes"],
                 cooperate_skill=info.get("cooperate_skill", 0),
                 mimir_id=int(_mi.get("mimir_id") or 0),
-                mimir_chips=",".join(str(x) for x in (_mi.get("chip_list") or []) if x))
+                mimir_chips=",".join(str(x) for x in (_mi.get("chip_list") or []) if x),
+                hero_chip_id=int(_mi.get("hero_id") or 0),
+                hero_chips=",".join(str(x) for x in (_mi.get("hero_chip_list") or []) if x),
+                team_index=team_index, activity_key=cont_id)
         except Exception as e:
             ctx.log(f"[team] 关卡现役编队保存异常: {e}", "WARN")
 
@@ -2615,6 +2656,10 @@ def _settle_battle_session(req, ctx, bid, session):
     mythic_final = mythic_is_final(stage_type, dest, activity_id)
     from mythic_normal_service import is_normal as normal_kind, validate as validate_normal
     mythic_normal = normal_kind(stage_type, dest)
+    from core_verification_cycle import IterationPeriodError, is_regression_battle
+    iteration_battle = is_regression_battle(stage_type, int(dest))
+    from core_special_challenge import is_challenge_battle
+    special_battle = is_challenge_battle(stage_type, int(dest))
     panel_cycle = None
     if boss_kind:
         panel_cycle = 'dream'
@@ -2624,7 +2669,7 @@ def _settle_battle_session(req, ctx, bid, session):
         panel_cycle = 'polyhedron'
     elif stage_type == 53 or 3070101 <= int(dest) <= 3070126:
         panel_cycle = 'seizure'
-    elif stage_type == 67 or 3090001 <= int(dest) <= 3090999 or 10101 <= int(dest) <= 16208:
+    elif iteration_battle:
         panel_cycle = 'iteration'
     if ctx.db and panel_cycle:
         from panel_cycles import CycleChanged, check_battle
@@ -2650,6 +2695,18 @@ def _settle_battle_session(req, ctx, bid, session):
             _require_boss_battle_identity(ctx, req.uid, session)
         except (BattlePeriodExpired, BossIdentityError) as exc:
             return _boss_period_rejection(ctx, req.uid, bid, dest, str(exc))
+    if iteration_battle and 'br' not in session:
+        try:
+            _iteration_battle_identity(stage_type, int(dest), session)
+        except IterationPeriodError as exc:
+            ctx.log(f'[iteration] 拒绝旧战斗 {bid}: {exc}', 'WARN')
+            return CSResponse([DownFrame(54033, _settlement_error_payload(bid, dest))])
+    if special_battle and 'br' not in session:
+        try:
+            _special_challenge_battle_identity(ctx, stage_type, int(dest), activity_id, session)
+        except IterationPeriodError as exc:
+            ctx.log(f'[iteration] 拒绝旧特殊挑战战斗 {bid}: {exc}', 'WARN')
+            return CSResponse([DownFrame(54033, _settlement_error_payload(bid, dest))])
 
     res_obj = session.get("result_data")
     if res_obj is None:
@@ -2674,7 +2731,7 @@ def _settle_battle_session(req, ctx, bid, session):
         # 兼容旧会话中仍有 extra 的情况，但不再读取或重发它。
         br, extra = session["br"], []
     else:
-        if pt_scroll_battle or boss_kind or mythic_final or rogue_battle or pinball_battle or hodur_battle or ash_battle or pub_battle or osiris_battle or skuld_battle or board_battle or sphero_battle or quanzhou_battle or polyhedron_battle or warchess_battle or mythic_normal:
+        if pt_scroll_battle or boss_kind or iteration_battle or special_battle or mythic_final or rogue_battle or pinball_battle or hodur_battle or ash_battle or pub_battle or osiris_battle or skuld_battle or board_battle or sphero_battle or quanzhou_battle or polyhedron_battle or warchess_battle or mythic_normal:
             from account_db import savepoint_transaction
             from operation_notifications import checkpoint_notifications, restore_notifications
             checkpoint = checkpoint_notifications(ctx)
@@ -2702,6 +2759,10 @@ def _settle_battle_session(req, ctx, bid, session):
                     # 若结算执行期间越过边界，撤销本次SQL和待发通知，不缓存成功。
                     if boss_kind:
                         _require_boss_battle_period(ctx, req.uid, session)
+                    if iteration_battle:
+                        _iteration_battle_identity(stage_type, int(dest), session)
+                    if special_battle:
+                        _special_challenge_battle_identity(ctx, stage_type, int(dest), activity_id, session)
                     if mythic_final:
                         validate_mythic(ctx.db, req.uid, session, after_clear=True)
                     if mythic_normal:
@@ -2719,6 +2780,9 @@ def _settle_battle_session(req, ctx, bid, session):
                     return CSResponse([DownFrame(54033, _settlement_error_payload(bid, dest))])
                 if isinstance(exc, (BattlePeriodExpired, BossIdentityError)):
                     return _boss_period_rejection(ctx, req.uid, bid, dest, str(exc))
+                if isinstance(exc, IterationPeriodError):
+                    ctx.log(f'[iteration] 拒绝旧战斗 {bid}: {exc}', 'WARN')
+                    return CSResponse([DownFrame(54033, _settlement_error_payload(bid, dest))])
                 if isinstance(exc, MythicPeriodExpired):
                     if mythic_normal:
                         return CSResponse([DownFrame(54033, _settlement_error_payload(bid, dest))])
@@ -2815,7 +2879,6 @@ def h_54038(req, ctx):
 
 def _sweep_settlement(req, ctx):
     """扫荡 → sc_54039（f1 result, f2 player_info, f3 battle_result，动态掉落引擎 × battle_times）。"""
-    import reserve_codec
     import battle_payload
     info = _parse_battle_common(req, ctx)
     from pt_scroll_service import reserved as pt_reserved
@@ -2830,9 +2893,14 @@ def _sweep_settlement(req, ctx):
             raise ValueError('未通关关卡不能扫荡')
     dest = info["dest"]
     times = max(1, int(info["battle_times"] or 1))
-    heroes = info["heroes"]
-    if not heroes and ctx.db is not None:
-        heroes = reserve_codec.get_stage_preset_heroes(ctx.db, req.uid, dest, info["type"])
+    from team_server import TeamServer, battle_reserve_key, own_hero_ids
+    teams = TeamServer.get_instance()
+    heroes = own_hero_ids(info.get("hero_details") or info["heroes"])
+    if ctx.db is not None:
+        last_clear = teams.get_last_clear_heroes(ctx.db, req.uid, dest)
+        if last_clear is not None:
+            heroes = last_clear
+    info["battle_team_key"] = battle_reserve_key(info)
 
     bid = _gen_battle_id(ctx.battle_seq)
     ctx.battle_id[0] = bid
@@ -2924,6 +2992,8 @@ def h_63006(req, ctx):
                     cooperate_skill=int(t.get("cooperate_unique_skill_id") or 0),
                     mimir_id=int(mi.get("mimir_id") or 0),
                     mimir_chips=",".join(str(x) for x in (mi.get("chip_list") or []) if x),
+                    hero_chip_id=int(mi.get("hero_id") or 0),
+                    hero_chips=",".join(str(x) for x in (mi.get("hero_chip_list") or []) if x),
                     team_index=int(t.get("team_index") or t.get("id") or 0),
                     activity_key=cont_id)
             ctx.log(f"cs_63006 -> 上阵即存 stage_type={stage_type} 关卡键={cont_id}")

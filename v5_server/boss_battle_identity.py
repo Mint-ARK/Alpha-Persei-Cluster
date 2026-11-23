@@ -10,12 +10,19 @@ def check_kind(stage_type, kind):
         raise BossIdentityError('梦境战斗类型与关卡类别冲突')
 
 
+def normal_boss_stages(catalog, area_id, group_id):
+    groups = catalog.get('stage_groups', {})
+    stages = groups.get(str(group_id), groups.get(group_id, {})).get('stages', [])
+    areas = catalog.get('normal_areas', {})
+    area = areas.get(str(area_id), areas.get(area_id, {}))
+    return stages[:area.get('level_amount') or len(stages)]
+
+
 def resolve(kind, stage_id, index, catalog, normal, advance):
     stage_id, index = int(stage_id), int(index or 0)
     if kind == 1:
-        groups = catalog.get('stage_groups', {})
         candidates = {int(b['group_id']) for b in normal['boss_challenge_list']
-                      if stage_id in groups.get(str(b['group_id']), {}).get('stages', [])}
+                      if stage_id in normal_boss_stages(catalog, normal.get('area_id'), b['group_id'])}
     else:
         pool = catalog.get('advance_pool') or catalog.get('advance_boss_pool', {})
         selected = {int(b['id']) for b in advance['boss_list']}

@@ -402,11 +402,7 @@
   },
   "rules": {
     "cycle_reset_day": "thursday_0500",
-    "affix_reset_days": [
-      "thursday_0500",
-      "saturday_0500",
-      "monday_0500"
-    ],
+    "affix_reset": "daily_0500",
     "stage_reset": "daily_0500",
     "rate_weekday": 1.0,
     "rate_weekend": 1.2

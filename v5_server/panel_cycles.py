@@ -8,6 +8,7 @@ from pathlib import Path
 
 from account_db import savepoint_transaction
 from boss_challenge_cycle import bounds as dream_bounds
+from core_verification_cycle import period as iteration_period, weekly_rows as iteration_weekly_rows
 from lazy_timer import get_daily_5am_ts, get_weekly_mon_5am_ts
 from mythic_cycle import bounds as mythic_bounds
 from task_cycle_notifications import reset_activity_points, reset_task_progress
@@ -70,8 +71,7 @@ def _bounds(kind, now):
     if kind == 'seizure':
         return weekly.get_seizure_period(now)
     if kind == 'iteration':
-        end = weekly.get_next_thursday_5am(now)
-        return end - WEEK, end
+        return iteration_period(now)[:2]
     if kind == 'dream':
         return dream_bounds(now)[:2]
     if kind == 'polyhedron':
@@ -149,8 +149,8 @@ def _dream(db, uid, now, start):
 
 def _iteration(db, uid, now, start):
     cycle = weekly.get_core_verification_cycle(now)
-    cleared = {int(x['info_id']) for x in db.query(
-        'SELECT info_id FROM core_verification_stage_record WHERE uid=? AND cycle=? AND sign=1', (uid, cycle))}
+    cleared = {stage_id for stage_id, row in db.get_core_verification_stage_records(uid, start).items()
+               if row['sign'] == 1}
     boss_one, boss_two = weekly.get_core_verification_stages(cycle)
     best = {1: 0, 2: 0}
     rows = []
@@ -159,8 +159,7 @@ def _iteration(db, uid, now, start):
         if stage_id in cleared:
             best[boss] = max(best[boss], diff)
         rows.append(_row(f'stage-{stage_id}', f'首领 {boss} · 难度 {diff}', int(stage_id in cleared), 1))
-    claimed = {int(x['task_id']) for x in db.query(
-        'SELECT task_id FROM core_verification_claimed_tasks WHERE uid=? AND cycle IN (0,?)', (uid, cycle))}
+    claimed = set(db.get_core_verification_claimed_tasks(uid, start))
     for key, reward in sorted(weekly.get_core_verification_rewards_catalog().items(), key=lambda item: int(item[0])):
         key = int(key)
         reward_type = int(reward['reward_type'])
@@ -295,9 +294,9 @@ def reset(db, uid, kind, token, now_ts=None):
         elif kind == 'dream':
             db.check_and_lazy_refresh_boss_challenge(uid, now, reset_current=True)
         elif kind == 'iteration':
-            cycle = weekly.get_core_verification_cycle(now)
-            db.reset_core_verification_challenge(uid, cycle, 0)
-            db.execute('DELETE FROM core_verification_claimed_tasks WHERE uid=? AND cycle=?', (uid, cycle))
+            db.reset_core_verification_challenge(uid, start, 0)
+            where, args = iteration_weekly_rows(start)
+            db.execute(f'DELETE FROM core_verification_claimed_tasks WHERE uid=? AND {where}', (uid, *args))
         elif kind == 'polyhedron':
             from polyhedron_service import PolyhedronRunManager
             activity = weekly.get_polyhedron_activity(now_ts=now)['activity_id']

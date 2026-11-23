@@ -1,5 +1,99 @@
 {
   "profiles": {
+    "4243301": {
+      "parent": 4243301,
+      "activity": 4243501,
+      "tasks": {
+        "50110": {
+          "condition_id": 1441201,
+          "condition_type": 11304,
+          "params": [
+            3092091
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50111": {
+          "condition_id": 1441202,
+          "condition_type": 11304,
+          "params": [
+            3092092
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50112": {
+          "condition_id": 1441203,
+          "condition_type": 11304,
+          "params": [
+            3092093
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50113": {
+          "condition_id": 1441204,
+          "condition_type": 11304,
+          "params": [
+            3093091
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 60
+            }
+          ]
+        },
+        "50114": {
+          "condition_id": 1441205,
+          "condition_type": 11307,
+          "params": [
+            3093091,
+            15000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 60
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        },
+        "50115": {
+          "condition_id": 1441206,
+          "condition_type": 11307,
+          "params": [
+            3093091,
+            22000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 40
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        }
+      }
+    },
     "229": {
       "parent": 4343301,
       "activity": 4343501,
@@ -173,6 +267,288 @@
           "condition_type": 11307,
           "params": [
             3093121,
+            22000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 40
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        }
+      }
+    },
+    "4443302": {
+      "parent": 4443302,
+      "activity": 4443502,
+      "tasks": {
+        "50310": {
+          "condition_id": 1450307,
+          "condition_type": 11304,
+          "params": [
+            3092131
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50311": {
+          "condition_id": 1450308,
+          "condition_type": 11304,
+          "params": [
+            3092132
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50312": {
+          "condition_id": 1450309,
+          "condition_type": 11304,
+          "params": [
+            3092133
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50313": {
+          "condition_id": 1450310,
+          "condition_type": 11304,
+          "params": [
+            3093131
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 60
+            }
+          ]
+        },
+        "50314": {
+          "condition_id": 1450311,
+          "condition_type": 11307,
+          "params": [
+            3093131,
+            15000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 60
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        },
+        "50315": {
+          "condition_id": 1450312,
+          "condition_type": 11307,
+          "params": [
+            3093131,
+            22000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 40
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        }
+      }
+    },
+    "4443303": {
+      "parent": 4443303,
+      "activity": 4443503,
+      "tasks": {
+        "50319": {
+          "condition_id": 1450313,
+          "condition_type": 11304,
+          "params": [
+            3092141
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50320": {
+          "condition_id": 1450314,
+          "condition_type": 11304,
+          "params": [
+            3092142
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50321": {
+          "condition_id": 1450315,
+          "condition_type": 11304,
+          "params": [
+            3092143
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50322": {
+          "condition_id": 1450316,
+          "condition_type": 11304,
+          "params": [
+            3093141
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 60
+            }
+          ]
+        },
+        "50323": {
+          "condition_id": 1450317,
+          "condition_type": 11307,
+          "params": [
+            3093141,
+            15000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 60
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        },
+        "50324": {
+          "condition_id": 1450318,
+          "condition_type": 11307,
+          "params": [
+            3093141,
+            22000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 40
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        }
+      }
+    },
+    "4443304": {
+      "parent": 4443304,
+      "activity": 4443504,
+      "tasks": {
+        "50328": {
+          "condition_id": 1450319,
+          "condition_type": 11304,
+          "params": [
+            3092151
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50329": {
+          "condition_id": 1450320,
+          "condition_type": 11304,
+          "params": [
+            3092152
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50330": {
+          "condition_id": 1450321,
+          "condition_type": 11304,
+          "params": [
+            3092153
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 80
+            }
+          ]
+        },
+        "50331": {
+          "condition_id": 1450322,
+          "condition_type": 11304,
+          "params": [
+            3093151
+          ],
+          "items": [
+            {
+              "id": 1,
+              "num": 60
+            }
+          ]
+        },
+        "50332": {
+          "condition_id": 1450323,
+          "condition_type": 11307,
+          "params": [
+            3093151,
+            15000
+          ],
+          "items": [
+            {
+              "id": 40603,
+              "num": 60
+            },
+            {
+              "id": 2,
+              "num": 30000
+            }
+          ]
+        },
+        "50333": {
+          "condition_id": 1450324,
+          "condition_type": 11307,
+          "params": [
+            3093151,
             22000
           ],
           "items": [

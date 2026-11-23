@@ -1,4 +1,4 @@
-"""Narrow native Mode4 reward/condition contract for the two served first rounds."""
+"""Native Mode 4 reward and condition definitions for the served rotation."""
 import hashlib
 import json
 from pathlib import Path
@@ -14,21 +14,25 @@ def build():
               ('activitycfg.lua','coreverificationclrewardcfg.lua','conditioncfg.lua'),4343301),
              ('311',ROOT/'v5_server/tools/diff_lua_decompiled_311',
               ('ActivityCfg.lua','CoreVerificationClRewardCfg.lua','ConditionCfg.lua'),4443301)]
-    for version,base,names,parent in sources:
+    for version,base,names,first_parent in sources:
         paths=[base/name for name in names]
         activities,rewards,conditions=map(parse_lua_file,paths)
-        child=activities[parent]['sub_activity_list'][1]
-        tasks={}
-        for tid,row in rewards.items():
-            if type(tid) is not int or row.get('activity_id')!=child or row.get('reward_type')!=1:continue
-            condition=conditions[row['condition']]
-            assert condition['type'] in (11304,11307)
-            # Preserve existing customized rewards; fill genuinely missing 311 rows from Lua.
-            items=old.get(str(tid),{}).get('rewards') or [dict(id=i,num=n) for i,n in row['reward']]
-            tasks[str(tid)]=dict(condition_id=row['condition'],condition_type=condition['type'],
-                                 params=condition['params'],items=items)
-        assert len(tasks)==6
-        result['profiles'][version]=dict(parent=parent,activity=child,tasks=tasks)
+        for parent in activities[111]['sub_activity_list']:
+            if activities[parent]['activity_template'] != 433:
+                continue
+            child=activities[parent]['sub_activity_list'][1]
+            tasks={}
+            for tid,row in rewards.items():
+                if type(tid) is not int or row.get('activity_id')!=child or row.get('reward_type')!=1:continue
+                condition=conditions[row['condition']]
+                assert condition['type'] in (11304,11307)
+                # Preserve existing customized rewards, and fill missing rows from Lua.
+                items=old.get(str(tid),{}).get('rewards') or [dict(id=i,num=n) for i,n in row['reward']]
+                tasks[str(tid)]=dict(condition_id=row['condition'],condition_type=condition['type'],
+                                     params=condition['params'],items=items)
+            assert len(tasks)==6
+            key = version if parent == first_parent else str(parent)
+            result['profiles'][key]=dict(parent=parent,activity=child,tasks=tasks)
         for path in paths:
             result['source_sha256'][str(path.relative_to(ROOT)).replace('\\','/')]=hashlib.sha256(path.read_bytes()).hexdigest()
     return result

@@ -5,6 +5,8 @@ import time
 ZONE = datetime.timezone(datetime.timedelta(hours=8))
 LEGACY_ANCHOR = 1700000000
 WEEK = 604800
+# 从周四结算边界切换，保留上一期已开放的首领和成绩。
+ADVANCE_GROUP_ROTATION_START = int(datetime.datetime(2026, 11, 26, 5, tzinfo=ZONE).timestamp())
 
 
 def bounds(now_ts=None):
