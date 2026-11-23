@@ -1769,12 +1769,15 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             from res_version_manager import PLATFORM_CHANNEL_IDS
             channel_id = int(PLATFORM_CHANNEL_IDS[platform])
             channel_user_id = "1012030496969579190"
-            token = f"{uuid.uuid4().hex[:32]}.{_gen.DEFAULT_UID}"
+            # The PC SDK expects a long JSON id. Keep the SDK account stable
+            # across save switches, including saves with small role UIDs.
+            mix_uid = _gen.LEGACY_UID
+            token = f"{uuid.uuid4().hex[:32]}.{mix_uid}"
             is_pay_allowed = _check_is_pay_allowed()
             return jsonify({
                 "errorCode": "0",
                 "data": {
-                    "id": _gen.DEFAULT_UID,
+                    "id": mix_uid,
                     "createDate": 1760276673000,
                     "modifyDate": int(time.time() * 1000),
                     "gameId": 3,
