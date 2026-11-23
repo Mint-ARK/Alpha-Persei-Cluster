@@ -721,14 +721,25 @@ class GMReader:
         except Exception:
             pass
 
-        if mem_mb <= 0:
+        if os.path.isfile("/proc/self/status"):
+            try:
+                with open("/proc/self/status", encoding="ascii", errors="replace") as status:
+                    for line in status:
+                        if line.startswith("VmRSS:"):
+                            mem_mb = round(int(line.split()[1]) / 1024, 1)
+                        elif line.startswith("VmHWM:"):
+                            peak_mem_mb = round(int(line.split()[1]) / 1024, 1)
+            except (OSError, ValueError):
+                pass
+
+        if peak_mem_mb <= 0:
             try:
                 import resource
-                mem_mb = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1)
-                peak_mem_mb = mem_mb
-            except Exception:
-                mem_mb = 0.0
-                peak_mem_mb = 0.0
+                import sys
+                units_per_mb = 1024 * 1024 if sys.platform == "darwin" else 1024
+                peak_mem_mb = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / units_per_mb, 1)
+            except (ImportError, OSError, ValueError):
+                pass
 
         return {
             "server_time": now,

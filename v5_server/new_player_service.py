@@ -98,18 +98,6 @@ def ensure_tasks(db, uid, now=None, *, res_version=None):
     cleared = {int(r['id']) for r in db.query('SELECT id FROM chapter WHERE uid=? AND clear_times>0', (uid,))} \
         if db.get_system_config('save.generation_version') == '1' else set()
     advanced = cfg['noob']['noob_advance_task_type']
-    claimed = {int(r['task_id']) for r in db.query(
-        'SELECT task_id FROM task WHERE uid=? AND (claimed_ts>0 OR complete_flag=1)',(uid,))}
-    plot_phases={}
-    for kind in (3,):
-        phases=sorted({int(t['phase'] or 1) for t in cfg['tasks'].values() if t['type']==kind})
-        selected=phases[0]
-        for phase in phases[:-1]:
-            phase_ids={int(k) for k,t in cfg['tasks'].items() if t['type']==kind and int(t['phase'] or 1)==phase}
-            if not phase_ids<=claimed:
-                break
-            selected=phases[phases.index(phase)+1]
-        plot_phases[kind]=selected
     eligible = set()
     for i,kind in enumerate(advanced):
         previous = [int(k) for k,t in cfg['tasks'].items() if i and t['type']==advanced[i-1]]
@@ -135,7 +123,6 @@ def ensure_tasks(db, uid, now=None, *, res_version=None):
         for tid_str, task in cfg['tasks'].items():
             tid = int(tid_str)
             kind = task['type']
-            phase = int(task['phase'] or 1)
             if kind == cfg['noob']['noob_task_type']:
                 # 603 新人课程 7 天任务全量下发，由客户端 ActivityNoobData:GetUnlockPhase() 控制后续天数锁定
                 pass
@@ -143,9 +130,7 @@ def ensure_tasks(db, uid, now=None, *, res_version=None):
                 if kind not in eligible:
                     continue
             elif kind == 3:
-                # 主线剧情任务按阶段推进
-                if phase > plot_phases[kind]:
-                    continue
+                continue  # 主线剧情阶段由 plot_progress_service 统一处理。
             elif kind == 10:
                 # 每日委托：仅开启已完成任务 + 当前最新一阶段任务
                 if tid not in active_offers:
@@ -168,6 +153,8 @@ def ensure_tasks(db, uid, now=None, *, res_version=None):
             db.execute('''INSERT OR IGNORE INTO task
                 (uid,task_id,task_type,progress,complete_flag,expired_ts,claimed_ts)
                 VALUES(?,?,?,?,0,0,0)''', (uid, tid, kind, progress))
+        from plot_progress_service import sync_plot_chapter
+        sync_plot_chapter(db, uid)
         ensure_activity_tasks(db, uid, get_activity_list(db, uid, res_version), res_version, now)
         from quanzhou_collection import ensure_tasks as ensure_quanzhou_tasks
         ensure_quanzhou_tasks(db, uid)
@@ -465,11 +452,13 @@ def payload(db, uid, cmd, *, res_version=None):
         rows=visible_tasks(db,uid,db.query('SELECT * FROM task WHERE uid=?',(uid,)))
         rows=visible_ash_tasks(db,uid,visible_hodur_tasks(db,uid,visible_vehicle_tasks(db,uid,rows)))
         rows=visible_osiris_tasks(db,uid,visible_pub_tasks(db,uid,rows))
-        rows=visible_skuld_tasks(db,uid,rows)
+        from plot_progress_service import plot_phase_for_claim, visible_plot_tasks
+        plot_phase = plot_phase_for_claim(db, uid, (r['task_id'] for r in rows)) or 1
+        rows = visible_plot_tasks(db, uid, visible_skuld_tasks(db,uid,rows), plot_phase)
         def phase(kind):
             return max([int(config()['tasks'][str(r['task_id'])]['phase'] or 1) for r in rows
                         if str(r['task_id']) in config()['tasks'] and config()['tasks'][str(r['task_id'])]['type']==kind] or [1])
-        return dict(assignment_list=[dict(id=r['task_id'],progress=int(r['progress'] or 0),complete_flag=int(r['complete_flag'] or 0),expired_timestamp=int(r['expired_ts'] or 0)) for r in rows],send_type=0,newbie_phase=phase(3),assignment_phase=phase(4))
+        return dict(assignment_list=[dict(id=r['task_id'],progress=int(r['progress'] or 0),complete_flag=int(r['complete_flag'] or 0),expired_timestamp=int(r['expired_ts'] or 0)) for r in rows],send_type=0,newbie_phase=plot_phase,assignment_phase=phase(4))
     if cmd == 52021:
         rows=db.query('SELECT id_list FROM loading_set WHERE uid=?',(uid,))
         return dict(id_list=json.loads(rows[0]['id_list']) if rows else [])

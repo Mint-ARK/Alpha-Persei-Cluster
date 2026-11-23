@@ -296,6 +296,9 @@ def on_stage_pass(ctx, uid, times=1, stage_id=0, stage_type=None, **kwargs):
     # Native battle common_info preserves team order; the first hero is captain.
     captain = (kwargs.get('heroes') or [0])[0]
     captain_tasks = _trigger_task_condition(db, uid, condition=1001, delta=times, param=captain) if captain else []
+    if c0:
+        from plot_progress_service import visible_plot_tasks
+        c0 = visible_plot_tasks(db, uid, c0)
     _push_task_diff(ctx, uid, c0 + c1 + c2 + c3 + captain_tasks)
 
 
@@ -328,12 +331,12 @@ def on_gold_cost(ctx, uid, amount=1, **kwargs):
 
 
 @bus.subscribe(Events.SHOP_BUY)
-def on_shop_buy(ctx, uid, count=1, shop_id=None, **kwargs):
+def on_shop_buy(ctx, uid, count=1, shop_id=None, furniture_count=0, **kwargs):
     """商店购买物品 (cond=600: 6005 需1次)"""
     c = _trigger_task_condition(ctx.db, uid, condition=600, delta=count, param=shop_id)
     _push_task_diff(ctx, uid, c)
-    if shop_id == 15:
-        on_dorm_action(ctx, uid, action_type="furniture_purchase", times=count)
+    if furniture_count > 0:
+        on_dorm_action(ctx, uid, action_type="furniture_purchase", times=furniture_count)
 
 
 @bus.subscribe(Events.BUY_FATIGUE)
@@ -399,7 +402,7 @@ def on_dorm_action(ctx, uid, action_type="visit", times=1, attribute_index=None,
     - battle: 挑战其他玩家 (cond=2011: 10002 挑战1次, 10005 挑战3次, 10006 挑战6次, 150197)
     - battle_win: 对战胜利 (cond=2010: 10007 胜利3次)
     - furniture: 家具库存图鉴更新
-    - furniture_purchase: 商店 15 的家具购买 (cond=601)
+    - furniture_purchase: 实际购买的家具（cond=601 的原版参数为 15）
     """
     changed = []
     if action_type in ("feed", "dine"):

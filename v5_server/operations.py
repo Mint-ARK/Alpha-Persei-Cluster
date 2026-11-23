@@ -986,6 +986,19 @@ def _task_rewards(ctx, task_id):
     return out
 
 
+def _plot_claim_frames(ctx, uid, previous_phase):
+    if previous_phase is None:
+        return []
+    from plot_progress_service import sync_plot_chapter
+    _, changes = sync_plot_chapter(ctx.db, uid, previous_phase)
+    if not changes:
+        return []
+    payload = ctx.codec_encode("sc_28007", {"progress_list": changes})
+    if not payload:
+        raise ValueError("必要主线任务进度 sc_28007 为空")
+    return [DownFrame(28007, payload)]
+
+
 @operation
 class TaskSubmitOp(Operation):
     """任务提交/领奖：cs_28010 {id} → sc_28011 {result, reward_list}。
@@ -1001,6 +1014,10 @@ class TaskSubmitOp(Operation):
     def apply(self, data, ctx):
         uid = self.uid
         tid = int(data.get("id") or data.get("task_id") or 0)
+        from plot_progress_service import plot_phase_for_claim, visible_plot_tasks
+        plot_phase = plot_phase_for_claim(ctx.db, uid, [tid])
+        if plot_phase is not None and not visible_plot_tasks(ctx.db, uid, [{"id": tid}], plot_phase):
+            raise OperationError(2, f"主线任务 {tid} 所属章节尚未解锁")
         from kadas_race_service import require_claimable
         from vehicle_ball_service import require_claimable as require_vehicle_claimable
         require_claimable(ctx.db, uid, [tid])
@@ -1083,6 +1100,7 @@ class TaskSubmitOp(Operation):
                         new_wk = min(15000, cur_wk + rw["num"])
                         ctx.db.execute("UPDATE battlepass SET weekly_gain_exp=? WHERE uid=?", (new_wk, uid))
         ctx.db.claim_task(uid, tid)
+        plot_frames = _plot_claim_frames(ctx, uid, plot_phase)
         from sphero_leisure_service import after_task_claim
         after_task_claim(ctx,uid,[tid])
         try:
@@ -1101,7 +1119,8 @@ class TaskSubmitOp(Operation):
                             ctx.pending_frames.append(DownFrame(28007, p28007))
         except Exception:
             pass
-        return {"task_id": tid, "already": False, "rewards": final_rewards, "has_ticket": has_ticket}
+        return {"task_id": tid, "already": False, "rewards": final_rewards,
+                "has_ticket": has_ticket, "plot_frames": plot_frames}
 
     def respond(self, result, data, ctx):
         payload = ctx.codec_encode("sc_28011", {
@@ -1110,7 +1129,8 @@ class TaskSubmitOp(Operation):
             raise ValueError("任务领取必要回执为空")
         ctx.log(f"cs_28010 -> 任务领奖 tid={result['task_id']} already={result['already']} 奖={result['rewards']}")
         # 原子时序前置：优先推送资产差分帧 sc_17023，再回显 sc_28011 业务帧，保证客户端在回调触发时资产已是最新状态
-        return _refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
+        return (_refresh_frames(ctx, self.uid, strict=True) + [DownFrame(self.sc, payload)]
+                + result.get("plot_frames", []))
 
 
 @operation
@@ -1171,6 +1191,9 @@ class TaskOneKeySubmitOp(Operation):
         tasks = visible_ash_tasks(ctx.db, uid, visible_hodur_tasks(ctx.db, uid, visible_vehicle_tasks(ctx.db, uid, visible_tasks(ctx.db, uid, tasks))))
         tasks = visible_osiris_tasks(ctx.db,uid,visible_pub_tasks(ctx.db,uid,tasks))
         tasks = visible_skuld_tasks(ctx.db,uid,tasks)
+        from plot_progress_service import plot_phase_for_claim, visible_plot_tasks
+        plot_phase = plot_phase_for_claim(ctx.db, uid, (t["task_id"] for t in tasks))
+        tasks = visible_plot_tasks(ctx.db, uid, tasks, plot_phase)
         claimed_task_types = {int(t["task_type"] or 0) for t in tasks}
 
         # 记录领取任务前的旧活跃度，用于严格对齐客户端 PostSubmitTaskList 仅结算旧达成宝箱的时序
@@ -1239,6 +1262,7 @@ class TaskOneKeySubmitOp(Operation):
 
         from sphero_leisure_service import after_task_claim
         after_task_claim(ctx,uid,[t['task_id'] for t in tasks])
+        plot_frames = _plot_claim_frames(ctx, uid, plot_phase)
 
         # 联动一键领取达成的活跃度宝箱 (仅当领取的任务中包含日常 6 / 周常 5 时触发，严禁污染练舞房 901/902 等独立任务)
         target_pt_ids = []
@@ -1258,6 +1282,10 @@ class TaskOneKeySubmitOp(Operation):
 
         all_touched_heroes = []
         all_touched_scenes = []
+        shows_box_currency_from_packet = (
+            getattr(ctx, "client_platform", None) == "ios"
+            and str(getattr(ctx, "resource_version", "")) == "229"
+        )
         import activity_lottery
         for pt_id in target_pt_ids:
             pt_rows = ctx.db.query("SELECT active_point, get_id_list FROM activity_pt WHERE uid=? AND activity_pt_id=?", (uid, pt_id))
@@ -1280,9 +1308,8 @@ class TaskOneKeySubmitOp(Operation):
                     rws = box_rewards.get(str(target_need), [])
                     for rw in rws:
                         _item_add(ctx, uid, rw["id"], rw["num"], source="activity_box")
-                        # 移转之辉（ID 1）已由客户端本地 PostSubmitTaskList 逐箱自动回显（如周任务 5 个 200，日任务 5/5/5/10/15）
-                        # 此处静默真实入库，sc_28015 回包不再冗余下发，彻底避免 1000 与 5个200 产生视觉冲突
-                        if rw["id"] != 1:
+                        # PC 会从本地配置回显箱子的移转之辉，iOS 229 需要显式回包。
+                        if rw["id"] != 1 or shows_box_currency_from_packet:
                             merged[rw["id"]] = merged.get(rw["id"], 0) + rw["num"]
 
                     # 活跃度宝箱额外神装/大场景抽奖彩蛋
@@ -1305,6 +1332,7 @@ class TaskOneKeySubmitOp(Operation):
                 "touched_heroes": list(set(all_touched_heroes)),
                 "touched_scenes": list(set(all_touched_scenes)),
                 "has_ticket": has_ticket,
+                "plot_frames": plot_frames,
                 "target_pt_ids": target_pt_ids}
 
     def respond(self, result, data, ctx):
@@ -1354,8 +1382,9 @@ class TaskOneKeySubmitOp(Operation):
             except Exception:
                 pass
 
-        # 4. 业务回包 sc_28015 作为终结帧下发（触发客户端 SendWithLoadingNew 回调并关闭 Loading 圈）
+        # 客户端处理完本章的领奖回执，再接收主线阶段进度。
         frames.append(DownFrame(self.sc, payload))
+        frames.extend(result.get("plot_frames", []))
         return frames
 
 
@@ -2348,7 +2377,16 @@ class MailReceiveOp(Operation):
                 raise ValueError("必要邮件场景刷新 sc_32009 为空")
             extra_frames.append(DownFrame(32009, p))
 
-        return _refresh_frames(ctx, self.uid, strict=True, required_heroes=hero_ids) + extra_frames + [DownFrame(self.sc, payload)]
+        frames = _refresh_frames(ctx, self.uid, strict=True, required_heroes=hero_ids)
+        frames += extra_frames + [DownFrame(self.sc, payload)]
+        if any(item["id"] in (22, 23, 35) and item["number"] > 0
+               for item in result["attachment_list"]):
+            from generator import gen_28019
+            activity_points = gen_28019(None, ctx.db, self.uid)
+            if not activity_points:
+                raise ValueError("必要邮件活跃度刷新 sc_28019 为空")
+            frames.append(DownFrame(28019, activity_points))
+        return frames
 
 
 @operation
@@ -6455,25 +6493,16 @@ class MythicQueryInfoOp(Operation):
 
     def respond(self, result, data, ctx):
         import weekly_challenge_service
-        payload = ctx.codec_encode("sc_44011", {"result": 0}) or b"\x08\x00"
         ctx.log("cs_44010 -> 查询黑区轮换信息")
-        
-        frames = []
-        if ctx.codec_encode and ctx.db:
-            try:
-                sc_07, sc_09, sc_19, sc_21, sc_23 = weekly_challenge_service.get_mythic_data(self.uid, ctx.db)
-                p07 = ctx.codec_encode("sc_44007", sc_07)
-                p09 = ctx.codec_encode("sc_44009", sc_09)
-                p19 = ctx.codec_encode("sc_44019", sc_19)
-                p21 = ctx.codec_encode("sc_44021", sc_21)
-                p23 = ctx.codec_encode("sc_44023", sc_23)
-                if p07: frames.append(DownFrame(44007, p07))
-                if p09: frames.append(DownFrame(44009, p09))
-                if p19: frames.append(DownFrame(44019, p19))
-                if p21: frames.append(DownFrame(44021, p21))
-                if p23: frames.append(DownFrame(44023, p23))
-            except Exception as e:
-                ctx.log(f"cs_44010 -> 动态推送下行帧异常: {e}")
+        sc_07, sc_09, sc_19, sc_21, sc_23 = weekly_challenge_service.get_mythic_data(self.uid, ctx.db)
+        # 信标清空后的 44009 可以合法编码为空，客户端仍需收到它来清掉旧进度。
+        # 先同步进度和深区地图，再下发会触发界面重绘的帧。
+        frames = [DownFrame(cmd, ctx.codec_encode(f"sc_{cmd}", state))
+                  for cmd, state in ((44009, sc_09), (44021, sc_21), (44023, sc_23),
+                                     (44007, sc_07), (44019, sc_19))]
+        if any(frame.payload is None or (frame.cmd != 44009 and not frame.payload) for frame in frames):
+            raise ValueError("黑区轮换快照下发不完整")
+        payload = ctx.codec_encode("sc_44011", {"result": 0}) or b"\x08\x00"
         return frames + [DownFrame(self.sc, payload)]
 
 

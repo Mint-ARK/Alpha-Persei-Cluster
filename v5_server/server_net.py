@@ -1091,6 +1091,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                 resp = send_file(w_file, mimetype=mime_type, conditional=True, max_age=0)
                 resp.headers["Access-Control-Allow-Origin"] = "*"
                 return resp
+            return Response(status=404)
 
         # 3. 官方客服/反馈/工单外部链接拦截（soboten.com / ticketclient / feedback） -> 导向一体化随身安全与客服中枢
         if "ticketclient" in path or "soboten" in host or "feedback" in path:

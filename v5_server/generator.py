@@ -245,6 +245,9 @@ def gen_28001(pkt, db, uid):
                 "VALUES (?, ?, ?, ?, ?, 0, 0, 0)",
                 (uid, tid, name, ttype, init_prog)
             )
+    from plot_progress_service import sync_plot_chapter, visible_plot_tasks
+    plot_phase, plot_changes = sync_plot_chapter(db, uid)
+    if not tasks or plot_changes:
         tasks = db.query(
             "SELECT task_id, progress, complete_flag, expired_ts FROM task WHERE uid=?",
             (uid,)
@@ -296,7 +299,7 @@ def gen_28001(pkt, db, uid):
 
     tasks = visible_ash_tasks(db, uid, visible_hodur_tasks(db, uid, visible_vehicle_tasks(db, uid, visible_tasks(db, uid, tasks))))
     tasks = visible_osiris_tasks(db,uid,visible_pub_tasks(db,uid,tasks))
-    tasks = visible_skuld_tasks(db,uid,tasks)
+    tasks = visible_plot_tasks(db, uid, visible_skuld_tasks(db,uid,tasks), plot_phase)
     assignment_list = []
     for t in tasks:
         is_claimed = bool(t.get("claimed_ts"))
@@ -310,7 +313,7 @@ def gen_28001(pkt, db, uid):
     return encode("sc_28001", {
         "assignment_list": assignment_list,
         "send_type": 0,
-        "newbie_phase": 19,
+        "newbie_phase": plot_phase,
         "assignment_phase": _rogue_assignment_phase(tasks)
     })
 

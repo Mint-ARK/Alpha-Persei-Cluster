@@ -706,6 +706,7 @@ class ShopService:
         touched_scene = False
         granted_equips = []
         purchase_counts = {}
+        furniture_counts = {}
         pre_purchase_counts = {}
         timed_goods = set()
         has_ticket_purchase = False
@@ -722,6 +723,7 @@ class ShopService:
             if buy_num <= 0:
                 continue
 
+            grant_start = len(give_items)
             g = self._find_goods_cfg(gid, sid)
             if not g:
                 raise OperationError(406, f"商品 {gid} 未配置或不在货架")
@@ -990,13 +992,20 @@ class ShopService:
                 )
             owner_shop = int(g.get("shop_id") or 0)
             purchase_counts[owner_shop] = purchase_counts.get(owner_shop, 0) + buy_num
+            if any(
+                InventoryService.classify_item(self.db, reward["item_id"])
+                in (ItemType.FURNITURE, ItemType.FURNITURE_SUIT)
+                for reward in give_items[grant_start:]
+            ):
+                furniture_counts[owner_shop] = furniture_counts.get(owner_shop, 0) + buy_num
 
         # 6. 广播 Events.SHOP_BUY
         try:
             # Use the purchased goods' configured owner, not a client-supplied
             # shop id. Mixed batches contribute once to each actual shop.
             for owner_shop, count in purchase_counts.items():
-                bus.emit(Events.SHOP_BUY, ctx, uid, count=count, shop_id=owner_shop)
+                bus.emit(Events.SHOP_BUY, ctx, uid, count=count, shop_id=owner_shop,
+                         furniture_count=furniture_counts.get(owner_shop, 0))
         except Exception as e:
             logger.error(f"[ShopService] 广播 Events.SHOP_BUY 异常: {e}")
 
