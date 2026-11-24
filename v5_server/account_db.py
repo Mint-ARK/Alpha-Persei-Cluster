@@ -5041,13 +5041,18 @@ class AccountDB:
         """, (uid, iid, cnt, now_ts))
 
     def calculate_dorm_hero_fatigue_recovery(self, uid, now_ts=None):
+        """Settle one account's dorm fatigue in a single transaction."""
+        with savepoint_transaction(self):
+            return self._calculate_dorm_hero_fatigue_recovery(uid, now_ts)
+
+    def _calculate_dorm_hero_fatigue_recovery(self, uid, now_ts):
         """[Phase 5] 设施场景体力动态自然恢复（对齐官方 DormHeroTemplate.GetRecoverFatigueNum 算法）：
         - 食堂打工/委托中: 0 恢复
         - 私人宿舍: 按宿舍等级 Lv 1~10 (100%~150%) 恢复 6.0~9.0 点/小时 (1.00~1.50 点/600秒)
         - 公共大厅: 按 100% 恢复 6.0 点/小时 (1.00 点/600秒)
         - 舞蹈训练营: 有专属房按专属房算，无专属房按大厅算
         - 空闲未入驻: 按 25% 恢复 1.5 点/小时 (0.25 点/600秒)
-        - 体力上限为 140
+        - 自然恢复上限为 120
         """
         now_ts = int(time.time()) if now_ts is None else int(now_ts)
         hero_to_archive = {
@@ -5103,7 +5108,8 @@ class AccountDB:
 
         # 5. 遍历 backhome_hero 结算疲劳
         heroes = self.query("SELECT archives_id, hero_id, fatigue, update_ts FROM backhome_hero WHERE uid=?", (uid,)) or []
-        updated_heroes = []
+        full_archives = []
+        recovered = []
 
         for h in heroes:
             arch = int(h["archives_id"])
@@ -5113,7 +5119,7 @@ class AccountDB:
 
             if cur_fatigue >= 120:
                 if last_ts != now_ts:
-                    self.execute("UPDATE backhome_hero SET update_ts=? WHERE uid=? AND archives_id=?", (now_ts, uid, arch))
+                    full_archives.append(arch)
                 continue
 
             # 判定场景速率
@@ -5153,11 +5159,20 @@ class AccountDB:
                 else:
                     advanced_sec = int(pts_added * (600.0 / pts_per_600s))
                     new_ts = last_ts + advanced_sec
-                self.execute("UPDATE backhome_hero SET fatigue=?, update_ts=? WHERE uid=? AND archives_id=?",
-                             (new_fatigue, new_ts, uid, arch))
-                updated_heroes.append((arch, new_fatigue))
+                recovered.append((new_fatigue, new_ts, uid, arch))
 
-        return updated_heroes
+        if full_archives:
+            placeholders = ",".join("?" for _ in full_archives)
+            self.execute(
+                f"UPDATE backhome_hero SET update_ts=? WHERE uid=? AND archives_id IN ({placeholders})",
+                (now_ts, uid, *full_archives),
+            )
+        if recovered:
+            self.executemany(
+                "UPDATE backhome_hero SET fatigue=?, update_ts=? WHERE uid=? AND archives_id=?",
+                recovered,
+            )
+        return [(arch, fatigue) for fatigue, _, _, arch in recovered]
 
     def deploy_dorm_hero(self, uid, dorm_id, hero_ids):
         """[Fix by Gemini 3.7-flash] 安排英雄入住房间（cs_58132 -> sc_58133，支持单人或多人列表）。"""

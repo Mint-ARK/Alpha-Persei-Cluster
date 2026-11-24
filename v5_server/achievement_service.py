@@ -812,24 +812,17 @@ class AchievementService:
                 update_item_progress(item["id"], cnt)
 
         # 8. 拥有达标等级的刻印数 (Condition 200)
-        eq_rows = self.db.query("SELECT id, prefab_id, exp, now_break_level FROM equip WHERE uid=?", (uid,))
-        if eq_rows:
+        equip_level_targets = {}
+        for item in _CFG_BY_COND.get(200, []):
+            param = item.get("parameter") or []
+            equip_level_targets[item["id"]] = int(param[0]) if param else 10
+        if equip_level_targets:
             from equip_service import EquipService
-            eq_svc = EquipService.get_instance(db=self.db)
-            eq_levels = []
-            for e in eq_rows:
-                pid = int(e.get("prefab_id") or 0)
-                exp = int(e.get("exp") or 0)
-                cfg = eq_svc.get_equip_cfg(pid, db=self.db)
-                variant = cfg["exp_variant"] if cfg else 1
-                lv, _, _ = eq_svc.calc_equip_level(variant, exp, db=self.db)
-                eq_levels.append(lv)
 
-            for item in _CFG_BY_COND.get(200, []):
-                param = item.get("parameter") or []
-                target_lv = int(param[0]) if param else 10
-                cnt = sum(1 for elv in eq_levels if elv >= target_lv)
-                update_item_progress(item["id"], cnt)
+            counts = EquipService(self.db).count_by_min_level(uid, equip_level_targets.values())
+            if counts:
+                for aid, level in equip_level_targets.items():
+                    update_item_progress(aid, counts[level])
 
         # 8.1 拥有5星品质刻印数 (Condition 301)
         eq_5_rows = self.db.query("SELECT COUNT(*) as cnt FROM equip WHERE uid=? AND (prefab_id >= 500000 OR prefab_id LIKE '5%')", (uid,))

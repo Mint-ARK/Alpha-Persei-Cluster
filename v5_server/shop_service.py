@@ -342,19 +342,19 @@ class ShopService:
         """
         base_list = self._get_shop_cfg_base_template()
         shop_cfg_map = {int(s["shop_id"]): s for s in base_list}
-        dynamic_shop_ids = set(shop_cfg_map.keys())
+        dynamic_shop_ids = tuple(sorted(shop_cfg_map))
 
         db_goods_by_shop = {}
-        if self.db:
+        if self.db and dynamic_shop_ids:
+            placeholders = ",".join("?" for _ in dynamic_shop_ids)
             db_goods = self.db.query(
                 "SELECT goods_id, item_id, name, cost_type, cost_id, cost, cheap_cost, discount, "
                 "limit_num, refresh_cycle, open_time, close_time, tag, detail_json, shop_id "
-                "FROM shop_goods WHERE shop_id > 0"
+                f"FROM shop_goods WHERE shop_id > 0 AND shop_id IN ({placeholders}) ORDER BY goods_id",
+                dynamic_shop_ids,
             )
             for g in (db_goods or []):
                 sid = int(g["shop_id"])
-                if sid not in dynamic_shop_ids:
-                    continue
                 gid = int(g["goods_id"])
                 dj_str = g.get("detail_json")
                 dj = json.loads(dj_str) if dj_str else {}
@@ -375,7 +375,7 @@ class ShopService:
 
         out_shop_cfg_list = []
 
-        for sid in sorted(dynamic_shop_ids):
+        for sid in dynamic_shop_ids:
             s = shop_cfg_map.get(sid, {"shop_id": sid, "goods_list": []})
             glist = s.get("goods_list", [])
             seen_gids = set()
@@ -468,7 +468,14 @@ class ShopService:
 
         db_goods_by_shop = {}
         if self.db:
-            db_goods_rows = self.db.query("SELECT shop_id, goods_id FROM shop_goods WHERE shop_id > 0 ORDER BY shop_id, goods_id")
+            # Only skip normal shops whose entries already come from the template or daily shelf.
+            covered_shop_ids = tuple(sorted((base_shop_map.keys() & NORMAL_SHOP_IDS) | {2}))
+            placeholders = ",".join("?" for _ in covered_shop_ids)
+            db_goods_rows = self.db.query(
+                "SELECT shop_id, goods_id FROM shop_goods WHERE shop_id > 0 "
+                f"AND shop_id NOT IN ({placeholders}) ORDER BY shop_id, goods_id",
+                covered_shop_ids,
+            )
             for g in (db_goods_rows or []):
                 db_goods_by_shop.setdefault(int(g["shop_id"]), []).append(int(g["goods_id"]))
 
@@ -534,8 +541,9 @@ class ShopService:
 
         from skin_draw_service import merge_ticket_shop_states
         from activity_content_service import merge_shop_states
+        activity_shops = merge_shop_states(out_shops, self.db, uid, res_version, copy_goods=False)
         return {"shop_item_list": merge_ticket_shop_states(
-            merge_shop_states(out_shops, self.db, uid, res_version), self.db, uid, res_version)}
+            activity_shops, self.db, uid, res_version)}
 
     def get_single_shop_payload(self, uid, shop_id):
         """获取单个商店的变动信息（sc_20005 changed_shop_info）"""

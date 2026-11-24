@@ -140,11 +140,12 @@ def reconcile_story_tasks(db, uid, version=None):
     return changed
 
 
-def merge_shop_states(shops, db, uid, version=None):
-    """Static activity shelves do not depend on captured login templates."""
+def merge_shop_states(shops, db, uid, version=None, *, copy_goods=True):
+    """Merge activity shelves. Callers with fresh goods dictionaries may share them."""
     import time
     cfg = catalog(version)
-    result = {int(s['shop_id']): deepcopy(s) for s in shops}
+    copy_shop = deepcopy if copy_goods else dict
+    result = {int(s['shop_id']): copy_shop(s) for s in shops}
     now = int(time.time())
     purchases = {(int(p['shop_id']), int(p['goods_id'])): p for p in db.query(
         'SELECT shop_id,goods_id,buy_times,next_refresh_timestamp FROM store_purchase WHERE uid=?', (uid,))}

@@ -24,6 +24,7 @@ import json
 import time
 import random
 import logging
+from bisect import bisect_right
 from contextlib import contextmanager
 
 logger = logging.getLogger("equip_service")
@@ -38,6 +39,9 @@ from codec import encode, decode
 from middleware import DownFrame
 
 # ----------------- 官方配置常量 -----------------
+
+_MAX_EQUIP_LEVEL = 60
+_MISSING_LEVEL_EXP = 1 << 30
 
 EQUIP_EXP_ITEMS = {
     40801: 50,    # 初级启示录
@@ -99,6 +103,17 @@ def material_give_back(overflow_exp):
     return refund
 
 
+def _parse_equip_exp_variant(raw_value):
+    try:
+        return (json.loads(raw_value or "[1]") or [1])[0]
+    except Exception:
+        return 1
+
+
+def _equip_curve_index(variant):
+    return min(max(int(variant or 1), 1), 7)
+
+
 class EquipService:
     _instance = None
 
@@ -118,7 +133,7 @@ class EquipService:
 
     def get_equip_curve(self, variant, db=None):
         """获取指定经验变种（variant 1..7）的各级升阶所需经验曲线 {level: need_exp}"""
-        v = min(max(int(variant or 1), 1), 7)
+        v = _equip_curve_index(variant)
         if v in self._curve_cache:
             return self._curve_cache[v]
         target_db = db or self.db
@@ -135,19 +150,65 @@ class EquipService:
         curve = self.get_equip_curve(variant, db=db)
         return sum(curve.get(l, 0) for l in range(1, int(target_level)))
 
-    def calc_equip_level(self, variant, total_exp, max_lv=60, db=None):
+    def calc_equip_level(self, variant, total_exp, max_lv=_MAX_EQUIP_LEVEL, db=None):
         """根据累计总经验计算当前等级与下一级剩余所需经验 (level, current_exp_in_level, next_need)"""
         curve = self.get_equip_curve(variant, db=db)
         lv = 1
         rem = int(total_exp or 0)
         while lv < max_lv:
-            need = curve.get(lv, 1 << 30)
+            need = curve.get(lv, _MISSING_LEVEL_EXP)
             if rem < need:
                 break
             rem -= need
             lv += 1
         next_need = curve.get(lv, 0)
         return lv, rem, next_need
+
+    def _level_exp_thresholds(self, variant, levels):
+        curve = self.get_equip_curve(variant)
+        cumulative = 0
+        required = float("-inf")
+        minimum_exp = {1: required}
+        for level in range(1, min(levels[-1], _MAX_EQUIP_LEVEL)):
+            cumulative += curve.get(level, _MISSING_LEVEL_EXP)
+            # The level calculator requires enough EXP for every earlier step.
+            required = max(required, cumulative)
+            minimum_exp[level + 1] = required
+        return tuple(minimum_exp.get(max(1, level), float("inf")) for level in levels)
+
+    def count_by_min_level(self, uid, min_levels):
+        """Count owned equips at each requested level using cumulative EXP."""
+        levels = sorted(set(min_levels))
+        if not levels:
+            return {}
+
+        rows = self.db.query("""
+            SELECT e.prefab_id, e.exp, cfg.exp_variant
+            FROM equip AS e
+            LEFT JOIN equip_cfg AS cfg ON cfg.prefab_id=CAST(COALESCE(e.prefab_id,0) AS INTEGER)
+            WHERE e.uid=?
+        """, (uid,))
+        if not rows:
+            return {}
+
+        thresholds_by_prefab = {}
+        thresholds_by_variant = {}
+        counts = [0] * (len(levels) + 1)
+        for row in rows:
+            prefab_id = int(row["prefab_id"] or 0)
+            if prefab_id not in thresholds_by_prefab:
+                variant = _equip_curve_index(_parse_equip_exp_variant(row["exp_variant"]))
+                if variant not in thresholds_by_variant:
+                    thresholds_by_variant[variant] = self._level_exp_thresholds(variant, levels)
+                thresholds_by_prefab[prefab_id] = thresholds_by_variant[variant]
+
+            reached = bisect_right(thresholds_by_prefab[prefab_id], int(row["exp"] or 0))
+            counts[reached] += 1
+
+        # Equips that reached a higher threshold count toward every lower one.
+        for index in range(len(levels) - 1, 0, -1):
+            counts[index] += counts[index + 1]
+        return dict(zip(levels, counts[1:]))
 
     def get_equip_cfg(self, prefab_id, db=None):
         """获取刻印静态配置"""
@@ -164,10 +225,7 @@ class EquipService:
             r["break_cost"] = json.loads(r["break_cost"] or "[]")
         except Exception:
             r["break_cost"] = []
-        try:
-            r["exp_variant"] = (json.loads(r["exp_variant"] or "[1]") or [1])[0]
-        except Exception:
-            r["exp_variant"] = 1
+        r["exp_variant"] = _parse_equip_exp_variant(r.get("exp_variant"))
         r["starlevel"] = int(r.get("starlevel") or 5)
         r["break_times_max"] = int(r.get("break_times_max") or 4)
 

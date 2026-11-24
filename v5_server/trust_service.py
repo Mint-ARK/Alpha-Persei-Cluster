@@ -904,6 +904,8 @@ class TrustService:
             # 开启交心已有73021/14007同步，不能重复接管其原生回调。
             if reason not in ('battle_win', 'daily_reset_5am') or old_mood == new_mood:
                 return
+            if reason == 'daily_reset_5am' and getattr(ctx, 'is_login_settlement', False):
+                return  # 14009 will initialize the hero with the settled mood.
             db = getattr(ctx, 'db', None)
             if not db or not self.is_hero_supported(hero_id) or not db.query(
                     'SELECT 1 FROM hero WHERE uid=? AND id=? AND unlock=1 AND trust_level>=1', (uid, hero_id)):

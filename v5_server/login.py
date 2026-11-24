@@ -102,6 +102,7 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
     - dynamic=0 帧从 payload_json 读取字典并通过 codec.encode 现场编码；
     - 若动态编码失败则回退至库内 blob 兜底；
     - 自动适配 zlib 压缩（>10KB 或原压缩标记）与 cmd>65535 高位协议标志。"""
+    started_ns = time.perf_counter_ns()
     log = log or (lambda *a, **k: None)
     frames = load_login_push(db)
     original_plot_count = sum(row[1] == 24009 for row in frames)
@@ -183,6 +184,22 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
     login_ver_cfg = _rvm.get_version_config(login_res_version)
     suppressed_cmds = set(login_ver_cfg.get("suppressed_cmds", set()))
     sent = dyn_hit = 0
+    first_frame_ns = login_marker_ns = last_frame_ns = None
+    generation_timings = {28001: (0, 0), 16015: (0, 0)}
+
+    def send_frame(cmd, frame):
+        nonlocal sent, first_frame_ns, login_marker_ns, last_frame_ns
+        sock.sendall(frame)
+        last_frame_ns = time.perf_counter_ns()
+        sent += 1
+        if first_frame_ns is None:
+            first_frame_ns = last_frame_ns
+        if cmd == 10201 and login_marker_ns is None:
+            login_marker_ns = last_frame_ns
+
+    def elapsed_ms(end_ns):
+        return "-" if end_ns is None else f"{(end_ns - started_ns) / 1_000_000:.2f}"
+
     sock.settimeout(5)
 
     # 登录前置强制触发 lazy_timer 脉冲（保证登录洪流下发的所有数据处于最新周期状态）
@@ -190,6 +207,8 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
         try:
             from lazy_timer import lazy_timer
             class _LoginCtx:
+                is_login_settlement = True
+
                 def __init__(self, d, l):
                     self.db = d
                     self.log = l
@@ -262,6 +281,31 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
     except Exception:
         _codec_encode = None
 
+    if login_policy.allows(73007) and 73007 not in suppressed_cmds:
+        try:
+            claimed_rows = db.query(
+                "SELECT key_id FROM claim_ledger WHERE uid=? AND kind='relation_story' ORDER BY key_id",
+                (uid,),
+            ) if uid else ()
+            story_payload = _codec_encode("sc_73007", {
+                "got_reward_id_list": [int(row["key_id"]) for row in claimed_rows],
+            })
+            if not isinstance(story_payload, bytes):
+                raise ValueError("羁绊领奖状态编码失败")
+        except Exception as exc:
+            frames = [row for row in frames if row[1] != 73007]
+            log(f"[login] 羁绊领奖状态不可用，跳过 sc_73007: {exc}", "WARN")
+        else:
+            # An empty payload is a valid snapshot. Preserve the first capture's
+            # position and header, or insert a missing snapshot before login completion.
+            owned_payloads[73007] = story_payload
+            story_index = next((i for i, row in enumerate(frames) if row[1] in (73007, 10201)), len(frames))
+            if story_index == len(frames) or frames[story_index][1] == 10201:
+                header = generator.build_frame(73007, b"")[:11]
+                frames.insert(story_index, (0, 73007, header, b"", 0, None))
+            frames[story_index + 1:] = [row for row in frames[story_index + 1:] if row[1] != 73007]
+
+    prepared_ns = time.perf_counter_ns()
     try:
         for seq, cmd, header, blob, dynamic, payload_json in frames:
             if blocks_command(cmd):
@@ -294,9 +338,16 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                     version_args = {"res_version": login_res_version}
                     if cmd == 11001:
                         version_args["special_now"] = special_now
-                    gen = generator.gen_payload(
-                        cmd, uid=uid, db=db, **version_args
-                    )
+                    timing = generation_timings.get(cmd)
+                    generation_started_ns = time.perf_counter_ns() if timing is not None else None
+                    try:
+                        gen = generator.gen_payload(cmd, uid=uid, db=db, **version_args)
+                    finally:
+                        if generation_started_ns is not None:
+                            calls, duration_ns = timing
+                            generation_timings[cmd] = (
+                                calls + 1, duration_ns + time.perf_counter_ns() - generation_started_ns,
+                            )
                 except Exception as e:
                     log(f"[login] sc_{cmd} 业务动态生成异常: {e}", "WARN")
                     if fresh_save or cmd in (13009, 14009, 46011, 47001, 47003, 24009, 24029, 24061, 30001, 11001, 18001, 20007, 20009, 52001, 52021, 53001, 19029, 34031, 34023, 34025, 34101, 68181, 12119, 89011, 68171, 24051, 24043, 85035, 49001, 49023, 51001, 83016, 83017, 83020, 83021, 83026, 79601, 28801, 28837, 86035) or (cmd == 32009 and dynamic_profile):
@@ -397,8 +448,7 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                             pass
                 frame = rebuild(header, blob)
 
-            sock.sendall(frame)
-            sent += 1
+            send_frame(cmd, frame)
 
             if cmd == 11001 and gen:
                 from codec import decode
@@ -408,8 +458,7 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                 for command, prepare in ((64077, cultivate_login_frames), (76151, pt_scroll_login_frames)):
                     if login_policy.allows(command):
                         for packet in prepare(db, uid, activities, _codec_encode):
-                            sock.sendall(generator.build_frame(packet.cmd, packet.payload))
-                            sent += 1
+                            send_frame(packet.cmd, generator.build_frame(packet.cmd, packet.payload))
                             dyn_hit += 1
 
             # 梦境再构联动补发 45001（普通首领列表）与 45101（进阶首领列表）
@@ -423,8 +472,7 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                         )
                         if ext_gen:
                             ext_frame = generator.build_frame(extra_cmd, ext_gen)
-                            sock.sendall(ext_frame)
-                            sent += 1
+                            send_frame(extra_cmd, ext_frame)
                             dyn_hit += 1
                             if frame_delay:
                                 time.sleep(frame_delay)
@@ -446,38 +494,27 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
                 })
                 if p11003 and generator is not None:
                     frame_11003 = generator.build_frame(11003, p11003)
-                    sock.sendall(frame_11003)
-                    sent += 1
+                    send_frame(11003, frame_11003)
                     dyn_hit += 1
             except Exception as _e:
                 log(f"[login] 多维变量周期 11003 推送异常: {_e}", "WARN")
 
-        # 好感与人际关系网登录联动推送：sc_73005 (礼物置换限额) + sc_73007 (已领羁绊故事) + sc_73001 (连携技能网)
+        # 好感与人际关系网登录联动推送：sc_73005 (礼物置换限额) + sc_73001 (连携技能网)
         try:
             from trust_service import TrustService
             _trust_svc = TrustService.get_instance()
             p73005 = _c_enc("sc_73005", _trust_svc.get_displace_limit_payload(db, uid) if (db and uid) else {"limit_list": []})
             if p73005 and generator is not None:
-                sock.sendall(generator.build_frame(73005, p73005))
-                sent += 1
-                dyn_hit += 1
-
-            claimed_rows = db.query("SELECT key_id FROM claim_ledger WHERE uid=? AND kind='relation_story'", (uid,)) if db and uid else []
-            got_list = [int(r["key_id"]) for r in claimed_rows]
-            p73007 = _c_enc("sc_73007", {"got_reward_id_list": got_list})
-            if p73007 and generator is not None:
-                sock.sendall(generator.build_frame(73007, p73007))
-                sent += 1
+                send_frame(73005, generator.build_frame(73005, p73005))
                 dyn_hit += 1
 
             # sc_73001 连携技能（协作技能网）全量等级与进度：客户端 ComboSkillData:InitLevelData 初始化
             p73001 = _c_enc("sc_73001", _trust_svc.get_combo_skill_payload(db, uid) if (db and uid) else {"info": {"skill_list": []}})
             if p73001 and generator is not None:
-                sock.sendall(generator.build_frame(73001, p73001))
-                sent += 1
+                send_frame(73001, generator.build_frame(73001, p73001))
                 dyn_hit += 1
         except Exception as _te:
-            log(f"[login] 好感与羁绊故事登录态推送异常: {_te}", "WARN")
+            log(f"[login] 礼物置换与连携技能登录态推送异常: {_te}", "WARN")
 
         # AI 转译器：静默检测并派发今日节日/节气/生日问候信件
         try:
@@ -490,6 +527,15 @@ def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
         log(f"[login] 洪流中断: {e} after {sent} frames", "WARN")
     finally:
         sock.settimeout(None)
+        finished_ns = time.perf_counter_ns()
+        task_calls, task_ns = generation_timings[28001]
+        draw_calls, draw_ns = generation_timings[16015]
+        log(
+            f"[login] 登录耗时(ms): 准备={elapsed_ms(prepared_ns)} 首帧={elapsed_ms(first_frame_ns)} "
+            f"10201={elapsed_ms(login_marker_ns)} 末帧={elapsed_ms(last_frame_ns)} 总计={elapsed_ms(finished_ns)} "
+            f"28001生成={task_ns / 1_000_000:.2f}({task_calls}次) "
+            f"16015生成={draw_ns / 1_000_000:.2f}({draw_calls}次)"
+        )
     log(f"[login] 登录洪流完成: {sent}/{len(frames)} 帧（动态 {dyn_hit}）")
     return sent, dyn_hit
 

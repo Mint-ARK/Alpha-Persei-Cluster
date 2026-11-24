@@ -248,15 +248,18 @@ def on_special_challenge_rotation(ctx, uid, cycle_start_ts=0, now_ts=None, **kwa
 
 @bus.subscribe(Events.DAILY_RESET_5AM)
 def on_seizure_daily_reset(ctx, uid, now_ts=None, **kwargs):
-    """刷新已在线客户端的关卡、今日积分和到期的两类倒计时。"""
+    """结算介质攫取的跨天状态，并通知已在线的客户端。"""
     if not uid or getattr(ctx, 'db', None) is None:
         return
     if not ctx.db.query("SELECT 1 FROM equip_seizure_progress WHERE uid=?", (uid,)):
         return
-    from middleware import DownFrame
     from weekly_challenge_service import get_equip_seizure_data
 
     data = get_equip_seizure_data(uid, ctx.db, now_ts, strict=True)
+    if getattr(ctx, 'is_login_settlement', False):
+        return  # The login flood builds 35011 from the settled save.
+
+    from middleware import DownFrame
     payload = ctx.codec_encode("sc_35011", data)
     if not payload:
         raise ValueError("介质攫取刷新帧 sc_35011 编码失败")

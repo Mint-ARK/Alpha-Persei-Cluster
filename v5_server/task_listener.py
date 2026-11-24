@@ -15,6 +15,14 @@ from account_db import savepoint_transaction
 
 logger = logging.getLogger("task_listener")
 
+_TASK_PROGRESS_UPSERT = """
+    INSERT INTO task (uid, task_id, task_type, progress, expired_ts) VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(uid, task_id) DO UPDATE SET
+        progress = excluded.progress,
+        task_type = excluded.task_type,
+        expired_ts = CASE WHEN COALESCE(task.expired_ts,0)=0 THEN excluded.expired_ts ELSE task.expired_ts END
+"""
+
 
 def _task_parameter_values(raw_value):
     """Parse assignmentcfg additional_parameter into integer values."""
@@ -78,18 +86,7 @@ def _shop_task_matches(raw_value, shop_id):
         return False
 
 
-def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=False,
-                            task_type_filter=None, activity_zero_only=False,
-                            param_candidates=None):
-    """
-    通用任务条件进度推进核心函数。
-    1. 查询所有未领取的、匹配 condition 的任务；
-    2. 匹配 additional_parameter（如有），候选参数任一匹配只推进一次；
-    3. 计算 new_progress = min(need, old_progress + delta)；
-    4. 若有真实变化，原子更新数据库并收集；
-    5. 返回变化列表: [{id: tid, progress: new_prog, complete_flag: 0}]
-    """
-    cond_int = int(condition)
+def _task_condition_candidates(db, uid, condition, task_type_filter=None, activity_zero_only=False):
     # 以 task_cfg 为主表，LEFT JOIN task 表，按需激活老账号缺省任务
     extra_where = ""
     extra_params = []
@@ -98,7 +95,7 @@ def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=F
         extra_params.append(int(task_type_filter))
     if activity_zero_only:
         extra_where += " AND COALESCE(c.activity_id, 0) = 0"
-    rows = db.query(
+    return db.query(
         f"""
         SELECT c.task_id, t.task_id as in_task, COALESCE(t.progress, 0) as progress, 
                COALESCE(c.need, 1) as need, c.additional_parameter, c.task_type,
@@ -126,8 +123,23 @@ def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=F
           )
           {extra_where}
         """,
-        (uid, cond_int, uid, *extra_params)
+        (uid, condition, uid, *extra_params)
     )
+
+
+def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=False,
+                            task_type_filter=None, activity_zero_only=False,
+                            param_candidates=None):
+    """
+    通用任务条件进度推进核心函数。
+    1. 查询所有未领取的、匹配 condition 的任务；
+    2. 匹配 additional_parameter（如有），候选参数任一匹配只推进一次；
+    3. 计算 new_progress = min(need, old_progress + delta)；
+    4. 若有真实变化，原子更新数据库并收集；
+    5. 返回变化列表: [{id: tid, progress: new_prog, complete_flag: 0}]
+    """
+    cond_int = int(condition)
+    rows = _task_condition_candidates(db, uid, cond_int, task_type_filter, activity_zero_only)
     if cond_int == 329001:
         return []  # Skuld projects persistent logical nodes.
     if 340001 <= cond_int <= 340009:
@@ -197,13 +209,7 @@ def _trigger_task_condition(db, uid, condition, delta=1, param=None, set_value=F
             if r['in_task'] is None and task_type in (5, 6, 7, 8, 901, 902, 1101, 3001):
                 from task_cycle_notifications import task_expiry_for_type
                 expiry = task_expiry_for_type(task_type)
-            db.execute(
-                """INSERT INTO task (uid, task_id, task_type, progress, expired_ts) VALUES (?, ?, ?, ?, ?)
-                   ON CONFLICT(uid, task_id) DO UPDATE SET progress = excluded.progress,
-                   task_type = excluded.task_type,
-                   expired_ts = CASE WHEN COALESCE(task.expired_ts,0)=0 THEN excluded.expired_ts ELSE task.expired_ts END""",
-                (uid, tid, task_type, new_prog, expiry)
-            )
+            db.execute(_TASK_PROGRESS_UPSERT, (uid, tid, task_type, new_prog, expiry))
             change = {
                 "id": tid,
                 "progress": new_prog,
@@ -582,6 +588,47 @@ def on_player_level_up(ctx, uid, old_lv=1, new_lv=1, stamina_gain=0, **kwargs):
 
 # ==================== 家园图鉴全量自愈服务 ====================
 
+def _sync_main_story_stage_tasks(db, uid):
+    with savepoint_transaction(db):
+        cleared_stages = set()
+        chapter_rows = db.query(
+            "SELECT id FROM chapter WHERE uid=? AND COALESCE(clear_times, 0) > 0 ORDER BY id",
+            (uid,)
+        )
+        for row in chapter_rows:
+            try:
+                stage_id = int(row.get("id") or 0)
+            except (TypeError, ValueError):
+                continue
+            if stage_id > 0:
+                cleared_stages.add(stage_id)
+        if not cleared_stages:
+            return []
+
+        pending = []
+        rows = _task_condition_candidates(db, uid, 401, task_type_filter=3, activity_zero_only=True)
+        for row in rows:
+            progress = min(int(row["need"] or 1), 1)
+            if progress <= int(row["progress"] or 0):
+                continue
+            first_match = min(
+                (stage_id for stage_id in _task_parameter_values(row["additional_parameter"])
+                 if stage_id in cleared_stages),
+                default=None,
+            )
+            if first_match is not None:
+                pending.append((first_match, row["task_id"], progress))
+
+        if pending:
+            # Preserve the original first-matching-stage order, including ties.
+            pending.sort(key=lambda change: change[0])
+            db.executemany(_TASK_PROGRESS_UPSERT, (
+                (uid, task_id, 3, progress, 0) for _, task_id, progress in pending
+            ))
+
+    return [dict(id=task_id, progress=progress, complete_flag=0) for _, task_id, progress in pending]
+
+
 def sync_cleared_stage_tasks(db, uid):
     """Idempotently restore missing main-story cond=401 progress from chapter clear facts.
 
@@ -592,21 +639,7 @@ def sync_cleared_stage_tasks(db, uid):
         return []
     changed = []
     try:
-        rows = db.query(
-            "SELECT id FROM chapter WHERE uid=? AND COALESCE(clear_times, 0) > 0 ORDER BY id",
-            (uid,)
-        )
-        for row in rows or []:
-            try:
-                stage_id = int(row.get("id") or 0)
-            except (TypeError, ValueError):
-                continue
-            if stage_id <= 0:
-                continue
-            changed.extend(_trigger_task_condition(
-                db, uid, condition=401, delta=1, param=stage_id, set_value=True,
-                task_type_filter=3, activity_zero_only=True
-            ))
+        changed = _sync_main_story_stage_tasks(db, uid)
     except Exception as exc:
         logger.warning("sync_cleared_stage_tasks failed for uid=%s: %s", uid, exc)
     # Chapter19 completion is a dedicated permanent task counter, including old
