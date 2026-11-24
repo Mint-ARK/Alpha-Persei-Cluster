@@ -96,7 +96,7 @@ def prepare_skin_draw_login(db, uid, version, generator):
     return result, has_draws
 
 
-def send_login_flood(sock, db, uid, generator, frame_delay=0.001, log=None):
+def send_login_flood(sock, db, uid, generator, frame_delay=0.0, log=None):
     """发送登录洪流：
     - dynamic=1 帧优先调用 generator 业务生成器动态生成；
     - dynamic=0 帧从 payload_json 读取字典并通过 codec.encode 现场编码；

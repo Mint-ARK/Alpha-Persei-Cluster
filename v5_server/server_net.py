@@ -2101,7 +2101,7 @@ def start_https(app, port, cert_file=None, key_file=None, *, http_port=80, bind_
 
 
 def start_game_server(port, core, db, generator, codec_encode, codec_decode,
-                      replay=None, material=None, frame_delay=0.001):
+                      replay=None, material=None, frame_delay=0.0):
     """启动 game TCP 服务器（main 装配用）。返回 server 对象（serve_forever 前）。"""
     srv = ThreadedServer(("0.0.0.0", port), GameHandler)
     srv.core = core

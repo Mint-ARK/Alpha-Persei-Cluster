@@ -120,7 +120,7 @@ def main(argv=None, *, launcher_arg_count=None):
                     default=argparse.SUPPRESS, help="使用默认 DNS 上游")
     ap.add_argument("--replay", default="", metavar="素材目录",
                     help="激活重放模块并指定素材目录（如 archive/20260805_全流程_服务器2_蒂卡拉/complete_replay）")
-    ap.add_argument("--frame-delay", type=float, default=0.001, help="重放帧间延迟")
+    ap.add_argument("--frame-delay", type=float, default=0.0, help="登录帧间等待（秒，0 为关闭）")
     ap.add_argument("--frame-override", default="", help="覆盖帧 bin（改数据）")
     ap.add_argument("--battle-port", type=int, default=6105,
                     help="UDP 动态战斗服端口（0=禁用；sc_54007 下发给客户端）")
