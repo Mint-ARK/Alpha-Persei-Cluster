@@ -46,7 +46,20 @@ public sealed partial class MainPage : Page
         "packaging.ys4fun.com",
         "ta.ys4fun.com",
         "webstatic.ys4fun.com",
-        "ys4fun-prod-pub.ys4fun.com"
+        "web-static.ys4fun.com",
+        "ys4fun-prod-pub.ys4fun.com",
+        "wpg-api.biligame.com",
+        "wpg.biligame.com",
+        "line3-sdk-app-api.biligame.net",
+        "line1-sdk-app-api.biligame.net",
+        "line1-realtime-api.biligame.net",
+        "line3-realtime-api.biligame.net",
+        "realtime.api.biligame.com",
+        "pkgdl.biligame.net",
+        "line1-log.biligame.net",
+        "line3-log.biligame.net",
+        "sdk.biligame.com",
+        "static.biligame.com"
     ];
     private const string HostsHeaderTag = "# >>> Local Server Hosts Redirect Begin >>>";
     private const string HostsFooterTag = "# <<< Local Server Hosts Redirect End <<<";

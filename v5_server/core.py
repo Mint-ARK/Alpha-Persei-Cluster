@@ -102,17 +102,18 @@ class Connection:
     """
 
     __slots__ = ("uid", "db", "generator", "codec_encode", "codec_decode",
-                 "log", "battle_id", "battle_stage", "battle_seq",
+                 "log", "peer_ip", "battle_id", "battle_stage", "battle_seq",
                  "chat_srv", "seq", "_ctx", "send_push", "login_ready", "client_platform", "resource_version")
 
     def __init__(self, uid=0, db=None, generator=None, codec_encode=None, codec_decode=None,
-                 log=None):
+                 log=None, peer_ip=None):
         self.uid = uid
         self.db = db
         self.generator = generator
         self.codec_encode = codec_encode
         self.codec_decode = codec_decode
         self.log = log
+        self.peer_ip = peer_ip
         self.battle_id = [None]
         self.battle_stage = [0]
         self.battle_seq = [0]
@@ -129,13 +130,15 @@ class Connection:
         if self._ctx is None:
             self._ctx = HandlerCtx(cfg={}, db=self.db, generator=self.generator,
                                    codec_encode=self.codec_encode,
-                                   codec_decode=self.codec_decode, log=self.log)
+                                   codec_decode=self.codec_decode, log=self.log,
+                                   peer_ip=self.peer_ip)
             # 同步连接级状态
             self._ctx.battle_id = self.battle_id
             self._ctx.battle_stage = self.battle_stage
             self._ctx.battle_seq = self.battle_seq
             self._ctx.chat_srv = self.chat_srv
             self._ctx.send_push = getattr(self, "send_push", None)
+        self._ctx.peer_ip = self.peer_ip
         self._ctx.client_platform = self.client_platform
         self._ctx.resource_version = self.resource_version
         return self._ctx

@@ -8,7 +8,7 @@ import time
 
 UPSTREAM_DNS = ("223.5.5.5", 53)
 UPSTREAM_DNS_BACKUP = ("114.114.114.114", 53)
-HIJACK_SUFFIXES = ("ys4fun.com", "ys4fun.cn", "soboten.com")
+HIJACK_SUFFIXES = ("ys4fun.com", "ys4fun.cn", "soboten.com", "biligame.com", "biligame.net")
 MAX_MESSAGE = 65535
 
 

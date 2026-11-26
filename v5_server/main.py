@@ -310,6 +310,7 @@ def main(argv=None, *, launcher_arg_count=None):
             log(f"CDN 本机出站 IP: {outbound_ip}", module="NET")
     cdn_proxy.set_capture_mode(capture_mode)
     log(f"对外发布 IP: {host_ip}", module="NET")
+    server_net.set_host_ip_explicit(bool(args.host_ip and args.host_ip.strip()))
 
     if args.self_check:
         print("=== 深空之眼单机服务核心自检 ===")

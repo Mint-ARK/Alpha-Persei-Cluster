@@ -35,8 +35,15 @@ CERT_DNS_NAMES = (
     "open.ys4fun.com", "account.ys4fun.com", "skzy.ys4fun.com",
     "download.ys4fun.com", "download-eo.ys4fun.com", "prod-api-activity.ys4fun.com",
     "packaging.ys4fun.com", "ta.ys4fun.com", "webstatic.ys4fun.com",
-    "ys4fun-prod-pub.ys4fun.com", "m.bbs.ys4fun.com", "bbs.ys4fun.com",
+    "web-static.ys4fun.com", "ys4fun-prod-pub.ys4fun.com", "m.bbs.ys4fun.com",
+    "bbs.ys4fun.com", "wpg-api.biligame.com", "wpg.biligame.com",
+    "line3-sdk-app-api.biligame.net", "line1-sdk-app-api.biligame.net",
+    "line1-realtime-api.biligame.net", "line3-realtime-api.biligame.net",
+    "realtime.api.biligame.com", "pkgdl.biligame.net",
+    "line1-log.biligame.net", "line3-log.biligame.net",
+    "sdk.biligame.com", "static.biligame.com",
     "soboten.com", "*.soboten.com", "*.ys4fun.com", "*.ys4fun.cn",
+    "*.biligame.com", "*.biligame.net", "biligame.com", "biligame.net",
     "ys4fun.com", "ys4fun.cn", "localhost",
 )
 
@@ -256,6 +263,41 @@ def get_default_lan_ip():
     """获取本机首选局域网 IPv4 地址。"""
     ips = get_all_lan_ips()
     return ips[0] if ips else "192.168.0.105"
+
+
+def normalize_ip_text(raw):
+    """Normalize IPv4/IPv6 text, unwrapping IPv4-mapped IPv6 addresses when valid."""
+    text = str(raw or "").strip()
+    if not text:
+        return ""
+    try:
+        addr = ipaddress.ip_address(text)
+        addr = getattr(addr, "ipv4_mapped", None) or addr
+        return str(addr)
+    except ValueError:
+        return text
+
+
+def is_loopback_ip(raw):
+    """Return True if raw parses as a loopback address or equals localhost."""
+    text = str(raw or "").strip()
+    if not text:
+        return False
+    if text.lower() == "localhost":
+        return True
+    try:
+        addr = ipaddress.ip_address(text)
+        addr = getattr(addr, "ipv4_mapped", None) or addr
+        return addr.is_loopback
+    except ValueError:
+        return False
+
+
+def resolve_client_target_ip(peer_ip, advertised_ip, *, allow_loopback=True):
+    """Return '127.0.0.1' for direct loopback peers when allowed, else advertised_ip."""
+    if allow_loopback and is_loopback_ip(peer_ip):
+        return "127.0.0.1"
+    return advertised_ip
 
 
 def generate_dual_layer_certs(output_dir=None, extra_ips=None, log=print, force=False, force_ca=False):

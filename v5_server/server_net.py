@@ -34,6 +34,7 @@ import gen_cert                # noqa: E402  局域网 IP 与证书工具
 from logger import log as _logger_log
 
 _HOST_IP = [gen_cert.get_default_lan_ip()]
+_HOST_IP_EXPLICIT = [True]
 
 
 def get_host_ip():
@@ -45,6 +46,16 @@ def set_host_ip(ip):
     """设置宿主机局域网 IP。"""
     if ip and ip != "0.0.0.0":
         _HOST_IP[0] = str(ip)
+
+
+def set_host_ip_explicit(explicit):
+    """Record whether the configured host IP came from an explicit override."""
+    _HOST_IP_EXPLICIT[0] = bool(explicit)
+
+
+def is_host_ip_explicit():
+    """Return True when the published host IP was explicitly supplied."""
+    return bool(_HOST_IP_EXPLICIT[0])
 
 
 _LATEST_CLIENT_PLATFORM = ["pc"]
@@ -391,7 +402,8 @@ class GameHandler(socketserver.StreamRequestHandler):
                                    generator=self.server.generator,
                                    codec_encode=self.server.codec_encode,
                                    codec_decode=self.server.codec_decode,
-                                   log=self.server.core.log)
+                                   log=self.server.core.log,
+                                   peer_ip=self.client_address[0])
 
         sent_sc_counts = collections.defaultdict(int)
         self.sent_sc_counts = sent_sc_counts
@@ -654,7 +666,7 @@ class GatewayHandler(socketserver.StreamRequestHandler):
                         sock_ip = self.request.getsockname()[0] if hasattr(self.request, "getsockname") else "127.0.0.1"
                         peer_ip = self.client_address[0] if hasattr(self, "client_address") else "127.0.0.1"
                         lan_ip = getattr(self.server, "host_ip", None) or _HOST_IP[0] or get_host_ip()
-                        game_ip = "127.0.0.1" if peer_ip in ("127.0.0.1", "::1") else lan_ip
+                        game_ip = gen_cert.resolve_client_target_ip(peer_ip, lan_ip)
 
                         from save_slot_manager import (
                             get_slot_manager, port_to_slot_id, switch_active_database,
@@ -959,7 +971,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
 
     def pc_startup_peer():
         peer = request.remote_addr or ''
-        local = peer in ('127.0.0.1', '::1')
+        local = gen_cert.is_loopback_ip(peer)
         forwarded = request.headers.get('X-Real-IP') if local else None
         return forwarded or peer, local and not forwarded and not request.headers.get('X-Forwarded-For')
 
@@ -1053,13 +1065,27 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
 
         raw_body = request.get_data()
         b_preview = raw_body[:300]
-        b_str = f" body={b_preview.decode('utf-8', errors='ignore')}" if b_preview else ""
+        is_bili_sdk = (
+            host.endswith((".biligame.com", ".biligame.net"))
+            or host in ("biligame.com", "biligame.net")
+            or path.startswith(("/api/pcg/", "/api/agreement/", "/api/external/", "/app/pcg/", "/collector/api/", "/tool/pcgame/", "/cg/api/"))
+        )
+        if is_bili_sdk or "access_key=" in qs or "channelLoginRespInfo" in raw_body.decode("utf-8", errors="ignore"):
+            print(f"[HTTPS] [{request.method}] from={request.headers.get('X-Forwarded-For') or request.remote_addr or ''} host={host} path={path} (sdk redacted)", flush=True)
+        else:
+            b_str = f" body={b_preview.decode('utf-8', errors='ignore')}" if b_preview else ""
+            client_ip = request.headers.get("X-Forwarded-For") or request.remote_addr or ""
+            print(f"[HTTPS] [{request.method}] from={client_ip} host={host} path={path} qs={qs}{b_str}", flush=True)
         client_ip = request.headers.get("X-Forwarded-For") or request.remote_addr or ""
         ua = request.headers.get("User-Agent", "")
-        print(f"[HTTPS] [{request.method}] from={client_ip} host={host} path={path} qs={qs}{b_str}", flush=True)
 
         # 详细抓取客户端日志上报（崩溃、初始化异常、埋点）
-        if "log" in path or "report" in path or "client" in path or "ta.ys4fun" in host:
+        if (
+            not is_bili_sdk
+            and "channelLoginRespInfo" not in raw_body.decode("utf-8", errors="ignore")
+            and not path.endswith(("/pass/user/login", "/pass/user/logout"))
+            and ("log" in path or "report" in path or "client" in path or "ta.ys4fun" in host)
+        ):
             try:
                 body_decoded = raw_body.decode("utf-8", errors="ignore")
                 print(f"[CLIENT REPORT] path={path} host={host} UA={ua}\n  BODY={body_decoded}", flush=True)
@@ -1073,6 +1099,17 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, HEAD"
             resp.headers["Access-Control-Allow-Headers"] = "*"
             return resp
+
+        from bilibili_sdk import dispatch_bilibili_request
+        _bili_req_json = request.get_json(silent=True) or {}
+        _bili_hit = dispatch_bilibili_request(host, path, request.args, request.form, _bili_req_json)
+        if _bili_hit is not None:
+            _b_status, _b_payload, _b_mime = _bili_hit
+            if isinstance(_b_payload, (bytes, bytearray)):
+                return Response(_b_payload, status=_b_status, mimetype=_b_mime)
+            _b_resp = jsonify(_b_payload)
+            _b_resp.status_code = _b_status
+            return _b_resp
 
         static_web_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static_web")
 
@@ -1556,21 +1593,29 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                 })
 
             # 默认返回区服列表 (action=server)
+            from gen_cert import is_loopback_ip, resolve_client_target_ip
+            from server_net import is_host_ip_explicit
             mix_id = request.args.get("mixId", str(_gen.DEFAULT_UID))
-            client_ip = (request.headers.get("X-Real-IP") or
-                         request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or
-                         request.remote_addr or "")
-            if lan_ip and lan_ip not in ("127.0.0.1", "::1", "localhost"):
-                gw_ip = lan_ip
+            raw_peer = (request.remote_addr or "").strip()
+            forwarded_ip = (
+                request.headers.get("X-Real-IP") or
+                request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+            )
+            client_ip = forwarded_ip or raw_peer
+            direct_loopback = is_loopback_ip(raw_peer) and not forwarded_ip
+            if is_loopback_ip(lan_ip):
+                gw_ip = resolve_client_target_ip(client_ip, lan_ip)
+            elif direct_loopback and not is_host_ip_explicit():
+                gw_ip = "127.0.0.1"
             else:
-                gw_ip = "127.0.0.1" if client_ip in ("127.0.0.1", "::1") else lan_ip
+                gw_ip = lan_ip
 
             # 动态生成多存档自适应区服列表 (Slot 1..32)
             from save_slot_manager import get_slot_manager
             slot_mgr = get_slot_manager()
             slot_mgr.base_port = gw_port
             slot_mgr.game_port = game_port
-            slot_mgr.configure_host(gw_ip)
+            slot_mgr.configure_host(lan_ip or gw_ip)
             refresh_started = time.monotonic()
             refresh_result = slot_mgr.wait_for_gateway_refresh(client_ip)
             core.log(f"[SDK] 区服刷新 {refresh_result}, "
@@ -1761,14 +1806,21 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             pay_on = (db.get_system_config("ios_pay_enabled", "0") == "1") if db else False
             return bool(curr_ver == "229" and plat == "ios" and pay_on)
 
-        # 7. Mix SDK 登录（/mix-sdk-api/pass/user/login）
+        # 7. Mix SDK 登录（/mix-sdk-api/pass/user/login）与登出
+        if "mix-sdk-api" in path and path.endswith("/pass/user/logout"):
+            return jsonify({"errorCode": "0"})
+
         if "mix-sdk-api" in path and path.endswith("/pass/user/login"):
             from client_version import http_platform
             platform = http_platform(request)
             record_client_platform(platform)
             from res_version_manager import PLATFORM_CHANNEL_IDS
-            channel_id = int(PLATFORM_CHANNEL_IDS[platform])
-            channel_user_id = "1012030496969579190"
+            from res_version_manager import PLATFORM_CHANNEL_IDS
+            from bilibili_sdk import extract_mix_channel_login
+            _req_json = request.get_json(silent=True) or {}
+            channel_id, target_channel_id, channel_user_id = extract_mix_channel_login(
+                request.args, request.form, _req_json, int(PLATFORM_CHANNEL_IDS[platform])
+            )
             # The PC SDK expects a long JSON id. Keep the SDK account stable
             # across save switches, including saves with small role UIDs.
             mix_uid = _gen.LEGACY_UID
@@ -1791,7 +1843,7 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
                     "totalRecharge": 0,
                     "registerFlag": False,
                     "inviteLimit": False,
-                    "targetChannelId": 7
+                    "targetChannelId": target_channel_id
                 }
             })
 
@@ -1943,8 +1995,8 @@ def build_https_app(core, material=None, game_port=8105, gw_port=8102, host_ip=N
             ).lower()
             chid = str(request.args.get("channelId") or request.form.get("channelId") or req_json.get("channelId") or "")
             # Official Mix SDK request channels, distinct from Manifest plugin IDs.
-            # Android official and iOS both use 7; PC official uses 9.
-            known_channels = {'9': ('pc',), '7': ('ios', 'android')}
+            # Android official and iOS both use 7; PC official uses 9; PC Bilibili uses 10.
+            known_channels = {'9': ('pc',), '10': ('pc',), '7': ('ios', 'android')}
             if plat in ('pc', 'android', 'ios') and chid in known_channels and plat not in known_channels[chid]:
                 return jsonify({'errorCode': '1', 'errorMsg': '平台与渠道不匹配', 'data': []})
             from client_version import http_platform
