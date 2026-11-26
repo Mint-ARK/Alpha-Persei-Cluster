@@ -842,8 +842,12 @@ class SaveSlotManager:
 
     def build_zones_response(self, client_ip: str, host_ip: str, game_port: int = DEFAULT_GAME_PORT) -> List[Dict[str, Any]]:
         """为 /gateway/get?action=server 生成自适应的区服列表下行数据"""
+        from gen_cert import is_loopback_ip
         self.game_port = game_port
-        self.configure_host(host_ip)
+        # Keep an already configured LAN/public host IP so local 127.0.0.1 and
+        # LAN peers still resolve to the same local session key.
+        if not (self._host_ip and is_loopback_ip(host_ip) and not is_loopback_ip(self._host_ip)):
+            self.configure_host(host_ip)
         state = self.get_session_state(client_ip)
         mapping = self._create_menu_mapping() if state == STATE_CREATE_MODE else self.get_slot_mapping()
         zones: List[Dict[str, Any]] = []

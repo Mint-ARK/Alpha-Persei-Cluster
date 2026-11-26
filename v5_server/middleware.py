@@ -137,12 +137,13 @@ class CSResponse:
 class HandlerCtx:
     """handler 运行上下文：V4.1 连接级状态 + 配置 + 库。每个连接一个实例。"""
 
-    def __init__(self, cfg=None, db=None, generator=None, codec_encode=None, codec_decode=None, log=None):
+    def __init__(self, cfg=None, db=None, generator=None, codec_encode=None, codec_decode=None, log=None, peer_ip=None):
         self.cfg = cfg or {}
         self.db = db
         self.generator = generator          # lib/generator 模块（结算推送 15009/17009）
         self.codec_encode = codec_encode    # codec.encode
         self.codec_decode = codec_decode    # codec.decode
+        self.peer_ip = peer_ip
         # 默认落盘日志器；外部可注入自定义 log（测试/对接时）
         self._log_sink = log or (lambda msg, level="INFO", **kw: _file_log(msg, level, **kw))
         self.log_failure_count = 0
@@ -2431,9 +2432,10 @@ def h_54030(req, ctx):
     if not isinstance(_p03, (bytes, bytearray, memoryview)) or not _p03:
         raise ValueError('Dynamic sc_54003 is missing')
     _p03 = bytes(_p03)
+    from gen_cert import resolve_client_target_ip
     next_seq = [ctx.battle_seq[0]]
     bid = _gen_battle_id(next_seq)
-    battle_ip = _BATTLE_IP[0] or "127.0.0.1"
+    battle_ip = resolve_client_target_ip(getattr(ctx, "peer_ip", None), _BATTLE_IP[0] or "127.0.0.1")
     _p07 = ctx.codec_encode("sc_54007", {"battle_start": {
         "result": 0, "battle_id": bid, "battle_server_ip": battle_ip,
         "battle_server_port": str(_BATTLE_PORT[0])}}) if ctx.codec_encode else None

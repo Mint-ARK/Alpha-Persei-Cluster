@@ -348,7 +348,7 @@
                                                    FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                         
                                         <Border Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="6" Padding="12,8">
-                                            <TextBlock x:Name="TxtHostsDetail" Text="目标路由域名 (10项): open.ys4fun.com, prod-api-activity.ys4fun.com, account.ys4fun.com 等"
+                                            <TextBlock x:Name="TxtHostsDetail" Text="目标路由域名 (23项): open.ys4fun.com, prod-api-activity.ys4fun.com, wpg-api.biligame.com 等"
                                                        FontSize="11" FontFamily="Consolas, Cascadia Code" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextWrapping="Wrap"/>
                                         </Border>
 

@@ -183,6 +183,50 @@ class AddressTests(unittest.TestCase):
         self.assertEqual(advertised, ['43.139.154.74'])
         self.assertEqual(cdn._source_ip(), '10.1.0.11')
 
+    def test_auto_detected_desktop_host_routes_loopback_peers_to_127(self):
+        import core as core_mod
+        import middleware as mw
+        import save_slot_manager as slots
+        import server_net
+
+        manager = slots.SaveSlotManager.__new__(slots.SaveSlotManager)
+        manager._lock = __import__('threading').RLock()
+        manager._refresh_condition = __import__('threading').Condition()
+        manager._refresh_clients = {}
+        manager._sessions = {}
+        manager._host_ip = ''
+        manager.base_port = 8102
+        manager.game_port = 8105
+        slot_info = slots.SaveSlotInfo(3, 8104, None, 'save', 42, 'tester', 1, 1792828800, True, False, 'save')
+
+        with patch.object(server_net, '_HOST_IP_EXPLICIT', [False]), \
+             patch.object(slots, 'get_slot_manager', return_value=manager), \
+             patch.object(manager, 'get_slot_mapping', return_value={3: slot_info}):
+            app = server_net.build_https_app(NS(log=lambda *a, **k: None), host_ip='192.168.31.158')
+            client = app.test_client()
+            for remote in ('127.0.0.1', '::1', '::ffff:127.0.0.1'):
+                with self.subTest(remote=remote):
+                    data = client.get('/skzy-activity/gateway/get?action=server',
+                                      environ_base={'REMOTE_ADDR': remote}).get_json()
+                    self.assertEqual({row['ip'] for row in data['data']}, {'127.0.0.1'})
+            self.assertEqual(manager._host_ip, '192.168.31.158')
+            self.assertEqual(manager._session_key('127.0.0.1'), '__local_client__')
+            self.assertEqual(manager._session_key('192.168.31.158'), '__local_client__')
+
+            lan_data = client.get('/skzy-activity/gateway/get?action=server',
+                                  environ_base={'REMOTE_ADDR': '192.168.31.88'}).get_json()
+            self.assertEqual({row['ip'] for row in lan_data['data']}, {'192.168.31.158'})
+            proxied = client.get('/skzy-activity/gateway/get?action=server',
+                                 headers={'X-Real-IP': '192.168.31.88'},
+                                 environ_base={'REMOTE_ADDR': '127.0.0.1'}).get_json()
+            self.assertEqual({row['ip'] for row in proxied['data']}, {'192.168.31.158'})
+
+        local_ctx = core_mod.Connection(peer_ip='::ffff:127.0.0.1').to_handler_ctx()
+        remote_ctx = core_mod.Connection(peer_ip='192.168.31.88').to_handler_ctx()
+        with patch.object(mw, '_BATTLE_IP', ['192.168.31.158']):
+            self.assertEqual(gen_cert.resolve_client_target_ip(local_ctx.peer_ip, mw._BATTLE_IP[0]), '127.0.0.1')
+            self.assertEqual(gen_cert.resolve_client_target_ip(remote_ctx.peer_ip, mw._BATTLE_IP[0]), '192.168.31.158')
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
